@@ -4,19 +4,24 @@ import Proposal from "../models/Proposal";
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
-  async create(
-    args: { abstract: any; status: any; users: any },
+  create(
+    args: { abstract: string; status: number; users: Array<number> },
     context: {
       repository: {
-        proposal: { create: (arg0: any, arg1: any, arg2: any) => number };
+        proposal: {
+          create: (
+            abstract: string,
+            status: number,
+            users: Array<number>
+          ) => any;
+        };
       };
     }
   ) {
-    const id = context.repository.proposal.create(
-      args.abstract,
-      args.status,
-      args.users
-    );
-    return new Proposal(id, args.abstract, args.status);
+    return context.repository.proposal
+      .create(args.abstract, args.status, args.users)
+      .then((id: number) =>
+        id ? new Proposal(id, args.abstract, args.status) : null
+      );
   }
 }
