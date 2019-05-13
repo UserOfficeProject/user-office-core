@@ -14,6 +14,19 @@ export default class UserRepository {
       );
   }
 
+  async create(firstname: string, lastname: string) {
+    return database
+      .insert({
+        firstname: firstname,
+        lastname: lastname
+      })
+      .returning("user_id")
+      .into("users")
+      .then(
+        (user_id: Array<number>) => new User(user_id[0], firstname, lastname)
+      );
+  }
+
   async getUsers() {
     return database
       .select()

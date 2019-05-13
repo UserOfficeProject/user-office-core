@@ -16,8 +16,10 @@ export default class ProposalMutations {
           ) => any;
         };
       };
+      messageBroker: any;
     }
   ) {
+    context.messageBroker.sendMessage("Proposal Created");
     return context.repository.proposal
       .create(args.abstract, args.status, args.users)
       .then((id: number) =>

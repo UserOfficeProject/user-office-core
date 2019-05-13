@@ -16,7 +16,7 @@ export default class ProposalRepository {
   }
 
   async create(abstract: string, status: number, users: Array<number>) {
-    var id: any = null;
+    var id: any = null; // not happy with this
     return database.transaction(function(trx: { commit: any; rollback: any }) {
       return database
         .insert({

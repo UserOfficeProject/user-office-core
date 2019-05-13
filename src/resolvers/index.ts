@@ -21,6 +21,16 @@ export default {
   ) {
     return context.mutations.proposal.create(args, context);
   },
+  createUser: function(
+    args: { firstname: string; lastname: string },
+    context: {
+      repository: {
+        user: { create: (arg0: any, arg1: any) => void };
+      };
+    }
+  ) {
+    return context.repository.user.create(args.firstname, args.lastname);
+  },
   user: function(
     args: { id: string },
     context: { repository: { user: { get: (arg0: any) => void } } }
