@@ -1,8 +1,36 @@
 import Proposal from "../models/Proposal";
+import { ProposalDataSource } from "./ProposalInterface";
 import database from "../database";
 import BluePromise from "bluebird";
 
-export default class ProposalRepository {
+export default class ProposalRepository implements ProposalDataSource {
+  acceptProposal(id: number): Promise<Proposal | null> {
+    return database
+      .update(
+        {
+          status: 5
+        },
+        ["proposal_id", "abstract", "status"]
+      )
+      .from("proposals")
+      .where("proposal_id", id)
+      .then(
+        (
+          proposal: [
+            {
+              proposal_id: number;
+              abstract: string;
+              status: number;
+            }
+          ]
+        ) =>
+          new Proposal(
+            proposal[0].proposal_id,
+            proposal[0].abstract,
+            proposal[0].status
+          )
+      );
+  }
   async get(id: number) {
     return database
       .select()

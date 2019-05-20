@@ -1,1 +1,7 @@
-// This is where we would check if a user is allowed to do something and maybe aggregate information
+import { ProposalDataSource } from "../repositories/ProposalInterface";
+
+export default class Queries {
+  get(id: number, proposalDataSource: ProposalDataSource) {
+    return proposalDataSource.get(id);
+  }
+}

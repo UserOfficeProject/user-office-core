@@ -8,7 +8,6 @@ export default class messageBroker {
   }
 
   sendMessage(msg: string) {
-    console.log("sendmessage");
     this.conn
       .then((connection: any) => {
         return connection.createChannel();

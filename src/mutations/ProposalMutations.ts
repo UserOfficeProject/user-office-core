@@ -1,5 +1,5 @@
 import Proposal from "../models/Proposal";
-
+import { ProposalDataSource } from "../repositories/ProposalInterface";
 // TODO: we should probably create object typ here instead of the repository to make that more basic
 // TODO: it is here much of the logic reside
 
@@ -25,5 +25,14 @@ export default class ProposalMutations {
       .then((id: number) =>
         id ? new Proposal(id, args.abstract, args.status) : null
       );
+  }
+
+  accept(proposalID: number, dataSource: ProposalDataSource) {
+    let userID = 1;
+
+    if (userID !== 1) {
+      return null;
+    }
+    return dataSource.acceptProposal(proposalID);
   }
 }

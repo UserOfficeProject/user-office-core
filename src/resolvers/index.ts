@@ -1,9 +1,6 @@
 export default {
-  proposal: function(
-    args: { id: string },
-    context: { repository: { proposal: { get: (arg0: string) => void } } }
-  ) {
-    return context.repository.proposal.get(args.id);
+  proposal: function(args: any, context: any) {
+    return context.query.proposal.get(args.id, context.repository.proposal);
   },
   proposals: function(
     args: any,
@@ -20,6 +17,12 @@ export default {
     }
   ) {
     return context.mutations.proposal.create(args, context);
+  },
+  approveProposal: function(args: { id: number }, context: any) {
+    return context.mutations.proposal.accept(
+      args.id,
+      context.repository.proposal
+    );
   },
   createUser: function(
     args: { firstname: string; lastname: string },

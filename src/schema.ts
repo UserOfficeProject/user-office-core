@@ -10,6 +10,7 @@ type Query {
 
   type Mutation {
     createProposal(abstract: String!, status: Int!, users: [Int!]): Proposal
+    approveProposal(id: Int!): Proposal
     createUser(firstname: String!, lastname: String!): User
   }
 
