@@ -4,7 +4,7 @@ import database from "../database";
 import BluePromise from "bluebird";
 
 export default class ProposalRepository implements ProposalDataSource {
-  acceptProposal(id: number): Promise<Proposal | null> {
+  public acceptProposal(id: number): Promise<Proposal | null> {
     return database
       .update(
         {
@@ -43,7 +43,7 @@ export default class ProposalRepository implements ProposalDataSource {
       );
   }
 
-  async create(abstract: string, status: number, users: Array<number>) {
+  async create(abstract: string, status: number, users: number[]) {
     var id: any = null; // not happy with this
     return database.transaction(function(trx: { commit: any; rollback: any }) {
       return database
@@ -54,8 +54,8 @@ export default class ProposalRepository implements ProposalDataSource {
         .returning("proposal_id")
         .into("proposals")
         .transacting(trx)
-        .then(function(proposal_id: Array<number>) {
-          id = proposal_id[0];
+        .then(function(proposalID: number[]) {
+          id = proposalID[0];
           return BluePromise.map(users, (user_id: number) => {
             return database
               .insert({ proposal_id: id, user_id: user_id })
@@ -78,7 +78,7 @@ export default class ProposalRepository implements ProposalDataSource {
     return database
       .select()
       .from("proposals")
-      .then((proposals: Array<any>) =>
+      .then((proposals: any[]) =>
         proposals.map(
           proposal =>
             new Proposal(
@@ -97,7 +97,7 @@ export default class ProposalRepository implements ProposalDataSource {
       .join("proposal_user as pc", { "p.proposal_id": "pc.proposal_id" })
       .join("users as u", { "u.user_id": "pc.user_id" })
       .where("u.user_id", id)
-      .then((proposals: Array<any>) =>
+      .then((proposals: any[]) =>
         proposals.map(
           proposal =>
             new Proposal(

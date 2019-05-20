@@ -1,5 +1,5 @@
 import Proposal from "../models/Proposal";
-
+//This is the agreement between collaborating sites
 export interface ProposalDataSource {
   get(id: number): Promise<Proposal | null>;
   acceptProposal(id: number): Promise<Proposal | null>;
@@ -8,6 +8,6 @@ export interface ProposalDataSource {
   create(
     abstract: string,
     status: number,
-    users: Array<number>
+    users: number[]
   ): Promise<Proposal | null>;
 }

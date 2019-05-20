@@ -7,12 +7,15 @@
     "test": "jest",
     "tsc": "tsc",
     "dev": "ts-node-dev --respawn --transpileOnly ./index.ts",
-    "prod": "tsc && node ./build/app.js"
+    "prod": "tsc && node ./build/app.js",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/express": "^4.16.1",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "amqplib": "^0.5.3",
     "bluebird": "^3.5.4",
     "express": "^4.16.4",
@@ -24,12 +27,12 @@
     "typescript": "^3.4.5"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.12",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.17.0",
-    "@types/jest": "^24.0.12",
     "jest": "^24.7.1",
+    "prettier": "^1.17.0",
     "ts-jest": "^24.0.2"
   }
 }

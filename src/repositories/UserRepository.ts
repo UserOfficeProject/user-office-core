@@ -22,16 +22,14 @@ export default class UserRepository {
       })
       .returning("user_id")
       .into("users")
-      .then(
-        (user_id: Array<number>) => new User(user_id[0], firstname, lastname)
-      );
+      .then((user_id: number[]) => new User(user_id[0], firstname, lastname));
   }
 
   async getUsers() {
     return database
       .select()
       .from("users")
-      .then((users: Array<any>) =>
+      .then((users: any[]) =>
         users.map(user => new User(user.user_id, user.firstname, user.lastname))
       );
   }
@@ -43,7 +41,7 @@ export default class UserRepository {
       .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
-      .then((users: Array<any>) =>
+      .then((users: any[]) =>
         users.map(user => new User(user.user_id, user.firstname, user.lastname))
       );
   }

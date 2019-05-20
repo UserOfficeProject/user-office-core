@@ -9,7 +9,7 @@ export default {
     return context.repository.proposal.getProposals();
   },
   createProposal: function(
-    args: { abstract: string; status: number; users: Array<number> },
+    args: { abstract: string; status: number; users: number[] },
     context: any
   ) {
     return context.mutations.proposal.create(
@@ -21,7 +21,8 @@ export default {
   approveProposal: function(args: { id: number }, context: any) {
     return context.mutations.proposal.accept(
       args.id,
-      context.repository.proposal
+      context.repository.proposal,
+      ["User_Officer"]
     );
   },
   createUser: function(
