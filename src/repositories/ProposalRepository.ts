@@ -65,7 +65,7 @@ export default class ProposalRepository implements ProposalDataSource {
         })
         .then(() => {
           trx.commit;
-          return id;
+          return new Proposal(id, abstract, status);
         })
         .catch(() => {
           trx.rollback;

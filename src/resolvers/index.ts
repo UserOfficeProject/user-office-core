@@ -10,13 +10,13 @@ export default {
   },
   createProposal: function(
     args: { abstract: string; status: number; users: Array<number> },
-    context: {
-      mutations: {
-        proposal: { create: (arg0: any, arg1: any) => void };
-      };
-    }
+    context: any
   ) {
-    return context.mutations.proposal.create(args, context);
+    return context.mutations.proposal.create(
+      args,
+      context.repository.proposal,
+      context.messageBroker
+    );
   },
   approveProposal: function(args: { id: number }, context: any) {
     return context.mutations.proposal.accept(
