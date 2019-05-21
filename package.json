@@ -27,6 +27,7 @@
     "typescript": "^3.4.5"
   },
   "devDependencies": {
+    "@types/express-graphql": "^0.8.0",
     "@types/jest": "^24.0.12",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",

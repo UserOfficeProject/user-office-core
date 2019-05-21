@@ -1,9 +1,10 @@
-import Proposal from "../models/Proposal";
-import { ProposalDataSource } from "./ProposalInterface";
-import database from "../database";
-import BluePromise from "bluebird";
+import database from "./database";
+import { ProposalDataSource } from "../ProposalDataSource";
+import Proposal from "../../models/Proposal";
 
-export default class ProposalRepository implements ProposalDataSource {
+const BluePromise = require("bluebird");
+
+export default class PostgresProposalDataSource implements ProposalDataSource {
   public acceptProposal(id: number): Promise<Proposal | null> {
     return database
       .update(

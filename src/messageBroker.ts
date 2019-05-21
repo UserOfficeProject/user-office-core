@@ -1,6 +1,10 @@
 var amqp = require("amqplib");
 
-export default class messageBroker {
+export interface MessageBroker {
+  sendMessage(message: string): void;
+}
+
+export class RabbitMQMessageBroker implements MessageBroker {
   conn: any;
 
   constructor() {

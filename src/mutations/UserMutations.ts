@@ -1,11 +1,15 @@
 import User from "../models/User";
+import UserDataSource from "../datasources/UserDataSource";
 
 export default class UserMutations {
-  create(args: any, context: any) {
-    return context.repository.user
-      .create(args.abstract, args.status, args.users)
-      .then((id: number) =>
-        id ? new User(id, args.abstract, args.status) : null
-      );
+  constructor(private dataSource: UserDataSource) {}
+
+  async create(firstname: string, lastname: string): Promise<User | null> {
+    // Various validation...
+    if (firstname !== "" && lastname !== "") {
+      return null; // Return rejection instead
+    }
+
+    return this.dataSource.create(firstname, lastname);
   }
 }
