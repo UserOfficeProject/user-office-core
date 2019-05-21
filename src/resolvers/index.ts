@@ -38,14 +38,19 @@ export default {
 
   createProposal: function(args: CreateProposalArgs, context: ResolverContext) {
     const { abstract, status, users } = args;
-    return context.mutations.proposal.create(abstract, status, users);
+    return context.mutations.proposal.create(
+      context.user,
+      abstract,
+      status,
+      users
+    );
   },
 
   approveProposal: function(
     args: ApproveProposalArgs,
     context: ResolverContext
   ) {
-    return context.mutations.proposal.accept(args.id, ["User_Officer"]);
+    return context.mutations.proposal.accept(context.user, args.id);
   },
 
   user: function(args: UserArgs, context: ResolverContext) {

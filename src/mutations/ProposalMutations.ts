@@ -1,6 +1,6 @@
-import Proposal from "../models/Proposal";
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { MessageBroker } from "../messageBroker";
+import User from "../models/User";
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
@@ -9,15 +9,29 @@ export default class ProposalMutations {
     private messageBroker: MessageBroker
   ) {}
 
-  create(abstract: string, status: number, users: number[]) {
+  async create(
+    agent: User | null,
+    abstract: string,
+    status: number,
+    users: number[]
+  ) {
+    if (agent == null) {
+      return null;
+    }
+
     this.messageBroker.sendMessage("Proposal Created");
     return this.dataSource.create(abstract, status, users);
   }
 
-  accept(proposalID: number, userRoles: string[]) {
-    if (!userRoles.includes("User_Officer")) {
+  async accept(agent: User | null, proposalID: number) {
+    if (agent == null) {
       return null;
     }
+    
+    if (!agent.roles.includes("User_Officer")) {
+      return null;
+    }
+
     return this.dataSource.acceptProposal(proposalID);
   }
 }

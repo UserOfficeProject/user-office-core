@@ -2,6 +2,7 @@ import ProposalMutations from "./ProposalMutations";
 import Proposal from "../models/Proposal";
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { MessageBroker } from "../messageBroker";
+import User from "../models/User";
 
 const dummyProposal = new Proposal(1, "asd", 1);
 const proposalDataSource: ProposalDataSource = {
@@ -22,10 +23,12 @@ const proposalMutations = new ProposalMutations(
   dummyMessageBroker
 );
 
-test("Accept proposal", () => {
-  expect(
-    proposalMutations.accept(1, ["Beamline_Manager", "User", "User_Officer"])
-  ).resolves.toBe(dummyProposal);
+test("A user officer can accept a proposal ", () => {
+  const agent = new User(0, "", "", ["User_Officer"]);
+  expect(proposalMutations.accept(agent, 1)).resolves.toBe(dummyProposal);
+});
 
-  expect(proposalMutations.accept(1, ["User"])).toBe(null);
+test("A non-officer user cannot accept a proposal", () => {
+  const agent = new User(0, "", "", []);
+  expect(proposalMutations.accept(agent, 1)).resolves.toBe(null);
 });
