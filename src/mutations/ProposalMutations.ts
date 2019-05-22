@@ -1,6 +1,8 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { MessageBroker } from "../messageBroker";
 import User from "../models/User";
+import { isUserOfficer } from "../utils/userAuthorization";
+
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
@@ -24,14 +26,10 @@ export default class ProposalMutations {
   }
 
   async accept(agent: User | null, proposalID: number) {
-    if (agent == null) {
+    if (isUserOfficer(agent)) {
+      return this.dataSource.acceptProposal(proposalID);
+    } else {
       return null;
     }
-    
-    if (!agent.roles.includes("User_Officer")) {
-      return null;
-    }
-
-    return this.dataSource.acceptProposal(proposalID);
   }
 }
