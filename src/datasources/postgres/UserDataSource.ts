@@ -32,7 +32,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from("users")
       .then((users: any[]) =>
-        users.map(user => new User(user.user_id, user.firstname, user.lastname))
+        users.map(
+          user =>
+            new User(user.user_id, user.firstname, user.lastname, ["dummyRole"])
+        )
       );
   }
 
@@ -44,7 +47,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
       .then((users: any[]) =>
-        users.map(user => new User(user.user_id, user.firstname, user.lastname))
+        users.map(
+          user =>
+            new User(user.user_id, user.firstname, user.lastname, ["dummyRole"])
+        )
       );
   }
 }

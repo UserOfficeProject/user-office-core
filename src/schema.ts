@@ -29,6 +29,7 @@ type User {
     firstname: String
     lastname: String
     proposals: [Proposal!]
+    roles:[String]
 }
 
 `);

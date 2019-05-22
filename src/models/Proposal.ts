@@ -10,6 +10,6 @@ export default class Proposal {
   }
 
   users(args: any, context: any) {
-    return context.repository.user.getProposalUsers(this.id);
+    return context.queries.user.dataSource.getProposalUsers(this.id);
   }
 }
