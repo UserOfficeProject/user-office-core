@@ -2,9 +2,9 @@ var { buildSchema } = require("graphql");
 
 export default buildSchema(`
 type Query {
-    proposal(id: ID!): Proposal
+    proposal(id: Int!): Proposal
     proposals: [Proposal]
-    user(id: ID!): User
+    user(id: Int!): User
     users: [User]
   }
 
