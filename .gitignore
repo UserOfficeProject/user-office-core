@@ -1,0 +1,5 @@
+node_modules
+src/**/*.js
+index.js
+build
+.DS_Store

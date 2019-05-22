@@ -1,7 +1,13 @@
-import { ProposalDataSource } from "../repositories/ProposalInterface";
+import { ProposalDataSource } from "../datasources/ProposalDataSource";
 
-export default class Queries {
-  get(id: number, proposalDataSource: ProposalDataSource) {
-    return proposalDataSource.get(id);
+export default class ProposalQueries {
+  constructor(private dataSource: ProposalDataSource) {}
+
+  public get(id: number) {
+    return this.dataSource.get(id);
+  }
+
+  public getAll() {
+    return this.dataSource.getProposals();
   }
 }

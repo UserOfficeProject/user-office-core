@@ -1,7 +1,9 @@
-import User from "../models/User";
-import database from "../database";
+import database from "./database";
 
-export default class UserRepository {
+import User from "../../models/User";
+import UserDataSource from "../UserDataSource";
+
+export default class PostgresUserDataSource implements UserDataSource {
   async get(id: number) {
     return database
       .select()

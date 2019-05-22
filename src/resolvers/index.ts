@@ -1,50 +1,64 @@
+import { ResolverContext } from "../context";
+
+interface ProposalArgs {
+  id: number;
+}
+
+interface ProposalsArgs {}
+
+interface CreateProposalArgs {
+  abstract: string;
+  status: number;
+  users: number[];
+}
+
+interface ApproveProposalArgs {
+  id: number;
+}
+
+interface UserArgs {
+  id: number;
+}
+
+interface UsersArgs {}
+
+interface CreateUserArgs {
+  firstname: string;
+  lastname: string;
+}
+
 export default {
-  proposal: function(args: any, context: any) {
-    return context.query.proposal.get(args.id, context.repository.proposal);
+  proposal(args: ProposalArgs, context: ResolverContext) {
+    return context.queries.proposal.get(args.id);
   },
-  proposals: function(
-    args: any,
-    context: { repository: { proposal: { getProposals: () => void } } }
-  ) {
-    return context.repository.proposal.getProposals();
+
+  proposals(_args: ProposalsArgs, context: ResolverContext) {
+    return context.queries.proposal.getAll();
   },
-  createProposal: function(
-    args: { abstract: string; status: number; users: number[] },
-    context: any
-  ) {
+
+  createProposal(args: CreateProposalArgs, context: ResolverContext) {
+    const { abstract, status, users } = args;
     return context.mutations.proposal.create(
-      args,
-      context.repository.proposal,
-      context.messageBroker
+      context.user,
+      abstract,
+      status,
+      users
     );
   },
-  approveProposal: function(args: { id: number }, context: any) {
-    return context.mutations.proposal.accept(
-      args.id,
-      context.repository.proposal,
-      ["User_Officer"]
-    );
+
+  approveProposal(args: ApproveProposalArgs, context: ResolverContext) {
+    return context.mutations.proposal.accept(context.user, args.id);
   },
-  createUser: function(
-    args: { firstname: string; lastname: string },
-    context: {
-      repository: {
-        user: { create: (arg0: any, arg1: any) => void };
-      };
-    }
-  ) {
-    return context.repository.user.create(args.firstname, args.lastname);
+
+  user(args: UserArgs, context: ResolverContext) {
+    return context.queries.user.get(args.id);
   },
-  user: function(
-    args: { id: string },
-    context: { repository: { user: { get: (arg0: any) => void } } }
-  ) {
-    return context.repository.user.get(args.id);
+
+  users(_args: UsersArgs, context: ResolverContext) {
+    return context.queries.user.getAll();
   },
-  users: function(
-    args: any,
-    context: { repository: { user: { getUsers: () => void } } }
-  ) {
-    return context.repository.user.getUsers();
+
+  createUser(args: CreateUserArgs, context: ResolverContext) {
+    return context.mutations.user.create(args.firstname, args.lastname);
   }
 };
