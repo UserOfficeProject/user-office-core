@@ -1,6 +1,6 @@
 import User from "../models/User";
 
-export default interface UserDataSource {
+export interface UserDataSource {
   // Read
   get(id: number): Promise<User | null>;
   getUsers(): Promise<User[]>;
