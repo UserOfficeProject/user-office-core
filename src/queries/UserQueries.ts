@@ -1,13 +1,23 @@
-import UserDataSource from "../datasources/UserDataSource";
+import { UserDataSource } from "../datasources/UserDataSource";
+import User from "../models/User";
+import { isUserOfficer, isUser } from "../utils/userAuthorization";
 
 export default class UserQueries {
   constructor(private dataSource: UserDataSource) {}
 
-  get(id: number) {
-    return this.dataSource.get(id);
+  async get(id: number, agent: User | null) {
+    if (isUserOfficer(agent) || isUser(agent, id)) {
+      return this.dataSource.get(id);
+    } else {
+      return null;
+    }
   }
 
-  getAll() {
-    return this.dataSource.getUsers();
+  async getAll(agent: User | null) {
+    if (isUserOfficer(agent)) {
+      return this.dataSource.getUsers();
+    } else {
+      return null;
+    }
   }
 }
