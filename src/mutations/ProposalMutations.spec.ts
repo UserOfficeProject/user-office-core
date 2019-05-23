@@ -1,5 +1,4 @@
 import ProposalMutations from "./ProposalMutations";
-import Proposal from "../models/Proposal";
 import { MessageBroker } from "../messageBroker";
 import User from "../models/User";
 import {
