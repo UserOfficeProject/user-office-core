@@ -1,3 +1,5 @@
+import { isRejection, Rejection } from "../rejection";
+
 type EventHandler<T> = (event: T) => void;
 
 export class EventBus<T extends { type: string }> {
@@ -20,12 +22,12 @@ export class EventBus<T extends { type: string }> {
   }
 
   public async wrap<V>(
-    inner: () => Promise<V | null>,
-    after: (result: V) => T
-  ): Promise<V | null> {
+    inner: () => Promise<V | Rejection>,
+    formEvent: (result: V) => T
+  ): Promise<V | Rejection> {
     const result = await inner();
-    if (result) {
-      const event = after(result);
+    if (!isRejection(result)) {
+      const event = formEvent(result);
       this.publish(event);
     }
     return result;
