@@ -1,19 +1,11 @@
 import UserQueries from "./UserQueries";
-import { UserDataSource } from "../datasources/UserDataSource";
-import User from "../models/User";
+import {
+  userDataSource,
+  dummyUser,
+  dummyUserOfficer
+} from "../datasources/mockups/UserDataSource";
 
-const dummyUserOfficer = new User(4, "John", "Doe", ["User_Officer"]);
-const dummyUser = new User(5, "Jane", "Doe", ["User"]);
-const userDataSource: UserDataSource = {
-  // Read
-  get: async (id: number) => dummyUser,
-  getUsers: async () => [dummyUser, dummyUserOfficer],
-  getProposalUsers: async (proposalID: number) => [dummyUser, dummyUserOfficer],
-  // Write
-  create: async (firstname: string, lastname: string) => dummyUser
-};
-
-const userQueries = new UserQueries(userDataSource);
+const userQueries = new UserQueries(new userDataSource());
 
 test("A user officer fetch can fetch any user account", () => {
   expect(userQueries.get(dummyUser.id, dummyUserOfficer)).resolves.toBe(
