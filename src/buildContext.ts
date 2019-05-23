@@ -64,10 +64,18 @@ async function sdmHandler(event: ApplicationEvent) {
   }
 }
 
-// Init event bus and add event handlers
+// Handler that just logs every event to stdout
+function loggingHandler(event: ApplicationEvent) {
+  const json = JSON.stringify(event);
+  const timestamp = new Date().toLocaleString();
+  console.log(`${timestamp} -- ${json}`);
+}
+
+// Create event bus and add event handlers
 const eventBus = new EventBus<ApplicationEvent>();
 eventBus.addHandler(emailHandler);
 eventBus.addHandler(sdmHandler);
+eventBus.addHandler(loggingHandler);
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource);
