@@ -2,11 +2,11 @@ const REJECTION = Symbol("REJECTION");
 
 export interface Rejection {
   [REJECTION]: true,
-  type: string;
+  reason: string;
 }
 
-export function rejection(type: string): Rejection {
-  return { [REJECTION]: true, type };
+export function rejection(reason: string): Rejection {
+  return { [REJECTION]: true, reason };
 }
 
 export function isRejection(value: any): value is Rejection {

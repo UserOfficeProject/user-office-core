@@ -30,7 +30,13 @@ test("A user officer can accept a proposal ", () => {
 test("A non-officer user cannot accept a proposal", () => {
   const agent = new User(0, "", "", []);
   expect(proposalMutations.accept(agent, 1)).resolves.toHaveProperty(
-    "type",
+    "reason",
     "NOT_USER_OFFICER"
   );
+});
+
+test("A non-logged in user cannot accept a proposal", () => {
+  const agent = null;
+  const result = proposalMutations.accept(agent, 1);
+  expect(result).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });

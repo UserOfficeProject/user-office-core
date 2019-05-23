@@ -8,12 +8,17 @@ type Query {
     users: [User]
   }
 
-  type Mutation {
-    createProposal(abstract: String!, status: Int!, users: [Int!]): Proposal
-    approveProposal(id: Int!): Proposal
-    createUser(firstname: String!, lastname: String!): User
+  type Rejection {
+    reason: String
   }
 
+  union ProposalResult = Proposal | Rejection
+
+  type Mutation {
+    createProposal(abstract: String!, status: Int!, users: [Int!]): ProposalResult
+    approveProposal(id: Int!): ProposalResult
+    createUser(firstname: String!, lastname: String!): ProposalResult
+  }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
 
