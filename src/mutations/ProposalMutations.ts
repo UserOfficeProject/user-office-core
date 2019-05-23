@@ -1,12 +1,14 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
-import { MessageBroker } from "../messageBroker";
 import User from "../models/User";
+import { EventBus } from "../events/eventBus";
+import { ApplicationEvent } from "../events/applicationEvents";
+
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
-    private messageBroker: MessageBroker
+    private eventBus: EventBus<ApplicationEvent>
   ) {}
 
   async create(
@@ -15,19 +17,25 @@ export default class ProposalMutations {
     status: number,
     users: number[]
   ) {
-    if (agent == null) {
-      return null;
-    }
+    return this.eventBus.wrap(
+      async () => {
+        if (agent == null) {
+          return null;
+        }
 
-    this.messageBroker.sendMessage("Proposal Created");
-    return this.dataSource.create(abstract, status, users);
+        return this.dataSource.create(abstract, status, users);
+      },
+      proposal => {
+        return { type: "PROPOSAL_ACCEPTED", proposal };
+      }
+    );
   }
 
   async accept(agent: User | null, proposalID: number) {
     if (agent == null) {
       return null;
     }
-    
+
     if (!agent.roles.includes("User_Officer")) {
       return null;
     }
