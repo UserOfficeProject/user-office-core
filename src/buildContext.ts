@@ -29,16 +29,34 @@ async function emailHandler(event: ApplicationEvent) {
         const message = `Dear ${firstname} ${lastname}, your proposal has been accepted.`;
         sendEmail(email, topic, message);
       }
+
+      return;
+    }
+
+    case "PROPOSAL_REJECTED": {
+      const proposal = event.proposal;
+      const participants = await userDataSource.getProposalUsers(proposal.id);
+
+      for (const { firstname, lastname, email } of participants) {
+        const topic = "Tough luck!";
+        const message = `Sorry ${firstname} ${lastname}, your proposal was rejected because: ${
+          event.reason
+        }`;
+        sendEmail(email, topic, message);
+      }
+
+      return;
     }
   }
 }
 
+// Handler to notify the SDM system that a proposal has been accepted
 async function sdmHandler(event: ApplicationEvent) {
   const rabbitMQ = new RabbitMQMessageBroker();
-  
+
   switch (event.type) {
     case "PROPOSAL_ACCEPTED": {
-      const { proposal } = event;
+      const { proposal } = event;
       const message = [proposal.id, proposal.status];
       const json = JSON.stringify(message);
       rabbitMQ.sendMessage(json);
