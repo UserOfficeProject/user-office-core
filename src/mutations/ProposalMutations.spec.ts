@@ -1,25 +1,17 @@
 import ProposalMutations from "./ProposalMutations";
 import Proposal from "../models/Proposal";
-import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { MessageBroker } from "../messageBroker";
 import User from "../models/User";
-
-const dummyProposal = new Proposal(1, "asd", 1);
-const proposalDataSource: ProposalDataSource = {
-  acceptProposal: async (id: number) => dummyProposal,
-  get: async (id: number) => dummyProposal,
-  create: async (abstract: string, status: number, users: number[]) =>
-    dummyProposal,
-  getProposals: async () => dummyProposal,
-  getUserProposals: async (id: number) => dummyProposal
-};
+import {
+  proposalDataSource,
+  dummyProposal
+} from "../datasources/mockups/ProposalDataSource";
 
 const dummyMessageBroker: MessageBroker = {
   sendMessage(message: string) {}
 };
-
 const proposalMutations = new ProposalMutations(
-  proposalDataSource,
+  new proposalDataSource(),
   dummyMessageBroker
 );
 
