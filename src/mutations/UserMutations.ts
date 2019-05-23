@@ -1,5 +1,5 @@
 import User from "../models/User";
-import UserDataSource from "../datasources/UserDataSource";
+import { UserDataSource } from "../datasources/UserDataSource";
 
 export default class UserMutations {
   constructor(private dataSource: UserDataSource) {}
