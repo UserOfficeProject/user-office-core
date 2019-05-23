@@ -29,5 +29,8 @@ test("A user officer can accept a proposal ", () => {
 
 test("A non-officer user cannot accept a proposal", () => {
   const agent = new User(0, "", "", []);
-  expect(proposalMutations.accept(agent, 1)).resolves.toHaveProperty("type", "NOT_USER_OFFICER");
+  expect(proposalMutations.accept(agent, 1)).resolves.toHaveProperty(
+    "type",
+    "NOT_USER_OFFICER"
+  );
 });
