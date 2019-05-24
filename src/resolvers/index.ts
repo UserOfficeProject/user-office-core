@@ -1,4 +1,7 @@
 import { ResolverContext } from "../context";
+import { isRejection, Rejection } from "../rejection";
+import Proposal from "../models/Proposal";
+import User from "../models/User";
 
 interface ProposalArgs {
   id: number;
@@ -27,6 +30,26 @@ interface CreateUserArgs {
   lastname: string;
 }
 
+function createMutationWrapper<T>(key: string) {
+  return async function(promise: Promise<T | Rejection>) {
+    const result = await promise;
+    if (isRejection(result)) {
+      return {
+        [key]: null,
+        error: result.reason
+      };
+    } else {
+      return {
+        [key]: result,
+        error: null
+      };
+    }
+  };
+}
+
+const wrapProposalMutation = createMutationWrapper<Proposal>("proposal");
+const wrapUserMutation = createMutationWrapper<User>("user");
+
 export default {
   proposal(args: ProposalArgs, context: ResolverContext) {
     return context.queries.proposal.get(args.id);
@@ -38,16 +61,15 @@ export default {
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
     const { abstract, status, users } = args;
-    return context.mutations.proposal.create(
-      context.user,
-      abstract,
-      status,
-      users
+    return wrapProposalMutation(
+      context.mutations.proposal.create(context.user, abstract, status, users)
     );
   },
 
   approveProposal(args: ApproveProposalArgs, context: ResolverContext) {
-    return context.mutations.proposal.accept(context.user, args.id);
+    return wrapProposalMutation(
+      context.mutations.proposal.accept(context.user, args.id)
+    );
   },
 
   user(args: UserArgs, context: ResolverContext) {
@@ -59,6 +81,8 @@ export default {
   },
 
   createUser(args: CreateUserArgs, context: ResolverContext) {
-    return context.mutations.user.create(args.firstname, args.lastname);
+    return wrapUserMutation(
+      context.mutations.user.create(args.firstname, args.lastname)
+    );
   }
 };

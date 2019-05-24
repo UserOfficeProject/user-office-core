@@ -2,18 +2,31 @@ var { buildSchema } = require("graphql");
 
 export default buildSchema(`
 type Query {
-    proposal(id: Int!): Proposal
+    proposal(id: ID!): Proposal
     proposals: [Proposal]
-    user(id: Int!): User
+    user(id: ID!): User
     users: [User]
   }
 
-  type Mutation {
-    createProposal(abstract: String!, status: Int!, users: [Int!]): Proposal
-    approveProposal(id: Int!): Proposal
-    createUser(firstname: String!, lastname: String!): User
+  type Rejection {
+    reason: String
   }
 
+  type ProposalMutationResult {
+    proposal: Proposal
+    error: String
+  }
+
+  type UserMutationResult {
+    user: User
+    error: String
+  }
+
+  type Mutation {
+    createProposal(abstract: String!, status: Int!, users: [Int!]): ProposalMutationResult
+    approveProposal(id: Int!): ProposalMutationResult
+    createUser(firstname: String!, lastname: String!): UserMutationResult
+  }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
 
