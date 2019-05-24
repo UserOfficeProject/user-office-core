@@ -12,12 +12,20 @@ type Query {
     reason: String
   }
 
-  union ProposalResult = Proposal | Rejection
+  type ProposalMutationResult {
+    proposal: Proposal
+    error: String
+  }
+
+  type UserMutationResult {
+    user: User
+    error: String
+  }
 
   type Mutation {
-    createProposal(abstract: String!, status: Int!, users: [Int!]): ProposalResult
-    approveProposal(id: Int!): ProposalResult
-    createUser(firstname: String!, lastname: String!): ProposalResult
+    createProposal(abstract: String!, status: Int!, users: [Int!]): ProposalMutationResult
+    approveProposal(id: Int!): ProposalMutationResult
+    createUser(firstname: String!, lastname: String!): UserMutationResult
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
