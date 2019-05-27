@@ -1,7 +1,5 @@
 import ProposalMutations from "./ProposalMutations";
 
-import Proposal from "../models/Proposal";
-import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import User from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";

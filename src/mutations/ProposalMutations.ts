@@ -48,7 +48,7 @@ export default class ProposalMutations {
       return rejection("NOT_LOGGED_IN");
     }
 
-    if (isUserOfficer(agent)) {
+    if (!isUserOfficer(agent)) {
       return rejection("NOT_USER_OFFICER");
     }
 
