@@ -1,5 +1,6 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import User from "../models/User";
+import { isUserOfficer } from "../utils/userAuthorization";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
@@ -47,7 +48,7 @@ export default class ProposalMutations {
       return rejection("NOT_LOGGED_IN");
     }
 
-    if (!agent.roles.includes("User_Officer")) {
+    if (!isUserOfficer(agent)) {
       return rejection("NOT_USER_OFFICER");
     }
 

@@ -1,7 +1,7 @@
 import database from "./database";
 
 import User from "../../models/User";
-import UserDataSource from "../UserDataSource";
+import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
   async get(id: number) {

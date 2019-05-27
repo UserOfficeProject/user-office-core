@@ -73,11 +73,11 @@ export default {
   },
 
   user(args: UserArgs, context: ResolverContext) {
-    return context.queries.user.get(args.id);
+    return context.queries.user.get(args.id, context.user);
   },
 
   users(_args: UsersArgs, context: ResolverContext) {
-    return context.queries.user.getAll();
+    return context.queries.user.getAll(context.user);
   },
 
   createUser(args: CreateUserArgs, context: ResolverContext) {
