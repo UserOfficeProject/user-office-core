@@ -4,7 +4,7 @@ import UserQueries from "./queries/UserQueries";
 // Site specific imports (only ESS atm)
 import PostgresUserDataSource from "./datasources/postgres/UserDataSource";
 import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSource";
-import ProposalQueries from "./Queries/ProposalQueries";
+import ProposalQueries from "./queries/ProposalQueries";
 import UserMutations from "./mutations/UserMutations";
 import ProposalMutations from "./mutations/ProposalMutations";
 import { EventBus } from "./events/eventBus";
