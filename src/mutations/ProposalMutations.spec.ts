@@ -33,3 +33,11 @@ test("A non-logged in user cannot accept a proposal", () => {
   const result = proposalMutations.accept(agent, 1);
   expect(result).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
+
+test("A user officer can not accept a proposal that does not exist", () => {
+  const agent = new User(0, "", "", ["User_Officer"]);
+  expect(proposalMutations.accept(agent, -1)).resolves.toHaveProperty(
+    "reason",
+    "INTERNAL_ERROR"
+  );
+});
