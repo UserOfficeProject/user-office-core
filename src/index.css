@@ -13,6 +13,6 @@ code {
 }
 
 
-.MuiPaper-elevation2 {
-  box-shadow: none !important;
+.MuiPaper-elevation2.MuiPaper-root {
+  box-shadow: none;
 }

@@ -7,10 +7,10 @@ import Paper from '@material-ui/core/Paper';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ProposalInformation from './ProposalInformation';
 import ProposalParticipants from './ProposalParticipants';
+import ProposalReview from './ProposalReview';
 import { request } from 'graphql-request'
 import { Link } from "react-router-dom";
 
@@ -40,15 +40,7 @@ const styles = theme => ({
   },
   stepper: {
     padding: theme.spacing(3, 0, 5),
-  },
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: theme.spacing(3),
-    marginLeft: theme.spacing(1),
-  },
+  }
 });
 
 const steps = ['Information', 'Participants', 'Review'];
@@ -59,63 +51,89 @@ class ProposalSubmission extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { proposalData: {
-
-    },
+    this.state = { 
+    proposalData: {},
+    proposalID: null,
     stepIndex: 0,
     };
   }
+
+
+
+  sendProposalRequest(){
+    
+    const query = `
+    mutation($abstract: String!, $status: Int!, $users: [Int!]) {
+      createProposal(abstract: $abstract, status: $status, users: $users){
+       proposal{
+        id
+      }
+        error
+      }
+    }
+    `;
+
+    const variables = {
+      status: 1,
+      abstract: this.state.proposalData.abstract,
+      users: this.state.proposalData.users.map((user => user.username)),
+    }
+      request('/graphql', query, variables).then(data => this.setState({ proposalID: data.createProposal.proposal.id}));
+  }
+  
+
 
 onChange(name, value){
   this.setState({...this.state, proposalData: {
     ...this.state.proposalData,
     [name]: value
   }})
-  console.log(this.state)
 }
+
+handleNext(data) {
+  this.setState({
+    stepIndex: this.state.stepIndex + 1,
+    proposalData: {
+      ...this.state.proposalData,
+      ...data
+    }
+  })
+};
+
+handleBack(){
+  this.setState({stepIndex: this.state.stepIndex - 1})
+};
 
 
 getStepContent(step) {
   switch (step) {
     case 0:
-      return <ProposalInformation onChange={this.onChange.bind(this)}/>;
+      return <ProposalInformation 
+                data={this.state.proposalData} 
+                onChange={this.onChange.bind(this)}
+                next={this.handleNext.bind(this)}
+                />;
     case 1:
-      return <ProposalParticipants onChange={this.onChange.bind(this)}/>;
+      return <ProposalParticipants 
+                data={this.state.proposalData} 
+                onChange={this.onChange.bind(this)}
+                next={this.handleNext.bind(this)}
+                back={this.handleBack.bind(this)}
+              />;
     case 2:
-      return <p> Review and Submit </p>;
+      return <ProposalReview
+                data={this.state.proposalData}
+                back={this.handleBack.bind(this)}
+                submit={this.sendProposalRequest.bind(this)}
+            />;
     default:
       throw new Error('Unknown step');
   }
 }
 
-
-sendProposalRequest(){
-  const query = `mutation {
-    createProposal(abstract: "${this.state.proposalData.abstract}", status: 1, users: ${this.state.proposalData.user.map((user => user.username))}){
-     proposal{
-      abstract
-    }
-      error
-    }
-  }`
-     
-    request('/graphql', query).then(data => console.log(data))
-}
-
-
 render() {
   const {classes} = this.props;
   const activeStep = this.state.stepIndex;
-  const handleNext = () => {
-    this.setState({stepIndex: this.state.stepIndex + 1})
-    if(this.state.stepIndex === steps.length - 1){
-      this.sendProposalRequest();
-    }
-  };
-
-  const handleBack = () => {
-    this.setState({stepIndex: this.state.stepIndex - 1})
-  };
 
   return (
     <React.Fragment>
@@ -140,33 +158,18 @@ render() {
             ))}
           </Stepper>
           <React.Fragment>
-            {activeStep === steps.length ? (
+            {this.state.proposalID ? (
               <React.Fragment>
                 <Typography variant="h5" gutterBottom>
                   Your proposal has been submitted
                 </Typography>
                 <Typography variant="subtitle1">
-                  Your proposal number is #2001539. You will recieve an email regarding approval
+                  Your proposal number is #{this.state.proposalID}. You will recieve an email regarding approval.
                 </Typography>
               </React.Fragment>
             ) : (
               <React.Fragment>
                 {this.getStepContent(activeStep)}
-                <div className={classes.buttons}>
-                  {activeStep !== 0 && (
-                    <Button onClick={handleBack} className={classes.button}>
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNext}
-                    className={classes.button}
-                  >
-                    {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-                  </Button>
-                </div>
               </React.Fragment>
             )}
           </React.Fragment>

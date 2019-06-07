@@ -5,9 +5,8 @@ import MaterialTable from 'material-table';
 import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
 import { request } from 'graphql-request'
 
-
+// TODO fix filtering in API
 function sendUserlRequest(searchQuery){
-    console.log(searchQuery)
     const query = `{
         users{
           firstname
@@ -16,7 +15,7 @@ function sendUserlRequest(searchQuery){
         }
       }`
        
-      return request('/graphql', query).then(data => { return {page: 0, totalCount: 9, data: data.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}}) }})
+      return request('/graphql', query).then(data => { return {page: 0, totalCount: data.users.length, data: data.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}}) }})
   }
   
 
@@ -44,13 +43,11 @@ function ParticipantModal(props) {
       };
 
 
-    const [state, setState] = React.useState({
-        columns: [
+    const columns = [
           { title: 'Name', field: 'name' },
           { title: 'Surname', field: 'surname' },
           { title: 'Username', field: 'username' },
-        ]
-      });
+        ];
 
   return (
       <Dialog
@@ -63,14 +60,14 @@ function ParticipantModal(props) {
         <MaterialTable
         icons={tableIcons}
         title="Add Participants"
-        columns={state.columns}
+        columns={columns}
         data={query => sendUserlRequest(query)}
         options={{
             search: true
         }}
         actions={[
             {
-              icon: Check,
+              icon: "+",
               tooltip: 'Select user',
               onClick: (event, rowData) => props.addParticipant({name: rowData.name, surname: rowData.surname, username: rowData.username})
             }
