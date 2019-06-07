@@ -38,17 +38,21 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-function sendSignUpRequest(setSubmit, firstName, lastName, email, password){
-    const query = `mutation{
-        createUser(firstname: "${firstName}", lastname: "${lastName}"){
+function sendSignUpRequest(setUserID, firstName, lastName, email, password){
+    const query = `mutation($firstName: String!, $lastName: String!){
+        createUser(firstname: $firstName, lastname: $lastName){
           user{
             id
           }
           error
         }
       }`
+      const variables = {
+        firstName,
+        lastName
+      }
 
-      request('/graphql', query).then(data => setSubmit(true))
+      request('/graphql', query, variables).then(data => setUserID(data.createUser.user.id))
 }
 
 
@@ -61,7 +65,7 @@ export default function SignUp() {
   const [lastName, setLastName] = useState("");  
   const [email, setEmail] = useState("");  
   const [password, setPassword] = useState("");
-  const [submitted, setSubmit] = useState(false);
+  const [userID, setUserID] = useState(null);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -73,7 +77,7 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        {submitted ? "You have been registered": 
+        {userID ? `You have been registered, you have ID:  ${userID}`: 
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
@@ -136,13 +140,13 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() =>sendSignUpRequest(setSubmit, firstName, lastName, email, password)}
+            onClick={() =>sendSignUpRequest(setUserID, firstName, lastName, email, password)}
           >
             Sign Up
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="/SignIn/" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
