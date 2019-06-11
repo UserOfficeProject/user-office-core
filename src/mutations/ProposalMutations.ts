@@ -5,7 +5,6 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import Proposal from "../models/Proposal";
-import { reject } from "bluebird";
 
 // TODO: it is here much of the logic reside
 
@@ -53,6 +52,6 @@ export default class ProposalMutations {
     }
 
     const result = await this.dataSource.acceptProposal(proposalID);
-    return result || reject("INTERNAL_ERROR");
+    return result || rejection("INTERNAL_ERROR");
   }
 }

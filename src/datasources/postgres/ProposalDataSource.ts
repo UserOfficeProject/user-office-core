@@ -24,12 +24,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               status: number;
             }
           ]
-        ) =>
-          new Proposal(
+        ) => {
+          if (proposal === undefined || !proposal.length) {
+            return null;
+          }
+          return new Proposal(
             proposal[0].proposal_id,
             proposal[0].abstract,
             proposal[0].status
-          )
+          );
+        }
       );
   }
   async get(id: number) {
