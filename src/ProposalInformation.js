@@ -4,6 +4,9 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/styles';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+
 
 const useStyles = makeStyles({
   buttons: {
@@ -20,36 +23,35 @@ const useStyles = makeStyles({
 export default function ProposalInformation(props) {
   const classes = useStyles();
 
-  const [title, setTitle] = useState(props.data.title || "");
-  const [titleError, setTitleError] = useState(false);
-
-  const [abstract, setAbstract] = useState(props.data.abstract || "");
-  const [abstractError, setAbstactError] = useState(false);
-
-  const handleNext = () => {
-    let vaildated = true; // I do not know why I need to do this
-
-    if(title.length < 10){
-      setTitleError(true);
-      vaildated = false;
-    }else{
-      setTitleError(false);
-    }
-
-    if(abstract.length < 20){
-      setAbstactError(true);
-      vaildated = false; 
-    }else{
-      setAbstactError(false);
-    }
-
-    if(vaildated){
-      props.next({title, abstract});
-    }
-  }
-
   return (
-    <React.Fragment>
+    <Formik
+    initialValues={{ title: '', abstract: '' }}
+    onSubmit={(values, actions) => {
+      props.next(values);
+    }}
+    validationSchema={Yup.object().shape({
+      title: Yup.string()
+        .min(10,'Title must be at least 10 characters')
+        .max(50, 'Title must be at most 50 characters')
+        .required('Title must be at least 10 characters'),
+      abstract: Yup.string()
+        .min(20,'Abstract must be at least 20 characters')
+        .max(200, 'Abstract must be at most 200 characters')
+        .required('Abstract must be at least 20 characters')
+    })}
+      >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isSubmitting,
+        /* and other goodies */
+      }) => (
+    <Form>
+      {console.log(errors)}
       <Typography variant="h6" gutterBottom>
         General Information
       </Typography>
@@ -60,11 +62,11 @@ export default function ProposalInformation(props) {
             id="title"
             name="title"
             label="Title"
-            defaultValue={title}
+            defaultValue={values.title}
             fullWidth
-            onChange={(e) => setTitle(e.target.value )}
-            error={titleError}
-            helperText={titleError ? 'Title must be at least 10 characters' : ' '}
+            onChange={handleChange}
+            error={touched.title && errors.title}
+            helperText={(touched.title && errors.title) && errors.title}
           />
         </Grid>
         <Grid item xs={12}>
@@ -73,24 +75,27 @@ export default function ProposalInformation(props) {
             id="abstract"
             name="abstract"
             label="Abstract"
-            defaultValue={abstract}
+            defaultValue={values.abstract}
             fullWidth
-            onChange={(e) => setAbstract(e.target.value )}
-            error={abstractError}
-            helperText={abstractError ? 'Abstract must be at least 20 characters' : ' '}
+            onChange={handleChange}
+            error={touched.abstract && errors.abstract}
+            helperText={(touched.abstract && errors.abstract) && errors.abstract}
           />
         </Grid>
       </Grid>
       <div className={classes.buttons}>
         <Button
+          disabled={isSubmitting}
+          type="submit"
           variant="contained"
           color="primary"
-          onClick={handleNext}
           className={classes.button}
         >
           Next
         </Button>
       </div>
-    </React.Fragment>
+    </Form>
+    )}
+    </Formik>
   );
 }
