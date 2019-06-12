@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -22,10 +22,9 @@ const useStyles = makeStyles({
 
 export default function ProposalInformation(props) {
   const classes = useStyles();
-
   return (
     <Formik
-    initialValues={{ title: '', abstract: '' }}
+    initialValues={{ title: props.data.title, abstract: props.data.abstract }}
     onSubmit={(values, actions) => {
       props.next(values);
     }}
@@ -45,13 +44,9 @@ export default function ProposalInformation(props) {
         errors,
         touched,
         handleChange,
-        handleBlur,
-        handleSubmit,
         isSubmitting,
-        /* and other goodies */
       }) => (
     <Form>
-      {console.log(errors)}
       <Typography variant="h6" gutterBottom>
         General Information
       </Typography>
@@ -65,7 +60,7 @@ export default function ProposalInformation(props) {
             defaultValue={values.title}
             fullWidth
             onChange={handleChange}
-            error={touched.title && errors.title}
+            error={(touched.title && errors.title)}
             helperText={(touched.title && errors.title) && errors.title}
           />
         </Grid>
@@ -78,7 +73,7 @@ export default function ProposalInformation(props) {
             defaultValue={values.abstract}
             fullWidth
             onChange={handleChange}
-            error={touched.abstract && errors.abstract}
+            error={(touched.abstract && errors.abstract)}
             helperText={(touched.abstract && errors.abstract) && errors.abstract}
           />
         </Grid>
