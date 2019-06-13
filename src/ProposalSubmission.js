@@ -1,5 +1,5 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -12,7 +12,7 @@ import { request } from 'graphql-request'
 import Container from '@material-ui/core/Container';
 
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   paper: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
@@ -26,24 +26,18 @@ const styles = theme => ({
   stepper: {
     padding: theme.spacing(3, 0, 5),
   }
-});
+}));
 
-const steps = ['Information', 'Participants', 'Review'];
 
-class ProposalSubmission extends React.Component {
 
-  constructor(props) {
-    super(props);
+export default function ProposalSubmission(props) {
 
-    this.state = { 
-    proposalData: {},
-    proposalID: null,
-    stepIndex: 0,
-    };
-  }
+  const steps = ['Information', 'Participants', 'Review'];
+  const [proposalData, setProposalData] = useState({});
+  const [proposalID, setProposalID] = useState(null);
+  const [stepIndex, setStepIndex] = useState(0);
 
-  sendProposalRequest(){
-    
+  const sendProposalRequest = () =>{  
     const query = `
     mutation($abstract: String!, $status: Int!, $users: [Int!]) {
       createProposal(abstract: $abstract, status: $status, users: $users){
@@ -57,54 +51,80 @@ class ProposalSubmission extends React.Component {
 
     const variables = {
       status: 1,
-      abstract: this.state.proposalData.abstract,
-      users: this.state.proposalData.users.map((user => user.username)),
+      abstract: proposalData.abstract,
+      users: proposalData.users.map((user => user.username)),
     }
-      request('/graphql', query, variables).then(data => this.setState({ proposalID: data.createProposal.proposal.id}));
+      request('/graphql', query, variables).then(data => setProposalID(data.createProposal.proposal.id));
   }
 
-handleNext(data) {
-  this.setState({
-    stepIndex: this.state.stepIndex + 1,
-    proposalData: {
-      ...this.state.proposalData,
-      ...data
+  const getProposalInformation = () => {
+    
+    const query = `
+    query($id: ID!) {
+      proposal(id: $id) {
+        id
+        abstract
+        status
+        users{
+          firstname
+          lastname
+          id
+          roles
+        }
+      }
     }
-  })
+    `;
+
+    const variables = {
+      id: 1
+    }
+      request('/graphql', query, variables).then(data => setProposalData(data.proposal));
+  }
+
+
+const handleNext = (data) => {
+  setProposalData({
+    ...proposalData,
+    ...data
+  });
+  setStepIndex(stepIndex + 1)
 };
 
-handleBack(){
-  this.setState({stepIndex: this.state.stepIndex - 1})
+const handleBack = () => {
+  setStepIndex(stepIndex - 1)
 };
 
 
-getStepContent(step) {
+const getStepContent = (step) => {
   switch (step) {
     case 0:
       return <ProposalInformation 
-                data={this.state.proposalData} 
-                next={this.handleNext.bind(this)}
+                data={proposalData} 
+                next={handleNext}
                 />;
     case 1:
       return <ProposalParticipants 
-                data={this.state.proposalData} 
-                next={this.handleNext.bind(this)}
-                back={this.handleBack.bind(this)}
+                data={proposalData} 
+                next={handleNext}
+                back={handleBack}
               />;
     case 2:
       return <ProposalReview
-                data={this.state.proposalData}
-                back={this.handleBack.bind(this)}
-                submit={this.sendProposalRequest.bind(this)}
+                data={proposalData}
+                back={handleBack}
+                submit={sendProposalRequest}
             />;
     default:
       throw new Error('Unknown step');
   }
 }
 
-render() {
-  const {classes} = this.props;
-  const activeStep = this.state.stepIndex;
+
+  // if(this.props.match.params.proposalID){
+  //   console.log("fetch proposal data");
+  //   //this.getProposalInformation();
+  // }
+  const classes = useStyles();
 
   return (
       <Container maxWidth="lg" className={classes.container}>
@@ -112,7 +132,7 @@ render() {
           <Typography component="h1" variant="h4" align="center">
             Proposal Submission
           </Typography>
-          <Stepper activeStep={activeStep} className={classes.stepper}>
+          <Stepper activeStep={stepIndex} className={classes.stepper}>
             {steps.map(label => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
@@ -120,26 +140,25 @@ render() {
             ))}
           </Stepper>
           <React.Fragment>
-            {this.state.proposalID ? (
+            {proposalID ? (
               <React.Fragment>
                 <Typography variant="h5" gutterBottom>
                   Your proposal has been submitted
                 </Typography>
                 <Typography variant="subtitle1">
-                  Your proposal number is #{this.state.proposalID}. You will recieve an email regarding approval.
+                  Your proposal number is #{proposalID}. You will recieve an email regarding approval.
                 </Typography>
               </React.Fragment>
             ) : (
               <React.Fragment>
-                {this.getStepContent(activeStep)}
+                {getStepContent(stepIndex)}
               </React.Fragment>
             )}
           </React.Fragment>
         </Paper>
       </ Container>
   );
-}
+
 
 }
 
-export default withStyles(styles)(ProposalSubmission);
