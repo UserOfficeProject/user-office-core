@@ -80,7 +80,12 @@ export default function ProposalSubmission({match}) {
       id
     }
       request('/graphql', query, variables).then(data => {
-        setProposalData(data.proposal)
+        setProposalData({
+          title: "This is a dummy title as we do not save titles yet",
+          abstract: data.proposal.abstract,
+          id: data.proposal.id,
+          users: data.proposal.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}})
+        })
         setLoading(false);
       });
   }
@@ -126,10 +131,11 @@ const getStepContent = (step) => {
 
   useEffect(() => {
     if(match.params.proposalID){
-      getProposalInformation(match.params.proposalID)
+      getProposalInformation(match.params.proposalID);
+    }else{
+      setProposalData({});
     }
-    
-  }, [match]);
+  }, [match.params.proposalID]);
   const classes = useStyles();
 
 
@@ -137,7 +143,7 @@ const getStepContent = (step) => {
       <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Proposal Submission
+            {proposalData.id ? "Update Proposal" : "Proposal Submission" }
           </Typography>
           <Stepper activeStep={stepIndex} className={classes.stepper}>
             {steps.map(label => (
