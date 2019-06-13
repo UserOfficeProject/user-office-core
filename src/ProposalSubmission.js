@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Stepper from '@material-ui/core/Stepper';
@@ -30,12 +30,13 @@ const useStyles = makeStyles(theme => ({
 
 
 
-export default function ProposalSubmission(props) {
+export default function ProposalSubmission({match}) {
 
   const steps = ['Information', 'Participants', 'Review'];
   const [proposalData, setProposalData] = useState({});
   const [proposalID, setProposalID] = useState(null);
   const [stepIndex, setStepIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const sendProposalRequest = () =>{  
     const query = `
@@ -57,7 +58,7 @@ export default function ProposalSubmission(props) {
       request('/graphql', query, variables).then(data => setProposalID(data.createProposal.proposal.id));
   }
 
-  const getProposalInformation = () => {
+  const getProposalInformation = (id) => {
     
     const query = `
     query($id: ID!) {
@@ -76,9 +77,12 @@ export default function ProposalSubmission(props) {
     `;
 
     const variables = {
-      id: 1
+      id
     }
-      request('/graphql', query, variables).then(data => setProposalData(data.proposal));
+      request('/graphql', query, variables).then(data => {
+        setProposalData(data.proposal)
+        setLoading(false);
+      });
   }
 
 
@@ -120,13 +124,16 @@ const getStepContent = (step) => {
 }
 
 
-  // if(this.props.match.params.proposalID){
-  //   console.log("fetch proposal data");
-  //   //this.getProposalInformation();
-  // }
+  useEffect(() => {
+    if(match.params.proposalID){
+      getProposalInformation(match.params.proposalID)
+    }
+    
+  }, [match]);
   const classes = useStyles();
 
-  return (
+
+  return (match.params.proposalID && loading? (<p>Loading</p>) :(
       <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
@@ -157,7 +164,7 @@ const getStepContent = (step) => {
           </React.Fragment>
         </Paper>
       </ Container>
-  );
+  ));
 
 
 }
