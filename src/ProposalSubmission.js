@@ -9,22 +9,10 @@ import ProposalInformation from './ProposalInformation';
 import ProposalParticipants from './ProposalParticipants';
 import ProposalReview from './ProposalReview';
 import { request } from 'graphql-request'
+import Container from '@material-ui/core/Container';
 
 
 const styles = theme => ({
-  appBar: {
-    position: 'relative',
-  },
-  layout: {
-    width: 'auto',
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-      width: 600,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-    },
-  },
   paper: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
@@ -44,7 +32,6 @@ const steps = ['Information', 'Participants', 'Review'];
 
 class ProposalSubmission extends React.Component {
 
-
   constructor(props) {
     super(props);
 
@@ -54,8 +41,6 @@ class ProposalSubmission extends React.Component {
     stepIndex: 0,
     };
   }
-
-
 
   sendProposalRequest(){
     
@@ -77,15 +62,6 @@ class ProposalSubmission extends React.Component {
     }
       request('/graphql', query, variables).then(data => this.setState({ proposalID: data.createProposal.proposal.id}));
   }
-  
-
-
-onChange(name, value){
-  this.setState({...this.state, proposalData: {
-    ...this.state.proposalData,
-    [name]: value
-  }})
-}
 
 handleNext(data) {
   this.setState({
@@ -107,13 +83,11 @@ getStepContent(step) {
     case 0:
       return <ProposalInformation 
                 data={this.state.proposalData} 
-                onChange={this.onChange.bind(this)}
                 next={this.handleNext.bind(this)}
                 />;
     case 1:
       return <ProposalParticipants 
                 data={this.state.proposalData} 
-                onChange={this.onChange.bind(this)}
                 next={this.handleNext.bind(this)}
                 back={this.handleBack.bind(this)}
               />;
@@ -133,8 +107,7 @@ render() {
   const activeStep = this.state.stepIndex;
 
   return (
-    <React.Fragment>
-      <main className={classes.layout}>
+      <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
             Proposal Submission
@@ -163,8 +136,7 @@ render() {
             )}
           </React.Fragment>
         </Paper>
-      </main>
-    </React.Fragment>
+      </ Container>
   );
 }
 

@@ -155,6 +155,7 @@ export default function Dashboard({ match }) {
         <div className={classes.appBarSpacer} />
         <Switch>
           <Route exact path="/Dashboard/" component={OverviewPage} />
+          <Route path="/Dashboard/ProposalSubmission/:proposalID" component={ProposalSubmission} />
           <Route path="/Dashboard/ProposalSubmission" component={ProposalSubmission} />
         </Switch>
       </main>

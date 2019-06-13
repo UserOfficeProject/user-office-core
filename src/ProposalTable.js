@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MaterialTable from 'material-table';
 import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
 import { request } from 'graphql-request'
+import { Redirect } from 'react-router';
 
 export default function ProposalTable(props) {
     
@@ -33,6 +34,7 @@ export default function ProposalTable(props) {
         ];
 
     const [proposals, setProposals] = useState([]);
+    const [editProposalID, setEditProposalID] = useState(0);
 
     const getProposals = () => {
         const query = `{
@@ -49,6 +51,10 @@ export default function ProposalTable(props) {
         getProposals()
       });
 
+      if (editProposalID) {
+        return <Redirect push to={`/Dashboard/ProposalSubmission/${editProposalID}`} />;
+      }
+
     
     return (
             <MaterialTable
@@ -63,7 +69,7 @@ export default function ProposalTable(props) {
                 {
                 icon: Edit,
                 tooltip: 'Edit proposal',
-                onClick: (event, rowData) => console.log("clicked edit proposal")
+                onClick: (event, rowData) => setEditProposalID(rowData.id)
                 }
             ]}
             />
