@@ -12,7 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 import { menuItems } from './menuItems';
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from './ProposalSubmission'
@@ -130,7 +130,7 @@ export default function Dashboard({ match }) {
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={0} color="secondary">
-              <NotificationsIcon />
+              <AccountCircle />
             </Badge>
           </IconButton>
         </Toolbar>

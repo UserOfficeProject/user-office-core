@@ -3,6 +3,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+import ProposalTable from './ProposalTable';
 import clsx from 'clsx';
 
 const useStyles = makeStyles(theme => ({
@@ -30,20 +31,18 @@ export default function OverviewPage() {
         <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={fixedHeightPaper}>
-                Your proposals
+            <Paper>
+                <ProposalTable/>
             </Paper>
           </Grid>
           <Grid item xs={6}>
             <Paper className={fixedHeightPaper}>
+                Upcoming visits
             </Paper>
           </Grid>
-          <Grid item xs={12}>
-            <Paper>
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper>
+          <Grid item xs={6}>
+            <Paper className={fixedHeightPaper}>
+                Actions to be done
             </Paper>
           </Grid>
         </Grid>
