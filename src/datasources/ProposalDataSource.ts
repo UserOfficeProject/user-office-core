@@ -11,5 +11,6 @@ export interface ProposalDataSource {
     status: number,
     users: number[]
   ): Promise<Proposal | null>;
+  update(proposal: Proposal): Promise<Proposal | null>;
   acceptProposal(id: number): Promise<Proposal | null>;
 }

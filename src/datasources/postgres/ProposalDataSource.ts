@@ -5,6 +5,38 @@ import Proposal from "../../models/Proposal";
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  public update(proposal: Proposal): Promise<Proposal | null> {
+    return database
+      .update(
+        {
+          abstract: proposal.abstract,
+          status: proposal.status
+        },
+        ["proposal_id", "abstract", "status"]
+      )
+      .from("proposals")
+      .where("proposal_id", proposal.id)
+      .then(
+        (
+          proposal: [
+            {
+              proposal_id: number;
+              abstract: string;
+              status: number;
+            }
+          ]
+        ) => {
+          if (proposal === undefined || !proposal.length) {
+            return null;
+          }
+          return new Proposal(
+            proposal[0].proposal_id,
+            proposal[0].abstract,
+            proposal[0].status
+          );
+        }
+      );
+  }
   public acceptProposal(id: number): Promise<Proposal | null> {
     return database
       .update(

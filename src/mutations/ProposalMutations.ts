@@ -39,6 +39,49 @@ export default class ProposalMutations {
     );
   }
 
+  async update(
+    agent: User | null,
+    id: string,
+    abstract: string,
+    status: number,
+    users: number[]
+  ): Promise<Proposal | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        //this becomes duplication of create, should be broken out
+
+        // if (agent == null) {
+        //   return rejection("NOT_LOGGED_IN");
+        // }
+
+        // if (abstract.length < 20) {
+        //   return rejection("TOO_SHORT_ABSTRACT");
+        // }
+
+        let proposal = await this.dataSource.get(parseInt(id));
+
+        if (!proposal) {
+          return rejection("INTERNAL_ERROR");
+        }
+
+        if (abstract !== undefined) {
+          proposal.abstract = abstract;
+        }
+
+        if (status !== undefined) {
+          proposal.status = status;
+        }
+
+        const result = await this.dataSource.update(proposal);
+
+        return result || rejection("INTERNAL_ERROR");
+      },
+      proposal => {
+        return { type: "PROPOSAL_ACCEPTED", proposal };
+      }
+    );
+  }
+
   async accept(
     agent: User | null,
     proposalID: number

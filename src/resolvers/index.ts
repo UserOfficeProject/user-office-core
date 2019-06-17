@@ -15,6 +15,13 @@ interface CreateProposalArgs {
   users: number[];
 }
 
+interface UpdateProposalArgs {
+  id: string;
+  abstract: string;
+  status: number;
+  users: number[];
+}
+
 interface ApproveProposalArgs {
   id: number;
 }
@@ -63,6 +70,19 @@ export default {
     const { abstract, status, users } = args;
     return wrapProposalMutation(
       context.mutations.proposal.create(context.user, abstract, status, users)
+    );
+  },
+
+  updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
+    const { id, abstract, status, users } = args;
+    return wrapProposalMutation(
+      context.mutations.proposal.update(
+        context.user,
+        id,
+        abstract,
+        status,
+        users
+      )
     );
   },
 
