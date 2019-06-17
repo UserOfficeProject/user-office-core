@@ -48,30 +48,34 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
-        //this becomes duplication of create, should be broken out
+        if (agent == null) {
+          return rejection("NOT_LOGGED_IN");
+        }
 
-        // if (agent == null) {
-        //   return rejection("NOT_LOGGED_IN");
-        // }
+        // Get proposal information
+        let proposal = await this.dataSource.get(parseInt(id)); //Hacky
 
-        // if (abstract.length < 20) {
-        //   return rejection("TOO_SHORT_ABSTRACT");
-        // }
-
-        let proposal = await this.dataSource.get(parseInt(id));
-
+        // Check what needs to be updated
         if (!proposal) {
           return rejection("INTERNAL_ERROR");
         }
 
         if (abstract !== undefined) {
           proposal.abstract = abstract;
+
+          if (abstract.length < 20) {
+            return rejection("TOO_SHORT_ABSTRACT");
+          }
         }
 
         if (status !== undefined) {
           proposal.status = status;
         }
 
+        if (users !== undefined) {
+          this.dataSource.setProposalUsers(parseInt(id), users); //Hacky
+        }
+        // This will overwrite the whole proposal with the new object created
         const result = await this.dataSource.update(proposal);
 
         return result || rejection("INTERNAL_ERROR");
