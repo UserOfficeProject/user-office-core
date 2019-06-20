@@ -5,6 +5,11 @@ interface ProposalAcceptedEvent {
   proposal: Proposal;
 }
 
+interface ProposalUpdatedEvent {
+  type: "PROPOSAL_UPDATED";
+  proposal: Proposal;
+}
+
 interface ProposalRejectedEvent {
   type: "PROPOSAL_REJECTED";
   proposal: Proposal;
@@ -18,5 +23,6 @@ interface ProposalCreatedEvent {
 
 export type ApplicationEvent =
   | ProposalAcceptedEvent
+  | ProposalUpdatedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent;

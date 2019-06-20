@@ -55,11 +55,12 @@ export default class ProposalMutations {
         // Get proposal information
         let proposal = await this.dataSource.get(parseInt(id)); //Hacky
 
-        // Check what needs to be updated
+        // Check that proposal exist
         if (!proposal) {
           return rejection("INTERNAL_ERROR");
         }
 
+        // Check what needs to be updated and update proposal object
         if (abstract !== undefined) {
           proposal.abstract = abstract;
 
@@ -73,7 +74,13 @@ export default class ProposalMutations {
         }
 
         if (users !== undefined) {
-          this.dataSource.setProposalUsers(parseInt(id), users); //Hacky
+          const resultUpdateUsers = await this.dataSource.setProposalUsers(
+            parseInt(id),
+            users
+          );
+          if (!resultUpdateUsers) {
+            return rejection("INTERNAL_ERROR");
+          }
         }
         // This will overwrite the whole proposal with the new object created
         const result = await this.dataSource.update(proposal);
@@ -81,7 +88,7 @@ export default class ProposalMutations {
         return result || rejection("INTERNAL_ERROR");
       },
       proposal => {
-        return { type: "PROPOSAL_ACCEPTED", proposal };
+        return { type: "PROPOSAL_UPDATED", proposal };
       }
     );
   }
