@@ -2,8 +2,6 @@ CREATE TABLE users (
   user_id  serial PRIMARY KEY
 , firstname     varchar(20) NOT NULL
 , lastname     varchar(20) NOT NULL
-, username     varchar(20) NOT NULL
-, email     varchar(20) NOT NULL
 );
 
 CREATE TABLE proposals (
