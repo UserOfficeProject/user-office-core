@@ -14,27 +14,18 @@ export default class ProposalMutations {
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
-  async create(
-    agent: User | null,
-    abstract: string,
-    status: number,
-    users: number[]
-  ): Promise<Proposal | Rejection> {
+  async create(agent: User | null): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (agent == null) {
           return rejection("NOT_LOGGED_IN");
         }
 
-        if (abstract.length < 20) {
-          return rejection("TOO_SHORT_ABSTRACT");
-        }
-
-        const result = await this.dataSource.create(abstract, status, users);
+        const result = await this.dataSource.create();
         return result || rejection("INTERNAL_ERROR");
       },
       proposal => {
-        return { type: "PROPOSAL_ACCEPTED", proposal };
+        return { type: "PROPOSAL_CREATED", proposal };
       }
     );
   }
@@ -42,6 +33,7 @@ export default class ProposalMutations {
   async update(
     agent: User | null,
     id: string,
+    title: string,
     abstract: string,
     status: number,
     users: number[]
@@ -61,6 +53,14 @@ export default class ProposalMutations {
         }
 
         // Check what needs to be updated and update proposal object
+        if (title !== undefined) {
+          proposal.title = title;
+
+          if (title.length < 10) {
+            return rejection("TOO_SHORT_TITLE");
+          }
+        }
+
         if (abstract !== undefined) {
           proposal.abstract = abstract;
 
@@ -106,6 +106,34 @@ export default class ProposalMutations {
     }
 
     const result = await this.dataSource.acceptProposal(proposalID);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
+  async reject(
+    agent: User | null,
+    proposalID: number
+  ): Promise<Proposal | Rejection> {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    if (!isUserOfficer(agent)) {
+      return rejection("NOT_USER_OFFICER");
+    }
+
+    const result = await this.dataSource.rejectProposal(proposalID);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
+  async submit(
+    agent: User | null,
+    proposalID: number
+  ): Promise<Proposal | Rejection> {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    const result = await this.dataSource.submitProposal(proposalID);
     return result || rejection("INTERNAL_ERROR");
   }
 }

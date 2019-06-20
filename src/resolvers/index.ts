@@ -9,14 +9,11 @@ interface ProposalArgs {
 
 interface ProposalsArgs {}
 
-interface CreateProposalArgs {
-  abstract: string;
-  status: number;
-  users: number[];
-}
+interface CreateProposalArgs {}
 
 interface UpdateProposalArgs {
   id: string;
+  title: string;
   abstract: string;
   status: number;
   users: number[];
@@ -67,18 +64,18 @@ export default {
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
-    const { abstract, status, users } = args;
     return wrapProposalMutation(
-      context.mutations.proposal.create(context.user, abstract, status, users)
+      context.mutations.proposal.create(context.user)
     );
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
-    const { id, abstract, status, users } = args;
+    const { id, title, abstract, status, users } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
         context.user,
         id,
+        title,
         abstract,
         status,
         users
@@ -89,6 +86,18 @@ export default {
   approveProposal(args: ApproveProposalArgs, context: ResolverContext) {
     return wrapProposalMutation(
       context.mutations.proposal.accept(context.user, args.id)
+    );
+  },
+
+  rejectProposal(args: ApproveProposalArgs, context: ResolverContext) {
+    return wrapProposalMutation(
+      context.mutations.proposal.reject(context.user, args.id)
+    );
+  },
+
+  submitProposal(args: ApproveProposalArgs, context: ResolverContext) {
+    return wrapProposalMutation(
+      context.mutations.proposal.submit(context.user, args.id)
     );
   },
 

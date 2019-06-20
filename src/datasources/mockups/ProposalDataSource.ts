@@ -1,9 +1,12 @@
 import { ProposalDataSource } from "../ProposalDataSource";
 import Proposal from "../../models/Proposal";
 
-export const dummyProposal = new Proposal(1, "asd", 1);
+export const dummyProposal = new Proposal(1, "title", "abstract", 1);
 
 export class proposalDataSource implements ProposalDataSource {
+  rejectProposal(id: number): Promise<Proposal | null> {
+    throw new Error("Method not implemented.");
+  }
   async update(proposal: Proposal): Promise<Proposal | null> {
     return dummyProposal;
   }
@@ -17,11 +20,18 @@ export class proposalDataSource implements ProposalDataSource {
     return null;
   }
 
+  async submitProposal(id: number): Promise<Proposal | null> {
+    if (id && id > 0) {
+      return dummyProposal;
+    }
+    return null;
+  }
+
   async get(id: number) {
     return dummyProposal;
   }
 
-  async create(abstract: string, status: number, users: number[]) {
+  async create() {
     return dummyProposal;
   }
 
