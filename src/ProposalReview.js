@@ -19,7 +19,6 @@ export default function ProposalReview(props) {
 
   return (
     <React.Fragment>
-      {console.log(props.data)}
       <div className={classes.buttons}>
         <Button onClick={props.back} className={classes.button}>
           Back

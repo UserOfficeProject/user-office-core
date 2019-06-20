@@ -30,17 +30,18 @@ const useStyles = makeStyles(theme => ({
 
 
 
-export default function ProposalSubmission({match}) {
+export default function ProposalEdit({match}) {
 
   const steps = ['Information', 'Participants', 'Review'];
   const [proposalData, setProposalData] = useState({});
   const [proposalID, setProposalID] = useState(null);
   const [stepIndex, setStepIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const sendProposalRequest = () =>{  
+  const sendProposalUpdate = () =>{  
     const query = `
-    mutation($abstract: String!, $status: Int!, $users: [Int!]) {
-      createProposal(abstract: $abstract, status: $status, users: $users){
+    mutation($id: ID!, $abstract: String!, $status: Int!, $users: [Int!]) {
+      updateProposal(id: $id, abstract: $abstract, status: $status, users: $users){
        proposal{
         id
       }
@@ -48,7 +49,6 @@ export default function ProposalSubmission({match}) {
       }
     }
     `;
-  
 
     const variables = {
       status: 1,
@@ -56,7 +56,39 @@ export default function ProposalSubmission({match}) {
       abstract: proposalData.abstract,
       users: proposalData.users.map((user => user.username)),
     }
-      request('/graphql', query, variables).then(data => setProposalID(data.createProposal.proposal.id));
+      request('/graphql', query, variables).then(data => setProposalID(data.updateProposal.proposal.id));
+  }
+
+  const getProposalInformation = (id) => {
+    
+    const query = `
+    query($id: ID!) {
+      proposal(id: $id) {
+        id
+        abstract
+        status
+        users{
+          firstname
+          lastname
+          id
+          roles
+        }
+      }
+    }
+    `;
+
+    const variables = {
+      id
+    }
+      request('/graphql', query, variables).then(data => {
+        setProposalData({
+          title: "This is a dummy title as we do not save titles yet",
+          abstract: data.proposal.abstract,
+          id: data.proposal.id,
+          users: data.proposal.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}})
+        })
+        setLoading(false);
+      });
   }
 
 
@@ -90,7 +122,7 @@ const getStepContent = (step) => {
       return <ProposalReview
                 data={proposalData}
                 back={handleBack}
-                submit={sendProposalRequest}
+                submit={sendProposalUpdate}
             />;
     default:
       throw new Error('Unknown step');
@@ -98,14 +130,19 @@ const getStepContent = (step) => {
 }
 
 
+  useEffect(() => {
+    getProposalInformation(match.params.proposalID);
+  }, [match.params.proposalID]);
   const classes = useStyles();
 
-
+  if(loading){
+      return <p>Loading</p>
+  }
   return (
       <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Proposal Submission
+            Update Proposal
           </Typography>
           <Stepper activeStep={stepIndex} className={classes.stepper}>
             {steps.map(label => (
@@ -118,10 +155,7 @@ const getStepContent = (step) => {
             {proposalID ? (
               <React.Fragment>
                 <Typography variant="h5" gutterBottom>
-                  Your proposal has been submitted
-                </Typography>
-                <Typography variant="subtitle1">
-                  Your proposal number is #{proposalID}. You will recieve an email regarding approval.
+                  Your proposal has been updated
                 </Typography>
               </React.Fragment>
             ) : (
@@ -133,7 +167,5 @@ const getStepContent = (step) => {
         </Paper>
       </ Container>
   );
-
-
 }
 

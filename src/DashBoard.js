@@ -16,6 +16,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { menuItems } from './menuItems';
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from './ProposalSubmission'
+import ProposalEdit from './ProposalEdit'
 import OverviewPage from './OverviewPage'
 
 
@@ -155,7 +156,7 @@ export default function Dashboard({ match }) {
         <div className={classes.appBarSpacer} />
         <Switch>
           <Route exact path="/Dashboard/" component={OverviewPage} />
-          <Route path="/Dashboard/ProposalSubmission/:proposalID" component={ProposalSubmission} />
+          <Route path="/Dashboard/ProposalSubmission/:proposalID" component={ProposalEdit} />
           <Route path="/Dashboard/ProposalSubmission" component={ProposalSubmission} />
         </Switch>
       </main>
