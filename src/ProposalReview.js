@@ -52,7 +52,7 @@ export default function ProposalReview(props) {
           onClick={props.submit}
           className={classes.button}
         >
-          {props.data.id ? "Update" : "Submit" }
+          {props.data.status ? "Update" : "Submit" }
         </Button>
       </div>
     </React.Fragment>

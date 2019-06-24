@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/styles';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
+import { request } from 'graphql-request'
 
 
 const useStyles = makeStyles({
@@ -21,12 +22,34 @@ const useStyles = makeStyles({
 
 
 export default function ProposalInformation(props) {
+
+  const sendProposalUpdate = (values) =>{  
+    const query = `
+    mutation($id: ID!, $title: String!, $abstract: String!,) {
+      updateProposal(id: $id, title: $title, abstract: $abstract){
+       proposal{
+        id
+      }
+        error
+      }
+    }
+    `;
+
+    const variables = {
+      id: props.data.id,
+      title: values.title,
+      abstract: values.abstract,
+    }
+      request('/graphql', query, variables).then(data => props.next(values));
+  }
+
   const classes = useStyles();
   return (
     <Formik
     initialValues={{ title: props.data.title, abstract: props.data.abstract }}
     onSubmit={(values, actions) => {
-      props.next(values);
+      sendProposalUpdate(values)
+      
     }}
     validationSchema={Yup.object().shape({
       title: Yup.string()

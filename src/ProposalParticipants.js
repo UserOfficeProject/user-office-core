@@ -4,6 +4,7 @@ import ParticipantModal from './ParticipantModal';
 import { makeStyles } from '@material-ui/styles';
 import Button from '@material-ui/core/Button';
 import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
+import { request } from 'graphql-request'
 
 const useStyles = makeStyles({
   errorText: {
@@ -27,6 +28,25 @@ export default function ProposalParticipants(props) {
     const [users, setUsers] = useState(props.data.users || []);
     const [userError, setUserError] = useState(false);
 
+    const sendProposalUpdate = () =>{  
+      const query = `
+      mutation($id: ID!, $users: [Int!]) {
+        updateProposal(id: $id, users: $users){
+         proposal{
+          id
+        }
+          error
+        }
+      }
+      `;
+  
+      const variables = {
+        id: props.data.id,
+        users: users.map((user => user.username))
+      }
+        request('/graphql', query, variables).then(data => props.next({users}));
+    }
+
     const addUser = (user) => {
         setUsers([
         ...users,
@@ -47,7 +67,7 @@ export default function ProposalParticipants(props) {
     if(users.length < 1){
       setUserError(true);
     }else{
-      props.next({users});
+      sendProposalUpdate();
     }
   }
 
