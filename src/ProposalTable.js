@@ -49,7 +49,7 @@ export default function ProposalTable(props) {
       
     useEffect(() => {
         getProposals()
-      });
+      }, []);
 
       if (editProposalID) {
         return <Redirect push to={`/Dashboard/ProposalSubmission/${editProposalID}`} />;
@@ -67,7 +67,7 @@ export default function ProposalTable(props) {
             }}
             actions={[
                 {
-                icon: Edit,
+                icon: () => <Edit/>,
                 tooltip: 'Edit proposal',
                 onClick: (event, rowData) => setEditProposalID(rowData.id)
                 }

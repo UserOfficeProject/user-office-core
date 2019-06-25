@@ -20,7 +20,6 @@ export default function ProposalEdit({match}) {
           firstname
           lastname
           id
-          roles
         }
       }
     }

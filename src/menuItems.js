@@ -5,6 +5,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import Edit from '@material-ui/icons/Edit';
+import People from '@material-ui/icons/People';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import {Link} from 'react-router-dom'
@@ -34,6 +35,12 @@ export const menuItems = (
         <FolderOpen />
       </ListItemIcon>
       <ListItemText primary="View Proposals" />
+    </ListItem>
+    <ListItem component={Link} to="/DashBoard/PeoplePage" button>
+      <ListItemIcon>
+        <People />
+      </ListItemIcon>
+      <ListItemText primary="View People" />
     </ListItem>
     <ListItem component={Link} to="/SignIn" button>
       <ListItemIcon>
