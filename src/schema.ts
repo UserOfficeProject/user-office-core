@@ -6,6 +6,7 @@ type Query {
     proposals: [Proposal]
     user(id: ID!): User
     users: [User]
+    roles: [Roles]
   }
 
   type Rejection {
@@ -29,9 +30,17 @@ type Query {
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
     createUser(firstname: String!, lastname: String!): UserMutationResult
+    addUserRole(userID: Int!, roleID: Int!): Boolean
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
+
+
+type Roles {
+  id: Int
+  shortCode: String
+  title: String
+}
 
 type Proposal {
     id: Int
@@ -46,7 +55,7 @@ type User {
     firstname: String
     lastname: String
     proposals: [Proposal!]
-    roles:[String]
+    roles:[Roles]
 }
 
 `);

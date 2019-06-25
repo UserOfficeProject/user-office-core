@@ -27,7 +27,14 @@ interface UserArgs {
   id: number;
 }
 
+interface AddUserRoleArgs {
+  userID: number;
+  roleID: number;
+}
+
 interface UsersArgs {}
+
+interface RolesArgs {}
 
 interface CreateUserArgs {
   firstname: string;
@@ -109,9 +116,21 @@ export default {
     return context.queries.user.getAll(context.user);
   },
 
+  roles(_args: RolesArgs, context: ResolverContext) {
+    return context.queries.user.getRoles();
+  },
+
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
       context.mutations.user.create(args.firstname, args.lastname)
+    );
+  },
+
+  addUserRole(args: AddUserRoleArgs, context: ResolverContext) {
+    return context.mutations.user.addRole(
+      context.user,
+      args.userID,
+      args.roleID
     );
   }
 };

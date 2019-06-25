@@ -19,7 +19,7 @@ app.use(
     //   const userId = req.session.userId;
     //   const user = await baseContext.queries.user.get(userId);
     // Mock user instead:
-    const user = new User(0, "Carl", "Carlsson", ["User_Officer"]);
+    const user = new User(0, "Carl", "Carlsson");
     const context: ResolverContext = { ...baseContext, user };
 
     return {

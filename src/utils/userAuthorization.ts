@@ -5,9 +5,9 @@ export function isUserOfficer(agent: User | null) {
     return false;
   }
 
-  if (!agent.roles.includes("User_Officer")) {
-    return false;
-  }
+  // if (!agent.roles.includes("User_Officer")) {
+  //   return false;
+  // }
   return true;
 }
 

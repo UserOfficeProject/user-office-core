@@ -20,4 +20,8 @@ export default class UserQueries {
       return null;
     }
   }
+
+  async getRoles() {
+    return this.dataSource.getRoles();
+  }
 }
