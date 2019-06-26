@@ -6,6 +6,9 @@ export const dummyUserOfficer = new User(4, "John", "Doe");
 export const dummyUser = new User(5, "Jane", "Doe");
 
 export class userDataSource implements UserDataSource {
+  setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
+    throw new Error("Method not implemented.");
+  }
   async getUserRoles(id: number): Promise<Role[]> {
     throw new Error("Method not implemented.");
   }
