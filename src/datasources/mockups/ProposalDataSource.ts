@@ -36,10 +36,10 @@ export class proposalDataSource implements ProposalDataSource {
   }
 
   async getProposals() {
-    return dummyProposal;
+    return [dummyProposal];
   }
 
   async getUserProposals(id: number) {
-    return dummyProposal;
+    return [dummyProposal];
   }
 }
