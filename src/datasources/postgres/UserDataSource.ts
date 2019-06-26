@@ -5,6 +5,18 @@ import Role from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
+  update(user: User): Promise<User | null> {
+    return database
+      .update({
+        firstname: user.firstname,
+        lastname: user.lastname
+      })
+      .from("users")
+      .where("user_id", user.id)
+      .then(() => {
+        return user;
+      });
+  }
   addUserRole(userID: number, roleID: number): boolean {
     return database
       .insert({

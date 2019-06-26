@@ -10,5 +10,6 @@ export interface UserDataSource {
   getProposalUsers(proposalId: number): Promise<User[]>;
   // Write
   create(firstname: string, lastname: string): Promise<User | null>;
+  update(user: User): Promise<User | null>;
   addUserRole(userID: number, roleID: number): boolean;
 }

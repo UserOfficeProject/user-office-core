@@ -19,6 +19,42 @@ export default class UserMutations {
     return result || rejection("INTERNAL_ERROR");
   }
 
+  async update(
+    agent: User | null,
+    id: string,
+    firstname: string,
+    lastname: string,
+    roles: number[]
+  ): Promise<User | Rejection> {
+    // Get user information
+    let user = await this.dataSource.get(parseInt(id)); //Hacky
+    console.log(user);
+    // Check that proposal exist
+    if (!user) {
+      return rejection("INTERNAL_ERROR");
+    }
+
+    if (firstname !== undefined) {
+      user.firstname = firstname;
+
+      if (firstname.length < 2) {
+        return rejection("TOO_SHORT_NAME");
+      }
+    }
+
+    if (lastname !== undefined) {
+      user.lastname = lastname;
+
+      if (lastname.length < 2) {
+        return rejection("TOO_SHORT_NAME");
+      }
+    }
+
+    const result = await this.dataSource.update(user);
+
+    return result || rejection("INTERNAL_ERROR");
+  }
+
   async addRole(
     agent: User | null,
     userID: number,

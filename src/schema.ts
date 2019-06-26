@@ -30,6 +30,7 @@ type Query {
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
     createUser(firstname: String!, lastname: String!): UserMutationResult
+    updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
   }
 

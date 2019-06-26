@@ -19,6 +19,13 @@ interface UpdateProposalArgs {
   users: number[];
 }
 
+interface UpdateUserArgs {
+  id: string;
+  firstname: string;
+  lastname: string;
+  roles: number[];
+}
+
 interface ApproveProposalArgs {
   id: number;
 }
@@ -123,6 +130,18 @@ export default {
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
       context.mutations.user.create(args.firstname, args.lastname)
+    );
+  },
+
+  updateUser(args: UpdateUserArgs, context: ResolverContext) {
+    return wrapUserMutation(
+      context.mutations.user.update(
+        context.user,
+        args.id,
+        args.firstname,
+        args.lastname,
+        args.roles
+      )
     );
   },
 
