@@ -1,4 +1,5 @@
 import database from "./database";
+import { UserRecord } from "./records";
 
 import User from "../../models/User";
 import { UserDataSource } from "../UserDataSource";
@@ -11,7 +12,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .where("user_id", id)
       .first()
       .then(
-        (user: { user_id: number; firstname: string; lastname: string }) =>
+        (user: UserRecord) =>
           new User(user.user_id, user.firstname, user.lastname)
       );
   }
@@ -31,7 +32,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from("users")
-      .then((users: any[]) =>
+      .then((users: UserRecord[]) =>
         users.map(
           user =>
             new User(user.user_id, user.firstname, user.lastname, ["dummyRole"])
@@ -46,7 +47,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
-      .then((users: any[]) =>
+      .then((users: UserRecord[]) =>
         users.map(
           user =>
             new User(user.user_id, user.firstname, user.lastname, ["dummyRole"])

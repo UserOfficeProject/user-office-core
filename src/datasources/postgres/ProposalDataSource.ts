@@ -1,4 +1,6 @@
 import database from "./database";
+import { ProposalRecord } from "./records";
+
 import { ProposalDataSource } from "../ProposalDataSource";
 import Proposal from "../../models/Proposal";
 
@@ -15,28 +17,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       )
       .from("proposals")
       .where("proposal_id", id)
-      .then(
-        (
-          proposal: [
-            {
-              proposal_id: number;
-              title: string;
-              abstract: string;
-              status: number;
-            }
-          ]
-        ) => {
-          if (proposal === undefined || !proposal.length) {
-            return null;
-          }
-          return new Proposal(
-            proposal[0].proposal_id,
-            proposal[0].title,
-            proposal[0].abstract,
-            proposal[0].status
-          );
+      .then((proposal: ProposalRecord[]) => {
+        if (proposal === undefined || !proposal.length) {
+          return null;
         }
-      );
+        return new Proposal(
+          proposal[0].proposal_id,
+          proposal[0].title,
+          proposal[0].abstract,
+          proposal[0].status
+        );
+      });
   }
 
   public submitProposal(id: number): Promise<Proposal | null> {
@@ -87,28 +78,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       )
       .from("proposals")
       .where("proposal_id", proposal.id)
-      .then(
-        (
-          proposal: [
-            {
-              proposal_id: number;
-              title: string;
-              abstract: string;
-              status: number;
-            }
-          ]
-        ) => {
-          if (proposal === undefined || !proposal.length) {
-            return null;
-          }
-          return new Proposal(
-            proposal[0].proposal_id,
-            proposal[0].title,
-            proposal[0].abstract,
-            proposal[0].status
-          );
+      .then((proposal: ProposalRecord[]) => {
+        if (proposal === undefined || !proposal.length) {
+          return null;
         }
-      );
+        return new Proposal(
+          proposal[0].proposal_id,
+          proposal[0].title,
+          proposal[0].abstract,
+          proposal[0].status
+        );
+      });
   }
 
   async get(id: number) {
@@ -118,12 +98,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where("proposal_id", id)
       .first()
       .then(
-        (proposal: {
-          proposal_id: number;
-          title: string;
-          abstract: string;
-          status: number;
-        }) =>
+        (proposal: ProposalRecord) =>
           new Proposal(
             proposal.proposal_id,
             proposal.title,
@@ -150,7 +125,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select()
       .from("proposals")
-      .then((proposals: any[]) =>
+      .then((proposals: ProposalRecord[]) =>
         proposals.map(
           proposal =>
             new Proposal(
@@ -170,7 +145,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .join("proposal_user as pc", { "p.proposal_id": "pc.proposal_id" })
       .join("users as u", { "u.user_id": "pc.user_id" })
       .where("u.user_id", id)
-      .then((proposals: any[]) =>
+      .then((proposals: ProposalRecord[]) =>
         proposals.map(
           proposal =>
             new Proposal(
