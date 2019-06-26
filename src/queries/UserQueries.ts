@@ -14,6 +14,7 @@ export default class UserQueries {
   }
 
   async getAll(agent: User | null) {
+    console.log(agent);
     if (isUserOfficer(agent)) {
       return this.dataSource.getUsers();
     } else {

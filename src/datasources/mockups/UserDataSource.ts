@@ -6,6 +6,9 @@ export const dummyUserOfficer = new User(4, "John", "Doe", "JoDo");
 export const dummyUser = new User(5, "Jane", "Doe", "JaDa");
 
 export class userDataSource implements UserDataSource {
+  getByUsername(username: string): Promise<User | null> {
+    throw new Error("Method not implemented.");
+  }
   async getPasswordByUsername(username: string): Promise<String | null> {
     return "Test1234!";
   }

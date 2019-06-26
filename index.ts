@@ -24,14 +24,10 @@ app.use(
   "/graphql",
   graphqlHTTP(async (req: Request) => {
     // Adds the currently logged-in user to the context object, which makes it available to the resolvers
-    // If the user is accessible though a query, it could look something like:
-    //   const userId = req.session.userId;
-    //   const user = await baseContext.queries.user.get(userId);
-    // Mock user instead:
-    const user = new User(0, "Carl", "Carlsson");
+    // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
+    const user = req.user;
     const context: ResolverContext = { ...baseContext, user };
-    //console.log(_req);
-    console.log(req.user);
+
     return {
       schema: schema,
       rootValue: root,
