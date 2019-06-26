@@ -1,4 +1,6 @@
 import database from "./database";
+import { UserRecord } from "./records";
+const BluePromise = require("bluebird");
 
 import User from "../../models/User";
 import Role from "../../models/Role";
@@ -50,6 +52,32 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
+  async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
+    return database.transaction(function(trx: { commit: any; rollback: any }) {
+      return database
+        .from("role_user")
+        .where("user_id", id)
+        .del()
+        .transacting(trx)
+        .then(() => {
+          return BluePromise.map(roles, (role_id: number) => {
+            return database
+              .insert({ user_id: id, role_id: role_id })
+              .into("role_user")
+              .transacting(trx);
+          });
+        })
+        .then(() => {
+          trx.commit;
+          return true;
+        })
+        .catch(() => {
+          trx.rollback;
+          return false;
+        });
+    });
+  }
+
   async get(id: number) {
     return database
       .select()
@@ -57,7 +85,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .where("user_id", id)
       .first()
       .then(
-        (user: { user_id: number; firstname: string; lastname: string }) =>
+        (user: UserRecord) =>
           new User(user.user_id, user.firstname, user.lastname)
       );
   }
@@ -77,7 +105,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from("users")
-      .then((users: any[]) =>
+      .then((users: UserRecord[]) =>
         users.map(user => new User(user.user_id, user.firstname, user.lastname))
       );
   }
@@ -89,7 +117,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
-      .then((users: any[]) =>
+      .then((users: UserRecord[]) =>
         users.map(user => new User(user.user_id, user.firstname, user.lastname))
       );
   }
