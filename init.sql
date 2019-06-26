@@ -2,6 +2,8 @@ CREATE TABLE users (
   user_id  serial PRIMARY KEY
 , firstname     varchar(20) NOT NULL
 , lastname     varchar(20) NOT NULL
+, username     varchar(20) UNIQUE
+, password     varchar(60) NOT NULL
 );
 
 CREATE TABLE proposals (
@@ -34,3 +36,5 @@ CREATE TABLE role_user (
 insert into roles (short_code, title) VALUES ('user', 'User');
 
 insert into roles (short_code, title) VALUES ('user_officer', 'User Officer');
+
+insert into users (firstname, lastname, username, password ) VALUES ('Carl', 'Carlsson', 'caca', 'Test1234!');

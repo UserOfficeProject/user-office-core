@@ -34,6 +34,11 @@ interface UserArgs {
   id: number;
 }
 
+interface LoginArgs {
+  username: string;
+  password: string;
+}
+
 interface AddUserRoleArgs {
   userID: number;
   roleID: number;
@@ -46,6 +51,8 @@ interface RolesArgs {}
 interface CreateUserArgs {
   firstname: string;
   lastname: string;
+  username: string;
+  password: string;
 }
 
 function createMutationWrapper<T>(key: string) {
@@ -115,6 +122,10 @@ export default {
     );
   },
 
+  login(args: LoginArgs, context: ResolverContext) {
+    return context.mutations.user.login(args.username, args.password);
+  },
+
   user(args: UserArgs, context: ResolverContext) {
     return context.queries.user.get(args.id, context.user);
   },
@@ -129,7 +140,12 @@ export default {
 
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
-      context.mutations.user.create(args.firstname, args.lastname)
+      context.mutations.user.create(
+        args.firstname,
+        args.lastname,
+        args.username,
+        args.password
+      )
     );
   },
 

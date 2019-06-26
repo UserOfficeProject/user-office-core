@@ -16,6 +16,7 @@ export interface UserRecord {
   readonly user_id: number;
   readonly firstname: string;
   readonly lastname: string;
+  readonly username: string;
 }
 
 export interface RoleRecord {

@@ -1,5 +1,6 @@
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
+const jwt = require("express-jwt");
 
 import { Request } from "express";
 
@@ -8,12 +9,20 @@ import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
 import User from "./src/models/User";
-import Proposal from "./src/models/Proposal";
 
 var app = express();
+
+// authentication middleware
+const authMiddleware = jwt({
+  credentialsRequired: false,
+  secret: "somesuperdupersecret"
+});
+
+app.use(authMiddleware);
+
 app.use(
   "/graphql",
-  graphqlHTTP(async (_req: Request) => {
+  graphqlHTTP(async (req: Request) => {
     // Adds the currently logged-in user to the context object, which makes it available to the resolvers
     // If the user is accessible though a query, it could look something like:
     //   const userId = req.session.userId;
@@ -21,7 +30,8 @@ app.use(
     // Mock user instead:
     const user = new User(0, "Carl", "Carlsson");
     const context: ResolverContext = { ...baseContext, user };
-
+    //console.log(_req);
+    console.log(req.user);
     return {
       schema: schema,
       rootValue: root,

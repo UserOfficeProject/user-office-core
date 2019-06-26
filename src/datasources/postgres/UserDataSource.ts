@@ -7,6 +7,15 @@ import Role from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
+  getPasswordByUsername(username: string): Promise<String | null> {
+    return database
+      .select("password")
+      .from("users")
+      .where("username", username)
+      .first()
+      .then((user: any) => user.password);
+  }
+
   update(user: User): Promise<User | null> {
     return database
       .update({
@@ -86,19 +95,41 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (user: UserRecord) =>
-          new User(user.user_id, user.firstname, user.lastname)
+          new User(user.user_id, user.firstname, user.lastname, user.username)
       );
   }
 
-  async create(firstname: string, lastname: string) {
+  async getByUsername(username: string) {
+    return database
+      .select()
+      .from("users")
+      .where("username", username)
+      .first()
+      .then(
+        (user: UserRecord) =>
+          new User(user.user_id, user.firstname, user.lastname, user.username)
+      );
+  }
+
+  async create(
+    firstname: string,
+    lastname: string,
+    username: string,
+    password: string
+  ) {
     return database
       .insert({
-        firstname: firstname,
-        lastname: lastname
+        firstname,
+        lastname,
+        username,
+        password
       })
       .returning("user_id")
       .into("users")
-      .then((user_id: number[]) => new User(user_id[0], firstname, lastname));
+      .then(
+        (user_id: number[]) =>
+          new User(user_id[0], firstname, lastname, username)
+      );
   }
 
   async getUsers() {
@@ -106,7 +137,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from("users")
       .then((users: UserRecord[]) =>
-        users.map(user => new User(user.user_id, user.firstname, user.lastname))
+        users.map(
+          user =>
+            new User(user.user_id, user.firstname, user.lastname, user.username)
+        )
       );
   }
 
@@ -118,7 +152,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
       .then((users: UserRecord[]) =>
-        users.map(user => new User(user.user_id, user.firstname, user.lastname))
+        users.map(
+          user =>
+            new User(user.user_id, user.firstname, user.lastname, user.username)
+        )
       );
   }
 }

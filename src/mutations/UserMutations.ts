@@ -2,11 +2,18 @@ import User from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
 import { isUserOfficer } from "../utils/userAuthorization";
+const jsonwebtoken = require("jsonwebtoken");
+import * as bcrypt from "bcryptjs";
 
 export default class UserMutations {
   constructor(private dataSource: UserDataSource) {}
 
-  async create(firstname: string, lastname: string): Promise<User | Rejection> {
+  async create(
+    firstname: string,
+    lastname: string,
+    username: string,
+    password: string
+  ): Promise<User | Rejection> {
     if (firstname === "") {
       return rejection("INVALID_FIRST_NAME");
     }
@@ -14,8 +21,15 @@ export default class UserMutations {
     if (lastname === "") {
       return rejection("INVALID_LAST_NAME");
     }
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
 
-    const result = await this.dataSource.create(firstname, lastname);
+    const result = await this.dataSource.create(
+      firstname,
+      lastname,
+      username,
+      hash
+    );
     return result || rejection("INTERNAL_ERROR");
   }
 
@@ -73,5 +87,36 @@ export default class UserMutations {
     const result = await this.dataSource.addUserRole(userID, roleID);
 
     return result || rejection("INTERNAL_ERROR");
+  }
+
+  async login(username: string, password: string): Promise<String | Rejection> {
+    const result = await this.dataSource.getPasswordByUsername(username);
+
+    const valid = bcrypt.compareSync(password, result); // true
+
+    if (!valid) {
+      return rejection("WRONG_PASSWORD");
+    }
+
+    const user = await this.dataSource.getByUsername(username);
+
+    if (!user) {
+      return rejection("INTERNAL_ERROR");
+    }
+
+    const roles = await this.dataSource.getUserRoles(user.id);
+
+    if (!roles) {
+      return rejection("INTERNAL_ERROR");
+    }
+
+    return jsonwebtoken.sign(
+      {
+        id: user.id,
+        roles
+      },
+      "somesuperdupersecret",
+      { expiresIn: "1y" }
+    );
   }
 }

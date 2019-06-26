@@ -29,9 +29,10 @@ type Query {
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
-    createUser(firstname: String!, lastname: String!): UserMutationResult
+    createUser(firstname: String!, lastname: String!, username: String!, password: String!): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
+    login(username: String!, password: String!): String
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
