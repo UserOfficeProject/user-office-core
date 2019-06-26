@@ -48,8 +48,49 @@ export default function UserPage(props) {
     ViewColumn: ViewColumn
   };
 
+  const [roles, setRoles] = useState([]);
 
-  // A user update is needed
+  const addRole = (role) => {
+    setRoles([
+    ...roles,
+    role
+    ]);
+    setOpen(false);
+};
+
+const removeRole = (role) => {
+  let newRoles = [...roles];
+  newRoles.splice(newRoles.indexOf(role), 1);
+  setRoles(
+    newRoles
+  );
+};
+
+const sendUserUpdate = (values) =>{  
+    const query = `
+    mutation($id: ID!, $firstname: String!, $lastname: String!, $roles: [Int!]) {
+      updateUser(id: $id, firstname: $firstname, lastname: $lastname, roles: $roles){
+       user{
+        id
+      }
+        error
+      }
+    }
+    `;
+
+    const variables = {
+      id: props.id,
+      firstname: values.firstname,
+      lastname: values.lastname,
+      roles: roles.map((role) => role.id)
+    }
+      request('/graphql', query, variables).then(data => console.log(data));
+  }
+
+
+
+
+
   const getUserInformation = (id) =>{  
     const query = `
     query($id: ID!) {
@@ -68,25 +109,15 @@ export default function UserPage(props) {
     const variables = {
       id
     }
-      request('/graphql', query, variables).then(data => setUserData({...data.user}));
+      request('/graphql', query, variables).then(data => {
+        setUserData({...data.user})
+        setRoles(data.user.roles)
+      });
   }
 
   useEffect(() => {
     getUserInformation(props.id);
   }, [props.id]);
-
-  const addRole = (role) => {
-    setUserData({
-    ...userData,
-    roles : [
-    ...userData.roles,
-    role]
-    });
-    setOpen(false);
-};
-
-
-
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -103,8 +134,7 @@ export default function UserPage(props) {
     <Formik
     initialValues={{ firstname: userData.firstname, lastname: userData.lastname }}
     onSubmit={(values, actions) => {
-      console.log("Update User", userData)
-      
+      sendUserUpdate(values);  
     }}
     validationSchema={Yup.object().shape({
       firstname: Yup.string()
@@ -162,7 +192,7 @@ export default function UserPage(props) {
         title="Roles"
         columns={columns}
         icons={tableIcons}
-        data={userData.roles.map(role => {return {name : role.title}})}
+        data={roles.map(role => {return {name : role.title}})}
         options={{
             search: false
         }}
@@ -178,7 +208,8 @@ export default function UserPage(props) {
           onRowDelete: oldData =>
           new Promise(resolve => {
             resolve();
-        })
+            removeRole(oldData);
+          })
       }}
         />
 
