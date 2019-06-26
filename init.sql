@@ -6,7 +6,8 @@ CREATE TABLE users (
 
 CREATE TABLE proposals (
   proposal_id serial PRIMARY KEY  -- implicit primary key constraint
-, abstract    text NOT NULL
+, title    varchar(20)
+, abstract    text
 , status      numeric NOT NULL DEFAULT 0
 );
 

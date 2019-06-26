@@ -23,8 +23,11 @@ type Query {
   }
 
   type Mutation {
-    createProposal(abstract: String!, status: Int!, users: [Int!]): ProposalMutationResult
+    createProposal: ProposalMutationResult
+    updateProposal(id: ID!, title: String, abstract: String, status: Int, users: [Int]): ProposalMutationResult
     approveProposal(id: Int!): ProposalMutationResult
+    submitProposal(id: Int!): ProposalMutationResult
+    rejectProposal(id: Int!): ProposalMutationResult
     createUser(firstname: String!, lastname: String!): UserMutationResult
   }
 
@@ -32,6 +35,7 @@ type Query {
 
 type Proposal {
     id: Int
+    title: String
     abstract: String
     status: Int
     users: [User!]

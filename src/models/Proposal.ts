@@ -1,10 +1,12 @@
 export default class Proposal {
   id: number;
+  title: string;
   abstract: string;
   status: number;
 
-  constructor(id: number, abstract: string, status: number) {
+  constructor(id: number, title: string, abstract: string, status: number) {
     this.id = id;
+    this.title = title;
     this.abstract = abstract;
     this.status = status;
   }

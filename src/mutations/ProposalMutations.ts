@@ -14,8 +14,26 @@ export default class ProposalMutations {
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
-  async create(
+  async create(agent: User | null): Promise<Proposal | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        if (agent == null) {
+          return rejection("NOT_LOGGED_IN");
+        }
+
+        const result = await this.dataSource.create();
+        return result || rejection("INTERNAL_ERROR");
+      },
+      proposal => {
+        return { type: "PROPOSAL_CREATED", proposal };
+      }
+    );
+  }
+
+  async update(
     agent: User | null,
+    id: string,
+    title: string,
     abstract: string,
     status: number,
     users: number[]
@@ -26,15 +44,51 @@ export default class ProposalMutations {
           return rejection("NOT_LOGGED_IN");
         }
 
-        if (abstract.length < 20) {
-          return rejection("TOO_SHORT_ABSTRACT");
+        // Get proposal information
+        let proposal = await this.dataSource.get(parseInt(id)); //Hacky
+
+        // Check that proposal exist
+        if (!proposal) {
+          return rejection("INTERNAL_ERROR");
         }
 
-        const result = await this.dataSource.create(abstract, status, users);
+        // Check what needs to be updated and update proposal object
+        if (title !== undefined) {
+          proposal.title = title;
+
+          if (title.length < 10) {
+            return rejection("TOO_SHORT_TITLE");
+          }
+        }
+
+        if (abstract !== undefined) {
+          proposal.abstract = abstract;
+
+          if (abstract.length < 20) {
+            return rejection("TOO_SHORT_ABSTRACT");
+          }
+        }
+
+        if (status !== undefined) {
+          proposal.status = status;
+        }
+
+        if (users !== undefined) {
+          const resultUpdateUsers = await this.dataSource.setProposalUsers(
+            parseInt(id),
+            users
+          );
+          if (!resultUpdateUsers) {
+            return rejection("INTERNAL_ERROR");
+          }
+        }
+        // This will overwrite the whole proposal with the new object created
+        const result = await this.dataSource.update(proposal);
+
         return result || rejection("INTERNAL_ERROR");
       },
       proposal => {
-        return { type: "PROPOSAL_ACCEPTED", proposal };
+        return { type: "PROPOSAL_UPDATED", proposal };
       }
     );
   }
@@ -52,6 +106,34 @@ export default class ProposalMutations {
     }
 
     const result = await this.dataSource.acceptProposal(proposalID);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
+  async reject(
+    agent: User | null,
+    proposalID: number
+  ): Promise<Proposal | Rejection> {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    if (!isUserOfficer(agent)) {
+      return rejection("NOT_USER_OFFICER");
+    }
+
+    const result = await this.dataSource.rejectProposal(proposalID);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
+  async submit(
+    agent: User | null,
+    proposalID: number
+  ): Promise<Proposal | Rejection> {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    const result = await this.dataSource.submitProposal(proposalID);
     return result || rejection("INTERNAL_ERROR");
   }
 }
