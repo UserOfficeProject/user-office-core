@@ -1,40 +1,36 @@
-import React from 'react';
+import React, {createContext, useState} from 'react';
 import SignUp from './SignUp'
 import SignIn from './SignIn'
-import ProposalSubmission from './ProposalSubmission'
 import DashBoard from './DashBoard'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
+
+export const AppContext = createContext();
 
 
-function menu(){
-  return<nav>
-  <ul>
-    <li>
-      <Link to="/ProposalSubmission/">Proposal</Link>
-    </li>
-    <li>
-      <Link to="/SignUp/">Registration</Link>
-    </li>
-    <li>
-      <Link to="/SignIn/">Login</Link>
-    </li>
-    <li>
-      <Link to="/DashBoard/">Dashboard</Link>
-    </li>
-  </ul>
-</nav>
-}
+const PrivateRoute = ({ component: Component, authed, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    authed
+      ? <Component {...props} />
+      : <Redirect to='/SignIn' />
+  )} />
+)
 
 
 function App() {
+  const [token, setToken] = useState(null);
+  console.log(token)
   return (
     <Router>
     <div className="App">
-        <Route exact path="/" component={menu} />
-        <Route path="/ProposalSubmission" component={ProposalSubmission} />
+      <AppContext.Provider value={{token, setToken}} >
+      <Switch>
         <Route path="/SignUp" component={SignUp} />
         <Route path="/SignIn" component={SignIn} />
-        <Route path="/DashBoard" component={DashBoard} />
+        <PrivateRoute authed={token} path="/" component={DashBoard}/>
+      </Switch>
+      </AppContext.Provider>
+
     </div>
     </Router>
   );
