@@ -44,7 +44,6 @@ export default function SignIn() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
   const {token, setToken} = useContext(AppContext);
-
   const requestToken = (values) =>{ 
     const {username, password} = values;
     const query = `
@@ -57,7 +56,7 @@ export default function SignIn() {
       username,
       password
     }
-  
+
       request('/graphql', query, variables).then(data => setToken(data.login)).catch((error) => setFailed(true));
   }
 

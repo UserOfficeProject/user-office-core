@@ -52,7 +52,7 @@ export default function ProposalTable(props) {
       }, []);
 
       if (editProposalID) {
-        return <Redirect push to={`/Dashboard/ProposalSubmission/${editProposalID}`} />;
+        return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;
       }
 
     

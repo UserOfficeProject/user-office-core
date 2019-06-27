@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import MaterialTable from 'material-table';
 import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
-import { request } from 'graphql-request'
 import { withRouter } from 'react-router-dom'
+import {AppContext } from "./App"
+
 // TODO fix filtering in API
-function sendUserlRequest(searchQuery){
+function sendUserlRequest(searchQuery, apiCall){
     const query = `{
         users{
           firstname
@@ -13,12 +14,12 @@ function sendUserlRequest(searchQuery){
         }
       }`
        
-      return request('/graphql', query).then(data => { return {page: 0, totalCount: data.users.length, data: data.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}}) }})
+      return apiCall(query).then(data => { return {page: 0, totalCount: data.users.length, data: data.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}}) }})
   }
   
 
 function PeopleTable(props) {
-
+   const { apiCall } = useContext(AppContext);
 
     const tableIcons = {
         Add: AddBox,
@@ -52,7 +53,7 @@ function PeopleTable(props) {
         icons={tableIcons}
         title="Users"
         columns={columns}
-        data={query => sendUserlRequest(query)}
+        data={query => sendUserlRequest(query, apiCall)}
         options={{
             search: true
         }}
@@ -60,7 +61,7 @@ function PeopleTable(props) {
             {
               icon: () => <Edit/>,
               tooltip: 'Edit user',
-              onClick: (event, rowData) => props.history.push(`/Dashboard/PeoplePage/${rowData.username}`)
+              onClick: (event, rowData) => props.history.push(`/PeoplePage/${rowData.username}`)
 
             }
           ]}

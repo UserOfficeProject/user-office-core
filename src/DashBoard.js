@@ -87,25 +87,17 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
+  }
 }));
 
 export default function Dashboard({ match }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+
+  
+
+
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -156,11 +148,11 @@ export default function Dashboard({ match }) {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Switch>
-          <Route exact path="/Dashboard/" component={OverviewPage} />
-          <Route path="/Dashboard/ProposalSubmission/:proposalID" component={ProposalEdit} />
-          <Route path="/Dashboard/ProposalSubmission" component={ProposalSubmission} />
-          <Route path="/Dashboard/PeoplePage/:userID" component={PeoplePage} />
-          <Route path="/Dashboard/PeoplePage" component={PeoplePage} />
+          <Route path="/ProposalSubmission/:proposalID" component={ProposalEdit} />
+          <Route path="/ProposalSubmission" component={ProposalSubmission} />
+          <Route path="/PeoplePage/:userID" component={PeoplePage} />
+          <Route path="/PeoplePage" component={PeoplePage} />
+          <Route component={OverviewPage} />
         </Switch>
       </main>
     </div>
