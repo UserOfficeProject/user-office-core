@@ -1,4 +1,4 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useState, useEffect, useContext }  from 'react';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
@@ -6,11 +6,12 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/styles';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { request } from 'graphql-request'
 import MaterialTable from 'material-table';
 import RoleModal from './RoleModal';
 import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
-
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import {AppContext } from "./App"
 
 const useStyles = makeStyles({
   buttons: {
@@ -21,11 +22,11 @@ const useStyles = makeStyles({
     marginTop: "25px",
     marginLeft: "10px",
   },
+  
 });
 
 
-export default function UserPage(props) {
-
+export default function UserPage({match}) {
   const [userData, setUserData] = useState(null);
   const [modalOpen, setOpen] = useState(false);
   const tableIcons = {
@@ -48,6 +49,7 @@ export default function UserPage(props) {
     ViewColumn: ViewColumn
   };
 
+  const { apiCall } = useContext(AppContext);
   const [roles, setRoles] = useState([]);
 
   const addRole = (role) => {
@@ -79,17 +81,13 @@ const sendUserUpdate = (values) =>{
     `;
 
     const variables = {
-      id: props.id,
+      id: match.params.id,
       firstname: values.firstname,
       lastname: values.lastname,
       roles: roles.map((role) => role.id)
     }
-      request('/graphql', query, variables).then(data => console.log(data));
+    apiCall(query, variables).then(data => console.log(data));
   }
-
-
-
-
 
   const getUserInformation = (id) =>{  
     const query = `
@@ -109,15 +107,15 @@ const sendUserUpdate = (values) =>{
     const variables = {
       id
     }
-      request('/graphql', query, variables).then(data => {
+    apiCall(query, variables).then(data => {
         setUserData({...data.user})
         setRoles(data.user.roles)
       });
   }
 
   useEffect(() => {
-    getUserInformation(props.id);
-  }, [props.id]);
+    getUserInformation(match.params.id);
+  }, [match.params.id]);
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -130,6 +128,10 @@ const sendUserUpdate = (values) =>{
   }
   return (
     <React.Fragment>
+              <Container maxWidth="lg" className={classes.container}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
     <RoleModal show={modalOpen} close={setOpen.bind(this, false)} add={addRole} />
     <Formik
     initialValues={{ firstname: userData.firstname, lastname: userData.lastname }}
@@ -229,6 +231,10 @@ const sendUserUpdate = (values) =>{
     </Form>
     )}
     </Formik>
+    </Paper>
+          </Grid>
+        </Grid>
+      </Container>
     </React.Fragment>
   );
 }

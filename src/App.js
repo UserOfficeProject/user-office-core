@@ -26,12 +26,14 @@ async function apiCall(token, query, variables) {
     },
   })
 
-  return graphQLClient.request(query).catch((error => console.log("take care of error")))
+  return graphQLClient.request(query, variables).catch((error => console.log("take care of error")))
 }
 
 
 function App() {
-  const [token, setToken] = useState(null);
+ //const [token, setToken] = useState(null);
+ // For development
+  const [token, setToken] = useState("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI");
 
   return (
     <Router>

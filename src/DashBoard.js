@@ -18,6 +18,7 @@ import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from './ProposalSubmission'
 import ProposalEdit from './ProposalEdit'
 import PeoplePage from './PeoplePage'
+import UserPage from './UserPage'
 import OverviewPage from './OverviewPage'
 
 
@@ -150,7 +151,7 @@ export default function Dashboard({ match }) {
         <Switch>
           <Route path="/ProposalSubmission/:proposalID" component={ProposalEdit} />
           <Route path="/ProposalSubmission" component={ProposalSubmission} />
-          <Route path="/PeoplePage/:userID" component={PeoplePage} />
+          <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route component={OverviewPage} />
         </Switch>

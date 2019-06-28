@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import PeopleTable from './PeopleTable';
-import UserPage from './UserPage'
-
+import { Edit } from "@material-ui/icons";
+import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -30,12 +30,18 @@ const useStyles = makeStyles(theme => ({
 
 export default function PeoplePage({match}) {
     const classes = useStyles();
+    const [userData, setUserData] = useState(null);
+
+    if (userData) {
+      return <Redirect to={`/PeoplePage/${userData.username}`} />;
+    }
+  
     return (<React.Fragment>
         <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-                {match.params.userID ? <UserPage id={match.params.userID} /> : <PeopleTable />}
+               <PeopleTable title="Users" actionText="Edit user" actionIcon={<Edit/>}  action={setUserData} />
             </Paper>
           </Grid>
         </Grid>

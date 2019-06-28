@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 import {AppContext } from "./App"
 
 // TODO fix filtering in API
-function sendUserlRequest(searchQuery, apiCall){
+function sendUserRequest(searchQuery, apiCall){
     const query = `{
         users{
           firstname
@@ -51,18 +51,17 @@ function PeopleTable(props) {
 
         <MaterialTable
         icons={tableIcons}
-        title="Users"
+        title={props.title}
         columns={columns}
-        data={query => sendUserlRequest(query, apiCall)}
+        data={query => sendUserRequest(query, apiCall)}
         options={{
             search: true
         }}
         actions={[
             {
-              icon: () => <Edit/>,
-              tooltip: 'Edit user',
-              onClick: (event, rowData) => props.history.push(`/PeoplePage/${rowData.username}`)
-
+              icon: () => props.actionIcon,
+              tooltip: props.title,
+              onClick: (event, rowData) => props.action(rowData)
             }
           ]}
         />
