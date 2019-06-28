@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { request } from 'graphql-request'
-import ProposalContainer from './ProposalContainer';
+import React, { useState, useEffect } from "react";
+import { request } from "graphql-request";
+import ProposalContainer from "./ProposalContainer";
 
-export default function ProposalEdit({match}) {
-
+export default function ProposalEdit({ match }) {
   const [proposalData, setProposalData] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const getProposalInformation = (id) => {
-    
+  const getProposalInformation = id => {
     const query = `
     query($id: ID!) {
       proposal(id: $id) {
@@ -27,29 +25,31 @@ export default function ProposalEdit({match}) {
 
     const variables = {
       id
-    }
-      request('/graphql', query, variables).then(data => {
-        setProposalData({
-          title: data.proposal.title,
-          abstract: data.proposal.abstract,
-          id: data.proposal.id,
-          status: data.proposal.status,
-          users: data.proposal.users.map((user) => {return {name: user.firstname, surname: user.lastname, username: user.id}})
+    };
+    request("/graphql", query, variables).then(data => {
+      setProposalData({
+        title: data.proposal.title,
+        abstract: data.proposal.abstract,
+        id: data.proposal.id,
+        status: data.proposal.status,
+        users: data.proposal.users.map(user => {
+          return {
+            name: user.firstname,
+            surname: user.lastname,
+            username: user.id
+          };
         })
-        setLoading(false);
       });
-  }
-
+      setLoading(false);
+    });
+  };
 
   useEffect(() => {
     getProposalInformation(match.params.proposalID);
   }, [match.params.proposalID]);
 
-  if(loading){
-      return <p>Loading</p>
+  if (loading) {
+    return <p>Loading</p>;
   }
-  return (
-    <ProposalContainer data={proposalData} /> 
-  );
+  return <ProposalContainer data={proposalData} />;
 }
-

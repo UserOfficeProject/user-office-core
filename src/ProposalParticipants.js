@@ -1,35 +1,49 @@
-import React, { useState } from 'react';
-import MaterialTable from 'material-table';
-import ParticipantModal from './ParticipantModal';
-import { makeStyles } from '@material-ui/styles';
-import Button from '@material-ui/core/Button';
-import { AddBox, Check, Clear, DeleteOutline, Edit, FilterList,ViewColumn,  ArrowUpward, Search, FirstPage, LastPage, ChevronRight, ChevronLeft, Remove, SaveAlt } from "@material-ui/icons";
-import { request } from 'graphql-request'
+import React, { useState } from "react";
+import MaterialTable from "material-table";
+import ParticipantModal from "./ParticipantModal";
+import { makeStyles } from "@material-ui/styles";
+import Button from "@material-ui/core/Button";
+import {
+  AddBox,
+  Check,
+  Clear,
+  DeleteOutline,
+  Edit,
+  FilterList,
+  ViewColumn,
+  ArrowUpward,
+  Search,
+  FirstPage,
+  LastPage,
+  ChevronRight,
+  ChevronLeft,
+  Remove,
+  SaveAlt
+} from "@material-ui/icons";
+import { request } from "graphql-request";
 
 const useStyles = makeStyles({
   errorText: {
     color: "#f44336"
   },
   buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
+    display: "flex",
+    justifyContent: "flex-end"
   },
   button: {
     marginTop: "25px",
-    marginLeft: "10px",
-  },
+    marginLeft: "10px"
+  }
 });
 
-
 export default function ProposalParticipants(props) {
+  const classes = useStyles();
+  const [modalOpen, setOpen] = useState(false);
+  const [users, setUsers] = useState(props.data.users || []);
+  const [userError, setUserError] = useState(false);
 
-    const classes = useStyles();
-    const [modalOpen, setOpen] = useState(false);
-    const [users, setUsers] = useState(props.data.users || []);
-    const [userError, setUserError] = useState(false);
-
-    const sendProposalUpdate = () =>{  
-      const query = `
+  const sendProposalUpdate = () => {
+    const query = `
       mutation($id: ID!, $users: [Int!]) {
         updateProposal(id: $id, users: $users){
          proposal{
@@ -39,92 +53,95 @@ export default function ProposalParticipants(props) {
         }
       }
       `;
-  
-      const variables = {
-        id: props.data.id,
-        users: users.map((user => user.username))
-      }
-        request('/graphql', query, variables).then(data => props.next({users}));
-    }
 
-    const addUser = (user) => {
-        setUsers([
-        ...users,
-        user
-        ]);
-        setOpen(false);
+    const variables = {
+      id: props.data.id,
+      users: users.map(user => user.username)
     };
+    request("/graphql", query, variables).then(data => props.next({ users }));
+  };
 
-    const removeUser = (user) => {
-      let newUsers = [...users];
-      newUsers.splice(newUsers.indexOf(user), 1);
-      setUsers(
-        newUsers
-      );
+  const addUser = user => {
+    setUsers([...users, user]);
+    setOpen(false);
+  };
+
+  const removeUser = user => {
+    let newUsers = [...users];
+    newUsers.splice(newUsers.indexOf(user), 1);
+    setUsers(newUsers);
   };
 
   const handleNext = () => {
-    if(users.length < 1){
+    if (users.length < 1) {
       setUserError(true);
-    }else{
+    } else {
       sendProposalUpdate();
     }
-  }
+  };
 
-    const tableIcons = {
-        Add: AddBox,
-        Check: Check,
-        Clear: Clear,
-        Delete: DeleteOutline,
-        DetailPanel: ChevronRight,
-        Edit: Edit,
-        Export: SaveAlt,
-        Filter: FilterList,
-        FirstPage: FirstPage,
-        LastPage: LastPage,
-        NextPage: ChevronRight,
-        PreviousPage: ChevronLeft,
-        ResetSearch: Clear,
-        Search: Search,
-        SortArrow: ArrowUpward,
-        ThirdStateCheck: Remove,
-        ViewColumn: ViewColumn
-      };
-  const columns =  [
-      { title: 'Name', field: 'name' },
-      { title: 'Surname', field: 'surname' },
-      { title: 'Username', field: 'username' },
-    ];
+  const tableIcons = {
+    Add: AddBox,
+    Check: Check,
+    Clear: Clear,
+    Delete: DeleteOutline,
+    DetailPanel: ChevronRight,
+    Edit: Edit,
+    Export: SaveAlt,
+    Filter: FilterList,
+    FirstPage: FirstPage,
+    LastPage: LastPage,
+    NextPage: ChevronRight,
+    PreviousPage: ChevronLeft,
+    ResetSearch: Clear,
+    Search: Search,
+    SortArrow: ArrowUpward,
+    ThirdStateCheck: Remove,
+    ViewColumn: ViewColumn
+  };
+  const columns = [
+    { title: "Name", field: "name" },
+    { title: "Surname", field: "surname" },
+    { title: "Username", field: "username" }
+  ];
 
   return (
     <React.Fragment>
-        <ParticipantModal show={modalOpen} close={setOpen.bind(this, false)} addParticipant={addUser} />
-        <MaterialTable
+      <ParticipantModal
+        show={modalOpen}
+        close={setOpen.bind(this, false)}
+        addParticipant={addUser}
+      />
+      <MaterialTable
         className={classes.table}
         icons={tableIcons}
         title="Add Co-Proposers"
         columns={columns}
         data={users}
         options={{
-            search: false
+          search: false
         }}
         actions={[
-            {
+          {
             icon: "+",
-            tooltip: 'Add User',
+            tooltip: "Add User",
             isFreeAction: true,
-            onClick: (event) => setOpen(true)
-            }
+            onClick: event => setOpen(true)
+          }
         ]}
         editable={{
-            onRowDelete: oldData =>
+          onRowDelete: oldData =>
             new Promise(resolve => {
               resolve();
               removeUser(oldData);
             })
         }}
-        />
-      {userError && <p className={classes.errorText}>You need to add at least one Co-Proposer</p>}
+      />
+      {userError && (
+        <p className={classes.errorText}>
+          You need to add at least one Co-Proposer
+        </p>
+      )}
       <div className={classes.buttons}>
         <Button onClick={props.back} className={classes.button}>
           Back
