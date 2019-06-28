@@ -42,7 +42,7 @@ export const menuItems = (
       </ListItemIcon>
       <ListItemText primary="View People" />
     </ListItem>
-    <ListItem component={Link} to="/SignIn" button>
+    <ListItem component={Link} to="/LogOut" button>
       <ListItemIcon>
         <ExitToApp />
       </ListItemIcon>

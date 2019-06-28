@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
@@ -10,6 +9,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { request } from "graphql-request";
 import { Link } from "react-router-dom";
+import { Formik, Field, Form } from "formik";
+import { TextField } from "formik-material-ui";
+import * as Yup from "yup";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -36,129 +38,117 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function sendSignUpRequest(setUserID, firstName, lastName, email, password) {
-  const query = `mutation($firstName: String!, $lastName: String!){
-        createUser(firstname: $firstName, lastname: $lastName){
-          user{
-            id
-          }
-          error
-        }
-      }`;
-  const variables = {
-    firstName,
-    lastName
-  };
-
-  request("/graphql", query, variables).then(data =>
-    setUserID(data.createUser.user.id)
-  );
-}
-
 export default function SignUp() {
   const classes = useStyles();
-
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [userID, setUserID] = useState(null);
+
+  const sendSignUpRequest = values => {
+    const { firstname, lastname, username, password } = values;
+    const query = `mutation($firstname: String!, $lastname: String!, $username: String!, $password: String!){
+          createUser(firstname: $firstname, lastname: $lastname, username: $username, password: $password){
+            user{
+              id
+            }
+            error
+          }
+        }`;
+    const variables = {
+      firstname,
+      lastname,
+      username,
+      password
+    };
+
+    request("/graphql", query, variables).then(data =>
+      setUserID(data.createUser.user.id)
+    );
+  };
+  if (userID) {
+    return <Link to="/SignIn/">{"Account Created, click here to login"}</Link>;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        {userID ? (
-          `You have been registered, you have ID:  ${userID}`
-        ) : (
-          <form className={classes.form} noValidate>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="fname"
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  value={firstName}
-                  onChange={e => setFirstName(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lname"
-                  value={lastName}
-                  onChange={e => setLastName(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                />
-              </Grid>
-            </Grid>
+      <Formik
+        initialValues={{
+          firstname: "",
+          lastname: "",
+          username: "",
+          password: ""
+        }}
+        onSubmit={async (values, actions) => {
+          await sendSignUpRequest(values);
+          actions.setSubmitting(false);
+        }}
+        validationSchema={Yup.object().shape({
+          username: Yup.string()
+            .min(2, "Username must be at least 2 characters")
+            .max(15, "Username must be at most 15 characters")
+            .required("Username must be at least 2 characters"),
+          password: Yup.string()
+            .min(8, "Password must be at least 8 characters")
+            .max(25, "Password must be at most 25 characters")
+            .required("Password must be at least 8 characters")
+        })}
+      >
+        <Form>
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Sign Up
+            </Typography>
+            <Field
+              name="firstname"
+              label="Firstname"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="lastname"
+              label="Lastname"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="username"
+              label="Username"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="password"
+              label="Password"
+              type="password"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
             <Button
+              type="submit"
               fullWidth
               variant="contained"
               color="primary"
               className={classes.submit}
-              onClick={() =>
-                sendSignUpRequest(
-                  setUserID,
-                  firstName,
-                  lastName,
-                  email,
-                  password
-                )
-              }
             >
               Sign Up
             </Button>
-            <Grid container justify="flex-end">
+            <Grid container>
               <Grid item>
-                <Link to="/SignIn/">Already have an account? Sign in</Link>
+                <Link to="/SignIn/">{"Have an account? Sign In"}</Link>
               </Grid>
             </Grid>
-          </form>
-        )}
-      </div>
+          </div>
+        </Form>
+      </Formik>
     </Container>
   );
 }

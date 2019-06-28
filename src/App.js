@@ -1,6 +1,7 @@
 import React, { createContext, useState } from "react";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
+import LogOut from "./LogOut";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Redirect } from "react-router-dom";
@@ -31,11 +32,11 @@ async function apiCall(token, query, variables) {
 }
 
 function App() {
-  //const [token, setToken] = useState(null);
+  const [token, setToken] = useState(null);
   // For development
-  const [token, setToken] = useState(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI"
-  );
+  // const [token, setToken] = useState(
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI"
+  // );
 
   return (
     <Router>
@@ -46,6 +47,7 @@ function App() {
           <Switch>
             <Route path="/SignUp" component={SignUp} />
             <Route path="/SignIn" component={SignIn} />
+            <Route path="/LogOut" component={LogOut} />
             <PrivateRoute authed={token} path="/" component={DashBoard} />
           </Switch>
         </AppContext.Provider>
