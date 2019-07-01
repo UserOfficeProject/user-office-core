@@ -108,32 +108,31 @@ export default function UserPage({ match }) {
     apiCall(query, variables).then(data => console.log(data));
   };
 
-  const getUserInformation = id => {
-    const query = `
-    query($id: ID!) {
-      user(id: $id){
-        firstname
-        lastname
-        roles{
-          id
-          shortCode
-          title
-        }
-      }
-    }`;
-
-    const variables = {
-      id
-    };
-    apiCall(query, variables).then(data => {
-      setUserData({ ...data.user });
-      setRoles(data.user.roles);
-    });
-  };
-
   useEffect(() => {
+    const getUserInformation = id => {
+      const query = `
+      query($id: ID!) {
+        user(id: $id){
+          firstname
+          lastname
+          roles{
+            id
+            shortCode
+            title
+          }
+        }
+      }`;
+
+      const variables = {
+        id
+      };
+      apiCall(query, variables).then(data => {
+        setUserData({ ...data.user });
+        setRoles(data.user.roles);
+      });
+    };
     getUserInformation(match.params.id);
-  }, [match.params.id]);
+  }, [match.params.id, apiCall]);
 
   const columns = [{ title: "Name", field: "name" }];
 

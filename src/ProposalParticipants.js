@@ -6,8 +6,6 @@ import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
 import { AppContext } from "./App";
 
-import { request } from "graphql-request";
-
 const useStyles = makeStyles({
   errorText: {
     color: "#f44336"

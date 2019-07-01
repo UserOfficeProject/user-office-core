@@ -53,20 +53,19 @@ export default function ProposalTable(props) {
   const [proposals, setProposals] = useState([]);
   const [editProposalID, setEditProposalID] = useState(0);
 
-  const getProposals = () => {
-    const query = `{
-        proposals {
-            id
-            abstract
-            status
-            }
-        }`;
-    return apiCall(query).then(data => setProposals(data.proposals));
-  };
-
   useEffect(() => {
+    const getProposals = () => {
+      const query = `{
+          proposals {
+              id
+              abstract
+              status
+              }
+          }`;
+      return apiCall(query).then(data => setProposals(data.proposals));
+    };
     getProposals();
-  }, []);
+  }, [apiCall]);
 
   if (editProposalID) {
     return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;

@@ -6,24 +6,25 @@ export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
   const { apiCall } = useContext(AppContext);
 
-  const createProposalID = () => {
-    const query = `
-    mutation{
-      createProposal{
-       proposal{
-        id
-      }
-        error
-      }
-    }
-    `;
-
-    apiCall(query).then(data => setProposalID(data.createProposal.proposal.id));
-  };
-
   useEffect(() => {
+    const createProposalID = () => {
+      const query = `
+      mutation{
+        createProposal{
+         proposal{
+          id
+        }
+          error
+        }
+      }
+      `;
+
+      apiCall(query).then(data =>
+        setProposalID(data.createProposal.proposal.id)
+      );
+    };
     createProposalID();
-  }, []);
+  }, [apiCall]);
 
   if (!proposalID) {
     return <p>Loading</p>;
