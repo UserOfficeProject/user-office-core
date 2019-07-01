@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { request } from "graphql-request";
+import { AppContext } from "./App";
 
 const useStyles = makeStyles({
   buttons: {
@@ -20,6 +21,8 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalInformation(props) {
+  const { apiCall } = useContext(AppContext);
+
   const sendProposalUpdate = values => {
     const query = `
     mutation($id: ID!, $title: String!, $abstract: String!,) {
@@ -37,7 +40,7 @@ export default function ProposalInformation(props) {
       title: values.title,
       abstract: values.abstract
     };
-    request("/graphql", query, variables).then(data => props.next(values));
+    apiCall(query, variables).then(data => props.next(values));
   };
 
   const classes = useStyles();

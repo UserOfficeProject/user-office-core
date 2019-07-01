@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -8,8 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
-import { request } from "graphql-request";
 import Container from "@material-ui/core/Container";
+import { AppContext } from "./App";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,6 +32,7 @@ export default function ProposalContainer(props) {
   const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const { apiCall } = useContext(AppContext);
 
   const submitProposal = () => {
     const query = `
@@ -49,7 +50,7 @@ export default function ProposalContainer(props) {
       id: props.data.id
     };
 
-    request("/graphql", query, variables).then(data => setSubmitted(true));
+    return apiCall(query, variables).then(data => setSubmitted(true));
   };
 
   const handleNext = data => {

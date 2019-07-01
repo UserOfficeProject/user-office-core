@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { request } from "graphql-request";
+import React, { useState, useEffect, useContext } from "react";
 import ProposalContainer from "./ProposalContainer";
+import { AppContext } from "./App";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
+  const { apiCall } = useContext(AppContext);
 
   const createProposalID = () => {
     const query = `
@@ -17,9 +18,7 @@ export default function ProposalSubmission() {
     }
     `;
 
-    request("/graphql", query).then(data =>
-      setProposalID(data.createProposal.proposal.id)
-    );
+    apiCall(query).then(data => setProposalID(data.createProposal.proposal.id));
   };
 
   useEffect(() => {

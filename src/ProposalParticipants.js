@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
+import { AppContext } from "./App";
 
 import { request } from "graphql-request";
 
@@ -26,6 +27,7 @@ export default function ProposalParticipants(props) {
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
+  const { apiCall } = useContext(AppContext);
 
   const sendProposalUpdate = () => {
     const query = `
@@ -43,7 +45,7 @@ export default function ProposalParticipants(props) {
       id: props.data.id,
       users: users.map(user => user.id)
     };
-    request("/graphql", query, variables).then(data => props.next({ users }));
+    apiCall(query, variables).then(data => props.next({ users }));
   };
 
   const addUser = user => {

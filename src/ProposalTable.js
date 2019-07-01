@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AppContext } from "./App";
+
 import MaterialTable from "material-table";
 import {
   AddBox,
@@ -17,10 +19,11 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { request } from "graphql-request";
 import { Redirect } from "react-router";
 
 export default function ProposalTable(props) {
+  const { apiCall } = useContext(AppContext);
+
   const tableIcons = {
     Add: AddBox,
     Check: Check,
@@ -58,9 +61,7 @@ export default function ProposalTable(props) {
             status
             }
         }`;
-    return request("/graphql", query).then(data =>
-      setProposals(data.proposals)
-    );
+    return apiCall(query).then(data => setProposals(data.proposals));
   };
 
   useEffect(() => {

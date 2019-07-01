@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { request } from "graphql-request";
+import React, { useState, useEffect, useContext } from "react";
 import ProposalContainer from "./ProposalContainer";
+import { AppContext } from "./App";
 
 export default function ProposalEdit({ match }) {
   const [proposalData, setProposalData] = useState({});
   const [loading, setLoading] = useState(true);
+  const { apiCall } = useContext(AppContext);
 
   const getProposalInformation = id => {
     const query = `
@@ -27,7 +28,7 @@ export default function ProposalEdit({ match }) {
     const variables = {
       id
     };
-    request("/graphql", query, variables).then(data => {
+    apiCall(query, variables).then(data => {
       setProposalData({
         title: data.proposal.title,
         abstract: data.proposal.abstract,

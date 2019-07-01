@@ -37,6 +37,16 @@ const useStyles = makeStyles({
   button: {
     marginTop: "25px",
     marginLeft: "10px"
+  },
+  paper: {
+    padding: "16px",
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column"
+  },
+  container: {
+    paddingTop: "25px",
+    paddingBottom: "25px"
   }
 });
 
@@ -216,7 +226,7 @@ export default function UserPage({ match }) {
                       actions={[
                         {
                           icon: () => <AddBox />,
-                          tooltip: "Add User",
+                          tooltip: "Add Role",
                           isFreeAction: true,
                           onClick: event => setOpen(true)
                         }
