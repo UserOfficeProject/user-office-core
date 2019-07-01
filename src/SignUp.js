@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
+import { Redirect } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -64,7 +65,7 @@ export default function SignUp() {
     );
   };
   if (userID) {
-    return <Link to="/SignIn/">{"Account Created, click here to login"}</Link>;
+    return <Redirect to="/SignIn/" />;
   }
 
   return (
@@ -81,6 +82,14 @@ export default function SignUp() {
           actions.setSubmitting(false);
         }}
         validationSchema={Yup.object().shape({
+          firstname: Yup.string()
+            .min(2, "firstname must be at least 2 characters")
+            .max(15, "firstname must be at most 15 characters")
+            .required("firstname must be at least 2 characters"),
+          lastname: Yup.string()
+            .min(2, "lastname must be at least 2 characters")
+            .max(15, "lastname must be at most 15 characters")
+            .required("lastname must be at least 2 characters"),
           username: Yup.string()
             .min(2, "Username must be at least 2 characters")
             .max(15, "Username must be at most 15 characters")

@@ -17,6 +17,7 @@ export default function ProposalEdit({ match }) {
         users{
           firstname
           lastname
+          username
           id
         }
       }
@@ -36,7 +37,8 @@ export default function ProposalEdit({ match }) {
           return {
             name: user.firstname,
             surname: user.lastname,
-            username: user.id
+            username: user.username,
+            id: user.id
           };
         })
       });

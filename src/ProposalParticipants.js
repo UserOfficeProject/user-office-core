@@ -1,25 +1,10 @@
 import React, { useState } from "react";
-import MaterialTable from "material-table";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
-import {
-  AddBox,
-  Check,
-  Clear,
-  DeleteOutline,
-  Edit,
-  FilterList,
-  ViewColumn,
-  ArrowUpward,
-  Search,
-  FirstPage,
-  LastPage,
-  ChevronRight,
-  ChevronLeft,
-  Remove,
-  SaveAlt
-} from "@material-ui/icons";
+import PeopleTable from "./PeopleTable";
+import { Add } from "@material-ui/icons";
+
 import { request } from "graphql-request";
 
 const useStyles = makeStyles({
@@ -56,7 +41,7 @@ export default function ProposalParticipants(props) {
 
     const variables = {
       id: props.data.id,
-      users: users.map(user => user.username)
+      users: users.map(user => user.id)
     };
     request("/graphql", query, variables).then(data => props.next({ users }));
   };
@@ -80,31 +65,6 @@ export default function ProposalParticipants(props) {
     }
   };
 
-  const tableIcons = {
-    Add: AddBox,
-    Check: Check,
-    Clear: Clear,
-    Delete: DeleteOutline,
-    DetailPanel: ChevronRight,
-    Edit: Edit,
-    Export: SaveAlt,
-    Filter: FilterList,
-    FirstPage: FirstPage,
-    LastPage: LastPage,
-    NextPage: ChevronRight,
-    PreviousPage: ChevronLeft,
-    ResetSearch: Clear,
-    Search: Search,
-    SortArrow: ArrowUpward,
-    ThirdStateCheck: Remove,
-    ViewColumn: ViewColumn
-  };
-  const columns = [
-    { title: "Name", field: "name" },
-    { title: "Surname", field: "surname" },
-    { title: "Username", field: "username" }
-  ];
-
   return (
     <React.Fragment>
       <ParticipantModal
@@ -112,30 +72,15 @@ export default function ProposalParticipants(props) {
         close={setOpen.bind(this, false)}
         addParticipant={addUser}
       />
-      <MaterialTable
-        className={classes.table}
-        icons={tableIcons}
-        title="Add Co-Proposers"
-        columns={columns}
+      <PeopleTable
+        title="Users"
+        actionText="Edit user"
+        actionIcon={<Add />}
+        action={setOpen}
+        isFreeAction={true}
         data={users}
-        options={{
-          search: false
-        }}
-        actions={[
-          {
-            icon: "+",
-            tooltip: "Add User",
-            isFreeAction: true,
-            onClick: event => setOpen(true)
-          }
-        ]}
-        editable={{
-          onRowDelete: oldData =>
-            new Promise(resolve => {
-              resolve();
-              removeUser(oldData);
-            })
-        }}
+        search={false}
+        onRemove={removeUser}
       />
       {userError && (
         <p className={classes.errorText}>

@@ -25,6 +25,7 @@ function sendUserRequest(searchQuery, apiCall) {
         users{
           firstname
           lastname
+          username
           id
         }
       }`;
@@ -37,7 +38,8 @@ function sendUserRequest(searchQuery, apiCall) {
         return {
           name: user.firstname,
           surname: user.lastname,
-          username: user.id
+          username: user.username,
+          id: user.id
         };
       })
     };
@@ -77,17 +79,29 @@ function PeopleTable(props) {
       icons={tableIcons}
       title={props.title}
       columns={columns}
-      data={query => sendUserRequest(query, apiCall)}
+      data={props.data ? props.data : query => sendUserRequest(query, apiCall)}
       options={{
-        search: true
+        search: props.search
       }}
       actions={[
         {
           icon: () => props.actionIcon,
+          isFreeAction: props.isFreeAction,
           tooltip: props.title,
           onClick: (event, rowData) => props.action(rowData)
         }
       ]}
+      editable={
+        props.onRemove
+          ? {
+              onRowDelete: oldData =>
+                new Promise(resolve => {
+                  resolve();
+                  props.onRemove(oldData);
+                })
+            }
+          : null
+      }
     />
   );
 }

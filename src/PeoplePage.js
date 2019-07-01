@@ -32,7 +32,7 @@ export default function PeoplePage({ match }) {
   const [userData, setUserData] = useState(null);
 
   if (userData) {
-    return <Redirect to={`/PeoplePage/${userData.username}`} />;
+    return <Redirect to={`/PeoplePage/${userData.id}`} />;
   }
 
   return (
