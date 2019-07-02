@@ -95,7 +95,7 @@ const useStyles = makeStyles(theme => ({
 export default function Dashboard({ match }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-  const { userData } = useContext(AppContext);
+  const { userData, currentRole } = useContext(AppContext);
   const { id } = userData.user;
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -153,7 +153,7 @@ export default function Dashboard({ match }) {
           </IconButton>
         </div>
         <Divider />
-        <List>{menuItems}</List>
+        <List>{menuItems[currentRole]}</List>
         <Divider />
       </Drawer>
       <main className={classes.content}>

@@ -2,6 +2,7 @@ import React, { createContext, useState } from "react";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
 import LogOut from "./LogOut";
+import RoleSelectionPage from "./RoleSelectionPage";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Redirect } from "react-router-dom";
@@ -9,12 +10,18 @@ import { GraphQLClient } from "graphql-request";
 
 export const AppContext = createContext();
 
-const PrivateRoute = ({ component: Component, authed, ...rest }) => (
+const PrivateRoute = ({ component: Component, authed, role, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
-      authed ? <Component {...props} /> : <Redirect to="/SignIn" />
-    }
+    render={props => {
+      if (!authed) {
+        return <Redirect to="/SignIn" />;
+      } else if (!role) {
+        return <Redirect to="/RoleSelectionPage" />;
+      } else {
+        return <Component {...props} />;
+      }
+    }}
   />
 );
 
@@ -39,6 +46,11 @@ async function apiCall(userData, query, variables) {
 
 function App() {
   const [userData, setUserData] = useState(null);
+  const [currentRole, setCurrentRole] = useState(null);
+
+  if (userData && userData.role && userData.role.length === 1) {
+    setCurrentRole(userData.role[0]);
+  }
   // For development
   // const [userData, setUserData] = useState({
   //   token:
@@ -51,7 +63,9 @@ function App() {
         <AppContext.Provider
           value={{
             userData,
+            currentRole,
             setUserData,
+            setCurrentRole,
             apiCall: apiCall.bind(this, userData)
           }}
         >
@@ -59,7 +73,13 @@ function App() {
             <Route path="/SignUp" component={SignUp} />
             <Route path="/SignIn" component={SignIn} />
             <Route path="/LogOut" component={LogOut} />
-            <PrivateRoute authed={userData} path="/" component={DashBoard} />
+            <Route path="/RoleSelectionPage" component={RoleSelectionPage} />
+            <PrivateRoute
+              authed={userData}
+              role={currentRole}
+              path="/"
+              component={DashBoard}
+            />
           </Switch>
         </AppContext.Provider>
       </div>
