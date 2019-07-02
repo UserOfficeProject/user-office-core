@@ -56,6 +56,7 @@ type User {
     id: Int
     firstname: String
     lastname: String
+    username: String
     proposals: [Proposal!]
     roles:[Roles]
 }
