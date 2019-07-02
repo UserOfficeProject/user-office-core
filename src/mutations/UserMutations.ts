@@ -89,10 +89,13 @@ export default class UserMutations {
     return result || rejection("INTERNAL_ERROR");
   }
 
-  async login(username: string, password: string): Promise<String | Rejection> {
+  async login(
+    username: string,
+    password: string
+  ): Promise<{ token: string; user: User } | Rejection> {
     const result = await this.dataSource.getPasswordByUsername(username);
 
-    const valid = bcrypt.compareSync(password, result); // true
+    const valid = bcrypt.compareSync(password, result);
 
     if (!valid) {
       return rejection("WRONG_PASSWORD");
@@ -104,19 +107,15 @@ export default class UserMutations {
       return rejection("INTERNAL_ERROR");
     }
 
-    const roles = await this.dataSource.getUserRoles(user.id);
-
-    if (!roles) {
-      return rejection("INTERNAL_ERROR");
-    }
-
-    return jsonwebtoken.sign(
-      {
-        id: user.id,
-        roles
-      },
-      "somesuperdupersecret",
-      { expiresIn: "1y" }
-    );
+    return {
+      token: jsonwebtoken.sign(
+        {
+          id: user.id
+        },
+        "somesuperdupersecret",
+        { expiresIn: "1y" }
+      ),
+      user
+    };
   }
 }
