@@ -19,4 +19,8 @@ export default class User {
   roles(args: any, context: any) {
     return context.queries.user.dataSource.getUserRoles(this.id);
   }
+
+  proposals(args: any, context: any) {
+    return context.queries.proposal.dataSource.getUserProposals(this.id);
+  }
 }
