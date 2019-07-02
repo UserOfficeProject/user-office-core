@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { AppContext } from "./App";
-
+import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
   AddBox,
@@ -19,7 +19,60 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { Redirect } from "react-router";
+
+function sendUserProposalRequest(searchQuery, userID, apiCall) {
+  const query = `
+  query($id: ID!) {
+    user(id: $id){
+      proposals {
+        id
+        abstract
+        status
+      }
+    }
+  }`;
+
+  const variables = {
+    id: userID
+  };
+  return apiCall(query, variables).then(data => {
+    return {
+      page: 0,
+      totalCount: data.user.proposals.length,
+      data: data.user.proposals.map(proposal => {
+        return {
+          id: proposal.id,
+          abstract: proposal.abstract,
+          status: proposal.status
+        };
+      })
+    };
+  });
+}
+
+function sendAllProposalRequest(searchQuery, apiCall) {
+  const query = `{
+    proposals {
+        id
+        abstract
+        status
+        }
+    }`;
+
+  return apiCall(query).then(data => {
+    return {
+      page: 0,
+      totalCount: data.proposals.length,
+      data: data.proposals.map(proposal => {
+        return {
+          id: proposal.id,
+          abstract: proposal.abstract,
+          status: proposal.status
+        };
+      })
+    };
+  });
+}
 
 export default function ProposalTable(props) {
   const { apiCall } = useContext(AppContext);
@@ -50,22 +103,7 @@ export default function ProposalTable(props) {
     { title: "Status", field: "status" }
   ];
 
-  const [proposals, setProposals] = useState([]);
   const [editProposalID, setEditProposalID] = useState(0);
-
-  useEffect(() => {
-    const getProposals = () => {
-      const query = `{
-          proposals {
-              id
-              abstract
-              status
-              }
-          }`;
-      return apiCall(query).then(data => setProposals(data.proposals));
-    };
-    getProposals();
-  }, [apiCall]);
 
   if (editProposalID) {
     return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;
@@ -76,7 +114,11 @@ export default function ProposalTable(props) {
       icons={tableIcons}
       title="Your Proposals"
       columns={columns}
-      data={proposals}
+      data={
+        props.id
+          ? query => sendUserProposalRequest(query, props.id, apiCall)
+          : query => sendAllProposalRequest(query, apiCall)
+      }
       options={{
         search: false
       }}

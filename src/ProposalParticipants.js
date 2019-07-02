@@ -65,6 +65,10 @@ export default function ProposalParticipants(props) {
     }
   };
 
+  const openModal = rowData => {
+    setOpen(true);
+  };
+
   return (
     <React.Fragment>
       <ParticipantModal
@@ -74,9 +78,8 @@ export default function ProposalParticipants(props) {
       />
       <PeopleTable
         title="Users"
-        actionText="Edit user"
         actionIcon={<Add />}
-        action={setOpen}
+        action={openModal}
         isFreeAction={true}
         data={users}
         search={false}

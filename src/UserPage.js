@@ -8,6 +8,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import MaterialTable from "material-table";
 import RoleModal from "./RoleModal";
+import { withRouter } from "react-router-dom";
 import {
   AddBox,
   Check,
@@ -50,7 +51,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UserPage({ match }) {
+function UserPage({ match, history }) {
   const [userData, setUserData] = useState(null);
   const [modalOpen, setOpen] = useState(false);
   const tableIcons = {
@@ -72,7 +73,6 @@ export default function UserPage({ match }) {
     ThirdStateCheck: Remove,
     ViewColumn: ViewColumn
   };
-
   const { apiCall } = useContext(AppContext);
   const [roles, setRoles] = useState([]);
 
@@ -105,7 +105,7 @@ export default function UserPage({ match }) {
       lastname: values.lastname,
       roles: roles.map(role => role.id)
     };
-    apiCall(query, variables).then(data => console.log(data));
+    apiCall(query, variables).then(data => history.push("/PeoplePage"));
   };
 
   useEffect(() => {
@@ -159,6 +159,7 @@ export default function UserPage({ match }) {
                 }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
+                  actions.setSubmitting(false);
                 }}
                 validationSchema={Yup.object().shape({
                   firstname: Yup.string()
@@ -260,3 +261,5 @@ export default function UserPage({ match }) {
     </React.Fragment>
   );
 }
+
+export default withRouter(UserPage);

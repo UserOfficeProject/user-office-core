@@ -42,12 +42,30 @@ const useStyles = makeStyles(theme => ({
 export default function SignIn() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
-  const { token, setToken } = useContext(AppContext);
+  const { userData, setUserData } = useContext(AppContext);
   const requestToken = values => {
     const { username, password } = values;
     const query = `
     mutation($username: String!, $password: String!){
-      login(username: $username, password: $password)
+      login(username: $username, password: $password){
+        user{
+          id
+          firstname
+          lastname
+          username
+          proposals{
+            id
+            abstract
+            title
+          }
+          roles{
+            id
+            title
+            shortCode
+          }
+        }
+        token
+      }
     }
     `;
 
@@ -57,11 +75,11 @@ export default function SignIn() {
     };
 
     request("/graphql", query, variables)
-      .then(data => setToken(data.login))
+      .then(data => setUserData(data.login))
       .catch(error => setFailed(true));
   };
 
-  if (token) {
+  if (userData) {
     return <Redirect to="/" />;
   }
 

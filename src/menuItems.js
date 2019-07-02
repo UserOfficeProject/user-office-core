@@ -4,7 +4,6 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import NoteAdd from "@material-ui/icons/NoteAdd";
-import Edit from "@material-ui/icons/Edit";
 import People from "@material-ui/icons/People";
 import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
@@ -24,13 +23,7 @@ export const menuItems = (
       </ListItemIcon>
       <ListItemText primary="New Proposal" />
     </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <Edit />
-      </ListItemIcon>
-      <ListItemText primary="Edit Proposals" />
-    </ListItem>
-    <ListItem button>
+    <ListItem component={Link} to="/ProposalPage" button>
       <ListItemIcon>
         <FolderOpen />
       </ListItemIcon>

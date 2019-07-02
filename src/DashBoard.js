@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -18,8 +18,11 @@ import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
 import ProposalEdit from "./ProposalEdit";
 import PeoplePage from "./PeoplePage";
+import ProposalPage from "./ProposalPage";
 import UserPage from "./UserPage";
 import OverviewPage from "./OverviewPage";
+import { Link } from "react-router-dom";
+import { AppContext } from "./App";
 
 const drawerWidth = 240;
 
@@ -92,7 +95,8 @@ const useStyles = makeStyles(theme => ({
 export default function Dashboard({ match }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-
+  const { userData } = useContext(AppContext);
+  const { id } = userData.user;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -129,7 +133,7 @@ export default function Dashboard({ match }) {
           >
             User Office
           </Typography>
-          <IconButton color="inherit">
+          <IconButton color="inherit" component={Link} to={`/PeoplePage/${id}`}>
             <Badge badgeContent={0} color="secondary">
               <AccountCircle />
             </Badge>
@@ -162,6 +166,7 @@ export default function Dashboard({ match }) {
           <Route path="/ProposalSubmission" component={ProposalSubmission} />
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
+          <Route path="/ProposalPage" component={ProposalPage} />
           <Route component={OverviewPage} />
         </Switch>
       </main>

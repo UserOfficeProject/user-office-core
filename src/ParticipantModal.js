@@ -13,7 +13,6 @@ function ParticipantModal(props) {
       id: rowData.id
     });
   };
-
   return (
     <Dialog
       aria-labelledby="simple-modal-title"

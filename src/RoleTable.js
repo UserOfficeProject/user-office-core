@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import MaterialTable from "material-table";
+import { AppContext } from "./App";
 import {
   AddBox,
   Check,
@@ -17,7 +18,6 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { AppContext } from "./App";
 
 function sendRoleRequest(searchQuery, apiCall) {
   const query = `{

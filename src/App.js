@@ -18,37 +18,48 @@ const PrivateRoute = ({ component: Component, authed, ...rest }) => (
   />
 );
 
-async function apiCall(token, query, variables) {
+async function apiCall(userData, query, variables) {
   const endpoint = "/graphql";
   const graphQLClient = new GraphQLClient(endpoint, {
     headers: {
-      authorization: `Bearer ${token}`
+      authorization: `Bearer ${userData.token}`
     }
   });
 
   return graphQLClient
     .request(query, variables)
+    .then(data => {
+      if (data.error) {
+        console.log("Server responded with error", data.error);
+      }
+      return data;
+    })
     .catch(error => console.log("Error", error));
 }
 
 function App() {
-  // const [token, setToken] = useState(null);
+  const [userData, setUserData] = useState(null);
   // For development
-  const [token, setToken] = useState(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI"
-  );
-
+  // const [userData, setUserData] = useState({
+  //   token:
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI",
+  //   user: {}
+  // });
   return (
     <Router>
       <div className="App">
         <AppContext.Provider
-          value={{ token, setToken, apiCall: apiCall.bind(this, token) }}
+          value={{
+            userData,
+            setUserData,
+            apiCall: apiCall.bind(this, userData)
+          }}
         >
           <Switch>
             <Route path="/SignUp" component={SignUp} />
             <Route path="/SignIn" component={SignIn} />
             <Route path="/LogOut" component={LogOut} />
-            <PrivateRoute authed={token} path="/" component={DashBoard} />
+            <PrivateRoute authed={userData} path="/" component={DashBoard} />
           </Switch>
         </AppContext.Provider>
       </div>

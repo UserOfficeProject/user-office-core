@@ -83,14 +83,18 @@ function PeopleTable(props) {
       options={{
         search: props.search
       }}
-      actions={[
-        {
-          icon: () => props.actionIcon,
-          isFreeAction: props.isFreeAction,
-          tooltip: props.title,
-          onClick: (event, rowData) => props.action(rowData)
-        }
-      ]}
+      actions={
+        props.action
+          ? [
+              {
+                icon: () => props.actionIcon,
+                isFreeAction: props.isFreeAction,
+                tooltip: props.title,
+                onClick: (event, rowData) => props.action(rowData)
+              }
+            ]
+          : null
+      }
       editable={
         props.onRemove
           ? {
