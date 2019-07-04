@@ -7,6 +7,7 @@ import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSourc
 import ProposalQueries from "./queries/ProposalQueries";
 import UserMutations from "./mutations/UserMutations";
 import ProposalMutations from "./mutations/ProposalMutations";
+import UserAuthorization from "./utils/UserAuthorization";
 import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
 import { RabbitMQMessageBroker } from "./messageBroker";
@@ -14,6 +15,10 @@ import { RabbitMQMessageBroker } from "./messageBroker";
 // Site specific data sources (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
 const proposalDataSource = new PostgresProposalDataSource();
+const userAuthorization = new UserAuthorization(
+  userDataSource,
+  proposalDataSource
+);
 
 // Handler to send email to proposers in accepted proposal
 async function emailHandler(event: ApplicationEvent) {
@@ -78,10 +83,17 @@ eventBus.addHandler(sdmHandler);
 eventBus.addHandler(loggingHandler);
 
 // From this point nothing is site-specific
-const userQueries = new UserQueries(userDataSource);
-const userMutations = new UserMutations(userDataSource);
-const proposalQueries = new ProposalQueries(proposalDataSource);
-const proposalMutations = new ProposalMutations(proposalDataSource, eventBus);
+const userQueries = new UserQueries(userDataSource, userAuthorization);
+const userMutations = new UserMutations(userDataSource, userAuthorization);
+const proposalQueries = new ProposalQueries(
+  proposalDataSource,
+  userAuthorization
+);
+const proposalMutations = new ProposalMutations(
+  proposalDataSource,
+  userAuthorization,
+  eventBus
+);
 
 const context: BasicResolverContext = {
   queries: {

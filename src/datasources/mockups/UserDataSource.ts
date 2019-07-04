@@ -9,7 +9,7 @@ export class userDataSource implements UserDataSource {
   getByUsername(username: string): Promise<User | null> {
     throw new Error("Method not implemented.");
   }
-  async getPasswordByUsername(username: string): Promise<String | null> {
+  async getPasswordByUsername(username: string): Promise<string | null> {
     return "Test1234!";
   }
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {

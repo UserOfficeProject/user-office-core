@@ -1,12 +1,18 @@
 import { UserDataSource } from "../datasources/UserDataSource";
 import User from "../models/User";
-import { isUserOfficer, isUser } from "../utils/userAuthorization";
 
 export default class UserQueries {
-  constructor(private dataSource: UserDataSource) {}
+  constructor(private dataSource: UserDataSource, private userAuth: any) {}
+
+  async getAgent(id: number) {
+    return this.dataSource.get(id);
+  }
 
   async get(id: number, agent: User | null) {
-    if (isUserOfficer(agent) || isUser(agent, id)) {
+    if (
+      (await this.userAuth.isUserOfficer(agent)) ||
+      (await this.userAuth.isUser(agent, id))
+    ) {
       return this.dataSource.get(id);
     } else {
       return null;
@@ -14,15 +20,18 @@ export default class UserQueries {
   }
 
   async getAll(agent: User | null) {
-    console.log(agent);
-    if (isUserOfficer(agent)) {
+    if (await this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getUsers();
     } else {
       return null;
     }
   }
 
-  async getRoles() {
-    return this.dataSource.getRoles();
+  async getRoles(agent: User | null) {
+    if (await this.userAuth.isUserOfficer(agent)) {
+      return this.dataSource.getRoles();
+    } else {
+      return null;
+    }
   }
 }

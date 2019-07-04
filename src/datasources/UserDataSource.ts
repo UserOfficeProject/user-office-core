@@ -19,5 +19,5 @@ export interface UserDataSource {
   update(user: User): Promise<User | null>;
   addUserRole(userID: number, roleID: number): boolean;
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
-  getPasswordByUsername(username: string): Promise<String | null>;
+  getPasswordByUsername(username: string): Promise<string | null>;
 }

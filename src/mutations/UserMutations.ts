@@ -1,12 +1,11 @@
 import User from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
-import { isUserOfficer } from "../utils/userAuthorization";
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 
 export default class UserMutations {
-  constructor(private dataSource: UserDataSource) {}
+  constructor(private dataSource: UserDataSource, private userAuth: any) {}
 
   async create(
     firstname: string,
@@ -40,10 +39,14 @@ export default class UserMutations {
     lastname: string,
     roles: number[]
   ): Promise<User | Rejection> {
-    // Get user information
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUser(agent, id))
+    ) {
+      return rejection("WRONG_PERMISSIONS");
+    }
     let user = await this.dataSource.get(parseInt(id)); //Hacky
-    console.log(user);
-    // Check that proposal exist
+
     if (!user) {
       return rejection("INTERNAL_ERROR");
     }
@@ -84,9 +87,13 @@ export default class UserMutations {
     userID: number,
     roleID: number
   ): Promise<Boolean | Rejection> {
-    const result = await this.dataSource.addUserRole(userID, roleID);
+    if (await this.userAuth.isUserOfficer(agent)) {
+      const result = await this.dataSource.addUserRole(userID, roleID);
 
-    return result || rejection("INTERNAL_ERROR");
+      return result || rejection("INTERNAL_ERROR");
+    } else {
+      return rejection("WRONG_PERMISSIONS");
+    }
   }
 
   async login(
@@ -94,6 +101,10 @@ export default class UserMutations {
     password: string
   ): Promise<{ token: string; user: User } | Rejection> {
     const result = await this.dataSource.getPasswordByUsername(username);
+
+    if (!result) {
+      return rejection("INTERNAL_ERROR");
+    }
 
     const valid = bcrypt.compareSync(password, result);
 

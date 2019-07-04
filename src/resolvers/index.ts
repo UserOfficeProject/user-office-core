@@ -77,11 +77,11 @@ const wrapUserMutation = createMutationWrapper<User>("user");
 
 export default {
   proposal(args: ProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.get(args.id);
+    return context.queries.proposal.get(args.id, context.user);
   },
 
   proposals(_args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll();
+    return context.queries.proposal.getAll(context.user);
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -135,7 +135,7 @@ export default {
   },
 
   roles(_args: RolesArgs, context: ResolverContext) {
-    return context.queries.user.getRoles();
+    return context.queries.user.getRoles(context.user);
   },
 
   createUser(args: CreateUserArgs, context: ResolverContext) {

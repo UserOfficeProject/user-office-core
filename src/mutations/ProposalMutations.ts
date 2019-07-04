@@ -1,6 +1,5 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import User from "../models/User";
-import { isUserOfficer } from "../utils/userAuthorization";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
@@ -11,6 +10,7 @@ import Proposal from "../models/Proposal";
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
+    private userAuth: any,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
@@ -46,6 +46,13 @@ export default class ProposalMutations {
 
         // Get proposal information
         let proposal = await this.dataSource.get(parseInt(id)); //Hacky
+
+        if (
+          !this.userAuth.isUserOfficer(agent) &&
+          !this.userAuth.isMemberOfProposal(agent, proposal)
+        ) {
+          return rejection("NOT_ALLOWED");
+        }
 
         // Check that proposal exist
         if (!proposal) {
@@ -101,7 +108,7 @@ export default class ProposalMutations {
       return rejection("NOT_LOGGED_IN");
     }
 
-    if (!isUserOfficer(agent)) {
+    if (!this.userAuth.isUserOfficer(agent)) {
       return rejection("NOT_USER_OFFICER");
     }
 
@@ -117,7 +124,7 @@ export default class ProposalMutations {
       return rejection("NOT_LOGGED_IN");
     }
 
-    if (!isUserOfficer(agent)) {
+    if (!this.userAuth.isUserOfficer(agent)) {
       return rejection("NOT_USER_OFFICER");
     }
 

@@ -7,7 +7,7 @@ import Role from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
-  getPasswordByUsername(username: string): Promise<String | null> {
+  getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select("password")
       .from("users")
