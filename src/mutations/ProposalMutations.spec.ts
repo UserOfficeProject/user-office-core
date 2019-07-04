@@ -26,26 +26,27 @@ const proposalMutations = new ProposalMutations(
 );
 
 test("A user officer can accept a proposal ", () => {
-  expect(proposalMutations.accept(dummyUserOfficer, 1)).resolves.toBe(
+  return expect(proposalMutations.accept(dummyUserOfficer, 1)).resolves.toBe(
     dummyProposal
   );
 });
 
 test("A non-officer user cannot accept a proposal", () => {
-  expect(proposalMutations.accept(dummyUser, 1)).resolves.toHaveProperty(
+  return expect(proposalMutations.accept(dummyUser, 1)).resolves.toHaveProperty(
     "reason",
     "NOT_USER_OFFICER"
   );
 });
 
 test("A non-logged in user cannot accept a proposal", () => {
-  const agent = null;
-  const result = proposalMutations.accept(agent, 1);
-  expect(result).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
+  return expect(proposalMutations.accept(null, 1)).resolves.toHaveProperty(
+    "reason",
+    "NOT_LOGGED_IN"
+  );
 });
 
 test("A user officer can not accept a proposal that does not exist", () => {
-  expect(
+  return expect(
     proposalMutations.accept(dummyUserOfficer, -1)
   ).resolves.toHaveProperty("reason", "INTERNAL_ERROR");
 });

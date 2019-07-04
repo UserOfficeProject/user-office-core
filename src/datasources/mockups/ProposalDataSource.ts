@@ -10,7 +10,7 @@ export class proposalDataSource implements ProposalDataSource {
   async update(proposal: Proposal): Promise<Proposal | null> {
     return dummyProposal;
   }
-  async setProposalUsers(id: number, users: number[]): Promise<Boolean | null> {
+  async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
     return true;
   }
   async acceptProposal(id: number): Promise<Proposal | null> {

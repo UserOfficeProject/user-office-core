@@ -4,7 +4,7 @@
   "description": "DUO-Backend-proto",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest --env=node --colors --coverage",
     "tsc": "tsc",
     "dev": "ts-node-dev --respawn --transpileOnly ./index.ts",
     "prod": "tsc && node ./build/app.js",
