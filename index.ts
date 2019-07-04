@@ -24,19 +24,31 @@ app.use(
   graphqlHTTP(async (req: Request) => {
     // Adds the currently logged-in user to the context object, which makes it available to the resolvers
     // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
-    let user = null;
-    if (req.user) {
-      user = await baseContext.queries.user.getAgent(req.user.id);
-    }
+    // let user = null;
+    // if (req.user) {
+    //   user = await baseContext.queries.user.getAgent(req.user.id);
+    // }
+
+    // For development purpose you can bypass JWT tokens and activate a user directly here
+
+    const user = {
+      id: 1,
+      firstname: "Carl",
+      lastname: "Carlsson",
+      username: "testuser",
+      roles: () => [],
+      proposals: () => []
+    };
 
     // const user = {
-    //   id: 1,
-    //   firstname: "carl",
-    //   lastname: "kalle",
-    //   username: "kalle",
+    //   id: 2,
+    //   firstname: "Anders",
+    //   lastname: "Andersson",
+    //   username: "testofficer",
     //   roles: () => [],
     //   proposals: () => []
     // };
+
     const context: ResolverContext = { ...baseContext, user };
 
     return {

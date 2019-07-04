@@ -48,8 +48,8 @@ export default class ProposalMutations {
         let proposal = await this.dataSource.get(parseInt(id)); //Hacky
 
         if (
-          !this.userAuth.isUserOfficer(agent) &&
-          !this.userAuth.isMemberOfProposal(agent, proposal)
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.userAuth.isMemberOfProposal(agent, proposal))
         ) {
           return rejection("NOT_ALLOWED");
         }
@@ -107,11 +107,9 @@ export default class ProposalMutations {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }
-
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
-
     const result = await this.dataSource.acceptProposal(proposalID);
     return result || rejection("INTERNAL_ERROR");
   }
@@ -124,7 +122,7 @@ export default class ProposalMutations {
       return rejection("NOT_LOGGED_IN");
     }
 
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
 

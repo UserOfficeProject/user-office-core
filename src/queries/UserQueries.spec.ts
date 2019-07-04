@@ -4,8 +4,14 @@ import {
   dummyUser,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
+import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
+import UserAuthorization from "../utils/UserAuthorization";
 
-const userQueries = new UserQueries(new userDataSource());
+const userAuthorization = new UserAuthorization(
+  new userDataSource(),
+  new proposalDataSource()
+);
+const userQueries = new UserQueries(new userDataSource(), userAuthorization);
 
 test("A user officer fetch can fetch any user account", () => {
   expect(userQueries.get(dummyUser.id, dummyUserOfficer)).resolves.toBe(
@@ -28,6 +34,9 @@ test("A user officer is allowed to fetch all accounts", () => {
   ]);
 });
 
-test("A user is not allowed to fetch all accounts", () => {
-  expect(userQueries.getAll(dummyUser)).resolves.toBe(null);
+test("A user is allowed to fetch all accounts", () => {
+  expect(userQueries.getAll(dummyUser)).resolves.toStrictEqual([
+    dummyUser,
+    dummyUserOfficer
+  ]);
 });

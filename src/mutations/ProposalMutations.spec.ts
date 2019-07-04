@@ -1,28 +1,38 @@
 import ProposalMutations from "./ProposalMutations";
-
-import User from "../models/User";
 import { EventBus } from "../events/eventBus";
+import UserAuthorization from "../utils/UserAuthorization";
+
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
   proposalDataSource,
   dummyProposal
 } from "../datasources/mockups/ProposalDataSource";
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
+import {
+  userDataSource,
+  dummyUser,
+  dummyUserOfficer
+} from "../datasources/mockups/UserDataSource";
 
+const dummyEventBus = new EventBus<ApplicationEvent>();
+const userAuthorization = new UserAuthorization(
+  new userDataSource(),
+  new proposalDataSource()
+);
 const proposalMutations = new ProposalMutations(
   new proposalDataSource(),
+  userAuthorization,
   dummyEventBus
 );
 
 test("A user officer can accept a proposal ", () => {
-  const agent = new User(0, "", "", ["User_Officer"]);
-  expect(proposalMutations.accept(agent, 1)).resolves.toBe(dummyProposal);
+  expect(proposalMutations.accept(dummyUserOfficer, 1)).resolves.toBe(
+    dummyProposal
+  );
 });
 
 test("A non-officer user cannot accept a proposal", () => {
-  const agent = new User(0, "", "", []);
-  expect(proposalMutations.accept(agent, 1)).resolves.toHaveProperty(
+  expect(proposalMutations.accept(dummyUser, 1)).resolves.toHaveProperty(
     "reason",
     "NOT_USER_OFFICER"
   );
@@ -35,9 +45,7 @@ test("A non-logged in user cannot accept a proposal", () => {
 });
 
 test("A user officer can not accept a proposal that does not exist", () => {
-  const agent = new User(0, "", "", ["User_Officer"]);
-  expect(proposalMutations.accept(agent, -1)).resolves.toHaveProperty(
-    "reason",
-    "INTERNAL_ERROR"
-  );
+  expect(
+    proposalMutations.accept(dummyUserOfficer, -1)
+  ).resolves.toHaveProperty("reason", "INTERNAL_ERROR");
 });

@@ -6,26 +6,33 @@ export const dummyUserOfficer = new User(4, "John", "Doe", "JoDo");
 export const dummyUser = new User(5, "Jane", "Doe", "JaDa");
 
 export class userDataSource implements UserDataSource {
-  getByUsername(username: string): Promise<User | null> {
-    throw new Error("Method not implemented.");
+  async getByUsername(username: string): Promise<User | null> {
+    return dummyUser;
   }
   async getPasswordByUsername(username: string): Promise<string | null> {
     return "Test1234!";
   }
-  setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
-    throw new Error("Method not implemented.");
+  async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
+    return true;
   }
   async getUserRoles(id: number): Promise<Role[]> {
-    throw new Error("Method not implemented.");
+    if (id == 4) {
+      return [{ id: 1, shortCode: "user_officer", title: "User Officer" }];
+    } else {
+      return [{ id: 2, shortCode: "user", title: "User" }];
+    }
   }
   async getRoles(): Promise<Role[]> {
-    throw new Error("Method not implemented.");
+    return [
+      { id: 1, shortCode: "user_officer", title: "User Officer" },
+      { id: 2, shortCode: "user", title: "User" }
+    ];
   }
   async update(user: User): Promise<User | null> {
-    throw new Error("Method not implemented.");
+    return dummyUser;
   }
-  addUserRole(userID: number, roleID: number): boolean {
-    throw new Error("Method not implemented.");
+  async addUserRole(userID: number, roleID: number): Promise<Boolean | null> {
+    return true;
   }
   async get(id: number) {
     return dummyUser;

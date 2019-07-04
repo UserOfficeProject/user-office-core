@@ -13,6 +13,7 @@ export default class UserQueries {
     if (agent == null) {
       return false;
     }
+
     return this.userDataSource.getUserRoles(agent.id).then(roles => {
       return roles.some(role => role.shortCode === "user_officer");
     });
