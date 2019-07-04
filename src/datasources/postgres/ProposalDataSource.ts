@@ -40,7 +40,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return this.setStatusProposal(id, 3);
   }
 
-  public setProposalUsers(id: number, users: number[]): boolean {
+  public setProposalUsers(id: number, users: number[]): Promise<Boolean> {
     return database.transaction(function(trx: { commit: any; rollback: any }) {
       return database
         .from("proposal_user")

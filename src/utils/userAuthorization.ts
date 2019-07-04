@@ -1,22 +1,40 @@
 import User from "../models/User";
+import Proposal from "../models/Proposal";
+import { UserDataSource } from "../datasources/UserDataSource";
+import { ProposalDataSource } from "../datasources/ProposalDataSource";
 
-export function isUserOfficer(agent: User | null) {
-  if (agent == null) {
-    return false;
+export default class UserQueries {
+  constructor(
+    private userDataSource: UserDataSource,
+    private proposalDataSource: ProposalDataSource
+  ) {}
+
+  async isUserOfficer(agent: User | null) {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.userDataSource.getUserRoles(agent.id).then(roles => {
+      return roles.some(role => role.shortCode === "user_officer");
+    });
   }
 
-  if (!agent.roles.includes("User_Officer")) {
-    return false;
+  async isUser(agent: User | null, id: string) {
+    if (agent == null) {
+      return false;
+    }
+    if (agent.id !== parseInt(id)) {
+      return false;
+    }
+    return true;
   }
-  return true;
-}
 
-export function isUser(agent: User | null, id: number) {
-  if (agent == null) {
-    return false;
+  async isMemberOfProposal(agent: User | null, proposal: Proposal | null) {
+    if (agent == null || proposal == null) {
+      return false;
+    }
+    return this.userDataSource.getProposalUsers(proposal.id).then(users => {
+      return users.some(user => user.id === agent.id);
+    });
   }
-  if (agent.id !== id) {
-    return false;
-  }
-  return true;
 }

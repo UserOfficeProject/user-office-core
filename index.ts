@@ -1,5 +1,6 @@
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
+const jwt = require("express-jwt");
 
 import { Request } from "express";
 
@@ -7,19 +8,47 @@ import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import User from "./src/models/User";
-import Proposal from "./src/models/Proposal";
 
 var app = express();
+
+// authentication middleware
+const authMiddleware = jwt({
+  credentialsRequired: false,
+  secret: "somesuperdupersecret"
+});
+
+app.use(authMiddleware);
+
 app.use(
   "/graphql",
-  graphqlHTTP(async (_req: Request) => {
+  graphqlHTTP(async (req: Request) => {
     // Adds the currently logged-in user to the context object, which makes it available to the resolvers
-    // If the user is accessible though a query, it could look something like:
-    //   const userId = req.session.userId;
-    //   const user = await baseContext.queries.user.get(userId);
-    // Mock user instead:
-    const user = new User(0, "Carl", "Carlsson", ["User_Officer"]);
+    // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
+    // let user = null;
+    // if (req.user) {
+    //   user = await baseContext.queries.user.getAgent(req.user.id);
+    // }
+
+    // For development purpose you can bypass JWT tokens and activate a user directly here
+
+    const user = {
+      id: 1,
+      firstname: "Carl",
+      lastname: "Carlsson",
+      username: "testuser",
+      roles: () => [],
+      proposals: () => []
+    };
+
+    // const user = {
+    //   id: 2,
+    //   firstname: "Anders",
+    //   lastname: "Andersson",
+    //   username: "testofficer",
+    //   roles: () => [],
+    //   proposals: () => []
+    // };
+
     const context: ResolverContext = { ...baseContext, user };
 
     return {

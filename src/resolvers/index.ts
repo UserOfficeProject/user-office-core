@@ -19,6 +19,13 @@ interface UpdateProposalArgs {
   users: number[];
 }
 
+interface UpdateUserArgs {
+  id: string;
+  firstname: string;
+  lastname: string;
+  roles: number[];
+}
+
 interface ApproveProposalArgs {
   id: number;
 }
@@ -27,11 +34,25 @@ interface UserArgs {
   id: number;
 }
 
+interface LoginArgs {
+  username: string;
+  password: string;
+}
+
+interface AddUserRoleArgs {
+  userID: number;
+  roleID: number;
+}
+
 interface UsersArgs {}
+
+interface RolesArgs {}
 
 interface CreateUserArgs {
   firstname: string;
   lastname: string;
+  username: string;
+  password: string;
 }
 
 function createMutationWrapper<T>(key: string) {
@@ -56,11 +77,11 @@ const wrapUserMutation = createMutationWrapper<User>("user");
 
 export default {
   proposal(args: ProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.get(args.id);
+    return context.queries.proposal.get(args.id, context.user);
   },
 
   proposals(_args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll();
+    return context.queries.proposal.getAll(context.user);
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -101,6 +122,10 @@ export default {
     );
   },
 
+  login(args: LoginArgs, context: ResolverContext) {
+    return context.mutations.user.login(args.username, args.password);
+  },
+
   user(args: UserArgs, context: ResolverContext) {
     return context.queries.user.get(args.id, context.user);
   },
@@ -109,9 +134,38 @@ export default {
     return context.queries.user.getAll(context.user);
   },
 
+  roles(_args: RolesArgs, context: ResolverContext) {
+    return context.queries.user.getRoles(context.user);
+  },
+
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
-      context.mutations.user.create(args.firstname, args.lastname)
+      context.mutations.user.create(
+        args.firstname,
+        args.lastname,
+        args.username,
+        args.password
+      )
+    );
+  },
+
+  updateUser(args: UpdateUserArgs, context: ResolverContext) {
+    return wrapUserMutation(
+      context.mutations.user.update(
+        context.user,
+        args.id,
+        args.firstname,
+        args.lastname,
+        args.roles
+      )
+    );
+  },
+
+  addUserRole(args: AddUserRoleArgs, context: ResolverContext) {
+    return context.mutations.user.addRole(
+      context.user,
+      args.userID,
+      args.roleID
     );
   }
 };

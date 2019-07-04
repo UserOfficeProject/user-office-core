@@ -8,7 +8,7 @@ export interface ProposalDataSource {
   // Write
   create(): Promise<Proposal | null>;
   update(proposal: Proposal): Promise<Proposal | null>;
-  setProposalUsers(id: number, users: number[]): boolean;
+  setProposalUsers(id: number, users: number[]): Promise<Boolean>;
   acceptProposal(id: number): Promise<Proposal | null>;
   rejectProposal(id: number): Promise<Proposal | null>;
   submitProposal(id: number): Promise<Proposal | null>;
