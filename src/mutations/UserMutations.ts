@@ -20,7 +20,10 @@ export default class UserMutations {
     if (lastname === "") {
       return rejection("INVALID_LAST_NAME");
     }
-    const salt = bcrypt.genSaltSync(10);
+
+    //Setting fixed salt for development
+    //const salt = bcrypt.genSaltSync(10);
+    const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
     const hash = bcrypt.hashSync(password, salt);
 
     const result = await this.dataSource.create(

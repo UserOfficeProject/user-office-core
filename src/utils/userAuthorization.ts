@@ -18,11 +18,11 @@ export default class UserQueries {
     });
   }
 
-  async isUser(agent: User | null, id: number) {
+  async isUser(agent: User | null, id: string) {
     if (agent == null) {
       return false;
     }
-    if (agent.id !== id) {
+    if (agent.id !== parseInt(id)) {
       return false;
     }
     return true;

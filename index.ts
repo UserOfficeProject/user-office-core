@@ -8,7 +8,6 @@ import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import User from "./src/models/User";
 
 var app = express();
 

@@ -20,11 +20,10 @@ export default class UserQueries {
   }
 
   async getAll(agent: User | null) {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getUsers();
-    } else {
+    if (agent == null) {
       return null;
     }
+    return this.dataSource.getUsers();
   }
 
   async getRoles(agent: User | null) {
