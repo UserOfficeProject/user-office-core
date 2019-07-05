@@ -10,9 +10,9 @@ import ProposalMutations from "./mutations/ProposalMutations";
 import UserAuthorization from "./utils/UserAuthorization";
 import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
-import { RabbitMQMessageBroker } from "./messageBroker";
+import createEventHandlers from "./eventHandlers";
 
-// Site specific data sources (only ESS atm)
+// Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
 const proposalDataSource = new PostgresProposalDataSource();
 const userAuthorization = new UserAuthorization(
@@ -20,75 +20,18 @@ const userAuthorization = new UserAuthorization(
   proposalDataSource
 );
 
-// Handler to send email to proposers in accepted proposal
-async function emailHandler(event: ApplicationEvent) {
-  function sendEmail(address: string, topic: string, message: string) {}
-
-  switch (event.type) {
-    case "PROPOSAL_ACCEPTED": {
-      const proposal = event.proposal;
-      const participants = await userDataSource.getProposalUsers(proposal.id);
-
-      for (const { firstname, lastname, email } of participants) {
-        const topic = "Congrats!";
-        const message = `Dear ${firstname} ${lastname}, your proposal has been accepted.`;
-        sendEmail(email, topic, message);
-      }
-
-      return;
-    }
-
-    case "PROPOSAL_REJECTED": {
-      const proposal = event.proposal;
-      const participants = await userDataSource.getProposalUsers(proposal.id);
-
-      for (const { firstname, lastname, email } of participants) {
-        const topic = "Tough luck!";
-        const message = `Sorry ${firstname} ${lastname}, your proposal was rejected because: ${
-          event.reason
-        }`;
-        sendEmail(email, topic, message);
-      }
-
-      return;
-    }
-  }
-}
-
-// Handler to notify the SDM system that a proposal has been accepted
-async function sdmHandler(event: ApplicationEvent) {
-  const rabbitMQ = new RabbitMQMessageBroker();
-
-  switch (event.type) {
-    case "PROPOSAL_ACCEPTED": {
-      const { proposal } = event;
-      const message = [proposal.id, proposal.status];
-      const json = JSON.stringify(message);
-      rabbitMQ.sendMessage(json);
-    }
-  }
-}
-
-// Handler that just logs every event to stdout
-function loggingHandler(event: ApplicationEvent) {
-  const json = JSON.stringify(event);
-  const timestamp = new Date().toLocaleString();
-  console.log(`${timestamp} -- ${json}`);
-}
-
-// Create event bus and add event handlers
-const eventBus = new EventBus<ApplicationEvent>();
-eventBus.addHandler(emailHandler);
-eventBus.addHandler(sdmHandler);
-eventBus.addHandler(loggingHandler);
+const eventHandlers = createEventHandlers(userDataSource);
 
 // From this point nothing is site-specific
+const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
+
 const userQueries = new UserQueries(userDataSource, userAuthorization);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
   userAuthorization
 );
+
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   userAuthorization,
