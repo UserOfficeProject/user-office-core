@@ -1,0 +1,13 @@
+image: node:7
+
+before_script:
+  - npm prune
+  - npm update -q
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - NODE_ENV=ci npm run test
