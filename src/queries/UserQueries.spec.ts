@@ -5,7 +5,7 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
-import UserAuthorization from "../utils/UserAuthorization";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),

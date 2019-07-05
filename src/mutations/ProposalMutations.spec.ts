@@ -1,6 +1,6 @@
 import ProposalMutations from "./ProposalMutations";
 import { EventBus } from "../events/eventBus";
-import UserAuthorization from "../utils/UserAuthorization";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import {

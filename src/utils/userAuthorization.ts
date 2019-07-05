@@ -3,7 +3,7 @@ import { Proposal } from "../models/Proposal";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 
-export default class UserQueries {
+export class UserAuthorization {
   constructor(
     private userDataSource: UserDataSource,
     private proposalDataSource: ProposalDataSource
