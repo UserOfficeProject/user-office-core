@@ -2,7 +2,7 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import Proposal from "../../models/Proposal";
+import { Proposal } from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 

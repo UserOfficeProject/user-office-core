@@ -1,5 +1,5 @@
 import { ProposalDataSource } from "../ProposalDataSource";
-import Proposal from "../../models/Proposal";
+import { Proposal } from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(1, "title", "abstract", 1);
 

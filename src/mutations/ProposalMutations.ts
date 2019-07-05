@@ -1,9 +1,9 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
-import User from "../models/User";
+import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import Proposal from "../models/Proposal";
+import { Proposal } from "../models/Proposal";
 
 // TODO: it is here much of the logic reside
 

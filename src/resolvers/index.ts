@@ -1,7 +1,7 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection } from "../rejection";
-import Proposal from "../models/Proposal";
-import User from "../models/User";
+import { Proposal } from "../models/Proposal";
+import { User } from "../models/User";
 
 interface ProposalArgs {
   id: number;
