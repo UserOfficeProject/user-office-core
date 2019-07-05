@@ -1,6 +1,6 @@
 import { UserDataSource } from "../UserDataSource";
-import User from "../../models/User";
-import Role from "../../models/Role";
+import { User } from "../../models/User";
+import { Role } from "../../models/Role";
 
 export const dummyUserOfficer = new User(4, "John", "Doe", "JoDo");
 export const dummyUser = new User(5, "Jane", "Doe", "JaDa");

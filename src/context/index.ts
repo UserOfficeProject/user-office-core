@@ -2,7 +2,7 @@ import ProposalMutations from "../mutations/ProposalMutations";
 import UserMutations from "../mutations/UserMutations";
 import ProposalQueries from "../Queries/ProposalQueries";
 import UserQueries from "../queries/UserQueries";
-import User from "../models/User";
+import { User } from "../models/User";
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;

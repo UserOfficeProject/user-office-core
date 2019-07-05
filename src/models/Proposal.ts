@@ -1,4 +1,4 @@
-export default class Proposal {
+export class Proposal {
   id: number;
   title: string;
   abstract: string;

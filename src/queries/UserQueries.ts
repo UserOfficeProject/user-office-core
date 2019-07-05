@@ -1,5 +1,5 @@
 import { UserDataSource } from "../datasources/UserDataSource";
-import User from "../models/User";
+import { User } from "../models/User";
 
 export default class UserQueries {
   constructor(private dataSource: UserDataSource, private userAuth: any) {}

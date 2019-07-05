@@ -1,4 +1,4 @@
-import User from "../models/User";
+import { User } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
 const jsonwebtoken = require("jsonwebtoken");

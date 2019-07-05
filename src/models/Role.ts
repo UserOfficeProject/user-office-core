@@ -1,4 +1,4 @@
-export default class User {
+export class Role {
   id: number;
   shortCode: string;
   title: string;

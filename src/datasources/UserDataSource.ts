@@ -1,5 +1,5 @@
-import User from "../models/User";
-import Role from "../models/Role";
+import { User } from "../models/User";
+import { Role } from "../models/Role";
 
 export interface UserDataSource {
   // Read

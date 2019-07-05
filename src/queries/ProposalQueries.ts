@@ -1,5 +1,5 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
-import User from "../models/User";
+import { User } from "../models/User";
 
 export default class ProposalQueries {
   constructor(private dataSource: ProposalDataSource, private userAuth: any) {}
