@@ -1,9 +1,5 @@
 image: node:7
 
-before_script:
-  - npm prune
-  - npm update -q
-
 stages:
   - test
   - deploy
@@ -11,6 +7,8 @@ stages:
 test:
   stage: test
   script:
+    - npm prune
+    - npm update -q
     - NODE_ENV=ci npm run test
     
 deploy_staging:
