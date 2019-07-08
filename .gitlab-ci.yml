@@ -16,8 +16,8 @@ test:
 deploy_staging:
   stage: deploy
   script:
-    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/duo2-backend-staging.git
-    - git push heroku master
-    - echo "Deployed to staging server"
+    - gem install dpl
+    - dpl --provider=heroku --app=duo2-backend-staging --api-key=$HEROKU_API_KEY
   only:
     - master
+    
