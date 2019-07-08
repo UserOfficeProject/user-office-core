@@ -6,8 +6,21 @@ before_script:
 
 stages:
   - test
+  - deploy_staging
 
 test:
   stage: test
   script:
     - NODE_ENV=ci npm run test
+    
+deploy_staging:
+  stage: deploy
+  script:
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/duo2-backend-staging.git
+    - git push heroku master
+    - echo "Deployed to staging server"
+  environment:
+  name: staging
+  url: https://duo2-backend-staging.herokuapp.com/
+  only:
+    - master
