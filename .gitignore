@@ -2,4 +2,5 @@ node_modules
 src/**/*.js
 index.js
 build
+coverage
 .DS_Store

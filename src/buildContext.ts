@@ -7,7 +7,7 @@ import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSourc
 import ProposalQueries from "./queries/ProposalQueries";
 import UserMutations from "./mutations/UserMutations";
 import ProposalMutations from "./mutations/ProposalMutations";
-import UserAuthorization from "./utils/UserAuthorization";
+import { UserAuthorization } from "./utils/UserAuthorization";
 import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
 import createEventHandlers from "./eventHandlers";

@@ -7,8 +7,9 @@
     "test": "jest --env=node --colors --coverage",
     "tsc": "tsc",
     "dev": "ts-node-dev --respawn --transpileOnly ./index.ts",
-    "prod": "tsc && node ./build/app.js",
-    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
+    "prod": "tsc && node ./build/index.js",
+    "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "start": "tsc && node ./build/index.js"
   },
   "author": "",
   "license": "ISC",
