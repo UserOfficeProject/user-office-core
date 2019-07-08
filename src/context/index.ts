@@ -1,6 +1,6 @@
 import ProposalMutations from "../mutations/ProposalMutations";
 import UserMutations from "../mutations/UserMutations";
-import ProposalQueries from "../Queries/ProposalQueries";
+import ProposalQueries from "../queries/ProposalQueries";
 import UserQueries from "../queries/UserQueries";
 import { User } from "../models/User";
 
