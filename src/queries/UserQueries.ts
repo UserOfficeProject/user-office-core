@@ -20,7 +20,6 @@ export default class UserQueries {
   }
 
   async getAll(agent: User | null, filter: string) {
-    console.log(filter);
     if (agent == null) {
       return null;
     }
