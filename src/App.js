@@ -46,26 +46,26 @@ async function apiCall(userData, query, variables) {
 
 function App() {
   // In prod
-  // const [currentRole, setCurrentRole] = useState(null);
+  const [currentRole, setCurrentRole] = useState(null);
 
-  // const [userData, setUserData] = useState(null);
-  // if (userData && userData.role && userData.role.length === 1) {
-  //   setCurrentRole(userData.role[0]);
-  // }
+  const [userData, setUserData] = useState(null);
+  if (userData && userData.role && userData.role.length === 1) {
+    setCurrentRole(userData.role[0]);
+  }
 
   //For development
-  const [currentRole, setCurrentRole] = useState("user_officer");
+  // const [currentRole, setCurrentRole] = useState("user_officer");
 
-  const [userData, setUserData] = useState({
-    token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI",
-    user: {
-      roles: [
-        { id: 1, shortCode: "user", title: "User" },
-        { id: 2, shortCode: "user_officer", title: "User Officer" }
-      ]
-    }
-  });
+  // const [userData, setUserData] = useState({
+  //   token:
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI",
+  //   user: {
+  //     roles: [
+  //       { id: 1, shortCode: "user", title: "User" },
+  //       { id: 2, shortCode: "user_officer", title: "User Officer" }
+  //     ]
+  //   }
+  // });
 
   return (
     <Router>
