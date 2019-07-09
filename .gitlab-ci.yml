@@ -29,7 +29,6 @@ production:
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
-    - cd build
     - dpl --provider=heroku --app=duo2-frontend-staging --api-key=$HEROKU_API_KEY --skip_cleanup
   only:
     - master
