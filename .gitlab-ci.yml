@@ -1,17 +1,35 @@
-image: node:7
+image: node:8.10.0-alpine
+cache:
+  key: "alpine"
+  paths:
+    - node_modules/
 
 stages:
-  - deploy
+  - build
+  - production
 
+build:
+  stage: build
+  artifacts:
+    paths:
+      - build/
+  script:
+    - npm install
+    - npm run build
+  tags:
+    - docker
+  only:
+    - master
 
-deploy_staging:
-  stage: deploy
+production:
+  type: deploy
+  stage: production
   image: ruby:latest
   script:
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
-    - dpl --provider=heroku --app=duo2-frontend-staging --api-key=$HEROKU_API_KEY
+    - cd build
+    - dpl --provider=heroku --app=duo2-frontend-staging --api-key=$HEROKU_API_KEY --skip_cleanup
   only:
     - master
-
