@@ -24,12 +24,6 @@ export const menuItems = {
         </ListItemIcon>
         <ListItemText primary="New Proposal" />
       </ListItem>
-      <ListItem component={Link} to="/PeoplePage" button>
-        <ListItemIcon>
-          <People />
-        </ListItemIcon>
-        <ListItemText primary="View People" />
-      </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
           <ExitToApp />
