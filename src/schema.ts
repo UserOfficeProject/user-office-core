@@ -5,7 +5,7 @@ type Query {
     proposal(id: ID!): Proposal
     proposals: [Proposal]
     user(id: ID!): User
-    users: [User]
+    users(filter: String): [User]
     roles: [Roles]
   }
 

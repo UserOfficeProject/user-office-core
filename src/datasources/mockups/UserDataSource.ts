@@ -38,7 +38,7 @@ export class userDataSource implements UserDataSource {
     return dummyUser;
   }
 
-  async getUsers() {
+  async getUsers(filter: string) {
     return [dummyUser, dummyUserOfficer];
   }
 

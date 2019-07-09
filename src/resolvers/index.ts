@@ -44,7 +44,9 @@ interface AddUserRoleArgs {
   roleID: number;
 }
 
-interface UsersArgs {}
+interface UsersArgs {
+  filter: string;
+}
 
 interface RolesArgs {}
 
@@ -130,8 +132,8 @@ export default {
     return context.queries.user.get(args.id, context.user);
   },
 
-  users(_args: UsersArgs, context: ResolverContext) {
-    return context.queries.user.getAll(context.user);
+  users(args: UsersArgs, context: ResolverContext) {
+    return context.queries.user.getAll(context.user, args.filter);
   },
 
   roles(_args: RolesArgs, context: ResolverContext) {

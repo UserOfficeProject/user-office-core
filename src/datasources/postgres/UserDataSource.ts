@@ -132,10 +132,13 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
-  async getUsers() {
+  async getUsers(filter: string) {
     return database
       .select()
       .from("users")
+      .where("username", "ilike", `%${filter}%`)
+      .orWhere("firstname", "ilike", `%${filter}%`)
+      .orWhere("lastname", "ilike", `%${filter}%`)
       .then((users: UserRecord[]) =>
         users.map(
           user =>
