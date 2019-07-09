@@ -136,9 +136,14 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from("users")
-      .where("username", "ilike", `%${filter}%`)
-      .orWhere("firstname", "ilike", `%${filter}%`)
-      .orWhere("lastname", "ilike", `%${filter}%`)
+      .modify((query: any) => {
+        if (filter) {
+          query
+            .where("username", "ilike", `%${filter}%`)
+            .orWhere("firstname", "ilike", `%${filter}%`)
+            .orWhere("lastname", "ilike", `%${filter}%`);
+        }
+      })
       .then((users: UserRecord[]) =>
         users.map(
           user =>
