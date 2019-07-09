@@ -121,10 +121,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getProposals() {
+  async getProposals(filter: string) {
     return database
       .select()
       .from("proposals")
+      .modify((query: any) => {
+        if (filter) {
+          query
+            .where("title", "ilike", `%${filter}%`)
+            .orWhere("abstract", "ilike", `%${filter}%`);
+        }
+      })
       .then((proposals: ProposalRecord[]) =>
         proposals.map(
           proposal =>

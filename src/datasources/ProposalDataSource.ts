@@ -3,7 +3,7 @@ import { Proposal } from "../models/Proposal";
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
-  getProposals(): Promise<Proposal[]>;
+  getProposals(filter: string): Promise<Proposal[]>;
   getUserProposals(id: number): Promise<Proposal[]>;
   // Write
   create(): Promise<Proposal | null>;

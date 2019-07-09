@@ -16,9 +16,9 @@ export default class ProposalQueries {
     }
   }
 
-  async getAll(agent: User | null) {
+  async getAll(agent: User | null, filter: string) {
     if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getProposals();
+      return this.dataSource.getProposals(filter);
     } else {
       return null;
     }

@@ -7,7 +7,9 @@ interface ProposalArgs {
   id: number;
 }
 
-interface ProposalsArgs {}
+interface ProposalsArgs {
+  filter: string;
+}
 
 interface CreateProposalArgs {}
 
@@ -82,8 +84,8 @@ export default {
     return context.queries.proposal.get(args.id, context.user);
   },
 
-  proposals(_args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll(context.user);
+  proposals(args: ProposalsArgs, context: ResolverContext) {
+    return context.queries.proposal.getAll(context.user, args.filter);
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
