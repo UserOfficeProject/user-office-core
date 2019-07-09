@@ -51,15 +51,19 @@ function sendUserProposalRequest(searchQuery, userID, apiCall) {
 }
 
 function sendAllProposalRequest(searchQuery, apiCall) {
-  const query = `{
-    proposals {
+  const query = `
+  query($filter: String!) {
+    proposals(filter: $filter) {
         id
         abstract
         status
         }
     }`;
 
-  return apiCall(query).then(data => {
+  const variables = {
+    filter: searchQuery.search
+  };
+  return apiCall(query, variables).then(data => {
     return {
       page: 0,
       totalCount: data.proposals.length,
@@ -120,7 +124,8 @@ export default function ProposalTable(props) {
           : query => sendAllProposalRequest(query, apiCall)
       }
       options={{
-        search: false
+        search: true,
+        debounceInterval: 400
       }}
       actions={[
         {

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import MaterialTable from "material-table";
 import {
   AddBox,
@@ -20,17 +20,23 @@ import {
 import { AppContext } from "./App";
 
 // TODO fix filtering in API
-function sendUserRequest(searchQuery, apiCall) {
-  const query = `{
-        users{
-          firstname
-          lastname
-          username
-          id
-        }
-      }`;
+function sendUserRequest(searchQuery, apiCall, setLoading) {
+  const query = `
+  query($filter: String) {
+    users(filter: $filter){
+      firstname
+      lastname
+      username
+      id
+    }
+  }`;
 
-  return apiCall(query).then(data => {
+  const variables = {
+    filter: searchQuery.search
+  };
+  setLoading(true);
+  return apiCall(query, variables).then(data => {
+    setLoading(false);
     return {
       page: 0,
       totalCount: data.users.length,
@@ -48,6 +54,7 @@ function sendUserRequest(searchQuery, apiCall) {
 
 function PeopleTable(props) {
   const { apiCall } = useContext(AppContext);
+  const [loading, setLoading] = useState(false);
 
   const tableIcons = {
     Add: AddBox,
@@ -79,9 +86,15 @@ function PeopleTable(props) {
       icons={tableIcons}
       title={props.title}
       columns={columns}
-      data={props.data ? props.data : query => sendUserRequest(query, apiCall)}
+      data={
+        props.data
+          ? props.data
+          : query => sendUserRequest(query, apiCall, setLoading)
+      }
+      isLoading={loading}
       options={{
-        search: props.search
+        search: props.search,
+        debounceInterval: 400
       }}
       actions={
         props.action
