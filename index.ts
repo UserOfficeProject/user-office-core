@@ -31,23 +31,23 @@ app.use(
 
     // For development purpose you can bypass JWT tokens and activate a user directly here
 
-    const user = {
-      id: 1,
-      firstname: "Carl",
-      lastname: "Carlsson",
-      username: "testuser",
-      roles: () => [],
-      proposals: () => []
-    };
-
     // const user = {
-    //   id: 2,
-    //   firstname: "Anders",
-    //   lastname: "Andersson",
-    //   username: "testofficer",
+    //   id: 1,
+    //   firstname: "Carl",
+    //   lastname: "Carlsson",
+    //   username: "testuser",
     //   roles: () => [],
     //   proposals: () => []
     // };
+
+    const user = {
+      id: 2,
+      firstname: "Anders",
+      lastname: "Andersson",
+      username: "testofficer",
+      roles: () => [],
+      proposals: () => []
+    };
 
     const context: ResolverContext = { ...baseContext, user };
 

@@ -19,11 +19,11 @@ export default class UserQueries {
     }
   }
 
-  async getAll(agent: User | null) {
+  async getAll(agent: User | null, filter: string) {
     if (agent == null) {
       return null;
     }
-    return this.dataSource.getUsers();
+    return this.dataSource.getUsers(filter);
   }
 
   async getRoles(agent: User | null) {
