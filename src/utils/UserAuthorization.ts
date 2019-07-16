@@ -19,11 +19,11 @@ export class UserAuthorization {
     });
   }
 
-  async isUser(agent: User | null, id: string) {
+  async isUser(agent: User | null, id: number) {
     if (agent == null) {
       return false;
     }
-    if (agent.id !== parseInt(id)) {
+    if (agent.id !== id) {
       return false;
     }
     return true;
