@@ -8,7 +8,7 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
-  async get(id: number, agent: User | null) {
+  async get(agent: User | null, id: number) {
     if (
       (await this.userAuth.isUserOfficer(agent)) ||
       (await this.userAuth.isUser(agent, id))

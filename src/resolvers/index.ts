@@ -131,7 +131,7 @@ export default {
   },
 
   user(args: UserArgs, context: ResolverContext) {
-    return context.queries.user.get(args.id, context.user);
+    return context.queries.user.get(context.user, args.id);
   },
 
   users(args: UsersArgs, context: ResolverContext) {
