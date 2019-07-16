@@ -19,6 +19,14 @@ const authMiddleware = jwt({
 
 app.use(authMiddleware);
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: { id: number };
+    }
+  }
+}
+
 app.use(
   "/graphql",
   graphqlHTTP(async (req: Request) => {
