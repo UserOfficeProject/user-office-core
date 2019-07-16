@@ -4,7 +4,7 @@ import { User } from "../models/User";
 export default class ProposalQueries {
   constructor(private dataSource: ProposalDataSource, private userAuth: any) {}
 
-  async get(id: number, agent: User | null) {
+  async get(agent: User | null, id: number) {
     const proposal = await this.dataSource.get(id);
     if (
       (await this.userAuth.isUserOfficer(agent)) ||
