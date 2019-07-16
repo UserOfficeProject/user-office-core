@@ -47,10 +47,14 @@ async function apiCall(userData, query, variables) {
 function App() {
   // In prod
   const [currentRole, setCurrentRole] = useState(null);
-
   const [userData, setUserData] = useState(null);
-  if (userData && userData.role && userData.role.length === 1) {
-    setCurrentRole(userData.role[0]);
+  if (
+    !currentRole &&
+    userData &&
+    userData.user.roles &&
+    userData.user.roles.length === 1
+  ) {
+    setCurrentRole(userData.user.roles[0].shortCode);
   }
 
   //For development
