@@ -129,7 +129,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then(
         (user_id: number[]) =>
           new User(user_id[0], firstname, lastname, username)
-      );
+      )
+      .then((user: User) => {
+        this.setUserRoles(user.id, [1]);
+        return user;
+      });
   }
 
   async getUsers(filter: string) {
