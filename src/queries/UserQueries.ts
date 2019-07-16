@@ -1,8 +1,12 @@
 import { UserDataSource } from "../datasources/UserDataSource";
 import { User } from "../models/User";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 export default class UserQueries {
-  constructor(private dataSource: UserDataSource, private userAuth: any) {}
+  constructor(
+    private dataSource: UserDataSource,
+    private userAuth: UserAuthorization
+  ) {}
 
   async getAgent(id: number) {
     return this.dataSource.get(id);

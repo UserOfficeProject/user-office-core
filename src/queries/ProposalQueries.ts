@@ -1,8 +1,12 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 export default class ProposalQueries {
-  constructor(private dataSource: ProposalDataSource, private userAuth: any) {}
+  constructor(
+    private dataSource: ProposalDataSource,
+    private userAuth: UserAuthorization
+  ) {}
 
   async get(agent: User | null, id: number) {
     const proposal = await this.dataSource.get(id);
