@@ -2,8 +2,22 @@ import { UserDataSource } from "../UserDataSource";
 import { User } from "../../models/User";
 import { Role } from "../../models/Role";
 
-export const dummyUserOfficer = new User(4, "John", "Doe", "JoDo");
-export const dummyUser = new User(5, "Jane", "Doe", "JaDa");
+export const dummyUserOfficer = new User(
+  4,
+  "John",
+  "Doe",
+  "JoDo",
+  "2019-07-17 08:25:12.23043+00",
+  "2019-07-17 08:25:12.23043+00"
+);
+export const dummyUser = new User(
+  5,
+  "Jane",
+  "Doe",
+  "JaDa",
+  "2019-07-17 08:25:12.23043+00",
+  "2019-07-17 08:25:12.23043+00"
+);
 
 export class userDataSource implements UserDataSource {
   async getByUsername(username: string): Promise<User | null> {

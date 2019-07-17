@@ -1,15 +1,13 @@
 export class Proposal {
-  id: number;
-  title: string;
-  abstract: string;
-  status: number;
-
-  constructor(id: number, title: string, abstract: string, status: number) {
-    this.id = id;
-    this.title = title;
-    this.abstract = abstract;
-    this.status = status;
-  }
+  constructor(
+    public id: number,
+    public title: string,
+    public abstract: string,
+    public proposer: number,
+    public status: number,
+    public created: string,
+    public updated: string
+  ) {}
 
   users(args: any, context: any) {
     return context.queries.user.dataSource.getProposalUsers(this.id);

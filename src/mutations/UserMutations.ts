@@ -103,6 +103,12 @@ export default class UserMutations {
     username: string,
     password: string
   ): Promise<{ token: string; user: User } | Rejection> {
+    const user = await this.dataSource.getByUsername(username);
+
+    if (!user) {
+      return rejection("INTERNAL_ERROR");
+    }
+
     const result = await this.dataSource.getPasswordByUsername(username);
 
     if (!result) {
@@ -113,12 +119,6 @@ export default class UserMutations {
 
     if (!valid) {
       return rejection("WRONG_PASSWORD");
-    }
-
-    const user = await this.dataSource.getByUsername(username);
-
-    if (!user) {
-      return rejection("INTERNAL_ERROR");
     }
 
     return {

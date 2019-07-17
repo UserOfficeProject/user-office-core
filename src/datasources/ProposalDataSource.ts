@@ -6,7 +6,7 @@ export interface ProposalDataSource {
   getProposals(filter: string): Promise<Proposal[]>;
   getUserProposals(id: number): Promise<Proposal[]>;
   // Write
-  create(): Promise<Proposal | null>;
+  create(id: number): Promise<Proposal | null>;
   update(proposal: Proposal): Promise<Proposal | null>;
   setProposalUsers(id: number, users: number[]): Promise<Boolean>;
   acceptProposal(id: number): Promise<Proposal | null>;

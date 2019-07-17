@@ -7,13 +7,28 @@ import { Proposal } from "../../models/Proposal";
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  setStatusProposal(id: number, status: number): Promise<Proposal | null> {
+  private createProposalObject(proposal: ProposalRecord) {
+    return new Proposal(
+      proposal.proposal_id,
+      proposal.title,
+      proposal.abstract,
+      proposal.proposer_id,
+      proposal.status,
+      proposal.created_at,
+      proposal.updated_at
+    );
+  }
+
+  async setStatusProposal(
+    id: number,
+    status: number
+  ): Promise<Proposal | null> {
     return database
       .update(
         {
           status
         },
-        ["proposal_id", "abstract", "status"]
+        ["*"]
       )
       .from("proposals")
       .where("proposal_id", id)
@@ -21,26 +36,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (proposal === undefined || !proposal.length) {
           return null;
         }
-        return new Proposal(
-          proposal[0].proposal_id,
-          proposal[0].title,
-          proposal[0].abstract,
-          proposal[0].status
-        );
+        return this.createProposalObject(proposal[0]);
       });
   }
 
-  public submitProposal(id: number): Promise<Proposal | null> {
+  async submitProposal(id: number): Promise<Proposal | null> {
     return this.setStatusProposal(id, 1);
   }
-  public acceptProposal(id: number): Promise<Proposal | null> {
+  async acceptProposal(id: number): Promise<Proposal | null> {
     return this.setStatusProposal(id, 2);
   }
-  public rejectProposal(id: number): Promise<Proposal | null> {
+  async rejectProposal(id: number): Promise<Proposal | null> {
     return this.setStatusProposal(id, 3);
   }
 
-  public setProposalUsers(id: number, users: number[]): Promise<Boolean> {
+  async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
     return database.transaction(function(trx: { commit: any; rollback: any }) {
       return database
         .from("proposal_user")
@@ -66,7 +76,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
   }
 
-  public update(proposal: Proposal): Promise<Proposal | null> {
+  async update(proposal: Proposal): Promise<Proposal | null> {
     return database
       .update(
         {
@@ -74,7 +84,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           abstract: proposal.abstract,
           status: proposal.status
         },
-        ["proposal_id", "title", "abstract", "status"]
+        ["*"]
       )
       .from("proposals")
       .where("proposal_id", proposal.id)
@@ -82,12 +92,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (proposal === undefined || !proposal.length) {
           return null;
         }
-        return new Proposal(
-          proposal[0].proposal_id,
-          proposal[0].title,
-          proposal[0].abstract,
-          proposal[0].status
-        );
+        return this.createProposalObject(proposal[0]);
       });
   }
 
@@ -97,27 +102,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from("proposals")
       .where("proposal_id", id)
       .first()
-      .then(
-        (proposal: ProposalRecord) =>
-          new Proposal(
-            proposal.proposal_id,
-            proposal.title,
-            proposal.abstract,
-            proposal.status
-          )
-      );
+      .then((proposal: ProposalRecord) => this.createProposalObject(proposal));
   }
 
-  async create() {
+  async create(proposerID: number) {
     return database
-      .insert({})
+      .insert({ proposer_id: proposerID })
       .into("proposals")
-      .returning("proposal_id")
-      .then((id: number[]) => {
-        return new Proposal(id[0], "null", "null", 0);
+      .returning(["*"])
+      .then((proposal: ProposalRecord[]) => {
+        return this.createProposalObject(proposal[0]);
       })
       .catch(() => {
-        console.log("asdad");
+        console.log("Should do something here");
       });
   }
 
@@ -125,6 +122,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select()
       .from("proposals")
+      .orderBy("proposal_id", "desc")
       .modify((query: any) => {
         if (filter) {
           query
@@ -133,35 +131,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
       })
       .then((proposals: ProposalRecord[]) =>
-        proposals.map(
-          proposal =>
-            new Proposal(
-              proposal.proposal_id,
-              proposal.title,
-              proposal.abstract,
-              proposal.status
-            )
-        )
+        proposals.map(proposal => this.createProposalObject(proposal))
       );
   }
 
   async getUserProposals(id: number) {
     return database
-      .select()
+      .select("p.*")
       .from("proposals as p")
-      .join("proposal_user as pc", { "p.proposal_id": "pc.proposal_id" })
-      .join("users as u", { "u.user_id": "pc.user_id" })
-      .where("u.user_id", id)
+      .leftJoin("proposal_user as pc", {
+        "p.proposal_id": "pc.proposal_id"
+      })
+      .where("pc.user_id", id)
+      .orWhere("p.proposer_id", id)
       .then((proposals: ProposalRecord[]) =>
-        proposals.map(
-          proposal =>
-            new Proposal(
-              proposal.proposal_id,
-              proposal.title,
-              proposal.abstract,
-              proposal.status
-            )
-        )
+        proposals.map(proposal => this.createProposalObject(proposal))
       );
   }
 }

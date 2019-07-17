@@ -7,6 +7,16 @@ import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
+  private createProposalObject(user: UserRecord) {
+    return new User(
+      user.user_id,
+      user.firstname,
+      user.lastname,
+      user.username,
+      user.created_at,
+      user.updated_at
+    );
+  }
   getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select("password")
@@ -93,10 +103,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("user_id", id)
       .first()
-      .then(
-        (user: UserRecord) =>
-          new User(user.user_id, user.firstname, user.lastname, user.username)
-      );
+      .then((user: UserRecord) => this.createProposalObject(user));
   }
 
   async getByUsername(username: string) {
@@ -105,10 +112,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("username", username)
       .first()
-      .then(
-        (user: UserRecord) =>
-          new User(user.user_id, user.firstname, user.lastname, user.username)
-      );
+      .then((user: UserRecord) => this.createProposalObject(user))
+      .catch((error: any) => {
+        return null;
+      });
   }
 
   async create(
@@ -124,12 +131,9 @@ export default class PostgresUserDataSource implements UserDataSource {
         username,
         password
       })
-      .returning("user_id")
+      .returning(["*"])
       .into("users")
-      .then(
-        (user_id: number[]) =>
-          new User(user_id[0], firstname, lastname, username)
-      )
+      .then((user: UserRecord[]) => this.createProposalObject(user[0]))
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
         return user;
@@ -149,10 +153,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .then((users: UserRecord[]) =>
-        users.map(
-          user =>
-            new User(user.user_id, user.firstname, user.lastname, user.username)
-        )
+        users.map(user => this.createProposalObject(user))
       );
   }
 
@@ -164,10 +165,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
       .then((users: UserRecord[]) =>
-        users.map(
-          user =>
-            new User(user.user_id, user.firstname, user.lastname, user.username)
-        )
+        users.map(user => this.createProposalObject(user))
       );
   }
 }

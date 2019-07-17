@@ -21,7 +21,7 @@ export default class ProposalMutations {
           return rejection("NOT_LOGGED_IN");
         }
 
-        const result = await this.dataSource.create();
+        const result = await this.dataSource.create(agent.id);
         return result || rejection("INTERNAL_ERROR");
       },
       proposal => {
@@ -47,16 +47,16 @@ export default class ProposalMutations {
         // Get proposal information
         let proposal = await this.dataSource.get(parseInt(id)); //Hacky
 
+        // Check that proposal exist
+        if (!proposal) {
+          return rejection("INTERNAL_ERROR");
+        }
+
         if (
           !(await this.userAuth.isUserOfficer(agent)) &&
           !(await this.userAuth.isMemberOfProposal(agent, proposal))
         ) {
           return rejection("NOT_ALLOWED");
-        }
-
-        // Check that proposal exist
-        if (!proposal) {
-          return rejection("INTERNAL_ERROR");
         }
 
         // Check what needs to be updated and update proposal object

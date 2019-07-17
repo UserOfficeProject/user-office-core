@@ -55,6 +55,9 @@ type Proposal {
     abstract: String
     status: Int
     users: [User!]
+    proposer: Int
+    created: String
+    updated: String
 }
 
 type User {
@@ -64,6 +67,8 @@ type User {
     username: String
     proposals: [Proposal!]
     roles:[Roles]
+    created: String
+    updated: String
 }
 
 `);
