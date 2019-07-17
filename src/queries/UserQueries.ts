@@ -1,14 +1,18 @@
 import { UserDataSource } from "../datasources/UserDataSource";
 import { User } from "../models/User";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 export default class UserQueries {
-  constructor(private dataSource: UserDataSource, private userAuth: any) {}
+  constructor(
+    private dataSource: UserDataSource,
+    private userAuth: UserAuthorization
+  ) {}
 
   async getAgent(id: number) {
     return this.dataSource.get(id);
   }
 
-  async get(id: number, agent: User | null) {
+  async get(agent: User | null, id: number) {
     if (
       (await this.userAuth.isUserOfficer(agent)) ||
       (await this.userAuth.isUser(agent, id))

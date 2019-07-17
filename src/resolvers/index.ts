@@ -4,7 +4,7 @@ import { Proposal } from "../models/Proposal";
 import { User } from "../models/User";
 
 interface ProposalArgs {
-  id: number;
+  id: string;
 }
 
 interface ProposalsArgs {
@@ -33,7 +33,7 @@ interface ApproveProposalArgs {
 }
 
 interface UserArgs {
-  id: number;
+  id: string;
 }
 
 interface LoginArgs {
@@ -81,7 +81,7 @@ const wrapUserMutation = createMutationWrapper<User>("user");
 
 export default {
   proposal(args: ProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.get(args.id, context.user);
+    return context.queries.proposal.get(context.user, parseInt(args.id));
   },
 
   proposals(args: ProposalsArgs, context: ResolverContext) {
@@ -131,7 +131,7 @@ export default {
   },
 
   user(args: UserArgs, context: ResolverContext) {
-    return context.queries.user.get(args.id, context.user);
+    return context.queries.user.get(context.user, parseInt(args.id));
   },
 
   users(args: UsersArgs, context: ResolverContext) {
