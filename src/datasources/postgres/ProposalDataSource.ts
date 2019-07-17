@@ -8,7 +8,6 @@ const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
   private createProposalObject(proposal: ProposalRecord) {
-    console.log(proposal);
     return new Proposal(
       proposal.proposal_id,
       proposal.title,
@@ -123,6 +122,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select()
       .from("proposals")
+      .orderBy("proposal_id", "desc")
       .modify((query: any) => {
         if (filter) {
           query
