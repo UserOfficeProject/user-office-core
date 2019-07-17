@@ -137,11 +137,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async getUserProposals(id: number) {
     return database
-      .select()
+      .select("p.*")
       .from("proposals as p")
-      .join("proposal_user as pc", { "p.proposal_id": "pc.proposal_id" })
-      .join("users as u", { "u.user_id": "pc.user_id" })
-      .where("u.user_id", id)
+      .leftJoin("proposal_user as pc", {
+        "p.proposal_id": "pc.proposal_id"
+      })
+      .where("pc.user_id", id)
+      .orWhere("p.proposer_id", id)
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => this.createProposalObject(proposal))
       );
