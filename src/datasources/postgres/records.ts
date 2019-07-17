@@ -20,6 +20,8 @@ export interface UserRecord {
   readonly firstname: string;
   readonly lastname: string;
   readonly username: string;
+  readonly created_at: string;
+  readonly updated_at: string;
 }
 
 export interface RoleRecord {
