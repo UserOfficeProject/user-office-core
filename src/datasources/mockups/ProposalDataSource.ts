@@ -1,7 +1,15 @@
 import { ProposalDataSource } from "../ProposalDataSource";
 import { Proposal } from "../../models/Proposal";
 
-export const dummyProposal = new Proposal(1, "title", "abstract", 1);
+export const dummyProposal = new Proposal(
+  1,
+  "title",
+  "abstract",
+  1, // main proposer
+  1, // status
+  "2019-07-17 08:25:12.23043+00",
+  "2019-07-17 08:25:12.23043+00"
+);
 
 export class proposalDataSource implements ProposalDataSource {
   async rejectProposal(id: number): Promise<Proposal | null> {

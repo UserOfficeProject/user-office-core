@@ -1,17 +1,40 @@
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE users (
   user_id  serial PRIMARY KEY
 , firstname     varchar(20) NOT NULL
 , lastname     varchar(20) NOT NULL
 , username     varchar(20) UNIQUE
 , password     varchar(100) NOT NULL
+, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE proposals (
   proposal_id serial PRIMARY KEY  -- implicit primary key constraint
 , title    varchar(20)
 , abstract    text
 , status      numeric NOT NULL DEFAULT 0
+, proposer_id int REFERENCES users (user_id)
+, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON proposals
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE proposal_user (
   proposal_id    int REFERENCES proposals (proposal_id) ON UPDATE CASCADE

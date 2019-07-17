@@ -9,7 +9,10 @@ export interface ProposalRecord {
   readonly proposal_id: number;
   readonly title: string;
   readonly abstract: string;
+  readonly proposer_id: number;
   readonly status: number;
+  readonly created_at: string;
+  readonly updated_at: string;
 }
 
 export interface UserRecord {
