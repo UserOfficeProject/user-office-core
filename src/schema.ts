@@ -67,8 +67,6 @@ type User {
     username: String
     proposals: [Proposal!]
     roles:[Roles]
-    created: String
-    updated: String
 }
 
 `);
