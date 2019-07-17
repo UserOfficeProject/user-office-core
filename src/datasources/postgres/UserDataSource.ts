@@ -112,7 +112,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("username", username)
       .first()
-      .then((user: UserRecord) => this.createProposalObject(user));
+      .then((user: UserRecord) => this.createProposalObject(user))
+      .catch((error: any) => {
+        return null;
+      });
   }
 
   async create(
