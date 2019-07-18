@@ -78,16 +78,20 @@ function App() {
           value={{
             userData,
             currentRole,
-            setUserData,
-            setCurrentRole,
             apiCall: apiCall.bind(this, userData)
           }}
         >
           <Switch>
             <Route path="/SignUp" component={SignUp} />
-            <Route path="/SignIn" component={SignIn} />
+            <Route
+              path="/SignIn"
+              render={() => <SignIn onSuccess={setUserData} />}
+            />
             <Route path="/LogOut" component={LogOut} />
-            <Route path="/RoleSelectionPage" component={RoleSelectionPage} />
+            <Route
+              path="/RoleSelectionPage"
+              render={() => <RoleSelectionPage onSelect={setCurrentRole} />}
+            />
             <PrivateRoute
               authed={userData}
               role={currentRole}
