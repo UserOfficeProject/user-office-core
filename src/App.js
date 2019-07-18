@@ -1,7 +1,6 @@
 import React, { createContext, useState } from "react";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
-import LogOut from "./LogOut";
 import RoleSelectionPage from "./RoleSelectionPage";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -87,7 +86,14 @@ function App() {
               path="/SignIn"
               render={() => <SignIn onSuccess={setUserData} />}
             />
-            <Route path="/LogOut" component={LogOut} />
+            <Route
+              path="/LogOut"
+              render={() => {
+                setUserData(null);
+                setCurrentRole(null);
+                return <Redirect to="/" />;
+              }}
+            />
             <Route
               path="/RoleSelectionPage"
               render={() => <RoleSelectionPage onSelect={setCurrentRole} />}
