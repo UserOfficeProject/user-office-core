@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SignInSide(props) {
+export default function SignInSide({ onSuccess }) {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
   const { userData } = useContext(AppContext);
@@ -86,7 +86,7 @@ export default function SignInSide(props) {
     request("/graphql", query, variables)
       .then(data => {
         if (data.login.token) {
-          props.onSuccess(data.login);
+          onSuccess(data.login);
         } else {
           setFailed(true);
         }
