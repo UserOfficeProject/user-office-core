@@ -26,9 +26,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function PeoplePage({ match }) {
+export default function PeoplePage({ match, onSelect }) {
   const classes = useStyles();
-  const { userData, currentRole, setCurrentRole } = useContext(AppContext);
+  const { userData, currentRole } = useContext(AppContext);
 
   if (!userData) {
     return <Redirect to="/SignIn" />;
@@ -45,7 +45,7 @@ export default function PeoplePage({ match }) {
             <Paper className={classes.paper}>Select role: </Paper>
           </Grid>
           {userData.user.roles.map(role => (
-            <Grid item xs={6} onClick={() => setCurrentRole(role.shortCode)}>
+            <Grid item xs={6} onClick={() => onSelect(role.shortCode)}>
               <Paper className={classes.paper}>{role.title}</Paper>
             </Grid>
           ))}
