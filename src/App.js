@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
 import RoleSelectionPage from "./RoleSelectionPage";
@@ -9,11 +9,11 @@ import { GraphQLClient } from "graphql-request";
 
 export const AppContext = createContext();
 
-const PrivateRoute = ({ component: Component, authed, role, ...rest }) => (
+const PrivateRoute = ({ component: Component, userData, role, ...rest }) => (
   <Route
     {...rest}
     render={props => {
-      if (!authed) {
+      if (!userData.token) {
         return <Redirect to="/SignIn" />;
       } else if (!role) {
         return <Redirect to="/RoleSelectionPage" />;
@@ -45,16 +45,16 @@ async function apiCall(userData, query, variables) {
 
 function App() {
   // In prod
+  const initUserData = { user: { roles: [] }, token: null };
+  const [userData, setUserData] = useState(initUserData);
   const [currentRole, setCurrentRole] = useState(null);
-  const [userData, setUserData] = useState(null);
-  if (
-    !currentRole &&
-    userData &&
-    userData.user.roles &&
-    userData.user.roles.length === 1
-  ) {
-    setCurrentRole(userData.user.roles[0].shortCode);
-  }
+
+  // check if user only has one role, in that case set it directly
+  useEffect(() => {
+    if (userData.user.roles.length === 1) {
+      setCurrentRole(userData.user.roles[0].shortCode);
+    }
+  }, [userData.user.roles]);
 
   //For development
   // const [currentRole, setCurrentRole] = useState("user_officer");
@@ -69,7 +69,6 @@ function App() {
   //     ]
   //   }
   // });
-
   return (
     <Router>
       <div className="App">
@@ -89,7 +88,7 @@ function App() {
             <Route
               path="/LogOut"
               render={() => {
-                setUserData(null);
+                setUserData(initUserData);
                 setCurrentRole(null);
                 return <Redirect to="/" />;
               }}
@@ -99,7 +98,7 @@ function App() {
               render={() => <RoleSelectionPage onSelect={setCurrentRole} />}
             />
             <PrivateRoute
-              authed={userData}
+              userData={userData}
               role={currentRole}
               path="/"
               component={DashBoard}
