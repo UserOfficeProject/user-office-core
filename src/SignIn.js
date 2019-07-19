@@ -94,7 +94,7 @@ export default function SignInSide({ onSuccess }) {
       .catch(error => setFailed(true));
   };
 
-  if (userData) {
+  if (userData.token) {
     return <Redirect to="/" />;
   }
 
