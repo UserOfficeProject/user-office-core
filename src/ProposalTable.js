@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { UserContext } from "./UserContextProvider";
+import { UserContext, useDataAPI } from "./UserContextProvider";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -19,36 +19,6 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-
-function sendUserProposalRequest(searchQuery, userID, apiCall) {
-  const query = `
-  query($id: ID!) {
-    user(id: $id){
-      proposals {
-        id
-        abstract
-        status
-      }
-    }
-  }`;
-
-  const variables = {
-    id: userID
-  };
-  return apiCall(query, variables).then(data => {
-    return {
-      page: 0,
-      totalCount: data.user.proposals.length,
-      data: data.user.proposals.map(proposal => {
-        return {
-          id: proposal.id,
-          abstract: proposal.abstract,
-          status: proposal.status
-        };
-      })
-    };
-  });
-}
 
 function sendAllProposalRequest(searchQuery, apiCall) {
   const query = `
@@ -80,6 +50,37 @@ function sendAllProposalRequest(searchQuery, apiCall) {
 
 export default function ProposalTable(props) {
   const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
+
+  const sendUserProposalRequest = (searchQuery, userID) => {
+    const query = `
+    query($id: ID!) {
+      user(id: $id){
+        proposals {
+          id
+          abstract
+          status
+        }
+      }
+    }`;
+
+    const variables = {
+      id: userID
+    };
+    return sendRequest(query, variables).then(data => {
+      return {
+        page: 0,
+        totalCount: data.user.proposals.length,
+        data: data.user.proposals.map(proposal => {
+          return {
+            id: proposal.id,
+            abstract: proposal.abstract,
+            status: proposal.status
+          };
+        })
+      };
+    });
+  };
 
   const tableIcons = {
     Add: AddBox,
@@ -120,7 +121,7 @@ export default function ProposalTable(props) {
       columns={columns}
       data={
         props.id
-          ? query => sendUserProposalRequest(query, props.id, apiCall)
+          ? query => sendUserProposalRequest(query, props.id)
           : query => sendAllProposalRequest(query, apiCall)
       }
       options={{

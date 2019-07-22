@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { GraphQLClient } from "graphql-request";
 
 const initUserData = { user: { roles: [] }, token: null, currentRole: null };
@@ -43,6 +43,30 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
+export function useDataAPI() {
+  const { token } = useContext(UserContext);
+
+  const sendRequest = (query, variables) => {
+    const endpoint = "/graphql";
+    const graphQLClient = new GraphQLClient(endpoint, {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    });
+
+    return graphQLClient
+      .request(query, variables)
+      .then(data => {
+        if (data.error) {
+          console.log("Server responded with error", data.error);
+        }
+        return data;
+      })
+      .catch(error => console.log("Error", error));
+  };
+  return sendRequest;
+}
 
 async function apiCall(token, query, variables) {
   const endpoint = "/graphql";
