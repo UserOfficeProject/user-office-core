@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -79,7 +79,7 @@ function sendAllProposalRequest(searchQuery, apiCall) {
 }
 
 export default function ProposalTable(props) {
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   const tableIcons = {
     Add: AddBox,

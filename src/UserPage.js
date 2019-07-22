@@ -28,7 +28,7 @@ import {
 } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   buttons: {
@@ -73,7 +73,7 @@ function UserPage({ match, history }) {
     ThirdStateCheck: Remove,
     ViewColumn: ViewColumn
   };
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
   const [roles, setRoles] = useState([]);
 
   const addRole = role => {

@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   errorText: {
@@ -25,7 +25,7 @@ export default function ProposalParticipants(props) {
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   const sendProposalUpdate = () => {
     const query = `

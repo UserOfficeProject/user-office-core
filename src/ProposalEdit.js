@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 export default function ProposalEdit({ match }) {
   const [proposalData, setProposalData] = useState({});
   const [loading, setLoading] = useState(true);
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   useEffect(() => {
     const getProposalInformation = id => {

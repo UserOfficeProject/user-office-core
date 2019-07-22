@@ -9,7 +9,7 @@ import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,7 +32,7 @@ export default function ProposalContainer(props) {
   const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   const submitProposal = () => {
     const query = `

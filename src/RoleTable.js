@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import MaterialTable from "material-table";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 import {
   AddBox,
   Check,
@@ -40,7 +40,7 @@ function sendRoleRequest(searchQuery, apiCall) {
 }
 
 function RoleTable(props) {
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   const tableIcons = {
     Add: AddBox,

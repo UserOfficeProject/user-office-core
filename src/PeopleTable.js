@@ -17,7 +17,7 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 // TODO fix filtering in API
 function sendUserRequest(searchQuery, apiCall, setLoading) {
@@ -53,7 +53,7 @@ function sendUserRequest(searchQuery, apiCall, setLoading) {
 }
 
 function PeopleTable(props) {
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
 
   const tableIcons = {

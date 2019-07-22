@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   useEffect(() => {
     const createProposalID = () => {

@@ -22,7 +22,7 @@ import ProposalPage from "./ProposalPage";
 import UserPage from "./UserPage";
 import OverviewPage from "./OverviewPage";
 import { Link } from "react-router-dom";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const drawerWidth = 240;
 
@@ -95,14 +95,15 @@ const useStyles = makeStyles(theme => ({
 export default function Dashboard({ match }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-  const { userData, currentRole } = useContext(AppContext);
-  const { id } = userData.user;
+  const { user, currentRole } = useContext(UserContext);
+  const { id } = user;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  console.log(user, currentRole);
 
   return (
     <div className={classes.root}>

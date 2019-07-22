@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   buttons: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalInformation(props) {
-  const { apiCall } = useContext(AppContext);
+  const { apiCall } = useContext(UserContext);
 
   const sendProposalUpdate = values => {
     const query = `
