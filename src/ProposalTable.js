@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { UserContext, useDataAPI } from "./UserContextProvider";
+import React, { useState } from "react";
+import { useDataAPI } from "./UserContextProvider";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -21,10 +21,9 @@ import {
 } from "@material-ui/icons";
 
 export default function ProposalTable(props) {
-  const { apiCall } = useContext(UserContext);
   const sendRequest = useDataAPI();
 
-  const sendAllProposalRequest = (searchQuery, apiCall) => {
+  const sendAllProposalRequest = searchQuery => {
     const query = `
     query($filter: String!) {
       proposals(filter: $filter) {
@@ -122,7 +121,7 @@ export default function ProposalTable(props) {
       data={
         props.id
           ? query => sendUserProposalRequest(query, props.id)
-          : query => sendAllProposalRequest(query, apiCall)
+          : query => sendAllProposalRequest(query)
       }
       options={{
         search: true,
