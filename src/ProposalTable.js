@@ -20,37 +20,37 @@ import {
   SaveAlt
 } from "@material-ui/icons";
 
-function sendAllProposalRequest(searchQuery, apiCall) {
-  const query = `
-  query($filter: String!) {
-    proposals(filter: $filter) {
-        id
-        abstract
-        status
-        }
-    }`;
-
-  const variables = {
-    filter: searchQuery.search
-  };
-  return apiCall(query, variables).then(data => {
-    return {
-      page: 0,
-      totalCount: data.proposals.length,
-      data: data.proposals.map(proposal => {
-        return {
-          id: proposal.id,
-          abstract: proposal.abstract,
-          status: proposal.status
-        };
-      })
-    };
-  });
-}
-
 export default function ProposalTable(props) {
   const { apiCall } = useContext(UserContext);
   const sendRequest = useDataAPI();
+
+  const sendAllProposalRequest = (searchQuery, apiCall) => {
+    const query = `
+    query($filter: String!) {
+      proposals(filter: $filter) {
+          id
+          abstract
+          status
+          }
+      }`;
+
+    const variables = {
+      filter: searchQuery.search
+    };
+    return sendRequest(query, variables).then(data => {
+      return {
+        page: 0,
+        totalCount: data.proposals.length,
+        data: data.proposals.map(proposal => {
+          return {
+            id: proposal.id,
+            abstract: proposal.abstract,
+            status: proposal.status
+          };
+        })
+      };
+    });
+  };
 
   const sendUserProposalRequest = (searchQuery, userID) => {
     const query = `
