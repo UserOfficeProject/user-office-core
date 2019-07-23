@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { UserContext } from "./UserContextProvider";
+import { useDataAPI } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   buttons: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalInformation(props) {
-  const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
 
   const sendProposalUpdate = values => {
     const query = `
@@ -39,7 +39,7 @@ export default function ProposalInformation(props) {
       title: values.title,
       abstract: values.abstract
     };
-    apiCall(query, variables).then(data => props.next(values));
+    sendRequest(query, variables).then(data => props.next(values));
   };
 
   const classes = useStyles();

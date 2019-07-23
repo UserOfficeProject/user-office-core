@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -9,7 +9,7 @@ import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
-import { UserContext } from "./UserContextProvider";
+import { useDataAPI } from "./UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,7 +32,7 @@ export default function ProposalContainer(props) {
   const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
 
   const submitProposal = () => {
     const query = `
@@ -50,7 +50,7 @@ export default function ProposalContainer(props) {
       id: props.data.id
     };
 
-    return apiCall(query, variables).then(data => setSubmitted(true));
+    return sendRequest(query, variables).then(data => setSubmitted(true));
   };
 
   const handleNext = data => {

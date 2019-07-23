@@ -103,7 +103,6 @@ export default function Dashboard({ match }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  console.log(user, currentRole);
 
   return (
     <div className={classes.root}>

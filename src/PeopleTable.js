@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import MaterialTable from "material-table";
 import {
   AddBox,
@@ -17,7 +17,7 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { UserContext } from "./UserContextProvider";
+import { useDataAPI } from "./UserContextProvider";
 
 // TODO fix filtering in API
 function sendUserRequest(searchQuery, apiCall, setLoading) {
@@ -53,7 +53,7 @@ function sendUserRequest(searchQuery, apiCall, setLoading) {
 }
 
 function PeopleTable(props) {
-  const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
   const [loading, setLoading] = useState(false);
 
   const tableIcons = {
@@ -89,7 +89,7 @@ function PeopleTable(props) {
       data={
         props.data
           ? props.data
-          : query => sendUserRequest(query, apiCall, setLoading)
+          : query => sendUserRequest(query, sendRequest, setLoading)
       }
       isLoading={loading}
       options={{

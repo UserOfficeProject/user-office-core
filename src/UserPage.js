@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -28,7 +28,7 @@ import {
 } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import { UserContext } from "./UserContextProvider";
+import { useDataAPI } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   buttons: {
@@ -73,7 +73,7 @@ function UserPage({ match, history }) {
     ThirdStateCheck: Remove,
     ViewColumn: ViewColumn
   };
-  const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
   const [roles, setRoles] = useState([]);
 
   const addRole = role => {
@@ -105,7 +105,7 @@ function UserPage({ match, history }) {
       lastname: values.lastname,
       roles: roles.map(role => role.id)
     };
-    apiCall(query, variables).then(data => history.push("/PeoplePage"));
+    sendRequest(query, variables).then(data => history.push("/PeoplePage"));
   };
 
   useEffect(() => {
@@ -126,13 +126,13 @@ function UserPage({ match, history }) {
       const variables = {
         id
       };
-      apiCall(query, variables).then(data => {
+      sendRequest(query, variables).then(data => {
         setUserData({ ...data.user });
         setRoles(data.user.roles);
       });
     };
     getUserInformation(match.params.id);
-  }, [match.params.id, apiCall]);
+  }, [match.params.id, sendRequest]);
 
   const columns = [{ title: "Name", field: "name" }];
 

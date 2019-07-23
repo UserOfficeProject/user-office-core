@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React from "react";
 import MaterialTable from "material-table";
-import { UserContext } from "./UserContextProvider";
+import { useDataAPI } from "./UserContextProvider";
 import {
   AddBox,
   Check,
@@ -40,7 +40,7 @@ function sendRoleRequest(searchQuery, apiCall) {
 }
 
 function RoleTable(props) {
-  const { apiCall } = useContext(UserContext);
+  const sendRequest = useDataAPI();
 
   const tableIcons = {
     Add: AddBox,
@@ -72,7 +72,7 @@ function RoleTable(props) {
       icons={tableIcons}
       title="Add Role"
       columns={columns}
-      data={query => sendRoleRequest(query, apiCall)}
+      data={query => sendRoleRequest(query, sendRequest)}
       options={{
         search: true
       }}
