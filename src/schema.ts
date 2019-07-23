@@ -3,7 +3,7 @@ var { buildSchema } = require("graphql");
 export default buildSchema(`
 type Query {
     proposal(id: ID!): Proposal
-    proposals(filter: String): [Proposal]
+    proposals(filter: String, first: Int, offset: Int): ProposalQueryResult
     user(id: ID!): User
     users(filter: String): [User]
     roles: [Roles]
@@ -11,6 +11,11 @@ type Query {
 
   type Rejection {
     reason: String
+  }
+
+  type ProposalQueryResult {
+    proposals: [Proposal]
+    totalCount: Int
   }
 
   type ProposalMutationResult {
