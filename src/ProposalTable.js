@@ -25,22 +25,27 @@ export default function ProposalTable(props) {
 
   const sendAllProposalRequest = searchQuery => {
     const query = `
-    query($filter: String!) {
-      proposals(filter: $filter) {
+    query($filter: String!, $first: Int!, $offset: Int!) {
+      proposals(filter: $filter, first: $first, offset: $offset) {
+        proposals{
           id
           abstract
           status
           }
+        totalCount
+        }
       }`;
 
     const variables = {
-      filter: searchQuery.search
+      filter: searchQuery.search,
+      offset: searchQuery.pageSize * searchQuery.page,
+      first: searchQuery.pageSize
     };
     return sendRequest(query, variables).then(data => {
       return {
-        page: 0,
-        totalCount: data.proposals.length,
-        data: data.proposals.map(proposal => {
+        page: searchQuery.page,
+        totalCount: data.proposals.totalCount,
+        data: data.proposals.proposals.map(proposal => {
           return {
             id: proposal.id,
             abstract: proposal.abstract,
