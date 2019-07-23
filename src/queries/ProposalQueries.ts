@@ -22,9 +22,9 @@ export default class ProposalQueries {
 
   async getAll(
     agent: User | null,
-    filter: string,
-    first: number,
-    offset: number
+    filter?: string,
+    first?: number,
+    offset?: number
   ) {
     if (await this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getProposals(filter, first, offset);

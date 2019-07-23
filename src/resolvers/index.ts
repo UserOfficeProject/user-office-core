@@ -8,9 +8,9 @@ interface ProposalArgs {
 }
 
 interface ProposalsArgs {
-  first: number;
-  offset: number;
-  filter: string;
+  first?: number;
+  offset?: number;
+  filter?: string;
 }
 
 interface CreateProposalArgs {}

@@ -4,9 +4,9 @@ export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
   getProposals(
-    filter: string,
-    first: number,
-    offset: number
+    filter?: string,
+    first?: number,
+    offset?: number
   ): Promise<Proposal[]>;
   getUserProposals(id: number): Promise<Proposal[]>;
   // Write
