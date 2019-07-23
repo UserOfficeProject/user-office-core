@@ -8,7 +8,9 @@ interface ProposalArgs {
 }
 
 interface ProposalsArgs {
-  filter: string;
+  first?: number;
+  offset?: number;
+  filter?: string;
 }
 
 interface CreateProposalArgs {}
@@ -85,7 +87,12 @@ export default {
   },
 
   proposals(args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll(context.user, args.filter);
+    return context.queries.proposal.getAll(
+      context.user,
+      args.filter,
+      args.first,
+      args.offset
+    );
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {

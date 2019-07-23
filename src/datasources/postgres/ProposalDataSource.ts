@@ -118,9 +118,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getProposals(filter: string) {
+  async getProposals(filter: string, first: number, offset: number) {
     return database
-      .select()
+      .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("proposals")
       .orderBy("proposal_id", "desc")
       .modify((query: any) => {
@@ -129,10 +129,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .where("title", "ilike", `%${filter}%`)
             .orWhere("abstract", "ilike", `%${filter}%`);
         }
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
       })
-      .then((proposals: ProposalRecord[]) =>
-        proposals.map(proposal => this.createProposalObject(proposal))
-      );
+      .then((proposals: ProposalRecord[]) => {
+        const props = proposals.map(proposal =>
+          this.createProposalObject(proposal)
+        );
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props
+        };
+      });
   }
 
   async getUserProposals(id: number) {

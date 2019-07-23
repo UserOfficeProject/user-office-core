@@ -43,7 +43,7 @@ export class proposalDataSource implements ProposalDataSource {
     return dummyProposal;
   }
 
-  async getProposals(filter: string) {
+  async getProposals(filter: string, first: number, offset: number) {
     return [dummyProposal];
   }
 

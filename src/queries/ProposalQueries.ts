@@ -20,9 +20,14 @@ export default class ProposalQueries {
     }
   }
 
-  async getAll(agent: User | null, filter: string) {
+  async getAll(
+    agent: User | null,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ) {
     if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getProposals(filter);
+      return this.dataSource.getProposals(filter, first, offset);
     } else {
       return null;
     }
