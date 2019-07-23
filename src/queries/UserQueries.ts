@@ -23,11 +23,16 @@ export default class UserQueries {
     }
   }
 
-  async getAll(agent: User | null, filter: string) {
+  async getAll(
+    agent: User | null,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ) {
     if (agent == null) {
       return null;
     }
-    return this.dataSource.getUsers(filter);
+    return this.dataSource.getUsers(filter, first, offset);
   }
 
   async getRoles(agent: User | null) {

@@ -140,10 +140,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  async getUsers(filter: string) {
+  async getUsers(filter?: string, first?: number, offset?: number) {
     return database
-      .select()
+      .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("users")
+      .orderBy("user_id", "desc")
       .modify((query: any) => {
         if (filter) {
           query
@@ -151,10 +152,20 @@ export default class PostgresUserDataSource implements UserDataSource {
             .orWhere("firstname", "ilike", `%${filter}%`)
             .orWhere("lastname", "ilike", `%${filter}%`);
         }
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
       })
-      .then((users: UserRecord[]) =>
-        users.map(user => this.createProposalObject(user))
-      );
+      .then((usersRecord: UserRecord[]) => {
+        const users = usersRecord.map(user => this.createProposalObject(user));
+        return {
+          totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
+          users
+        };
+      });
   }
 
   async getProposalUsers(id: number) {

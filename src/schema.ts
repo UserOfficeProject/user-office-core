@@ -4,8 +4,8 @@ export default buildSchema(`
 type Query {
     proposal(id: ID!): Proposal
     proposals(filter: String, first: Int, offset: Int): ProposalQueryResult
-    user(id: ID!): User
-    users(filter: String): [User]
+    user(id: ID!): UserQueryResult
+    users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
   }
 
@@ -15,6 +15,11 @@ type Query {
 
   type ProposalQueryResult {
     proposals: [Proposal]
+    totalCount: Int
+  }
+
+  type UserQueryResult {
+    users: [User]
     totalCount: Int
   }
 

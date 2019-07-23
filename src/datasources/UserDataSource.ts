@@ -6,7 +6,7 @@ export interface UserDataSource {
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getUserRoles(id: number): Promise<Role[]>;
-  getUsers(filter: string): Promise<User[]>;
+  getUsers(filter?: string, first?: number, offset?: number): Promise<User[]>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<User[]>;
   // Write

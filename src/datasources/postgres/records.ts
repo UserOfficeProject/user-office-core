@@ -6,6 +6,7 @@ export interface ProposalUserRecord {
 }
 
 export interface ProposalRecord {
+  [x: string]: any;
   readonly proposal_id: number;
   readonly title: string;
   readonly abstract: string;
@@ -13,6 +14,7 @@ export interface ProposalRecord {
   readonly status: number;
   readonly created_at: string;
   readonly updated_at: string;
+  readonly full_count: number;
 }
 
 export interface UserRecord {
@@ -22,6 +24,7 @@ export interface UserRecord {
   readonly username: string;
   readonly created_at: string;
   readonly updated_at: string;
+  readonly full_count: number;
 }
 
 export interface RoleRecord {

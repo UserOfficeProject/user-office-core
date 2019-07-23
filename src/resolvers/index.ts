@@ -49,7 +49,9 @@ interface AddUserRoleArgs {
 }
 
 interface UsersArgs {
-  filter: string;
+  first?: number;
+  offset?: number;
+  filter?: string;
 }
 
 interface RolesArgs {}
@@ -142,7 +144,12 @@ export default {
   },
 
   users(args: UsersArgs, context: ResolverContext) {
-    return context.queries.user.getAll(context.user, args.filter);
+    return context.queries.user.getAll(
+      context.user,
+      args.filter,
+      args.first,
+      args.offset
+    );
   },
 
   roles(_args: RolesArgs, context: ResolverContext) {

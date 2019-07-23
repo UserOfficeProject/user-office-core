@@ -118,7 +118,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getProposals(filter: string, first: number, offset: number) {
+  async getProposals(filter?: string, first?: number, offset?: number) {
     return database
       .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("proposals")
