@@ -1,21 +1,16 @@
 import React, { useContext } from "react";
 import { GraphQLClient } from "graphql-request";
 
+//For Prod
 const initUserData = { user: { roles: [] }, token: null, currentRole: null };
 
 //For development
-// const [currentRole, setCurrentRole] = useState("user_officer");
-
-// const [userData, setUserData] = useState({
+// const initUserData = {
+//   user: { roles: ["user_officer", "user"], id: 2 },
 //   token:
-//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn0seyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU2MTU1NTA5MywiZXhwIjoxNTkzMTEyNjkzfQ.84BAbKZzEZWD9Ayq-JVwY1PeMj1qUZKiz_JuumVoCMI",
-//   user: {
-//     roles: [
-//       { id: 1, shortCode: "user", title: "User" },
-//       { id: 2, shortCode: "user_officer", title: "User Officer" }
-//     ]
-//   }
-// });
+//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNTYzODgzNzcxLCJleHAiOjE1OTU0NDEzNzF9.AOvbYPv21pi1VBPV0qM2oiyIESC-ugPfrgZolsb9dJk",
+//   currentRole: "user_officer"
+// };
 
 export const UserContext = React.createContext();
 
@@ -68,25 +63,6 @@ export function useDataAPI() {
   return sendRequest;
 }
 
-async function apiCall(token, query, variables) {
-  const endpoint = "/graphql";
-  const graphQLClient = new GraphQLClient(endpoint, {
-    headers: {
-      authorization: `Bearer ${token}`
-    }
-  });
-
-  return graphQLClient
-    .request(query, variables)
-    .then(data => {
-      if (data.error) {
-        console.log("Server responded with error", data.error);
-      }
-      return data;
-    })
-    .catch(error => console.log("Error", error));
-}
-
 export const UserContextProvider = props => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
 
@@ -96,8 +72,7 @@ export const UserContextProvider = props => {
         ...state,
         handleLogin: data => dispatch({ type: "loginUser", payload: data }),
         handleLogout: data => dispatch({ type: "logOffUser", payload: data }),
-        handleRole: role => dispatch({ type: "selectRole", payload: role }),
-        apiCall: (query, variables) => apiCall(state.token, query, variables)
+        handleRole: role => dispatch({ type: "selectRole", payload: role })
       }}
     >
       {props.children}
