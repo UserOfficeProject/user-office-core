@@ -4,11 +4,10 @@ import { useDataAPI } from "./UserContextProvider";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
-  const sendRequest = useDataAPI();
+  const [sendRequest] = useDataAPI();
 
   useEffect(() => {
-    const createProposalID = () => {
-      const query = `
+    const query = `
       mutation{
         createProposal{
          proposal{
@@ -18,13 +17,10 @@ export default function ProposalSubmission() {
         }
       }
       `;
-
-      sendRequest(query).then(data =>
-        setProposalID(data.createProposal.proposal.id)
-      );
-    };
-    createProposalID();
-  }, [sendRequest]);
+    sendRequest(query).then(data =>
+      setProposalID(data.createProposal.proposal.id)
+    );
+  }, []);
 
   if (!proposalID) {
     return <p>Loading</p>;

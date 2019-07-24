@@ -132,7 +132,7 @@ function UserPage({ match, history }) {
       });
     };
     getUserInformation(match.params.id);
-  }, [match.params.id, sendRequest]);
+  }, [match.params.id]);
 
   const columns = [{ title: "Name", field: "name" }];
 
