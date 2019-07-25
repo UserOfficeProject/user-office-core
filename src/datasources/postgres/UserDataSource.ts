@@ -38,17 +38,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         return user;
       });
   }
-  addUserRole(userID: number, roleID: number): Promise<Boolean | null> {
-    return database
-      .insert({
-        role_id: roleID,
-        user_id: userID
-      })
-      .into("role_user")
-      .then(() => {
-        return true;
-      });
-  }
 
   async getRoles() {
     return database

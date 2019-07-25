@@ -54,9 +54,7 @@ export class userDataSource implements UserDataSource {
   async update(user: User): Promise<User | null> {
     return dummyUser;
   }
-  async addUserRole(userID: number, roleID: number): Promise<Boolean | null> {
-    return true;
-  }
+
   async get(id: number) {
     return dummyUser;
   }

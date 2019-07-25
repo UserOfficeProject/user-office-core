@@ -38,13 +38,13 @@ export default class UserMutations {
   async update(
     agent: User | null,
     id: string,
-    firstname: string,
-    lastname: string,
-    roles: number[]
+    firstname?: string,
+    lastname?: string,
+    roles?: number[]
   ): Promise<User | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, id))
+      !(await this.userAuth.isUser(agent, parseInt(id)))
     ) {
       return rejection("WRONG_PERMISSIONS");
     }
@@ -70,34 +70,21 @@ export default class UserMutations {
       }
     }
 
-    if (await this.userAuth.isUserOfficer(agent)) {
-      if (roles !== undefined) {
-        const resultUpdateRoles = await this.dataSource.setUserRoles(
-          parseInt(id),
-          roles
-        );
-        if (!resultUpdateRoles) {
-          return rejection("INTERNAL_ERROR");
-        }
+    if (roles !== undefined) {
+      if (!(await this.userAuth.isUserOfficer(agent))) {
+        return rejection("WRONG_PERMISSIONS");
+      }
+      const resultUpdateRoles = await this.dataSource.setUserRoles(
+        parseInt(id),
+        roles
+      );
+      if (!resultUpdateRoles) {
+        return rejection("INTERNAL_ERROR");
       }
     }
     const result = await this.dataSource.update(user);
 
     return result || rejection("INTERNAL_ERROR");
-  }
-
-  async addRole(
-    agent: User | null,
-    userID: number,
-    roleID: number
-  ): Promise<Boolean | Rejection> {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      const result = await this.dataSource.addUserRole(userID, roleID);
-
-      return result || rejection("INTERNAL_ERROR");
-    } else {
-      return rejection("WRONG_PERMISSIONS");
-    }
   }
 
   async login(

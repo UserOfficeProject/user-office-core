@@ -58,7 +58,6 @@ export class proposalDataSource implements ProposalDataSource {
   async get(id: number) {
     if (id && id > 0) {
       if (id == dummyProposalSubmitted.id) {
-        console.log("dada");
         return dummyProposalSubmitted;
       } else {
         return dummyProposal;
