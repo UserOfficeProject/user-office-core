@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -26,11 +26,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function PeoplePage({ match, onSelect }) {
+export default function RoleSelectionPage() {
   const classes = useStyles();
-  const { userData, currentRole } = useContext(AppContext);
+  const { user, currentRole, handleRole } = useContext(UserContext);
 
-  if (!userData) {
+  if (!user) {
     return <Redirect to="/SignIn" />;
   }
   if (currentRole) {
@@ -44,8 +44,8 @@ export default function PeoplePage({ match, onSelect }) {
           <Grid item xs={12}>
             <Paper className={classes.paper}>Select role: </Paper>
           </Grid>
-          {userData.user.roles.map(role => (
-            <Grid item xs={6} onClick={() => onSelect(role.shortCode)}>
+          {user.roles.map(role => (
+            <Grid item xs={6} onClick={() => handleRole(role.shortCode)}>
               <Paper className={classes.paper}>{role.title}</Paper>
             </Grid>
           ))}

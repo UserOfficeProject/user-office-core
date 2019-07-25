@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { AppContext } from "./App";
+import { useDataAPI } from "./UserContextProvider";
 
 export default function ProposalEdit({ match }) {
   const [proposalData, setProposalData] = useState({});
   const [loading, setLoading] = useState(true);
-  const { apiCall } = useContext(AppContext);
+  const sendRequest = useDataAPI();
 
   useEffect(() => {
     const getProposalInformation = id => {
@@ -29,7 +29,7 @@ export default function ProposalEdit({ match }) {
       const variables = {
         id
       };
-      apiCall(query, variables).then(data => {
+      sendRequest(query, variables).then(data => {
         setProposalData({
           title: data.proposal.title,
           abstract: data.proposal.abstract,
@@ -48,7 +48,7 @@ export default function ProposalEdit({ match }) {
       });
     };
     getProposalInformation(match.params.proposalID);
-  }, [match.params.proposalID, apiCall]);
+  }, [match.params.proposalID, sendRequest]);
 
   if (loading) {
     return <p>Loading</p>;

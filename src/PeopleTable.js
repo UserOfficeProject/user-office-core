@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import MaterialTable from "material-table";
 import {
   AddBox,
@@ -17,30 +17,35 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { AppContext } from "./App";
+import { useDataAPI } from "./UserContextProvider";
 
 // TODO fix filtering in API
 function sendUserRequest(searchQuery, apiCall, setLoading) {
   const query = `
-  query($filter: String) {
-    users(filter: $filter){
+  query($filter: String!, $first: Int!, $offset: Int!) {
+    users(filter: $filter, first: $first, offset: $offset){
+      users{
       firstname
       lastname
       username
       id
+      }
+      totalCount
     }
   }`;
 
   const variables = {
-    filter: searchQuery.search
+    filter: searchQuery.search,
+    offset: searchQuery.pageSize * searchQuery.page,
+    first: searchQuery.pageSize
   };
   setLoading(true);
   return apiCall(query, variables).then(data => {
     setLoading(false);
     return {
-      page: 0,
-      totalCount: data.users.length,
-      data: data.users.map(user => {
+      page: searchQuery.page,
+      totalCount: data.users.totalCount,
+      data: data.users.users.map(user => {
         return {
           name: user.firstname,
           surname: user.lastname,
@@ -53,7 +58,7 @@ function sendUserRequest(searchQuery, apiCall, setLoading) {
 }
 
 function PeopleTable(props) {
-  const { apiCall } = useContext(AppContext);
+  const sendRequest = useDataAPI();
   const [loading, setLoading] = useState(false);
 
   const tableIcons = {
@@ -89,7 +94,7 @@ function PeopleTable(props) {
       data={
         props.data
           ? props.data
-          : query => sendUserRequest(query, apiCall, setLoading)
+          : query => sendUserRequest(query, sendRequest, setLoading)
       }
       isLoading={loading}
       options={{

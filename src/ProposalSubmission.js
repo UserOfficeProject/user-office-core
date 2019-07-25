@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { AppContext } from "./App";
+import { useDataAPI } from "./UserContextProvider";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
-  const { apiCall } = useContext(AppContext);
+  const sendRequest = useDataAPI();
 
   useEffect(() => {
-    const createProposalID = () => {
-      const query = `
+    const query = `
       mutation{
         createProposal{
          proposal{
@@ -18,13 +17,10 @@ export default function ProposalSubmission() {
         }
       }
       `;
-
-      apiCall(query).then(data =>
-        setProposalID(data.createProposal.proposal.id)
-      );
-    };
-    createProposalID();
-  }, [apiCall]);
+    sendRequest(query).then(data =>
+      setProposalID(data.createProposal.proposal.id)
+    );
+  }, [sendRequest]);
 
   if (!proposalID) {
     return <p>Loading</p>;

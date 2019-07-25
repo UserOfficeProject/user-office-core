@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { AppContext } from "./App";
+import React, { useState } from "react";
+import { useDataAPI } from "./UserContextProvider";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -20,66 +20,71 @@ import {
   SaveAlt
 } from "@material-ui/icons";
 
-function sendUserProposalRequest(searchQuery, userID, apiCall) {
-  const query = `
-  query($id: ID!) {
-    user(id: $id){
-      proposals {
-        id
-        abstract
-        status
-      }
-    }
-  }`;
+export default function ProposalTable(props) {
+  const sendRequest = useDataAPI();
 
-  const variables = {
-    id: userID
-  };
-  return apiCall(query, variables).then(data => {
-    return {
-      page: 0,
-      totalCount: data.user.proposals.length,
-      data: data.user.proposals.map(proposal => {
-        return {
-          id: proposal.id,
-          abstract: proposal.abstract,
-          status: proposal.status
-        };
-      })
-    };
-  });
-}
-
-function sendAllProposalRequest(searchQuery, apiCall) {
-  const query = `
-  query($filter: String!) {
-    proposals(filter: $filter) {
-        id
-        abstract
-        status
+  const sendAllProposalRequest = searchQuery => {
+    const query = `
+    query($filter: String!, $first: Int!, $offset: Int!) {
+      proposals(filter: $filter, first: $first, offset: $offset) {
+        proposals{
+          id
+          abstract
+          status
+          }
+        totalCount
         }
+      }`;
+
+    const variables = {
+      filter: searchQuery.search,
+      offset: searchQuery.pageSize * searchQuery.page,
+      first: searchQuery.pageSize
+    };
+    return sendRequest(query, variables).then(data => {
+      return {
+        page: searchQuery.page,
+        totalCount: data.proposals.totalCount,
+        data: data.proposals.proposals.map(proposal => {
+          return {
+            id: proposal.id,
+            abstract: proposal.abstract,
+            status: proposal.status
+          };
+        })
+      };
+    });
+  };
+
+  const sendUserProposalRequest = (searchQuery, userID) => {
+    const query = `
+    query($id: ID!) {
+      user(id: $id){
+        proposals {
+          id
+          abstract
+          status
+        }
+      }
     }`;
 
-  const variables = {
-    filter: searchQuery.search
-  };
-  return apiCall(query, variables).then(data => {
-    return {
-      page: 0,
-      totalCount: data.proposals.length,
-      data: data.proposals.map(proposal => {
-        return {
-          id: proposal.id,
-          abstract: proposal.abstract,
-          status: proposal.status
-        };
-      })
+    const variables = {
+      id: userID
     };
-  });
-}
-
-export default function ProposalTable(props) {
-  const { apiCall } = useContext(AppContext);
+    return sendRequest(query, variables).then(data => {
+      return {
+        page: 0,
+        totalCount: data.user.proposals.length,
+        data: data.user.proposals.map(proposal => {
+          return {
+            id: proposal.id,
+            abstract: proposal.abstract,
+            status: proposal.status
+          };
+        })
+      };
+    });
+  };
 
   const tableIcons = {
     Add: AddBox,
@@ -120,8 +125,8 @@ export default function ProposalTable(props) {
       columns={columns}
       data={
         props.id
-          ? query => sendUserProposalRequest(query, props.id, apiCall)
-          : query => sendAllProposalRequest(query, apiCall)
+          ? query => sendUserProposalRequest(query, props.id)
+          : query => sendAllProposalRequest(query)
       }
       options={{
         search: true,

@@ -1,10 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { AppContext } from "./App";
+import { useDataAPI } from "./UserContextProvider";
 
 const useStyles = makeStyles({
   errorText: {
@@ -25,7 +25,7 @@ export default function ProposalParticipants(props) {
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const { apiCall } = useContext(AppContext);
+  const sendRequest = useDataAPI();
 
   const sendProposalUpdate = () => {
     const query = `
@@ -43,7 +43,7 @@ export default function ProposalParticipants(props) {
       id: props.data.id,
       users: users.map(user => user.id)
     };
-    apiCall(query, variables).then(data => props.next({ users }));
+    sendRequest(query, variables).then(data => props.next({ users }));
   };
 
   const addUser = user => {

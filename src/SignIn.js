@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
 import { request } from "graphql-request";
-import { AppContext } from "./App";
+import { UserContext } from "./UserContextProvider";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 
@@ -48,10 +48,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SignInSide({ onSuccess }) {
+export default function SignInSide() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
-  const { userData } = useContext(AppContext);
+  const { handleLogin, token } = useContext(UserContext);
   const requestToken = values => {
     const { username, password } = values;
     const query = `
@@ -86,7 +86,7 @@ export default function SignInSide({ onSuccess }) {
     request("/graphql", query, variables)
       .then(data => {
         if (data.login.token) {
-          onSuccess(data.login);
+          handleLogin(data.login);
         } else {
           setFailed(true);
         }
@@ -94,7 +94,7 @@ export default function SignInSide({ onSuccess }) {
       .catch(error => setFailed(true));
   };
 
-  if (userData.token) {
+  if (token) {
     return <Redirect to="/" />;
   }
 
