@@ -4,7 +4,7 @@ import { useDataAPI } from "./UserContextProvider";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);
-  const [sendRequest] = useDataAPI();
+  const sendRequest = useDataAPI();
 
   useEffect(() => {
     const query = `
@@ -20,7 +20,7 @@ export default function ProposalSubmission() {
     sendRequest(query).then(data =>
       setProposalID(data.createProposal.proposal.id)
     );
-  }, []);
+  }, [sendRequest]);
 
   if (!proposalID) {
     return <p>Loading</p>;

@@ -48,7 +48,7 @@ export default function ProposalEdit({ match }) {
       });
     };
     getProposalInformation(match.params.proposalID);
-  }, [match.params.proposalID]);
+  }, [match.params.proposalID, sendRequest]);
 
   if (loading) {
     return <p>Loading</p>;
