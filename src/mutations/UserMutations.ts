@@ -70,16 +70,17 @@ export default class UserMutations {
       }
     }
 
-    if (roles !== undefined) {
-      const resultUpdateRoles = await this.dataSource.setUserRoles(
-        parseInt(id),
-        roles
-      );
-      if (!resultUpdateRoles) {
-        return rejection("INTERNAL_ERROR");
+    if (await this.userAuth.isUserOfficer(agent)) {
+      if (roles !== undefined) {
+        const resultUpdateRoles = await this.dataSource.setUserRoles(
+          parseInt(id),
+          roles
+        );
+        if (!resultUpdateRoles) {
+          return rejection("INTERNAL_ERROR");
+        }
       }
     }
-
     const result = await this.dataSource.update(user);
 
     return result || rejection("INTERNAL_ERROR");

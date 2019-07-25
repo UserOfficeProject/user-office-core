@@ -11,10 +11,19 @@ export const dummyUserOfficer = new User(
   "2019-07-17 08:25:12.23043+00"
 );
 export const dummyUser = new User(
-  5,
+  2,
   "Jane",
   "Doe",
   "JaDa",
+  "2019-07-17 08:25:12.23043+00",
+  "2019-07-17 08:25:12.23043+00"
+);
+
+export const dummyUserNotOnProposal = new User(
+  3,
+  "Noel",
+  "Doe",
+  "NoDO",
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
@@ -30,7 +39,7 @@ export class userDataSource implements UserDataSource {
     return true;
   }
   async getUserRoles(id: number): Promise<Role[]> {
-    if (id == 4) {
+    if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: "user_officer", title: "User Officer" }];
     } else {
       return [{ id: 2, shortCode: "user", title: "User" }];
@@ -56,8 +65,8 @@ export class userDataSource implements UserDataSource {
     return [dummyUser, dummyUserOfficer];
   }
 
-  async getProposalUsers() {
-    return [dummyUser, dummyUserOfficer];
+  async getProposalUsers(id: number) {
+    return [dummyUser];
   }
 
   async create(firstname: string, lastname: string) {

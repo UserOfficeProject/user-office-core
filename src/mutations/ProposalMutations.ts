@@ -33,10 +33,10 @@ export default class ProposalMutations {
   async update(
     agent: User | null,
     id: string,
-    title: string,
-    abstract: string,
-    status: number,
-    users: number[]
+    title?: string,
+    abstract?: string,
+    status?: number,
+    users?: number[]
   ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
@@ -57,6 +57,13 @@ export default class ProposalMutations {
           !(await this.userAuth.isMemberOfProposal(agent, proposal))
         ) {
           return rejection("NOT_ALLOWED");
+        }
+
+        if (
+          (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
+          proposal.status !== 0
+        ) {
+          return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
 
         // Check what needs to be updated and update proposal object
@@ -136,6 +143,19 @@ export default class ProposalMutations {
   ): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
+    }
+
+    let proposal = await this.dataSource.get(proposalID);
+
+    if (!proposal) {
+      return rejection("INTERNAL_ERROR");
+    }
+
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection("NOT_ALLOWED");
     }
 
     const result = await this.dataSource.submitProposal(proposalID);

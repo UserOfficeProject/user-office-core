@@ -33,8 +33,7 @@ export class UserAuthorization {
     if (agent == null || proposal == null) {
       return false;
     }
-
-    if ((agent.id = proposal.proposer)) {
+    if (agent.id === proposal.proposer) {
       return true;
     }
     return this.userDataSource.getProposalUsers(proposal.id).then(users => {
