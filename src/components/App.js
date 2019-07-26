@@ -5,7 +5,10 @@ import RoleSelectionPage from "./RoleSelectionPage";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Redirect } from "react-router-dom";
-import { UserContextProvider, UserContext } from "./UserContextProvider";
+import {
+  UserContextProvider,
+  UserContext
+} from "../context/UserContextProvider";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>

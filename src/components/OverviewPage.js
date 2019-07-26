@@ -5,7 +5,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposalTable from "./ProposalTable";
 import clsx from "clsx";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   container: {

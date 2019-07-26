@@ -28,7 +28,7 @@ import {
 } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 
 const useStyles = makeStyles({
   buttons: {
@@ -105,7 +105,7 @@ function UserPage({ match, history }) {
       lastname: values.lastname,
       roles: roles.map(role => role.id)
     };
-    sendRequest(query, variables).then(data => history.push("/PeoplePage"));
+    sendRequest(query, variables).then(data => console.log(data));
   };
 
   useEffect(() => {
