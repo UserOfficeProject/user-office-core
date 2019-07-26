@@ -129,7 +129,7 @@ export default function ProposalTable(props) {
           : query => sendAllProposalRequest(query)
       }
       options={{
-        search: true,
+        search: props.search,
         debounceInterval: 400
       }}
       actions={[

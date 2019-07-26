@@ -34,7 +34,7 @@ export default function ProposalPage({ match }) {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <ProposalTable />
+              <ProposalTable search={true} />
             </Paper>
           </Grid>
         </Grid>
