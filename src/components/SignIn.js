@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
 import { request } from "graphql-request";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 

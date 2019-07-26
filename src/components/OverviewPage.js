@@ -5,7 +5,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposalTable from "./ProposalTable";
 import clsx from "clsx";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -34,7 +34,7 @@ export default function OverviewPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <ProposalTable id={user.id} />
+              <ProposalTable id={user.id} search={false} />
             </Paper>
           </Grid>
           <Grid item xs={6}>

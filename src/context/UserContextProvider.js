@@ -1,5 +1,4 @@
-import React, { useContext, useMemo } from "react";
-import { GraphQLClient } from "graphql-request";
+import React from "react";
 
 //For Prod
 const initUserData = { user: { roles: [] }, token: null, currentRole: null };
@@ -38,34 +37,6 @@ const reducer = (state, action) => {
       return state;
   }
 };
-
-export function useDataAPI() {
-  const { token } = useContext(UserContext);
-
-  const sendRequest = useMemo(
-    () =>
-      async function sendRequest(query, variables) {
-        const endpoint = "/graphql";
-        const graphQLClient = new GraphQLClient(endpoint, {
-          headers: {
-            authorization: `Bearer ${token}`
-          }
-        });
-
-        return await graphQLClient
-          .request(query, variables)
-          .then(data => {
-            if (data.error) {
-              console.log("Server responded with error", data.error);
-            }
-            return data;
-          })
-          .catch(error => console.log("Error", error));
-      },
-    [token]
-  );
-  return sendRequest;
-}
 
 export const UserContextProvider = props => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);

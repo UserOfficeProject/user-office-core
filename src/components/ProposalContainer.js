@@ -9,7 +9,7 @@ import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 
 const useStyles = makeStyles(theme => ({
   paper: {

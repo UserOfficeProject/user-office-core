@@ -4,7 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
 
 const useStyles = makeStyles(theme => ({
   container: {

@@ -17,7 +17,7 @@ import {
   Remove,
   SaveAlt
 } from "@material-ui/icons";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 
 // TODO fix filtering in API
 function sendUserRequest(searchQuery, apiCall, setLoading) {

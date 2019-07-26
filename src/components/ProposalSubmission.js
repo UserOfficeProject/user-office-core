@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 
 export default function ProposalSubmission() {
   const [proposalID, setProposalID] = useState(null);

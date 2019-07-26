@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 
 const useStyles = makeStyles({
   errorText: {

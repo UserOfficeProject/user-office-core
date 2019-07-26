@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDataAPI } from "./UserContextProvider";
+import { useDataAPI } from "../hooks/useDataAPI";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -129,7 +129,7 @@ export default function ProposalTable(props) {
           : query => sendAllProposalRequest(query)
       }
       options={{
-        search: true,
+        search: props.search,
         debounceInterval: 400
       }}
       actions={[

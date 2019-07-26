@@ -22,7 +22,7 @@ import ProposalPage from "./ProposalPage";
 import UserPage from "./UserPage";
 import OverviewPage from "./OverviewPage";
 import { Link } from "react-router-dom";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
 
 const drawerWidth = 240;
 
