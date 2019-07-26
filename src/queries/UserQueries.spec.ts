@@ -47,3 +47,7 @@ test("A user is allowed to fetch all accounts", () => {
 test("A user that is not logged in is not allowed to fetch all accounts", () => {
   return expect(userQueries.getAll(null, "")).resolves.toBe(null);
 });
+
+test("A user is not allowed to fetch roles", () => {
+  return expect(userQueries.getRoles(dummyUser)).resolves.toBe(null);
+});
