@@ -25,7 +25,7 @@ CREATE TABLE proposals (
   proposal_id serial PRIMARY KEY  -- implicit primary key constraint
 , title    varchar(20)
 , abstract    text
-, status      numeric NOT NULL DEFAULT 0
+, status      int NOT NULL DEFAULT 0
 , proposer_id int REFERENCES users (user_id)
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

@@ -177,13 +177,5 @@ export default {
         args.roles
       )
     );
-  },
-
-  addUserRole(args: AddUserRoleArgs, context: ResolverContext) {
-    return context.mutations.user.addRole(
-      context.user,
-      args.userID,
-      args.roleID
-    );
   }
 };
