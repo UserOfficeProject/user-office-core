@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useDataAPI } from "../hooks/useDataAPI";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import {
@@ -21,71 +20,6 @@ import {
 } from "@material-ui/icons";
 
 export default function ProposalTable(props) {
-  const sendRequest = useDataAPI();
-
-  const sendAllProposalRequest = searchQuery => {
-    const query = `
-    query($filter: String!, $first: Int!, $offset: Int!) {
-      proposals(filter: $filter, first: $first, offset: $offset) {
-        proposals{
-          id
-          abstract
-          status
-          }
-        totalCount
-        }
-      }`;
-
-    const variables = {
-      filter: searchQuery.search,
-      offset: searchQuery.pageSize * searchQuery.page,
-      first: searchQuery.pageSize
-    };
-    return sendRequest(query, variables).then(data => {
-      return {
-        page: searchQuery.page,
-        totalCount: data.proposals.totalCount,
-        data: data.proposals.proposals.map(proposal => {
-          return {
-            id: proposal.id,
-            abstract: proposal.abstract,
-            status: proposal.status
-          };
-        })
-      };
-    });
-  };
-
-  const sendUserProposalRequest = (searchQuery, userID) => {
-    const query = `
-    query($id: ID!) {
-      user(id: $id){
-        proposals {
-          id
-          abstract
-          status
-        }
-      }
-    }`;
-
-    const variables = {
-      id: userID
-    };
-    return sendRequest(query, variables).then(data => {
-      return {
-        page: 0,
-        totalCount: data.user.proposals.length,
-        data: data.user.proposals.map(proposal => {
-          return {
-            id: proposal.id,
-            abstract: proposal.abstract,
-            status: proposal.status
-          };
-        })
-      };
-    });
-  };
-
   const tableIcons = {
     Add: AddBox,
     Check: Check,
@@ -108,7 +42,7 @@ export default function ProposalTable(props) {
 
   const columns = [
     { title: "ID", field: "id" },
-    { title: "Abstract", field: "abstract" },
+    { title: "Title", field: "title" },
     { title: "Status", field: "status" }
   ];
 
@@ -121,13 +55,9 @@ export default function ProposalTable(props) {
   return (
     <MaterialTable
       icons={tableIcons}
-      title="Your Proposals"
+      title={props.title}
       columns={columns}
-      data={
-        props.id
-          ? query => sendUserProposalRequest(query, props.id)
-          : query => sendAllProposalRequest(query)
-      }
+      data={query => props.searchQuery(query)}
       options={{
         search: props.search,
         debounceInterval: 400
