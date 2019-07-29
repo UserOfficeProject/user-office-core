@@ -87,6 +87,22 @@ export default class UserMutations {
     return result || rejection("INTERNAL_ERROR");
   }
 
+  async addUserForReview(
+    agent: User | null,
+    userID: number,
+    proposalID: number
+  ): Promise<Boolean | Rejection> {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_USER_OFFICER");
+    }
+    const result = await this.dataSource.addUserForReview(userID, proposalID);
+
+    return result || rejection("INTERNAL_ERROR");
+  }
+
   async login(
     username: string,
     password: string

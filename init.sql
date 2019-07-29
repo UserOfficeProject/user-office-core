@@ -25,7 +25,7 @@ CREATE TABLE proposals (
   proposal_id serial PRIMARY KEY  -- implicit primary key constraint
 , title    varchar(20)
 , abstract    text
-, status      numeric NOT NULL DEFAULT 0
+, status      int NOT NULL DEFAULT 0
 , proposer_id int REFERENCES users (user_id)
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -56,9 +56,29 @@ CREATE TABLE role_user (
 );
 
 
+CREATE TABLE reviews (
+  review_id serial PRIMARY KEY  -- implicit primary key constraint
+, user_id int REFERENCES users (user_id) ON UPDATE CASCADE
+, proposal_id int REFERENCES proposals (proposal_id) ON UPDATE CASCADE
+, comment    varchar(500)
+, grade      int
+, status      int
+, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON reviews
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+
 insert into roles (short_code, title) VALUES ('user', 'User');
 
 insert into roles (short_code, title) VALUES ('user_officer', 'User Officer');
+
+insert into roles (short_code, title) VALUES ('reviewer', 'Reviewer');
+
 
 insert into users (firstname, lastname, username, password ) VALUES ('Carl', 'Carlsson', 'testuser', '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm');
 
@@ -67,6 +87,9 @@ insert into role_user (role_id, user_id) VALUES (1, 1);
 
 insert into users (firstname, lastname, username, password ) VALUES ('Anders', 'Andersson', 'testofficer', '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm');
 
-insert into role_user (role_id, user_id) VALUES (1, 2);
-
 insert into role_user (role_id, user_id) VALUES (2, 2);
+
+
+insert into users (firstname, lastname, username, password ) VALUES ('Olof', 'Olofsson', 'testreviewer', '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm');
+
+insert into role_user (role_id, user_id) VALUES (3, 3);

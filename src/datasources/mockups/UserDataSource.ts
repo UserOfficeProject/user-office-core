@@ -29,6 +29,12 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async addUserForReview(
+    userID: number,
+    proposalID: number
+  ): Promise<Boolean | null> {
+    return true;
+  }
   async getByUsername(username: string): Promise<User | null> {
     return dummyUser;
   }

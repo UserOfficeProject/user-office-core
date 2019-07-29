@@ -48,6 +48,8 @@ type Query {
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
     login(username: String!, password: String!): LoginMutationResult
+    addUserForReview(userID: Int!, proposalID: Int!): Boolean
+    addReview(proposalID: Int!, comment: String!, grade: Int!): Review
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
@@ -80,5 +82,12 @@ type User {
     created: String
     updated: String
 }
+
+type Review {
+  id: Int
+  comment: String
+  grade: Int
+}
+
 
 `);

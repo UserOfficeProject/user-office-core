@@ -135,6 +135,17 @@ export default {
     );
   },
 
+  addUserForReview(
+    args: { userID: number; proposalID: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.addUserForReview(
+      context.user,
+      args.userID,
+      args.proposalID
+    );
+  },
+
   login(args: LoginArgs, context: ResolverContext) {
     return context.mutations.user.login(args.username, args.password);
   },
@@ -176,14 +187,6 @@ export default {
         args.lastname,
         args.roles
       )
-    );
-  },
-
-  addUserRole(args: AddUserRoleArgs, context: ResolverContext) {
-    return context.mutations.user.addRole(
-      context.user,
-      args.userID,
-      args.roleID
     );
   }
 };

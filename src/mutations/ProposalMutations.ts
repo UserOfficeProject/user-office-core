@@ -58,9 +58,14 @@ export default class ProposalMutations {
         ) {
           return rejection("NOT_ALLOWED");
         }
-
+        console.log(
+          "-------------",
+          proposal.status !== 0,
+          typeof proposal.status,
+          0 !== 0
+        );
         if (
-          (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
+          !(await this.userAuth.isMemberOfProposal(agent, proposal)) &&
           proposal.status !== 0
         ) {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
