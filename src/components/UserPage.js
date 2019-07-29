@@ -54,6 +54,8 @@ const useStyles = makeStyles({
 function UserPage({ match, history }) {
   const [userData, setUserData] = useState(null);
   const [modalOpen, setOpen] = useState(false);
+  const sendRequest = useDataAPI();
+
   const tableIcons = {
     Add: AddBox,
     Check: Check,
@@ -73,7 +75,6 @@ function UserPage({ match, history }) {
     ThirdStateCheck: Remove,
     ViewColumn: ViewColumn
   };
-  const sendRequest = useDataAPI();
   const [roles, setRoles] = useState([]);
 
   const addRole = role => {
@@ -83,7 +84,7 @@ function UserPage({ match, history }) {
 
   const removeRole = role => {
     let newRoles = [...roles];
-    newRoles.splice(newRoles.indexOf(role), 1);
+    newRoles.splice(newRoles.findIndex(element => role.id === element.id), 1);
     setRoles(newRoles);
   };
 
@@ -218,7 +219,7 @@ function UserPage({ match, history }) {
                       columns={columns}
                       icons={tableIcons}
                       data={roles.map(role => {
-                        return { name: role.title };
+                        return { name: role.title, id: role.id };
                       })}
                       options={{
                         search: false
