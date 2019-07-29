@@ -18,8 +18,9 @@ import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
 import ProposalEdit from "./ProposalEdit";
 import PeoplePage from "./PeoplePage";
-import ProposalPage from "./ProposalPage";
 import UserPage from "./UserPage";
+import ProposalPage from "./ProposalPage";
+import ProfilePage from "./ProfilePage";
 import OverviewPage from "./OverviewPage";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
@@ -133,7 +134,11 @@ export default function Dashboard({ match }) {
           >
             User Office
           </Typography>
-          <IconButton color="inherit" component={Link} to={`/PeoplePage/${id}`}>
+          <IconButton
+            color="inherit"
+            component={Link}
+            to={`/ProfilePage/${id}`}
+          >
             <Badge badgeContent={0} color="secondary">
               <AccountCircle />
             </Badge>
@@ -164,10 +169,15 @@ export default function Dashboard({ match }) {
             component={ProposalEdit}
           />
           <Route path="/ProposalSubmission" component={ProposalSubmission} />
+          <Route path="/ProfilePage/:id" component={ProfilePage} />
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
-          <Route component={OverviewPage} />
+          <Route
+            component={
+              currentRole === "user_officer" ? ProposalPage : OverviewPage
+            }
+          />
         </Switch>
       </main>
     </div>

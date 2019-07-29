@@ -3,7 +3,7 @@ import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import ProposalTable from "./ProposalTable";
+import ProposalTableUser from "./ProposalTableUser";
 import clsx from "clsx";
 import { UserContext } from "../context/UserContextProvider";
 
@@ -34,7 +34,7 @@ export default function OverviewPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <ProposalTable id={user.id} search={false} />
+              <ProposalTableUser id={user.id} />
             </Paper>
           </Grid>
           <Grid item xs={6}>

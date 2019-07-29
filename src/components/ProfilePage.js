@@ -6,26 +6,6 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import MaterialTable from "material-table";
-import RoleModal from "./RoleModal";
-import { withRouter } from "react-router-dom";
-import {
-  AddBox,
-  Check,
-  Clear,
-  DeleteOutline,
-  Edit,
-  FilterList,
-  ViewColumn,
-  ArrowUpward,
-  Search,
-  FirstPage,
-  LastPage,
-  ChevronRight,
-  ChevronLeft,
-  Remove,
-  SaveAlt
-} from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { useDataAPI } from "../hooks/useDataAPI";
@@ -51,47 +31,14 @@ const useStyles = makeStyles({
   }
 });
 
-function UserPage({ match, history }) {
+export default function ProfilePage({ match, history }) {
   const [userData, setUserData] = useState(null);
-  const [modalOpen, setOpen] = useState(false);
   const sendRequest = useDataAPI();
-
-  const tableIcons = {
-    Add: AddBox,
-    Check: Check,
-    Clear: Clear,
-    Delete: DeleteOutline,
-    DetailPanel: ChevronRight,
-    Edit: Edit,
-    Export: SaveAlt,
-    Filter: FilterList,
-    FirstPage: FirstPage,
-    LastPage: LastPage,
-    NextPage: ChevronRight,
-    PreviousPage: ChevronLeft,
-    ResetSearch: Clear,
-    Search: Search,
-    SortArrow: ArrowUpward,
-    ThirdStateCheck: Remove,
-    ViewColumn: ViewColumn
-  };
-  const [roles, setRoles] = useState([]);
-
-  const addRole = role => {
-    setRoles([...roles, role]);
-    setOpen(false);
-  };
-
-  const removeRole = role => {
-    let newRoles = [...roles];
-    newRoles.splice(newRoles.findIndex(element => role.id === element.id), 1);
-    setRoles(newRoles);
-  };
 
   const sendUserUpdate = values => {
     const query = `
-    mutation($id: ID!, $firstname: String!, $lastname: String!, $roles: [Int!]) {
-      updateUser(id: $id, firstname: $firstname, lastname: $lastname, roles: $roles){
+    mutation($id: ID!, $firstname: String!, $lastname: String!) {
+      updateUser(id: $id, firstname: $firstname, lastname: $lastname){
        user{
         id
       }
@@ -103,10 +50,9 @@ function UserPage({ match, history }) {
     const variables = {
       id: match.params.id,
       firstname: values.firstname,
-      lastname: values.lastname,
-      roles: roles.map(role => role.id)
+      lastname: values.lastname
     };
-    sendRequest(query, variables).then(data => history.push("/PeoplePage"));
+    sendRequest(query, variables).then(data => console.log(data));
   };
 
   useEffect(() => {
@@ -116,11 +62,6 @@ function UserPage({ match, history }) {
         user(id: $id){
           firstname
           lastname
-          roles{
-            id
-            shortCode
-            title
-          }
         }
       }`;
 
@@ -129,13 +70,10 @@ function UserPage({ match, history }) {
       };
       sendRequest(query, variables).then(data => {
         setUserData({ ...data.user });
-        setRoles(data.user.roles);
       });
     };
     getUserInformation(match.params.id);
   }, [match.params.id, sendRequest]);
-
-  const columns = [{ title: "Name", field: "name" }];
 
   const classes = useStyles();
 
@@ -148,18 +86,19 @@ function UserPage({ match, history }) {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <RoleModal
-                show={modalOpen}
-                close={setOpen.bind(this, false)}
-                add={addRole}
-              />
               <Formik
                 initialValues={{
                   firstname: userData.firstname,
                   lastname: userData.lastname
                 }}
                 onSubmit={(values, actions) => {
+                  actions.setStatus({
+                    success: "Updating"
+                  });
                   sendUserUpdate(values);
+                  actions.setStatus({
+                    success: "Updated"
+                  });
                   actions.setSubmitting(false);
                 }}
                 validationSchema={Yup.object().shape({
@@ -173,12 +112,23 @@ function UserPage({ match, history }) {
                     .required("Lastname is required")
                 })}
               >
-                {({ values, errors, touched, handleChange, isSubmitting }) => (
+                {({
+                  values,
+                  errors,
+                  touched,
+                  handleChange,
+                  isSubmitting,
+                  status
+                }) => (
                   <Form>
                     <Typography variant="h6" gutterBottom>
                       User Information
                     </Typography>
                     <Grid container spacing={3}>
+                      <Grid item xs={12} alignContent="center">
+                        {status ? status.success : ""}
+                      </Grid>
+
                       <Grid item xs={6}>
                         <TextField
                           required
@@ -212,35 +162,6 @@ function UserPage({ match, history }) {
                         />
                       </Grid>
                     </Grid>
-
-                    <MaterialTable
-                      className={classes.table}
-                      title="Roles"
-                      columns={columns}
-                      icons={tableIcons}
-                      data={roles.map(role => {
-                        return { name: role.title, id: role.id };
-                      })}
-                      options={{
-                        search: false
-                      }}
-                      actions={[
-                        {
-                          icon: () => <AddBox />,
-                          tooltip: "Add Role",
-                          isFreeAction: true,
-                          onClick: event => setOpen(true)
-                        }
-                      ]}
-                      editable={{
-                        onRowDelete: oldData =>
-                          new Promise(resolve => {
-                            resolve();
-                            removeRole(oldData);
-                          })
-                      }}
-                    />
-
                     <div className={classes.buttons}>
                       <Button
                         disabled={isSubmitting}
@@ -262,5 +183,3 @@ function UserPage({ match, history }) {
     </React.Fragment>
   );
 }
-
-export default withRouter(UserPage);
