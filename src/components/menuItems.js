@@ -34,12 +34,6 @@ export const menuItems = {
   ),
   user_officer: (
     <div>
-      <ListItem component={Link} to="/" button>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Dashboard" />
-      </ListItem>
       <ListItem component={Link} to="/ProposalPage" button>
         <ListItemIcon>
           <FolderOpen />

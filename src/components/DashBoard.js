@@ -167,7 +167,11 @@ export default function Dashboard({ match }) {
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
-          <Route component={OverviewPage} />
+          <Route
+            component={
+              currentRole === "user_officer" ? ProposalPage : OverviewPage
+            }
+          />
         </Switch>
       </main>
     </div>
