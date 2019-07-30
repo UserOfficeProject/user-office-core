@@ -42,4 +42,12 @@ export default class UserQueries {
       return null;
     }
   }
+
+  async getProposers(agent: User | null, proposalId: number) {
+    if (await this.userAuth.isUserOfficer(agent)) {
+      return this.dataSource.getProposalUsers(proposalId);
+    } else {
+      return null;
+    }
+  }
 }

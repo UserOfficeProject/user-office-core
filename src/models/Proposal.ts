@@ -8,13 +8,4 @@ export class Proposal {
     public created: string,
     public updated: string
   ) {}
-
-  users(args: any, context: any) {
-    return context.queries.user.dataSource.getProposalUsers(this.id);
-  }
-
-  reviews(args: any, context: any) {
-    console.log(context);
-    return context.queries.proposal.dataSource.getProposalReviews(this.id);
-  }
 }
