@@ -49,7 +49,7 @@ type Query {
     addUserRole(userID: Int!, roleID: Int!): Boolean
     login(username: String!, password: String!): LoginMutationResult
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
-    addReview(proposalID: Int!, comment: String!, grade: Int!): Review
+    addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
@@ -70,6 +70,7 @@ type Proposal {
     proposer: Int
     created: String
     updated: String
+    reviews: [Review]
 }
 
 type User {
@@ -81,12 +82,16 @@ type User {
     roles:[Roles]
     created: String
     updated: String
+    reviews: [Review]
 }
 
 type Review {
   id: Int
+  proposalID: Int
+  userID: Int
   comment: String
   grade: Int
+  status: Int
 }
 
 

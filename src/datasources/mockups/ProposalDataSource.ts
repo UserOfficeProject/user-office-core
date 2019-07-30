@@ -22,6 +22,13 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
+  async submitReview(
+    reviewID: number,
+    comment: string,
+    grade: number
+  ): Promise<import("../../models/Review").Review | null> {
+    throw new Error("Method not implemented.");
+  }
   async rejectProposal(id: number): Promise<Proposal | null> {
     if (id && id > 0) {
       return dummyProposal;

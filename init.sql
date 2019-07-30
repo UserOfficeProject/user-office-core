@@ -57,7 +57,7 @@ CREATE TABLE role_user (
 
 
 CREATE TABLE reviews (
-  review_id serial PRIMARY KEY  -- implicit primary key constraint
+  review_id serial PRIMARY KEY 
 , user_id int REFERENCES users (user_id) ON UPDATE CASCADE
 , proposal_id int REFERENCES proposals (proposal_id) ON UPDATE CASCADE
 , comment    varchar(500)
@@ -65,6 +65,7 @@ CREATE TABLE reviews (
 , status      int
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, CONSTRAINT prop_user_pkey PRIMARY KEY (proposal_id, user_id)  -- explicit pk
 );
 
 CREATE TRIGGER set_timestamp

@@ -1,11 +1,13 @@
 import { User } from "../models/User";
 import { Role } from "../models/Role";
+import { Review } from "../models/Review";
 
 export interface UserDataSource {
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getUserRoles(id: number): Promise<Role[]>;
+  getUserReviews(id: number): Promise<Review[]>;
   getUsers(filter?: string, first?: number, offset?: number): Promise<User[]>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<User[]>;

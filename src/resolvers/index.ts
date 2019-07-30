@@ -135,6 +135,18 @@ export default {
     );
   },
 
+  addReview(
+    args: { reviewID: number; comment: string; grade: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.proposal.submitReview(
+      context.user,
+      args.reviewID,
+      args.comment,
+      args.grade
+    );
+  },
+
   addUserForReview(
     args: { userID: number; proposalID: number },
     context: ResolverContext

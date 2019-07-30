@@ -1,6 +1,12 @@
 import { Proposal } from "../models/Proposal";
+import { Review } from "../models/Review";
 
 export interface ProposalDataSource {
+  submitReview(
+    reviewID: number,
+    comment: string,
+    grade: number
+  ): Promise<Review | null>;
   // Read
   get(id: number): Promise<Proposal | null>;
   getProposals(

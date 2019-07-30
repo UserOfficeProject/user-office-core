@@ -4,6 +4,7 @@ const BluePromise = require("bluebird");
 
 import { User } from "../../models/User";
 import { Role } from "../../models/Role";
+import { Review } from "../../models/Review";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -175,15 +176,38 @@ export default class PostgresUserDataSource implements UserDataSource {
   ): Promise<Boolean | null> {
     return database
       .insert({
-        userID,
-        proposalID
+        user_id: userID,
+        proposal_id: proposalID
       })
-      .returning(["*"])
       .into("reviews")
-      .then((user: UserRecord[]) => this.createProposalObject(user[0]))
-      .then((user: User) => {
-        this.setUserRoles(user.id, [1]);
-        return user;
+      .then(() => {
+        return true;
+      })
+      .catch(() => {
+        return false;
+      });
+  }
+
+  async getUserReviews(id: number): Promise<Review[]> {
+    return database
+      .select()
+      .from("reviews")
+      .where("user_id", id)
+      .then((reviews: any[]) => {
+        return reviews.map(
+          review =>
+            new Review(
+              id,
+              review.proposal_id,
+              review.user_id,
+              review.comment,
+              review.grade,
+              review.status
+            )
+        );
+      })
+      .catch(() => {
+        return [];
       });
   }
 }

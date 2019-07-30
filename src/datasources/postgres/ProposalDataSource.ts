@@ -3,6 +3,7 @@ import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import { Proposal } from "../../models/Proposal";
+import { Review } from "../../models/Review";
 
 const BluePromise = require("bluebird");
 
@@ -159,5 +160,56 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => this.createProposalObject(proposal))
       );
+  }
+
+  async submitReview(
+    reviewID: number,
+    comment: string,
+    grade: number
+  ): Promise<Review | null> {
+    return database
+      .update(
+        {
+          comment,
+          grade
+        },
+        ["*"]
+      )
+      .from("reviews")
+      .where("review_id", reviewID)
+      .then((review: any) => {
+        console.log(review);
+        return new Review(
+          reviewID,
+          review[0].proposal_id,
+          review[0].user_id,
+          comment,
+          grade,
+          0
+        );
+      });
+  }
+
+  async getProposalReviews(id: number): Promise<Review[]> {
+    return database
+      .select()
+      .from("reviews")
+      .where("proposal_id", id)
+      .then((reviews: any[]) => {
+        return reviews.map(
+          review =>
+            new Review(
+              id,
+              review.proposal_id,
+              review.user_id,
+              review.comment,
+              review.grade,
+              review.status
+            )
+        );
+      })
+      .catch(() => {
+        return [];
+      });
   }
 }
