@@ -63,6 +63,37 @@ interface CreateUserArgs {
   password: string;
 }
 
+function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
+  if (proposal == null) {
+    return null;
+  }
+
+  const { id, title, abstract, status, created, updated } = proposal;
+  const agent = context.user;
+
+  return {
+    id,
+    title,
+    abstract,
+    status,
+    created,
+    updated,
+    user: () => context.queries.user.getProposers(agent, id),
+    reviews: () => context.queries.review.reviewsForProposal(agent, id)
+  };
+}
+
+function resolveProposals(
+  proposals: Proposal[] | null,
+  context: ResolverContext
+) {
+  if (proposals == null) {
+    return null;
+  }
+
+  return proposals.map(proposal => resolveProposal(proposal, context));
+}
+
 function createMutationWrapper<T>(key: string) {
   return async function(promise: Promise<T | Rejection>) {
     const result = await promise;
@@ -84,17 +115,24 @@ const wrapProposalMutation = createMutationWrapper<Proposal>("proposal");
 const wrapUserMutation = createMutationWrapper<User>("user");
 
 export default {
-  proposal(args: ProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.get(context.user, parseInt(args.id));
+  async proposal(args: ProposalArgs, context: ResolverContext) {
+    const proposal = await context.queries.proposal.get(
+      context.user,
+      parseInt(args.id)
+    );
+
+    return resolveProposal(proposal, context);
   },
 
-  proposals(args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll(
+  async proposals(args: ProposalsArgs, context: ResolverContext) {
+    const proposals = await context.queries.proposal.getAll(
       context.user,
       args.filter,
       args.first,
       args.offset
     );
+
+    return resolveProposals(proposals, context);
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {

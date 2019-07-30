@@ -4,6 +4,8 @@ import UserQueries from "./queries/UserQueries";
 // Site specific imports (only ESS atm)
 import PostgresUserDataSource from "./datasources/postgres/UserDataSource";
 import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSource";
+import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
+
 import ProposalQueries from "./queries/ProposalQueries";
 import UserMutations from "./mutations/UserMutations";
 import ProposalMutations from "./mutations/ProposalMutations";
@@ -11,10 +13,13 @@ import { UserAuthorization } from "./utils/UserAuthorization";
 import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
 import createEventHandlers from "./eventHandlers";
+import ReviewQueries from "./queries/ReviewQueries";
 
 // Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
 const proposalDataSource = new PostgresProposalDataSource();
+const reviewDataSource = new PostgresReviewDataSource();
+
 const userAuthorization = new UserAuthorization(
   userDataSource,
   proposalDataSource
@@ -31,6 +36,7 @@ const proposalQueries = new ProposalQueries(
   proposalDataSource,
   userAuthorization
 );
+const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
@@ -41,7 +47,8 @@ const proposalMutations = new ProposalMutations(
 const context: BasicResolverContext = {
   queries: {
     user: userQueries,
-    proposal: proposalQueries
+    proposal: proposalQueries,
+    review: reviewQueries
   },
   mutations: {
     user: userMutations,
