@@ -7,8 +7,11 @@ export interface UserDataSource {
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getUserRoles(id: number): Promise<Role[]>;
-  getUserReviews(id: number): Promise<Review[]>;
-  getUsers(filter?: string, first?: number, offset?: number): Promise<User[]>;
+  getUsers(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; users: User[] }>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<User[]>;
   // Write
@@ -19,7 +22,6 @@ export interface UserDataSource {
     password: string
   ): Promise<User | null>;
   update(user: User): Promise<User | null>;
-  addUserForReview(userID: number, proposalID: number): Promise<Boolean | null>;
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
   getPasswordByUsername(username: string): Promise<string | null>;
 }

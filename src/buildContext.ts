@@ -14,6 +14,7 @@ import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
 import createEventHandlers from "./eventHandlers";
 import ReviewQueries from "./queries/ReviewQueries";
+import ReviewMutations from "./mutations/ReviewMutations";
 
 // Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
@@ -37,6 +38,11 @@ const proposalQueries = new ProposalQueries(
   userAuthorization
 );
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
+const reviewMutations = new ReviewMutations(
+  reviewDataSource,
+  userAuthorization,
+  eventBus
+);
 
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
@@ -52,7 +58,8 @@ const context: BasicResolverContext = {
   },
   mutations: {
     user: userMutations,
-    proposal: proposalMutations
+    proposal: proposalMutations,
+    review: reviewMutations
   }
 };
 

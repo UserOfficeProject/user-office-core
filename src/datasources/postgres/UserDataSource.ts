@@ -169,45 +169,4 @@ export default class PostgresUserDataSource implements UserDataSource {
         users.map(user => this.createProposalObject(user))
       );
   }
-
-  async addUserForReview(
-    userID: number,
-    proposalID: number
-  ): Promise<Boolean | null> {
-    return database
-      .insert({
-        user_id: userID,
-        proposal_id: proposalID
-      })
-      .into("reviews")
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
-  }
-
-  async getUserReviews(id: number): Promise<Review[]> {
-    return database
-      .select()
-      .from("reviews")
-      .where("user_id", id)
-      .then((reviews: any[]) => {
-        return reviews.map(
-          review =>
-            new Review(
-              id,
-              review.proposal_id,
-              review.user_id,
-              review.comment,
-              review.grade,
-              review.status
-            )
-        );
-      })
-      .catch(() => {
-        return [];
-      });
-  }
 }

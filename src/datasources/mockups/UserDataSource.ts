@@ -65,8 +65,12 @@ export class userDataSource implements UserDataSource {
     return dummyUser;
   }
 
-  async getUsers(filter: string) {
-    return [dummyUser, dummyUserOfficer];
+  async getUsers(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; users: User[] }> {
+    return { totalCount: 2, users: [dummyUser, dummyUserOfficer] };
   }
 
   async getProposalUsers(id: number) {

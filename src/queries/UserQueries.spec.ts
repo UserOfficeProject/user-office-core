@@ -34,14 +34,17 @@ test("A user is not allowed to fetch other peoples account ", () => {
 test("A user officer is allowed to fetch all accounts", () => {
   return expect(
     userQueries.getAll(dummyUserOfficer, "")
-  ).resolves.toStrictEqual([dummyUser, dummyUserOfficer]);
+  ).resolves.toStrictEqual({
+    totalCount: 2,
+    users: [dummyUser, dummyUserOfficer]
+  });
 });
 
 test("A user is allowed to fetch all accounts", () => {
-  return expect(userQueries.getAll(dummyUser, "")).resolves.toStrictEqual([
-    dummyUser,
-    dummyUserOfficer
-  ]);
+  return expect(userQueries.getAll(dummyUser, "")).resolves.toStrictEqual({
+    totalCount: 2,
+    users: [dummyUser, dummyUserOfficer]
+  });
 });
 
 test("A user that is not logged in is not allowed to fetch all accounts", () => {

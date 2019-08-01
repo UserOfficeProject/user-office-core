@@ -4,7 +4,6 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import { Proposal } from "../models/Proposal";
-import { Review } from "../models/Review";
 
 // TODO: it is here much of the logic reside
 
@@ -159,16 +158,6 @@ export default class ProposalMutations {
     }
 
     const result = await this.dataSource.submitProposal(proposalID);
-    return result || rejection("INTERNAL_ERROR");
-  }
-
-  async submitReview(
-    user: User | null,
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review | Rejection> {
-    const result = await this.dataSource.submitReview(reviewID, comment, grade);
     return result || rejection("INTERNAL_ERROR");
   }
 }

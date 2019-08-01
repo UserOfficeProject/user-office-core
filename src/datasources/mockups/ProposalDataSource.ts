@@ -77,8 +77,12 @@ export class proposalDataSource implements ProposalDataSource {
     return dummyProposal;
   }
 
-  async getProposals(filter: string, first: number, offset: number) {
-    return [dummyProposal];
+  async getProposals(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: Proposal[] }> {
+    return { totalCount: 1, proposals: [dummyProposal] };
   }
 
   async getUserProposals(id: number) {

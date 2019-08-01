@@ -8,4 +8,6 @@ export interface ReviewDataSource {
   ): Promise<Review | null>;
 
   getProposalReviews(id: number): Promise<Review[]>;
+  getUserReviews(id: number): Promise<Review[]>;
+  addUserForReview(userID: number, proposalID: number): Promise<Boolean | null>;
 }

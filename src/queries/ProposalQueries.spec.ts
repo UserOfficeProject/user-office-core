@@ -45,7 +45,7 @@ test("A userofficer can get any proposal", () => {
 test("A userofficer can get all proposal", () => {
   return expect(
     proposalQueries.getAll(dummyUserOfficer)
-  ).resolves.toStrictEqual([dummyProposal]);
+  ).resolves.toStrictEqual({ totalCount: 1, proposals: [dummyProposal] });
 });
 
 test("A user cannot query all proposals", () => {

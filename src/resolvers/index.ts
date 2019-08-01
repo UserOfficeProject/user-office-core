@@ -84,14 +84,19 @@ function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
 }
 
 function resolveProposals(
-  proposals: Proposal[] | null,
+  proposals: { totalCount: number; proposals: Proposal[] } | null,
   context: ResolverContext
 ) {
   if (proposals == null) {
     return null;
   }
 
-  return proposals.map(proposal => resolveProposal(proposal, context));
+  return {
+    totalCount: proposals.totalCount,
+    proposals: proposals.proposals.map(proposal =>
+      resolveProposal(proposal, context)
+    )
+  };
 }
 
 function createMutationWrapper<T>(key: string) {
@@ -177,7 +182,7 @@ export default {
     args: { reviewID: number; comment: string; grade: number },
     context: ResolverContext
   ) {
-    return context.mutations.proposal.submitReview(
+    return context.mutations.review.submitReview(
       context.user,
       args.reviewID,
       args.comment,
@@ -189,7 +194,7 @@ export default {
     args: { userID: number; proposalID: number },
     context: ResolverContext
   ) {
-    return context.mutations.user.addUserForReview(
+    return context.mutations.review.addUserForReview(
       context.user,
       args.userID,
       args.proposalID
