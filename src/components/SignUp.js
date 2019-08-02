@@ -10,7 +10,8 @@ import Container from "@material-ui/core/Container";
 import { request } from "graphql-request";
 import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
-import { TextField } from "formik-material-ui";
+import { TextField, Select } from "formik-material-ui";
+import { MenuItem } from '@material-ui/core';
 import * as Yup from "yup";
 import { Redirect } from "react-router-dom";
 
@@ -39,14 +40,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+
+
 export default function SignUp() {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
 
+  const titles = ["Mr.", "Ms.", "Dr."];
+
   const sendSignUpRequest = values => {
-    const { firstname, lastname, username, password } = values;
-    const query = `mutation($firstname: String!, $lastname: String!, $username: String!, $password: String!){
-          createUser(firstname: $firstname, lastname: $lastname, username: $username, password: $password){
+    const { firstname, lastname, username, password, title } = values;
+    const query = `mutation($title: String!, $firstname: String!, $lastname: String!, $username: String!, $password: String!){
+          createUser(title: $title, firstname: $firstname, lastname: $lastname, username: $username, password: $password){
             user{
               id
             }
@@ -54,6 +59,7 @@ export default function SignUp() {
           }
         }`;
     const variables = {
+      title,
       firstname,
       lastname,
       username,
@@ -72,6 +78,7 @@ export default function SignUp() {
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
+          title: "",
           firstname: "",
           lastname: "",
           username: "",
@@ -109,6 +116,25 @@ export default function SignUp() {
             <Typography component="h1" variant="h5">
               Sign Up
             </Typography>
+
+            <Field
+              type="text"
+              name="title"
+              label="Title"
+              select
+              margin="normal"
+              component={TextField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+            >
+              {titles.map(option => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </Field>
             <Field
               name="firstname"
               label="Firstname"
