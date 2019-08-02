@@ -20,6 +20,18 @@ export function useProposalData(id) {
                 username
                 id
               }
+              reviews{
+                id
+                grade
+                comment
+                status
+                reviewer{
+                  firstname
+                  lastname
+                  username
+                  id
+                }
+              }
             }
           }
           `;
@@ -39,6 +51,15 @@ export function useProposalData(id) {
               surname: user.lastname,
               username: user.username,
               id: user.id
+            };
+          }),
+          reviews: data.proposal.reviews.map(review => {
+            return {
+              id: review.id,
+              grade: review.grade,
+              comment: review.comment,
+              reviewer: review.reviewer,
+              status: review.status
             };
           })
         });
