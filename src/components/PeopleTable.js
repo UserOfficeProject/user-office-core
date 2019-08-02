@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
-import { Edit } from "@material-ui/icons";
 import { useDataAPI } from "../hooks/useDataAPI";
 
-// TODO fix filtering in API
 function sendUserRequest(searchQuery, apiCall, setLoading) {
   const query = `
   query($filter: String!, $first: Int!, $offset: Int!) {
