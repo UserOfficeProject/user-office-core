@@ -16,6 +16,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import { menuItems } from "./menuItems";
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
+import ProposalReviewUserOfficer from "./ProposalReviewUserOfficer";
 import ProposalEdit from "./ProposalEdit";
 import PeoplePage from "./PeoplePage";
 import UserPage from "./UserPage";
@@ -173,6 +174,10 @@ export default function Dashboard({ match }) {
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
+          <Route
+            path="/ProposalReviewUserOfficer/:id"
+            component={ProposalReviewUserOfficer}
+          />
           <Route
             component={
               currentRole === "user_officer" ? ProposalPage : OverviewPage
