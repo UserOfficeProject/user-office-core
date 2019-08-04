@@ -4,6 +4,7 @@ import { Role } from "../../models/Role";
 
 export const dummyUserOfficer = new User(
   4,
+  "Mr.",
   "John",
   "Doe",
   "JoDo",
@@ -12,6 +13,7 @@ export const dummyUserOfficer = new User(
 );
 export const dummyUser = new User(
   2,
+  "",
   "Jane",
   "Doe",
   "JaDa",
@@ -21,6 +23,7 @@ export const dummyUser = new User(
 
 export const dummyUserNotOnProposal = new User(
   3,
+  "Dr.",
   "Noel",
   "Doe",
   "NoDO",
