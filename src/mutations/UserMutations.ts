@@ -8,6 +8,7 @@ export default class UserMutations {
   constructor(private dataSource: UserDataSource, private userAuth: any) {}
 
   async create(
+    title: string,
     firstname: string,
     lastname: string,
     username: string,
@@ -27,6 +28,7 @@ export default class UserMutations {
     const hash = bcrypt.hashSync(password, salt);
 
     const result = await this.dataSource.create(
+      title,
       firstname,
       lastname,
       username,

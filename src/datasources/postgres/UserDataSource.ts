@@ -108,6 +108,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async create(
+    title: string,
     firstname: string,
     lastname: string,
     username: string,
@@ -115,6 +116,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   ) {
     return database
       .insert({
+        title,
         firstname,
         lastname,
         username,

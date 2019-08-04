@@ -57,6 +57,7 @@ interface UsersArgs {
 interface RolesArgs {}
 
 interface CreateUserArgs {
+  title: string;
   firstname: string;
   lastname: string;
   username: string;
@@ -159,6 +160,7 @@ export default {
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
       context.mutations.user.create(
+        args.title,
         args.firstname,
         args.lastname,
         args.username,

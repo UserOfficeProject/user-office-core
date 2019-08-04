@@ -19,6 +19,7 @@ export interface ProposalRecord {
 
 export interface UserRecord {
   readonly user_id: number;
+  readonly title: string;
   readonly firstname: string;
   readonly lastname: string;
   readonly username: string;
