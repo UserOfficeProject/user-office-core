@@ -10,6 +10,7 @@ export default class UserMutations {
   async create(
     title: string,
     firstname: string,
+    middlename:string,
     lastname: string,
     username: string,
     password: string
@@ -30,6 +31,7 @@ export default class UserMutations {
     const result = await this.dataSource.create(
       title,
       firstname,
+      middlename,
       lastname,
       username,
       hash

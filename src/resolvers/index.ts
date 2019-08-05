@@ -59,6 +59,7 @@ interface RolesArgs {}
 interface CreateUserArgs {
   title: string;
   firstname: string;
+  middlename: string;
   lastname: string;
   username: string;
   password: string;
@@ -162,6 +163,7 @@ export default {
       context.mutations.user.create(
         args.title,
         args.firstname,
+        args.middlename,
         args.lastname,
         args.username,
         args.password

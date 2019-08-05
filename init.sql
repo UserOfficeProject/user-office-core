@@ -9,6 +9,7 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE users (
   user_id  serial PRIMARY KEY
 , title       varchar(5) DEFAULT NULL
+, middlename    varchar(20) DEFAULT NULL
 , firstname     varchar(20) NOT NULL
 , lastname     varchar(20) NOT NULL
 , username     varchar(20) UNIQUE
@@ -61,7 +62,7 @@ insert into roles (short_code, title) VALUES ('user', 'User');
 
 insert into roles (short_code, title) VALUES ('user_officer', 'User Officer');
 
-insert into users (title, firstname, lastname, username, password ) VALUES ('Mr.', 'Carl', 'Carlsson', 'testuser', '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm');
+insert into users (title, firstname, middlename, lastname, username, password ) VALUES ('Mr.', 'Carl', 'Christian', 'Carlsson', 'testuser', '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm');
 
 insert into role_user (role_id, user_id) VALUES (1, 1);
 

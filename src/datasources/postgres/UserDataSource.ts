@@ -10,7 +10,9 @@ export default class PostgresUserDataSource implements UserDataSource {
   private createProposalObject(user: UserRecord) {
     return new User(
       user.user_id,
+      user.title,
       user.firstname,
+      user.middlename,
       user.lastname,
       user.username,
       user.created_at,
@@ -110,14 +112,17 @@ export default class PostgresUserDataSource implements UserDataSource {
   async create(
     title: string,
     firstname: string,
+    middlename: string,
     lastname: string,
     username: string,
     password: string
   ) {
+    
     return database
       .insert({
         title,
         firstname,
+        middlename,
         lastname,
         username,
         password
