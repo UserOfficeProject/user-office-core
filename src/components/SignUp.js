@@ -49,9 +49,9 @@ export default function SignUp() {
   const titles = ["Mr.", "Ms.", "Dr."];
 
   const sendSignUpRequest = values => {
-    const { firstname, lastname, username, password, title } = values;
-    const query = `mutation($title: String!, $firstname: String!, $lastname: String!, $username: String!, $password: String!){
-          createUser(title: $title, firstname: $firstname, lastname: $lastname, username: $username, password: $password){
+    const {title, firstname, middlename, lastname, username, password } = values;
+    const query = `mutation($title: String, $firstname: String!, $middlename: String, $lastname: String!, $username: String!, $password: String!){
+          createUser(title: $title, firstname: $firstname, middlename: $middlename, lastname: $lastname, username: $username, password: $password){
             user{
               id
             }
@@ -61,6 +61,7 @@ export default function SignUp() {
     const variables = {
       title,
       firstname,
+      middlename,
       lastname,
       username,
       password
@@ -80,6 +81,7 @@ export default function SignUp() {
         initialValues={{
           title: "",
           firstname: "",
+          middlename: "",
           lastname: "",
           username: "",
           password: ""
@@ -93,6 +95,10 @@ export default function SignUp() {
             .min(2, "firstname must be at least 2 characters")
             .max(15, "firstname must be at most 15 characters")
             .required("firstname must be at least 2 characters"),
+          middlename: Yup.string()
+            .min(2, "middlename must be at least 2 characters")
+            .max(15, "middlename must be at most 15 characters")
+            .required("middlename must be at least 2 characters"),
           lastname: Yup.string()
             .min(2, "lastname must be at least 2 characters")
             .max(15, "lastname must be at most 15 characters")
@@ -138,6 +144,14 @@ export default function SignUp() {
             <Field
               name="firstname"
               label="Firstname"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="middlename"
+              label="Middle name"
               type="text"
               component={TextField}
               margin="normal"
