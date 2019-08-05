@@ -10,10 +10,11 @@ import Container from "@material-ui/core/Container";
 import { request } from "graphql-request";
 import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
-import { TextField, Select } from "formik-material-ui";
-import { MenuItem } from '@material-ui/core';
+import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import { Redirect } from "react-router-dom";
+import FormikDropdown from './FormikDropdown';
+import nationalities from '../model/nationalities';
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -45,26 +46,76 @@ const useStyles = makeStyles(theme => ({
 export default function SignUp() {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
+  const nationalitiesList = nationalities.NATIONALITIES.map(nationality => { return { text: nationality, value: nationality } });
 
-  const titles = ["Mr.", "Ms.", "Dr."];
 
   const sendSignUpRequest = values => {
-    const {title, firstname, middlename, lastname, username, password } = values;
-    const query = `mutation($title: String, $firstname: String!, $middlename: String, $lastname: String!, $username: String!, $password: String!){
-          createUser(title: $title, firstname: $firstname, middlename: $middlename, lastname: $lastname, username: $username, password: $password){
-            user{
-              id
-            }
-            error
-          }
-        }`;
+    const { title, firstname, middlename, lastname, username, password, preferredname, orcid, gender, nationality, birthdate, organisation, department, organisation_address, position, email, telephone, telephone_alt } = values;
+    const query = `mutation(
+                            $title: String, 
+                            $firstname: String!, 
+                            $middlename: String, 
+                            $lastname: String!, 
+                            $username: String!, 
+                            $password: String!,
+                            $preferredname: String,
+                            $orcid: String!,
+                            $gender: String!,
+                            $nationality: String!,
+                            $birthdate: String!,
+                            $organisation: String!,
+                            $department: String!,
+                            $organisation_address: String!,
+                            $position: String!,
+                            $email: String!,
+                            $telephone: String!,
+                            $telephone_alt: String
+                            )
+                  {
+                    createUser(
+                              title: $title, 
+                              firstname: $firstname, 
+                              middlename: $middlename, 
+                              lastname: $lastname, 
+                              username: $username, 
+                              password: $password,
+                              preferredname: $preferredname
+                              orcid: $orcid
+                              gender: $gender
+                              nationality: $nationality
+                              birthdate: $birthdate
+                              organisation: $organisation
+                              department: $department
+                              organisation_address: $organisation_address
+                              position: $position
+                              email: $email
+                              telephone: $telephone
+                              telephone_alt: $telephone_alt
+                              )
+                     {
+                        user { id }
+                        error
+                     }
+                  }`;
     const variables = {
       title,
       firstname,
       middlename,
       lastname,
       username,
-      password
+      password,
+      preferredname,
+      orcid,
+      gender,
+      nationality,
+      birthdate,
+      organisation,
+      department,
+      organisation_address,
+      position,
+      email,
+      telephone,
+      telephone_alt
     };
 
     request("/graphql", query, variables).then(data =>
@@ -84,7 +135,19 @@ export default function SignUp() {
           middlename: "",
           lastname: "",
           username: "",
-          password: ""
+          password: "",
+          preferredname: "",
+          orcid: "",
+          gender: "",
+          nationality: "",
+          birthdate: "",
+          organisation: "",
+          department: "",
+          organisation_address: "",
+          position: "",
+          email: "",
+          telephone: "",
+          telephone_alt: ""
         }}
         onSubmit={async (values, actions) => {
           await sendSignUpRequest(values);
@@ -123,24 +186,11 @@ export default function SignUp() {
               Sign Up
             </Typography>
 
-            <Field
-              type="text"
-              name="title"
+            <FormikDropdown
+              items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }]}
               label="Title"
-              select
-              margin="normal"
-              component={TextField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              fullWidth
-            >
-              {titles.map(option => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </Field>
+              name="title" />
+
             <Field
               name="firstname"
               label="Firstname"
@@ -181,6 +231,108 @@ export default function SignUp() {
               margin="normal"
               fullWidth
             />
+
+            <Field
+              name="preferredname"
+              label="preferredname"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="orcid"
+              label="orcid"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <FormikDropdown
+              items={[{ text: "Female", value: "female" }, { text: "Male", value: "male" }, { text: "Rather not say", value: "unspecified" }]}
+              label="Gender"
+              name="gender" />
+
+            <FormikDropdown
+              items={nationalitiesList}
+              label="Nationality"
+              name="nationality" />
+
+            <Field
+              name="birthdate"
+              label="birthdate"
+              type="date"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="organisation"
+              label="organisation"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="department"
+              label="department"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+
+            <Field
+              name="organisation_address"
+              label="Organization address"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="position"
+              label="Position"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="email"
+              label="E-mail"
+              type="email"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="telephone"
+              label="Telephone"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Field
+              name="telephone_alt "
+              label="Telephone Alt."
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+
             <Button
               type="submit"
               fullWidth
