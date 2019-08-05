@@ -15,6 +15,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.middlename,
       user.lastname,
       user.username,
+      user.preferredname,
+      user.orcid,
+      user.gender,
+      user.nationality,
+      user.birthdate,
+      user.organisation,
+      user.department,
+      user.organisation_address,
+      user.position,
+      user.email,
+      user.telephone,
+      user.telephone_alt,
       user.created_at,
       user.updated_at
     );
@@ -115,7 +127,19 @@ export default class PostgresUserDataSource implements UserDataSource {
     middlename: string,
     lastname: string,
     username: string,
-    password: string
+    password: string,
+    preferredname: string | null,
+    orcid: string,
+    gender: string,
+    nationality: string,
+    birthdate: string,
+    organisation: string,
+    department: string,
+    organisation_address: string,
+    position: string,
+    email: string,
+    telephone: string,
+    telephone_alt: string | null,
   ) {
     
     return database
@@ -125,7 +149,19 @@ export default class PostgresUserDataSource implements UserDataSource {
         middlename,
         lastname,
         username,
-        password
+        password,
+        preferredname,
+        orcid,
+        gender,
+        nationality,
+        birthdate,
+        organisation,
+        department,
+        organisation_address,
+        position,
+        email,
+        telephone,
+        telephone_alt
       })
       .returning(["*"])
       .into("users")
