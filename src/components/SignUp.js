@@ -120,7 +120,7 @@ export default function SignUp() {
   }
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
           title: "",
