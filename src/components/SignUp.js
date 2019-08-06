@@ -193,31 +193,31 @@ export default function SignUp() {
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign Up
-            </Typography>
 
-            <FormikDropdown name="title" label="Title" items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }]} />
+            <Typography component="h1" variant="h5">Sign Up</Typography>
+
             <Field name="firstname" label="Firstname" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="middlename" label="Middle name" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="lastname" label="Lastname" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="username" label="Username" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="password" label="Password" type="password" component={TextField} margin="normal" fullWidth />
             <Field name="preferredname" label="Preferred name" type="text" component={TextField} margin="normal" fullWidth />
-            <Field name="orcid" label="ORCID" type="text" component={TextField} margin="normal" fullWidth />
+
             <FormikDropdown name="gender" label="Gender" items={[{ text: "Female", value: "female" }, { text: "Male", value: "male" }, { text: "Rather not say", value: "unspecified" }]}   />
             <FormikDropdown name="nationality" label="Nationality" items={nationalitiesList}   />
             <Field name="birthdate" label="Birthdate" type="date" component={TextField} margin="normal" fullWidth />
+	          <Field name="orcid" label="ORCID" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="organisation" label="Organisation" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="department" label="Department" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="organisation_address" label="Organization address" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="position" label="Position" type="text" component={TextField} margin="normal" fullWidth />
+
             <Field name="email" label="E-mail" type="email" component={TextField} margin="normal" fullWidth />
             <Field name="telephone" label="Telephone" type="text" component={TextField} margin="normal" fullWidth />
             <Field name="telephone_alt" label="Telephone Alt." type="text" component={TextField} margin="normal" fullWidth />
-            <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} >
-              Sign Up
-            </Button>
+
+            <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} >Sign Up</Button>
+
             <Grid container>
               <Grid item>
                 <Link to="/SignIn/">{"Have an account? Sign In"}</Link>
