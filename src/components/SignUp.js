@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { Redirect } from "react-router-dom";
 import FormikDropdown from './FormikDropdown';
 import nationalities from '../model/nationalities';
+import dateformat from 'dateformat';
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -48,9 +49,7 @@ export default function SignUp() {
   const [userID, setUserID] = useState(null);
   const nationalitiesList = nationalities.NATIONALITIES.map(nationality => { return { text: nationality, value: nationality } });
 
-
   const sendSignUpRequest = values => {
-    const { title, firstname, middlename, lastname, username, password, preferredname, orcid, gender, nationality, birthdate, organisation, department, organisation_address, position, email, telephone, telephone_alt } = values;
     const query = `mutation(
                             $title: String, 
                             $firstname: String!, 
@@ -97,36 +96,15 @@ export default function SignUp() {
                         error
                      }
                   }`;
-    const variables = {
-      title,
-      firstname,
-      middlename,
-      lastname,
-      username,
-      password,
-      preferredname,
-      orcid,
-      gender,
-      nationality,
-      birthdate,
-      organisation,
-      department,
-      organisation_address,
-      position,
-      email,
-      telephone,
-      telephone_alt
-    };
-
-    request("/graphql", query, variables).then(data =>
+    request("/graphql", query, values).then(data =>
       setUserID(data.createUser.user.id)
     );
   };
   if (userID) {
     return <Redirect to="/SignIn/" />;
   }
-
   return (
+    
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
@@ -140,7 +118,7 @@ export default function SignUp() {
           orcid: "",
           gender: "",
           nationality: "",
-          birthdate: "",
+          birthdate: dateformat(new Date().setFullYear(new Date().getFullYear() - 30), 'yyyy-mm-dd'),
           organisation: "",
           department: "",
           organisation_address: "",
@@ -149,7 +127,9 @@ export default function SignUp() {
           telephone: "",
           telephone_alt: ""
         }}
+
         onSubmit={async (values, actions) => {
+
           await sendSignUpRequest(values);
           actions.setSubmitting(false);
         }}
@@ -158,22 +138,53 @@ export default function SignUp() {
             .min(2, "firstname must be at least 2 characters")
             .max(15, "firstname must be at most 15 characters")
             .required("firstname must be at least 2 characters"),
-          middlename: Yup.string()
-            .min(2, "middlename must be at least 2 characters")
-            .max(15, "middlename must be at most 15 characters")
-            .required("middlename must be at least 2 characters"),
           lastname: Yup.string()
             .min(2, "lastname must be at least 2 characters")
             .max(15, "lastname must be at most 15 characters")
             .required("lastname must be at least 2 characters"),
           username: Yup.string()
             .min(2, "Username must be at least 2 characters")
-            .max(15, "Username must be at most 15 characters")
+            .max(20, "Username must be at most 20 characters")
             .required("Username must be at least 2 characters"),
           password: Yup.string()
             .min(8, "Password must be at least 8 characters")
             .max(25, "Password must be at most 25 characters")
-            .required("Password must be at least 8 characters")
+            .required("Password must be at least 8 characters"),
+          orcid: Yup.string()
+            .min(8, "ORCID must be at least 8 characters")
+            .required("ORCID must be at least 8 characters"),
+          gender: Yup.string()
+            .required("please specify your gender"),
+          nationality: Yup.string()
+            .required("please specify your nationality"),
+          birthdate: Yup.date()
+            .max(new Date())
+            .required("Please specify your birth date"),
+          organisation: Yup.string()
+            .min(2, "organisation must be at least 2 characters")
+            .max(50, "organisation must be at most 50 characters")
+            .required("organisation must be at least 2 characters"),
+          department: Yup.string()
+            .min(2, "department must be at least 2 characters")
+            .max(50, "department must be at most 50 characters")
+            .required("department must be at least 2 characters"),
+          organisation_address: Yup.string()
+            .min(2, "organisation address must be at least 2 characters")
+            .max(100, "organisation must be at most 100 characters")
+            .required("organisation must be at least 2 characters"),
+          position: Yup.string()
+            .min(2, "position must be at least 2 characters")
+            .max(30, "position must be at most 30 characters")
+            .required("position must be at least 2 characters"),
+          email: Yup.string().email("email is in correct format")
+            .required("please specify email"),
+          telephone: Yup.string()
+            .min(2, "telephone must be at least 2 characters")
+            .max(20, "telephone must be at most 20 characters")
+            .required("telephone must be at least 2 characters"),
+          telephone_alt: Yup.string()
+              .min(2, "telephone must be at least 2 characters")
+              .max(20, "telephone must be at most 20 characters")
         })}
       >
         <Form>
@@ -186,160 +197,25 @@ export default function SignUp() {
               Sign Up
             </Typography>
 
-            <FormikDropdown
-              items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }]}
-              label="Title"
-              name="title" />
-
-            <Field
-              name="firstname"
-              label="Firstname"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            <Field
-              name="middlename"
-              label="Middle name"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            <Field
-              name="lastname"
-              label="Lastname"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            <Field
-              name="username"
-              label="Username"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            <Field
-              name="password"
-              label="Password"
-              type="password"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="preferredname"
-              label="preferredname"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            <Field
-              name="orcid"
-              label="orcid"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <FormikDropdown
-              items={[{ text: "Female", value: "female" }, { text: "Male", value: "male" }, { text: "Rather not say", value: "unspecified" }]}
-              label="Gender"
-              name="gender" />
-
-            <FormikDropdown
-              items={nationalitiesList}
-              label="Nationality"
-              name="nationality" />
-
-            <Field
-              name="birthdate"
-              label="birthdate"
-              type="date"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="organisation"
-              label="organisation"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="department"
-              label="department"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-
-            <Field
-              name="organisation_address"
-              label="Organization address"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="position"
-              label="Position"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="email"
-              label="E-mail"
-              type="email"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="telephone"
-              label="Telephone"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-            <Field
-              name="telephone_alt "
-              label="Telephone Alt."
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
+            <FormikDropdown name="title" label="Title" items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }]} />
+            <Field name="firstname" label="Firstname" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="middlename" label="Middle name" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="lastname" label="Lastname" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="username" label="Username" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="password" label="Password" type="password" component={TextField} margin="normal" fullWidth />
+            <Field name="preferredname" label="Preferred name" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="orcid" label="ORCID" type="text" component={TextField} margin="normal" fullWidth />
+            <FormikDropdown name="gender" label="Gender" items={[{ text: "Female", value: "female" }, { text: "Male", value: "male" }, { text: "Rather not say", value: "unspecified" }]}   />
+            <FormikDropdown name="nationality" label="Nationality" items={nationalitiesList}   />
+            <Field name="birthdate" label="Birthdate" type="date" component={TextField} margin="normal" fullWidth />
+            <Field name="organisation" label="Organisation" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="department" label="Department" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="organisation_address" label="Organization address" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="position" label="Position" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="email" label="E-mail" type="email" component={TextField} margin="normal" fullWidth />
+            <Field name="telephone" label="Telephone" type="text" component={TextField} margin="normal" fullWidth />
+            <Field name="telephone_alt" label="Telephone Alt." type="text" component={TextField} margin="normal" fullWidth />
+            <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} >
               Sign Up
             </Button>
             <Grid container>
@@ -352,4 +228,7 @@ export default function SignUp() {
       </Formik>
     </Container>
   );
+
+  
+
 }

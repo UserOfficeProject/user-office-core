@@ -113,7 +113,7 @@ export default function SignInSide() {
             validationSchema={Yup.object().shape({
               username: Yup.string()
                 .min(2, "Username must be at least 2 characters")
-                .max(15, "Username must be at most 15 characters")
+                .max(20, "Username must be at most 20 characters")
                 .required("Username must be at least 2 characters"),
               password: Yup.string()
                 .min(8, "Password must be at least 8 characters")

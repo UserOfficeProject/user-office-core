@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { TextField } from "formik-material-ui";
 import { MenuItem } from '@material-ui/core';
 import { Field } from "formik";
@@ -26,7 +25,6 @@ class FormikDropdown extends React.Component<TProps> {
                 {option.text}
               </MenuItem>
               );
-            
           })}
         </Field>
         );
