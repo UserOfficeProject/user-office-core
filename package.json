@@ -54,7 +54,6 @@
     "@types/react-router-dom": "^4.3.4",
     "@types/yup": "^0.26.22",
     "@types/react-test-renderer": "^16.8.3",
-    "react-test-renderer": "^16.8.6",
-    "eslint": "^6.1.0"
+    "react-test-renderer": "^16.8.6"
   }
 }
