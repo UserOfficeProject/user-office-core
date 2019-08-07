@@ -5,6 +5,7 @@ cache:
     - node_modules/
 
 stages:
+  - test
   - build
   - production
 
@@ -20,6 +21,15 @@ build:
     - docker
   only:
     - master
+
+test:
+  stage: test
+  script:
+    - npm prune
+    - npm update -q
+    - NODE_ENV=ci npm run test
+
+
 
 production:
   type: deploy
