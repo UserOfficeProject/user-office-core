@@ -17,8 +17,10 @@ import { menuItems } from "./menuItems";
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
 import ProposalReviewUserOfficer from "./ProposalReviewUserOfficer";
+import ProposalTableReviewer from "./ProposalTableReviewer";
 import ProposalEdit from "./ProposalEdit";
 import PeoplePage from "./PeoplePage";
+import ProposalGrade from "./ProposalGrade";
 import UserPage from "./UserPage";
 import ProposalPage from "./ProposalPage";
 import ProfilePage from "./ProfilePage";
@@ -174,6 +176,11 @@ export default function Dashboard({ match }) {
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
+          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route
+            path="/ProposalTableReviewer"
+            component={ProposalTableReviewer}
+          />
           <Route
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
