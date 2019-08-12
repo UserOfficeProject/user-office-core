@@ -57,10 +57,24 @@ interface UsersArgs {
 interface RolesArgs {}
 
 interface CreateUserArgs {
+  title: string;
   firstname: string;
+  middlename: string;
   lastname: string;
   username: string;
   password: string;
+  preferredname: string;
+  orcid: string;
+  gender: string;
+  nationality: string;
+  birthdate: string;
+  organisation: string;
+  department: string;
+  organisation_address: string;
+  position: string;
+  email: string;
+  telephone: string;
+  telephone_alt: string;
 }
 
 function createMutationWrapper<T>(key: string) {
@@ -159,10 +173,24 @@ export default {
   createUser(args: CreateUserArgs, context: ResolverContext) {
     return wrapUserMutation(
       context.mutations.user.create(
+        args.title,
         args.firstname,
+        args.middlename,
         args.lastname,
         args.username,
-        args.password
+        args.password,
+        args.preferredname,
+        args.orcid,
+        args.gender,
+        args.nationality,
+        args.birthdate,
+        args.organisation,
+        args.department,
+        args.organisation_address,
+        args.position,
+        args.email,
+        args.telephone,
+        args.telephone_alt,
       )
     );
   },
