@@ -11,6 +11,8 @@ export function useAddReview() {
       addReview(reviewID: $reviewID, grade: $grade, comment: $comment){
         id
         status
+        comment
+        grade
       }
     }
     `;
