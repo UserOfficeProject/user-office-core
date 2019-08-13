@@ -6,6 +6,8 @@ import ProposalParticipants from "./ProposalParticipants";
 import ReviewTable from "./ReviewTable";
 import { useProposalData } from "../hooks/useProposalData";
 import { useAddUserForReview } from "../hooks/useAddUserForReview";
+import { useRemoveUserForReview } from "../hooks/useRemoveUserForReview";
+
 import { Add } from "@material-ui/icons";
 import ParticipantModal from "./ParticipantModal";
 import Container from "@material-ui/core/Container";
@@ -39,13 +41,20 @@ export default function ProposalReview({ match }) {
   const [reviewers, setReviewers] = useState([]);
   const { loading, proposalData } = useProposalData(match.params.id);
   const sendAddReviewer = useAddUserForReview(match.params.id);
+  const sendRemoveReviewer = useRemoveUserForReview(match.params.id);
 
   useEffect(() => {
     if (proposalData) {
       setReviewers(
         proposalData.reviews.map(review => {
           const { firstname, lastname, id, username } = review.reviewer;
-          return { name: firstname, surname: lastname, username, id };
+          return {
+            name: firstname,
+            surname: lastname,
+            username,
+            id,
+            reviewID: review.id
+          };
         })
       );
     }
@@ -61,6 +70,7 @@ export default function ProposalReview({ match }) {
     let newUsers = [...reviewers];
     newUsers.splice(newUsers.indexOf(user), 1);
     setReviewers(newUsers);
+    sendRemoveReviewer(user.reviewID);
   };
 
   if (loading) {
@@ -100,15 +110,6 @@ export default function ProposalReview({ match }) {
           search={false}
           onRemove={removeUser}
         />
-        <div className={classes.buttons}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-          >
-            Update
-          </Button>
-        </div>
       </Paper>
     </Container>
   );
