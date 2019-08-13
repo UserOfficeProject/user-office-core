@@ -13,12 +13,31 @@ export default class ReviewMutations {
   ) {}
 
   async submitReview(
-    user: User | null,
+    agent: User | null,
     reviewID: number,
     comment: string,
     grade: number
   ): Promise<Review | Rejection> {
+    const review = await this.dataSource.get(reviewID);
+    if (
+      review &&
+      !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
+    ) {
+      return rejection("NOT_REVIEWER_OF_PROPOSAL");
+    }
     const result = await this.dataSource.submitReview(reviewID, comment, grade);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
+  async removeUserForReview(agent: User | null, id: number) {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_USER_OFFICER");
+    }
+    const result = await this.dataSource.removeUserForReview(id);
+
     return result || rejection("INTERNAL_ERROR");
   }
 

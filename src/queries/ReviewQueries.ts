@@ -10,11 +10,19 @@ export default class ReviewQueries {
     private userAuth: UserAuthorization
   ) {}
 
+  async get(agent: User | null, id: number) {
+    if (await this.userAuth.isUserOfficer(agent)) {
+      return this.dataSource.get(id);
+    } else {
+      return null;
+    }
+  }
+
   async reviewsForProposal(
     agent: User | null,
     proposalId: number
   ): Promise<Review[] | null> {
-    if (this.userAuth.isUserOfficer(agent)) {
+    if (await this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getProposalReviews(proposalId);
     } else {
       return null;

@@ -67,7 +67,6 @@ function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
   if (proposal == null) {
     return null;
   }
-
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
 
@@ -78,7 +77,7 @@ function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
     status,
     created,
     updated,
-    user: () => context.queries.user.getProposers(agent, id),
+    users: () => context.queries.user.getProposers(agent, id),
     reviews: () => context.queries.review.reviewsForProposal(agent, id)
   };
 }
@@ -178,6 +177,10 @@ export default {
     );
   },
 
+  review(args: { id: number }, context: ResolverContext) {
+    return context.queries.review.get(context.user, args.id);
+  },
+
   addReview(
     args: { reviewID: number; comment: string; grade: number },
     context: ResolverContext
@@ -198,6 +201,13 @@ export default {
       context.user,
       args.userID,
       args.proposalID
+    );
+  },
+
+  removeUserForReview(args: { reviewID: number }, context: ResolverContext) {
+    return context.mutations.review.removeUserForReview(
+      context.user,
+      args.reviewID
     );
   },
 

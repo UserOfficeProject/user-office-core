@@ -7,6 +7,7 @@ type Query {
     user(id: ID!): User
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
+    review(id: ID!): Review
   }
 
   type Rejection {
@@ -49,6 +50,7 @@ type Query {
     addUserRole(userID: Int!, roleID: Int!): Boolean
     login(username: String!, password: String!): LoginMutationResult
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
+    removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }
 
@@ -87,8 +89,8 @@ type User {
 
 type Review {
   id: Int
-  proposalID: Int
-  userID: Int
+  proposal: Proposal
+  reviewer: User
   comment: String
   grade: Int
   status: Int
