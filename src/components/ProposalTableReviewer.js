@@ -38,20 +38,27 @@ export default function ProposalTableReviewer() {
 
   const columns = [
     { title: "ID", field: "id" },
-    { title: "Title", field: "title" }
+    { title: "Title", field: "title" },
+    { title: "Comment", field: "comment" },
+    { title: "Grade", field: "grade" }
   ];
 
-  const [editProposalID, setEditProposalID] = useState(0);
+  const [editReviewID, setEditReviewID] = useState(0);
 
-  if (editProposalID) {
-    return <Redirect push to={`/ProposalGrade/${editProposalID}`} />;
+  if (editReviewID) {
+    return <Redirect push to={`/ProposalGrade/${editReviewID}`} />;
   }
 
   if (loading) {
     return <p>Loading</p>;
   }
-  const proposalsData = userData.reviews.map(review => {
-    return { id: review.proposal.id, title: review.proposal.title };
+  const reviewData = userData.reviews.map(review => {
+    return {
+      id: review.id,
+      title: review.proposal.title,
+      grade: review.grade,
+      comment: review.comment
+    };
   });
   return (
     <Container maxWidth="lg" className={classes.container}>
@@ -62,12 +69,12 @@ export default function ProposalTableReviewer() {
               icons={tableIcons}
               title={"Proposals to review"}
               columns={columns}
-              data={proposalsData}
+              data={reviewData}
               actions={[
                 {
                   icon: () => <Edit />,
                   tooltip: "Review proposal",
-                  onClick: (event, rowData) => setEditProposalID(rowData.id)
+                  onClick: (event, rowData) => setEditReviewID(rowData.id)
                 }
               ]}
             />
