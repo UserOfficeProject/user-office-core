@@ -45,7 +45,26 @@ type Query {
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
-    createUser(firstname: String!, lastname: String!, username: String!, password: String!): UserMutationResult
+    createUser(
+        title: String, 
+        firstname: String!, 
+        middlename:String, 
+        lastname: String!, 
+        username: String!, 
+        password: String!,
+        preferredname: String,
+        orcid: String!,
+        gender: String!,
+        nationality: String!,
+        birthdate: String!,
+        organisation: String!,
+        department: String!,
+        organisation_address: String!,
+        position: String!,
+        email: String!,
+        telephone: String!,
+        telephone_alt: String
+        ): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
     login(username: String!, password: String!): LoginMutationResult

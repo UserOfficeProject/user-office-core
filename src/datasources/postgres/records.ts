@@ -19,9 +19,23 @@ export interface ProposalRecord {
 
 export interface UserRecord {
   readonly user_id: number;
+  readonly title: string;
   readonly firstname: string;
+  readonly middlename: string;
   readonly lastname: string;
   readonly username: string;
+  readonly preferredname: string;
+  readonly orcid: string;
+  readonly gender: string;
+  readonly nationality: string;
+  readonly birthdate: string;
+  readonly organisation: string;
+  readonly department: string;
+  readonly organisation_address: string;
+  readonly position: string;
+  readonly email: string;
+  readonly telephone: string;
+  readonly telephone_alt: string;
   readonly created_at: string;
   readonly updated_at: string;
   readonly full_count: number;
