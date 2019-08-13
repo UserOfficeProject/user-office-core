@@ -32,3 +32,12 @@ export interface RoleRecord {
   readonly short_code: string;
   readonly title: string;
 }
+
+export interface ReviewRecord {
+  readonly review_id: number;
+  readonly user_id: number;
+  readonly proposal_id: number;
+  readonly comment: string;
+  readonly grade: number;
+  readonly status: number;
+}

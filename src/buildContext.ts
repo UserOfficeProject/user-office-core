@@ -23,7 +23,8 @@ const reviewDataSource = new PostgresReviewDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
-  proposalDataSource
+  proposalDataSource,
+  reviewDataSource
 );
 
 const eventHandlers = createEventHandlers(userDataSource);
