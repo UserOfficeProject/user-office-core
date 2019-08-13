@@ -7,4 +7,12 @@ export class Review {
     public grade: number,
     public status: number
   ) {}
+
+  reviewer(args: any, context: any) {
+    return context.queries.user.dataSource.get(this.userID);
+  }
+
+  proposal(args: any, context: any) {
+    return context.queries.proposal.dataSource.get(this.proposalID);
+  }
 }

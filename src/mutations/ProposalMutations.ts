@@ -59,7 +59,7 @@ export default class ProposalMutations {
           return rejection("NOT_ALLOWED");
         }
         if (
-          !(await this.userAuth.isMemberOfProposal(agent, proposal)) &&
+          (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
           proposal.status !== 0
         ) {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");

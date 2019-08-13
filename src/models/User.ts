@@ -13,7 +13,7 @@ export class User {
   }
 
   reviews(args: any, context: any) {
-    return context.queries.user.dataSource.getUserReviews(this.id);
+    return context.queries.review.dataSource.getUserReviews(this.id);
   }
 
   proposals(args: any, context: any) {

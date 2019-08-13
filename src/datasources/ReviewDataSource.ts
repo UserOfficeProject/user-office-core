@@ -1,6 +1,8 @@
 import { Review } from "../models/Review";
 
 export interface ReviewDataSource {
+  removeUserForReview(id: number): Promise<Boolean | null>;
+  get(id: number): Promise<Review | null>;
   submitReview(
     reviewID: number,
     comment: string,
