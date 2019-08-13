@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposalInformation from "./ProposalInformation";
-import { useProposalData } from "../hooks/useProposalData";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { Formik, Field, Form } from "formik";
@@ -10,6 +9,8 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import { useAddReview } from "../hooks/useAddReview";
+import { useReviewData } from "../hooks/useReviewData";
+import { Redirect } from "react-router";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -34,8 +35,14 @@ const useStyles = makeStyles(theme => ({
 
 export default function ProposalGrade({ match }) {
   const classes = useStyles();
-  const { loading, proposalData } = useProposalData(match.params.id);
+  const { loading, reviewData } = useReviewData(match.params.id);
+  const [submitted, setSubmitted] = useState(false);
+
   const sendAddReview = useAddReview();
+
+  if (submitted) {
+    return <Redirect push to={`/ProposalTableReviewer/`} />;
+  }
 
   if (loading) {
     return <p>Loading</p>;
@@ -44,14 +51,22 @@ export default function ProposalGrade({ match }) {
   return (
     <Container maxWidth="lg" className={classes.container}>
       <Paper className={classes.paper}>
-        <ProposalInformation data={proposalData} disabled={true} />
+        <ProposalInformation data={reviewData.proposal} disabled={true} />
       </Paper>
 
       <Paper className={classes.paper}>
         <Formik
-          initialValues={{ username: "", password: "" }}
+          initialValues={{
+            grade: reviewData.grade,
+            comment: reviewData.comment
+          }}
           onSubmit={async (values, actions) => {
-            sendAddReview(1, values.grade, values.comment);
+            await sendAddReview(
+              parseInt(match.params.id),
+              values.grade,
+              values.comment
+            );
+            setSubmitted(true);
             actions.setSubmitting(false);
           }}
           validationSchema={Yup.object().shape({
