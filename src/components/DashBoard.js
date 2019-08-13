@@ -185,11 +185,11 @@ export default function Dashboard({ match }) {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
-          <Route
-            component={
-              currentRole === "user_officer" ? ProposalPage : OverviewPage
-            }
-          />
+          {currentRole === "user_officer" && <Route component={ProposalPage} />}
+          {currentRole === "user" && <Route component={OverviewPage} />}
+          {currentRole === "reviewer" && (
+            <Route component={ProposalTableReviewer} />
+          )}
         </Switch>
       </main>
     </div>
