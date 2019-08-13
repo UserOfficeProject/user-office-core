@@ -2,11 +2,13 @@ import { User } from "../models/User";
 import { Proposal } from "../models/Proposal";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
+import { ReviewDataSource } from "../datasources/ReviewDataSource";
 
 export class UserAuthorization {
   constructor(
     private userDataSource: UserDataSource,
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    private reviewDataSource: ReviewDataSource
   ) {}
 
   async isUserOfficer(agent: User | null) {
@@ -38,6 +40,15 @@ export class UserAuthorization {
     }
     return this.userDataSource.getProposalUsers(proposal.id).then(users => {
       return users.some(user => user.id === agent.id);
+    });
+  }
+
+  async isReviewerOfProposal(agent: User | null, proposalID: number) {
+    if (agent == null) {
+      return false;
+    }
+    return this.reviewDataSource.getUserReviews(agent.id).then(reviews => {
+      return reviews.some(review => review.proposalID === proposalID);
     });
   }
 }
