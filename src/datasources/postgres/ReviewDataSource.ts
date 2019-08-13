@@ -1,9 +1,38 @@
 import { ReviewDataSource } from "../ReviewDataSource";
 import { Review } from "../../models/Review";
+import { ReviewRecord } from "./records";
 
 import database from "./database";
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
+  private createReviewObject(review: ReviewRecord) {
+    return new Review(
+      review.review_id,
+      review.proposal_id,
+      review.user_id,
+      review.comment,
+      review.grade,
+      review.status
+    );
+  }
+
+  async get(id: number): Promise<Review | null> {
+    return database
+      .select()
+      .from("reviews")
+      .where("review_id", id)
+      .first()
+      .then((review: ReviewRecord) => this.createReviewObject(review));
+  }
+
+  async removeUserForReview(id: number): Promise<Boolean | null> {
+    return database
+      .from("reviews")
+      .where("review_id", id)
+      .del()
+      .then(() => true);
+  }
+
   async submitReview(
     reviewID: number,
     comment: string,
@@ -20,7 +49,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from("reviews")
       .where("review_id", reviewID)
       .then((review: any) => {
-        console.log(review);
         return new Review(
           reviewID,
           review[0].proposal_id,
@@ -41,7 +69,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         return reviews.map(
           review =>
             new Review(
-              id,
+              review.review_id,
               review.proposal_id,
               review.user_id,
               review.comment,
@@ -82,7 +110,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         return reviews.map(
           review =>
             new Review(
-              id,
+              review.review_id,
               review.proposal_id,
               review.user_id,
               review.comment,
