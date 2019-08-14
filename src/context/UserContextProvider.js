@@ -1,21 +1,32 @@
 import React from "react";
 
 //For Prod
-const initUserData = { user: { roles: [] }, token: null, currentRole: null };
+const initUserData = {
+  user: { roles: [], id: localStorage.id },
+  token: localStorage.token,
+  currentRole: localStorage.currentRole
+};
 
-//For development
-// const initUserData = {
-//   user: { roles: ["user_officer", "user"], id: 2 },
-//   token:
-//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNTYzODgzNzcxLCJleHAiOjE1OTU0NDEzNzF9.AOvbYPv21pi1VBPV0qM2oiyIESC-ugPfrgZolsb9dJk",
-//   currentRole: "user_officer"
-// };
+const setLocalStorage = payload => {
+  localStorage.token = payload.token;
+  localStorage.id = payload.user.id;
+  if (payload.user.roles.length === 1) {
+    localStorage.currentRole = payload.user.roles[0];
+  }
+};
+
+const resetLocalStorage = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("currentRole");
+  localStorage.removeItem("id");
+};
 
 export const UserContext = React.createContext();
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "loginUser":
+      setLocalStorage(action.payload);
       return {
         ...action.payload,
         currentRole:
@@ -24,11 +35,16 @@ const reducer = (state, action) => {
             : null
       };
     case "selectRole":
+      localStorage.currentRole = action.payload;
       return {
         ...state,
         currentRole: action.payload
       };
     case "logOffUser":
+      resetLocalStorage();
+      localStorage.removeItem("token");
+      localStorage.removeItem("currentRole");
+      localStorage.removeItem("id");
       return {
         initUserData
       };
