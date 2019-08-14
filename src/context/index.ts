@@ -2,16 +2,20 @@ import ProposalMutations from "../mutations/ProposalMutations";
 import UserMutations from "../mutations/UserMutations";
 import ProposalQueries from "../queries/ProposalQueries";
 import UserQueries from "../queries/UserQueries";
+import ReviewQueries from "../queries/ReviewQueries";
+import ReviewMutations from "../mutations/ReviewMutations";
 import { User } from "../models/User";
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
   user: UserQueries;
+  review: ReviewQueries;
 }
 
 interface ResolverContextMutations {
   proposal: ProposalMutations;
   user: UserMutations;
+  review: ReviewMutations;
 }
 
 export interface BasicResolverContext {

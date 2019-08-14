@@ -9,6 +9,8 @@ import {
   dummyProposal
 } from "../datasources/mockups/ProposalDataSource";
 
+import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
+
 import {
   userDataSource,
   dummyUser,
@@ -19,7 +21,8 @@ import {
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource()
+  new proposalDataSource(),
+  new reviewDataSource()
 );
 const proposalQueries = new ProposalQueries(
   new proposalDataSource(),
@@ -30,7 +33,7 @@ test("A user on the proposal can get a proposal it belongs to", () => {
   return expect(proposalQueries.get(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
-test("A user not on the proposal cannot get a proposal it belongs to", () => {
+test("A user not on the proposal cannot get a proposal", () => {
   return expect(
     proposalQueries.get(dummyUserNotOnProposal, dummyProposal.id)
   ).resolves.toBe(null);
@@ -45,7 +48,7 @@ test("A userofficer can get any proposal", () => {
 test("A userofficer can get all proposal", () => {
   return expect(
     proposalQueries.getAll(dummyUserOfficer)
-  ).resolves.toStrictEqual([dummyProposal]);
+  ).resolves.toStrictEqual({ totalCount: 1, proposals: [dummyProposal] });
 });
 
 test("A user cannot query all proposals", () => {

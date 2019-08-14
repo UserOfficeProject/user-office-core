@@ -1,4 +1,4 @@
-var { buildSchema } = require("graphql")
+var { buildSchema } = require("graphql");
 
 export default buildSchema(`
 type Query {
@@ -7,6 +7,7 @@ type Query {
     user(id: ID!): User
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
+    review(id: ID!): Review
   }
 
   type Rejection {
@@ -67,6 +68,9 @@ type Query {
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
     login(username: String!, password: String!): LoginMutationResult
+    addUserForReview(userID: Int!, proposalID: Int!): Boolean
+    removeUserForReview(reviewID: Int!): Boolean
+    addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }
 
 """ We can use node interfaces for the types so ESS and Max IV can have different types """
@@ -87,6 +91,7 @@ type Proposal {
     proposer: Int
     created: String
     updated: String
+    reviews: [Review]
 }
 
 type User {
@@ -98,6 +103,16 @@ type User {
     roles:[Roles]
     created: String
     updated: String
+    reviews: [Review]
+}
+
+type Review {
+  id: Int
+  proposal: Proposal
+  reviewer: User
+  comment: String
+  grade: Int
+  status: Int
 }
 
 

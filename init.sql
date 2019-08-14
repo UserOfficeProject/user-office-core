@@ -1,3 +1,11 @@
+drop table IF EXISTS users;
+drop table IF EXISTS proposals;
+drop table IF EXISTS proposal_users;
+drop table IF EXISTS roles;
+drop table IF EXISTS role_users;
+drop table IF EXISTS reviews;
+
+
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN

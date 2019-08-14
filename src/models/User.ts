@@ -26,6 +26,10 @@ export class User {
     return context.queries.user.dataSource.getUserRoles(this.id);
   }
 
+  reviews(args: any, context: any) {
+    return context.queries.review.dataSource.getUserReviews(this.id);
+  }
+
   proposals(args: any, context: any) {
     return context.queries.proposal.dataSource.getUserProposals(this.id);
   }

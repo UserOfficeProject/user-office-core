@@ -71,6 +71,12 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async addUserForReview(
+    userID: number,
+    proposalID: number
+  ): Promise<Boolean | null> {
+    return true;
+  }
   async getByUsername(username: string): Promise<User | null> {
     return dummyUser;
   }
@@ -101,8 +107,12 @@ export class userDataSource implements UserDataSource {
     return dummyUser;
   }
 
-  async getUsers(filter: string) {
-    return [dummyUser, dummyUserOfficer];
+  async getUsers(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; users: User[] }> {
+    return { totalCount: 2, users: [dummyUser, dummyUserOfficer] };
   }
 
   async getProposalUsers(id: number) {

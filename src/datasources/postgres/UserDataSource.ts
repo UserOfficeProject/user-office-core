@@ -4,6 +4,7 @@ const BluePromise = require("bluebird");
 
 import { User } from "../../models/User";
 import { Role } from "../../models/Role";
+import { Review } from "../../models/Review";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {

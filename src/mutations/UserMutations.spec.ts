@@ -1,6 +1,7 @@
 import UserMutations from "./UserMutations";
 import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
@@ -19,7 +20,8 @@ import {
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource()
+  new proposalDataSource(),
+  new reviewDataSource()
 );
 const userMutations = new UserMutations(
   new userDataSource(),

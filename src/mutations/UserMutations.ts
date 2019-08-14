@@ -114,7 +114,6 @@ export default class UserMutations {
 
     return result || rejection("INTERNAL_ERROR");
   }
-
   async login(
     username: string,
     password: string

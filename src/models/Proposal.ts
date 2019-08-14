@@ -8,8 +8,4 @@ export class Proposal {
     public created: string,
     public updated: string
   ) {}
-
-  users(args: any, context: any) {
-    return context.queries.user.dataSource.getProposalUsers(this.id);
-  }
 }

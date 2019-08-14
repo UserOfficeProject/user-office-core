@@ -3,6 +3,7 @@ import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import { Proposal } from "../../models/Proposal";
+import { Review } from "../../models/Review";
 
 const BluePromise = require("bluebird");
 

@@ -42,4 +42,8 @@ export default class UserQueries {
       return null;
     }
   }
+
+  async getProposers(agent: User | null, proposalId: number) {
+    return this.dataSource.getProposalUsers(proposalId);
+  }
 }

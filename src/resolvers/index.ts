@@ -77,6 +77,41 @@ interface CreateUserArgs {
   telephone_alt: string;
 }
 
+function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
+  if (proposal == null) {
+    return null;
+  }
+  const { id, title, abstract, status, created, updated } = proposal;
+  const agent = context.user;
+
+  return {
+    id,
+    title,
+    abstract,
+    status,
+    created,
+    updated,
+    users: () => context.queries.user.getProposers(agent, id),
+    reviews: () => context.queries.review.reviewsForProposal(agent, id)
+  };
+}
+
+function resolveProposals(
+  proposals: { totalCount: number; proposals: Proposal[] } | null,
+  context: ResolverContext
+) {
+  if (proposals == null) {
+    return null;
+  }
+
+  return {
+    totalCount: proposals.totalCount,
+    proposals: proposals.proposals.map(proposal =>
+      resolveProposal(proposal, context)
+    )
+  };
+}
+
 function createMutationWrapper<T>(key: string) {
   return async function(promise: Promise<T | Rejection>) {
     const result = await promise;
@@ -98,17 +133,24 @@ const wrapProposalMutation = createMutationWrapper<Proposal>("proposal");
 const wrapUserMutation = createMutationWrapper<User>("user");
 
 export default {
-  proposal(args: ProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.get(context.user, parseInt(args.id));
+  async proposal(args: ProposalArgs, context: ResolverContext) {
+    const proposal = await context.queries.proposal.get(
+      context.user,
+      parseInt(args.id)
+    );
+
+    return resolveProposal(proposal, context);
   },
 
-  proposals(args: ProposalsArgs, context: ResolverContext) {
-    return context.queries.proposal.getAll(
+  async proposals(args: ProposalsArgs, context: ResolverContext) {
+    const proposals = await context.queries.proposal.getAll(
       context.user,
       args.filter,
       args.first,
       args.offset
     );
+
+    return resolveProposals(proposals, context);
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -146,6 +188,40 @@ export default {
   submitProposal(args: ApproveProposalArgs, context: ResolverContext) {
     return wrapProposalMutation(
       context.mutations.proposal.submit(context.user, args.id)
+    );
+  },
+
+  review(args: { id: number }, context: ResolverContext) {
+    return context.queries.review.get(context.user, args.id);
+  },
+
+  addReview(
+    args: { reviewID: number; comment: string; grade: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.review.submitReview(
+      context.user,
+      args.reviewID,
+      args.comment,
+      args.grade
+    );
+  },
+
+  addUserForReview(
+    args: { userID: number; proposalID: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.review.addUserForReview(
+      context.user,
+      args.userID,
+      args.proposalID
+    );
+  },
+
+  removeUserForReview(args: { reviewID: number }, context: ResolverContext) {
+    return context.mutations.review.removeUserForReview(
+      context.user,
+      args.reviewID
     );
   },
 
@@ -190,7 +266,7 @@ export default {
         args.position,
         args.email,
         args.telephone,
-        args.telephone_alt,
+        args.telephone_alt
       )
     );
   },

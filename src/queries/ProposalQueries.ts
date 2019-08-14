@@ -10,9 +10,15 @@ export default class ProposalQueries {
 
   async get(agent: User | null, id: number) {
     const proposal = await this.dataSource.get(id);
+
+    if (!proposal) {
+      return null;
+    }
+
     if (
       (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isMemberOfProposal(agent, proposal))
+      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
+      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
     ) {
       return proposal;
     } else {
