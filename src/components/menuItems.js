@@ -53,5 +53,21 @@ export const menuItems = {
         <ListItemText primary="Logout" />
       </ListItem>
     </div>
+  ),
+  reviewer: (
+    <div>
+      <ListItem component={Link} to="/ProposalTableReviewer" button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
+      <ListItem component={Link} to="/LogOut" button>
+        <ListItemIcon>
+          <ExitToApp />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
+      </ListItem>
+    </div>
   )
 };

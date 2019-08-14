@@ -26,7 +26,6 @@ export default function ProposalParticipants(props) {
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
   const sendRequest = useDataAPI();
-
   const sendProposalUpdate = () => {
     const query = `
       mutation($id: ID!, $users: [Int!]) {
@@ -90,19 +89,21 @@ export default function ProposalParticipants(props) {
           You need to add at least one Co-Proposer
         </p>
       )}
-      <div className={classes.buttons}>
-        <Button onClick={props.back} className={classes.button}>
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleNext}
-          className={classes.button}
-        >
-          Next
-        </Button>
-      </div>
+      {props.back ? (
+        <div className={classes.buttons}>
+          <Button onClick={props.back} className={classes.button}>
+            Back
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleNext}
+            className={classes.button}
+          >
+            Next
+          </Button>
+        </div>
+      ) : null}
     </React.Fragment>
   );
 }
