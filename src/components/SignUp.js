@@ -65,7 +65,7 @@ export default function SignUp() {
 
   const sendSignUpRequest = values => {
     const query = `mutation(
-                            $title: String, 
+                            $user_title: String, 
                             $firstname: String!, 
                             $middlename: String, 
                             $lastname: String!, 
@@ -86,7 +86,7 @@ export default function SignUp() {
                             )
                   {
                     createUser(
-                              title: $title, 
+                              user_title: $user_title, 
                               firstname: $firstname, 
                               middlename: $middlename, 
                               lastname: $lastname, 
@@ -123,7 +123,7 @@ export default function SignUp() {
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          title: "",
+          user_title: "",
           firstname: "",
           middlename: "",
           lastname: "",
@@ -222,6 +222,7 @@ export default function SignUp() {
           <Card className={classes.card}>
           <Typography className={classes.cardHeader}>Personal details</Typography>
             <CardContent>
+                <FormikDropdown name="user_title" label="Title" items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }, { text: "Rather not say", value: "unspecified" }]}   />
                 <Field name="firstname" label="Firstname" type="text" component={TextField} margin="normal" fullWidth/>
                 <Field name="middlename" label="Middle name" type="text" component={TextField} margin="normal" fullWidth/>
                 <Field name="lastname" label="Lastname" type="text" component={TextField} margin="normal" fullWidth />
