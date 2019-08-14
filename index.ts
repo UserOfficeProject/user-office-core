@@ -17,7 +17,12 @@ const authMiddleware = jwt({
   secret: "somesuperdupersecret"
 });
 
-app.use(authMiddleware);
+app.use(authMiddleware, function(err, req, res, next) {
+  if (err.code === "invalid_token") {
+    return res.sendStatus(401, "jwt expired");
+  }
+  return res.sendStatus(400);
+});
 
 declare global {
   namespace Express {
@@ -36,26 +41,6 @@ app.use(
     if (req.user) {
       user = await baseContext.queries.user.getAgent(req.user.id);
     }
-
-    // For development purpose you can bypass JWT tokens and activate a user directly here
-
-    // const user = {
-    //   id: 1,
-    //   firstname: "Carl",
-    //   lastname: "Carlsson",
-    //   username: "testuser",
-    //   roles: () => [],
-    //   proposals: () => []
-    // };
-
-    // const user = {
-    //   id: 2,
-    //   firstname: "Anders",
-    //   lastname: "Andersson",
-    //   username: "testofficer",
-    //   roles: () => [],
-    //   proposals: () => []
-    // };
 
     const context: ResolverContext = { ...baseContext, user };
 
