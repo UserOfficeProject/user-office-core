@@ -46,7 +46,7 @@ type Query {
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
     createUser(
-        title: String, 
+        user_title: String, 
         firstname: String!, 
         middlename:String, 
         lastname: String!, 

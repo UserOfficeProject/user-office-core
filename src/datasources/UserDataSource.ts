@@ -16,7 +16,7 @@ export interface UserDataSource {
   getProposalUsers(proposalId: number): Promise<User[]>;
   // Write
   create(
-    title: string,
+    user_title: string,
     firstname: string,
     middlename: string,
     lastname: string,
