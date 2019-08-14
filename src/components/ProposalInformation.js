@@ -68,6 +68,7 @@ export default function ProposalInformation(props) {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <TextField
+                disabled={props.disabled}
                 required
                 id="title"
                 name="title"
@@ -81,6 +82,7 @@ export default function ProposalInformation(props) {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                disabled={props.disabled}
                 required
                 id="abstract"
                 name="abstract"
@@ -95,17 +97,19 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          <div className={classes.buttons}>
-            <Button
-              disabled={isSubmitting}
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-            >
-              Next
-            </Button>
-          </div>
+          {props.next ? (
+            <div className={classes.buttons}>
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                Next
+              </Button>
+            </div>
+          ) : null}
         </Form>
       )}
     </Formik>

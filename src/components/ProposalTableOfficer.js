@@ -1,48 +1,48 @@
-import React from "react";
-import ProposalTable from "./ProposalTable";
-import { useDataAPI } from "../hooks/useDataAPI";
+import React, { useState } from "react";
+import { useProposalsData } from "../hooks/useProposalsData";
+import { Redirect } from "react-router";
+import MaterialTable from "material-table";
+import { tableIcons } from "../utils/tableIcons";
+import { Edit } from "@material-ui/icons";
 
 export default function ProposalTableOfficer() {
-  const sendRequest = useDataAPI();
+  const { loading, proposalsData } = useProposalsData("");
 
-  const sendAllProposalRequest = searchQuery => {
-    const query = `
-    query($filter: String!, $first: Int!, $offset: Int!) {
-      proposals(filter: $filter, first: $first, offset: $offset) {
-        proposals{
-          id
-          title
-          status
-          }
-        totalCount
-        }
-      }`;
+  const columns = [
+    { title: "ID", field: "id" },
+    { title: "Title", field: "title" },
+    { title: "Status", field: "status" }
+  ];
 
-    const variables = {
-      filter: searchQuery.search,
-      offset: searchQuery.pageSize * searchQuery.page,
-      first: searchQuery.pageSize
-    };
-    return sendRequest(query, variables).then(data => {
-      return {
-        page: searchQuery.page,
-        totalCount: data.proposals.totalCount,
-        data: data.proposals.proposals.map(proposal => {
-          return {
-            id: proposal.id,
-            title: proposal.title,
-            status: proposal.status
-          };
-        })
-      };
-    });
-  };
+  const [editProposalID, setEditProposalID] = useState(0);
+
+  if (editProposalID) {
+    return (
+      <Redirect push to={`/ProposalReviewUserOfficer/${editProposalID}`} />
+    );
+  }
+
+  if (loading) {
+    return <p>Loading</p>;
+  }
 
   return (
-    <ProposalTable
-      title="Proposals"
-      search={true}
-      searchQuery={sendAllProposalRequest}
+    <MaterialTable
+      icons={tableIcons}
+      title={"Proposals"}
+      columns={columns}
+      data={proposalsData}
+      options={{
+        search: true,
+        debounceInterval: 400
+      }}
+      actions={[
+        {
+          icon: () => <Edit />,
+          tooltip: "View proposal",
+          onClick: (event, rowData) => setEditProposalID(rowData.id)
+        }
+      ]}
     />
   );
 }
