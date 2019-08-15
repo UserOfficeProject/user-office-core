@@ -1,5 +1,9 @@
 drop table IF EXISTS users;
 drop table IF EXISTS proposals;
+drop table IF EXISTS proposal_questions;
+drop table IF EXISTS proposal_answers;
+drop table IF EXISTS proposal_question_datatypes;
+drop table IF EXISTS proposal_question_dependencies;
 drop table IF EXISTS proposal_users;
 drop table IF EXISTS roles;
 drop table IF EXISTS role_users;
@@ -57,6 +61,39 @@ CREATE TRIGGER set_timestamp
 BEFORE UPDATE ON proposals
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE proposal_question_datatypes (
+  proposal_question_datatype_id  VARCHAR(64) PRIMARY KEY
+);
+
+CREATE TABLE proposal_questions (
+  proposal_question_id  VARCHAR(64) PRIMARY KEY   /* f.x.links_with_industry */
+, data_type             VARCHAR(64) NOT NULL REFERENCES proposal_question_datatypes(proposal_question_datatype_id)
+, question              VARCHAR(256) NOT NULL
+, config                VARCHAR(512) DEFAULT NULL              /* f.x. { "min":2, "max":50 } */
+, created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON proposal_questions
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+CREATE TABLE proposal_answers (
+  proposal_id           INTEGER NOT NULL REFERENCES proposals(proposal_id)
+, proposal_question_id  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
+, answer                VARCHAR(512) 
+, created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, PRIMARY KEY (proposal_id, proposal_question_id)
+);
+
+CREATE TABLE proposal_question_dependencies (
+  proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
+, proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
+, conditions                    VARCHAR(64) DEFAULT NULL
+, PRIMARY KEY (proposal_question_id, proposal_question_dependency)
+);
 
 CREATE TABLE proposal_user (
   proposal_id    int REFERENCES proposals (proposal_id) ON UPDATE CASCADE
@@ -171,3 +208,18 @@ VALUES (
 INSERT INTO role_user (role_id, user_id) VALUES (1, 2);
 
 INSERT INTO role_user (role_id, user_id) VALUES (2, 2);
+
+INSERT INTO proposal_question_datatypes VALUES ('SMALL_TEXT');
+INSERT INTO proposal_question_datatypes VALUES ('LARGE_TEXT');
+INSERT INTO proposal_question_datatypes VALUES ('SELECTION_FROM_OPTIONS');
+INSERT INTO proposal_question_datatypes VALUES ('BOOLEAN');
+INSERT INTO proposal_question_datatypes VALUES ('DATE');
+INSERT INTO proposal_question_datatypes VALUES ('FILE_UPLOAD');
+
+INSERT INTO proposal_questions VALUES ('has_links_with_industry', 'SELECTION_FROM_OPTIONS', 'Links with industry?', '{"variant":"radio", "options":["yes", "no"]}');
+INSERT INTO proposal_questions VALUES ('links_with_industry', 'SMALL_TEXT', 'Please specify', '{"max":300, "min":2}');
+INSERT INTO proposal_questions VALUES ('final_delivery_date', 'DATE', 'Final delivery date');
+INSERT INTO proposal_questions VALUES ('final_delivery_date_motivation', 'LARGE_TEXT', 'Please motivate the chosen date', '"small_label":"(e.g. based on awarded beamtime, or described intention to apply)"');
+/* TODO add more questions */
+
+INSERT INTO proposal_question_dependencies VALUES ('links_with_industry', 'has_links_with_industry', '{ "ifValue": "yes" }');
