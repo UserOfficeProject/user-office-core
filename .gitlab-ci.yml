@@ -28,6 +28,9 @@ test:
     - npm prune
     - npm update -q
     - NODE_ENV=ci npm run test
+  tags:
+    - docker
+
 
 
 
