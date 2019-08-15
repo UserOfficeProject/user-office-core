@@ -10,6 +10,8 @@ test:
     - npm prune
     - npm update -q
     - NODE_ENV=ci npm run test
+  tags:
+    - docker
     
 deploy_staging:
   stage: deploy
@@ -21,4 +23,6 @@ deploy_staging:
     - dpl --provider=heroku --app=duo2-backend-staging --api-key=$HEROKU_API_KEY
   only:
     - master
+  tags:
+    - docker
     
