@@ -45,3 +45,5 @@ production:
     - dpl --provider=heroku --app=duo2-frontend-staging --api-key=$HEROKU_API_KEY --skip_cleanup
   only:
     - master
+  tags:
+    - docker
