@@ -1,6 +1,7 @@
 import ProposalQueries from "./ProposalQueries";
 import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { Rejection, rejection } from "../rejection";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
@@ -17,6 +18,7 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
+import { ProposalTemplate } from "../models/Proposal";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -53,4 +55,17 @@ test("A userofficer can get all proposal", () => {
 
 test("A user cannot query all proposals", () => {
   return expect(proposalQueries.getAll(dummyUser)).resolves.toBe(null);
+});
+
+test("Non authentificated user can not get the template", () => {
+  return expect(proposalQueries.getProposalTemplate(null)).resolves.not.toBeInstanceOf(ProposalTemplate);
+});
+
+test("Authentificated user can get the template", () => {
+  return expect(proposalQueries.getProposalTemplate(dummyUser)).resolves.toBeInstanceOf(ProposalTemplate);
+});
+
+test("Proposal template should have fields", async () => {
+  let template = await proposalQueries.getProposalTemplate(dummyUser) as ProposalTemplate;
+  return expect(template.fields.length).toBeGreaterThan(0);
 });

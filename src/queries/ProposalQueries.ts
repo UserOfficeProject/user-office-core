@@ -47,6 +47,6 @@ export default class ProposalQueries {
       return rejection("Not authorized");
     }
 
-    return await this.dataSource.getProposalTemplate();;
+    return await this.dataSource.getProposalTemplate();
   }
 }
