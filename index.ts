@@ -1,6 +1,7 @@
 const express = require("express");
 const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
+const config = require("./config");
 
 import { Request } from "express";
 
@@ -14,7 +15,7 @@ var app = express();
 // authentication middleware
 const authMiddleware = jwt({
   credentialsRequired: false,
-  secret: "somesuperdupersecret"
+  secret: config.secret
 });
 
 app.use(authMiddleware, function(err, req, res, next) {
@@ -24,14 +25,6 @@ app.use(authMiddleware, function(err, req, res, next) {
   return res.sendStatus(400);
 });
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: { id: number };
-    }
-  }
-}
-
 app.use(
   "/graphql",
   graphqlHTTP(async (req: Request) => {
@@ -39,7 +32,7 @@ app.use(
     // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
     let user = null;
     if (req.user) {
-      user = await baseContext.queries.user.getAgent(req.user.id);
+      user = await baseContext.queries.user.getAgent(req.user.user.id);
     }
 
     const context: ResolverContext = { ...baseContext, user };
