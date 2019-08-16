@@ -34,10 +34,6 @@ type Query {
     error: String
   }
 
-  type LoginMutationResult {
-    user: User
-    token: String
-  }
 
   type Mutation {
     createProposal: ProposalMutationResult
@@ -45,6 +41,7 @@ type Query {
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
+    token(token: String!): String
     createUser(
         title: String, 
         firstname: String!, 
@@ -67,14 +64,11 @@ type Query {
         ): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
-    login(username: String!, password: String!): LoginMutationResult
+    login(username: String!, password: String!): String
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
     removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }
-
-""" We can use node interfaces for the types so ESS and Max IV can have different types """
-
 
 type Roles {
   id: Int
