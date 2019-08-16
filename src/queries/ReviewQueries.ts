@@ -29,11 +29,11 @@ export default class ReviewQueries {
   async reviewsForProposal(
     agent: User | null,
     proposalId: number
-  ): Promise<Review[] | null> {
+  ): Promise<Review[] | []> {
     if (await this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getProposalReviews(proposalId);
     } else {
-      return null;
+      return [];
     }
   }
 }
