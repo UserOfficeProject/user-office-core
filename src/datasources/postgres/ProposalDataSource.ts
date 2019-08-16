@@ -2,8 +2,7 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal } from "../../models/Proposal";
-import { Review } from "../../models/Review";
+import { Proposal, ProposalTemplate, ProposalTemplateField } from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 
@@ -159,6 +158,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orWhere("p.proposer_id", id)
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => this.createProposalObject(proposal))
+      );
+  }
+
+  async getProposalTemplate(): Promise<ProposalTemplate> {
+    return database
+      .select("q.*")
+      .from("proposal_questions as q")
+      .then((fields: ProposalTemplateField[]) => {
+        return new ProposalTemplate(fields);
+      }
       );
   }
 }

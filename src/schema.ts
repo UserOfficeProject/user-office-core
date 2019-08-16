@@ -8,6 +8,7 @@ type Query {
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
     review(id: ID!): Review
+    proposalTemplate: ProposalTemplateResult
   }
 
   type Rejection {
@@ -31,6 +32,11 @@ type Query {
 
   type UserMutationResult {
     user: User
+    error: String
+  }
+
+  type ProposalTemplateResult {
+    template: ProposalTemplate
     error: String
   }
 
@@ -115,5 +121,22 @@ type Review {
   status: Int
 }
 
+
+type ProposalTemplate {
+    fields:[ProposalTemplateField]
+}
+  
+type ProposalTemplateField {
+    proposal_question_id: String,
+    data_type: String,
+    question: String,
+    config: String,
+    dependencies: [FieldDependency]
+}
+  
+type FieldDependency {
+    dependsOnField: String,
+    conditions: String,
+}
 
 `);

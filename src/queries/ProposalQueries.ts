@@ -1,6 +1,8 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { ProposalTemplate } from "../models/Proposal";
+import { Rejection, rejection } from "../rejection";
 
 export default class ProposalQueries {
   constructor(
@@ -37,5 +39,14 @@ export default class ProposalQueries {
     } else {
       return null;
     }
+  }
+
+  async getProposalTemplate(agent: User | null):Promise<ProposalTemplate | Rejection>
+  {
+    if (agent == null) {
+      return rejection("Not authorized");
+    }
+
+    return await this.dataSource.getProposalTemplate();;
   }
 }
