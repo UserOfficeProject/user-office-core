@@ -10,8 +10,16 @@ export default class ReviewQueries {
     private userAuth: UserAuthorization
   ) {}
 
-  async get(agent: User | null, id: number) {
-    if (await this.userAuth.isUserOfficer(agent)) {
+  async get(agent: User | null, id: number): Promise<Review | null> {
+    const review = await this.dataSource.get(id);
+    if (!review || !agent) {
+      return null;
+    }
+
+    if (
+      (await this.userAuth.isUserOfficer(agent)) ||
+      review.userID === agent.id
+    ) {
       return this.dataSource.get(id);
     } else {
       return null;
@@ -21,11 +29,11 @@ export default class ReviewQueries {
   async reviewsForProposal(
     agent: User | null,
     proposalId: number
-  ): Promise<Review[] | null> {
+  ): Promise<Review[] | []> {
     if (await this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getProposalReviews(proposalId);
     } else {
-      return null;
+      return [];
     }
   }
 }
