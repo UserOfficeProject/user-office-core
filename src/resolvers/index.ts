@@ -229,6 +229,10 @@ export default {
     return context.mutations.user.login(args.username, args.password);
   },
 
+  token(args: { token: string }, context: ResolverContext) {
+    return context.mutations.user.token(args.token);
+  },
+
   user(args: UserArgs, context: ResolverContext) {
     return context.queries.user.get(context.user, parseInt(args.id));
   },
