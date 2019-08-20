@@ -3,11 +3,30 @@ import { GraphQLClient } from "graphql-request";
 import { UserContext } from "../context/UserContextProvider";
 
 export function useDataAPI() {
-  const { token } = useContext(UserContext);
+  const { token, expToken, handleNewToken } = useContext(UserContext);
+  const endpoint = "/graphql";
+
+  const sendRequestForToken = useCallback(async () => {
+    const query = `
+    mutation($token: String!) {
+      token(token: $token)
+    }
+    `;
+    const variables = {
+      token
+    };
+    return await new GraphQLClient(endpoint)
+      .request(query, variables)
+      .then(data => handleNewToken(data.token));
+  }, [token, handleNewToken]);
 
   const sendRequest = useCallback(
     async function sendRequest(query, variables) {
-      const endpoint = "/graphql";
+      //check if token older than an hour, if so ask for new one
+      if (expToken < Date.now() / 1000 + 7 * 24 * 3600 - 3600) {
+        sendRequestForToken();
+      }
+
       const graphQLClient = new GraphQLClient(endpoint, {
         headers: {
           authorization: `Bearer ${token}`
@@ -24,7 +43,7 @@ export function useDataAPI() {
         })
         .catch(error => console.log("Error", error));
     },
-    [token]
+    [token, expToken, sendRequestForToken]
   );
   return sendRequest;
 }
