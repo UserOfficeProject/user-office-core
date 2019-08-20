@@ -2,7 +2,7 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal, ProposalTemplate, ProposalTemplateField } from "../../models/Proposal";
+import { Proposal, ProposalTemplate, ProposalTemplateField, FieldDependency } from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 
@@ -162,12 +162,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    return database
-      .select("q.*")
-      .from("proposal_questions as q")
-      .then((fields: ProposalTemplateField[]) => {
-        return new ProposalTemplate(fields);
-      }
-      );
+    let deps:FieldDependency[] = await database
+              .select("d.*")
+              .from("proposal_question_dependencies as d");
+
+    let fields: ProposalTemplateField[] = await database
+                .select("q.*")
+                .from("proposal_questions as q");
+
+    fields.forEach( field => { field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id ) });
+
+    return new ProposalTemplate(fields);
   }
 }
