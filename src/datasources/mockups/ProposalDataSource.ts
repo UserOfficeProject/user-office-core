@@ -26,7 +26,7 @@ export class proposalDataSource implements ProposalDataSource {
 
   async getProposalTemplate():Promise<ProposalTemplate> {
     var hasLinksToField = new ProposalTemplateField("hasLinksToField", DataType.SELECTION_FROM_OPTIONS, "Has any links to field?", {'variant':'radio', 'options':['yes', 'no']}, null);
-    var linksToField = new ProposalTemplateField("linksToField", DataType.SMALL_TEXT, "Please specify", null, [new FieldDependency("hasLinksToField", "{ 'ifValue': 'yes' }")]);
+    var linksToField = new ProposalTemplateField("linksToField", DataType.SMALL_TEXT, "Please specify", null, [new FieldDependency("linksToField", "hasLinksToField", "{ 'ifValue': 'yes' }")]);
     return new ProposalTemplate([hasLinksToField, linksToField]);
   }
   

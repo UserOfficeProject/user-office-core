@@ -216,10 +216,10 @@ INSERT INTO proposal_question_datatypes VALUES ('BOOLEAN');
 INSERT INTO proposal_question_datatypes VALUES ('DATE');
 INSERT INTO proposal_question_datatypes VALUES ('FILE_UPLOAD');
 
-INSERT INTO proposal_questions VALUES ('has_links_with_industry', 'SELECTION_FROM_OPTIONS', 'Links with industry?', '{"variant":"radio", "options":["yes", "no"]}');
-INSERT INTO proposal_questions VALUES ('links_with_industry', 'SMALL_TEXT', 'Please specify', '{"max":300, "min":2}');
-INSERT INTO proposal_questions VALUES ('final_delivery_date', 'DATE', 'Final delivery date');
-INSERT INTO proposal_questions VALUES ('final_delivery_date_motivation', 'LARGE_TEXT', 'Please motivate the chosen date', '"small_label":"(e.g. based on awarded beamtime, or described intention to apply)"');
+INSERT INTO proposal_questions VALUES ('has_links_with_industry', 'SELECTION_FROM_OPTIONS', 'Links with industry?', '{"variant":"radio", "options":["yes", "no"], "topic":"general_info"}');
+INSERT INTO proposal_questions VALUES ('links_with_industry', 'SMALL_TEXT', 'Please specify', '{"max":300, "min":2,"topic":"general_info"}');
+INSERT INTO proposal_questions VALUES ('final_delivery_date', 'DATE', 'Final delivery date', '{"topic":"general_info"}');
+INSERT INTO proposal_questions VALUES ('final_delivery_date_motivation', 'LARGE_TEXT', 'Please motivate the chosen date', '{"small_label":"(e.g. based on awarded beamtime, or described intention to apply)","topic":"general_info"}');
 /* TODO add more questions */
 
 INSERT INTO proposal_question_dependencies VALUES ('links_with_industry', 'has_links_with_industry', '{ "ifValue": "yes" }');

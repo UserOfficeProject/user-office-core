@@ -27,8 +27,10 @@ export class ProposalTemplateField {
 }
   
 export class FieldDependency {
+  
   constructor(
-    public dependsOnField:string,
+    public proposal_question_id:string,
+    public proposal_question_dependency:string,
     public conditions:string,
   ) {}
 }

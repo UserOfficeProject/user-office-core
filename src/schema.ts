@@ -135,7 +135,8 @@ type ProposalTemplateField {
 }
   
 type FieldDependency {
-    dependsOnField: String,
+    proposal_question_dependency: String,
+    proposal_question_id: String,
     conditions: String,
 }
 
