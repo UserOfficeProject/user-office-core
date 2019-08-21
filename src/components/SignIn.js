@@ -56,25 +56,7 @@ export default function SignInSide() {
     const { username, password } = values;
     const query = `
     mutation($username: String!, $password: String!){
-      login(username: $username, password: $password){
-        user{
-          id
-          firstname
-          lastname
-          username
-          proposals{
-            id
-            abstract
-            title
-          }
-          roles{
-            id
-            title
-            shortCode
-          }
-        }
-        token
-      }
+      login(username: $username, password: $password)
     }
     `;
 
@@ -85,7 +67,7 @@ export default function SignInSide() {
 
     request("/graphql", query, variables)
       .then(data => {
-        if (data.login.token) {
+        if (data.login) {
           handleLogin(data.login);
         } else {
           setFailed(true);
