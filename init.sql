@@ -91,7 +91,7 @@ CREATE TABLE proposal_answers (
 CREATE TABLE proposal_question_dependencies (
   proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
 , proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
-, conditions                    VARCHAR(64) DEFAULT NULL
+, condition                     VARCHAR(64) DEFAULT NULL
 , PRIMARY KEY (proposal_question_id, proposal_question_dependency)
 );
 
@@ -222,4 +222,4 @@ INSERT INTO proposal_questions VALUES ('final_delivery_date', 'DATE', 'Final del
 INSERT INTO proposal_questions VALUES ('final_delivery_date_motivation', 'LARGE_TEXT', 'Please motivate the chosen date', '{"small_label":"(e.g. based on awarded beamtime, or described intention to apply)","topic":"general_info"}');
 /* TODO add more questions */
 
-INSERT INTO proposal_question_dependencies VALUES ('links_with_industry', 'has_links_with_industry', '{ "ifValue": "yes" }');
+INSERT INTO proposal_question_dependencies VALUES ('links_with_industry', 'has_links_with_industry', '{ "condition": "equals", "params":"yes" }');

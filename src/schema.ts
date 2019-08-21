@@ -137,7 +137,7 @@ type ProposalTemplateField {
 type FieldDependency {
     proposal_question_dependency: String,
     proposal_question_id: String,
-    conditions: String,
+    condition: String,
 }
 
 `);
