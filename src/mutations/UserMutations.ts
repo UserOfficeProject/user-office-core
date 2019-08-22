@@ -3,6 +3,7 @@ import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
+const config = require("./../../config");
 
 export default class UserMutations {
   constructor(private dataSource: UserDataSource, private userAuth: any) {}
@@ -10,7 +11,7 @@ export default class UserMutations {
   async create(
     user_title: string,
     firstname: string,
-    middlename:string,
+    middlename: string,
     lastname: string,
     username: string,
     password: string,
@@ -117,13 +118,13 @@ export default class UserMutations {
   async login(
     username: string,
     password: string
-  ): Promise<{ token: string; user: User } | Rejection> {
+  ): Promise<{ token: string } | Rejection> {
     const user = await this.dataSource.getByUsername(username);
 
     if (!user) {
       return rejection("INTERNAL_ERROR");
     }
-
+    const roles = await this.dataSource.getUserRoles(user.id);
     const result = await this.dataSource.getPasswordByUsername(username);
 
     if (!result) {
@@ -135,16 +136,26 @@ export default class UserMutations {
     if (!valid) {
       return rejection("WRONG_PASSWORD");
     }
+    const token = jsonwebtoken.sign({ user, roles }, config.secret, {
+      expiresIn: config.tokenLife
+    });
 
-    return {
-      token: jsonwebtoken.sign(
+    return token;
+  }
+
+  async token(token: string): Promise<{ token: string } | Rejection> {
+    try {
+      const decoded = jsonwebtoken.verify(token, config.secret);
+      const freshToken = jsonwebtoken.sign(
+        { user: decoded.user, roles: decoded.roles },
+        config.secret,
         {
-          id: user.id
-        },
-        "somesuperdupersecret",
-        { expiresIn: "1y" }
-      ),
-      user
-    };
+          expiresIn: config.tokenLife
+        }
+      );
+      return freshToken;
+    } catch (error) {
+      return rejection("BAD_TOKEN");
+    }
   }
 }

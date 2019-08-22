@@ -40,17 +40,13 @@ type Query {
     error: String
   }
 
-  type LoginMutationResult {
-    user: User
-    token: String
-  }
-
   type Mutation {
     createProposal: ProposalMutationResult
     updateProposal(id: ID!, title: String, abstract: String, status: Int, users: [Int]): ProposalMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
+    token(token: String!): String
     createUser(
         user_title: String, 
         firstname: String!, 
@@ -73,14 +69,11 @@ type Query {
         ): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
-    login(username: String!, password: String!): LoginMutationResult
+    login(username: String!, password: String!): String
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
     removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }
-
-""" We can use node interfaces for the types so ESS and Max IV can have different types """
-
 
 type Roles {
   id: Int
@@ -121,23 +114,5 @@ type Review {
   status: Int
 }
 
-
-type ProposalTemplate {
-    fields:[ProposalTemplateField]
-}
-  
-type ProposalTemplateField {
-    proposal_question_id: String,
-    data_type: String,
-    question: String,
-    config: String,
-    dependencies: [FieldDependency]
-}
-  
-type FieldDependency {
-    proposal_question_dependency: String,
-    proposal_question_id: String,
-    condition: String,
-}
 
 `);
