@@ -1,6 +1,8 @@
 import React from "react";
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
+import ResetPassword from "./ResetPassword";
+import ResetPasswordEmail from "./ResetPasswordEmail";
 import RoleSelectionPage from "./RoleSelectionPage";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -37,6 +39,8 @@ function App() {
           <Switch>
             <Route path="/SignUp" component={SignUp} />
             <Route path="/SignIn" component={SignIn} />
+            <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
+            <Route path="/ResetPassword/:token" component={ResetPassword} />
             <Route
               path="/LogOut"
               render={() => (
