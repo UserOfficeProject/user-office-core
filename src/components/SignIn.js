@@ -4,7 +4,6 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { TextField } from "formik-material-ui";
 import { Link } from "react-router-dom";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
@@ -13,25 +12,10 @@ import { Redirect } from "react-router-dom";
 import { request } from "graphql-request";
 import { UserContext } from "../context/UserContextProvider";
 import { Formik, Field, Form } from "formik";
+import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    height: "100vh"
-  },
-  image: {
-    backgroundImage:
-      "url(https://lh3.googleusercontent.com/-M6eItc6QC1k/XS8Gew8sG8I/AAAAAAAANmo/_7-Tnmk8jKU6CSwcrB32-UAM0PnQMLMDQCK8BGAs/s0/2019-07-17.png)",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "cover",
-    backgroundPosition: "center"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
-  },
   avatar: {
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main
@@ -45,6 +29,12 @@ const useStyles = makeStyles(theme => ({
   },
   errorMessage: {
     color: "red"
+  },
+  paper: {
+    margin: theme.spacing(8, 4),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
   }
 }));
 
@@ -52,6 +42,7 @@ export default function SignInSide() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
   const { handleLogin, token } = useContext(UserContext);
+
   const requestToken = values => {
     const { username, password } = values;
     const query = `
@@ -81,77 +72,72 @@ export default function SignInSide() {
   }
 
   return (
-    <Grid container component="main" className={classes.root}>
-      <CssBaseline />
-      <Grid item xs={false} sm={4} md={7} className={classes.image} />
-      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-        <div className={classes.paper}>
-          <Formik
-            initialValues={{ username: "", password: "" }}
-            onSubmit={async (values, actions) => {
-              await requestToken(values);
-              actions.setSubmitting(false);
-            }}
-            validationSchema={Yup.object().shape({
-              username: Yup.string()
-                .min(2, "Username must be at least 2 characters")
-                .max(20, "Username must be at most 20 characters")
-                .required("Username must be at least 2 characters"),
-              password: Yup.string()
-                .min(8, "Password must be at least 8 characters")
-                .max(25, "Password must be at most 25 characters")
-                .required("Password must be at least 8 characters")
-            })}
-          >
-            <Form>
-              <CssBaseline />
-              <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                  <LockOutlinedIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                  Sign in
-                </Typography>
-                <Field
-                  name="username"
-                  label="Username"
-                  type="text"
-                  component={TextField}
-                  margin="normal"
-                  fullWidth
-                />
-                <Field
-                  name="password"
-                  label="Password"
-                  type="password"
-                  component={TextField}
-                  margin="normal"
-                  fullWidth
-                />
-                {failedLogin && (
-                  <p className={classes.errorMessage}>Wrong Credentials</p>
-                )}
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  Sign In
-                </Button>
-                <Grid container>
-                  <Grid item>
-                    <Link to="/SignUp/">
-                      {"Don't have an account? Sign Up"}
-                    </Link>
-                  </Grid>
-                </Grid>
-              </div>
-            </Form>
-          </Formik>
-        </div>
-      </Grid>
-    </Grid>
+    <PhotoInSide>
+      <Formik
+        initialValues={{ username: "", password: "" }}
+        onSubmit={async (values, actions) => {
+          await requestToken(values);
+          actions.setSubmitting(false);
+        }}
+        validationSchema={Yup.object().shape({
+          username: Yup.string()
+            .min(2, "Username must be at least 2 characters")
+            .max(20, "Username must be at most 20 characters")
+            .required("Username must be at least 2 characters"),
+          password: Yup.string()
+            .min(8, "Password must be at least 8 characters")
+            .max(25, "Password must be at most 25 characters")
+            .required("Password must be at least 8 characters")
+        })}
+      >
+        <Form className={classes.form}>
+          <CssBaseline />
+          <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5">
+              Sign in
+            </Typography>
+            <Field
+              name="username"
+              label="Username"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="password"
+              label="Password"
+              type="password"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            {failedLogin && (
+              <p className={classes.errorMessage}>Wrong Credentials</p>
+            )}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Sign In
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link to="/ResetPasswordEmail/">Forgot password?</Link>
+              </Grid>
+              <Grid item>
+                <Link to="/SignUp/">Don't have an account? Sign Up</Link>
+              </Grid>
+            </Grid>
+          </div>
+        </Form>
+      </Formik>
+    </PhotoInSide>
   );
 }
