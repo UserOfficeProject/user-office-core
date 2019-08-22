@@ -37,6 +37,12 @@ export default function createHandler(userDataSource: UserDataSource) {
 
         return;
       }
+
+      case "PASSWORD_RESET_EMAIL": {
+        console.log("Send Password Reset email");
+
+        return;
+      }
     }
   };
 }
