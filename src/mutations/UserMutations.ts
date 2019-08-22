@@ -1,12 +1,28 @@
 import { User } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
+import { EventBus } from "../events/eventBus";
+import { ApplicationEvent } from "../events/applicationEvents";
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 const config = require("./../../config");
 
 export default class UserMutations {
-  constructor(private dataSource: UserDataSource, private userAuth: any) {}
+  constructor(
+    private dataSource: UserDataSource,
+    private userAuth: any,
+    private eventBus: EventBus<ApplicationEvent>
+  ) {}
+
+  createPasswordHash(password: string): string {
+    //Check that password follows rules
+
+    //Setting fixed salt for development
+    //const salt = bcrypt.genSaltSync(10);
+    const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+    const hash = bcrypt.hashSync(password, salt);
+    return hash;
+  }
 
   async create(
     user_title: string,
@@ -36,10 +52,7 @@ export default class UserMutations {
       return rejection("INVALID_LAST_NAME");
     }
 
-    //Setting fixed salt for development
-    //const salt = bcrypt.genSaltSync(10);
-    const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
-    const hash = bcrypt.hashSync(password, salt);
+    const hash = this.createPasswordHash(password);
 
     const result = await this.dataSource.create(
       user_title,
@@ -156,6 +169,56 @@ export default class UserMutations {
       return freshToken;
     } catch (error) {
       return rejection("BAD_TOKEN");
+    }
+  }
+
+  async resetPasswordEmail(
+    email: String
+  ): Promise<{ user: User; link: string } | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        const user = await this.dataSource.getByEmail(email);
+
+        if (!user) {
+          return rejection("COULD_NOT_FIND_USER_BY_EMAIL");
+        }
+
+        const token = jsonwebtoken.sign(
+          {
+            id: user.id,
+            updated: user.updated
+          },
+          config.secret,
+          { expiresIn: "24h" }
+        );
+
+        const link = config.baseURL + "/resetPassword/" + token;
+
+        // Send reset email with link
+        return { user, link };
+      },
+      res => {
+        return { type: "PASSWORD_RESET_EMAIL", user: res.user, link: res.link };
+      }
+    );
+  }
+
+  async resetPassword(token: string, password: string): Promise<Boolean> {
+    // Check that token is valid
+
+    try {
+      const hash = this.createPasswordHash(password);
+      const decoded = jsonwebtoken.verify(token, config.secret);
+      const user = await this.dataSource.get(decoded.id);
+
+      //Check that user exist and that it has not been updated since token creation
+      if (user && user.updated === decoded.updated) {
+        return this.dataSource.setUserPassword(user.id, hash);
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
     }
   }
 }

@@ -33,7 +33,11 @@ const eventHandlers = createEventHandlers(userDataSource);
 const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
 
 const userQueries = new UserQueries(userDataSource, userAuthorization);
-const userMutations = new UserMutations(userDataSource, userAuthorization);
+const userMutations = new UserMutations(
+  userDataSource,
+  userAuthorization,
+  eventBus
+);
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
   userAuthorization
