@@ -115,4 +115,22 @@ type Review {
 }
 
 
+type ProposalTemplate {
+    fields:[ProposalTemplateField]
+}
+  
+type ProposalTemplateField {
+    proposal_question_id: String,
+    data_type: String,
+    question: String,
+    config: String,
+    dependencies: [FieldDependency]
+}
+  
+type FieldDependency {
+    proposal_question_dependency: String,
+    proposal_question_id: String,
+    condition: String,
+}
+
 `);
