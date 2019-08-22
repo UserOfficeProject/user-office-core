@@ -128,10 +128,7 @@ export default class UserMutations {
 
     return result || rejection("INTERNAL_ERROR");
   }
-  async login(
-    username: string,
-    password: string
-  ): Promise<{ token: string } | Rejection> {
+  async login(username: string, password: string): Promise<string | Rejection> {
     const user = await this.dataSource.getByUsername(username);
 
     if (!user) {

@@ -9,18 +9,18 @@ export const dummyUserOfficer = new User(
   "Smith",
   "Doe",
   "JoDo",
-  'Hailey',
-  '683142616',
-  'male',
-  'United Kingdom',
-  '1990-01-25',
-  'Johnston, Hammes and Keeling',
-  'IT department',
-  'Vietnam, Consueloburgh, 4788 Frederik Parkways',
-  'Producer',
-  'Dorris83@gmail.com',
-  '(012) 325-1151',
-  '1-316-182-3694',
+  "Hailey",
+  "683142616",
+  "male",
+  "United Kingdom",
+  "1990-01-25",
+  "Johnston, Hammes and Keeling",
+  "IT department",
+  "Vietnam, Consueloburgh, 4788 Frederik Parkways",
+  "Producer",
+  "Dorris83@gmail.com",
+  "(012) 325-1151",
+  "1-316-182-3694",
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
@@ -31,18 +31,18 @@ export const dummyUser = new User(
   null,
   "Doe",
   "JaDa",
-  'Meta',
-  '568567353',
-  'male',
-  'Pitcairn Islands',
-  '1981-05-04',
-  'Anderson LLC',
-  'IT department',
-  'Sudan, North Catalina, 7486 Schimmel Pine',
-  'Architect',
-  'Cleve30@yahoo.com',
-  '045-272-7984 x34539',
-  '028-065-8228 x08367',
+  "Meta",
+  "568567353",
+  "male",
+  "Pitcairn Islands",
+  "1981-05-04",
+  "Anderson LLC",
+  "IT department",
+  "Sudan, North Catalina, 7486 Schimmel Pine",
+  "Architect",
+  "Cleve30@yahoo.com",
+  "045-272-7984 x34539",
+  "028-065-8228 x08367",
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
@@ -54,23 +54,33 @@ export const dummyUserNotOnProposal = new User(
   null,
   "Doe",
   "NoDO",
-  'Damion',
-  '182082741',
-  'female',
-  'Zambia',
-  '1991-11-08',
-  'Ritchie - Balistreri',
-  'IT department',
-  'Andorra, Strackeview, 81436 Summer Mill',
-  'Facilitator',
-  'Tyrique41@hotmail.com',
-  '1-272-760-1466 x03877',
-  '174-603-1024',
+  "Damion",
+  "182082741",
+  "female",
+  "Zambia",
+  "1991-11-08",
+  "Ritchie - Balistreri",
+  "IT department",
+  "Andorra, Strackeview, 81436 Summer Mill",
+  "Facilitator",
+  "Tyrique41@hotmail.com",
+  "1-272-760-1466 x03877",
+  "174-603-1024",
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
 
 export class userDataSource implements UserDataSource {
+  async setUserPassword(id: number, password: string): Promise<Boolean> {
+    return true;
+  }
+  async getByEmail(email: String): Promise<User | null> {
+    if (dummyUser.email === email) {
+      return dummyUser;
+    } else {
+      return null;
+    }
+  }
   async addUserForReview(
     userID: number,
     proposalID: number
@@ -81,7 +91,7 @@ export class userDataSource implements UserDataSource {
     return dummyUser;
   }
   async getPasswordByUsername(username: string): Promise<string | null> {
-    return "Test1234!";
+    return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
   async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
     return true;
