@@ -50,7 +50,7 @@ export class ProposalTemplateField {
   public data_type!: DataType;
   public question!: string;
   public config!: any | { topic: string };
-  public value: any = "c";
+  public value: any = "";
   public dependencies!: FieldDependency[] | null;
 
   constructor(obj: object | null = null) {
