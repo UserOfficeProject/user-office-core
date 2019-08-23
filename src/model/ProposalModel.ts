@@ -18,9 +18,9 @@ export class ProposalTemplate {
   private conditionEvalator = new ConditionEvaluator();
 
   constructor(obj: object | null = null) {
-    if (obj != null) {
+    if (obj !== null) {
       Object.assign(this, obj);
-      if (this.fields != null) {
+      if (this.fields !== null) {
         this.fields = this.fields.map(x => new ProposalTemplateField(x));
       }
     }
@@ -30,11 +30,11 @@ export class ProposalTemplate {
     let isAtLeastOneDissasisfied = this.getFieldById(
       fieldId
     ).dependencies!.some(dep => !this.isDependencySatisfied(dep));
-    return isAtLeastOneDissasisfied == false;
+    return isAtLeastOneDissasisfied === false;
   }
 
   public getFieldById = (questionId: string) =>
-    this.fields.find(field => field.proposal_question_id == questionId)!;
+    this.fields.find(field => field.proposal_question_id === questionId)!;
 
   private isDependencySatisfied(dependency: FieldDependency): boolean {
     let { condition, params } = JSON.parse(dependency.condition);
@@ -49,8 +49,8 @@ export class ProposalTemplateField {
   public proposal_question_id!: string;
   public data_type!: DataType;
   public question!: string;
-  public config!: { topic: string };
-  public value: any = "";
+  public config!: any | { topic: string };
+  public value: any = "c";
   public dependencies!: FieldDependency[] | null;
 
   constructor(obj: object | null = null) {

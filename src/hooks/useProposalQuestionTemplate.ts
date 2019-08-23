@@ -37,7 +37,7 @@ export function useProposalQuestionTemplate() {
       });
     };
     getProposalTemplateRequest();
-  }, []); // passing empty array as a second param so that effect is called only once on mount
+  }, [sendRequest]); // passing empty array as a second param so that effect is called only once on mount
 
   return { loading, proposalQuestionModel };
 }
