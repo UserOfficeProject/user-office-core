@@ -1,14 +1,16 @@
 import React from "react";
+import * as Yup from "yup"
+import { Formik, Form } from "formik";
 import { ProposalTemplate, Proposal } from "../model/ProposalModel";
 import { Button } from "@material-ui/core";
-import { ComponentFactory } from "./ProposalComponents";
+import { ComponentFactory, createFormikCofigObjects } from "./ProposalComponents";
 
 export default class ProposalQuestionareStep extends React.Component<{ model: ProposalTemplate; next: Function; back: Function; data: Proposal; topic: string;}> 
 {
   private componentFactory: ComponentFactory = new ComponentFactory();
 
   onInputUpdated() {
-    this.setState({});
+    this.setState({}); // re-render
   }
 
   render() {
@@ -18,26 +20,45 @@ export default class ProposalQuestionareStep extends React.Component<{ model: Pr
       return <div>loading...</div>;
     }
 
-    let components = (model! as ProposalTemplate).fields.map(field => {
-      if (field.config.topic == topic && model.areDependenciesSatisfied(field.proposal_question_id)) {
-        return this.componentFactory.createComponent(field, {
-          onComplete: this.onInputUpdated.bind(this)
-        });
-      }
-      return null; // field does not beling to topic or, according to dependecies, ut should not be displayed
+    let activeFields = (model! as ProposalTemplate).fields.filter(field => {
+      return (
+        field.config.topic === topic &&
+        model.areDependenciesSatisfied(field.proposal_question_id)
+      );
     });
 
     let backbutton = back ? <Button onClick={() => back()}>Back</Button> : null;
-    let nextButton = next ? <Button variant="contained" color="primary" onClick={() => next()}>Next</Button> : null;
+    let nextButton = next ? <Button type="submit" variant="contained" color="primary" onClick={() => { next(); }} > Next </Button> : null;
+
+    let { initialValues, validationSchema } = createFormikCofigObjects(
+      activeFields
+    );
 
     return (
-      <div>
-        {components}
-        <div>
-          {backbutton}
-          {nextButton}
-        </div>
-      </div>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={() => {}}
+        validationSchema={Yup.object().shape(validationSchema)}
+      >
+        {({ errors, touched, handleChange, isSubmitting }) => (
+          <Form>
+            <div>
+              {activeFields.map(field => {
+                return this.componentFactory.createComponent(field, {
+                  onComplete: this.onInputUpdated.bind(this), // for re-rendering when input changes
+                  touched: touched, // for formik
+                  errors: errors,  // for formik
+                  handleChange: handleChange // for formik
+                });
+              })}
+              <div>
+                {backbutton}
+                {nextButton}
+              </div>
+            </div>
+          </Form>
+        )}
+      </Formik>
     );
   }
 }
