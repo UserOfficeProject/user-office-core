@@ -11,6 +11,7 @@ import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import { useDataAPI } from "../hooks/useDataAPI";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
+import ProposalInformation from "./ProposalInformation";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -29,7 +30,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ProposalContainer(props) {
-  const steps = ["Information", "Crystallization", "Biological deuteration", "Chemical deuteration", "Participants", "Review"];
+  const steps = ["New proposal", "Information", "Crystallization", "Biological deuteration", "Chemical deuteration", "Participants", "Review"];
   const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -55,6 +56,8 @@ export default function ProposalContainer(props) {
     return sendRequest(query, variables).then(data => setSubmitted(true));
   };
 
+  
+
   const handleNext = data => {
     setProposalData({
       ...proposalData,
@@ -76,6 +79,10 @@ export default function ProposalContainer(props) {
     switch (step) {
       case 0:
         return (
+        <ProposalInformation data={proposalData} next={handleNext} />
+        );
+      case 1:
+        return (
           <ProposalQuestionareStep
             data={proposalData}
             next={handleNext}
@@ -83,7 +90,7 @@ export default function ProposalContainer(props) {
             topic="general-information"
           />
         );
-      case 1:
+      case 2:
         return (
           <ProposalQuestionareStep
             data={proposalData}
@@ -93,7 +100,7 @@ export default function ProposalContainer(props) {
             topic="crystallization"
           />
         );
-      case 2:
+      case 3:
         return (
           <ProposalQuestionareStep
             data={proposalData}
@@ -104,7 +111,7 @@ export default function ProposalContainer(props) {
           />
         );
 
-      case 3:
+      case 4:
         return (
           <ProposalQuestionareStep
             data={proposalData}
@@ -114,7 +121,7 @@ export default function ProposalContainer(props) {
             topic="chemical-deuteration"
           />
         );
-      case 4:
+      case 5:
         return (
           <ProposalParticipants
             data={proposalData}
@@ -122,7 +129,7 @@ export default function ProposalContainer(props) {
             back={handleBack}
           />
         );
-      case 5:
+      case 6:
         return (
           <ProposalReview
             data={proposalData}
