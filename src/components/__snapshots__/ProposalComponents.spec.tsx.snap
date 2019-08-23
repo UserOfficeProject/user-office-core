@@ -10,9 +10,9 @@ exports[`Textfield rendered without crashing 1`] = `
     <label
       className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
       data-shrink={false}
-      htmlFor="standard-name"
+      htmlFor="links_with_industry"
     >
-      general_info
+      Please specify
     </label>
     <div
       className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-fullWidth MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
@@ -22,7 +22,8 @@ exports[`Textfield rendered without crashing 1`] = `
         aria-invalid={false}
         className="MuiInputBase-input MuiInput-input"
         disabled={false}
-        id="standard-name"
+        id="links_with_industry"
+        name="links_with_industry"
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
@@ -32,5 +33,6 @@ exports[`Textfield rendered without crashing 1`] = `
       />
     </div>
   </div>
+  <span />
 </div>
 `;

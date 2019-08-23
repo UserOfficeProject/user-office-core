@@ -9,7 +9,11 @@ test('Textfield rendered without crashing', () => {
   const renderer = ReactTestRenderer.create(
     <ProposalComponentTextInput
     templateField={template.getFieldById('links_with_industry')}
-    onComplete={() => {}} />
+    onComplete={() => {}} 
+    handleChange={() => {}}
+    errors={{}}
+    touched={{}}
+    />
   );
 
   let tree = renderer.toJSON();
