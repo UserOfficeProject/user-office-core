@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -8,9 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import { Redirect } from "react-router-dom";
 import { request } from "graphql-request";
-import { UserContext } from "../context/UserContextProvider";
 import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
@@ -27,7 +25,10 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2)
   },
-  errorMessage: {
+  sentMessageSuccess: {
+    color: "green"
+  },
+  sentMessageError: {
     color: "red"
   },
   paper: {
@@ -38,56 +39,37 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SignInSide() {
+export default function ResetPasswordEmail() {
   const classes = useStyles();
-  const [failedLogin, setFailed] = useState(false);
-  const { handleLogin, token } = useContext(UserContext);
-
-  const requestToken = values => {
-    const { username, password } = values;
+  const [emailSuccess, setSuccess] = useState(null);
+  const requestResetEmail = values => {
+    const { email } = values;
     const query = `
-    mutation($username: String!, $password: String!){
-      login(username: $username, password: $password)
+    mutation($email: String!){
+      resetPasswordEmail(email: $email)
     }
     `;
-
     const variables = {
-      username,
-      password
+      email
     };
 
-    request("/graphql", query, variables)
-      .then(data => {
-        if (data.login) {
-          handleLogin(data.login);
-        } else {
-          setFailed(true);
-        }
-      })
-      .catch(error => setFailed(true));
+    request("/graphql", query, variables).then(data =>
+      setSuccess(data.resetPasswordEmail)
+    );
   };
-
-  if (token) {
-    return <Redirect to="/" />;
-  }
 
   return (
     <PhotoInSide>
       <Formik
         initialValues={{ username: "", password: "" }}
         onSubmit={async (values, actions) => {
-          await requestToken(values);
+          await requestResetEmail(values);
           actions.setSubmitting(false);
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string()
-            .min(2, "Username must be at least 2 characters")
-            .max(20, "Username must be at most 20 characters")
-            .required("Username must be at least 2 characters"),
-          password: Yup.string()
-            .min(8, "Password must be at least 8 characters")
-            .max(25, "Password must be at most 25 characters")
-            .required("Password must be at least 8 characters")
+          email: Yup.string()
+            .email("Please enter a valid email")
+            .required("Please enter an email")
         })}
       >
         <Form className={classes.form}>
@@ -97,27 +79,27 @@ export default function SignInSide() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Reset Password
             </Typography>
             <Field
-              name="username"
-              label="Username"
-              type="text"
+              name="email"
+              label="Email"
+              type="email"
               component={TextField}
               margin="normal"
               fullWidth
             />
-            <Field
-              name="password"
-              label="Password"
-              type="password"
-              component={TextField}
-              margin="normal"
-              fullWidth
-            />
-            {failedLogin && (
-              <p className={classes.errorMessage}>Wrong Credentials</p>
-            )}
+            {console.log(emailSuccess)}
+            {emailSuccess !== null &&
+              (emailSuccess ? (
+                <p className={classes.sentMessageSuccess}>
+                  A mail has been sent to the provided email.
+                </p>
+              ) : (
+                <p className={classes.sentMessageError}>
+                  No account found for this email address.
+                </p>
+              ))}
             <Button
               type="submit"
               fullWidth
@@ -125,14 +107,11 @@ export default function SignInSide() {
               color="primary"
               className={classes.submit}
             >
-              Sign In
+              Send Email
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link to="/ResetPasswordEmail/">Forgot password?</Link>
-              </Grid>
               <Grid item>
-                <Link to="/SignUp/">Don't have an account? Sign Up</Link>
+                <Link to="/SignIn/">Have an account? Sign In</Link>
               </Grid>
             </Grid>
           </div>

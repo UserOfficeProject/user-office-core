@@ -13,9 +13,9 @@ import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import { Redirect } from "react-router-dom";
-import FormikDropdown from './FormikDropdown';
-import nationalities from '../model/nationalities';
-import dateformat from 'dateformat';
+import FormikDropdown from "./FormikDropdown";
+import nationalities from "../model/nationalities";
+import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
@@ -32,12 +32,12 @@ const useStyles = makeStyles(theme => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    marginLeft: "auto",
+    marginRight: "auto",
     backgroundColor: theme.palette.secondary.main
   },
   heading: {
-    textAlign:'center'
+    textAlign: "center"
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -50,18 +50,20 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0 12px'
+    fontSize: "18px",
+    padding: "22px 0 0 12px"
   },
   card: {
-    margin: '30px 0'
+    margin: "30px 0"
   }
 }));
 
 export default function SignUp() {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
-  const nationalitiesList = nationalities.NATIONALITIES.map(nationality => { return { text: nationality, value: nationality } });
+  const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
+    return { text: nationality, value: nationality };
+  });
 
   const sendSignUpRequest = values => {
     const query = `mutation(
@@ -133,7 +135,10 @@ export default function SignUp() {
           orcid: "",
           gender: "",
           nationality: "",
-          birthdate: dateformat(new Date().setFullYear(new Date().getFullYear() - 30), 'yyyy-mm-dd'),
+          birthdate: dateformat(
+            new Date().setFullYear(new Date().getFullYear() - 30),
+            "yyyy-mm-dd"
+          ),
           organisation: "",
           department: "",
           organisation_address: "",
@@ -142,12 +147,10 @@ export default function SignUp() {
           telephone: "",
           telephone_alt: ""
         }}
-
         onSubmit={async (values, actions) => {
           await sendSignUpRequest(values);
           actions.setSubmitting(false);
         }}
-
         validationSchema={Yup.object().shape({
           firstname: Yup.string()
             .min(2, "firstname must be at least 2 characters")
@@ -168,10 +171,8 @@ export default function SignUp() {
           orcid: Yup.string()
             .min(8, "ORCID must be at least 8 characters")
             .required("ORCID must be at least 8 characters"),
-          gender: Yup.string()
-            .required("please specify your gender"),
-          nationality: Yup.string()
-            .required("please specify your nationality"),
+          gender: Yup.string().required("please specify your gender"),
+          nationality: Yup.string().required("please specify your nationality"),
           birthdate: Yup.date()
             .max(new Date())
             .required("Please specify your birth date"),
@@ -191,84 +192,217 @@ export default function SignUp() {
             .min(2, "position must be at least 2 characters")
             .max(30, "position must be at most 30 characters")
             .required("position must be at least 2 characters"),
-          email: Yup.string().email("email is in correct format")
+          email: Yup.string()
+            .email("email is in correct format")
             .required("please specify email"),
           telephone: Yup.string()
             .min(2, "telephone must be at least 2 characters")
             .max(20, "telephone must be at most 20 characters")
             .required("telephone must be at least 2 characters"),
           telephone_alt: Yup.string()
-              .min(2, "telephone must be at least 2 characters")
-              .max(20, "telephone must be at most 20 characters")
+            .min(2, "telephone must be at least 2 characters")
+            .max(20, "telephone must be at most 20 characters")
         })}
       >
-        
         <Form>
           <CssBaseline />
-            <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
-            </Avatar>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
 
-            <Typography component="h1" variant="h5" className={classes.heading}>Sign Up</Typography>
-
-            <Card className={classes.card}>
-          <Typography className={classes.cardHeader}>Login details</Typography>
-            <CardContent>
-                <Field name="username" label="Username" type="text" component={TextField} margin="normal" fullWidth autoComplete="off" />
-                <Field name="password" label="Password" type="password" component={TextField} margin="normal" fullWidth autoComplete="off"/>
-            </CardContent>
-            </Card>
+          <Typography component="h1" variant="h5" className={classes.heading}>
+            Sign Up
+          </Typography>
 
           <Card className={classes.card}>
-          <Typography className={classes.cardHeader}>Personal details</Typography>
+            <Typography className={classes.cardHeader}>
+              Login details
+            </Typography>
             <CardContent>
-                <FormikDropdown name="user_title" label="Title" items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }, { text: "Rather not say", value: "unspecified" }]}   />
-                <Field name="firstname" label="Firstname" type="text" component={TextField} margin="normal" fullWidth/>
-                <Field name="middlename" label="Middle name" type="text" component={TextField} margin="normal" fullWidth/>
-                <Field name="lastname" label="Lastname" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="preferredname" label="Preferred name" type="text" component={TextField} margin="normal" fullWidth />
-                <FormikDropdown name="gender" label="Gender" items={[{ text: "Female", value: "female" }, { text: "Male", value: "male" }, { text: "Rather not say", value: "unspecified" }]}   />
-                <FormikDropdown name="nationality" label="Nationality" items={nationalitiesList}   />
-                <Field name="birthdate" label="Birthdate" type="date" component={TextField} margin="normal" fullWidth />
+              <Field
+                name="username"
+                label="Username"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+                autoComplete="off"
+              />
+              <Field
+                name="password"
+                label="Password"
+                type="password"
+                component={TextField}
+                margin="normal"
+                fullWidth
+                autoComplete="off"
+              />
             </CardContent>
-            </Card>
+          </Card>
 
-            <Card className={classes.card}>
-            <Typography className={classes.cardHeader}>Organization details</Typography>
+          <Card className={classes.card}>
+            <Typography className={classes.cardHeader}>
+              Personal details
+            </Typography>
+            <CardContent>
+              <Field
+                name="firstname"
+                label="Firstname"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="middlename"
+                label="Middle name"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="lastname"
+                label="Lastname"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="preferredname"
+                label="Preferred name"
+                type="text"
+                component={TextField}
+                margin="normal"
+                fullWidth
+              />
+              <FormikDropdown
+                name="gender"
+                label="Gender"
+                items={[
+                  { text: "Female", value: "female" },
+                  { text: "Male", value: "male" },
+                  { text: "Rather not say", value: "unspecified" }
+                ]}
+              />
+              <FormikDropdown
+                name="nationality"
+                label="Nationality"
+                items={nationalitiesList}
+              />
+              <Field
+                name="birthdate"
+                label="Birthdate"
+                type="date"
+                component={TextField}
+                margin="normal"
+                fullWidth
+              />
+            </CardContent>
+          </Card>
+
+          <Card className={classes.card}>
+            <Typography className={classes.cardHeader}>
+              Organization details
+            </Typography>
             <CardContent>
               <Grid container spacing={1}>
-                <Field name="orcid" label="ORCID" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="organisation" label="Organisation" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="department" label="Department" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="organisation_address" label="Organization address" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="position" label="Position" type="text" component={TextField} margin="normal" fullWidth />
+                <Field
+                  name="orcid"
+                  label="ORCID"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="organisation"
+                  label="Organisation"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="department"
+                  label="Department"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="organisation_address"
+                  label="Organization address"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="position"
+                  label="Position"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
               </Grid>
             </CardContent>
           </Card>
 
-            <Card className={classes.card}>
-            <Typography className={classes.cardHeader}>Contact details</Typography>
+          <Card className={classes.card}>
+            <Typography className={classes.cardHeader}>
+              Contact details
+            </Typography>
             <CardContent>
               <Grid container spacing={1}>
-                <Field name="email" label="E-mail" type="email" component={TextField} margin="normal" fullWidth />
-                <Field name="telephone" label="Telephone" type="text" component={TextField} margin="normal" fullWidth />
-                <Field name="telephone_alt" label="Telephone Alt." type="text" component={TextField} margin="normal" fullWidth />
-                </Grid>
-                </CardContent>
-            </Card>
-
-            <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} >Sign Up</Button>
-
-            <Grid container>
-              <Grid item>
-                <Link to="/SignIn/">{"Have an account? Sign In"}</Link>
+                <Field
+                  name="email"
+                  label="E-mail"
+                  type="email"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="telephone"
+                  label="Telephone"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
+                <Field
+                  name="telephone_alt"
+                  label="Telephone Alt."
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                />
               </Grid>
+            </CardContent>
+          </Card>
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            Sign Up
+          </Button>
+
+          <Grid container>
+            <Grid item>
+              <Link to="/SignIn/">Have an account? Sign In</Link>
             </Grid>
+          </Grid>
         </Form>
       </Formik>
     </Container>
   );
-
-  
-
 }
