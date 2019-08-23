@@ -36,8 +36,8 @@ export interface UserRecord {
   readonly email: string;
   readonly telephone: string;
   readonly telephone_alt: string;
-  readonly created_at: string;
-  readonly updated_at: string;
+  readonly created_at: Date;
+  readonly updated_at: Date;
   readonly full_count: number;
 }
 

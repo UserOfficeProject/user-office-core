@@ -68,6 +68,8 @@ type Query {
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
     removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
+    resetPasswordEmail(email: String!): Boolean
+    resetPassword(token: String!, password: String!): Boolean
   }
 
 type Roles {
@@ -98,6 +100,7 @@ type User {
     created: String
     updated: String
     reviews: [Review]
+    email: String
 }
 
 type Review {

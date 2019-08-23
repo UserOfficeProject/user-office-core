@@ -78,9 +78,24 @@ CREATE TABLE role_user (
 );
 
 
+CREATE TABLE reviews (
+  review_id serial 
+, user_id int REFERENCES users (user_id) ON UPDATE CASCADE
+, proposal_id int REFERENCES proposals (proposal_id) ON UPDATE CASCADE
+, comment    varchar(500)
+, grade      int
+, status      int
+, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+, CONSTRAINT prop_user_pkey PRIMARY KEY (proposal_id, user_id)  -- explicit pk
+);
+
+
 INSERT INTO roles (short_code, title) VALUES ('user', 'User');
 
 INSERT INTO roles (short_code, title) VALUES ('user_officer', 'User Officer');
+
+INSERT INTO roles (short_code, title) VALUES ('reviewer', 'Reviewer');
 
 INSERT INTO users (
                   user_title, 
@@ -168,6 +183,48 @@ VALUES (
                 '1-359-864-3489 x7390'
                 );
 
-INSERT INTO role_user (role_id, user_id) VALUES (1, 2);
-
 INSERT INTO role_user (role_id, user_id) VALUES (2, 2);
+
+
+INSERT INTO users (
+                  user_title, 
+                  firstname, 
+                  middlename, 
+                  lastname, 
+                  username, 
+                  password,
+                  preferredname,
+                  orcid,
+                  gender,
+                  nationality,
+                  birthdate,
+                  organisation,
+                  department,
+                  organisation_address,
+                  position,
+                  email,
+                  telephone,
+                  telephone_alt
+                  ) 
+VALUES (
+                'Mr.', 
+                'Nils', 
+                'Adam',
+                'Nilsson', 
+                'testreviewer', 
+                '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                'Rhiannon',
+                '878321897',
+                'male',
+                'French',
+                '1981-08-05',
+                'Pfannerstill and Sons',
+                'IT department',
+                'Congo, Alleneville, 35823 Mueller Glens',
+                'Liaison',
+                'nils@ess.se',
+                '711-316-5728',
+                '1-359-864-3489 x7390'
+                );
+
+INSERT INTO role_user (role_id, user_id) VALUES (3, 3);

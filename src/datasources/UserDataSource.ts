@@ -6,6 +6,7 @@ export interface UserDataSource {
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
+  getByEmail(email: String): Promise<User | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     filter?: string,
@@ -37,5 +38,6 @@ export interface UserDataSource {
   ): Promise<User | null>;
   update(user: User): Promise<User | null>;
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
+  setUserPassword(id: number, password: string): Promise<Boolean>;
   getPasswordByUsername(username: string): Promise<string | null>;
 }

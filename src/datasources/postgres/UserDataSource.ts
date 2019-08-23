@@ -28,8 +28,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.email,
       user.telephone,
       user.telephone_alt,
-      user.created_at,
-      user.updated_at
+      user.created_at.toISOString(),
+      user.updated_at.toISOString()
     );
   }
   getPasswordByUsername(username: string): Promise<string | null> {
@@ -101,6 +101,19 @@ export default class PostgresUserDataSource implements UserDataSource {
     });
   }
 
+  async setUserPassword(id: number, password: string): Promise<Boolean> {
+    return database
+      .update({
+        password
+      })
+      .from("users")
+      .where("user_id", id)
+      .then(() => {
+        return true;
+      })
+      .catch(() => false);
+  }
+
   async get(id: number) {
     return database
       .select()
@@ -115,6 +128,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from("users")
       .where("username", username)
+      .first()
+      .then((user: UserRecord) => this.createProposalObject(user))
+      .catch((error: any) => {
+        return null;
+      });
+  }
+
+  async getByEmail(email: String): Promise<User | null> {
+    return database
+      .select()
+      .from("users")
+      .where("email", email)
       .first()
       .then((user: UserRecord) => this.createProposalObject(user))
       .catch((error: any) => {
@@ -140,9 +165,8 @@ export default class PostgresUserDataSource implements UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    telephone_alt: string | null,
+    telephone_alt: string | null
   ) {
-    
     return database
       .insert({
         user_title,
