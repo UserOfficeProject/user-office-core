@@ -19,13 +19,7 @@ export  default function ProposalQuestionareStep(props: {
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory: ComponentFactory = new ComponentFactory();
-
-  const classes = makeStyles({
-    inputComponentWrapper: {
-      margin: "10px 0"
-    }
-  })();
-
+  
   const { back, next, model, topic } = props;
 
   if (model == null) {
@@ -56,14 +50,12 @@ export  default function ProposalQuestionareStep(props: {
         <Form>
           {activeFields.map(field => {
             return (
-              <div className={classes.inputComponentWrapper}>
-                {componentFactory.createComponent(field, {
+                componentFactory.createComponent(field, {
                   onComplete: forceUpdate, // for re-rendering when input changes
                   touched: touched, // for formik
                   errors: errors, // for formik
                   handleChange: handleChange // for formik
-                })}
-              </div>
+                })
             );
           })}
           <div>

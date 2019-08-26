@@ -1,14 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
-import {
-  TextField,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  makeStyles
-} from "@material-ui/core";
+import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, makeStyles} from "@material-ui/core";
 import JSDict from "../utils/Dictionary";
 import * as Yup from "yup";
 
@@ -24,7 +16,7 @@ export class ProposalComponentTextInput extends React.Component<IBasicComponentP
     }
     let { templateField, onComplete, touched, errors } = this.props;
     return (
-      <div className="baseComponent">
+      <React.Fragment>
         <TextField
           id={templateField.proposal_question_id}
           name={templateField.proposal_question_id}
@@ -45,15 +37,21 @@ export class ProposalComponentTextInput extends React.Component<IBasicComponentP
           margin="normal"
         />
         <span>{templateField.config.small_label}</span>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
-    horizontal: {
+    horizontalLayout: {
       flexDirection: "row"
+    },
+    verticalLayout: {
+      flexDirection: "column"
+    },
+    wrapper: {
+      margin: "18px 0 0 0"
     }
   })();
 
@@ -63,8 +61,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   let { templateField, onComplete } = props;
 
   return (
-    <div className="baseComponent">
-      <FormControl component="fieldset">
+      <FormControl component="fieldset" className={classes.wrapper}>
         <FormLabel component="legend">{templateField.question}</FormLabel>
         <span>{templateField.config.small_label}</span>
         <RadioGroup
@@ -76,7 +73,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             onComplete();
           }}
           value={templateField.value}
-          className={templateField.config.options.length < 3 ? classes.horizontal : undefined}
+          className={templateField.config.options.length < 3 ? classes.horizontalLayout : classes.verticalLayout}
         >
           {(templateField.config.options as string[]).map(option => {
             return (
@@ -89,7 +86,6 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
           })}
         </RadioGroup>
       </FormControl>
-    </div>
   );
 }
 
