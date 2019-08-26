@@ -42,7 +42,9 @@ export function ProposalComponentTextInput(props:IBasicComponentProps) {
           multiline={templateField.config.multiline}
           rows={templateField.config.multiline?4:1}
           className={classes.textField}
-          shrink
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
       </div>
     );
@@ -85,7 +87,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             }}
           >
             {(templateField.config.options as string[]).map(option => {
-              return <MenuItem value={option}>{option}</MenuItem>;
+              return <MenuItem value={option} key={option}>{option}</MenuItem>;
             })}
           </Select>
         </FormControl>
@@ -114,6 +116,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               return (
                 <FormControlLabel
                   value={option}
+                  key={option}
                   control={<Radio />}
                   label={option}
                 />
@@ -137,7 +140,6 @@ export function ProposalComponentCheckBox(props: IBasicComponentProps) {
       <FormControlLabel
         control={
           <Checkbox
-            checked={templateField.value}
             id={templateField.proposal_question_id}
             name={templateField.proposal_question_id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {

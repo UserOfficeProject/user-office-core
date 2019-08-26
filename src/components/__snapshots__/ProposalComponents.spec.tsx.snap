@@ -26,6 +26,7 @@ exports[`Textfield rendered without crashing 1`] = `
         onChange={[Function]}
         onFocus={[Function]}
         required={false}
+        rows={1}
         type="text"
         value=""
       />

@@ -50,7 +50,7 @@ export  default function ProposalQuestionareStep(props: {
         <Form>
           {activeFields.map(field => {
             return (
-              <div className="baseComponent">
+              <div className="baseComponent" key={field.proposal_question_id}>
                 {componentFactory.createComponent(field, {
                   onComplete: forceUpdate, // for re-rendering when input changes
                   touched: touched, // for formik
