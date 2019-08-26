@@ -2,7 +2,7 @@ import React from "react";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { ProposalTemplate, Proposal } from "../model/ProposalModel";
-import { Button } from "@material-ui/core";
+import { Button, makeStyles } from "@material-ui/core";
 import {
   ComponentFactory,
   createFormikCofigObjects
@@ -10,23 +10,26 @@ import {
 
 export  default function ProposalQuestionareStep(props: {
   model: ProposalTemplate;
-  next: Function;
-  back: Function;
   data: Proposal;
   topic: string;
+  next?: Function;
+  back?: Function;
 }) {
-
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-  const componentFactory: ComponentFactory = new ComponentFactory();
 
   const { back, next, model, topic } = props;
 
-  if (model == null) {
-    return <div>loading...</div>;
-  }
+  
 
-  let activeFields = (model! as ProposalTemplate).fields.filter(field => {
+  const [, updateState] = React.useState();
+  const forceUpdate = React.useCallback(() => updateState({}), []);
+  const componentFactory = new ComponentFactory();
+  const classes = makeStyles({
+    componentWrapper: {
+      margin:"10px 0"
+    }
+  })();
+
+  let activeFields = model.fields.filter(field => {
     return (
       field.config.topic === topic &&
       model.areDependenciesSatisfied(field.proposal_question_id)
@@ -34,23 +37,30 @@ export  default function ProposalQuestionareStep(props: {
   });
 
   let backbutton = back ? <Button onClick={() => back()}>Back</Button> : null;
-  let nextButton = next ? <Button type="submit" variant="contained" color="primary" onClick={() => {console.log("Save values to server"); console.log(model); next();}}>Next</Button> : null;
+  let nextButton = next ? <Button type="submit" variant="contained" color="primary">Next</Button> : null;
 
-  let { initialValues, validationSchema } = createFormikCofigObjects(
-    activeFields
-  );
+  let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
+
+  const updateProposal = () => {
+    console.log("Updating proposal")
+    //next!();
+  }
+
+  if (model == null) {
+    return <div>loading...</div>;
+  }
 
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={() => {}}
       validationSchema={Yup.object().shape(validationSchema)}
+      onSubmit={updateProposal}
     >
-      {({ errors, touched, handleChange }) => (
-        <Form>
+      {({ errors, touched, handleChange, handleSubmit }) => (
+        <form onSubmit={handleSubmit}>
           {activeFields.map(field => {
             return (
-              <div className="baseComponent" key={field.proposal_question_id}>
+              <div className={classes.componentWrapper} key={field.proposal_question_id}>
                 {componentFactory.createComponent(field, {
                   onComplete: forceUpdate, // for re-rendering when input changes
                   touched: touched, // for formik
@@ -64,7 +74,7 @@ export  default function ProposalQuestionareStep(props: {
             {backbutton}
             {nextButton}
           </div>
-        </Form>
+        </form>
       )}
     </Formik>
   );

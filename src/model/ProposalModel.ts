@@ -84,8 +84,7 @@ export class ProposalTemplateResult {
 }
 
 export enum DataType {
-  SMALL_TEXT = "SMALL_TEXT",
-  LARGE_TEXT = "LARGE_TEXT",
+  TEXT_INPUT = "TEXT_INPUT",
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",

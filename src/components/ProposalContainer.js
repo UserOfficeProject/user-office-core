@@ -85,6 +85,7 @@ export default function ProposalContainer(props) {
         return (
           <ProposalQuestionareStep
             data={proposalData}
+            back={handleBack}
             next={handleNext}
             model={proposalQuestionModel}
             topic="general-information"
