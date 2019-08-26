@@ -4,17 +4,12 @@ import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
 import JSDict from "../utils/Dictionary";
 import * as Yup from "yup";
 
-export class ProposalComponentTextInput extends React.Component<IBasicComponentProps> {
-  onChange(e: ChangeEvent<HTMLInputElement>) {
-    this.props.templateField.value = e.target.value;
-    this.props.handleChange(e); // letting Formik know that there was a change
-  }
+export function ProposalComponentTextInput(props:IBasicComponentProps) {
 
-  render() {
-    if (this.props.templateField === undefined) {
-      return <div>loading...</div>;
-    }
-    let { templateField, onComplete, touched, errors } = this.props;
+  if (props.templateField === undefined) {
+    return <div>loading...</div>;
+  }
+  let { templateField, onComplete, touched, errors } = props;
     return (
       <React.Fragment>
         <TextField
@@ -23,7 +18,10 @@ export class ProposalComponentTextInput extends React.Component<IBasicComponentP
           fullWidth
           label={templateField.question}
           value={templateField.value}
-          onChange={this.onChange.bind(this)}
+          onChange={(evt: ChangeEvent<HTMLInputElement>) => {
+            props.templateField.value = evt.target.value;
+            props.handleChange(evt); // letting Formik know that there was a change
+          }}
           onBlur={() => onComplete()}
           error={
             touched[templateField.proposal_question_id] &&
@@ -39,7 +37,6 @@ export class ProposalComponentTextInput extends React.Component<IBasicComponentP
         <span>{templateField.config.small_label}</span>
       </React.Fragment>
     );
-  }
 }
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
