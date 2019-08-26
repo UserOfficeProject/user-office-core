@@ -13,31 +13,29 @@ export function ProposalComponentTextInput(props:IBasicComponentProps) {
     }
   })();
 
-  let { templateField, onComplete, touched, errors } = props;
+  let { templateField, onComplete, touched, errors, handleChange } = props;
+  let { proposal_question_id, config, question } = templateField;
+  let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
+
 
     return (
       <div>
         <TextField
-          id={templateField.proposal_question_id}
-          name={templateField.proposal_question_id}
+          id={proposal_question_id}
+          name={proposal_question_id}
           fullWidth
-          label={templateField.question}
+          label={question}
           value={templateField.value}
           onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-            props.templateField.value = evt.target.value;
-            props.handleChange(evt); // letting Formik know that there was a change
+            templateField.value = evt.target.value;
+            handleChange(evt); // letting Formik know that there was a change
           }}
           onBlur={() => onComplete()}
-          placeholder={templateField.config.small_label}
-          error={
-            touched[templateField.proposal_question_id] &&
-            errors[templateField.proposal_question_id]
-          }
-          helperText={
-            errors[templateField.proposal_question_id]
-          }
-          multiline={templateField.config.multiline}
-          rows={templateField.config.multiline?4:1}
+          placeholder={config.small_label}
+          error={isError}
+          helperText={errors[proposal_question_id]}
+          multiline={config.multiline}
+          rows={config.multiline?4:1}
           className={classes.textField}
           InputLabelProps={{
             shrink: true,
@@ -61,53 +59,53 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
     }
   })();
 
-  let { templateField, onComplete, touched, errors } = props;
-
+  let { templateField, onComplete, touched, errors, handleChange } = props;
+  let { proposal_question_id, config, question } = templateField;
+  let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
   switch (templateField.config.variant) {
     case "dropdown":
       return (
-        <FormControl className={classes.wrapper}>
-          <InputLabel htmlFor={templateField.proposal_question_id} shrink>
-            {templateField.question}
-          </InputLabel>
+        <FormControl className={classes.wrapper} error={isError}>
+          <InputLabel htmlFor={proposal_question_id} shrink>{question}</InputLabel>
+          <span>{templateField.config.small_label}</span>
           <Select
-            id={templateField.proposal_question_id}
-            name={templateField.proposal_question_id}
+            id={proposal_question_id}
+            name={proposal_question_id}
             value={templateField.value}
             onChange={evt => {
-              props.templateField.value = (evt.target as HTMLInputElement).value;
-              props.handleChange(evt); // letting Formik know that there was a change
+              templateField.value = (evt.target as HTMLInputElement).value;
+              handleChange(evt); // letting Formik know that there was a change
               onComplete();
             }}
           >
-            {(templateField.config.options as string[]).map(option => {
+            {(config.options as string[]).map(option => {
               return <MenuItem value={option} key={option}>{option}</MenuItem>;
             })}
           </Select>
-          {touched[templateField.proposal_question_id] && <ErrorLabel>{errors[templateField.proposal_question_id]}</ErrorLabel>}
+          {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
         </FormControl>
       );
     default:
       return (
-        <FormControl component="fieldset" className={classes.wrapper + touched[templateField.proposal_question_id] && "error"}>
-          <FormLabel component="legend">{templateField.question}</FormLabel>
-          <span>{templateField.config.small_label}</span>
-          <RadioGroup
-            id={templateField.proposal_question_id}
-            name={templateField.proposal_question_id}
+        <FormControl className={classes.wrapper} error={isError}>
+        <FormLabel>{templateField.question}</FormLabel>
+        <span>{templateField.config.small_label}</span>
+        <RadioGroup
+          id={templateField.proposal_question_id}
+          name={templateField.proposal_question_id}
             onChange={evt => {
-              props.templateField.value = (evt.target as HTMLInputElement).value;
-              props.handleChange(evt); // letting Formik know that there was a change
+              templateField.value = (evt.target as HTMLInputElement).value;
+              handleChange(evt); // letting Formik know that there was a change
               onComplete();
             }}
             value={templateField.value}
             className={
-              templateField.config.options.length < 3
+              config.options.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
             }
           >
-            {(templateField.config.options as string[]).map(option => {
+            {(config.options as string[]).map(option => {
               return (
                 <FormControlLabel
                   value={option}
@@ -118,7 +116,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               );
             })}
           </RadioGroup>
-          {touched[templateField.proposal_question_id] && <ErrorLabel>{errors[templateField.proposal_question_id]}</ErrorLabel>}
+          {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
         </FormControl>
       );
   }
@@ -127,18 +125,20 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
 
 
 export function ProposalComponentCheckBox(props: IBasicComponentProps) {
-  let { templateField, onComplete, touched, errors } = props;
+  let { templateField, onComplete, touched, errors, handleChange } = props;
+  let { proposal_question_id, config, question } = templateField;
+  let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
 
   return (
-    <div>
+      <FormControl error={isError}>
       <FormControlLabel
         control={
           <Checkbox
-            id={templateField.proposal_question_id}
-            name={templateField.proposal_question_id}
+            id={proposal_question_id}
+            name={proposal_question_id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-              props.templateField.value = evt.target.checked;
-              props.handleChange(evt); // letting Formik know that there was a change
+              templateField.value = evt.target.checked;
+              handleChange(evt); // letting Formik know that there was a change
               onComplete();
             }}
             value={templateField.value}
@@ -147,11 +147,11 @@ export function ProposalComponentCheckBox(props: IBasicComponentProps) {
             }}
           />
         }
-        label={templateField.question}
+        label={question}
       />
-      <span>{templateField.config.small_label}</span>
-      {touched[templateField.proposal_question_id] && <ErrorLabel>{errors[templateField.proposal_question_id]}</ErrorLabel>}
-    </div>
+      <span>{config.small_label}</span>
+      {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
+      </FormControl>
   );
 }
 
@@ -159,24 +159,27 @@ export function ProposalComponentCheckBox(props: IBasicComponentProps) {
 
 export function ProposalCompontentDatePicker(props: IBasicComponentProps)
 {
-  let { templateField, onComplete, touched, errors } = props;
+  let { templateField, onComplete, touched, errors, handleChange } = props;
+  let { proposal_question_id, config, question } = templateField;
+  let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
   if(!templateField.value) {
     templateField.value = new Date();
   }
   return (
-    <div>
+    <FormControl error={isError}>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
       <KeyboardDatePicker
+          error={isError}
           disableToolbar
           variant="inline"
           format="dd/MMM/yyyy"
-          id={templateField.proposal_question_id}
-          name={templateField.proposal_question_id}
-          label={templateField.question}
+          id={proposal_question_id}
+          name={proposal_question_id}
+          label={question}
           value={templateField.value}
           onChange={(date, val) => {
-            props.templateField.value = val;
-            props.handleChange(val); // letting Formik know that there was a change;
+            templateField.value = val;
+            handleChange(val); // letting Formik know that there was a change;
             onComplete();
           }}
           KeyboardButtonProps={{
@@ -184,9 +187,9 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps)
           }}
         />
         </MuiPickersUtilsProvider>
-      <span>{templateField.config.small_label}</span>
-      {touched[templateField.proposal_question_id] && <ErrorLabel>{errors[templateField.proposal_question_id]}</ErrorLabel>}
-    </div>
+      <span>{config.small_label}</span>
+      {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
+    </FormControl>
   );
 }
 
@@ -245,6 +248,10 @@ export const toYupValidationSchema = (
       let selectFromOptionsSchema = Yup.string();
       field.config.required && (selectFromOptionsSchema = selectFromOptionsSchema.required(`This is a required field`));
       return selectFromOptionsSchema;
+    case DataType.DATE:
+      let dateSchema = Yup.date();
+      field.config.required && (dateSchema = dateSchema.required(`This date is required`));
+      return dateSchema;
     default:
       return Yup.string();
   }

@@ -26,6 +26,14 @@ export  default function ProposalQuestionareStep(props: {
   const classes = makeStyles({
     componentWrapper: {
       margin:"10px 0"
+    },
+    buttons: {
+      display: "flex",
+      justifyContent: "flex-end"
+    },
+    button: {
+      marginTop: "25px",
+      marginLeft: "10px"
     }
   })();
 
@@ -36,14 +44,14 @@ export  default function ProposalQuestionareStep(props: {
     );
   });
 
-  let backbutton = back ? <Button onClick={() => back()}>Back</Button> : null;
-  let nextButton = next ? <Button type="submit" variant="contained" color="primary">Next</Button> : null;
+  let backbutton = back ? <Button onClick={() => back()} className={classes.buttons}>Back</Button> : null;
+  let nextButton = next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
   const updateProposal = () => {
     console.log("Updating proposal")
-    //next!();
+    next!();
   }
 
   if (model == null) {
@@ -70,7 +78,7 @@ export  default function ProposalQuestionareStep(props: {
               </div>
             );
           })}
-          <div>
+          <div className={classes.buttons}>
             {backbutton}
             {nextButton}
           </div>
