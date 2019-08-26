@@ -6,8 +6,8 @@ exports[`Textfield rendered without crashing 1`] = `
     className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
   >
     <label
-      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
-      data-shrink={false}
+      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
+      data-shrink={true}
       htmlFor="links_with_industry"
     >
       Please specify
@@ -31,6 +31,5 @@ exports[`Textfield rendered without crashing 1`] = `
       />
     </div>
   </div>
-  <span />
 </div>
 `;

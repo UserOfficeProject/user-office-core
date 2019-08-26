@@ -49,7 +49,7 @@ export class ProposalTemplateField {
   public proposal_question_id!: string;
   public data_type!: DataType;
   public question!: string;
-  public config!: any | { topic: string };
+  public config!: any | { topic: string, variant: string | undefined, small_label:string | undefined, required: boolean | undefined, options:string[] };
   public value: any = "";
   public dependencies!: FieldDependency[] | null;
 

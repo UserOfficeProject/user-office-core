@@ -2,7 +2,7 @@ import React from "react";
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import { ProposalTemplate, Proposal } from "../model/ProposalModel";
-import { Button, makeStyles } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import {
   ComponentFactory,
   createFormikCofigObjects
@@ -19,7 +19,7 @@ export  default function ProposalQuestionareStep(props: {
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory: ComponentFactory = new ComponentFactory();
-  
+
   const { back, next, model, topic } = props;
 
   if (model == null) {
@@ -34,7 +34,7 @@ export  default function ProposalQuestionareStep(props: {
   });
 
   let backbutton = back ? <Button onClick={() => back()}>Back</Button> : null;
-  let nextButton = next ? <Button type="submit" variant="contained" color="primary">Next</Button> : null;
+  let nextButton = next ? <Button type="submit" variant="contained" color="primary" onClick={() => {console.log("Save values to server"); console.log(model); next();}}>Next</Button> : null;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(
     activeFields
@@ -46,16 +46,18 @@ export  default function ProposalQuestionareStep(props: {
       onSubmit={() => {}}
       validationSchema={Yup.object().shape(validationSchema)}
     >
-      {({ errors, touched, handleChange, isSubmitting }) => (
+      {({ errors, touched, handleChange }) => (
         <Form>
           {activeFields.map(field => {
             return (
-                componentFactory.createComponent(field, {
+              <div className="baseComponent">
+                {componentFactory.createComponent(field, {
                   onComplete: forceUpdate, // for re-rendering when input changes
                   touched: touched, // for formik
                   errors: errors, // for formik
                   handleChange: handleChange // for formik
-                })
+                })}
+              </div>
             );
           })}
           <div>
