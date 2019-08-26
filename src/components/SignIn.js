@@ -106,6 +106,7 @@ export default function SignInSide() {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="input-username"
             />
             <Field
               name="password"
@@ -114,6 +115,7 @@ export default function SignInSide() {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="input-password"
             />
             {failedLogin && (
               <p className={classes.errorMessage}>Wrong Credentials</p>
@@ -124,6 +126,7 @@ export default function SignInSide() {
               variant="contained"
               color="primary"
               className={classes.submit}
+              data-cy="submit"
             >
               Sign In
             </Button>
