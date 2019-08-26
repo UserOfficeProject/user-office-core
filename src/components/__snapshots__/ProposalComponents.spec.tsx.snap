@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Textfield rendered without crashing 1`] = `
-<div
-  className="baseComponent"
->
+Array [
   <div
     className="MuiFormControl-root MuiTextField-root MuiFormControl-marginNormal MuiFormControl-fullWidth"
   >
@@ -32,7 +30,7 @@ exports[`Textfield rendered without crashing 1`] = `
         value=""
       />
     </div>
-  </div>
-  <span />
-</div>
+  </div>,
+  <span />,
+]
 `;
