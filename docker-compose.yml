@@ -2,7 +2,29 @@
 version: '3.1'
 
 services:
-
+  reverse-proxy:
+    image: traefik # The official Traefik docker image
+    command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "80:80"     # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  backend: 
+    image: backend
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      tokenLife: 7d
+      baseURL: localhost:3000
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/api, /graphql"
+      - "traefik.port=4000"
+  frontend: 
+    image: frontend
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/"
+      - "traefik.port=80"
   db:
     image: postgres:11.2
     restart: always
@@ -14,11 +36,6 @@ services:
       - 5432:5432
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
   rabbitmq:
     image: "rabbitmq:3-management"
     hostname: "rabbit"

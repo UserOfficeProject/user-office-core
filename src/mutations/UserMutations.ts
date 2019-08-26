@@ -5,7 +5,6 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
-const config = require("./../../config");
 
 export default class UserMutations {
   constructor(
@@ -146,8 +145,8 @@ export default class UserMutations {
     if (!valid) {
       return rejection("WRONG_PASSWORD");
     }
-    const token = jsonwebtoken.sign({ user, roles }, config.secret, {
-      expiresIn: config.tokenLife
+    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+      expiresIn: process.env.tokenLife
     });
 
     return token;
@@ -155,12 +154,12 @@ export default class UserMutations {
 
   async token(token: string): Promise<{ token: string } | Rejection> {
     try {
-      const decoded = jsonwebtoken.verify(token, config.secret);
+      const decoded = jsonwebtoken.verify(token, process.env.secret);
       const freshToken = jsonwebtoken.sign(
         { user: decoded.user, roles: decoded.roles },
-        config.secret,
+        process.env.secret,
         {
-          expiresIn: config.tokenLife
+          expiresIn: process.env.tokenLife
         }
       );
       return freshToken;
@@ -185,11 +184,11 @@ export default class UserMutations {
             id: user.id,
             updated: user.updated
           },
-          config.secret,
+          process.env.secret,
           { expiresIn: "24h" }
         );
 
-        const link = config.baseURL + "/resetPassword/" + token;
+        const link = process.env.baseURL + "/resetPassword/" + token;
 
         // Send reset email with link
         return { user, link };
@@ -205,7 +204,7 @@ export default class UserMutations {
 
     try {
       const hash = this.createPasswordHash(password);
-      const decoded = jsonwebtoken.verify(token, config.secret);
+      const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation
