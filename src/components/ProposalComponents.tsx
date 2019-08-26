@@ -6,12 +6,17 @@ import * as Yup from "yup";
 
 export function ProposalComponentTextInput(props:IBasicComponentProps) {
 
+  const classes = makeStyles({
+    textField: {
+      margin:"0 0 10px 0"
+    }
+  })();
   if (props.templateField === undefined) {
     return <div>loading...</div>;
   }
   let { templateField, onComplete, touched, errors } = props;
     return (
-      <React.Fragment>
+      <div>
         <TextField
           id={templateField.proposal_question_id}
           name={templateField.proposal_question_id}
@@ -32,10 +37,10 @@ export function ProposalComponentTextInput(props:IBasicComponentProps) {
             errors[templateField.proposal_question_id] &&
             errors[templateField.proposal_question_id]
           }
-          margin="normal"
+          className={classes.textField}
         />
         <span>{templateField.config.small_label}</span>
-      </React.Fragment>
+      </div>
     );
 }
 
@@ -48,7 +53,8 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
       flexDirection: "column"
     },
     wrapper: {
-      margin: "18px 0 0 0"
+      margin: "18px 0 0 0",
+      display:"flex"
     }
   })();
 
@@ -125,15 +131,10 @@ export const toYupValidationSchema = (
 ): Yup.Schema<any> => {
   switch (field.data_type) {
     case DataType.SMALL_TEXT:
-      return Yup.string()
-        .min(
-          field.config.min,
-          `Value must be at least ${field.config.min} characters`
-        )
-        .max(
-          field.config.max,
-          `Value must be at most ${field.config.max} characters`
-        );
+      let schema = Yup.string();
+      field.config.min && schema.min(field.config.min, `Value must be at least ${field.config.min} characters`);
+      field.config.max && schema.max(field.config.max, `Value must be at most ${field.config.max} characters`);
+
     case DataType.SELECTION_FROM_OPTIONS:
       return Yup.string();
   }

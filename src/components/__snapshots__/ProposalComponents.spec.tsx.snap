@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Textfield rendered without crashing 1`] = `
-Array [
+<div>
   <div
-    className="MuiFormControl-root MuiTextField-root MuiFormControl-marginNormal MuiFormControl-fullWidth"
+    className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
   >
     <label
       className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
@@ -30,7 +30,7 @@ Array [
         value=""
       />
     </div>
-  </div>,
-  <span />,
-]
+  </div>
+  <span />
+</div>
 `;
