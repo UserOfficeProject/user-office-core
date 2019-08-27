@@ -1,22 +1,24 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
-import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, makeStyles, Checkbox, InputLabel, Select, MenuItem } from "@material-ui/core";
+import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, makeStyles, Checkbox, InputLabel, Select, MenuItem, Button, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from "@material-ui/core";
 import JSDict from "../utils/Dictionary";
 import * as Yup from "yup";
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
 
 export function ProposalComponentTextInput(props:IBasicComponentProps) {
   const classes = makeStyles({
     textField: {
-      margin:"15px 0 10px 0"
+      margin: "15px 0 10px 0"
     }
   })();
 
   let { templateField, onComplete, touched, errors, handleChange } = props;
   let { proposal_question_id, config, question } = templateField;
   let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
-
 
     return (
       <div>
@@ -195,6 +197,142 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps)
 
 
 
+export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps, {files:string[], nextFileId:number}>
+{
+  nextFileId:number = 0;
+  state = { nextFileId:0, files:new Array<string>() }
+
+  constructor(props:any) 
+  {
+    super(props);
+    this.state.files = [this.getNextFileName()];
+  }
+  getNextFileName() {
+    this.nextFileId++;
+    return `${this.props.templateField.proposal_question_id}_${this.nextFileId}`;
+  }
+
+  onFileSelected() {
+    var files = this.state.files;
+    if(this.props.templateField.config.multiple) {
+      files.push(this.getNextFileName()); 
+    }
+    this.setState({files:files});
+  }
+
+  onDeleteClicked(fileId:string) {
+    let files = this.state.files;
+    var index = files.indexOf(fileId);
+    files.splice(index, 1);
+    if(!this.props.templateField.config.multiple) {
+      files.push(this.getNextFileName()); 
+    }
+    this.setState({files:files})
+  }
+
+  render() {
+    let { templateField, touched, errors } = this.props;
+    let { proposal_question_id, config } = templateField;
+    let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
+
+    return ( 
+      <FormControl error={isError}>
+      <FormLabel error={isError}>{templateField.question}</FormLabel>
+      <span>{templateField.config.small_label}</span>
+      {
+        this.state.files.map((fileId:string) => {
+          return <FileEntry 
+              key={fileId} 
+              filetype={config.filetype} 
+              fileId={fileId} 
+              onFileSelected={this.onFileSelected.bind(this)} 
+              onDeleteClicked={this.onDeleteClicked.bind(this)} />
+        })
+      }
+      <span>{config.small_label}</span>
+      {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
+    </FormControl>);
+  };
+
+}
+
+
+function FileEntry(props:{fileId:string, filetype:string | undefined, onFileSelected:Function, onDeleteClicked:Function}) {
+  const classes = makeStyles(theme => ({
+    fileListWrapper: {
+      marginTop: theme.spacing(2),
+      marginBottim: theme.spacing(2)
+    },
+    addIcon: {
+      marginRight: theme.spacing(1),
+    },
+    avatar:
+    {
+      backgroundColor:theme.palette.primary.main,
+      color:"white"
+    },
+    listContainer:
+    {
+      listStyle:"none",
+      padding:0,
+      marginBottom:0
+    }
+  }))();
+
+  const [file, setFile] = useState<File|null>(null);
+  const fileInput = <input
+        accept={props.filetype}
+        style={{ display: 'none' }}
+        type="file"
+        id={props.fileId}
+        multiple={false}
+        onChange={e => {
+           let file = e.target.files ? e.target.files[0] : null
+           setFile(file);
+           props.onFileSelected();
+        }}
+      />
+
+  if(file)
+  {
+    return (
+      <ul className={classes.listContainer}>
+      <ListItem>
+        <ListItemAvatar>
+          <Avatar className={classes.avatar}>
+           <AttachFileIcon/>
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={file.name}
+          secondary={file.size}
+        />
+        <ListItemSecondaryAction>
+          <IconButton edge="end" aria-label="delete">
+            <DeleteOutlineIcon onClick={() => {props.onDeleteClicked(props.fileId)}}/>
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+      </ul>
+    );
+  }
+
+  return (
+    <div className={classes.fileListWrapper}>
+      {fileInput}
+      <label htmlFor={props.fileId} >
+      <Button variant="outlined" component="span">
+      <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+        </Button>
+      </label> 
+    </div>
+  )
+}
+
+
+
+
+
 
 
 
@@ -213,6 +351,7 @@ export class ComponentFactory {
     this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
     this.componentMap.put(DataType.BOOLEAN, ProposalComponentCheckBox);
     this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
     this.componentMap.put(
       DataType.SELECTION_FROM_OPTIONS,
       ProposalComponentMultipleChoice
