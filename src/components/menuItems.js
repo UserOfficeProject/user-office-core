@@ -7,6 +7,7 @@ import NoteAdd from "@material-ui/icons/NoteAdd";
 import People from "@material-ui/icons/People";
 import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
+import CalendarToday from "@material-ui/icons/CalendarToday";
 import { Link } from "react-router-dom";
 
 export const menuItems = {
@@ -39,6 +40,12 @@ export const menuItems = {
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="View Proposals" />
+      </ListItem>
+      <ListItem component={Link} to="/CallPage" button>
+        <ListItemIcon>
+          <CalendarToday />
+        </ListItemIcon>
+        <ListItemText primary="View Calls" />
       </ListItem>
       <ListItem component={Link} to="/PeoplePage" button>
         <ListItemIcon>
