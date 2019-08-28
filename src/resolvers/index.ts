@@ -1,6 +1,6 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection } from "../rejection";
-import { Proposal } from "../models/Proposal";
+import { Proposal, ProposalTemplate } from "../models/Proposal";
 import { User } from "../models/User";
 
 interface ProposalArgs {
@@ -112,7 +112,7 @@ function resolveProposals(
   };
 }
 
-function createMutationWrapper<T>(key: string) {
+function createResponseWrapper<T>(key: string) {
   return async function(promise: Promise<T | Rejection>) {
     const result = await promise;
     if (isRejection(result)) {
@@ -129,8 +129,9 @@ function createMutationWrapper<T>(key: string) {
   };
 }
 
-const wrapProposalMutation = createMutationWrapper<Proposal>("proposal");
-const wrapUserMutation = createMutationWrapper<User>("user");
+const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
+const wrapUserMutation = createResponseWrapper<User>("user");
+const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>("template");
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -151,6 +152,10 @@ export default {
     );
 
     return resolveProposals(proposals, context);
+  },
+
+  async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
+    return await wrapProposalTemplate(context.queries.proposal.getProposalTemplate(context.user));
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
