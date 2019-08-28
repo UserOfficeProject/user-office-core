@@ -1,14 +1,17 @@
 import { BasicResolverContext } from "./context";
-import UserQueries from "./queries/UserQueries";
 
 // Site specific imports (only ESS atm)
 import PostgresUserDataSource from "./datasources/postgres/UserDataSource";
 import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSource";
 import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
+import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
 
-import ProposalQueries from "./queries/ProposalQueries";
+import UserQueries from "./queries/UserQueries";
 import UserMutations from "./mutations/UserMutations";
+import ProposalQueries from "./queries/ProposalQueries";
 import ProposalMutations from "./mutations/ProposalMutations";
+import CallQueries from "./queries/CallQueries";
+import CallMutations from "./mutations/CallMutations";
 import { UserAuthorization } from "./utils/UserAuthorization";
 import { EventBus } from "./events/eventBus";
 import { ApplicationEvent } from "./events/applicationEvents";
@@ -20,6 +23,7 @@ import ReviewMutations from "./mutations/ReviewMutations";
 const userDataSource = new PostgresUserDataSource();
 const proposalDataSource = new PostgresProposalDataSource();
 const reviewDataSource = new PostgresReviewDataSource();
+const callDataSource = new PostgresCallDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
@@ -49,6 +53,13 @@ const reviewMutations = new ReviewMutations(
   eventBus
 );
 
+const callQueries = new CallQueries(callDataSource, userAuthorization);
+const callMutations = new CallMutations(
+  callDataSource,
+  userAuthorization,
+  eventBus
+);
+
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   userAuthorization,
@@ -59,12 +70,14 @@ const context: BasicResolverContext = {
   queries: {
     user: userQueries,
     proposal: proposalQueries,
-    review: reviewQueries
+    review: reviewQueries,
+    call: callQueries
   },
   mutations: {
     user: userMutations,
     proposal: proposalMutations,
-    review: reviewMutations
+    review: reviewMutations,
+    call: callMutations
   }
 };
 

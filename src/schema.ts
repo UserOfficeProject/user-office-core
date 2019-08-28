@@ -8,6 +8,8 @@ type Query {
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
     review(id: ID!): Review
+    call(id: ID!): Call
+    calls: [Call]
   }
 
   type Rejection {
@@ -29,6 +31,11 @@ type Query {
     error: String
   }
 
+  type CallMutationResult {
+    call: Call
+    error: String
+  }
+
   type UserMutationResult {
     user: User
     error: String
@@ -41,6 +48,7 @@ type Query {
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
+    createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     token(token: String!): String
     createUser(
         user_title: String, 
@@ -76,6 +84,19 @@ type Roles {
   id: Int
   shortCode: String
   title: String
+}
+
+type Call {
+  id: Int
+  shortCode: String
+  startCall: String
+  endCall: String
+  startReview: String
+  endReview: String
+  startNotify: String
+  endNotify: String
+  cycleComment: String
+  surveyComment: String
 }
 
 type Proposal {

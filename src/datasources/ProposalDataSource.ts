@@ -3,6 +3,7 @@ import { Proposal } from "../models/Proposal";
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
+  checkActiveCall(): Promise<Boolean>;
   getProposals(
     filter?: string,
     first?: number,

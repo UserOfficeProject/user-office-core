@@ -55,3 +55,16 @@ export interface ReviewRecord {
   readonly grade: number;
   readonly status: number;
 }
+
+export interface CallRecord {
+  readonly call_id: number;
+  readonly call_short_code: string;
+  readonly start_call: Date;
+  readonly end_call: Date;
+  readonly start_review: Date;
+  readonly end_review: Date;
+  readonly start_notify: Date;
+  readonly end_notify: Date;
+  readonly cycle_comment: string;
+  readonly survey_comment: string;
+}
