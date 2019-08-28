@@ -197,136 +197,135 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps)
 
 
 
-export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps, {files:string[], nextFileId:number}>
-{
-  nextFileId:number = 0;
-  state = { nextFileId:0, files:new Array<string>() }
+export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps,{ files: string[] }> {
+  state = { files: new Array<string>() };
 
-  constructor(props:any) 
-  {
-    super(props);
-    this.state.files = [this.getNextFileName()];
-  }
-  getNextFileName() {
-    this.nextFileId++;
-    return `${this.props.templateField.proposal_question_id}_${this.nextFileId}`;
-  }
-
-  onFileSelected() {
+  onFileSelected(selected: string) {
     var files = this.state.files;
-    if(this.props.templateField.config.multiple) {
-      files.push(this.getNextFileName()); 
-    }
-    this.setState({files:files});
+    files.push(selected);
+    this.setState({ files: files });
   }
 
-  onDeleteClicked(fileId:string) {
-    let files = this.state.files;
-    var index = files.indexOf(fileId);
-    files.splice(index, 1);
-    if(!this.props.templateField.config.multiple) {
-      files.push(this.getNextFileName()); 
-    }
-    this.setState({files:files})
+  onDeleteClicked(deleteFileId: string) {
+    this.setState({ files: this.state.files.filter(fileId => fileId != deleteFileId) });
   }
 
+  getUniqueFileId() {
+    return `${this.props.templateField.proposal_question_id}_${new Date().getTime()}`;
+  }
+  
   render() {
     let { templateField, touched, errors } = this.props;
     let { proposal_question_id, config } = templateField;
-    let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
+    let isError =
+      touched[proposal_question_id] && errors[proposal_question_id]
+        ? true
+        : false;
+    let curFileList = this.state.files;
 
-    return ( 
+    // clone the state, because we might modify the array
+    let listItems = curFileList.slice(0); 
+
+    if (!config.maxFiles || config.maxFiles < listItems.length) {
+      listItems.push(this.getUniqueFileId()); // new file entry
+    }
+
+    return (
       <FormControl error={isError}>
-      <FormLabel error={isError}>{templateField.question}</FormLabel>
-      <span>{templateField.config.small_label}</span>
-      {
-        this.state.files.map((fileId:string) => {
-          return <FileEntry 
-              key={fileId} 
-              filetype={config.filetype} 
-              fileId={fileId} 
-              onFileSelected={this.onFileSelected.bind(this)} 
-              onDeleteClicked={this.onDeleteClicked.bind(this)} />
-        })
-      }
-      <span>{config.small_label}</span>
-      {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
-    </FormControl>);
-  };
-
+        <FormLabel error={isError}>{templateField.question}</FormLabel>
+        <span>{templateField.config.small_label}</span>
+        <ul style={{listStyle: "none", padding: 0,marginBottom: 0}}>
+          {listItems.map((fileId: string) => {
+            return (
+              <FileEntry
+                key={fileId}
+                filetype={config.filetype}
+                fileId={fileId}
+                onFileSelected={this.onFileSelected.bind(this)}
+                onDeleteClicked={this.onDeleteClicked.bind(this)}
+              />
+            );
+          })}
+        </ul>
+        <span>{config.small_label}</span>
+        {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
+      </FormControl>
+    );
+  }
 }
 
-
-function FileEntry(props:{fileId:string, filetype:string | undefined, onFileSelected:Function, onDeleteClicked:Function}) {
+function FileEntry(props: {
+  fileId: string;
+  filetype: string | undefined;
+  onFileSelected: Function;
+  onDeleteClicked: Function;
+}) {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
       marginBottim: theme.spacing(2)
     },
     addIcon: {
-      marginRight: theme.spacing(1),
+      marginRight: theme.spacing(1)
     },
-    avatar:
-    {
-      backgroundColor:theme.palette.primary.main,
-      color:"white"
-    },
-    listContainer:
-    {
-      listStyle:"none",
-      padding:0,
-      marginBottom:0
+    avatar: {
+      backgroundColor: theme.palette.primary.main,
+      color: "white"
     }
   }))();
 
-  const [file, setFile] = useState<File|null>(null);
-  const fileInput = <input
-        accept={props.filetype}
-        style={{ display: 'none' }}
-        type="file"
-        id={props.fileId}
-        multiple={false}
-        onChange={e => {
-           let file = e.target.files ? e.target.files[0] : null
-           setFile(file);
-           props.onFileSelected();
-        }}
-      />
+  const [file, setFile] = useState<File | null>(null);
+  const fileInput = (
+    <input
+      accept={props.filetype}
+      style={{ display: 'none' }}
+      type="file"
+      id={props.fileId}
+      multiple={false}
+      onChange={e => {
+        let selectedFile = e.target.files ? e.target.files[0] : null;
+        setFile(selectedFile);
+        props.onFileSelected(props.fileId);
+      }}
+    />
+  );
 
-  if(file)
-  {
+  if (file) {
+    const fileSizeMb = Math.round(file.size / 100) / 10;
     return (
-      <ul className={classes.listContainer}>
       <ListItem>
+        {fileInput}
         <ListItemAvatar>
           <Avatar className={classes.avatar}>
-           <AttachFileIcon/>
+            <AttachFileIcon />
           </Avatar>
         </ListItemAvatar>
-        <ListItemText
-          primary={file.name}
-          secondary={file.size}
-        />
+        <ListItemText primary={file.name} secondary={`${fileSizeMb} MB`} />
         <ListItemSecondaryAction>
-          <IconButton edge="end" aria-label="delete">
-            <DeleteOutlineIcon onClick={() => {props.onDeleteClicked(props.fileId)}}/>
+          <IconButton
+            edge="end"
+            aria-label="delete"
+            onClick={() => {
+              props.onDeleteClicked(props.fileId);
+            }}
+          >
+            <DeleteOutlineIcon />
           </IconButton>
         </ListItemSecondaryAction>
       </ListItem>
-      </ul>
     );
   }
 
   return (
-    <div className={classes.fileListWrapper}>
+    <ListItem className={classes.fileListWrapper}>
       {fileInput}
-      <label htmlFor={props.fileId} >
-      <Button variant="outlined" component="span">
-      <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+      <label htmlFor={props.fileId}>
+        <Button variant="outlined" component="span">
+          <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
         </Button>
-      </label> 
-    </div>
-  )
+      </label>
+    </ListItem>
+  );
 }
 
 
