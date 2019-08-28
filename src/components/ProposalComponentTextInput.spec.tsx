@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
-import { ProposalComponentTextInput } from './ProposalComponents';
+import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
 import { createTemplate } from '../test/ProposalTestBed';
 
 test('Textfield rendered without crashing', () => {
