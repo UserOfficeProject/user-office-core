@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useState, createRef } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
-import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, makeStyles, Checkbox, InputLabel, Select, MenuItem, Button, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton, Input } from "@material-ui/core";
+import { TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, makeStyles, Checkbox, InputLabel, Select, MenuItem, Button, ListItem, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction, IconButton } from "@material-ui/core";
 import JSDict from "../utils/Dictionary";
 import * as Yup from "yup";
 import DateFnsUtils from '@date-io/date-fns';
@@ -197,17 +197,26 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps)
 
 
 
-export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps, {files:string[]}>
+export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps, {files:string[], nextFileId:number}>
 {
-  state = { files:new Array<string>() }
+  nextFileId:number = 0;
+  state = { nextFileId:0, files:new Array<string>() }
 
-  getUnityeFileId() {
-    return `${this.props.templateField.proposal_question_id}_${new Date().getTime()}`;
+  constructor(props:any) 
+  {
+    super(props);
+    this.state.files = [this.getNextFileName()];
+  }
+  getNextFileName() {
+    this.nextFileId++;
+    return `${this.props.templateField.proposal_question_id}_${this.nextFileId}`;
   }
 
-  onFileSelected(fileId:string) {
+  onFileSelected() {
     var files = this.state.files;
-    files.push(fileId); 
+    if(this.props.templateField.config.multiple) {
+      files.push(this.getNextFileName()); 
+    }
     this.setState({files:files});
   }
 
@@ -215,35 +224,31 @@ export class ProposalCompontentFileUpload extends React.Component<IBasicComponen
     let files = this.state.files;
     var index = files.indexOf(fileId);
     files.splice(index, 1);
+    if(!this.props.templateField.config.multiple) {
+      files.push(this.getNextFileName()); 
+    }
     this.setState({files:files})
-  }
-
-  createFileEntry(fileId:string, fileType:string) {
-    return (
-      <FileEntry 
-              key={fileId} 
-              filetype={fileType} 
-              fileId={fileId} 
-              onFileSelected={this.onFileSelected.bind(this)} 
-              onDeleteClicked={this.onDeleteClicked.bind(this)} />
-    )
   }
 
   render() {
     let { templateField, touched, errors } = this.props;
     let { proposal_question_id, config } = templateField;
     let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
-    let isUploadBtnVisible = (!config.maxFiles || config.maxFiles > this.state.files.length);
-    let filesJsx = this.state.files.map(fileId => {
-      return this.createFileEntry(fileId, config.fileType)
-    });
-    let newFileJsx = isUploadBtnVisible ? this.createFileEntry(this.getUnityeFileId(), config.fileType) : null;
+
     return ( 
       <FormControl error={isError}>
-      <FormLabel>{templateField.question}</FormLabel>
+      <FormLabel error={isError}>{templateField.question}</FormLabel>
       <span>{templateField.config.small_label}</span>
-      {filesJsx}
-      {newFileJsx}
+      {
+        this.state.files.map((fileId:string) => {
+          return <FileEntry 
+              key={fileId} 
+              filetype={config.filetype} 
+              fileId={fileId} 
+              onFileSelected={this.onFileSelected.bind(this)} 
+              onDeleteClicked={this.onDeleteClicked.bind(this)} />
+        })
+      }
       <span>{config.small_label}</span>
       {isError && <ErrorLabel>{errors[proposal_question_id]}</ErrorLabel>}
     </FormControl>);
@@ -261,11 +266,13 @@ function FileEntry(props:{fileId:string, filetype:string | undefined, onFileSele
     addIcon: {
       marginRight: theme.spacing(1),
     },
-    avatar:{
+    avatar:
+    {
       backgroundColor:theme.palette.primary.main,
       color:"white"
     },
-    listContainer: {
+    listContainer:
+    {
       listStyle:"none",
       padding:0,
       marginBottom:0
@@ -273,26 +280,23 @@ function FileEntry(props:{fileId:string, filetype:string | undefined, onFileSele
   }))();
 
   const [file, setFile] = useState<File|null>(null);
-  const ref = createRef<HTMLInputElement>();
   const fileInput = <input
         accept={props.filetype}
-        //style={{ display: 'none' }}
+        style={{ display: 'none' }}
         type="file"
         id={props.fileId}
-        ref={ref}
         multiple={false}
         onChange={e => {
            let file = e.target.files ? e.target.files[0] : null
            setFile(file);
-           props.onFileSelected(props.fileId);
+           props.onFileSelected();
         }}
       />
 
-  if(file) // if file already sellected
+  if(file)
   {
     return (
       <ul className={classes.listContainer}>
-        {fileInput}
       <ListItem>
         <ListItemAvatar>
           <Avatar className={classes.avatar}>
