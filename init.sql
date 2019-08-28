@@ -91,6 +91,21 @@ CREATE TABLE reviews (
 );
 
 
+CREATE TABLE call (
+  call_id serial PRIMARY KEY 
+, call_short_code varchar(20) NOT NULL
+, start_call date NOT NULL
+, end_call date NOT NULL
+, start_review date NOT NULL
+, end_review date NOT NULL
+, start_notify date NOT NULL
+, end_notify date NOT NULL
+, cycle_comment varchar(100) NOT NULL
+, survey_comment varchar(100) NOT NULL
+);
+
+
+
 INSERT INTO roles (short_code, title) VALUES ('user', 'User');
 
 INSERT INTO roles (short_code, title) VALUES ('user_officer', 'User Officer');
