@@ -16,7 +16,9 @@ export class ProposalCompontentFileUpload extends React.Component<IBasicComponen
   }
 
   onDeleteClicked(deleteFileId: string) {
-    this.setState({ files: this.state.files.filter(fileId => fileId !== deleteFileId) });
+    this.setState({
+      files: this.state.files.filter(fileId => fileId !== deleteFileId)
+    });
   }
 
   getUniqueFileId() {

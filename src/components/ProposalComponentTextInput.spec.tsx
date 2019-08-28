@@ -8,11 +8,11 @@ test('Textfield rendered without crashing', () => {
   var template = createTemplate();
   const renderer = ReactTestRenderer.create(
     <ProposalComponentTextInput
-    templateField={template.getFieldById('links_with_industry')}
-    onComplete={() => {}} 
-    handleChange={() => {}}
-    errors={{}}
-    touched={{}}
+      templateField={template.getFieldById("links_with_industry")}
+      onComplete={() => {}}
+      handleChange={() => {}}
+      errors={{}}
+      touched={{}}
     />
   );
 
