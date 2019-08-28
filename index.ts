@@ -35,6 +35,7 @@ app.use(
       user = await baseContext.queries.user.getAgent(req.user.user.id);
     }
 
+
     const context: ResolverContext = { ...baseContext, user };
 
     return {

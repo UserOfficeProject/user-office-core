@@ -1,4 +1,5 @@
 import { Proposal } from "../models/Proposal";
+import { User } from "../models/user";
 
 interface ProposalAcceptedEvent {
   type: "PROPOSAL_ACCEPTED";
@@ -21,8 +22,15 @@ interface ProposalCreatedEvent {
   proposal: Proposal;
 }
 
+interface UserResetPasswordEmailEvent {
+  type: "PASSWORD_RESET_EMAIL";
+  user: User;
+  link: string;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalRejectedEvent
-  | ProposalCreatedEvent;
+  | ProposalCreatedEvent
+  | UserResetPasswordEmailEvent;

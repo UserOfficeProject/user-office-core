@@ -290,5 +290,17 @@ export default {
         args.roles
       )
     );
+  },
+
+  async resetPasswordEmail(args: { email: string }, context: ResolverContext) {
+    const result = await context.mutations.user.resetPasswordEmail(args.email);
+    return !isRejection(result);
+  },
+
+  resetPassword(
+    args: { token: string; password: string },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.resetPassword(args.token, args.password);
   }
 };
