@@ -5,11 +5,13 @@ import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Typography from "@material-ui/core/Typography";
-import ProposalInformation from "./ProposalInformation";
+import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
+import ProposalInformation from "./ProposalInformation";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -28,11 +30,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ProposalContainer(props) {
-  const steps = ["Information", "Participants", "Review"];
+  const steps = ["New proposal", "Information", "Crystallization", "Biological deuteration", "Chemical deuteration", "Participants", "Review"];
   const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const sendRequest = useDataAPI();
+  const { loading, proposalQuestionModel } = useProposalQuestionTemplate();
 
   const submitProposal = () => {
     const query = `
@@ -53,6 +56,8 @@ export default function ProposalContainer(props) {
     return sendRequest(query, variables).then(data => setSubmitted(true));
   };
 
+  
+
   const handleNext = data => {
     setProposalData({
       ...proposalData,
@@ -66,10 +71,58 @@ export default function ProposalContainer(props) {
   };
 
   const getStepContent = step => {
+    if(loading)
+    {
+      return "Loading...";
+    }
+
     switch (step) {
       case 0:
-        return <ProposalInformation data={proposalData} next={handleNext} />;
+        return (
+        <ProposalInformation data={proposalData} next={handleNext} />
+        );
       case 1:
+        return (
+          <ProposalQuestionareStep
+            data={proposalData}
+            back={handleBack}
+            next={handleNext}
+            model={proposalQuestionModel}
+            topic="general-information"
+          />
+        );
+      case 2:
+        return (
+          <ProposalQuestionareStep
+            data={proposalData}
+            next={handleNext}
+            back={handleBack}
+            model={proposalQuestionModel}
+            topic="crystallization"
+          />
+        );
+      case 3:
+        return (
+          <ProposalQuestionareStep
+            data={proposalData}
+            next={handleNext}
+            back={handleBack}
+            model={proposalQuestionModel}
+            topic="biological-deuteration"
+          />
+        );
+
+      case 4:
+        return (
+          <ProposalQuestionareStep
+            data={proposalData}
+            next={handleNext}
+            back={handleBack}
+            model={proposalQuestionModel}
+            topic="chemical-deuteration"
+          />
+        );
+      case 5:
         return (
           <ProposalParticipants
             data={proposalData}
@@ -77,7 +130,7 @@ export default function ProposalContainer(props) {
             back={handleBack}
           />
         );
-      case 2:
+      case 6:
         return (
           <ProposalReview
             data={proposalData}
