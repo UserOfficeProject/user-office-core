@@ -7,6 +7,11 @@ import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import { useAddCall } from "../hooks/useAddCall";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker
+} from "@material-ui/pickers";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -34,18 +39,40 @@ const useStyles = makeStyles(theme => ({
 export default function AddCall(props) {
   const classes = useStyles();
   const sendAddCall = useAddCall();
+  const DatePickerField = ({ field, form, ...other }) => {
+    const currentError = form.errors[field.name];
 
+    return (
+      <KeyboardDatePicker
+        clearable
+        name={field.name}
+        value={field.value}
+        format="yyyy-MM-dd"
+        helperText={currentError}
+        error={Boolean(currentError)}
+        onError={error => {
+          // handle as a side effect
+          if (error !== currentError) {
+            form.setFieldError(field.name, error);
+          }
+        }}
+        // if you are using custom validation schema you probably want to pass `true` as third argument
+        onChange={date => form.setFieldValue(field.name, date, false)}
+        {...other}
+      />
+    );
+  };
   return (
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
           shortCode: "",
-          start: "",
-          end: "",
-          startReview: "",
-          endReview: "",
-          startNotify: "",
-          endNotify: "",
+          start: null,
+          end: null,
+          startReview: null,
+          endReview: null,
+          startNotify: null,
+          endNotify: null,
           cycleComment: "",
           surveyComment: ""
         }}
@@ -76,97 +103,104 @@ export default function AddCall(props) {
           props.close();
         }}
         validationSchema={Yup.object().shape({
-          shortCode: Yup.string().required("Short Code is required")
+          shortCode: Yup.string().required("Short Code is required"),
+          start: Yup.date().required("Date is required"),
+          end: Yup.date().required("Date is required"),
+          startReview: Yup.date().required("Date is required"),
+          endReview: Yup.date().required("Date is required"),
+          startNotify: Yup.date().required("Date is required"),
+          endNotify: Yup.date().required("Date is required"),
+          cycleComment: Yup.string().required("Date is required"),
+          surveyComment: Yup.string().required("Date is required")
         })}
       >
-        <Form>
-          <Typography className={classes.cardHeader}>
-            Call information
-          </Typography>
+        {({ values, errors, handleChange }) => (
+          <Form>
+            <Typography className={classes.cardHeader}>
+              Call information
+            </Typography>
 
-          <Field
-            name="shortCode"
-            label="Short Code"
-            type="text"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="start"
-            label="Start"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="end"
-            label="End"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="startReview"
-            label="Start of review"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="endReview"
-            label="End of review"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="startNotify"
-            label="Start of notification period"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="endNotify"
-            label="End of notification period"
-            type="date"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="cycleComment"
-            label="Cycle comment"
-            type="text"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
-          <Field
-            name="surveyComment"
-            label="Survey Comment"
-            type="text"
-            component={TextField}
-            margin="normal"
-            fullWidth
-          />
+            <Field
+              name="shortCode"
+              label="Short Code"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Field
+                name="start"
+                label="Start"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
 
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Add Call
-          </Button>
-        </Form>
+              <Field
+                name="end"
+                label="End"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="startReview"
+                label="Start of review"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="endReview"
+                label="End of review"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="startNotify"
+                label="Start of notification period"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
+              <Field
+                name="endNotify"
+                label="End of notification period"
+                component={DatePickerField}
+                margin="normal"
+                fullWidth
+              />
+            </MuiPickersUtilsProvider>
+            <Field
+              name="cycleComment"
+              label="Cycle comment"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="surveyComment"
+              label="Survey Comment"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Add Call
+            </Button>
+          </Form>
+        )}
       </Formik>
     </Container>
   );
