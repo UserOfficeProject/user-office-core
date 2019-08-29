@@ -13,7 +13,7 @@ import Badge from "@material-ui/core/Badge";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import { menuItems } from "./menuItems";
+import MenuItems from "./MenuItems";
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
 import ProposalReviewUserOfficer from "./ProposalReviewUserOfficer";
@@ -162,7 +162,9 @@ export default function Dashboard({ match }) {
           </IconButton>
         </div>
         <Divider />
-        <List>{menuItems[currentRole]}</List>
+        <List>
+          <MenuItems role={currentRole} />
+        </List>
         <Divider />
       </Drawer>
       <main className={classes.content}>

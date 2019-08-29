@@ -9,9 +9,25 @@ import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import CalendarToday from "@material-ui/icons/CalendarToday";
 import { Link } from "react-router-dom";
+import { useCallsData } from "../hooks/useCallsData";
 
-export const menuItems = {
-  user: (
+export default function MenuItems({ role }) {
+  const { loading, callsData } = useCallsData();
+
+  let proposalDisabled = false;
+
+  // Checks if there is a call open, during the current time
+  if (!loading) {
+    const currentTime = new Date().getTime();
+    proposalDisabled = callsData
+      ? callsData.filter(
+          call =>
+            new Date(call.startDate).getTime() < currentTime &&
+            currentTime < new Date(call.endDate).getTime()
+        ).length === 0
+      : false;
+  }
+  const user = (
     <div>
       <ListItem component={Link} to="/" button>
         <ListItemIcon>
@@ -19,7 +35,12 @@ export const menuItems = {
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItem>
-      <ListItem component={Link} to="/ProposalSubmission" button>
+      <ListItem
+        component={Link}
+        to="/ProposalSubmission"
+        button
+        disabled={proposalDisabled}
+      >
         <ListItemIcon>
           <NoteAdd />
         </ListItemIcon>
@@ -32,8 +53,9 @@ export const menuItems = {
         <ListItemText primary="Logout" />
       </ListItem>
     </div>
-  ),
-  user_officer: (
+  );
+
+  const user_officer = (
     <div>
       <ListItem component={Link} to="/ProposalPage" button>
         <ListItemIcon>
@@ -60,8 +82,8 @@ export const menuItems = {
         <ListItemText primary="Logout" />
       </ListItem>
     </div>
-  ),
-  reviewer: (
+  );
+  const reviewer = (
     <div>
       <ListItem component={Link} to="/ProposalTableReviewer" button>
         <ListItemIcon>
@@ -76,5 +98,16 @@ export const menuItems = {
         <ListItemText primary="Logout" />
       </ListItem>
     </div>
-  )
-};
+  );
+
+  switch (role) {
+    case "user":
+      return user;
+    case "user_officer":
+      return user_officer;
+    case "reviewer":
+      return reviewer;
+    default:
+      return null;
+  }
+}
