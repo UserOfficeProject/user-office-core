@@ -12,15 +12,24 @@ export class Proposal {
 
 export class ProposalTemplate {
   constructor(
-    public fields:ProposalTemplateField[]
+    public topics: Topic[]
     ) {}
   }
+
+export class Topic {
+  constructor(
+    public topic_id:number,
+    public topic_title: string,
+    public fields:ProposalTemplateField[] | null
+   ) {}
+}
   
 export class ProposalTemplateField {
   constructor(
     public proposal_question_id:string,
     public data_type:DataType,
     public question:string,
+    public topic: number | null,
     public config: object | null,
     public dependencies: FieldDependency[] | null
   ) {}

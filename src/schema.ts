@@ -119,13 +119,20 @@ type Review {
 
 
 type ProposalTemplate {
-    fields:[ProposalTemplateField]
+    topics: [Topic]
+}
+
+type Topic {
+  topic_id:Int,
+  topic_title: String,
+  fields:[ProposalTemplateField]
 }
   
 type ProposalTemplateField {
     proposal_question_id: String,
     data_type: String,
     question: String,
+
     config: String,
     dependencies: [FieldDependency]
 }
