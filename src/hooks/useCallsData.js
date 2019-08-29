@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 
-export function useCallsData() {
+export function useCallsData(show) {
   const sendRequest = useDataAPI();
   const [callsData, setCallsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export function useCallsData() {
       });
     };
     sendAllCallsRequest();
-  }, [sendRequest]);
+  }, [sendRequest, show]);
 
   return { loading, callsData };
 }

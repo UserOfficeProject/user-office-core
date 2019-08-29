@@ -33,8 +33,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function CallPage() {
   const classes = useStyles();
-  const { loading, callsData } = useCallsData();
   const [show, setShow] = useState(false);
+  const { loading, callsData } = useCallsData(show);
 
   const columns = [
     { title: "Short Code", field: "shortCode" },
