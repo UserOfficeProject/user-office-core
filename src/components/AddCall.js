@@ -39,12 +39,12 @@ const useStyles = makeStyles(theme => ({
 export default function AddCall(props) {
   const classes = useStyles();
   const sendAddCall = useAddCall();
+  const currentDay = new Date();
   const DatePickerField = ({ field, form, ...other }) => {
     const currentError = form.errors[field.name];
 
     return (
       <KeyboardDatePicker
-        clearable
         name={field.name}
         value={field.value}
         format="yyyy-MM-dd"
@@ -67,12 +67,12 @@ export default function AddCall(props) {
       <Formik
         initialValues={{
           shortCode: "",
-          start: null,
-          end: null,
-          startReview: null,
-          endReview: null,
-          startNotify: null,
-          endNotify: null,
+          start: currentDay,
+          end: currentDay,
+          startReview: currentDay,
+          endReview: currentDay,
+          startNotify: currentDay,
+          endNotify: currentDay,
           cycleComment: "",
           surveyComment: ""
         }}
