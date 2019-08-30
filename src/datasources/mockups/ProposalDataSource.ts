@@ -1,5 +1,11 @@
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal, ProposalTemplate, ProposalTemplateField as ProposalTemplateField, DataType, FieldDependency, Topic } from "../../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalTemplateField,
+  DataType,
+  FieldDependency
+} from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
   1,
@@ -21,15 +27,35 @@ export const dummyProposalSubmitted = new Proposal(
   "2019-07-17 08:25:12.23043+00"
 );
 
-
 export class proposalDataSource implements ProposalDataSource {
-
-  async getProposalTemplate():Promise<ProposalTemplate> {
-    var hasLinksToField = new ProposalTemplateField("hasLinksToField", DataType.SELECTION_FROM_OPTIONS, "Has any links to field?", 1, {'variant':'radio', 'options':['yes', 'no']}, null);
-    var linksToField = new ProposalTemplateField("linksToField", DataType.SMALL_TEXT, "Please specify", 1, null, [new FieldDependency("linksToField", "hasLinksToField", "{ 'ifValue': 'yes' }")]);
-    return new ProposalTemplate([new Topic(1, 'general information', [hasLinksToField, linksToField])]);
+  async checkActiveCall(): Promise<Boolean> {
+    return true;
   }
-  
+
+  async getProposalTemplate(): Promise<ProposalTemplate> {
+    var hasLinksToField = new ProposalTemplateField(
+      "hasLinksToField",
+      DataType.SELECTION_FROM_OPTIONS,
+      "Has any links to field?",
+      { variant: "radio", options: ["yes", "no"] },
+      null
+    );
+    var linksToField = new ProposalTemplateField(
+      "linksToField",
+      DataType.SMALL_TEXT,
+      "Please specify",
+      null,
+      [
+        new FieldDependency(
+          "linksToField",
+          "hasLinksToField",
+          "{ 'ifValue': 'yes' }"
+        )
+      ]
+    );
+    return new ProposalTemplate([hasLinksToField, linksToField]);
+  }
+
   async submitReview(
     reviewID: number,
     comment: string,

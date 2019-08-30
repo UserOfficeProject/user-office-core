@@ -2,6 +2,7 @@ import { ResolverContext } from "../context";
 import { isRejection, Rejection } from "../rejection";
 import { Proposal, ProposalTemplate } from "../models/Proposal";
 import { User } from "../models/User";
+import { Call } from "../models/Call";
 
 interface ProposalArgs {
   id: string;
@@ -14,6 +15,18 @@ interface ProposalsArgs {
 }
 
 interface CreateProposalArgs {}
+
+interface CreateCallArgs {
+  shortCode: string;
+  startCall: string;
+  endCall: string;
+  startReview: string;
+  endReview: string;
+  startNotify: string;
+  endNotify: string;
+  cycleComment: string;
+  surveyComment: string;
+}
 
 interface UpdateProposalArgs {
   id: string;
@@ -131,7 +144,10 @@ function createResponseWrapper<T>(key: string) {
 
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
-const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>("template");
+const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
+  "template"
+);
+const wrapCallMutation = createResponseWrapper<Call>("call");
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -155,7 +171,9 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-    return await wrapProposalTemplate(context.queries.proposal.getProposalTemplate(context.user));
+    return await wrapProposalTemplate(
+      context.queries.proposal.getProposalTemplate(context.user)
+    );
   },
 
   createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -302,5 +320,28 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  createCall(args: CreateCallArgs, context: ResolverContext) {
+    return wrapCallMutation(
+      context.mutations.call.create(
+        context.user,
+        args.shortCode,
+        args.startCall,
+        args.endCall,
+        args.startReview,
+        args.endReview,
+        args.startNotify,
+        args.endNotify,
+        args.cycleComment,
+        args.surveyComment
+      )
+    );
+  },
+  call(args: { id: number }, context: ResolverContext) {
+    return context.queries.call.get(context.user, args.id);
+  },
+  calls(args: {}, context: ResolverContext) {
+    return context.queries.call.getAll(context.user);
   }
 };
