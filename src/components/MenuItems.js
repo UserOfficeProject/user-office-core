@@ -9,7 +9,7 @@ import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import CalendarToday from "@material-ui/icons/CalendarToday";
 import { Link } from "react-router-dom";
-import { useCallsData } from "./useCallsData";
+import { useCallsData } from "../hooks/useCallsData";
 
 export default function MenuItems({ role }) {
   const { loading, callsData } = useCallsData();
