@@ -13,7 +13,7 @@ import Badge from "@material-ui/core/Badge";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import { menuItems } from "./menuItems";
+import MenuItems from "./MenuItems";
 import { Route, Switch } from "react-router-dom";
 import ProposalSubmission from "./ProposalSubmission";
 import ProposalReviewUserOfficer from "./ProposalReviewUserOfficer";
@@ -23,6 +23,7 @@ import PeoplePage from "./PeoplePage";
 import ProposalGrade from "./ProposalGrade";
 import UserPage from "./UserPage";
 import ProposalPage from "./ProposalPage";
+import CallPage from "./CallPage";
 import ProfilePage from "./ProfilePage";
 import OverviewPage from "./OverviewPage";
 import { Link } from "react-router-dom";
@@ -161,7 +162,9 @@ export default function Dashboard({ match }) {
           </IconButton>
         </div>
         <Divider />
-        <List>{menuItems[currentRole]}</List>
+        <List>
+          <MenuItems role={currentRole} />
+        </List>
         <Divider />
       </Drawer>
       <main className={classes.content}>
@@ -176,6 +179,7 @@ export default function Dashboard({ match }) {
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
+          <Route path="/CallPage" component={CallPage} />
           <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route
             path="/ProposalTableReviewer"
