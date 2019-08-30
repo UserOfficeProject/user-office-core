@@ -13,17 +13,27 @@ export class Proposal {
 }
 
 export class ProposalTemplate {
-  public fields!: ProposalTemplateField[];
-
+  public topics: Topic[] = [];
+  private fields: ProposalTemplateField[] = []; // reference to all fields for quick lookup
+  
   private conditionEvalator = new ConditionEvaluator();
-
+  
   constructor(obj: object | null = null) {
     if (obj !== null) {
       Object.assign(this, obj);
-      if (this.fields !== null) {
-        this.fields = this.fields.map(x => new ProposalTemplateField(x));
+      if (this.topics !== null) {
+        this.topics = this.topics.map(x => new Topic(x));
+        this.topics.forEach(topic => topic.fields && (this.fields = this.fields.concat(topic.fields)));
       }
     }
+  }
+  
+  public getAllFields():ProposalTemplateField[] {
+    return this.fields;
+  }
+
+  public getTopicById(topicId:number):Topic | undefined {
+    return this.topics.find(topic => topic.topic_id === topicId);
   }
 
   public areDependenciesSatisfied(fieldId: string) {
@@ -45,11 +55,29 @@ export class ProposalTemplate {
   }
 }
 
+export class Topic {
+  constructor(obj: object | null = null) {
+    if (obj !== null) {
+      Object.assign(this, obj);
+      if (this.fields !== null) {
+        this.fields = this.fields.map(x => new ProposalTemplateField(x));
+      }
+    }
+  }
+  public topic_id!:number;
+  public topic_title!: string;
+  public fields!:ProposalTemplateField[];
+
+  public getFieldById = (questionId: string) =>
+    this.fields && this.fields.find(field => field.proposal_question_id === questionId)!;
+
+}
+
 export class ProposalTemplateField {
   public proposal_question_id!: string;
   public data_type!: DataType;
   public question!: string;
-  public config!: any | { topic: string, variant: string | undefined, small_label:string | undefined, required: boolean | undefined, options:string[] };
+  public config!: any | { variant: string | undefined, small_label:string | undefined, required: boolean | undefined, options:string[] };
   public value: any = "";
   public dependencies!: FieldDependency[] | null;
 

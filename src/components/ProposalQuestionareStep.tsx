@@ -15,13 +15,12 @@ import { createFormikCofigObjects } from "./ProposalYupUtilities";
 
 export  default function ProposalQuestionareStep(props: {
   model: ProposalTemplate;
-  data: Proposal;
-  topic: string;
+  topicId: number;
   next?: Function;
   back?: Function;
 }) {
 
-  const { back, next, model, topic } = props;
+  const { back, next, model, topicId } = props;
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
@@ -39,12 +38,12 @@ export  default function ProposalQuestionareStep(props: {
     }
   })();
 
-  let activeFields = model.fields.filter(field => {
-    return (
-      field.config.topic === topic &&
-      model.areDependenciesSatisfied(field.proposal_question_id)
-    );
-  });
+  const topic = model.getTopicById(topicId);
+  let activeFields = topic
+    ? topic.fields.filter((field: ProposalTemplateField) => {
+        return model.areDependenciesSatisfied(field.proposal_question_id);
+      })
+    : [];
 
   let backbutton = back ? <Button onClick={() => back()} className={classes.buttons}>Back</Button> : null;
   let nextButton = next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;

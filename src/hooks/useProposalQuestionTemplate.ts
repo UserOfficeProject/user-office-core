@@ -4,25 +4,29 @@ import { ProposalTemplate } from "../model/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();
-  const [proposalQuestionModel, setProposalQuestionModel] = useState<ProposalTemplate>();
+  const [proposalTemplate, setProposalQuestionModel] = useState<ProposalTemplate>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getProposalTemplateRequest = () => {
       const query = `
             query {
-              proposalTemplate{
+              proposalTemplate {
                 error
                 template {
-                  fields {
-                    proposal_question_id
-                    data_type
-                    question
-                    config
-                    dependencies {
-                      proposal_question_dependency
-                      condition
+                  topics {
+                    topic_title
+                    topic_id,
+                    fields {
                       proposal_question_id
+                      data_type
+                      question
+                      config
+                      dependencies {
+                        proposal_question_dependency
+                        condition
+                        proposal_question_id
+                      }
                     }
                   }
                 }
@@ -39,5 +43,5 @@ export function useProposalQuestionTemplate() {
     getProposalTemplateRequest();
   }, [sendRequest]); // passing empty array as a second param so that effect is called only once on mount
 
-  return { loading, proposalQuestionModel };
+  return { loading, proposalTemplate };
 }
