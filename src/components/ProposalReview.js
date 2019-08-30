@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useContext} from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
+import { FormApi } from "./ProposalContainer";
 
 const useStyles = makeStyles({
   buttons: {
@@ -16,6 +17,7 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalReview(props) {
+  const api = useContext(FormApi);
   const classes = useStyles();
 
   return (
@@ -23,13 +25,13 @@ export default function ProposalReview(props) {
       <ProposalInformation data={props.data} disabled={true} />
       <ProposalParticipants data={props.data} disabled={true} />
       <div className={classes.buttons}>
-        <Button onClick={props.back} className={classes.button}>
+        <Button onClick={api.back} className={classes.button}>
           Back
         </Button>
         <Button
           variant="contained"
           color="primary"
-          onClick={props.submit}
+          onClick={api.next}
           className={classes.button}
         >
           {props.data.status ? "Update" : "Submit"}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { FormApi } from "./ProposalContainer";
 
 const useStyles = makeStyles({
   buttons: {
@@ -20,6 +21,7 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalInformation(props) {
+  const api = useContext(FormApi);
   const sendRequest = useDataAPI();
 
   const sendProposalUpdate = values => {
@@ -39,7 +41,7 @@ export default function ProposalInformation(props) {
       title: values.title,
       abstract: values.abstract
     };
-    sendRequest(query, variables).then(data => props.next(values));
+    sendRequest(query, variables).then(data => api.next(values));
   };
 
   const classes = useStyles();
@@ -97,7 +99,7 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          {props.next ? (
+          {api.next ? (
             <div className={classes.buttons}>
               <Button
                 disabled={isSubmitting}

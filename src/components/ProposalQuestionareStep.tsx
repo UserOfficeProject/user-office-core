@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { ProposalTemplate, Proposal, DataType, ProposalTemplateField } from "../model/ProposalModel";
+import { ProposalTemplate, DataType, ProposalTemplateField } from "../model/ProposalModel";
 import { Button, makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -11,16 +11,16 @@ import { ProposalCompontentDatePicker } from "./ProposalCompontentDatePicker";
 import { ProposalCompontentFileUpload } from "./ProposalCompontentFileUpload";
 import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
 import { createFormikCofigObjects } from "./ProposalYupUtilities";
+import { FormApi } from "./ProposalContainer";
 
 
 export  default function ProposalQuestionareStep(props: {
   model: ProposalTemplate;
   topicId: number;
-  next?: Function;
-  back?: Function;
 }) {
 
-  const { back, next, model, topicId } = props;
+  const api = useContext(FormApi);
+  const { model, topicId } = props;
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
@@ -45,14 +45,14 @@ export  default function ProposalQuestionareStep(props: {
       })
     : [];
 
-  let backbutton = back ? <Button onClick={() => back()} className={classes.buttons}>Back</Button> : null;
-  let nextButton = next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
+  let backbutton = api.back ? <Button onClick={() => api.back!()} className={classes.buttons}>Back</Button> : null;
+  let nextButton = api.next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
   const updateProposal = () => {
     console.log("Updating proposal")
-    next!();
+    api.next!();
   }
 
   if (model == null) {

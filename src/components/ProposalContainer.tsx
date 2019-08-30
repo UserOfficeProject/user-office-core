@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, createContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -12,6 +12,7 @@ import { useDataAPI } from "../hooks/useDataAPI";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import { ProposalTemplate } from "../model/ProposalModel";
+import ProposalInformation from "./ProposalInformation";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -31,13 +32,14 @@ const useStyles = makeStyles(theme => ({
 
 
 export default function ProposalContainer(props:any) {
+  const [proposalData, setProposalData] = useState(props.data);
   const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const sendRequest = useDataAPI();
   const { proposalTemplate } = useProposalQuestionTemplate();
   const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
   const classes = useStyles();
-
+  
   const submitProposal = () => {
     const query = `
     mutation($id: Int!){
@@ -56,7 +58,11 @@ export default function ProposalContainer(props:any) {
     return sendRequest(query, variables).then(() => setSubmitted(true));
   };
 
-  const handleNext = () => {
+  const handleNext = (data:any) => {
+    setProposalData({
+      ...proposalData,
+      ...data
+    });
     setStepIndex(stepIndex + 1);
   };
 
@@ -65,29 +71,35 @@ export default function ProposalContainer(props:any) {
   };
 
   const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
-    var proposalSteps = proposalTemplate.topics.map(topic => 
-      new ProposalStep(topic.topic_title, 
-      <ProposalQuestionareStep
-        back={handleBack}
-        next={handleNext}
-        model={proposalTemplate}
-        topicId={topic.topic_id}
-      />)
-    );
-    proposalSteps.push(
-      new ProposalStep('Participants' ,
-      <ProposalParticipants
-        next={handleNext}
-        back={handleBack}
-      />));
-    proposalSteps.push(
-      new ProposalStep('Review', 
-      <ProposalReview
-        back={handleBack}
-        submit={submitProposal}
-      />));
+    var allProposalSteps = [];
 
-    return proposalSteps;
+    allProposalSteps.push(
+    new ProposalStep(
+      "New Proposal (tmp)", 
+      <ProposalInformation data={proposalData}/>
+      )
+    );
+    allProposalSteps = allProposalSteps.concat(proposalTemplate.topics.map(topic => 
+      new ProposalStep(
+        topic.topic_title, 
+        <ProposalQuestionareStep
+          model={proposalTemplate}
+          topicId={topic.topic_id}
+        />
+    )));
+    allProposalSteps.push(
+      new ProposalStep(
+        'Participants' , 
+        <ProposalParticipants data={proposalData}/>
+      )
+    );
+    allProposalSteps.push(
+      new ProposalStep(
+        'Review',
+        <ProposalReview data={proposalData}/>
+      )
+    );
+    return allProposalSteps;
   }
 
   useEffect(() => {
@@ -111,33 +123,36 @@ export default function ProposalContainer(props:any) {
     return proposalSteps[step].element;
   };
 
-  
+  const api = {next:handleNext, back:handleBack, submit:submitProposal};
+
 
   return (
-    <Container maxWidth="lg" >
-      <Paper className={classes.paper}>
-        <Typography component="h1" variant="h4" align="center">
-          {false ? "Update Proposal" : "New Proposal"}
-        </Typography>
-        <Stepper activeStep={stepIndex} className={classes.stepper}>
-          {proposalSteps.map(proposalStep => (
-            <Step key={proposalStep.title}>
-              <StepLabel>{proposalStep.title}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <React.Fragment>
-          {submitted ? (
-            <React.Fragment>
-              <Typography variant="h5" gutterBottom>
-                {false ? "Update Proposal" : "Sent Proposal"}
-              </Typography>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
-          )}
-        </React.Fragment>
-      </Paper>
+    <Container maxWidth="lg">
+      <FormApi.Provider value={api}>
+        <Paper className={classes.paper}>
+          <Typography component="h1" variant="h4" align="center">
+            {false ? "Update Proposal" : "New Proposal"}
+          </Typography>
+          <Stepper activeStep={stepIndex} className={classes.stepper}>
+            {proposalSteps.map(proposalStep => (
+              <Step key={proposalStep.title}>
+                <StepLabel>{proposalStep.title}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <React.Fragment>
+            {submitted ? (
+              <React.Fragment>
+                <Typography variant="h5" gutterBottom>
+                  {false ? "Update Proposal" : "Sent Proposal"}
+                </Typography>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
+            )}
+          </React.Fragment>
+        </Paper>
+      </FormApi.Provider>
     </Container>
   );
 }
@@ -146,3 +161,6 @@ export default function ProposalContainer(props:any) {
 class ProposalStep {
   constructor(public title: string, public element: JSX.Element) {}
 }
+
+export const FormApi = createContext<{next:Function | null, back:Function | null, submit:Function | null}>({next:null, back: null, submit:null});
+

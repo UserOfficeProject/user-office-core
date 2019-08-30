@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { FormApi } from "./ProposalContainer";
 
 const useStyles = makeStyles({
   errorText: {
@@ -21,6 +22,7 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalParticipants(props) {
+  const api = useContext(FormApi);
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
@@ -42,7 +44,7 @@ export default function ProposalParticipants(props) {
       id: props.data.id,
       users: users.map(user => user.id)
     };
-    sendRequest(query, variables).then(data => props.next({ users }));
+    sendRequest(query, variables).then(data => api.next({ users }));
   };
 
   const addUser = user => {
@@ -89,9 +91,9 @@ export default function ProposalParticipants(props) {
           You need to add at least one Co-Proposer
         </p>
       )}
-      {props.back ? (
+      {api.back ? (
         <div className={classes.buttons}>
-          <Button onClick={props.back} className={classes.button}>
+          <Button onClick={api.back} className={classes.button}>
             Back
           </Button>
           <Button
