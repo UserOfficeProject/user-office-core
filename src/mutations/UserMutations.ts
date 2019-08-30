@@ -3,6 +3,8 @@ import { UserDataSource } from "../datasources/UserDataSource";
 import { rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
+import { UserAuthorization } from "../utils/UserAuthorization";
+
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 const config = require("./../../config");
@@ -10,7 +12,7 @@ const config = require("./../../config");
 export default class UserMutations {
   constructor(
     private dataSource: UserDataSource,
-    private userAuth: any,
+    private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 

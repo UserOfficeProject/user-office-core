@@ -19,6 +19,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     );
   }
 
+  async checkActiveCall(): Promise<Boolean> {
+    const currentDate = new Date().toISOString();
+    return database
+      .select()
+      .from("call")
+      .where("start_call", "<=", currentDate)
+      .andWhere("end_call", ">=", currentDate)
+      .first()
+      .then((call: any) => (call ? true : false));
+  }
+
   async setStatusProposal(
     id: number,
     status: number

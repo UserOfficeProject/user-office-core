@@ -4,13 +4,14 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import { Proposal } from "../models/Proposal";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
-    private userAuth: any,
+    private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
@@ -19,6 +20,14 @@ export default class ProposalMutations {
       async () => {
         if (agent == null) {
           return rejection("NOT_LOGGED_IN");
+        }
+
+        // Check if there is an open call, if not reject
+        if (
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.dataSource.checkActiveCall())
+        ) {
+          return rejection("NO_ACTIVE_CALL_FOUND");
         }
 
         const result = await this.dataSource.create(agent.id);
@@ -46,6 +55,14 @@ export default class ProposalMutations {
 
         // Get proposal information
         let proposal = await this.dataSource.get(parseInt(id)); //Hacky
+
+        // Check if there is an open call, if not reject
+        if (
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.dataSource.checkActiveCall())
+        ) {
+          return rejection("NO_ACTIVE_CALL_FOUND");
+        }
 
         // Check that proposal exist
         if (!proposal) {
