@@ -2,6 +2,7 @@ image: node:7
 
 stages:
   - test
+  - build
   - deploy
 
 test:
@@ -12,6 +13,14 @@ test:
     - NODE_ENV=ci npm run test
   tags:
     - docker
+
+docker build:
+  stage: build
+  script:
+  - docker info
+  - docker build -t $LATEST_VER -t $MAJOR_VER -t $MINOR_VER -t $PATCH_VER .
+  tags:
+    - docker-in-docker
     
 deploy_staging:
   stage: deploy
