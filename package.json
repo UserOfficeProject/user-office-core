@@ -4,7 +4,7 @@
   "description": "DUO-Backend-proto",
   "main": "index.js",
   "scripts": {
-    "test": "jest --env=node --colors --coverage",
+    "test": "secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 jest --env=node --colors --coverage",
     "tsc": "tsc",
     "dev": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 ts-node-dev --respawn --transpileOnly ./index.ts",
     "prod": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 node ./build/index.js",
