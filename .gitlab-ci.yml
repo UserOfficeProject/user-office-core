@@ -19,7 +19,7 @@ docker build:
   stage: build
   script:
   - docker info
-  - docker build -t $LATEST_VER -t $MAJOR_VER -t $MINOR_VER -t $PATCH_VER .
+  - docker build . -t "duo-backend"
   tags:
     - docker
     
