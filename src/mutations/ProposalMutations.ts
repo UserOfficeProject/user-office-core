@@ -3,7 +3,7 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { Proposal } from "../models/Proposal";
+import { Proposal, ProposalAnswer } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 
 // TODO: it is here much of the logic reside
@@ -42,8 +42,7 @@ export default class ProposalMutations {
   async update(
     agent: User | null,
     id: string,
-    title?: string,
-    abstract?: string,
+    answers:ProposalAnswer[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -82,22 +81,17 @@ export default class ProposalMutations {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
 
-        // Check what needs to be updated and update proposal object
-        if (title !== undefined) {
-          proposal.title = title;
-
-          if (title.length < 10) {
-            return rejection("TOO_SHORT_TITLE");
+        answers.forEach(async answer => {
+          // TODO validate input
+          // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
+          if(answer.answer !== undefined) {
+            await this.dataSource.updateAnswer(
+              proposal.id,
+              answer.proposal_question_id,
+              answer.answer
+            );
           }
-        }
-
-        if (abstract !== undefined) {
-          proposal.abstract = abstract;
-
-          if (abstract.length < 20) {
-            return rejection("TOO_SHORT_ABSTRACT");
-          }
-        }
+        })
 
         if (status !== undefined) {
           proposal.status = status;

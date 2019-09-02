@@ -44,6 +44,11 @@ export class FieldDependency {
   ) {}
 }
 
+export interface ProposalAnswer {
+  proposal_question_id: string;
+  answer: string;
+}
+
 export enum DataType {
   SMALL_TEXT,
   LARGE_TEXT,

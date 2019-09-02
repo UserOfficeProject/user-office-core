@@ -49,7 +49,7 @@ type Query {
 
   type Mutation {
     createProposal: ProposalMutationResult
-    updateProposal(id: ID!, title: String, abstract: String, status: Int, users: [Int]): ProposalMutationResult
+    updateProposal(id:ID!, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
@@ -105,7 +105,7 @@ type Call {
 }
 
 type Proposal {
-    id: Int
+    id: ID
     title: String
     abstract: String
     status: Int
@@ -138,7 +138,6 @@ type Review {
   status: Int
 }
 
-
 type ProposalTemplate {
     topics: [Topic]
 }
@@ -162,6 +161,11 @@ type FieldDependency {
     proposal_question_dependency: String,
     proposal_question_id: String,
     condition: String,
+}
+
+input ProposalAnswer {
+  proposal_question_id: ID!,
+  answer: String
 }
 
 `);

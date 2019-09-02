@@ -87,6 +87,41 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
   }
 
+  async updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean> {
+    const results: [{ count: number }] =  await database
+      .count()
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      });
+
+      const hasEntry = !results || results[0].count == 0;
+      if (hasEntry) {
+        return database("proposal_answers")
+          .update({
+            answer: answer
+          })
+          .where({
+            proposal_id: proposal_id,
+            proposal_question_id: question_id
+          });
+      } else {
+        return database
+          .insert({
+            proposal_id: proposal_id,
+            proposal_question_id: question_id,
+            answer: answer
+          })
+          .into("proposal_answers");
+      }
+  }
+
+
   async update(proposal: Proposal): Promise<Proposal | null> {
     return database
       .update(

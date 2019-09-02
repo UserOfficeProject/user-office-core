@@ -29,6 +29,11 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
+  
+  
+  async updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean> {
+    return true;
+  }
   async checkActiveCall(): Promise<Boolean> {
     return true;
   }
@@ -110,7 +115,7 @@ export class proposalDataSource implements ProposalDataSource {
     return null;
   }
 
-  async create() {
+  async create(proposerID:number) {
     return dummyProposal;
   }
 
