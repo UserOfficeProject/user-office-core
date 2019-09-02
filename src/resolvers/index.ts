@@ -30,6 +30,8 @@ interface CreateCallArgs {
 
 interface UpdateProposalArgs {
   id: string;
+  title: string;
+  abstract: string;
   answers:ProposalAnswer[];
   status: number;
   users: number[];
@@ -182,11 +184,13 @@ export default {
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
-    const { id, answers, status, users } = args;
+    const { id, title, abstract, answers, status, users } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
         context.user,
         id,
+        title,
+        abstract,
         answers,
         status,
         users

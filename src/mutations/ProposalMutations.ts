@@ -42,7 +42,9 @@ export default class ProposalMutations {
   async update(
     agent: User | null,
     id: string,
-    answers:ProposalAnswer[],
+    title?: string,
+    abstract?: string,
+    answers?:ProposalAnswer[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -81,17 +83,21 @@ export default class ProposalMutations {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
 
-        answers.forEach(async answer => {
-          // TODO validate input
-          // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
-          if(answer.answer !== undefined) {
-            await this.dataSource.updateAnswer(
-              proposal!.id,
-              answer.proposal_question_id,
-              answer.answer
-            );
+        if (title !== undefined) {
+          proposal.title = title;
+
+          if (title.length < 10) {
+            return rejection("TOO_SHORT_TITLE");
           }
-        })
+        }
+
+        if (abstract !== undefined) {
+          proposal.abstract = abstract;
+
+          if (abstract.length < 20) {
+            return rejection("TOO_SHORT_ABSTRACT");
+          }
+        }
 
         if (status !== undefined) {
           proposal.status = status;
@@ -107,6 +113,23 @@ export default class ProposalMutations {
           }
         }
         // This will overwrite the whole proposal with the new object created
+
+        
+        if(answers !== undefined) 
+        {
+          // TODO validate input
+          // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
+          answers.forEach(async answer => {
+            if(answer.answer !== undefined) {
+              await this.dataSource.updateAnswer(
+                proposal!.id,
+                answer.proposal_question_id,
+                answer.answer
+              );
+            }
+          })
+        }
+
         const result = await this.dataSource.update(proposal);
 
         return result || rejection("INTERNAL_ERROR");

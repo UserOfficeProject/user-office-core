@@ -49,7 +49,7 @@ type Query {
 
   type Mutation {
     createProposal: ProposalMutationResult
-    updateProposal(id:ID!, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
+    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
