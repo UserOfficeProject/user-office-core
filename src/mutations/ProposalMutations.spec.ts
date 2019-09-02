@@ -36,8 +36,7 @@ test("A user on the proposal can update it's title if it is in edit mode", () =>
     proposalMutations.update(
       dummyUser,
       "1",
-      "New proposal title",
-      undefined,
+      [{proposal_question_id:"title", answer:"New project title"}],
       undefined,
       undefined
     )
@@ -49,8 +48,7 @@ test("A user on the proposal can't update it's title if it is not in edit mode",
     proposalMutations.update(
       dummyUser,
       "2",
-      "New proposal title",
-      undefined,
+      [{proposal_question_id:"title", answer:"New project title"}],
       undefined,
       undefined
     )
@@ -62,8 +60,7 @@ test("A userofficer can update a proposal in edit mode", () => {
     proposalMutations.update(
       dummyUserOfficer,
       "1",
-      "New proposal title",
-      undefined,
+      [{proposal_question_id:"title", answer:"New project title"}],
       undefined,
       undefined
     )
@@ -75,8 +72,7 @@ test("A userofficer can update a proposal in submit mode", () => {
     proposalMutations.update(
       dummyUserOfficer,
       "2",
-      "New proposal title",
-      undefined,
+      [{proposal_question_id:"title", answer:"New project title"}],
       undefined,
       undefined
     )
@@ -88,8 +84,7 @@ test("A user not on a proposal can not update it", () => {
     proposalMutations.update(
       dummyUserNotOnProposal,
       "1",
-      "New proposal title",
-      undefined,
+      [{proposal_question_id:"title", answer:"New project title"}],
       undefined,
       undefined
     )
