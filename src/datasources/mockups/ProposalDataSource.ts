@@ -1,5 +1,11 @@
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal } from "../../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalTemplateField,
+  DataType,
+  FieldDependency
+} from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
   1,
@@ -22,6 +28,34 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
+  async checkActiveCall(): Promise<Boolean> {
+    return true;
+  }
+
+  async getProposalTemplate(): Promise<ProposalTemplate> {
+    var hasLinksToField = new ProposalTemplateField(
+      "hasLinksToField",
+      DataType.SELECTION_FROM_OPTIONS,
+      "Has any links to field?",
+      { variant: "radio", options: ["yes", "no"] },
+      null
+    );
+    var linksToField = new ProposalTemplateField(
+      "linksToField",
+      DataType.SMALL_TEXT,
+      "Please specify",
+      null,
+      [
+        new FieldDependency(
+          "linksToField",
+          "hasLinksToField",
+          "{ 'ifValue': 'yes' }"
+        )
+      ]
+    );
+    return new ProposalTemplate([hasLinksToField, linksToField]);
+  }
+
   async submitReview(
     reviewID: number,
     comment: string,

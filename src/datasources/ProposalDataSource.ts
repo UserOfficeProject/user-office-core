@@ -1,14 +1,17 @@
-import { Proposal } from "../models/Proposal";
+import { Proposal, ProposalTemplate } from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
+  checkActiveCall(): Promise<Boolean>;
   getProposals(
     filter?: string,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; proposals: Proposal[] }>;
+    ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
+  getProposalTemplate():Promise<ProposalTemplate>;
+
   // Write
   create(id: number): Promise<Proposal | null>;
   update(proposal: Proposal): Promise<Proposal | null>;

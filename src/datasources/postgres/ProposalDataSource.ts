@@ -2,8 +2,7 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal } from "../../models/Proposal";
-import { Review } from "../../models/Review";
+import { Proposal, ProposalTemplate, ProposalTemplateField, FieldDependency } from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 
@@ -18,6 +17,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       proposal.created_at,
       proposal.updated_at
     );
+  }
+
+  async checkActiveCall(): Promise<Boolean> {
+    const currentDate = new Date().toISOString();
+    return database
+      .select()
+      .from("call")
+      .where("start_call", "<=", currentDate)
+      .andWhere("end_call", ">=", currentDate)
+      .first()
+      .then((call: any) => (call ? true : false));
   }
 
   async setStatusProposal(
@@ -160,5 +170,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => this.createProposalObject(proposal))
       );
+  }
+
+  async getProposalTemplate(): Promise<ProposalTemplate> {
+    let deps:FieldDependency[] = await database
+              .select("d.*")
+              .from("proposal_question_dependencies as d");
+
+    let fields: ProposalTemplateField[] = await database
+                .select("q.*")
+                .from("proposal_questions as q");
+
+    fields.forEach( field => { field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id ) });
+
+    return new ProposalTemplate(fields);
   }
 }

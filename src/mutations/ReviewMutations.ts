@@ -4,11 +4,12 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import { Review } from "../models/Review";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 export default class ReviewMutations {
   constructor(
     private dataSource: ReviewDataSource,
-    private userAuth: any,
+    private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
