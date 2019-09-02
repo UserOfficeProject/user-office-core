@@ -15,6 +15,7 @@ test:
     - docker
 
 docker build:
+  image: docker:stable
   stage: build
   script:
   - docker info
