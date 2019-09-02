@@ -86,7 +86,7 @@ export default class ProposalMutations {
           // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
           if(answer.answer !== undefined) {
             await this.dataSource.updateAnswer(
-              proposal.id,
+              proposal!.id,
               answer.proposal_question_id,
               answer.answer
             );
