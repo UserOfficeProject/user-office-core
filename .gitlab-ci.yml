@@ -3,7 +3,6 @@ image: node:7
 stages:
   - test
   - build
-  - registry
   - deploy
 
 test:
@@ -21,21 +20,10 @@ docker build:
   script:
   - docker info
   - docker build . -t dmsc/duo-backend
-  tags:
-    - docker
-
-docker push:
-  image: docker:stable
-  stage: registry
-  stage: Push to Docker Hub
-  only:
-  - master
-  script:
   - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
   - docker push dmsc/duo-backend
   tags:
     - docker
-
 
 deploy_staging:
   stage: deploy
