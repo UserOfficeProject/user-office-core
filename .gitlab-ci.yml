@@ -26,7 +26,7 @@ docker build:
 
 docker push:
   image: docker:stable
-  stage: registry
+  stage: push
   stage: Push to Docker Hub
   only:
   - master
