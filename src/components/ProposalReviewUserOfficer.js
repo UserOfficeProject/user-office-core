@@ -40,8 +40,8 @@ export default function ProposalReview({ match }) {
   const [modalOpen, setOpen] = useState(false);
   const [reviewers, setReviewers] = useState([]);
   const { loading, proposalData } = useProposalData(match.params.id);
-  const sendAddReviewer = useAddUserForReview(match.params.id);
-  const sendRemoveReviewer = useRemoveUserForReview(match.params.id);
+  const sendAddReviewer = useAddUserForReview(); 
+  const sendRemoveReviewer = useRemoveUserForReview();
 
   useEffect(() => {
     if (proposalData) {
