@@ -6,6 +6,7 @@ import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
 import { useDataAPI } from "../hooks/useDataAPI";
 import { FormApi } from "./ProposalContainer";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
 
 const useStyles = makeStyles({
   errorText: {
@@ -27,25 +28,8 @@ export default function ProposalParticipants(props) {
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const sendRequest = useDataAPI();
-  const sendProposalUpdate = () => {
-    const query = `
-      mutation($id: ID!, $users: [Int!]) {
-        updateProposal(id: $id, users: $users){
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
+  const updateProposal = useUpdateProposal();
 
-    const variables = {
-      id: props.data.id,
-      users: users.map(user => user.id)
-    };
-    sendRequest(query, variables).then(data => api.next({ users }));
-  };
 
   const addUser = user => {
     setUsers([...users, user]);
@@ -62,7 +46,11 @@ export default function ProposalParticipants(props) {
     if (users.length < 1) {
       setUserError(true);
     } else {
-      sendProposalUpdate();
+      const userIds = users.map(user => user.id);
+      updateProposal({
+        id: props.data.id,
+        users: userIds
+      }).then(data => api.next({ users }));
     }
   };
 

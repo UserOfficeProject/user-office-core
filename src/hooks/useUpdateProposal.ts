@@ -6,10 +6,10 @@ export function useUpdateProposal() {
   const sendRequest = useDataAPI();
 
   const sendAddReview = useCallback(
-    async ( params: { id:number, title?:string, abstract?:string, answers?:ProposalAnswer[]}) => {
+    async ( parameters: { id:number, title?:string, abstract?:string, answers?:ProposalAnswer[], users?:number[]}) => {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswer]) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers){
+      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswer], $users:[Int]) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, users:$users){
          proposal{
           id
         }
@@ -18,7 +18,7 @@ export function useUpdateProposal() {
       }
       `;
 
-      return await sendRequest(query, params).then(resp => resp);
+      return await sendRequest(query, parameters).then(resp => resp);
     },
     [sendRequest]
   );
