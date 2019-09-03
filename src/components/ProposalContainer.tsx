@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -13,22 +13,10 @@ import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplat
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import { ProposalTemplate } from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
+import ErrorIcon from '@material-ui/icons/Error';
+import { Zoom } from "@material-ui/core";
 
-const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  },
-  stepper: {
-    padding: theme.spacing(3, 0, 5)
-  }
-}));
+
 
 
 export default function ProposalContainer(props:any) {
@@ -38,7 +26,22 @@ export default function ProposalContainer(props:any) {
   const sendRequest = useDataAPI();
   const { proposalTemplate } = useProposalQuestionTemplate();
   const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
-  const classes = useStyles();
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const classes = makeStyles(theme => ({
+    paper: {
+      marginTop: theme.spacing(3),
+      marginBottom: theme.spacing(3),
+      padding: theme.spacing(2),
+      [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
+        marginTop: theme.spacing(6),
+        marginBottom: theme.spacing(6),
+        padding: theme.spacing(3)
+      }
+    },
+    stepper: {
+      padding: theme.spacing(3, 0, 5)
+    }
+  }))();
   
   const submitProposal = () => {
     const query = `
@@ -70,45 +73,51 @@ export default function ProposalContainer(props:any) {
     setStepIndex(stepIndex - 1);
   };
 
-  const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
-    var allProposalSteps = new Array<ProposalStep>();
-
-    allProposalSteps.push(
-    new ProposalStep(
-      "New Proposal", 
-      <ProposalInformation data={proposalData}/>
-      )
-    );    
-    allProposalSteps = allProposalSteps.concat(proposalTemplate.topics.map(topic => 
-      new ProposalStep(
-        topic.topic_title, 
-        <ProposalQuestionareStep
-          model={proposalTemplate}
-          topicId={topic.topic_id}
-          data={proposalData}
-        />
-    )));
-    allProposalSteps.push(
-      new ProposalStep(
-        'Participants' , 
-        <ProposalParticipants data={proposalData}/>
-      )
-    );
-    allProposalSteps.push(
-      new ProposalStep(
-        'Review',
-        <ProposalReview data={proposalData}/>
-      )
-    );
-    return allProposalSteps;
+  const handleError = (msg:string) => {
+    setErrorMessage(msg);
   }
 
+
+  
+
   useEffect(() => {
+    const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
+      var allProposalSteps = new Array<ProposalStep>();
+  
+      allProposalSteps.push(
+      new ProposalStep(
+        "New Proposal", 
+        <ProposalInformation data={proposalData}/>
+        )
+      );    
+      allProposalSteps = allProposalSteps.concat(proposalTemplate.topics.map(topic => 
+        new ProposalStep(
+          topic.topic_title, 
+          <ProposalQuestionareStep
+            model={proposalTemplate}
+            topicId={topic.topic_id}
+            data={proposalData}
+          />
+      )));
+      allProposalSteps.push(
+        new ProposalStep(
+          'Participants' , 
+          <ProposalParticipants data={proposalData}/>
+        )
+      );
+      allProposalSteps.push(
+        new ProposalStep(
+          'Review',
+          <ProposalReview data={proposalData}/>
+        )
+      );
+      return allProposalSteps;
+    }
     if (proposalTemplate) {
       const proposalSteps = createProposalSteps(proposalTemplate);
       setProposalSteps(proposalSteps)
     }
-  }, [proposalTemplate]);
+  }, [proposalTemplate, proposalData]);
 
   
   const getStepContent = (step:number) => {
@@ -124,7 +133,7 @@ export default function ProposalContainer(props:any) {
     return proposalSteps[step].element;
   };
 
-  const api = {next:handleNext, back:handleBack, submit:submitProposal};
+  const api = {next:handleNext, back:handleBack, submit:submitProposal, error:handleError};
 
 
   return (
@@ -149,7 +158,10 @@ export default function ProposalContainer(props:any) {
                 </Typography>
               </React.Fragment>
             ) : (
-              <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
+              <React.Fragment>
+              {getStepContent(stepIndex)}
+              <ErrorMessageBox message={errorMessage} />
+              </React.Fragment>
             )}
           </React.Fragment>
         </Paper>
@@ -163,5 +175,24 @@ class ProposalStep {
   constructor(public title: string, public element: JSX.Element) {}
 }
 
-export const FormApi = createContext<{next:Function | null, back:Function | null, submit:Function | null}>({next:null, back: null, submit:null});
+const ErrorMessageBox = (props:{message?:string | undefined}) => {
+  const classes = makeStyles(() => ({
+    error: {
+      color:"#ff0000",
+      padding:"10px 0",
+      display:"flex",
+      alignItems:"center",
+      justifyContent:"flex-end",
+    },
+    icon: {
+      margin:"5px"
+    }
+  }))();
+    return <Zoom in={props.message !== undefined} mountOnEnter unmountOnExit>
+      <div className={classes.error}><ErrorIcon className={classes.icon}/> {props.message}</div>
+      </Zoom>
+  
+}
+
+export const FormApi = createContext<{next:Function | null, back:Function | null, submit:Function | null, error:Function | null}>({next:null, back: null, submit:null, error:null});
 
