@@ -7,20 +7,6 @@ cache:
 stages:
   - test
   - build
-  - production
-
-build:
-  stage: build
-  artifacts:
-    paths:
-      - build/
-  script:
-    - npm install
-    - npm run build
-  tags:
-    - docker
-  only:
-    - master
 
 test:
   stage: test
@@ -31,19 +17,13 @@ test:
   tags:
     - docker
 
-
-
-
-production:
-  type: deploy
-  stage: production
-  image: ruby:latest
+docker build:
+  image: docker:stable
+  stage: build
   script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=duo2-frontend-staging --api-key=$HEROKU_API_KEY --skip_cleanup
-  only:
-    - master
+  - docker info
+  - docker build . -t dmsc/duo-frontend
+  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+  - docker push dmsc/duo-frontend
   tags:
     - docker
