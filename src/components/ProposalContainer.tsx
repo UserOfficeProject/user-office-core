@@ -71,20 +71,21 @@ export default function ProposalContainer(props:any) {
   };
 
   const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
-    var allProposalSteps = [];
+    var allProposalSteps = new Array<ProposalStep>();
 
     allProposalSteps.push(
     new ProposalStep(
-      "New Proposal (tmp)", 
+      "New Proposal", 
       <ProposalInformation data={proposalData}/>
       )
-    );
+    );    
     allProposalSteps = allProposalSteps.concat(proposalTemplate.topics.map(topic => 
       new ProposalStep(
         topic.topic_title, 
         <ProposalQuestionareStep
           model={proposalTemplate}
           topicId={topic.topic_id}
+          data={proposalData}
         />
     )));
     allProposalSteps.push(

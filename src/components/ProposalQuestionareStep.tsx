@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { ProposalTemplate, DataType, ProposalTemplateField } from "../model/ProposalModel";
+import { ProposalTemplate, DataType, ProposalTemplateField, ProposalAnswer } from "../model/ProposalModel";
 import { Button, makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -12,11 +12,13 @@ import { ProposalCompontentFileUpload } from "./ProposalCompontentFileUpload";
 import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
 import { createFormikCofigObjects } from "./ProposalYupUtilities";
 import { FormApi } from "./ProposalContainer";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
 
 
 export  default function ProposalQuestionareStep(props: {
   model: ProposalTemplate;
   topicId: number;
+  data:{id:number}
 }) {
 
   const api = useContext(FormApi);
@@ -24,6 +26,7 @@ export  default function ProposalQuestionareStep(props: {
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
+  const updateAnswers = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {
       margin:"10px 0"
@@ -50,8 +53,13 @@ export  default function ProposalQuestionareStep(props: {
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
-  const updateProposal = () => {
-    console.log("Updating proposal")
+  const onSubmitClicked = async (values:any) => {
+    const proposalId:number = props.data.id;
+    const answers:ProposalAnswer[] = Object.keys(values).map(key => {
+      return {proposal_question_id:key, answer:values[key]};
+    });
+
+    await updateAnswers({id:proposalId, answers:answers});
     api.next!();
   }
 
@@ -63,7 +71,7 @@ export  default function ProposalQuestionareStep(props: {
     <Formik
       initialValues={initialValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={updateProposal}
+      onSubmit={onSubmitClicked}
     >
       {({ errors, touched, handleChange, handleSubmit }) => (
         <form onSubmit={handleSubmit}>

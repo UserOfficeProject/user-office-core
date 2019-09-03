@@ -6,8 +6,8 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { useDataAPI } from "../hooks/useDataAPI";
 import { FormApi } from "./ProposalContainer";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
 
 const useStyles = makeStyles({
   buttons: {
@@ -22,34 +22,18 @@ const useStyles = makeStyles({
 
 export default function ProposalInformation(props) {
   const api = useContext(FormApi);
-  const sendRequest = useDataAPI();
-
-  const sendProposalUpdate = values => {
-    const query = `
-    mutation($id: ID!, $title: String!, $abstract: String!,) {
-      updateProposal(id: $id, title: $title, abstract: $abstract){
-       proposal{
-        id
-      }
-        error
-      }
-    }
-    `;
-
-    const variables = {
-      id: props.data.id,
-      title: values.title,
-      abstract: values.abstract
-    };
-    sendRequest(query, variables).then(data => api.next(values));
-  };
+  const updateProposal = useUpdateProposal();
 
   const classes = useStyles();
   return (
     <Formik
       initialValues={{ title: props.data.title, abstract: props.data.abstract }}
-      onSubmit={(values, actions) => {
-        sendProposalUpdate(values);
+      onSubmit={(values) => {
+        updateProposal({
+          id: props.data.id,
+          title: values.title,
+          abstract: values.abstract
+        }).then(() => api.next());
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
