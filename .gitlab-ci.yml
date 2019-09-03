@@ -3,7 +3,6 @@ image: node:7
 stages:
   - test
   - build
-  - deploy
 
 test:
   stage: test
@@ -24,17 +23,3 @@ docker build:
   - docker push dmsc/duo-backend
   tags:
     - docker
-
-deploy_staging:
-  stage: deploy
-  image: ruby:latest
-  script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=duo2-backend-staging --api-key=$HEROKU_API_KEY
-  only:
-    - master
-  tags:
-    - docker
-    
