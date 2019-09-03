@@ -111,6 +111,11 @@ export class ProposalTemplateResult {
   error!: String;
 }
 
+export interface ProposalAnswer {
+  proposal_question_id: string;
+  answer: string;
+}
+
 export enum DataType {
   TEXT_INPUT = "TEXT_INPUT",
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
