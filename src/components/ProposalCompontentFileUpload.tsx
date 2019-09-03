@@ -32,7 +32,8 @@ export class ProposalCompontentFileUpload extends React.Component<IBasicComponen
     let curFileList = this.state.files;
     // clone the state, because we might modify the array
     let listItems = curFileList.slice(0);
-    if (!config.maxFiles || config.maxFiles < listItems.length) {
+    let maxFilesAllowed = config.maxFiles || 1; 
+    if (maxFilesAllowed > listItems.length) {
       listItems.push(this.getUniqueFileId()); // new file entry
     }
     return (
