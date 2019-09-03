@@ -60,7 +60,8 @@ export  default function ProposalQuestionareStep(props: {
     });
 
     await updateAnswers({id:proposalId, answers:answers});
-    api.next!();
+    
+    api.next && api.next();
   }
 
   if (model == null) {
