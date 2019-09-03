@@ -127,6 +127,7 @@ export default function AddCall(props) {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="short-code"
             />
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Field
@@ -135,6 +136,7 @@ export default function AddCall(props) {
                 component={DatePickerField}
                 margin="normal"
                 fullWidth
+                data-cy="start-date"
               />
 
               <Field
@@ -143,6 +145,7 @@ export default function AddCall(props) {
                 component={DatePickerField}
                 margin="normal"
                 fullWidth
+                data-cy="end-date"
               />
               <Field
                 name="startReview"
@@ -150,6 +153,7 @@ export default function AddCall(props) {
                 component={DatePickerField}
                 margin="normal"
                 fullWidth
+                data-cy="start-review"
               />
               <Field
                 name="endReview"
@@ -180,6 +184,7 @@ export default function AddCall(props) {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="cycle-comment"
             />
             <Field
               name="surveyComment"
@@ -188,6 +193,7 @@ export default function AddCall(props) {
               component={TextField}
               margin="normal"
               fullWidth
+              data-cy="survey-comment"
             />
 
             <Button
@@ -196,6 +202,7 @@ export default function AddCall(props) {
               variant="contained"
               color="primary"
               className={classes.submit}
+              data-cy="submit"
             >
               Add Call
             </Button>
