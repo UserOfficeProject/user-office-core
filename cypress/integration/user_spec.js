@@ -1,57 +1,132 @@
 /// <reference types="Cypress" />
+const faker = require("faker");
 
-context(
-  "A user should be able to login and submit a proposal and then logout",
-  () => {
-    beforeEach(() => {
-      cy.visit("localhost:3000");
-    });
-    it(".type() - type into a DOM element", () => {
-     cy.get('[data-cy=input-username] input')
-        .type("testuser")
-        .should("have.value", "testuser");
+context("User tests", () => {
+  beforeEach(() => {
+    cy.visit("localhost:3000");
+  });
 
-      cy.get('[data-cy=input-password] input')
-        .type("Test1234!")
-        .should("have.value", "Test1234!");
+  // Login details
+  const userName = faker.internet.userName();
+  const password = faker.internet.password();
 
-      cy.get('[data-cy=submit]').click()
+  // Personal details
+  const firstName = faker.name.firstName();
+  const lastName = faker.name.lastName();
+  const middleName = faker.name.firstName();
+  const birthDate = faker.date
+    .past()
+    .toISOString()
+    .slice(0, 10);
 
-      cy.contains("Your proposals");
+  //Organization detail
+  const organisation = faker.company.companyName();
+  const department = faker.commerce.department();
+  const orgAddress = faker.address.streetAddress();
+  const position = faker.name.jobTitle();
 
-      cy.contains("New Proposal").click();
+  //Contact details
+  const email = faker.internet.email();
+  const telephone = faker.phone.phoneNumber();
+  const telephoneAlt = faker.phone.phoneNumber();
 
-      cy.get("input")
-        .eq(0)
-        .type("This is my prop")
-        .should("have.value", "This is my prop");
+  it("A user should be able to create a new account", () => {
+    cy.get("[data-cy=create-account]").click();
 
-      cy.get("input")
-        .eq(1)
-        .type("This is a abstract for my proposal")
-        .should("have.value", "This is a abstract for my proposal");
+    // Login details
+    cy.get("[data-cy=username] input")
+      .type(userName)
+      .should("have.value", userName);
 
-      cy.contains("Next").click();
+    cy.get("[data-cy=password] input")
+      .type(password)
+      .should("have.value", password);
 
-      cy.get(".MTableToolbar-actions-877").click();
+    // Personal details
+    cy.get("[data-cy=firstname] input")
+      .type(firstName)
+      .should("have.value", firstName);
 
-      cy.contains("testuser");
+    cy.get("[data-cy=middlename] input")
+      .type(middleName)
+      .should("have.value", middleName);
 
-      cy.get("td")
-        .eq(2)
-        .click();
+    cy.get("[data-cy=lastname] input")
+      .type(lastName)
+      .should("have.value", lastName);
 
-      cy.contains("Next").click();
+    cy.get("[data-cy=preferredname] input")
+      .type(firstName)
+      .should("have.value", firstName);
 
-      cy.contains("Submit").click();
+    cy.get("#select-gender").click();
 
-      cy.contains("Dashboard").click();
+    cy.contains("Male").click();
 
-      cy.contains("Title of my prop");
+    cy.get("#select-nationality").click();
 
-      cy.contains("Logout").click();
+    cy.contains("Swedish").click();
 
-      cy.contains("Sign in");
-    });
-  }
-);
+    cy.get("[data-cy=birthdate] input")
+      .type(birthDate)
+      .should("have.value", birthDate);
+
+    //Organization details
+    cy.get("[data-cy=orcid] input")
+      .type("0000-0000-0000-0000")
+      .should("have.value", "0000-0000-0000-0000");
+
+    cy.get("[data-cy=organisation] input")
+      .type(organisation)
+      .should("have.value", organisation);
+
+    cy.get("[data-cy=department] input")
+      .type(department)
+      .should("have.value", department);
+
+    cy.get("[data-cy=organisation-address] input")
+      .type(orgAddress)
+      .should("have.value", orgAddress);
+
+    cy.get("[data-cy=position] input")
+      .type(position)
+      .should("have.value", position);
+
+    //Contact details
+    cy.get("[data-cy=email] input")
+      .type(email)
+      .should("have.value", email);
+
+    cy.get("[data-cy=telephone] input")
+      .type(telephone)
+      .should("have.value", telephone);
+
+    cy.get("[data-cy=telephone-alt] input")
+      .type(telephoneAlt)
+      .should("have.value", telephoneAlt);
+
+    //Submit
+    cy.get("[data-cy=submit]").click();
+
+    //Check redirect to Sign in page
+    cy.contains("Sign in");
+  });
+
+  it("A user should be able to login and out", () => {
+    cy.get("[data-cy=input-username] input")
+      .type(userName)
+      .should("have.value", userName);
+
+    cy.get("[data-cy=input-password] input")
+      .type(password)
+      .should("have.value", password);
+
+    cy.get("[data-cy=submit]").click();
+
+    cy.contains("Your proposals");
+
+    cy.contains("Logout").click();
+
+    cy.contains("Sign in");
+  });
+});

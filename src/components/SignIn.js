@@ -135,7 +135,9 @@ export default function SignInSide() {
                 <Link to="/ResetPasswordEmail/">Forgot password?</Link>
               </Grid>
               <Grid item>
-                <Link to="/SignUp/">Don't have an account? Sign Up</Link>
+                <Link to="/SignUp/" data-cy="create-account">
+                  Don't have an account? Sign Up
+                </Link>
               </Grid>
             </Grid>
           </div>
