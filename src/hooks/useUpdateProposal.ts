@@ -1,11 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 import { ProposalAnswer } from "../model/ProposalModel";
 
 export function useUpdateProposal() {
   const sendRequest = useDataAPI();
+  const [loading, setLoading] = useState(false);
 
-  const sendAddReview = useCallback(
+  const updateProposal = useCallback(
     async ( parameters: { id:number, title?:string, abstract?:string, answers?:ProposalAnswer[], users?:number[]}) => {
       const query = `
       mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswer], $users:[Int]) {
@@ -17,11 +18,14 @@ export function useUpdateProposal() {
         }
       }
       `;
-
-      return await sendRequest(query, parameters).then(resp => resp);
+      setLoading(true);
+      const result = await sendRequest(query, parameters).then(resp => resp);
+      setLoading(false);
+      return result;
     },
     [sendRequest]
+
   );
 
-  return sendAddReview;
+  return {loading, updateProposal};
 }

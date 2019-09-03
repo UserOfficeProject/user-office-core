@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { ProposalTemplate, DataType, ProposalTemplateField, ProposalAnswer } from "../model/ProposalModel";
-import { Button, makeStyles } from "@material-ui/core";
+import { Button, makeStyles, CircularProgress } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
@@ -26,7 +26,7 @@ export  default function ProposalQuestionareStep(props: {
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
-  const updateAnswers = useUpdateProposal();
+  const {loading, updateProposal} = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {
       margin:"10px 0"
@@ -50,6 +50,7 @@ export  default function ProposalQuestionareStep(props: {
 
     let backbutton = api.back ? <Button onClick={() => api.back!()} className={classes.buttons}>Back</Button> : null;
     let nextButton = api.next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
+    let buttonArea = loading ? <CircularProgress /> : <Fragment>{backbutton}{nextButton}</Fragment>;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
@@ -59,7 +60,7 @@ export  default function ProposalQuestionareStep(props: {
       return {proposal_question_id:key, answer:values[key]};
     });
 
-    const result = await updateAnswers({id:proposalId, answers:answers});
+    const result = await updateProposal({id:proposalId, answers:answers});
 
     if(result && result.error) {
       api.error && api.error(result.error);
@@ -95,8 +96,7 @@ export  default function ProposalQuestionareStep(props: {
             );
           })}
           <div className={classes.buttons}>
-            {backbutton}
-            {nextButton}
+            {buttonArea}
           </div>
         </form>
       )}

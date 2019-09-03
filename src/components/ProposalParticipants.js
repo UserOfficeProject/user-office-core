@@ -27,7 +27,7 @@ export default function ProposalParticipants(props) {
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const updateProposal = useUpdateProposal();
+  const {loading, updateProposal} = useUpdateProposal();
 
 
   const addUser = user => {

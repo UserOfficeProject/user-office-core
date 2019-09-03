@@ -22,7 +22,7 @@ const useStyles = makeStyles({
 
 export default function ProposalInformation(props) {
   const api = useContext(FormApi);
-  const updateProposal = useUpdateProposal();
+  const {loading, updateProposal} = useUpdateProposal();
 
   const classes = useStyles();
   return (
