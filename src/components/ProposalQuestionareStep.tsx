@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from "react";
+import React, { useContext, Fragment, useRef } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { ProposalTemplate, DataType, ProposalTemplateField, ProposalAnswer } from "../model/ProposalModel";
@@ -13,6 +13,7 @@ import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoi
 import { createFormikCofigObjects } from "./ProposalYupUtilities";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
 
 export  default function ProposalQuestionareStep(props: {
@@ -22,6 +23,7 @@ export  default function ProposalQuestionareStep(props: {
 }) {
 
   const api = useContext(FormApi);
+  const proposalForm = React.createRef<HTMLFormElement>();
   const { model, topicId } = props;
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -30,14 +32,6 @@ export  default function ProposalQuestionareStep(props: {
   const classes = makeStyles({
     componentWrapper: {
       margin:"10px 0"
-    },
-    buttons: {
-      display: "flex",
-      justifyContent: "flex-end"
-    },
-    button: {
-      marginTop: "25px",
-      marginLeft: "10px"
     }
   })();
 
@@ -48,13 +42,10 @@ export  default function ProposalQuestionareStep(props: {
       })
     : [];
 
-    let backbutton = api.back ? <Button onClick={() => api.back!()} className={classes.buttons}>Back</Button> : null;
-    let nextButton = api.next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
-    let buttonArea = loading ? <CircularProgress /> : <Fragment>{backbutton}{nextButton}</Fragment>;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
-  const onSubmitClicked = async (values:any) => {
+  const onFormSubmit = async (values:any) => {
     const proposalId:number = props.data.id;
     const answers:ProposalAnswer[] = Object.keys(values).map(key => {
       return {proposal_question_id:key, answer:values[key]};
@@ -68,8 +59,8 @@ export  default function ProposalQuestionareStep(props: {
     else{
       api.next && api.next();
     }
-    
   }
+
 
   if (model == null) {
     return <div>loading...</div>;
@@ -79,10 +70,10 @@ export  default function ProposalQuestionareStep(props: {
     <Formik
       initialValues={initialValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={onSubmitClicked}
+      onSubmit={onFormSubmit}
     >
       {({ errors, touched, handleChange, handleSubmit }) => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={proposalForm}>
           {activeFields.map(field => {
             return (
                 <div className={classes.componentWrapper} key={field.proposal_question_id}>
@@ -95,9 +86,7 @@ export  default function ProposalQuestionareStep(props: {
                 </div>
             );
           })}
-          <div className={classes.buttons}>
-            {buttonArea}
-          </div>
+          <ProposalNavigationFragment back={api.back} showSubmit={true} isLoading={loading}/>
         </form>
       )}
     </Formik>

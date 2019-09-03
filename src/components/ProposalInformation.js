@@ -2,29 +2,17 @@ import React, { useContext } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
-const useStyles = makeStyles({
-  buttons: {
-    display: "flex",
-    justifyContent: "flex-end"
-  },
-  button: {
-    marginTop: "25px",
-    marginLeft: "10px"
-  }
-});
+
 
 export default function ProposalInformation(props) {
   const api = useContext(FormApi);
   const {loading, updateProposal} = useUpdateProposal();
-
-  const classes = useStyles();
   return (
     <Formik
       initialValues={{ title: props.data.title, abstract: props.data.abstract }}
@@ -46,7 +34,7 @@ export default function ProposalInformation(props) {
           .required("Abstract must be at least 20 characters")
       })}
     >
-      {({ values, errors, touched, handleChange, isSubmitting }) => (
+      {({ values, errors, touched, handleChange }) => (
         <Form>
           <Typography variant="h6" gutterBottom>
             General Information
@@ -83,19 +71,7 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          {api.next ? (
-            <div className={classes.buttons}>
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.button}
-              >
-                Next
-              </Button>
-            </div>
-          ) : null}
+          <ProposalNavigationFragment showSubmit={api.next !== null} isLoading={loading} />
         </Form>
       )}
     </Formik>
