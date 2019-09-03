@@ -11,7 +11,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   backend: 
-    image: backend
+    image: dmsc/duo-backend
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
@@ -21,7 +21,7 @@ services:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql"
       - "traefik.port=4000"
   frontend: 
-    image: frontend
+    image: dmsc/duo-frontend
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
