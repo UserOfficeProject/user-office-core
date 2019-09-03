@@ -23,3 +23,5 @@ docker build:
   - docker push dmsc/duo-backend
   tags:
     - docker
+  only:
+    - master
