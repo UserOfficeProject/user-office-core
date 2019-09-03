@@ -48,8 +48,8 @@ export  default function ProposalQuestionareStep(props: {
       })
     : [];
 
-  let backbutton = api.back ? <Button onClick={() => api.back!()} className={classes.buttons}>Back</Button> : null;
-  let nextButton = api.next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
+    let backbutton = api.back ? <Button onClick={() => api.back!()} className={classes.buttons}>Back</Button> : null;
+    let nextButton = api.next ? <Button type="submit" variant="contained" color="primary" className={classes.buttons}>Next</Button> : null;
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
@@ -59,9 +59,15 @@ export  default function ProposalQuestionareStep(props: {
       return {proposal_question_id:key, answer:values[key]};
     });
 
-    await updateAnswers({id:proposalId, answers:answers});
+    const result = await updateAnswers({id:proposalId, answers:answers});
+
+    if(result && result.error) {
+      api.error && api.error(result.error);
+    }
+    else{
+      api.next && api.next();
+    }
     
-    api.next && api.next();
   }
 
   if (model == null) {
