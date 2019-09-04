@@ -1,8 +1,8 @@
-import React, { useContext, Fragment, useRef } from "react";
+import React, { useContext } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { ProposalTemplate, DataType, ProposalTemplateField, ProposalAnswer } from "../model/ProposalModel";
-import { Button, makeStyles, CircularProgress } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";

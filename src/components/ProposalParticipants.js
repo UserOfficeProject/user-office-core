@@ -6,6 +6,7 @@ import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
 const useStyles = makeStyles({
   errorText: {
@@ -41,7 +42,8 @@ export default function ProposalParticipants(props) {
     setUsers(newUsers);
   };
 
-  const handleNext = () => {
+  const onSubmit = (e) => {
+    e.preventDefault();
     if (users.length < 1) {
       setUserError(true);
     } else {
@@ -58,7 +60,7 @@ export default function ProposalParticipants(props) {
   };
 
   return (
-    <React.Fragment>
+    <form onSubmit={onSubmit}>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
@@ -78,21 +80,8 @@ export default function ProposalParticipants(props) {
           You need to add at least one Co-Proposer
         </p>
       )}
-      {api.back ? (
-        <div className={classes.buttons}>
-          <Button onClick={api.back} className={classes.button}>
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNext}
-            className={classes.button}
-          >
-            Next
-          </Button>
-        </div>
-      ) : null}
-    </React.Fragment>
+
+      <ProposalNavigationFragment showSubmit={true} back={api.back} isLoading={loading} />
+    </form>
   );
 }
