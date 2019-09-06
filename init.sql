@@ -137,6 +137,14 @@ CREATE TABLE reviews (
 , CONSTRAINT prop_user_pkey PRIMARY KEY (proposal_id, user_id)  -- explicit pk
 );
 
+CREATE TABLE files (
+  id           serial PRIMARY KEY
+, file_name     VARCHAR(64) NOT NULL
+, size_in_btyes int
+, mime_type     VARCHAR(64) 
+, oid           int UNIQUE
+, created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
 CREATE TABLE call (
   call_id serial PRIMARY KEY 
@@ -202,6 +210,29 @@ VALUES
                   );
 
 INSERT INTO role_user (role_id, user_id) VALUES (1, 1);
+
+
+
+INSERT INTO call(
+          call_short_code 
+        , start_call 
+        , end_call 
+        , start_review 
+        , end_review 
+        , start_notify
+        , end_notify
+        , cycle_comment 
+        , survey_comment )
+ VALUES(
+        'call 1', 
+        '2019-01-01', 
+        '2023-01-01',
+        '2019-01-01', 
+        '2023-01-01',
+        '2019-01-01', 
+        '2023-01-01', 
+        'This is cycle comment', 
+        'This is survey comment');
 
 
 INSERT INTO users (
@@ -302,8 +333,6 @@ INSERT INTO proposal_question_datatypes VALUES ('BOOLEAN');
 INSERT INTO proposal_question_datatypes VALUES ('DATE');
 INSERT INTO proposal_question_datatypes VALUES ('FILE_UPLOAD');
 
-INSERT INTO proposal_questions VALUES('proposal_title','TEXT_INPUT','Proposal title',1, '{"topic":"general-information","required":true, "min":2, "max":500}');
-INSERT INTO proposal_questions VALUES('brief_summary','TEXT_INPUT','Brief summary',1,'{"topic":"general-information","required":true, "min":10, "max":500, "multiline":true}');
 INSERT INTO proposal_questions VALUES('has_links_with_industry','SELECTION_FROM_OPTIONS','Links with industry?',1,'{"topic":"general-information","required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('links_with_industry','TEXT_INPUT','If yes, please describe:',1,'{"topic":"general-information","placeholder":"Please specify links with industry"}');
 INSERT INTO proposal_questions VALUES('is_student_proposal','SELECTION_FROM_OPTIONS','Are any of the co-proposers students?',1,'{"topic":"general-information","required":true, "options":["yes", "no"], "variant":"radio"}');
