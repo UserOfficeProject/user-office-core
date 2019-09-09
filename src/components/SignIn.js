@@ -41,13 +41,17 @@ const useStyles = makeStyles(theme => ({
 export default function SignInSide() {
   const classes = useStyles();
   const [failedLogin, setFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { handleLogin, token } = useContext(UserContext);
 
   const requestToken = values => {
     const { username, password } = values;
     const query = `
     mutation($username: String!, $password: String!){
-      login(username: $username, password: $password)
+      login(username: $username, password: $password){
+        token
+        error
+      }
     }
     `;
 
@@ -58,9 +62,14 @@ export default function SignInSide() {
 
     request("/graphql", query, variables)
       .then(data => {
-        if (data.login) {
-          handleLogin(data.login);
+        if (!data.login.error) {
+          handleLogin(data.login.token);
         } else {
+          if (data.login.error === "WRONG_USERNAME_OR_PASSWORD") {
+            setErrorMessage("Wrong password or username");
+          } else if (data.login.error === "EMAIL_NOT_VERIFIED") {
+            setErrorMessage("Verify email before login");
+          }
           setFailed(true);
         }
       })
@@ -116,7 +125,7 @@ export default function SignInSide() {
               fullWidth
             />
             {failedLogin && (
-              <p className={classes.errorMessage}>Wrong Credentials</p>
+              <p className={classes.errorMessage}>{errorMessage}</p>
             )}
             <Button
               type="submit"

@@ -3,6 +3,7 @@ import SignUp from "./SignUp";
 import SignIn from "./SignIn";
 import ResetPassword from "./ResetPassword";
 import ResetPasswordEmail from "./ResetPasswordEmail";
+import EmailVerification from "./EmailVerification";
 import RoleSelectionPage from "./RoleSelectionPage";
 import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -41,6 +42,10 @@ function App() {
             <Route path="/SignIn" component={SignIn} />
             <Route path="/ResetPasswordEmail" component={ResetPasswordEmail} />
             <Route path="/ResetPassword/:token" component={ResetPassword} />
+            <Route
+              path="/EmailVerification/:token"
+              component={EmailVerification}
+            />
             <Route
               path="/LogOut"
               render={() => (
