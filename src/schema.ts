@@ -42,6 +42,11 @@ type Query {
     error: String
   }
 
+  type LoginMutationResult {
+    token: String
+    error: String
+  }
+
   type ProposalTemplateResult {
     template: ProposalTemplate
     error: String
@@ -77,12 +82,13 @@ type Query {
         ): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
-    login(username: String!, password: String!): String
+    login(username: String!, password: String!): LoginMutationResult
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
     removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
     resetPasswordEmail(email: String!): Boolean
     resetPassword(token: String!, password: String!): Boolean
+    emailVerification(token: String!): Boolean
   }
 
 type Roles {

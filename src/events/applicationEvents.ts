@@ -28,9 +28,16 @@ interface UserResetPasswordEmailEvent {
   link: string;
 }
 
+interface AccountCreation {
+  type: "ACCOUNT_CREATED";
+  user: User;
+  link: string;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
+  | AccountCreation
   | UserResetPasswordEmailEvent;

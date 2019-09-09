@@ -16,6 +16,7 @@ export class User {
     public organisation_address: string,
     public position: string,
     public email: string,
+    public emailVerified: boolean,
     public telephone: string,
     public telephone_alt: string | null,
     public created: string,

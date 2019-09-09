@@ -4,7 +4,6 @@ const BluePromise = require("bluebird");
 
 import { User } from "../../models/User";
 import { Role } from "../../models/Role";
-import { Review } from "../../models/Review";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
@@ -26,6 +25,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.organisation_address,
       user.position,
       user.email,
+      user.email_verified,
       user.telephone,
       user.telephone_alt,
       user.created_at.toISOString(),
@@ -224,7 +224,18 @@ export default class PostgresUserDataSource implements UserDataSource {
         };
       });
   }
-
+  async setUserEmailVerified(id: number): Promise<Boolean> {
+    return database
+      .update({
+        email_verified: true
+      })
+      .from("users")
+      .where("user_id", id)
+      .then(() => {
+        return true;
+      })
+      .catch(() => false);
+  }
   async getProposalUsers(id: number) {
     return database
       .select()

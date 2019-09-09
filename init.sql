@@ -36,6 +36,7 @@ CREATE TABLE users (
 , organisation_address varchar(100) NOT NULL
 , position  varchar(30) NOT NULL
 , email     varchar(30) UNIQUE
+, email_verified boolean DEFAULT False
 , telephone varchar(20) NOT NULL
 , telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
