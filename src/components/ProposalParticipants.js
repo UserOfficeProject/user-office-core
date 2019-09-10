@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
 import { FormApi } from "./ProposalContainer";
