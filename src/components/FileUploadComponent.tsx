@@ -19,15 +19,30 @@ import ErrorIcon from '@material-ui/icons/Error';
 import CancelIcon from '@material-ui/icons/Cancel';
 
 export class FileUploadComponent extends React.Component<
-  { maxFiles?: number; id?: string; fileType?: string },
+  { maxFiles?: number; id?: string; fileType?: string, value:string, onChange:Function },
   { files: FileMetaData[] }
 > {
+
+  inputRef: React.RefObject<HTMLInputElement>;
+
+  constructor(props:any) {
+    super(props);
+    this.inputRef = React.createRef();
+  }
   state = { files: new Array<FileMetaData>() };
 
   onUploadComplete(newFile: FileMetaData) {
     this.setState(prevState => ({
       files: prevState.files.concat(newFile)
     }));
+
+    // sending event and pretending change event came from InputField
+    const inputElement = this.inputRef.current!;
+    let event:any = {};
+    inputElement.value = this.state.files.map(metaData => metaData.fid).join(",");
+    event.target = inputElement;
+    this.props.onChange(event);
+    //
   }
 
   onDeleteClicked(deleteFile: FileMetaData) {
@@ -53,7 +68,7 @@ export class FileUploadComponent extends React.Component<
 
     return (
       <React.Fragment>
-        <input type="text" id={id} name={id} readOnly value={this.state.files.map(metaData => metaData.mimeType)} />
+        <input type="text" id={id} name={id} readOnly value={this.props.value}  ref={this.inputRef}/>
         <List
           component="nav"
           aria-label="main mailbox folders"
