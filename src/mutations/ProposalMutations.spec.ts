@@ -38,7 +38,12 @@ test("A user on the proposal can update it's title if it is in edit mode", () =>
       "1",
       "New project title",
       "Project abstract description",
-      [{proposal_question_id:"fasta_seq", answer:"ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK*"}],
+      [
+        {
+          proposal_question_id: "fasta_seq",
+          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        }
+      ],
       undefined,
       undefined
     )
@@ -52,7 +57,12 @@ test("A user on the proposal can't update it's title if it is not in edit mode",
       "2",
       "New project title",
       "Project abstract description",
-      [{proposal_question_id:"fasta_seq", answer:"ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK*"}],
+      [
+        {
+          proposal_question_id: "fasta_seq",
+          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        }
+      ],
       undefined,
       undefined
     )
@@ -66,7 +76,12 @@ test("A userofficer can update a proposal in edit mode", () => {
       "1",
       "New project title",
       "Project abstract description",
-      [{proposal_question_id:"fasta_seq", answer:"ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK*"}],
+      [
+        {
+          proposal_question_id: "fasta_seq",
+          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        }
+      ],
       undefined,
       undefined
     )
@@ -80,7 +95,12 @@ test("A userofficer can update a proposal in submit mode", () => {
       "2",
       "New project title",
       "Project abstract description",
-      [{proposal_question_id:"fasta_seq", answer:"ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK*"}],
+      [
+        {
+          proposal_question_id: "fasta_seq",
+          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        }
+      ],
       undefined,
       undefined
     )
@@ -94,7 +114,12 @@ test("A user not on a proposal can not update it", () => {
       "1",
       "New project title",
       "Project abstract description",
-      [{proposal_question_id:"fasta_seq", answer:"ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK*"}],
+      [
+        {
+          proposal_question_id: "fasta_seq",
+          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        }
+      ],
       undefined,
       undefined
     )
@@ -188,4 +213,36 @@ test("A non-logged in user cannot submit a proposal", () => {
     "reason",
     "NOT_LOGGED_IN"
   );
+});
+
+test("A user can attach files", () => {
+  const dummyFileList = ["1020597501870552"];
+  return expect(
+    proposalMutations.updateFiles(
+      dummyUser,
+      1,
+      "reference_files",
+      dummyFileList
+    )
+  ).resolves.toBe(dummyFileList);
+});
+
+test("A non-belonging can't attach files", () => {
+  const dummyFileList = ["1020597501870552"];
+  return expect(
+    proposalMutations.updateFiles(
+      dummyUserNotOnProposal,
+      1,
+      "reference_files",
+      dummyFileList
+    )
+  ).resolves.toBe(dummyFileList);
+});
+
+test("User must have valid session to attach files", () => {
+  return expect(
+    proposalMutations.updateFiles(null, 1, "reference_files", [
+      "1020597501870552"
+    ])
+  ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
