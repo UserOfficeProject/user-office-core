@@ -145,7 +145,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  async updateFiles(
+  async insertFiles(
     proposal_id: number,
     question_id: string,
     files: string[]

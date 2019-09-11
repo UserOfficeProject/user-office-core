@@ -29,7 +29,7 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
-  updateFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
+  insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
     throw new Error("Method not implemented.");
   }
   deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {

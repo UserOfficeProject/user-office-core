@@ -146,7 +146,7 @@ export default class ProposalMutations {
         questionId
       );
 
-      const result = await this.dataSource.updateFiles(
+      const result = await this.dataSource.insertFiles(
         proposalId,
         questionId,
         files
