@@ -140,6 +140,21 @@ export default class ProposalMutations {
     );
   }
 
+  async updateFiles(proposalId:number, questionId:string, files:string[]) {
+      await this.dataSource.deleteFiles(
+        proposalId, 
+        questionId
+      );
+
+      const result = await this.dataSource.updateFiles(
+        proposalId,
+        questionId,
+        files
+      );
+
+      return result || rejection("INTERNAL_ERROR");
+  }
+
   async accept(
     agent: User | null,
     proposalID: number

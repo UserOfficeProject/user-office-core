@@ -1,6 +1,6 @@
 export class FileMetaData {
     constructor(
-        public fid:string,
+        public file_id:string,
         public oid:number,
         public originalFileName:string,
         public mimeType:string,

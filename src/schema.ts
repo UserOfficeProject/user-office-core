@@ -32,6 +32,11 @@ type Query {
     error: String
   }
 
+  type FilesMutationResult {
+    files: [String]
+    error: String
+  }
+
   type CallMutationResult {
     call: Call
     error: String
@@ -50,6 +55,7 @@ type Query {
   type Mutation {
     createProposal: ProposalMutationResult
     updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
+    updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult

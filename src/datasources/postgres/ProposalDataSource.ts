@@ -2,7 +2,13 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal, ProposalTemplate, ProposalTemplateField, FieldDependency, Topic } from "../../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalTemplateField,
+  FieldDependency,
+  Topic
+} from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 
@@ -92,7 +98,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     question_id: string,
     answer: string
   ): Promise<Boolean> {
-    const results: [{ count: string }] =  await database
+    const results: [{ count: string }] = await database
       .count()
       .from("proposal_answers")
       .where({
@@ -100,28 +106,77 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         proposal_question_id: question_id
       });
 
-      const hasEntry = results && results[0].count !== '0';
-      if (hasEntry) {
-        
-        return database("proposal_answers")
-          .update({
-            answer: answer
-          })
-          .where({
-            proposal_id: proposal_id,
-            proposal_question_id: question_id
-          });
-      } else {
-        return database
-          .insert({
-            proposal_id: proposal_id,
-            proposal_question_id: question_id,
-            answer: answer
-          })
-          .into("proposal_answers");
-      }
+    const hasEntry = results && results[0].count !== "0";
+    if (hasEntry) {
+      return database("proposal_answers")
+        .update({
+          answer: answer
+        })
+        .where({
+          proposal_id: proposal_id,
+          proposal_question_id: question_id
+        });
+    } else {
+      return database
+        .insert({
+          proposal_id: proposal_id,
+          proposal_question_id: question_id,
+          answer: answer
+        })
+        .into("proposal_answers");
+    }
   }
 
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean | null> {
+    const selectResult = await database
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      })
+      .select("id");
+
+    if (!selectResult || selectResult.length != 1) {
+      return null;
+    }
+
+    const answerId = selectResult[0].id;
+
+    await database("proposal_answers_files")
+      .where({ answer_id: answerId })
+      .del();
+
+    return true;
+  }
+
+  async updateFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[] | null> {
+    const selectResult = await database
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      })
+      .select("id");
+
+    if (!selectResult || selectResult.length != 1) {
+      return null;
+    }
+
+    const answerId = selectResult[0].id;
+
+    await database("proposal_answers_files").insert(
+      files.map(file => ({ answer_id: answerId, file_id: file }))
+    );
+
+    return files;
+  }
 
   async update(proposal: Proposal): Promise<Proposal | null> {
     return database
@@ -209,25 +264,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-
-    
-
-    const deps:FieldDependency[] = await database
-              .select("*")
-              .from("proposal_question_dependencies");
+    const deps: FieldDependency[] = await database
+      .select("*")
+      .from("proposal_question_dependencies");
 
     const fields: ProposalTemplateField[] = await database
-                .select("*")
-                .from("proposal_questions");
+      .select("*")
+      .from("proposal_questions");
 
     const topics: Topic[] = await database
-                .select("p.*")
-                .from("proposal_topics as p")
-                .where("p.is_enabled", true)
-                .orderBy("sort_order");
+      .select("p.*")
+      .from("proposal_topics as p")
+      .where("p.is_enabled", true)
+      .orderBy("sort_order");
 
-    topics.forEach( topic => { topic.fields = fields.filter(field => field.topic === topic.topic_id ) });
-    fields.forEach( field => { field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id ) });
+    topics.forEach(topic => {
+      topic.fields = fields.filter(field => field.topic === topic.topic_id);
+    });
+    fields.forEach(field => {
+      field.dependencies = deps.filter(
+        dep => dep.proposal_question_id === field.proposal_question_id
+      );
+    });
 
     return new ProposalTemplate(topics);
   }

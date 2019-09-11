@@ -37,6 +37,12 @@ interface UpdateProposalArgs {
   users: number[];
 }
 
+interface UpdateProposalFilesArgs {
+  proposal_id: number;
+  question_id: string;
+  files: string[];
+}
+
 interface UpdateUserArgs {
   id: string;
   firstname: string;
@@ -143,6 +149,7 @@ function createResponseWrapper<T>(key: string) {
   };
 }
 
+const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
@@ -194,6 +201,17 @@ export default {
         answers,
         status,
         users
+      )
+    );
+  },
+
+  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+    const { proposal_id, question_id, files } = args;
+    return wrapFilesMutation(
+      context.mutations.proposal.updateFiles(
+        proposal_id,
+        question_id,
+        files
       )
     );
   },

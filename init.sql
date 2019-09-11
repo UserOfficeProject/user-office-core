@@ -2,6 +2,7 @@ drop table IF EXISTS users;
 drop table IF EXISTS proposals;
 drop table IF EXISTS proposal_questions;
 drop table IF EXISTS proposal_answers;
+drop table IF EXISTS proposal_answers_files;
 drop table IF EXISTS proposal_question_datatypes;
 drop table IF EXISTS proposal_question_dependencies;
 drop table IF EXISTS proposal_users;
@@ -9,6 +10,7 @@ drop table IF EXISTS roles;
 drop table IF EXISTS role_users;
 drop table IF EXISTS reviews;
 drop table IF EXISTS proposal_topics;
+drop table IF EXISTS files;
 
 
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
@@ -18,6 +20,28 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION file_id_pseudo_encrypt(VALUE bigint) returns bigint AS $$
+DECLARE
+l1 bigint;
+l2 bigint;
+r1 bigint;
+r2 bigint;
+i int:=0;
+BEGIN
+    l1:= (VALUE >> 32) & 4294967295::bigint;
+    r1:= VALUE & 4294967295;
+    WHILE i < 3 LOOP
+        l2 := r1;
+        r2 := l1 # ((((1366.0 * r1 + 150889) % 714025) / 714025.0) * 32767*32767)::int;
+        l1 := l2;
+        r1 := r2;
+        i := i + 1;
+    END LOOP;
+RETURN ((l1::bigint << 32) + r1);
+END;
+$$ LANGUAGE plpgsql strict immutable;
+
 
 CREATE TABLE users (
   user_id  serial PRIMARY KEY
@@ -90,7 +114,8 @@ FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE proposal_answers (
-  proposal_id           INTEGER NOT NULL REFERENCES proposals(proposal_id)
+  id                    serial UNIQUE
+, proposal_id           INTEGER NOT NULL REFERENCES proposals(proposal_id)
 , proposal_question_id  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
 , answer                VARCHAR(512) 
 , created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -137,13 +162,23 @@ CREATE TABLE reviews (
 , CONSTRAINT prop_user_pkey PRIMARY KEY (proposal_id, user_id)  -- explicit pk
 );
 
+
+
+DROP SEQUENCE IF EXISTS files_file_id_seq;
+CREATE SEQUENCE files_file_id_seq;
+
 CREATE TABLE files (
-  id           serial PRIMARY KEY
-, file_name     VARCHAR(64) NOT NULL
-, size_in_btyes int
+  file_id            BIGINT PRIMARY KEY default file_id_pseudo_encrypt(nextval('files_file_id_seq'))
+, file_name     VARCHAR(512) NOT NULL
+, size_in_btyes INT
 , mime_type     VARCHAR(64) 
-, oid           int UNIQUE
+, oid           INT UNIQUE
 , created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE proposal_answers_files (
+  answer_id int REFERENCES proposal_answers (id)
+, file_id  bigint REFERENCES files (file_id)
 );
 
 CREATE TABLE call (

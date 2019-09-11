@@ -23,17 +23,17 @@ export default class PostgresFileDataSource implements IFileDataSource {
     sizeInBytes: number,
     path: string
   ): Promise<FileMetaData | null> {
-    let err, oid, fileEntry;
+    let err, oid, resultSet;
 
     [err, oid] = await to(this.storeBlob(path));
     if (err) {
-      console.log("No somethings is wrong");
+      console.error("Could not store BLOB");
       return null;
     }
 
     fs.unlinkSync(path);
 
-    [err, fileEntry] = await to(
+    [err, resultSet] = await to(
       database
         .insert({
           file_name: fileName,
@@ -46,8 +46,9 @@ export default class PostgresFileDataSource implements IFileDataSource {
     );
     if (err) return null;
 
+    const fileEntry = resultSet[0];
     return new FileMetaData(
-      fileEntry.id,
+      fileEntry.file_id,
       oid as number,
       fileName,
       mimeType,
