@@ -127,24 +127,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
-  async deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<Boolean | null> {
-    
-    const answerId = await this.getAnswerId(proposal_id, question_id);
-    if(!answerId)
-    {
-      return null;
-    }
-
-    await database("proposal_answers_files")
-      .where({ answer_id: answerId })
-      .del();
-
-    return true;
-  }
-
   async insertFiles(
     proposal_id: number,
     question_id: string,
@@ -163,6 +145,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     return files;
   }
+
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean | null> 
+  {
+    const answerId = await this.getAnswerId(proposal_id, question_id);
+    if(!answerId)
+    {
+      return null;
+    }
+
+    await database("proposal_answers_files")
+      .where({ answer_id: answerId })
+      .del();
+
+    return true;
+  }
+
+  
+
+  
 
   private async getAnswerId(proposal_id:number, question_id:string):Promise<number | null> {
    const selectResult = await database

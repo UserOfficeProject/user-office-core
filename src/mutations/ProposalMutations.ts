@@ -44,7 +44,7 @@ export default class ProposalMutations {
     id: string,
     title?: string,
     abstract?: string,
-    answers?:ProposalAnswer[],
+    answers?: ProposalAnswer[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -114,20 +114,18 @@ export default class ProposalMutations {
         }
         // This will overwrite the whole proposal with the new object created
 
-        
-        if(answers !== undefined) 
-        {
+        if (answers !== undefined) {
           // TODO validate input
           // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
           answers.forEach(async answer => {
-            if(answer.answer !== undefined) {
+            if (answer.answer !== undefined) {
               await this.dataSource.updateAnswer(
                 proposal!.id,
                 answer.proposal_question_id,
                 answer.answer
               );
             }
-          })
+          });
         }
 
         const result = await this.dataSource.update(proposal);
@@ -140,19 +138,35 @@ export default class ProposalMutations {
     );
   }
 
-  async updateFiles(proposalId:number, questionId:string, files:string[]) {
-      await this.dataSource.deleteFiles(
-        proposalId, 
-        questionId
-      );
+  async updateFiles(
+    agent: User | null,
+    proposalId: number,
+    questionId: string,
+    files: string[]
+  ): Promise<string[] | Rejection> {
+    if (agent == null) 
+    {
+      return rejection("NOT_LOGGED_IN");
+    }
 
-      const result = await this.dataSource.insertFiles(
-        proposalId,
-        questionId,
-        files
-      );
+    let proposal = await this.dataSource.get(proposalId);
 
-      return result || rejection("INTERNAL_ERROR");
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection("NOT_ALLOWED");
+    }
+
+    await this.dataSource.deleteFiles(proposalId, questionId);
+
+    const result = await this.dataSource.insertFiles(
+      proposalId,
+      questionId,
+      files
+    );
+
+    return result || rejection("INTERNAL_ERROR");
   }
 
   async accept(

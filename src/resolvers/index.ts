@@ -209,6 +209,7 @@ export default {
     const { proposal_id, question_id, files } = args;
     return wrapFilesMutation(
       context.mutations.proposal.updateFiles(
+        context.user,
         proposal_id,
         question_id,
         files
