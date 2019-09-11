@@ -19,15 +19,15 @@ export class ProposalCompontentFileUpload extends React.Component<IBasicComponen
       <FormLabel error={isError}>{templateField.question}</FormLabel>
       <span>{templateField.config.small_label}</span>
         <FileUploadComponent 
-        maxFiles={config.maxFiles} 
+        maxFiles={config.max_files} 
         id={templateField.proposal_question_id} 
+        fileType={config.file_type}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           templateField.value = evt.target.value;
           handleChange(evt); // letting Formik know that there was a change
           onComplete();
         }}
         value={templateField.value}/>
-      <span>{config.small_label}</span>
       {isError && <ProposalErrorLabel>{errors[proposal_question_id]}</ProposalErrorLabel>}
     </FormControl>
     );

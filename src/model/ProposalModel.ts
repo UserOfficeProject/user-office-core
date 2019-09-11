@@ -77,7 +77,7 @@ export class ProposalTemplateField {
   public proposal_question_id!: string;
   public data_type!: DataType;
   public question!: string;
-  public config!: any | { variant: string | undefined, small_label:string | undefined, required: boolean | undefined, options:string[] };
+  public config!: FieldConfig;
   public value: any = "";
   public dependencies!: FieldDependency[] | null;
 
@@ -122,4 +122,17 @@ export enum DataType {
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",
   FILE_UPLOAD = "FILE_UPLOAD"
+}
+
+export interface FieldConfig {
+  variant?: string, 
+  small_label?:string;
+  required?: boolean;
+  options?:string[];
+  file_type?:string;
+  max_files?:number;
+  multiline?:boolean;
+  min?:number;
+  max?:number;
+  placeholder?:string;
 }

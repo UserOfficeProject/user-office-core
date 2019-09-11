@@ -50,7 +50,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
           templateField.value = (evt.target as HTMLInputElement).value;
           handleChange(evt); // letting Formik know that there was a change
           onComplete();
-        }} value={templateField.value} className={config.options.length < 3
+        }} value={templateField.value} className={config.options!.length < 3
           ? classes.horizontalLayout
           : classes.verticalLayout}>
           {(config.options as string[]).map(option => {

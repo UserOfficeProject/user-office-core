@@ -39,7 +39,7 @@ export class FileUploadComponent extends React.Component<
     // sending event and pretending change event came from InputField
     const inputElement = this.inputRef.current!;
     let event:any = {};
-    inputElement.value = this.state.files.map(metaData => metaData.fid).join(",");
+    inputElement.value = this.state.files.map(metaData => metaData.file_id).join(",");
     event.target = inputElement;
     this.props.onChange(event);
     //
@@ -47,17 +47,17 @@ export class FileUploadComponent extends React.Component<
 
   onDeleteClicked(deleteFile: FileMetaData) {
     this.setState(prevState => ({
-      files: prevState.files.filter(fileId => fileId.fid !== deleteFile.fid)
+      files: prevState.files.filter(fileId => fileId.file_id !== deleteFile.file_id)
     }));
   }
 
   render() {
     const { files } = this.state;
-    const { maxFiles, fileType, id} = this.props;
-    const maxFilesAllowed = maxFiles || 1;
+    const { fileType, id} = this.props;
+    const maxFiles = this.props.maxFiles || 1;
     
     let newFileEntry;
-    if (files.length < maxFilesAllowed) {
+    if (files.length < maxFiles) {
       newFileEntry = (
         <NewFileEntry
           filetype={fileType}
@@ -66,9 +66,11 @@ export class FileUploadComponent extends React.Component<
       );
     }
 
+  const amountFilesInfo = (maxFiles > 1) ? <span>Max: {maxFiles} file(s)</span> : null;
     return (
       <React.Fragment>
-        <input type="text" id={id} name={id} readOnly value={this.props.value}  ref={this.inputRef}/>
+        <input type="hidden" id={id} name={id} readOnly value={this.props.value} ref={this.inputRef}/>
+        {amountFilesInfo}
         <List
           component="nav"
           aria-label="main mailbox folders"
@@ -76,9 +78,9 @@ export class FileUploadComponent extends React.Component<
         >
           {files.map((metaData: FileMetaData) => {
             return (
-              <ListItem key={metaData.fid}>
+              <ListItem key={metaData.file_id}>
                 <FileEntry
-                  key={metaData.fid}
+                  key={metaData.file_id}
                   onDeleteClicked={this.onDeleteClicked.bind(this)}
                   metaData={metaData}
                 />
@@ -238,10 +240,10 @@ export function NewFileEntry(props: {
           <ListItemAvatar>
               <CircularProgress variant="static" value={progress} />
           </ListItemAvatar>
-          <ListItemText primary="Uploading..." secondary={Math.round(progress) + "%"} />;
+          <ListItemText primary="Uploading..." secondary={Math.round(progress) + "%"} />
           <ListItemSecondaryAction><CancelIcon /></ListItemSecondaryAction>
         </React.Fragment>
         );
   }
-  return <div>Unknown state</div>;
+  return <div>Unknown state</div>
 }

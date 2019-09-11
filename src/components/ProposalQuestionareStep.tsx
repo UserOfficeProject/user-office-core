@@ -14,6 +14,7 @@ import { createFormikCofigObjects } from "./ProposalYupUtilities";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
+import { useUpdateProposalFiles } from "../hooks/useUpdateProposalFiles";
 
 
 export  default function ProposalQuestionareStep(props: {
@@ -28,7 +29,8 @@ export  default function ProposalQuestionareStep(props: {
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
-  const {loading, updateProposal} = useUpdateProposal();
+  const {loading:formSaving, updateProposal} = useUpdateProposal();
+  const {loading:filesSaving, updateProposalFiles} = useUpdateProposalFiles();
   const classes = makeStyles({
     componentWrapper: {
       margin:"10px 0"
@@ -42,23 +44,28 @@ export  default function ProposalQuestionareStep(props: {
       })
     : [];
 
-
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
 
-  const onFormSubmit = async (values:any) => {
+  const onFormSubmit = async (values:any) => 
+  {
     const proposalId:number = props.data.id;
     const answers:ProposalAnswer[] = Object.keys(values).map(key => {
       return {proposal_question_id:key, answer:values[key]};
     });
 
     const result = await updateProposal({id:proposalId, answers:answers});
-
     if(result && result.error) {
       api.error && api.error(result.error);
     }
-    else{
-      api.next && api.next();
-    }
+
+    let activeFileFields = activeFields.filter(field => field.data_type === DataType.FILE_UPLOAD);
+    await activeFileFields.forEach(async fileField => {
+      const fileIds = fileField.value ? fileField.value.split(",") : [];
+      await updateProposalFiles({proposal_id:proposalId, question_id: fileField.proposal_question_id, files:fileIds})
+    });
+
+    api.next && api.next();
+
   }
 
 
@@ -86,7 +93,7 @@ export  default function ProposalQuestionareStep(props: {
                 </div>
             );
           })}
-          <ProposalNavigationFragment back={api.back} showSubmit={true} isLoading={loading}/>
+          <ProposalNavigationFragment back={api.back} showSubmit={true} isLoading={formSaving || filesSaving}/>
         </form>
       )}
     </Formik>
@@ -102,8 +109,7 @@ class ComponentFactory {
     this.componentMap.put(DataType.BOOLEAN, ProposalComponentCheckBox);
     this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
     this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
-    this.componentMap.put(DataType.SELECTION_FROM_OPTIONS,ProposalComponentMultipleChoice
-    );
+    this.componentMap.put(DataType.SELECTION_FROM_OPTIONS,ProposalComponentMultipleChoice);
   }
   createComponent(field: ProposalTemplateField,props: any): React.ComponentElement<IBasicComponentProps, any> {
     props.templateField = field;
