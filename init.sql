@@ -381,7 +381,7 @@ INSERT INTO proposal_questions VALUES('molecular_weight','TEXT_INPUT','Molecular
 INSERT INTO proposal_questions VALUES('oligomerization_state','TEXT_INPUT','Oligomerization state:',2,'{"topic":"crystallization","min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('pdb_id','TEXT_INPUT','PDB ID of crystal structure',2,'{"topic":"crystallization","min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('doi_or_alike','TEXT_INPUT','If the reference is publicly available, please provide the DOI or an accessible link:',2,'{"topic":"crystallization","min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('reference_file','FILE_UPLOAD','If the reference is not publicly available, please upload a copy.',2,'{"topic":"crystallization", "maxFiles":3}');
+INSERT INTO proposal_questions VALUES('reference_file','FILE_UPLOAD','If the reference is not publicly available, please upload a copy.',2,'{"topic":"crystallization", "max_files":3}');
 INSERT INTO proposal_questions VALUES('crystallization_cofactors_ligands','TEXT_INPUT','Does the protein have any co-factors or ligands required for crystallization? Specify:',2,'{"topic":"crystallization","min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('prec_composition','TEXT_INPUT','Known crystallization precipitant composition:',2,'{"topic":"crystallization","min":2, "max":200,"small_label":"(inc.buffer, salt, additives, pH)"}');
 INSERT INTO proposal_questions VALUES('crystallization_experience','TEXT_INPUT','What crystallization method, volume, and temperature have you used in the past?',2,'{"topic":"crystallization", "multiline":true,"min":2, "max":500,"small_label":"(e.g. vapour diffusion, 10 µL drops, room temperature)"}');
@@ -398,7 +398,7 @@ INSERT INTO proposal_questions VALUES('slide_select_deuteration','BOOLEAN','slid
 INSERT INTO proposal_questions VALUES('is_biomass','BOOLEAN','Biomass (E. coli)',3,'{"topic":"biological-deuteration","variant":"checkbox"}');
 INSERT INTO proposal_questions VALUES('will_provide_organism','BOOLEAN','Will user provide the organism for us to grow under deuterated conditions?',3,'{"topic":"biological-deuteration","variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('organism_name','TEXT_INPUT','What is the organism',3,'{"topic":"biological-deuteration","min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('reference_pdf','FILE_UPLOAD','Please attach a reference or protocol of culture conditions and media composition',3,'{"topic":"biological-deuteration","small_label":"Accepted formats: PDF"}');
+INSERT INTO proposal_questions VALUES('reference_pdf','FILE_UPLOAD','Please attach a reference or protocol of culture conditions and media composition',3,'{"topic":"biological-deuteration","small_label":"Accepted formats: PDF", "file_type":"pdf"}');
 INSERT INTO proposal_questions VALUES('material_amount','TEXT_INPUT','How much material do you need',3,'{"topic":"biological-deuteration","min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('material_condition','TEXT_INPUT','Indicate wet or dry mass',3,'{"topic":"biological-deuteration","min":2, "max":5}');
 INSERT INTO proposal_questions VALUES('amount_justification','TEXT_INPUT','Justify amount',3,'{"topic":"biological-deuteration","min":10, "max":500, "multiline":true}');
@@ -445,7 +445,7 @@ INSERT INTO proposal_questions VALUES('chem_deu_d_percentage','TEXT_INPUT','indi
 INSERT INTO proposal_questions VALUES('chem_deu_structure_justification','TEXT_INPUT','Justify level of deuteration',4,'{"topic":"chemical-deuteration","variant":"radio", "options":["yes", "no"], "multiline":true}');
 INSERT INTO proposal_questions VALUES('chem_deu_chem_structure','FILE_UPLOAD','Attach chemical structure',4,'{"topic":"chemical-deuteration"}');
 INSERT INTO proposal_questions VALUES('chem_deu_prep_source','SELECTION_FROM_OPTIONS','Has this molecule (or an unlabeled/isotopic analogue) been prepared by yourself or others?',4,'{"topic":"chemical-deuteration","variant":"radio", "options":["yes", "no"]}');
-INSERT INTO proposal_questions VALUES('chem_deu_protocol','FILE_UPLOAD','If yes, please provide a protocol (attach a reference PDF if published)',4,'{"topic":"chemical-deuteration"}');
+INSERT INTO proposal_questions VALUES('chem_deu_protocol','FILE_UPLOAD','If yes, please provide a protocol (attach a reference PDF if published)',4,'{"topic":"chemical-deuteration", "file_type":"pdf"}');
 
 INSERT INTO proposal_question_dependencies VALUES('links_with_industry', 'has_links_with_industry', '{ "condition": "equals", "params":"yes"}');
 INSERT INTO proposal_question_dependencies VALUES('crystallization_molecule_name', 'has_crystallization', '{ "condition": "equals", "params":true }');
