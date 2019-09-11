@@ -131,19 +131,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<Boolean | null> {
-    const selectResult = await database
-      .from("proposal_answers")
-      .where({
-        proposal_id: proposal_id,
-        proposal_question_id: question_id
-      })
-      .select("id");
-
-    if (!selectResult || selectResult.length != 1) {
+    
+    const answerId = await this.getAnswerId(proposal_id, question_id);
+    if(!answerId)
+    {
       return null;
     }
-
-    const answerId = selectResult[0].id;
 
     await database("proposal_answers_files")
       .where({ answer_id: answerId })
@@ -157,25 +150,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     question_id: string,
     files: string[]
   ): Promise<string[] | null> {
-    const selectResult = await database
-      .from("proposal_answers")
-      .where({
-        proposal_id: proposal_id,
-        proposal_question_id: question_id
-      })
-      .select("id");
-
-    if (!selectResult || selectResult.length != 1) {
+    
+    const answerId= await this.getAnswerId(proposal_id, question_id);
+    if(!answerId)
+    {
       return null;
     }
-
-    const answerId = selectResult[0].id;
 
     await database("proposal_answers_files").insert(
       files.map(file => ({ answer_id: answerId, file_id: file }))
     );
 
     return files;
+  }
+
+  private async getAnswerId(proposal_id:number, question_id:string):Promise<number | null> {
+   const selectResult = await database
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      })
+      .select("answer_id");
+
+    if (!selectResult || selectResult.length != 1) {
+      return null;
+    }
+
+    return selectResult[0].answer_id; 
   }
 
   async update(proposal: Proposal): Promise<Proposal | null> {

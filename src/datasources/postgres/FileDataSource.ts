@@ -38,7 +38,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
         .insert({
           file_name: fileName,
           mime_type: mimeType,
-          size_in_btyes: sizeInBytes,
+          size_in_bytes: sizeInBytes,
           oid: oid
         })
         .into("files")

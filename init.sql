@@ -114,7 +114,7 @@ FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE proposal_answers (
-  id                    serial UNIQUE
+  answer_id             serial UNIQUE
 , proposal_id           INTEGER NOT NULL REFERENCES proposals(proposal_id)
 , proposal_question_id  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
 , answer                VARCHAR(512) 
@@ -170,14 +170,14 @@ CREATE SEQUENCE files_file_id_seq;
 CREATE TABLE files (
   file_id            BIGINT PRIMARY KEY default file_id_pseudo_encrypt(nextval('files_file_id_seq'))
 , file_name     VARCHAR(512) NOT NULL
-, size_in_btyes INT
+, size_in_bytes INT
 , mime_type     VARCHAR(64) 
 , oid           INT UNIQUE
 , created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE proposal_answers_files (
-  answer_id int REFERENCES proposal_answers (id)
+  answer_id int REFERENCES proposal_answers (answer_id)
 , file_id  bigint REFERENCES files (file_id)
 );
 
