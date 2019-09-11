@@ -10,6 +10,7 @@ import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
 import multer from "multer";
 import { unlink } from 'fs';
+import { NextFunction } from 'connect';
 
 var upload = multer({ dest: "uploads/" });
 
@@ -21,7 +22,7 @@ const authMiddleware = jwt({
   secret: config.secret
 });
 
-app.use(authMiddleware, (err:any, req:Request, res:Response) => {
+app.use(authMiddleware, (err:any, req:Request, res:Response, next:NextFunction) => {
   if (err.code === "invalid_token") {
     return res.status(401).send("jwt expired");
   }
