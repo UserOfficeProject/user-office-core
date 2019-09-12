@@ -227,7 +227,7 @@ test("A user can attach files", () => {
   ).resolves.toBe(dummyFileList);
 });
 
-test("A non-belonging can't attach files", () => {
+test("A non-belonging should not be able to attach files", () => {
   const dummyFileList = ["1020597501870552"];
   return expect(
     proposalMutations.updateFiles(
@@ -236,7 +236,7 @@ test("A non-belonging can't attach files", () => {
       "reference_files",
       dummyFileList
     )
-  ).resolves.toBe(dummyFileList);
+  ).resolves.not.toBe(dummyFileList);
 });
 
 test("User must have valid session to attach files", () => {
