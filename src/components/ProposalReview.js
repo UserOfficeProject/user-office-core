@@ -31,7 +31,7 @@ export default function ProposalReview(props) {
         <Button
           variant="contained"
           color="primary"
-          onClick={api.next}
+          onClick={api.submit}
           className={classes.button}
         >
           {props.data.status ? "Update" : "Submit"}

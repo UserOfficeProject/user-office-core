@@ -8,12 +8,12 @@ import Typography from "@material-ui/core/Typography";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
-import { useDataAPI } from "../hooks/useDataAPI";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import { ProposalTemplate } from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
 import ErrorIcon from '@material-ui/icons/Error';
+import {useSubmitProposal} from '../hooks/useSubmitProposal';
 import { Zoom } from "@material-ui/core";
 
 
@@ -21,12 +21,11 @@ import { Zoom } from "@material-ui/core";
 
 export default function ProposalContainer(props:any) {
   const [proposalData, setProposalData] = useState(props.data);
-  const [submitted, setSubmitted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  const sendRequest = useDataAPI();
   const { proposalTemplate } = useProposalQuestionTemplate();
   const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const {submitted, submitProposal} = useSubmitProposal()
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -43,23 +42,7 @@ export default function ProposalContainer(props:any) {
     }
   }))();
   
-  const submitProposal = () => {
-    const query = `
-    mutation($id: Int!){
-      submitProposal(id: $id){
-       proposal{
-        id
-      }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id: props.data.id
-    };
-
-    return sendRequest(query, variables).then(() => setSubmitted(true));
-  };
+  
 
   const handleNext = (data:any) => {
     setProposalData({

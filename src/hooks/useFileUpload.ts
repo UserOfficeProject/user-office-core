@@ -50,13 +50,13 @@ export function useFileUpload(completeHandller:Function)
     setState(UPLOAD_STATE.UPLOADING);
     var formdata = new FormData();
     formdata.append("file", file);
-    const ajax = new XMLHttpRequest();
-    ajax.upload.addEventListener("progress", progressHandler, false);
-    ajax.addEventListener("load", completeHandler, false);
-    ajax.addEventListener("error", () => { setState(UPLOAD_STATE.ERROR) }, false);
-    ajax.addEventListener("abort", () => { setState(UPLOAD_STATE.ABORTED) }, false);
-    ajax.open("POST", "/upload");
-    ajax.send(formdata);
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener("progress", progressHandler, false);
+    xhr.addEventListener("load", completeHandler, false);
+    xhr.addEventListener("error", () => { setState(UPLOAD_STATE.ERROR) }, false);
+    xhr.addEventListener("abort", () => { setState(UPLOAD_STATE.ABORTED) }, false);
+    xhr.open("POST", "/upload");
+    xhr.send(formdata);
   };
 
   return { uploadFile, progress, state };

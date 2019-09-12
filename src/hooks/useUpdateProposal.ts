@@ -27,7 +27,7 @@ export function useUpdateProposal()
           answer.answer = answer.answer.toString();
         });
       } 
-      const result = await sendRequest(query, parameters).then(resp => resp);
+      const result = await sendRequest(query, parameters);
       setLoading(false);
       return result;
     },
