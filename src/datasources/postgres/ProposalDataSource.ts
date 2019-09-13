@@ -98,15 +98,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     question_id: string,
     answer: string
   ): Promise<Boolean> {
-    const results: [{ count: string }] = await database
+    const results: { count: string } = await database
       .count()
       .from("proposal_answers")
       .where({
         proposal_id: proposal_id,
         proposal_question_id: question_id
-      });
+      })
+      .first();
 
-    const hasEntry = results && results[0].count !== "0";
+    const hasEntry = results && results.count !== "0";
     if (hasEntry) {
       return database("proposal_answers")
         .update({
