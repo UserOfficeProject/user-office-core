@@ -4,7 +4,8 @@ import {
   ProposalTemplate,
   ProposalTemplateField,
   DataType,
-  FieldDependency
+  FieldDependency,
+  Topic
 } from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
@@ -28,6 +29,17 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
+  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
+    return files;
+  }
+  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {
+    return true;
+  }
+  
+  
+  async updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean> {
+    return true;
+  }
   async checkActiveCall(): Promise<Boolean> {
     return true;
   }
@@ -37,6 +49,7 @@ export class proposalDataSource implements ProposalDataSource {
       "hasLinksToField",
       DataType.SELECTION_FROM_OPTIONS,
       "Has any links to field?",
+      1,
       { variant: "radio", options: ["yes", "no"] },
       null
     );
@@ -44,6 +57,7 @@ export class proposalDataSource implements ProposalDataSource {
       "linksToField",
       DataType.SMALL_TEXT,
       "Please specify",
+      1,
       null,
       [
         new FieldDependency(
@@ -53,7 +67,7 @@ export class proposalDataSource implements ProposalDataSource {
         )
       ]
     );
-    return new ProposalTemplate([hasLinksToField, linksToField]);
+    return new ProposalTemplate([new Topic(1, 'General information', [hasLinksToField, linksToField])]);
   }
 
   async submitReview(
@@ -107,7 +121,7 @@ export class proposalDataSource implements ProposalDataSource {
     return null;
   }
 
-  async create() {
+  async create(proposerID:number) {
     return dummyProposal;
   }
 
