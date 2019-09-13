@@ -2,7 +2,13 @@ import database from "./database";
 import { ProposalRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { Proposal, ProposalTemplate, ProposalTemplateField, FieldDependency } from "../../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalTemplateField,
+  FieldDependency,
+  Topic
+} from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
 
@@ -85,6 +91,98 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           return false;
         });
     });
+  }
+
+  async updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean> {
+    const results: { count: string } = await database
+      .count()
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      })
+      .first();
+
+    const hasEntry = results && results.count !== "0";
+    if (hasEntry) {
+      return database("proposal_answers")
+        .update({
+          answer: answer
+        })
+        .where({
+          proposal_id: proposal_id,
+          proposal_question_id: question_id
+        });
+    } else {
+      return database
+        .insert({
+          proposal_id: proposal_id,
+          proposal_question_id: question_id,
+          answer: answer
+        })
+        .into("proposal_answers");
+    }
+  }
+
+  async insertFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[] | null> {
+    
+    const answerId= await this.getAnswerId(proposal_id, question_id);
+    if(!answerId)
+    {
+      return null;
+    }
+
+    await database("proposal_answers_files").insert(
+      files.map(file => ({ answer_id: answerId, file_id: file }))
+    );
+
+    return files;
+  }
+
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean | null> 
+  {
+    const answerId = await this.getAnswerId(proposal_id, question_id);
+    if(!answerId)
+    {
+      return null;
+    }
+
+    await database("proposal_answers_files")
+      .where({ answer_id: answerId })
+      .del();
+
+    return true;
+  }
+
+  
+
+  
+
+  private async getAnswerId(proposal_id:number, question_id:string):Promise<number | null> {
+   const selectResult = await database
+      .from("proposal_answers")
+      .where({
+        proposal_id: proposal_id,
+        proposal_question_id: question_id
+      })
+      .select("answer_id");
+
+    if (!selectResult || selectResult.length != 1) {
+      return null;
+    }
+
+    return selectResult[0].answer_id; 
   }
 
   async update(proposal: Proposal): Promise<Proposal | null> {
@@ -173,16 +271,29 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    let deps:FieldDependency[] = await database
-              .select("d.*")
-              .from("proposal_question_dependencies as d");
+    const deps: FieldDependency[] = await database
+      .select("*")
+      .from("proposal_question_dependencies");
 
-    let fields: ProposalTemplateField[] = await database
-                .select("q.*")
-                .from("proposal_questions as q");
+    const fields: ProposalTemplateField[] = await database
+      .select("*")
+      .from("proposal_questions");
 
-    fields.forEach( field => { field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id ) });
+    const topics: Topic[] = await database
+      .select("p.*")
+      .from("proposal_topics as p")
+      .where("p.is_enabled", true)
+      .orderBy("sort_order");
 
-    return new ProposalTemplate(fields);
+    topics.forEach(topic => {
+      topic.fields = fields.filter(field => field.topic === topic.topic_id);
+    });
+    fields.forEach(field => {
+      field.dependencies = deps.filter(
+        dep => dep.proposal_question_id === field.proposal_question_id
+      );
+    });
+
+    return new ProposalTemplate(topics);
   }
 }
