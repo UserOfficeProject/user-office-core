@@ -67,5 +67,5 @@ test("Authentificated user can get the template", () => {
 
 test("Proposal template should have fields", async () => {
   let template = await proposalQueries.getProposalTemplate(dummyUser) as ProposalTemplate;
-  return expect(template.fields.length).toBeGreaterThan(0);
+  return expect(template.topics[0].fields!.length).toBeGreaterThan(0);
 });

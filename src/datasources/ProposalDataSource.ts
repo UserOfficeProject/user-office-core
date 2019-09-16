@@ -19,4 +19,7 @@ export interface ProposalDataSource {
   acceptProposal(id: number): Promise<Proposal | null>;
   rejectProposal(id: number): Promise<Proposal | null>;
   submitProposal(id: number): Promise<Proposal | null>;
+  updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean>;
+  insertFiles(proposal_id:number, question_id: string, files:string[]): Promise<string[]>;
+  deleteFiles(proposal_id:number, question_id: string): Promise<Boolean>;
 }

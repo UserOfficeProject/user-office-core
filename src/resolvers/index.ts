@@ -1,6 +1,6 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection } from "../rejection";
-import { Proposal, ProposalTemplate } from "../models/Proposal";
+import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
 
@@ -32,8 +32,15 @@ interface UpdateProposalArgs {
   id: string;
   title: string;
   abstract: string;
+  answers:ProposalAnswer[];
   status: number;
   users: number[];
+}
+
+interface UpdateProposalFilesArgs {
+  proposal_id: number;
+  question_id: string;
+  files: string[];
 }
 
 interface UpdateUserArgs {
@@ -147,6 +154,7 @@ function createResponseWrapper<T>(key: string) {
   };
 }
 
+const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
@@ -188,15 +196,28 @@ export default {
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
-    const { id, title, abstract, status, users } = args;
+    const { id, title, abstract, answers, status, users } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
         context.user,
         id,
         title,
         abstract,
+        answers,
         status,
         users
+      )
+    );
+  },
+
+  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+    const { proposal_id, question_id, files } = args;
+    return wrapFilesMutation(
+      context.mutations.proposal.updateFiles(
+        context.user,
+        proposal_id,
+        question_id,
+        files
       )
     );
   },

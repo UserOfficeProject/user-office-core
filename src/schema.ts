@@ -33,6 +33,11 @@ type Query {
     error: String
   }
 
+  type FilesMutationResult {
+    files: [String]
+    error: String
+  }
+
   type CallMutationResult {
     call: Call
     error: String
@@ -50,7 +55,8 @@ type Query {
 
   type Mutation {
     createProposal: ProposalMutationResult
-    updateProposal(id: ID!, title: String, abstract: String, status: Int, users: [Int]): ProposalMutationResult
+    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
+    updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
@@ -107,7 +113,7 @@ type Call {
 }
 
 type Proposal {
-    id: Int
+    id: ID
     title: String
     abstract: String
     status: Int
@@ -140,15 +146,21 @@ type Review {
   status: Int
 }
 
-
 type ProposalTemplate {
-    fields:[ProposalTemplateField]
+    topics: [Topic]
+}
+
+type Topic {
+  topic_id:Int,
+  topic_title: String,
+  fields:[ProposalTemplateField]
 }
   
 type ProposalTemplateField {
     proposal_question_id: String,
     data_type: String,
     question: String,
+
     config: String,
     dependencies: [FieldDependency]
 }
@@ -157,6 +169,11 @@ type FieldDependency {
     proposal_question_dependency: String,
     proposal_question_id: String,
     condition: String,
+}
+
+input ProposalAnswer {
+  proposal_question_id: ID!,
+  answer: String
 }
 
 enum PageName {
