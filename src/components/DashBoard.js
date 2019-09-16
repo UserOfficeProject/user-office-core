@@ -22,6 +22,7 @@ import ProposalEdit from "./ProposalEdit";
 import PeoplePage from "./PeoplePage";
 import ProposalGrade from "./ProposalGrade";
 import UserPage from "./UserPage";
+import PageEditor from "./PageEditor";
 import ProposalPage from "./ProposalPage";
 import CallPage from "./CallPage";
 import ProfilePage from "./ProfilePage";
@@ -179,6 +180,7 @@ export default function Dashboard({ match }) {
           <Route path="/PeoplePage/:id" component={UserPage} />
           <Route path="/PeoplePage" component={PeoplePage} />
           <Route path="/ProposalPage" component={ProposalPage} />
+          <Route path="/PageEditor" component={PageEditor} />
           <Route path="/CallPage" component={CallPage} />
           <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route
