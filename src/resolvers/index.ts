@@ -90,6 +90,11 @@ interface CreateUserArgs {
   telephone_alt: string;
 }
 
+enum PageName {
+    HOMEPAGE,
+    HELPPAGE
+}
+
 function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
   if (proposal == null) {
     return null;
@@ -343,5 +348,14 @@ export default {
   },
   calls(args: {}, context: ResolverContext) {
     return context.queries.call.getAll(context.user);
+  },
+  setPageContent(args: {id: PageName}, context: ResolverContext) {
+    return true
+  },
+
+  getPageContent(args: {id: PageName}, context: ResolverContext) {
+    return "<p> HELLO WORLD</P>"
   }
+
+
 };
