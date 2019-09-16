@@ -1,4 +1,4 @@
-import { Proposal, ProposalTemplate } from "../models/Proposal";
+import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read
@@ -22,4 +22,5 @@ export interface ProposalDataSource {
   updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean>;
   insertFiles(proposal_id:number, question_id: string, files:string[]): Promise<string[]>;
   deleteFiles(proposal_id:number, question_id: string): Promise<Boolean>;
+  getProposalAnswers(proposalId:number):Promise<ProposalAnswer[]>;
 }

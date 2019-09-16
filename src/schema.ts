@@ -54,7 +54,7 @@ type Query {
 
   type Mutation {
     createProposal: ProposalMutationResult
-    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
+    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], status: Int, users: [Int]): ProposalMutationResult
     updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
@@ -117,6 +117,7 @@ type Proposal {
     status: Int
     users: [User!]
     proposer: Int
+    answers: [ProposalAnswer!]
     created: String
     updated: String
     reviews: [Review]
@@ -169,7 +170,12 @@ type FieldDependency {
     condition: String,
 }
 
-input ProposalAnswer {
+input ProposalAnswerInput {
+  proposal_question_id: ID!,
+  answer: String
+}
+
+type ProposalAnswer {
   proposal_question_id: ID!,
   answer: String
 }

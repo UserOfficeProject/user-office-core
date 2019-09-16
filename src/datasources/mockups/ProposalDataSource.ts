@@ -5,7 +5,8 @@ import {
   ProposalTemplateField,
   DataType,
   FieldDependency,
-  Topic
+  Topic,
+  ProposalAnswer
 } from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
@@ -29,6 +30,9 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export class proposalDataSource implements ProposalDataSource {
+  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
+    throw new Error("Method not implemented.");
+  }
   async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
     return files;
   }
