@@ -11,7 +11,7 @@ export function useUpdateProposal()
     async ( parameters: { id:number, title?:string, abstract?:string, answers?:ProposalAnswer[], users?:number[]}) => 
     {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswer], $users:[Int]) {
+      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $users:[Int]) {
         updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, users:$users){
          proposal{
           id

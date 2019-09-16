@@ -136,3 +136,17 @@ export interface FieldConfig {
   max?:number;
   placeholder?:string;
 }
+
+
+export interface ProposalInformation {
+  id: number;
+  title?: string;
+  abstract?: string;
+  proposer?: number;
+  status?: number;
+  created?: string;
+  updated?: string;
+  users?: any; // TODO implement
+  answers?: ProposalAnswer[];
+  reviews?: any // TODO implement
+}

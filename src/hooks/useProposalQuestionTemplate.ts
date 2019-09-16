@@ -4,7 +4,7 @@ import { ProposalTemplate } from "../model/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();
-  const [proposalTemplate, setProposalQuestionModel] = useState<ProposalTemplate>();
+  const [proposalTemplate, setProposalQuestionModel] = useState<ProposalTemplate | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
