@@ -1,14 +1,14 @@
 import { ConditionEvaluator } from "./ConditionEvaluator";
 
-export class Proposal {
+export class ProposalData {
   constructor(
     public id: number,
-    public title: string,
-    public abstract: string,
-    public proposer: number,
-    public status: number,
-    public created: string,
-    public updated: string
+    public title?: string,
+    public abstract?: string,
+    public proposer?: number,
+    public status?: number,
+    public created?: string,
+    public updated?: string
   ) {}
 }
 

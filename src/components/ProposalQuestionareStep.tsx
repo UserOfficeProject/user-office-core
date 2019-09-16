@@ -24,7 +24,6 @@ export  default function ProposalQuestionareStep(props: {
 }) {
 
   const api = useContext(FormApi);
-  const proposalForm = React.createRef<HTMLFormElement>();
   const { model, topicId } = props;
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -45,6 +44,7 @@ export  default function ProposalQuestionareStep(props: {
     : [];
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
+
 
   const onFormSubmit = async (values:any) => 
   {
@@ -79,8 +79,8 @@ export  default function ProposalQuestionareStep(props: {
       validationSchema={Yup.object().shape(validationSchema)}
       onSubmit={onFormSubmit}
     >
-      {({ errors, touched, handleChange, handleSubmit }) => (
-        <form onSubmit={handleSubmit} ref={proposalForm}>
+     {({ errors, touched, handleChange, handleSubmit }) => (
+        <form onSubmit={handleSubmit}>
           {activeFields.map(field => {
             return (
                 <div className={classes.componentWrapper} key={field.proposal_question_id}>

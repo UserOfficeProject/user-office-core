@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, {  } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { useDataAPI } from "../hooks/useDataAPI";
+import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate" 
+import { useCreateProposal } from "../hooks/useCreateProposal";
+import { ProposalData } from "../model/ProposalModel";
 
 export default function ProposalSubmission() {
-  const [proposalID, setProposalID] = useState(null);
-  const sendRequest = useDataAPI();
+  const { proposalTemplate } = useProposalQuestionTemplate();
+  const { proposalID } = useCreateProposal();
+  
 
-  useEffect(() => {
-    const query = `
-      mutation{
-        createProposal{
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
-    sendRequest(query).then(data =>
-      setProposalID(data.createProposal.proposal.id)
-    );
-  }, [sendRequest]);
-
-  if (!proposalID) {
+  if (!proposalID || !proposalTemplate) {
     return <p>Loading</p>;
   }
 
-  return <ProposalContainer data={{ id: proposalID }} />;
+  return <ProposalContainer data={new ProposalData(proposalID)} template={proposalTemplate} />;
 }

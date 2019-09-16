@@ -8,9 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import { ProposalTemplate } from "../model/ProposalModel";
+import { ProposalTemplate, ProposalData } from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
 import ErrorIcon from '@material-ui/icons/Error';
 import {useSubmitProposal} from '../hooks/useSubmitProposal';
@@ -19,10 +18,9 @@ import { Zoom } from "@material-ui/core";
 
 
 
-export default function ProposalContainer(props:any) {
+export default function ProposalContainer(props:{data:ProposalData, template:ProposalTemplate}) {
   const [proposalData, setProposalData] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
-  const { proposalTemplate } = useProposalQuestionTemplate();
   const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const {submitted, submitProposal} = useSubmitProposal()
@@ -43,12 +41,12 @@ export default function ProposalContainer(props:any) {
   }))();
   
   
-
-  const handleNext = (data:any) => {
+  const handleNext = (data:ProposalData) => {
     setProposalData({
       ...proposalData,
       ...data
     });
+    
     setStepIndex(stepIndex + 1);
   };
 
@@ -60,8 +58,6 @@ export default function ProposalContainer(props:any) {
     setErrorMessage(msg);
   }
 
-
-  
 
   useEffect(() => {
     const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
@@ -96,11 +92,11 @@ export default function ProposalContainer(props:any) {
       );
       return allProposalSteps;
     }
-    if (proposalTemplate) {
-      const proposalSteps = createProposalSteps(proposalTemplate);
-      setProposalSteps(proposalSteps)
-    }
-  }, [proposalTemplate, proposalData]);
+
+    const proposalSteps = createProposalSteps(props.template);
+    setProposalSteps(proposalSteps);
+
+  }, [props.template, proposalData]);
 
   
   const getStepContent = (step:number) => {
