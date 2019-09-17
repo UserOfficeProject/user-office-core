@@ -121,7 +121,8 @@ export enum DataType {
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",
-  FILE_UPLOAD = "FILE_UPLOAD"
+  FILE_UPLOAD = "FILE_UPLOAD",
+  EMBELLISHMENT = "EMBELLISHMENT"
 }
 
 export interface FieldConfig {
@@ -135,6 +136,7 @@ export interface FieldConfig {
   min?:number;
   max?:number;
   placeholder?:string;
+  html?:string;
 }
 
 

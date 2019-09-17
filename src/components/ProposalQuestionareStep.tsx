@@ -15,6 +15,7 @@ import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { useUpdateProposalFiles } from "../hooks/useUpdateProposalFiles";
+import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 
 
 export  default function ProposalQuestionareStep(props: {
@@ -110,6 +111,7 @@ class ComponentFactory {
     this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
     this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
     this.componentMap.put(DataType.SELECTION_FROM_OPTIONS,ProposalComponentMultipleChoice);
+    this.componentMap.put(DataType.EMBELLISHMENT,ProposalComponentEmbellishment);
   }
   createComponent(field: ProposalTemplateField,props: any): React.ComponentElement<IBasicComponentProps, any> {
     props.templateField = field;
