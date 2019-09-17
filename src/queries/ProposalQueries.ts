@@ -17,7 +17,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    if (await this.hasAccessRights(agent, proposal)) {
+    if (await this.hasAccessRights(agent, proposal) === true) {
       return proposal;
     } else {
       return null;
@@ -31,7 +31,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    if (await this.hasAccessRights(agent, proposal)) {
+    if (await this.hasAccessRights(agent, proposal) === true) {
       return await this.dataSource.getProposalAnswers(proposal.id);
     } else {
       return null;
