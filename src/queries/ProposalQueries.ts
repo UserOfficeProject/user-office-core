@@ -1,7 +1,7 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalTemplate } from "../models/Proposal";
+import { ProposalTemplate, Proposal } from "../models/Proposal";
 import { Rejection, rejection } from "../rejection";
 
 export default class ProposalQueries {
@@ -17,15 +17,31 @@ export default class ProposalQueries {
       return null;
     }
 
-    if (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
-      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
-    ) {
+    if (await this.hasAccessRights(agent, proposal) === true) {
       return proposal;
     } else {
       return null;
     }
+  }
+
+  async getAnswers(agent: User | null, id:number) {
+    const proposal = await this.dataSource.get(id);
+
+    if (!proposal) {
+      return null;
+    }
+
+    if (await this.hasAccessRights(agent, proposal) === true) {
+      return await this.dataSource.getProposalAnswers(proposal.id);
+    } else {
+      return null;
+    }
+  }
+
+  private async hasAccessRights(agent: User | null, proposal:Proposal):Promise<boolean> {
+    return (await this.userAuth.isUserOfficer(agent)) ||
+    (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
+    (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
   }
 
   async getAll(
