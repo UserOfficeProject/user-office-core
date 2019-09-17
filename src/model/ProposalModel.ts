@@ -113,7 +113,7 @@ export class ProposalTemplateResult {
 
 export interface ProposalAnswer {
   proposal_question_id: string;
-  answer: string;
+  answer: boolean | number | string;
 }
 
 export enum DataType {

@@ -24,7 +24,7 @@ export function useUpdateProposal()
       if(parameters.answers)
       {
         parameters.answers!.forEach(answer => {
-          answer.answer = answer.answer.toString();
+          answer.answer = JSON.stringify({value: answer.answer});
         });
       } 
       const result = await sendRequest(query, parameters);

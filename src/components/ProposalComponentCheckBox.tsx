@@ -22,6 +22,7 @@ export function ProposalComponentCheckBox(props: IBasicComponentProps) {
               onComplete();
             }}
             value={templateField.value}
+            checked={templateField.value}
             inputProps={{
               "aria-label": "primary checkbox"
             }}

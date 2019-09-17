@@ -67,10 +67,10 @@ export function useProposalData(id:number) {
               status: review.status
             };
           }),
-          answers: data.proposal.answers.map((answer:ProposalAnswer) => {
+          answers: data.proposal.answers.map((answer:any) => {
             return {
               proposal_question_id: answer.proposal_question_id,
-              answer: answer.answer,
+              answer: JSON.parse(answer.answer).value,
             }
           })
         });
