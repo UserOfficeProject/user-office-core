@@ -37,7 +37,7 @@ export class ProposalTemplate {
   }
 
   public areDependenciesSatisfied(fieldId: string) {
-    let isAtLeastOneDissasisfied = this.getFieldById(
+    const isAtLeastOneDissasisfied = this.getFieldById(
       fieldId
     ).dependencies!.some(dep => !this.isDependencySatisfied(dep));
     return isAtLeastOneDissasisfied === false;
@@ -47,9 +47,11 @@ export class ProposalTemplate {
     this.fields.find(field => field.proposal_question_id === questionId)!;
 
   private isDependencySatisfied(dependency: FieldDependency): boolean {
-    let { condition, params } = JSON.parse(dependency.condition);
-    let field = this.getFieldById(dependency.proposal_question_dependency);
-    return this.conditionEvalator
+    const { condition, params } = JSON.parse(dependency.condition);
+    const field = this.getFieldById(dependency.proposal_question_dependency);
+    const isParentSattisfied = this.areDependenciesSatisfied(dependency.proposal_question_dependency);
+    return isParentSattisfied &&
+      this.conditionEvalator
       .getConfitionEvaluator(condition)
       .isSattisfied(field, params);
   }
