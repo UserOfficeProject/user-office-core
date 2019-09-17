@@ -367,6 +367,7 @@ INSERT INTO proposal_question_datatypes VALUES ('SELECTION_FROM_OPTIONS');
 INSERT INTO proposal_question_datatypes VALUES ('BOOLEAN');
 INSERT INTO proposal_question_datatypes VALUES ('DATE');
 INSERT INTO proposal_question_datatypes VALUES ('FILE_UPLOAD');
+INSERT INTO proposal_question_datatypes VALUES ('EMBELLISHMENT');
 
 INSERT INTO proposal_questions VALUES('has_links_with_industry','SELECTION_FROM_OPTIONS','Links with industry?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('links_with_industry','TEXT_INPUT','If yes, please describe:',1,'{"placeholder":"Please specify links with industry"}');
