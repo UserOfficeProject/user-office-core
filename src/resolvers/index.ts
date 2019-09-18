@@ -14,6 +14,10 @@ interface ProposalsArgs {
   filter?: string;
 }
 
+interface ProposalAttachmentMetadataArgs {
+  fileIds:string[]
+}
+
 interface CreateProposalArgs {}
 
 interface CreateCallArgs {
@@ -206,18 +210,6 @@ export default {
     );
   },
 
-  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
-    const { proposal_id, question_id, files } = args;
-    return wrapFilesMutation(
-      context.mutations.proposal.updateFiles(
-        context.user,
-        proposal_id,
-        question_id,
-        files
-      )
-    );
-  },
-
   approveProposal(args: ApproveProposalArgs, context: ResolverContext) {
     return wrapProposalMutation(
       context.mutations.proposal.accept(context.user, args.id)
@@ -233,6 +225,24 @@ export default {
   submitProposal(args: ApproveProposalArgs, context: ResolverContext) {
     return wrapProposalMutation(
       context.mutations.proposal.submit(context.user, args.id)
+    );
+  },
+
+  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+    const { proposal_id, question_id, files } = args;
+    return wrapFilesMutation(
+      context.mutations.proposal.updateFiles(
+        context.user,
+        proposal_id,
+        question_id,
+        files
+      )
+    );
+  },
+
+  async proposalAttachmentMetadata(args: ProposalAttachmentMetadataArgs, context: ResolverContext) {
+    return await wrapFilesMutation(
+      context.queries.proposal.getProposalAttachmentMetadata()
     );
   },
 

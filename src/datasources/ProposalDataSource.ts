@@ -1,4 +1,5 @@
 import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
+import { FileMetaData } from "../models/Blob";
 
 export interface ProposalDataSource {
   // Read
@@ -23,4 +24,5 @@ export interface ProposalDataSource {
   insertFiles(proposal_id:number, question_id: string, files:string[]): Promise<string[]>;
   deleteFiles(proposal_id:number, question_id: string): Promise<Boolean>;
   getProposalAnswers(proposalId:number):Promise<ProposalAnswer[]>;
+  getFileMetadata(fileIds:string[]):FileMetaData[];
 }
