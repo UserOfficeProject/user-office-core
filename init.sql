@@ -74,7 +74,7 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 
 CREATE TABLE proposals (
   proposal_id serial PRIMARY KEY  -- implicit primary key constraint
-, title    varchar(20)
+, title    varchar(50)
 , abstract    text
 , status      int NOT NULL DEFAULT 0
 , proposer_id int REFERENCES users (user_id)
@@ -374,9 +374,9 @@ INSERT INTO proposal_questions VALUES('has_links_with_industry','SELECTION_FROM_
 INSERT INTO proposal_questions VALUES('links_with_industry','TEXT_INPUT','If yes, please describe:',1,'{"placeholder":"Please specify links with industry"}');
 INSERT INTO proposal_questions VALUES('is_student_proposal','SELECTION_FROM_OPTIONS','Are any of the co-proposers students?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('is_towards_degree','SELECTION_FROM_OPTIONS','Does the proposal work towards a students degree?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
-INSERT INTO proposal_questions VALUES('ttl_delivery_date','EMBELLISHMENT','',1,'{"html":"<h2>Delivery date</h2>"}');
-INSERT INTO proposal_questions VALUES('final_delivery_date','DATE','Final delivery date',1,'{"min":"now"}');
-INSERT INTO proposal_questions VALUES('final_delivery_date_motivation','TEXT_INPUT','Please motivate the chosen date',1,'{"min":10, "multiline":true, "max":500}');
+INSERT INTO proposal_questions VALUES('ttl_delivery_date','EMBELLISHMENT','',1,'{"html":"<h2>Final delivery date</h2>"}');
+INSERT INTO proposal_questions VALUES('final_delivery_date','DATE','Choose a date',1,'{"min":"now", "required":true}');
+INSERT INTO proposal_questions VALUES('final_delivery_date_motivation','TEXT_INPUT','Please motivate the chosen date',1,'{"min":10, "multiline":true, "max":500, "small_label":"(e.g. based on awarded beamtime, or described intention to apply)"}');
 INSERT INTO proposal_questions VALUES('ttl_crystallization','EMBELLISHMENT','',2,'{"html":"<h2>Crystallization</h2>"}');
 INSERT INTO proposal_questions VALUES('has_crystallization','BOOLEAN','Is crystallization applicable',2,'{"variant":"checkbox"}');
 INSERT INTO proposal_questions VALUES('crystallization_molecule_name','TEXT_INPUT','Name of molecule to be crystallized',2,'{"min":2, "max":40, "small_label":"(e.g. superoxide dismutase)"}');
@@ -449,7 +449,7 @@ INSERT INTO proposal_questions VALUES('chem_deu_amount','TEXT_INPUT','Amount of 
 INSERT INTO proposal_questions VALUES('chem_deu_amount_justification','TEXT_INPUT','Justify amount',4,'{"variant":"radio", "options":["yes", "no"], "multiline":true}');
 INSERT INTO proposal_questions VALUES('chem_deu_d_percentage','TEXT_INPUT','indicate percentage and location of deuteration',4,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('chem_deu_structure_justification','TEXT_INPUT','Justify level of deuteration',4,'{"variant":"radio", "options":["yes", "no"], "multiline":true}');
-INSERT INTO proposal_questions VALUES('chem_deu_chem_structure','FILE_UPLOAD','Attach chemical structure',4,'{}');
+INSERT INTO proposal_questions VALUES('chem_deu_chem_structure','FILE_UPLOAD','Attach chemical structure',4,'{"file_type":"application/pdf"}');
 INSERT INTO proposal_questions VALUES('chem_deu_prep_source','SELECTION_FROM_OPTIONS','Has this molecule (or an unlabeled/isotopic analogue) been prepared by yourself or others?',4,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('chem_deu_protocol','FILE_UPLOAD','If yes, please provide a protocol (attach a reference PDF if published)',4,'{ "file_type":"application/pdf"}');
 
