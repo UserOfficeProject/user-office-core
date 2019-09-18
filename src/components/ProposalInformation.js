@@ -21,16 +21,16 @@ export default function ProposalInformation(props) {
           id: props.data.id,
           title: values.title,
           abstract: values.abstract
-        }).then(() => api.next());
+        }).then(() => api.next(values));
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
           .min(10, "Title must be at least 10 characters")
-          .max(50, "Title must be at most 50 characters")
+          .max(100, "Title must be at most 100 characters")
           .required("Title must be at least 10 characters"),
         abstract: Yup.string()
           .min(20, "Abstract must be at least 20 characters")
-          .max(200, "Abstract must be at most 200 characters")
+          .max(500, "Abstract must be at most 500 characters")
           .required("Abstract must be at least 20 characters")
       })}
     >
@@ -61,6 +61,9 @@ export default function ProposalInformation(props) {
                 id="abstract"
                 name="abstract"
                 label="Abstract"
+                multiline
+                rowsMax="16"
+                rows="4"
                 defaultValue={values.abstract}
                 fullWidth
                 onChange={handleChange}
