@@ -13,11 +13,8 @@ export default class PostgresFileDataSource implements IFileDataSource {
   }
 
 
-  async getMetadata(ids: string[]): Promise<FileMetaData> {
-    const fileMetadata = await database("files")
-    .select("file_name, mime_type, size_in_bytes, oid")
-    .whereIn("file_id",ids);
-    return fileMetadata;
+  getMetaData(id: string): Promise<FileMetaData> {
+    throw new Error("Method not implemented.");
   }
 
   async put(

@@ -3,13 +3,11 @@ import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ProposalTemplate, Proposal } from "../models/Proposal";
 import { Rejection, rejection } from "../rejection";
-import { IFileDataSource } from "../datasources/IFileDataSource";
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
-    private userAuth: UserAuthorization,
-    private fileDataSource: IFileDataSource
+    private userAuth: UserAuthorization
   ) {}
 
   async get(agent: User | null, id: number) {
@@ -66,19 +64,5 @@ export default class ProposalQueries {
     }
 
     return await this.dataSource.getProposalTemplate();
-  }
-
-  async getProposalAttachmentMetadata(fileIds:string[]): Promise<string[] | Rejection> {
-    const proposal = await this.fileDataSource.getMetadata(fileIds);
-
-    if (!proposal) {
-      return null;
-    }
-
-    if (await this.hasAccessRights(agent, proposal) === true) {
-      return proposal;
-    } else {
-      return null;
-    }
   }
 }

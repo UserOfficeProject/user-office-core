@@ -11,7 +11,6 @@ type Query {
     proposalTemplate: ProposalTemplateResult
     call(id: ID!): Call
     calls: [Call]
-    proposalFileMetadata(fileIds:[String]): [FileMetadata]
   }
 
   type Rejection {
@@ -179,14 +178,6 @@ input ProposalAnswerInput {
 type ProposalAnswer {
   proposal_question_id: ID!,
   answer: String
-}
-
-type FileMetadata {
-  file_id:String,
-  originalFileName:String,
-  mimeType:String,
-  sizeInBytes:Int,
-  createdDate:String
 }
 
 `);
