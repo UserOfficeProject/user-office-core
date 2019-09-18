@@ -3,6 +3,7 @@ import { isRejection, Rejection } from "../rejection";
 import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
+import { FileMetadata } from "../models/Blob";
 
 interface ProposalArgs {
   id: string;
@@ -12,6 +13,10 @@ interface ProposalsArgs {
   first?: number;
   offset?: number;
   filter?: string;
+}
+
+interface FileMetadataArgs {
+  fileIds:string[]
 }
 
 interface CreateProposalArgs {}
@@ -206,9 +211,9 @@ export default {
     );
   },
 
-  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+  async updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
     const { proposal_id, question_id, files } = args;
-    return wrapFilesMutation(
+    return await wrapFilesMutation(
       context.mutations.proposal.updateFiles(
         context.user,
         proposal_id,
@@ -216,6 +221,11 @@ export default {
         files
       )
     );
+  },
+
+  async fileMetadata(args:FileMetadataArgs, context:ResolverContext): Promise<FileMetadata[]>
+  {
+    return await context.queries.file.getFileMetadata(args.fileIds);
   },
 
   approveProposal(args: ApproveProposalArgs, context: ResolverContext) {

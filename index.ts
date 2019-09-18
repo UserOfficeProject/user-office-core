@@ -46,10 +46,14 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
 app.get("/download/:file_id", async (req, res) => {
   try {
-      const path = await baseContext.mutations.file.prepare(req.params.file_id);
-      await res.download(path, 'file.png', () => {
-        unlink(path, () => {}); // delete file once done
-      });
+      const fileId =  req.params.file_id;
+      const path = await baseContext.mutations.file.prepare(fileId);
+      const metaData = await baseContext.queries.file.getFileMetadata([fileId]);
+      if(path && metaData) {
+        await res.download(path, metaData[0].originalFileName, () => {
+          unlink(path, () => {}); // delete file once done
+        });
+      }
   } catch (e) {
     res.status(500).send(e);
   }
