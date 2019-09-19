@@ -2,8 +2,6 @@ import React from  'react';
 import ProposalContainer from "./ProposalContainer";
 import { useProposalData } from "../hooks/useProposalData";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate" 
-import { ProposalData } from '../model/ProposalModel'
-
 
 export default function ProposalEdit(props:{match:any}):JSX.Element {
 

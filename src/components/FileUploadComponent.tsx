@@ -1,6 +1,10 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState, useRef, useEffect } from "react";
 import { FileMetaData } from "../model/FileUpload";
-import { useFileUpload, UPLOAD_STATE } from "../hooks/useFileUpload";
+import {
+  useFileUpload,
+  useGetFileMetadata,
+  UPLOAD_STATE
+} from "../hooks/useFileUpload";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import {
   IconButton,
@@ -15,92 +19,91 @@ import {
   List} from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import ErrorIcon from '@material-ui/icons/Error';
-import CancelIcon from '@material-ui/icons/Cancel';
+import GetAppIcon from "@material-ui/icons/GetApp";
+import ErrorIcon from "@material-ui/icons/Error";
+import CancelIcon from "@material-ui/icons/Cancel";
 
-export class FileUploadComponent extends React.Component<
-  { maxFiles?: number; id?: string; fileType?: string, value:string, onChange:Function },
-  { files: FileMetaData[] }
-> {
+export function FileUploadComponent(props: {
+  maxFiles?: number;
+  id?: string;
+  fileType?: string;
+  value: string;
+  onChange: Function;
+}) {
+  const { getFileMetadata, filesMetadata } = useGetFileMetadata();
+  const [files, setFiles] = useState<FileMetaData[]>([]);
+  const inputRef = useRef(null);
 
-  inputRef: React.RefObject<HTMLInputElement>;
-
-  constructor(props:any) {
-    super(props);
-    this.inputRef = React.createRef();
-  }
-  state = { files: new Array<FileMetaData>() };
-
-  onUploadComplete(newFile: FileMetaData) {
-    this.setState(prevState => ({
-      files: prevState.files.concat(newFile)
-    }));
-
-    // sending event and pretending change event came from InputField
-    const inputElement = this.inputRef.current!;
-    let event:any = {};
-    inputElement.value = this.state.files.map(metaData => metaData.file_id).join(",");
+   
+  useEffect(() => {
+    const inputElement: HTMLInputElement = inputRef.current!;
+    let event: any = {};
     event.target = inputElement;
-    this.props.onChange(event);
-    //
-  }
+    props.onChange(event);
+  }, [files]);  // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
 
-  onDeleteClicked(deleteFile: FileMetaData) {
-    this.setState(prevState => ({
-      files: prevState.files.filter(fileId => fileId.file_id !== deleteFile.file_id)
-    }));
-  }
-
-  render() {
-    const { files } = this.state;
-    const { fileType, id} = this.props;
-    const maxFiles = this.props.maxFiles || 1;
-    
-    let newFileEntry;
-    if (files.length < maxFiles) {
-      newFileEntry = (
-        <NewFileEntry
-          filetype={fileType}
-          onUploadComplete={this.onUploadComplete.bind(this)}
-        />
-      );
+  useEffect(() => {
+    if (props.value) {
+      getFileMetadata(props.value.split(","));
     }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps, run only once in the beginning
 
-  const amountFilesInfo = (maxFiles > 1) ? <span>Max: {maxFiles} file(s)</span> : null;
-    return (
-      <React.Fragment>
-        <input type="hidden" id={id} name={id} readOnly value={this.props.value} ref={this.inputRef}/>
-        {amountFilesInfo}
-        <List
-          component="nav"
-          aria-label="main mailbox folders"
-          style={{ listStyle: "none", padding: 0, marginBottom: 0 }}
-        >
-          {files.map((metaData: FileMetaData) => {
+  useEffect(() => {
+    setFiles(filesMetadata);
+  }, [filesMetadata]);
+
+  const onUploadComplete = (newFile: FileMetaData) => {
+    setFiles(files.concat(newFile));
+  };
+
+  const onDeleteClicked = (deleteFile: FileMetaData) => {
+    setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
+  };
+
+  const { fileType, id } = props;
+  const maxFiles = props.maxFiles || 1;
+
+  let newFileEntry;
+  if (files.length < maxFiles) {
+    newFileEntry = (
+      <NewFileEntry filetype={fileType} onUploadComplete={onUploadComplete} />
+    );
+  }
+
+  const amountFilesInfo =
+    maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
+  return (
+    <React.Fragment>
+      <input
+        type="text"
+        id={id}
+        name={id}
+        readOnly
+        value={files.map(metaData => metaData.fileId).join(",")}
+        ref={inputRef}
+      />
+      {amountFilesInfo}
+      <List
+        component="nav"
+        style={{ listStyle: "none", padding: 0, marginBottom: 0 }}
+      >
+        {files.map &&
+          files.map((metaData: FileMetaData) => {
             return (
-              <ListItem key={metaData.file_id}>
+              <ListItem key={metaData.fileId}>
                 <FileEntry
-                  key={metaData.file_id}
-                  onDeleteClicked={this.onDeleteClicked.bind(this)}
+                  key={metaData.fileId}
+                  onDeleteClicked={onDeleteClicked}
                   metaData={metaData}
                 />
               </ListItem>
             );
           })}
-          <ListItem key="addNew">
-           {newFileEntry}
-          </ListItem>
-        </List>
-      </React.Fragment>
-    );
-  }
+        <ListItem key="addNew">{newFileEntry}</ListItem>
+      </List>
+    </React.Fragment>
+  );
 }
-
-
-
-
-
-
 
 export function FileEntry(props: {
   onDeleteClicked: Function;
@@ -114,8 +117,14 @@ export function FileEntry(props: {
     avatar: {
       backgroundColor: theme.palette.primary.main,
       color: "white"
+    },
+    downloadLink: {
+      display:"inline-flex",
+      color:"rgba(0, 0, 0, 0.54)"
     }
-  }))(); // DRY
+  }))();
+
+  const downloadLink = `/files/download/${props.metaData.fileId}`; // TODO to get a path to server? Or how to allow download via proxy
 
   const formatBytes = (bytes: number, decimals: number = 2): string => {
     if (bytes === 0) return "0 Bytes";
@@ -141,19 +150,21 @@ export function FileEntry(props: {
         secondary={formatBytes(props.metaData.sizeInBytes)}
       />
       <ListItemSecondaryAction>
-        <IconButton edge="end" aria-label="delete" onClick={() => { props.onDeleteClicked(props.metaData)}}>
+        <IconButton edge="end">
+          <a href={downloadLink} className={classes.downloadLink} download><GetAppIcon /></a>
+        </IconButton>
+        <IconButton
+          edge="end"
+          onClick={() => {
+            props.onDeleteClicked(props.metaData);
+          }}
+        >
           <DeleteOutlineIcon />
         </IconButton>
       </ListItemSecondaryAction>
     </React.Fragment>
   );
 }
-
-
-
-
-
-
 
 export function NewFileEntry(props: {
   filetype: string | undefined;
@@ -173,77 +184,76 @@ export function NewFileEntry(props: {
     }
   }))(); // DRY
 
-
-  const {
-    uploadFile,
-    progress,
-    state
-  } = useFileUpload(props.onUploadComplete);
+  const { uploadFile, progress, state } = useFileUpload();
 
   const onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
     let selectedFile = e.target.files ? e.target.files[0] : null;
     if (!selectedFile) return;
 
-    uploadFile(selectedFile!);
+    uploadFile(selectedFile!, props.onUploadComplete);
   };
 
-
-  switch (state) 
-  {
+  switch (state) {
     case UPLOAD_STATE.PRISTINE:
       return (
         <React.Fragment>
-          <input
-            accept={props.filetype}
-            style={{ display: "none" }}
-            type="file"
-            id="newFile"
-            multiple={false}
-            onChange={onFileSelected}
-          />
-          <label htmlFor="newFile">
+          <label>
+            <input
+              accept={props.filetype}
+              style={{ display: "none" }}
+              type="file"
+              multiple={false}
+              onChange={onFileSelected}
+            />
             <Button variant="outlined" component="span">
               <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
             </Button>
           </label>
         </React.Fragment>
       );
-      case UPLOAD_STATE.ERROR:
-          return (
-            <React.Fragment>
-              <ListItemAvatar>
-                <Avatar className={classes.avatar}>
-                  <ErrorIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="Error occurred" />
-              <ListItemSecondaryAction>
-                <CancelIcon />
-              </ListItemSecondaryAction>
-            </React.Fragment>
-          );
+    case UPLOAD_STATE.ERROR:
+      return (
+        <React.Fragment>
+          <ListItemAvatar>
+            <Avatar className={classes.avatar}>
+              <ErrorIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Error occurred" />
+          <ListItemSecondaryAction>
+            <CancelIcon />
+          </ListItemSecondaryAction>
+        </React.Fragment>
+      );
     case UPLOAD_STATE.ABORTED:
-        return (
-          <React.Fragment>
+      return (
+        <React.Fragment>
           <ListItemAvatar>
             <Avatar className={classes.avatar}>
               <CancelIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText primary="Upload cancelled" />
-          <ListItemSecondaryAction><CancelIcon /></ListItemSecondaryAction>
+          <ListItemSecondaryAction>
+            <CancelIcon />
+          </ListItemSecondaryAction>
         </React.Fragment>
-        );
+      );
     case UPLOAD_STATE.UPLOADING:
-        return (
-          <React.Fragment>
+      return (
+        <React.Fragment>
           <ListItemAvatar>
-              <CircularProgress variant="static" value={progress} />
+            <CircularProgress variant="static" value={progress} />
           </ListItemAvatar>
-          <ListItemText primary="Uploading..." secondary={Math.round(progress) + "%"} />
-          <ListItemSecondaryAction><CancelIcon /></ListItemSecondaryAction>
+          <ListItemText
+            primary="Uploading..."
+            secondary={Math.round(progress) + "%"}
+          />
+          <ListItemSecondaryAction>
+            <CancelIcon />
+          </ListItemSecondaryAction>
         </React.Fragment>
-        );
+      );
   }
-  return <div>Unknown state</div>
+  return <div>Unknown state</div>;
 }

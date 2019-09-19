@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalInformation, ProposalAnswer } from "../model/ProposalModel";
+import { ProposalInformation } from "../model/ProposalModel";
 
 export function useProposalData(id:number) {
   const sendRequest = useDataAPI();

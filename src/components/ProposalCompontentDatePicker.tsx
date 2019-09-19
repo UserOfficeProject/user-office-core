@@ -3,16 +3,14 @@ import { FormControl } from "@material-ui/core";
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalErrorLabel } from "./ProposalErrorLabel";
 import { Field } from "formik";
 export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
-  let { templateField, onComplete, touched, errors, handleChange, setFieldValue } = props;
-  let { proposal_question_id, config, question } = templateField;
-  let isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
+  const { templateField, onComplete, touched, errors } = props;
+  const { proposal_question_id, config, question } = templateField;
+  const isError = (touched[proposal_question_id] && errors[proposal_question_id]) ? true : false;
   if (!templateField.value) {
     templateField.value = new Date();
   }
-
 
   return (
     <FormControl error={isError}>
