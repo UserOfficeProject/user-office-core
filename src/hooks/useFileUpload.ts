@@ -15,6 +15,7 @@ export function useFileUpload()
 {
   const [progress, setProgress] = useState<number>(0);
   const [state, setState] = useState<UPLOAD_STATE>(UPLOAD_STATE.PRISTINE);
+  var xhr:XMLHttpRequest;
 
   const reset = () => 
   {
@@ -22,12 +23,22 @@ export function useFileUpload()
     setState(UPLOAD_STATE.PRISTINE);
   }
 
+  const abort = () => 
+  {
+    try{
+      xhr.abort();
+    }
+    catch {};
+
+    reset();
+  }
+
   const uploadFile = (file: File, completeHandler:Function) => 
   {
     setState(UPLOAD_STATE.UPLOADING);
     var formdata = new FormData();
     formdata.append("file", file);
-    const xhr = new XMLHttpRequest();
+    xhr = new XMLHttpRequest();
 
     xhr.upload.addEventListener("progress", (event) => 
       {
@@ -60,7 +71,7 @@ export function useFileUpload()
     xhr.send(formdata);
   };
 
-  return { uploadFile, progress, state };
+  return { uploadFile, progress, state, abort };
 }
 
 

@@ -195,7 +195,7 @@ export function NewFileEntry(props: {
     }
   }))(); // DRY
 
-  const { uploadFile, progress, state } = useFileUpload();
+  const { uploadFile, progress, state, abort } = useFileUpload();
 
   const onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
     let selectedFile = e.target.files ? e.target.files[0] : null;
@@ -232,7 +232,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText primary="Error occurred" />
           <ListItemSecondaryAction>
-            <CancelIcon />
+            <CancelIcon onClick={() => abort() }/>
           </ListItemSecondaryAction>
         </React.Fragment>
       );
@@ -246,7 +246,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText primary="Upload cancelled" />
           <ListItemSecondaryAction>
-            <CancelIcon />
+          <CancelIcon onClick={() => abort() }/>
           </ListItemSecondaryAction>
         </React.Fragment>
       );
@@ -261,7 +261,7 @@ export function NewFileEntry(props: {
             secondary={Math.round(progress) + "%"}
           />
           <ListItemSecondaryAction>
-            <CancelIcon />
+            { /* Add cancel upload button */}
           </ListItemSecondaryAction>
         </React.Fragment>
       );
