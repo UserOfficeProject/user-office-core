@@ -34,6 +34,17 @@ export function FileUploadComponent(props: {
   const [files, setFiles] = useState<FileMetaData[]>([]);
   const inputRef = useRef(null);
 
+  const classes = makeStyles(theme => ({
+    list: {
+      listStyle: "none",
+      padding: 0, 
+      marginBottom: 0,
+      '& li': {
+        paddingLeft: 0
+      }
+    }
+  }))();
+
    
   useEffect(() => {
     const inputElement: HTMLInputElement = inputRef.current!;
@@ -75,7 +86,7 @@ export function FileUploadComponent(props: {
   return (
     <React.Fragment>
       <input
-        type="text"
+        type="hidden"
         id={id}
         name={id}
         readOnly
@@ -84,8 +95,8 @@ export function FileUploadComponent(props: {
       />
       {amountFilesInfo}
       <List
-        component="nav"
-        style={{ listStyle: "none", padding: 0, marginBottom: 0 }}
+        component="ul"
+        className={classes.list}
       >
         {files.map &&
           files.map((metaData: FileMetaData) => {
