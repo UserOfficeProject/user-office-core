@@ -8,8 +8,7 @@ import { IFileDataSource } from "../datasources/IFileDataSource";
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
-    private userAuth: UserAuthorization,
-    private fileDataSource: IFileDataSource
+    private userAuth: UserAuthorization
   ) {}
 
   async get(agent: User | null, id: number) {

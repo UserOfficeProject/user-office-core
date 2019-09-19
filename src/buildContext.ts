@@ -50,7 +50,8 @@ const userMutations = new UserMutations(
 );
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
-  userAuthorization
+  userAuthorization,
+  fileDataSource
 );
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
