@@ -27,6 +27,7 @@ import ProposalPage from "./ProposalPage";
 import CallPage from "./CallPage";
 import ProfilePage from "./ProfilePage";
 import OverviewPage from "./OverviewPage";
+import HelpPage from "./HelpPage";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
 
@@ -182,6 +183,7 @@ export default function Dashboard({ match }) {
           <Route path="/ProposalPage" component={ProposalPage} />
           <Route path="/PageEditor" component={PageEditor} />
           <Route path="/CallPage" component={CallPage} />
+          <Route path="/HelpPage" component={HelpPage} />
           <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route
             path="/ProposalTableReviewer"

@@ -1,11 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
+import { useGetPageContent } from "../hooks/useGetPageContent";
+import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import ProposalTableUser from "./ProposalTableUser";
-import { UserContext } from "../context/UserContextProvider";
-import { useGetPageContent } from "../hooks/useGetPageContent";
 import parse from "html-react-parser";
 
 const useStyles = makeStyles(theme => ({
@@ -20,23 +18,16 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "column"
   }
 }));
-
-export default function OverviewPage() {
+export default function HelpPage() {
   const classes = useStyles();
-  const { user } = useContext(UserContext);
-  const [loadingHomeContent, homePageContent] = useGetPageContent("HOMEPAGE");
+  const [loadingHelpContent, helpPageContent] = useGetPageContent("HELPPAGE");
   return (
     <React.Fragment>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              {loadingHomeContent ? null : parse(homePageContent)}
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <ProposalTableUser id={user.id} />
+              {loadingHelpContent ? null : parse(helpPageContent)}
             </Paper>
           </Grid>
         </Grid>

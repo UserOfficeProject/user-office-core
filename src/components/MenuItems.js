@@ -5,6 +5,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import NoteAdd from "@material-ui/icons/NoteAdd";
 import People from "@material-ui/icons/People";
+import Help from "@material-ui/icons/Help";
 import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import CalendarToday from "@material-ui/icons/CalendarToday";
@@ -46,6 +47,12 @@ export default function MenuItems({ role }) {
           <NoteAdd />
         </ListItemIcon>
         <ListItemText primary="New Proposal" />
+      </ListItem>
+      <ListItem component={Link} to="/HelpPage" button>
+        <ListItemIcon>
+          <Help />
+        </ListItemIcon>
+        <ListItemText primary="Help" />
       </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
