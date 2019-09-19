@@ -32,7 +32,7 @@ interface UpdateProposalArgs {
   id: string;
   title: string;
   abstract: string;
-  answers:ProposalAnswer[];
+  answers: ProposalAnswer[];
   status: number;
   users: number[];
 }
@@ -98,8 +98,8 @@ interface CreateUserArgs {
 }
 
 enum PageName {
-    HOMEPAGE,
-    HELPPAGE
+  HOMEPAGE = 1,
+  HELPPAGE = 2
 }
 
 function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
@@ -210,7 +210,7 @@ export default {
     );
   },
 
-  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+  updateProposalFiles(args: UpdateProposalFilesArgs, context: ResolverContext) {
     const { proposal_id, question_id, files } = args;
     return wrapFilesMutation(
       context.mutations.proposal.updateFiles(
@@ -370,13 +370,21 @@ export default {
   calls(args: {}, context: ResolverContext) {
     return context.queries.call.getAll(context.user);
   },
-  setPageContent(args: {id: PageName}, context: ResolverContext) {
-    return true
+  setPageContent(
+    args: { id: PageName; text: string },
+    context: ResolverContext
+  ) {
+    console.log(PageName[args.id], args.id);
+    return context.mutations.admin.setPageText(
+      context.user,
+      parseInt(PageName[args.id]),
+      args.text
+    );
   },
-
-  getPageContent(args: {id: PageName}, context: ResolverContext) {
-    return "<p> HELLO WORLD</P>"
+  getPageContent(args: { id: PageName }, context: ResolverContext) {
+    return context.queries.admin.getPageText(
+      context.user,
+      parseInt(PageName[args.id])
+    );
   }
-
-
 };
