@@ -22,6 +22,8 @@ app.get("/*", function(req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
+app.use("/files", proxy("https://duo2-backend-staging.herokuapp.com"));
 app.use("/", proxy("https://duo2-backend-staging.herokuapp.com"));
+
 
 app.listen(port);
