@@ -7,7 +7,8 @@ import { ApplicationEvent } from "../events/applicationEvents";
 import {
   proposalDataSource,
   dummyProposalSubmitted,
-  dummyProposal
+  dummyProposal,
+  dummyAnswers
 } from "../datasources/mockups/ProposalDataSource";
 
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -45,6 +46,14 @@ test("A userofficer can get any proposal", () => {
   return expect(proposalQueries.get(dummyUserOfficer, 1)).resolves.toBe(
     dummyProposal
   );
+});
+
+test("Get answers should succeed for authorized user", () => {
+  return expect(proposalQueries.getAnswers(dummyUser, 1)).resolves.toBe(dummyAnswers);
+});
+
+test("Get answers should not succeed for unauthorized user", () => {
+  return expect(proposalQueries.getAnswers(dummyUserNotOnProposal, 1)).resolves.not.toBe(dummyAnswers);
 });
 
 test("A userofficer can get all proposal", () => {
