@@ -7,7 +7,8 @@ import {
   ProposalTemplate,
   ProposalTemplateField,
   FieldDependency,
-  Topic
+  Topic,
+  ProposalAnswer
 } from "../../models/Proposal";
 
 const BluePromise = require("bluebird");
@@ -295,5 +296,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
 
     return new ProposalTemplate(topics);
+  }
+
+  async getProposalAnswers(proposalId:number): Promise<ProposalAnswer[]> {
+    return await database("proposal_answers")
+      .where("proposal_id", proposalId);
   }
 }

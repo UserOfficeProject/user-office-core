@@ -1,4 +1,4 @@
-import { Proposal, ProposalTemplate } from "../models/Proposal";
+import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read
@@ -33,4 +33,5 @@ export interface ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<Boolean | null>;
+  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
 }

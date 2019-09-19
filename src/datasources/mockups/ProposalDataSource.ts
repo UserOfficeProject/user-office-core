@@ -5,7 +5,8 @@ import {
   ProposalTemplateField,
   DataType,
   FieldDependency,
-  Topic
+  Topic,
+  ProposalAnswer
 } from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
@@ -28,7 +29,21 @@ export const dummyProposalSubmitted = new Proposal(
   "2019-07-17 08:25:12.23043+00"
 );
 
+export const dummyAnswers: Array<ProposalAnswer> = [
+  { 
+    proposal_question_id: "has_references", 
+    answer: "true" 
+  },
+  {
+    proposal_question_id: "fasta_seq",
+    answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+  }
+];
+
 export class proposalDataSource implements ProposalDataSource {
+  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
+    return dummyAnswers;
+  }
   async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
     return files;
   }

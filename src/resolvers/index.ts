@@ -117,7 +117,8 @@ function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
     created,
     updated,
     users: () => context.queries.user.getProposers(agent, id),
-    reviews: () => context.queries.review.reviewsForProposal(agent, id)
+    reviews: () => context.queries.review.reviewsForProposal(agent, id),
+    answers: () => context.queries.proposal.getAnswers(agent, id)
   };
 }
 
