@@ -112,7 +112,7 @@ type Call {
 }
 
 type Proposal {
-    id: ID
+    id: Int
     title: String
     abstract: String
     status: Int
