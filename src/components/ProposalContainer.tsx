@@ -50,7 +50,11 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
     setStepIndex(stepIndex + 1);
   };
 
-  const handleBack = () => {
+  const handleBack = (data:ProposalData) => {
+    setProposalData({
+      ...proposalData,
+      ...data
+    });
     setStepIndex(stepIndex - 1);
   };
 
@@ -112,7 +116,7 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
     return proposalSteps[step].element;
   };
 
-  const api = {next:handleNext, back:handleBack, submit:submitProposal, error:handleError};
+  const api = {next:handleNext, back:handleBack, error:handleError};
 
 
   return (
@@ -173,5 +177,11 @@ const ErrorMessageBox = (props:{message?:string | undefined}) => {
   
 }
 
-export const FormApi = createContext<{next:Function | null, back:Function | null, submit:Function | null, error:Function | null}>({next:null, back: null, submit:null, error:null});
+type CallbackSignature = (data:ProposalData) => void;
+
+export const FormApi = createContext<{next:CallbackSignature, back:CallbackSignature, error:(msg:string) => void }>( { 
+  next: (data:ProposalData) => { console.warn("Using default implementation for next") },
+  back: (data:ProposalData) => { console.warn("Using default implementation for back") },
+  error: (msg:string) => { console.warn("Using default implementation for error") }
+});
 

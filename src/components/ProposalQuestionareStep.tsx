@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import { ProposalTemplate, DataType, ProposalTemplateField, ProposalAnswer } from "../model/ProposalModel";
@@ -16,6 +16,7 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { useUpdateProposalFiles } from "../hooks/useUpdateProposalFiles";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
+import submitFormAsync from '../utils/FormikAsyncFormHandler';
 
 
 export  default function ProposalQuestionareStep(props: {
@@ -26,9 +27,10 @@ export  default function ProposalQuestionareStep(props: {
 
   const api = useContext(FormApi);
   const { model, topicId } = props;
-  const [, updateState] = React.useState();
+  const [, updateState] = useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
+  const topic = model.getTopicById(topicId);
   const {loading:formSaving, updateProposal} = useUpdateProposal();
   const {loading:filesSaving, updateProposalFiles} = useUpdateProposalFiles();
   const classes = makeStyles({
@@ -37,7 +39,6 @@ export  default function ProposalQuestionareStep(props: {
     }
   })();
 
-  const topic = model.getTopicById(topicId);
   let activeFields = topic
     ? topic.fields.filter((field: ProposalTemplateField) => {
         return model.areDependenciesSatisfied(field.proposal_question_id);
@@ -45,7 +46,6 @@ export  default function ProposalQuestionareStep(props: {
     : [];
 
   let { initialValues, validationSchema } = createFormikCofigObjects(activeFields);
-
 
   const onFormSubmit = async (values:any) => 
   {
@@ -64,11 +64,7 @@ export  default function ProposalQuestionareStep(props: {
       const fileIds = fileField.value ? fileField.value.split(",") : [];
       await updateProposalFiles({proposal_id:proposalId, question_id: fileField.proposal_question_id, files:fileIds})
     });
-
-    api.next && api.next();
-
   }
-
 
   if (model == null) {
     return <div>loading...</div>;
@@ -80,8 +76,8 @@ export  default function ProposalQuestionareStep(props: {
       validationSchema={Yup.object().shape(validationSchema)}
       onSubmit={onFormSubmit}
     >
-     {({ errors, touched, handleChange, handleSubmit }) => (
-        <form onSubmit={handleSubmit}>
+     {({ values, errors, touched, handleChange, submitForm, validateForm }) => (
+        <form>
           {activeFields.map(field => {
             return (
                 <div className={classes.componentWrapper} key={field.proposal_question_id}>
@@ -94,13 +90,16 @@ export  default function ProposalQuestionareStep(props: {
                 </div>
             );
           })}
-          <ProposalNavigationFragment back={api.back} showSubmit={true} isLoading={formSaving || filesSaving}/>
-        </form>
+          <ProposalNavigationFragment 
+           back={() => {submitFormAsync(submitForm, validateForm).then((isValid:boolean)=> { if(isValid) { api.back(values)}})}}
+           next={() => {submitFormAsync(submitForm, validateForm).then((isValid:boolean)=> { if(isValid) { api.next(values)}})}}
+          isLoading={formSaving || filesSaving} 
+          />
+          </form>
       )}
     </Formik>
   );
 }
-
 
 class ComponentFactory {
   private componentMap = JSDict.Create<string, any>();

@@ -16,12 +16,13 @@ export default function ProposalInformation(props) {
   return (
     <Formik
       initialValues={{ title: props.data.title, abstract: props.data.abstract }}
-      onSubmit={(values) => {
-        updateProposal({
+      onSubmit={async values => {
+        await updateProposal({
           id: props.data.id,
           title: values.title,
           abstract: values.abstract
-        }).then(() => api.next(values));
+        });
+        api.next(values);
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
@@ -34,7 +35,7 @@ export default function ProposalInformation(props) {
           .required("Abstract must be at least 20 characters")
       })}
     >
-      {({ values, errors, touched, handleChange }) => (
+      {({ values, errors, touched, handleChange, submitForm }) => (
         <Form>
           <Typography variant="h6" gutterBottom>
             General Information
@@ -74,7 +75,10 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          <ProposalNavigationFragment showSubmit={api.next !== null} isLoading={loading} />
+          <ProposalNavigationFragment 
+            next={submitForm}
+            isLoading={loading} 
+          />
         </Form>
       )}
     </Formik>

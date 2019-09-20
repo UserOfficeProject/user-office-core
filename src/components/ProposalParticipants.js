@@ -41,17 +41,19 @@ export default function ProposalParticipants(props) {
     setUsers(newUsers);
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    if (users.length < 1) {
-      setUserError(true);
-    } else {
-      const userIds = users.map(user => user.id);
-      updateProposal({
-        id: props.data.id,
-        users: userIds
-      }).then(data => api.next({ users }));
-    }
+  const submit = () => {
+    return new Promise((resolve, reject) => {
+      if (users.length < 1) {
+        setUserError(true);
+      } else {
+        const userIds = users.map(user => user.id);
+        updateProposal({
+          id: props.data.id,
+          users: userIds
+        }).then(data => resolve());
+      }
+    })
+    
   };
 
   const openModal = rowData => {
@@ -59,7 +61,7 @@ export default function ProposalParticipants(props) {
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
@@ -80,7 +82,11 @@ export default function ProposalParticipants(props) {
         </p>
       )}
 
-      <ProposalNavigationFragment showSubmit={true} back={api.back} isLoading={loading} />
+          <ProposalNavigationFragment 
+           next={ () => { submit().then(api.next({users})) } }
+           back={ () => { submit().then(api.back({users})) } }
+          isLoading={loading} 
+          />
     </form>
   );
 }
