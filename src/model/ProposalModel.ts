@@ -6,7 +6,7 @@ export class ProposalData {
     public title?: string,
     public abstract?: string,
     public proposer?: number,
-    public status?: number,
+    public status?: ProposalStatus,
     public created?: string,
     public updated?: string
   ) {}
@@ -153,4 +153,9 @@ export interface ProposalInformation {
   users?: any; // TODO implement
   answers?: ProposalAnswer[];
   reviews?: any // TODO implement
+}
+
+export enum ProposalStatus {
+  DRAFT = 0,
+  SUBMITTED = 1
 }

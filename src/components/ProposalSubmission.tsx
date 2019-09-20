@@ -2,16 +2,14 @@ import React, {  } from "react";
 import ProposalContainer from "./ProposalContainer";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate" 
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { ProposalData } from "../model/ProposalModel";
 
 export default function ProposalSubmission() {
   const { proposalTemplate } = useProposalQuestionTemplate();
-  const { proposalID } = useCreateProposal();
-  
+  const { proposal } = useCreateProposal();
 
-  if (!proposalID || !proposalTemplate) {
+  if (!proposal || !proposalTemplate) {
     return <p>Loading</p>;
   }
 
-  return <ProposalContainer data={new ProposalData(proposalID)} template={proposalTemplate} />;
+  return <ProposalContainer data={proposal} template={proposalTemplate} />;
 }

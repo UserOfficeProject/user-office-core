@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
+import { ProposalData } from "../model/ProposalModel";
 
 export function useCreateProposal() {
   const sendRequest = useDataAPI();
-  const [proposalID, setProposalID] = useState(null);
+  const [proposal, setProposal] = useState<ProposalData|null>(null);
 
   useEffect(() => {
     const query = `
@@ -11,15 +12,16 @@ export function useCreateProposal() {
         createProposal{
          proposal{
           id
+          status
         }
           error
         }
       }
       `;
     sendRequest(query).then(data =>
-      setProposalID(data.createProposal.proposal.id)
+      setProposal(data.createProposal.proposal)
     );
   }, [sendRequest]);
 
-  return { proposalID };
+  return { proposal };
 }

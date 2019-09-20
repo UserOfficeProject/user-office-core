@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useSubmitProposal() {
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const sendRequest = useDataAPI();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const submitProposal = async (id: number) => {
     const query = `
@@ -20,10 +20,11 @@ export function useSubmitProposal() {
       id
     };
 
+    setIsLoading(true);
     await sendRequest(query, variables);
-    setSubmitted(true);
-    return;
+    setIsLoading(false);
+    return true;
   };
 
-  return { submitted, submitProposal };
+  return { isLoading, submitProposal };
 }

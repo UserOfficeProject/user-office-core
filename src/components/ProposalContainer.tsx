@@ -9,10 +9,9 @@ import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import { ProposalTemplate, ProposalData } from "../model/ProposalModel";
+import { ProposalTemplate, ProposalData, ProposalStatus } from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
 import ErrorIcon from '@material-ui/icons/Error';
-import {useSubmitProposal} from '../hooks/useSubmitProposal';
 import { Zoom } from "@material-ui/core";
 
 
@@ -23,7 +22,6 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
   const [stepIndex, setStepIndex] = useState(0);
   const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const {submitted, submitProposal} = useSubmitProposal()
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -118,7 +116,6 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
 
   const api = {next:handleNext, back:handleBack, error:handleError};
 
-
   return (
     <Container maxWidth="lg">
       <FormApi.Provider value={api}>
@@ -134,16 +131,16 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
             ))}
           </Stepper>
           <React.Fragment>
-            {submitted ? (
+            {proposalData.status === ProposalStatus.DRAFT ? (
+              <React.Fragment>
+                {getStepContent(stepIndex)}
+              <ErrorMessageBox message={errorMessage} />
+              </React.Fragment>
+            ) : (
               <React.Fragment>
                 <Typography variant="h5" gutterBottom>
                   {false ? "Update Proposal" : "Sent Proposal"}
                 </Typography>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-              {getStepContent(stepIndex)}
-              <ErrorMessageBox message={errorMessage} />
               </React.Fragment>
             )}
           </React.Fragment>
