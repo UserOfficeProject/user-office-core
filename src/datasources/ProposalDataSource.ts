@@ -8,9 +8,9 @@ export interface ProposalDataSource {
     filter?: string,
     first?: number,
     offset?: number
-    ): Promise<{ totalCount: number; proposals: Proposal[] }>;
+  ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
-  getProposalTemplate():Promise<ProposalTemplate>;
+  getProposalTemplate(): Promise<ProposalTemplate>;
 
   // Write
   create(id: number): Promise<Proposal | null>;
@@ -19,8 +19,19 @@ export interface ProposalDataSource {
   acceptProposal(id: number): Promise<Proposal | null>;
   rejectProposal(id: number): Promise<Proposal | null>;
   submitProposal(id: number): Promise<Proposal | null>;
-  updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean>;
-  insertFiles(proposal_id:number, question_id: string, files:string[]): Promise<string[]>;
-  deleteFiles(proposal_id:number, question_id: string): Promise<Boolean>;
-  getProposalAnswers(proposalId:number):Promise<ProposalAnswer[]>;
+  updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean>;
+  insertFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[] | null>;
+  deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean | null>;
+  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
 }

@@ -195,6 +195,15 @@ CREATE TABLE call (
 );
 
 
+CREATE TABLE pagetext (
+  pagetext_id serial PRIMARY KEY  -- implicit primary key constraint
+, content    text	
+);
+
+
+INSERT INTO pagetext (content) values ('HOMEPAGE');
+
+INSERT INTO pagetext (content) values ('HELPPAGE');
 
 INSERT INTO roles (short_code, title) VALUES ('user', 'User');
 

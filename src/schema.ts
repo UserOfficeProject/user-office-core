@@ -11,6 +11,7 @@ type Query {
     proposalTemplate: ProposalTemplateResult
     call(id: ID!): Call
     calls: [Call]
+    getPageContent(id: PageName!): String
     fileMetadata(fileIds:[String]): [FileMetadata]
   }
 
@@ -60,6 +61,7 @@ type Query {
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
+    setPageContent(id: PageName!, text: String): Boolean
     createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     token(token: String!): String
     createUser(
@@ -179,6 +181,11 @@ input ProposalAnswerInput {
 type ProposalAnswer {
   proposal_question_id: ID!,
   answer: String
+}
+
+enum PageName {
+  HOMEPAGE
+  HELPPAGE
 }
 
 type FileMetadata {

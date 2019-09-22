@@ -6,6 +6,7 @@ import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSourc
 import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
 import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
 import PostgresFileDataSource from "./datasources/postgres/FileDataSource";
+import PostgresAdminDataSource from "./datasources/postgres/AdminDataSource";
 
 import UserQueries from "./queries/UserQueries";
 import UserMutations from "./mutations/UserMutations";
@@ -21,6 +22,8 @@ import ReviewQueries from "./queries/ReviewQueries";
 import ReviewMutations from "./mutations/ReviewMutations";
 import FileQueries from "./queries/FileQueries";
 import FileMutations from "./mutations/FileMutations";
+import AdminQueries from "./queries/AdminQueries";
+import AdminMutations from "./mutations/AdminMutations";
 
 // Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
@@ -28,8 +31,7 @@ const proposalDataSource = new PostgresProposalDataSource();
 const reviewDataSource = new PostgresReviewDataSource();
 const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
-
-
+const adminDataSource = new PostgresAdminDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
@@ -79,20 +81,29 @@ const fileMutations = new FileMutations(
   eventBus
 );
 
+const adminQueries = new AdminQueries(adminDataSource, userAuthorization);
+const adminMutations = new AdminMutations(
+  adminDataSource,
+  userAuthorization,
+  eventBus
+);
+
 const context: BasicResolverContext = {
   queries: {
     user: userQueries,
     proposal: proposalQueries,
     review: reviewQueries,
     call: callQueries,
-    file: fileQueries
+    file: fileQueries,
+    admin: adminQueries
   },
   mutations: {
     user: userMutations,
     proposal: proposalMutations,
     review: reviewMutations,
     call: callMutations,
-    file: fileMutations
+    file: fileMutations,
+    admin: adminMutations
   }
 };
 
