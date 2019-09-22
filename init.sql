@@ -491,6 +491,7 @@ INSERT INTO proposal_question_dependencies VALUES('bio_deu_other', 'slide_select
 INSERT INTO proposal_question_dependencies VALUES('will_provide_organism', 'is_biomass', '{ "condition": "equals", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('organism_name', 'is_biomass', '{ "condition": "equals", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('organism_name', 'will_provide_organism', '{ "condition": "equals", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'will_provide_organism', '{ "condition": "equals", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'is_biomass', '{ "condition": "equals", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('material_amount', 'is_biomass', '{ "condition": "equals", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('material_condition', 'is_biomass', '{ "condition": "equals", "params":true }');
