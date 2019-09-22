@@ -2,8 +2,12 @@ import { makeStyles, Button, CircularProgress } from "@material-ui/core";
 import { Fragment } from "react";
 import React from 'react';
 
-const ProposalNavigationFragment = (props:{back:(() => void)|undefined, next:(() => void)|undefined, isLoading:boolean, backLabel?:string, nextLabel?:string}) => 
+const ProposalNavigationFragment = (props:{back:(() => void)|undefined, next:(() => void)|undefined, isLoading:boolean, backLabel?:string, nextLabel?:string, disabled?:boolean}) => 
 {
+  if(props.disabled === true) 
+  {
+    return <div></div>
+  }
    const classes = makeStyles({
         buttons: {
           marginTop: "15px",

@@ -4,8 +4,9 @@ import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
-import { ProposalData, ProposalStatus } from "../model/ProposalModel";
+import { ProposalData, ProposalStatus, ProposalTemplate } from "../model/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
+import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 
 const useStyles = makeStyles({
   buttons: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProposalReview({data} : { data: ProposalData }) {
+export default function ProposalReview({data, template} : { data: ProposalData, template:ProposalTemplate }) {
   const api = useContext(FormApi);
   const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
@@ -26,6 +27,7 @@ export default function ProposalReview({data} : { data: ProposalData }) {
   return (
     <React.Fragment>
       <ProposalInformation data={data} disabled={true} />
+      <ProposaQuestionaryReview data={data} template={template} />
       <ProposalParticipants data={data} disabled={true} />
       <div className={classes.buttons}>
 
@@ -40,6 +42,7 @@ export default function ProposalReview({data} : { data: ProposalData }) {
         }}
         nextLabel={data.status ? "Update" : "Submit"}
         isLoading={isLoading}
+        disabled={true}
         />
       </div>
     </React.Fragment>

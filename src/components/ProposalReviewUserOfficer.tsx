@@ -13,6 +13,8 @@ import ParticipantModal from "./ParticipantModal";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import PeopleTable from "./PeopleTable";
+import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
+import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -35,18 +37,19 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ProposalReview({ match }) {
+export default function ProposalReview({ match }:{match:any}) {
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
-  const [reviewers, setReviewers] = useState([]);
-  const { loading, proposalData } = useProposalData(match.params.id);
+  const [reviewers, setReviewers] = useState<any>([]);
+  const { proposalData } = useProposalData(match.params.id);
+  const { proposalTemplate } = useProposalQuestionTemplate();
   const sendAddReviewer = useAddUserForReview(); 
   const sendRemoveReviewer = useRemoveUserForReview();
 
   useEffect(() => {
     if (proposalData) {
       setReviewers(
-        proposalData.reviews.map(review => {
+        proposalData.reviews.map((review:any) => {
           const { firstname, lastname, id, username } = review.reviewer;
           return {
             name: firstname,
@@ -60,37 +63,34 @@ export default function ProposalReview({ match }) {
     }
   }, [proposalData]);
 
-  const addUser = user => {
+  const addUser = (user:any) => {
     sendAddReviewer(user.id, parseInt(match.params.id));
     setReviewers([...reviewers, user]);
     setOpen(false);
   };
 
-  const removeUser = user => {
+  const removeUser = (user:any) => {
     let newUsers = [...reviewers];
     newUsers.splice(newUsers.indexOf(user), 1);
     setReviewers(newUsers);
     sendRemoveReviewer(user.reviewID);
   };
 
-  if (loading) {
+  if (!proposalData || !proposalTemplate) {
     return <p>Loading</p>;
   }
 
+  proposalData.answers!.forEach(answer => {
+    proposalTemplate.getFieldById(answer.proposal_question_id).value = answer.answer;
+  })
+
+
   return (
-    <Container maxWidth="lg" className={classes.container}>
+    <Container maxWidth="lg">
       <Paper className={classes.paper}>
-        <ProposalInformation data={proposalData} />
-        <ProposalParticipants data={proposalData} />
-        <div className={classes.buttons}>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-          >
-            Update
-          </Button>
-        </div>
+        <ProposalInformation data={proposalData} disabled={true} />
+        <ProposaQuestionaryReview data={proposalData} template={proposalTemplate} />
+        <ProposalParticipants data={proposalData}  disabled={true}/>
       </Paper>
       <Paper className={classes.paper}>
         <ReviewTable reviews={proposalData.reviews} />
@@ -98,7 +98,7 @@ export default function ProposalReview({ match }) {
       <Paper className={classes.paper}>
         <ParticipantModal
           show={modalOpen}
-          close={setOpen.bind(this, false)}
+          close={setOpen}
           addParticipant={addUser}
         />
         <PeopleTable
@@ -109,6 +109,7 @@ export default function ProposalReview({ match }) {
           data={reviewers}
           search={false}
           onRemove={removeUser}
+          disabled={true}
         />
       </Paper>
     </Container>

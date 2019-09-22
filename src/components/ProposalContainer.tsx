@@ -75,7 +75,7 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
         new ProposalStep(
           topic.topic_title, 
           <ProposalQuestionareStep
-            model={proposalTemplate}
+            template={proposalTemplate}
             topicId={topic.topic_id}
             data={proposalData}
           />
@@ -89,7 +89,7 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
       allProposalSteps.push(
         new ProposalStep(
           'Review',
-          <ProposalReview data={proposalData}/>
+          <ProposalReview data={proposalData} template={proposalTemplate}/>
         )
       );
       return allProposalSteps;

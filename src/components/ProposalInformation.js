@@ -76,6 +76,7 @@ export default function ProposalInformation(props) {
             </Grid>
           </Grid>
           <ProposalNavigationFragment 
+            disabled = {props.disabled}
             next={submitForm}
             isLoading={loading} 
           />

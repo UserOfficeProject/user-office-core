@@ -83,6 +83,7 @@ export default function ProposalParticipants(props) {
       )}
 
           <ProposalNavigationFragment 
+          disabled={props.disabled}
            next={ () => { submit().then(api.next({users})) } }
            back={ () => { submit().then(api.back({users})) } }
           isLoading={loading} 
