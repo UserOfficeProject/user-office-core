@@ -123,10 +123,6 @@ export default function SignUp() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <FormikDropdown 
-      name="user_title" 
-      label="Title" 
-      items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }, { text: "Rather not say", value: "unspecified" }]}   />
       <Formik
         initialValues={{
           user_title: "",
