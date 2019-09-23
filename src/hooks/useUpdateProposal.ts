@@ -1,15 +1,25 @@
 import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalAnswer } from "../model/ProposalModel";
+import { ProposalAnswer, getDataTypeSpec } from "../model/ProposalModel";
 
-export function useUpdateProposal() 
-{
+export function useUpdateProposal() {
   const sendRequest = useDataAPI();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(
-    async ( parameters: { id:number, title?:string, abstract?:string, answers?:ProposalAnswer[], users?:number[]}) => 
-    {
+    async (parameters: {
+      id: number;
+      title?: string;
+      abstract?: string;
+      answers?: ProposalAnswer[];
+      users?: number[];
+    }) => {
+      let answers = parameters.answers;
+      if (answers) {
+        answers = answers.filter(
+          answer => getDataTypeSpec(answer.data_type).readonly === false
+        );
+      }
       const query = `
       mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $users:[Int]) {
         updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, users:$users){
@@ -21,21 +31,17 @@ export function useUpdateProposal()
       }
       `;
       setLoading(true);
-      if(parameters.answers)
-      {
+      if (parameters.answers) {
         parameters.answers!.forEach(answer => {
-          answer.answer = JSON.stringify({value: answer.answer});
+          answer.value = JSON.stringify({ value: answer.value });
         });
-      } 
+      }
       const result = await sendRequest(query, parameters);
       setLoading(false);
       return result;
     },
     [sendRequest]
-
   );
 
-  return {loading, updateProposal};
+  return { loading, updateProposal };
 }
-
-
