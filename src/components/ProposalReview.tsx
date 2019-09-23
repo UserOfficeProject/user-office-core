@@ -4,7 +4,7 @@ import ProposalInformation from "./ProposalInformation";
 import ProposalParticipants from "./ProposalParticipants";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
-import { ProposalData, ProposalStatus, ProposalTemplate } from "../model/ProposalModel";
+import { ProposalData, ProposalStatus } from "../model/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProposalReview({data, template} : { data: ProposalData, template:ProposalTemplate }) {
+export default function ProposalReview({data} : { data: ProposalData }) {
   const api = useContext(FormApi);
   const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
@@ -27,10 +27,9 @@ export default function ProposalReview({data, template} : { data: ProposalData, 
   return (
     <React.Fragment>
       <ProposalInformation data={data} disabled={true} />
-      <ProposaQuestionaryReview data={data} template={template} />
+      <ProposaQuestionaryReview data={data} />
       <ProposalParticipants data={data} disabled={true} />
       <div className={classes.buttons}>
-
         <ProposalNavigationFragment
         back={() => api.back(data)}
         backLabel="Back"

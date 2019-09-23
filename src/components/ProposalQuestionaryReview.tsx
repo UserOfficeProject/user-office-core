@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import {
-  ProposalTemplate,
   ProposalData,
   ProposalTemplateField
 } from "../model/ProposalModel";
@@ -17,28 +16,30 @@ import {
 
 export default function ProposaQuestionaryReview(props: {
   data: ProposalData;
-  template: ProposalTemplate;
 }) {
-  if (!props.template || !props.data) {
+
+  const template = props.data.questionary!;
+  
+  if (!props.data) {
     return <div>Loading...</div>;
   }
 
   const classes = makeStyles(theme => ({
     heading: {
-      marginTop:theme.spacing(2)
+      marginTop: theme.spacing(2)
     }
   }))();
-  
-  const allFields = props.template.getAllFields();
+
+  const allFields = template.getAllFields();
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
 
   return (
     <Fragment>
-       <Typography variant="h6" className={classes.heading} gutterBottom>
-       Questionary review
-          </Typography>
+      <Typography variant="h6" className={classes.heading} gutterBottom>
+        Questionary review
+      </Typography>
       <Paper>
         <Table>
           <TableHead>

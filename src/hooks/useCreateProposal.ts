@@ -13,6 +13,23 @@ export function useCreateProposal() {
          proposal{
           id
           status
+          questionary {
+            topics {
+              topic_title
+              topic_id,
+              fields {
+                proposal_question_id
+                data_type
+                question
+                config
+                dependencies {
+                  proposal_question_dependency
+                  condition
+                  proposal_question_id
+                }
+              }
+            }
+          }
         }
           error
         }

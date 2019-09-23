@@ -11,7 +11,7 @@
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
     "express-http-proxy": "^1.5.1",
-    "formik": "^1.5.7",
+    "formik": "^1.5.8",
     "formik-material-ui": "0.0.18",
     "graphql-request": "^1.8.2",
     "html-react-parser": "^0.9.1",

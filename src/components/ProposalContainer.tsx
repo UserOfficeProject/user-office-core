@@ -9,19 +9,22 @@ import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import { ProposalTemplate, ProposalData, ProposalStatus } from "../model/ProposalModel";
+import {
+  ProposalTemplate,
+  ProposalData,
+  ProposalStatus
+} from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
-import ErrorIcon from '@material-ui/icons/Error';
+import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom } from "@material-ui/core";
 
-
-
-
-export default function ProposalContainer(props:{data:ProposalData, template:ProposalTemplate}) {
+export default function ProposalContainer(props: { data: ProposalData }) {
   const [proposalData, setProposalData] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
-  const [ proposalSteps, setProposalSteps ] = useState<ProposalStep[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const [proposalSteps, setProposalSteps] = useState<ProposalStep[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -37,18 +40,17 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
       padding: theme.spacing(3, 0, 5)
     }
   }))();
-  
-  
-  const handleNext = (data:ProposalData) => {
+
+  const handleNext = (data: ProposalData) => {
     setProposalData({
       ...proposalData,
       ...data
     });
-    
+
     setStepIndex(stepIndex + 1);
   };
 
-  const handleBack = (data:ProposalData) => {
+  const handleBack = (data: ProposalData) => {
     setProposalData({
       ...proposalData,
       ...data
@@ -56,65 +58,66 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
     setStepIndex(stepIndex - 1);
   };
 
-  const handleError = (msg:string) => {
+  const handleError = (msg: string) => {
     setErrorMessage(msg);
-  }
-
+  };
 
   useEffect(() => {
-    const createProposalSteps = (proposalTemplate:ProposalTemplate):ProposalStep[] => {
+    const createProposalSteps = (
+      proposalTemplate: ProposalTemplate
+    ): ProposalStep[] => {
       var allProposalSteps = new Array<ProposalStep>();
-  
+
       allProposalSteps.push(
-      new ProposalStep(
-        "New Proposal", 
-        <ProposalInformation data={proposalData}/>
+        new ProposalStep(
+          "New Proposal",
+          <ProposalInformation data={proposalData} />
         )
-      );    
-      allProposalSteps = allProposalSteps.concat(proposalTemplate.topics.map(topic => 
-        new ProposalStep(
-          topic.topic_title, 
-          <ProposalQuestionareStep
-            template={proposalTemplate}
-            topicId={topic.topic_id}
-            data={proposalData}
-          />
-      )));
-      allProposalSteps.push(
-        new ProposalStep(
-          'Participants' , 
-          <ProposalParticipants data={proposalData}/>
+      );
+      allProposalSteps = allProposalSteps.concat(
+        proposalTemplate.topics.map(
+          topic =>
+            new ProposalStep(
+              topic.topic_title,
+              (
+                <ProposalQuestionareStep
+                  topicId={topic.topic_id}
+                  data={proposalData}
+                />
+              )
+            )
         )
       );
       allProposalSteps.push(
         new ProposalStep(
-          'Review',
-          <ProposalReview data={proposalData} template={proposalTemplate}/>
+          "Participants",
+          <ProposalParticipants data={proposalData} />
         )
+      );
+      allProposalSteps.push(
+        new ProposalStep("Review", <ProposalReview data={proposalData} />)
       );
       return allProposalSteps;
-    }
+    };
 
-    const proposalSteps = createProposalSteps(props.template);
+    const proposalSteps = createProposalSteps(proposalData.questionary!);
     setProposalSteps(proposalSteps);
+  }, [proposalData]);
 
-  }, [props.template, proposalData]);
-
-  
-  const getStepContent = (step:number) => {
-    if(!proposalSteps || proposalSteps.length === 0) {
+  const getStepContent = (step: number) => {
+    if (!proposalSteps || proposalSteps.length === 0) {
       return "Loading...";
     }
 
-    if(!proposalSteps[step]) {
+    if (!proposalSteps[step]) {
       console.error(`Invalid step ${step}`);
-      return <span>Error</span>
+      return <span>Error</span>;
     }
 
     return proposalSteps[step].element;
   };
 
-  const api = {next:handleNext, back:handleBack, error:handleError};
+  const api = { next: handleNext, back: handleBack, error: handleError };
 
   return (
     <Container maxWidth="lg">
@@ -134,7 +137,7 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
             {proposalData.status === ProposalStatus.DRAFT ? (
               <React.Fragment>
                 {getStepContent(stepIndex)}
-              <ErrorMessageBox message={errorMessage} />
+                <ErrorMessageBox message={errorMessage} />
               </React.Fragment>
             ) : (
               <React.Fragment>
@@ -150,35 +153,46 @@ export default function ProposalContainer(props:{data:ProposalData, template:Pro
   );
 }
 
-
 class ProposalStep {
   constructor(public title: string, public element: JSX.Element) {}
 }
 
-const ErrorMessageBox = (props:{message?:string | undefined}) => {
+const ErrorMessageBox = (props: { message?: string | undefined }) => {
   const classes = makeStyles(() => ({
     error: {
-      color:"#ff0000",
-      padding:"10px 0",
-      display:"flex",
-      alignItems:"center",
-      justifyContent:"flex-end",
+      color: "#ff0000",
+      padding: "10px 0",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end"
     },
     icon: {
-      margin:"5px"
+      margin: "5px"
     }
   }))();
-    return <Zoom in={props.message !== undefined} mountOnEnter unmountOnExit>
-      <div className={classes.error}><ErrorIcon className={classes.icon}/> {props.message}</div>
-      </Zoom>
-  
-}
+  return (
+    <Zoom in={props.message !== undefined} mountOnEnter unmountOnExit>
+      <div className={classes.error}>
+        <ErrorIcon className={classes.icon} /> {props.message}
+      </div>
+    </Zoom>
+  );
+};
 
-type CallbackSignature = (data:ProposalData) => void;
+type CallbackSignature = (data: ProposalData) => void;
 
-export const FormApi = createContext<{next:CallbackSignature, back:CallbackSignature, error:(msg:string) => void }>( { 
-  next: (data:ProposalData) => { console.warn("Using default implementation for next") },
-  back: (data:ProposalData) => { console.warn("Using default implementation for back") },
-  error: (msg:string) => { console.warn("Using default implementation for error") }
+export const FormApi = createContext<{
+  next: CallbackSignature;
+  back: CallbackSignature;
+  error: (msg: string) => void;
+}>({
+  next: (data: ProposalData) => {
+    console.warn("Using default implementation for next");
+  },
+  back: (data: ProposalData) => {
+    console.warn("Using default implementation for back");
+  },
+  error: (msg: string) => {
+    console.warn("Using default implementation for error");
+  }
 });
-

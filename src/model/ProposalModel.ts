@@ -7,6 +7,7 @@ export class ProposalData {
     public abstract?: string,
     public proposer?: number,
     public status?: ProposalStatus,
+    public questionary?: ProposalTemplate,
     public created?: string,
     public updated?: string
   ) {}
@@ -108,14 +109,10 @@ export class FieldDependency {
   }
 }
 
-export class ProposalTemplateResult {
-  template!: ProposalTemplate;
-  error!: String;
-}
-
 export interface ProposalAnswer {
   proposal_question_id: string;
-  answer: boolean | number | string;
+  value: boolean | number | string;
+  data_type: DataType;
 }
 
 export enum DataType {
@@ -125,6 +122,19 @@ export enum DataType {
   DATE = "DATE",
   FILE_UPLOAD = "FILE_UPLOAD",
   EMBELLISHMENT = "EMBELLISHMENT"
+}
+
+export interface DataTypeSpec {
+  readonly:boolean;
+}
+
+export function getDataTypeSpec(type:DataType):DataTypeSpec {
+  switch(type) {
+    case DataType.EMBELLISHMENT:
+      return {readonly:true};
+    default:
+      return {readonly:false};   
+  }
 }
 
 export interface FieldConfig {
@@ -151,7 +161,7 @@ export interface ProposalInformation {
   created?: string;
   updated?: string;
   users?: any; // TODO implement
-  answers?: ProposalAnswer[];
+  questionary?: ProposalTemplate;
   reviews?: any // TODO implement
 }
 

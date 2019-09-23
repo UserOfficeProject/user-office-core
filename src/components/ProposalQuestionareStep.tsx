@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import {
-  ProposalTemplate,
   DataType,
   ProposalTemplateField,
-  ProposalAnswer
+  ProposalAnswer,
+  ProposalData
 } from "../model/ProposalModel";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
@@ -19,29 +19,31 @@ import { createFormikCofigObjects } from "./ProposalYupUtilities";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import { useUpdateProposalFiles } from "../hooks/useUpdateProposalFiles";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
 
 export default function ProposalQuestionareStep(props: {
-  template: ProposalTemplate;
+  data: ProposalData;
   topicId: number;
-  data: { id: number };
 }) {
+  const { data, topicId } = props;
   const api = useContext(FormApi);
-  const { template, topicId } = props;
   const [, updateState] = useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
-  const topic = template.getTopicById(topicId);
   const { loading: formSaving, updateProposal } = useUpdateProposal();
-  const { loading: filesSaving, updateProposalFiles } = useUpdateProposalFiles();
   const classes = makeStyles({
     componentWrapper: {
       margin: "10px 0"
     }
   })();
 
+  if (data == null) {
+    return <div>loading...</div>;
+  }
+
+  const template = data.questionary!;
+  const topic = template.getTopicById(topicId);
   let activeFields = topic
     ? topic.fields.filter((field: ProposalTemplateField) => {
         return template.areDependenciesSatisfied(field.proposal_question_id);
@@ -54,31 +56,21 @@ export default function ProposalQuestionareStep(props: {
 
   const onFormSubmit = async (values: any) => {
     const proposalId: number = props.data.id;
-    const answers: ProposalAnswer[] = Object.keys(values).map(key => {
-      return { proposal_question_id: key, answer: values[key] };
+
+    const answers: ProposalAnswer[] = activeFields.map(field => {
+      return (({ proposal_question_id, data_type, value }) => ({
+        proposal_question_id,
+        data_type,
+        value
+      }))(field); // convert field to answer objcet
     });
 
     const result = await updateProposal({ id: proposalId, answers: answers });
+
     if (result && result.error) {
       api.error && api.error(result.error);
     }
-
-    let activeFileFields = activeFields.filter(
-      field => field.data_type === DataType.FILE_UPLOAD
-    );
-    activeFileFields.forEach(async (fileField) => {
-      const fileIds = fileField.value ? fileField.value.split(",") : [];
-      await updateProposalFiles({
-        proposal_id: proposalId,
-        question_id: fileField.proposal_question_id,
-        files: fileIds
-      });
-    });
   };
-
-  if (template == null) {
-    return <div>loading...</div>;
-  }
 
   return (
     <Formik
@@ -129,7 +121,7 @@ export default function ProposalQuestionareStep(props: {
                 }
               );
             }}
-            isLoading={formSaving || filesSaving}
+            isLoading={formSaving}
           />
         </form>
       )}
