@@ -8,7 +8,6 @@ type Query {
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
     review(id: ID!): Review
-    proposalTemplate: ProposalTemplateResult
     call(id: ID!): Call
     calls: [Call]
     getPageContent(id: PageName!): String
@@ -46,11 +45,6 @@ type Query {
 
   type UserMutationResult {
     user: User
-    error: String
-  }
-
-  type ProposalTemplateResult {
-    template: ProposalTemplate
     error: String
   }
 
@@ -120,7 +114,7 @@ type Proposal {
     status: Int
     users: [User!]
     proposer: Int
-    answers: [ProposalAnswer!]
+    questionary: ProposalTemplate
     created: String
     updated: String
     reviews: [Review]
@@ -162,7 +156,7 @@ type ProposalTemplateField {
     proposal_question_id: String,
     data_type: String,
     question: String,
-
+    value: String,
     config: String,
     dependencies: [FieldDependency]
 }

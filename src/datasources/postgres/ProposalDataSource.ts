@@ -300,6 +300,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async getProposalAnswers(proposalId:number): Promise<ProposalAnswer[]> {
     return await database("proposal_answers")
-      .where("proposal_id", proposalId);
+      .where("proposal_id", proposalId)
+      .select('proposal_question_id', 'answer as value'); // TODO rename the column
   }
 }

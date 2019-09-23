@@ -1,6 +1,11 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection } from "../rejection";
-import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalAnswer,
+  ProposalInformation
+} from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
@@ -16,7 +21,7 @@ interface ProposalsArgs {
 }
 
 interface FileMetadataArgs {
-  fileIds:string[]
+  fileIds: string[];
 }
 
 interface CreateProposalArgs {}
@@ -107,24 +112,43 @@ enum PageName {
   HELPPAGE = 2
 }
 
-function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
+async function resolveProposal(
+  proposal: Proposal | null,
+  context: ResolverContext
+) {
   if (proposal == null) {
     return null;
   }
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
 
-  return {
+  const users = await context.queries.user.getProposers(agent, id);
+  if (isRejection(users)) {
+    return users;
+  }
+
+  const reviews = await context.queries.review.reviewsForProposal(agent, id);
+  if (isRejection(reviews)) {
+    return reviews;
+  }
+
+  const questionary = await context.queries.proposal.getQuestionary(agent, id);
+  if (isRejection(questionary)) {
+    return questionary;
+  }
+
+  return new ProposalInformation(
     id,
     title,
     abstract,
+    agent.id,
     status,
     created,
     updated,
-    users: () => context.queries.user.getProposers(agent, id),
-    reviews: () => context.queries.review.reviewsForProposal(agent, id),
-    answers: () => context.queries.proposal.getAnswers(agent, id)
-  };
+    users,
+    reviews,
+    questionary
+  );
 }
 
 function resolveProposals(
@@ -162,6 +186,9 @@ function createResponseWrapper<T>(key: string) {
 
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<
+  ProposalInformation
+>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
@@ -195,9 +222,24 @@ export default {
     );
   },
 
-  createProposal(args: CreateProposalArgs, context: ResolverContext) {
-    return wrapProposalMutation(
-      context.mutations.proposal.create(context.user)
+  async createProposal(args: CreateProposalArgs, context: ResolverContext) {
+    return wrapProposalInformationMutation(
+      new Promise(async (resolve, reject) => {
+        let newProposal = await context.mutations.proposal.create(context.user);
+        if (isRejection(newProposal)) {
+          return newProposal;
+        }
+
+        let newProposalInformation = await resolveProposal(
+          newProposal,
+          context
+        );
+        if (isRejection(newProposalInformation)) {
+          return newProposalInformation;
+        }
+
+        resolve(newProposalInformation);
+      })
     );
   },
 
@@ -216,7 +258,10 @@ export default {
     );
   },
 
-  async updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+  async updateProposalFiles(
+    args: UpdateProposalFilesArgs,
+    context: ResolverContext
+  ) {
     const { proposal_id, question_id, files } = args;
     return await wrapFilesMutation(
       context.mutations.proposal.updateFiles(
@@ -228,8 +273,10 @@ export default {
     );
   },
 
-  async fileMetadata(args:FileMetadataArgs, context:ResolverContext): Promise<FileMetadata[]>
-  {
+  async fileMetadata(
+    args: FileMetadataArgs,
+    context: ResolverContext
+  ): Promise<FileMetadata[]> {
     return await context.queries.file.getFileMetadata(args.fileIds);
   },
 

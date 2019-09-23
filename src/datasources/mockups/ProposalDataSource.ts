@@ -32,11 +32,13 @@ export const dummyProposalSubmitted = new Proposal(
 export const dummyAnswers: Array<ProposalAnswer> = [
   { 
     proposal_question_id: "has_references", 
-    answer: "true" 
+    data_type: DataType.BOOLEAN,
+    value: "true" 
   },
   {
     proposal_question_id: "fasta_seq",
-    answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+    data_type: DataType.TEXT_INPUT,
+    value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
   }
 ];
 
@@ -68,9 +70,10 @@ export class proposalDataSource implements ProposalDataSource {
       { variant: "radio", options: ["yes", "no"] },
       null
     );
+
     var linksToField = new ProposalTemplateField(
       "linksToField",
-      DataType.SMALL_TEXT,
+      DataType.TEXT_INPUT,
       "Please specify",
       1,
       null,

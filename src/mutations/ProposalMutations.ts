@@ -5,6 +5,7 @@ import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import { Proposal, ProposalAnswer } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { ILogger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
@@ -118,11 +119,11 @@ export default class ProposalMutations {
           // TODO validate input
           // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
           answers.forEach(async answer => {
-            if (answer.answer !== undefined) {
+            if (answer.value !== undefined) {
               await this.dataSource.updateAnswer(
                 proposal!.id,
                 answer.proposal_question_id,
-                answer.answer
+                answer.value
               );
             }
           });
