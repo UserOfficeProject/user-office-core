@@ -123,10 +123,6 @@ export default function SignUp() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <FormikDropdown 
-      name="user_title" 
-      label="Title" 
-      items={[{ text: "Ms.", value: "Ms." }, { text: "Mr.", value: "Mr." }, { text: "Dr.", value: "Dr." }, { text: "Rather not say", value: "unspecified" }]}   />
       <Formik
         initialValues={{
           user_title: "",
@@ -168,6 +164,8 @@ export default function SignUp() {
             .min(2, "Username must be at least 2 characters")
             .max(20, "Username must be at most 20 characters")
             .required("Username must be at least 2 characters"),
+          user_title: Yup.string()
+            .required("User title is required"),
           password: Yup.string()
             .min(8, "Password must be at least 8 characters")
             .max(25, "Password must be at most 25 characters")
@@ -248,7 +246,17 @@ export default function SignUp() {
             <Typography className={classes.cardHeader}>
               Personal details
             </Typography>
+
             <CardContent>
+              <FormikDropdown
+                name="user_title"
+                label="Title"
+                items={[
+                  { text: "Ms.", value: "Ms." }, 
+                  { text: "Mr.", value: "Mr." }, 
+                  { text: "Dr.", value: "Dr." }, 
+                  { text: "Rather not say", value: "unspecified" }]}
+              />
               <Field
                 name="firstname"
                 label="Firstname"
