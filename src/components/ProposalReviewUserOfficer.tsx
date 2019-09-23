@@ -14,7 +14,7 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import PeopleTable from "./PeopleTable";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
+import { useGetProposalQuestionary } from "../hooks/useProposalQuestionTemplate";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -42,7 +42,7 @@ export default function ProposalReview({ match }:{match:any}) {
   const [modalOpen, setOpen] = useState(false);
   const [reviewers, setReviewers] = useState<any>([]);
   const { proposalData } = useProposalData(match.params.id);
-  const { proposalTemplate } = useProposalQuestionTemplate();
+  const { proposalTemplate } = useGetProposalQuestionary(match.params.id);
   const sendAddReviewer = useAddUserForReview(); 
   const sendRemoveReviewer = useRemoveUserForReview();
 

@@ -1,11 +1,16 @@
-import React, {  } from "react";
+import React, { useEffect } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate" 
+import { useGetProposalQuestionary } from "../hooks/useProposalQuestionTemplate" 
 import { useCreateProposal } from "../hooks/useCreateProposal";
+import { ProposalTemplate } from "../model/ProposalModel";
 
 export default function ProposalSubmission() {
-  const { proposalTemplate } = useProposalQuestionTemplate();
   const { proposal } = useCreateProposal();
+  var proposalTemplate:ProposalTemplate | null = null;
+  useEffect(() => {
+    proposalTemplate = useGetProposalQuestionary(1).proposalTemplate;;
+  }, [proposal])
+  
 
   if (!proposal || !proposalTemplate) {
     return <p>Loading</p>;

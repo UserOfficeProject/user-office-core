@@ -1,12 +1,12 @@
 import React from  'react';
 import ProposalContainer from "./ProposalContainer";
 import { useProposalData } from "../hooks/useProposalData";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate" 
+import { useGetProposalQuestionary } from "../hooks/useProposalQuestionTemplate" 
 
 export default function ProposalEdit(props:{match:any}):JSX.Element {
 
   const { proposalData } = useProposalData(props.match.params.proposalID);
-  const { proposalTemplate } = useProposalQuestionTemplate();
+  const { proposalTemplate } = useGetProposalQuestionary(props.match.params.proposalID);
 
   if (!proposalData || !proposalTemplate) {
     return <p>Loading</p>;

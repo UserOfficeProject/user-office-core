@@ -13,6 +13,7 @@ export class ProposalData {
 }
 
 export class ProposalTemplate {
+  public proposalId:number = 0;
   public topics: Topic[] = [];
   private fields: ProposalTemplateField[] = []; // reference to all fields for quick lookup
   

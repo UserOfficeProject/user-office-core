@@ -14,9 +14,6 @@ import ProposalInformation from "./ProposalInformation";
 import ErrorIcon from '@material-ui/icons/Error';
 import { Zoom } from "@material-ui/core";
 
-
-
-
 export default function ProposalContainer(props:{data:ProposalData, template:ProposalTemplate}) {
   const [proposalData, setProposalData] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
