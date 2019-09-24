@@ -42,7 +42,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
     sizeInBytes: number,
     path: string
   ): Promise<FileMetadata | null> {
-    let err, oid, resultSet;
+    let err, oid, resultSet:any;
 
     [err, oid] = await to(this.storeBlob(path));
     if (err) {
@@ -78,16 +78,24 @@ export default class PostgresFileDataSource implements IFileDataSource {
 
   private async storeBlob(filePath: string): Promise<number> {
     return new Promise(async (resolve, reject) => {
-      let err: any, oid: number, stream: WriteStream, connection: Client;
+      let err: any, oid: number, stream: WriteStream, connection: Client | undefined;
 
       [err, connection] = await to(database.client.acquireConnection());
       if (err)
+      {
         return reject(`Could not establish connection with database \n ${err}`);
+      }
+      
+      if(!connection) 
+      {
+        return reject(`Could not obtain connection`);
+      }
 
       [err] = await to(connection.query("BEGIN")); // start the transaction
       if (err) return reject(`Could not begin transaction \n${err}`);
 
       var blobManager = new LargeObjectManager({ pg: connection });
+      // @ts-ignore
       [err, [oid, stream]] = await to(
         blobManager.createAndWritableStreamAsync()
       );
@@ -99,6 +107,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
       console.info(`Creating a large object with the oid ${oid}`);
 
       stream.on("finish", function() {
+        // @ts-ignore Already checked
         connection.query("COMMIT", () => resolve(oid));
       });
 
@@ -109,18 +118,26 @@ export default class PostgresFileDataSource implements IFileDataSource {
 
   private async retrieveBlob(oid: number, output:string): Promise<void> {
     return new Promise(async (resolve, reject) => {
-      let err: any, stream: ReadStream, connection: Client, size;
+      let err: any, stream: ReadStream, connection: Client | undefined, size;
 
       if(!output) reject("Output must be specified");
 
       [err, connection] = await to(database.client.acquireConnection());
       if (err)
+      {
         return reject(`Could not establish connection with database \n ${err}`);
+      }
+
+      if(!connection) 
+      {
+        return reject(`Could not obtain connection`);
+      }
 
       [err] = await to(connection.query("BEGIN")); // start the transaction
       if (err) return reject(`Could not begin transaction \n${err}`);
         
       const blobManager = new LargeObjectManager({ pg: connection });
+      // @ts-ignore
       [err, [size, stream]] = await to(
         blobManager.openAndReadableStreamAsync(oid)
       );
@@ -132,6 +149,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
       console.log("Streaming a large object with a total size of", size);
 
       stream.on("end", function() {
+         // @ts-ignore Already checked
         connection.query("COMMIT", () => resolve());
       });
 

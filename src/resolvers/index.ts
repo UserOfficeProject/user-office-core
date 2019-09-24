@@ -122,6 +122,11 @@ async function resolveProposal(
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
 
+  if(!agent) 
+  {
+    return rejection("Not aututhorized");
+  }
+
   const users = await context.queries.user.getProposers(agent, id);
   if (isRejection(users)) {
     return users;
@@ -135,6 +140,9 @@ async function resolveProposal(
   const questionary = await context.queries.proposal.getQuestionary(agent, id);
   if (isRejection(questionary)) {
     return questionary;
+  }
+  if(agent == null) {
+    return rejection("Not authorized");
   }
 
   return new ProposalInformation(
