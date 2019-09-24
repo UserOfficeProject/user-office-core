@@ -16,6 +16,8 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
+import { DataType } from "../models/Proposal";
+import { User } from "../models/User";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -32,99 +34,47 @@ const proposalMutations = new ProposalMutations(
 //Update
 
 test("A user on the proposal can update it's title if it is in edit mode", () => {
-  return expect(
-    proposalMutations.update(
-      dummyUser,
-      "1",
-      "New project title",
-      "Project abstract description",
-      [
-        {
-          proposal_question_id: "fasta_seq",
-          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-        }
-      ],
-      undefined,
-      undefined
-    )
-  ).resolves.toBe(dummyProposal);
+  return expect(tryUpdateProposal(dummyUser, "1"))
+  .resolves.toBe(dummyProposal);
 });
 
 test("A user on the proposal can't update it's title if it is not in edit mode", () => {
-  return expect(
-    proposalMutations.update(
-      dummyUser,
-      "2",
-      "New project title",
-      "Project abstract description",
-      [
-        {
-          proposal_question_id: "fasta_seq",
-          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-        }
-      ],
-      undefined,
-      undefined
-    )
-  ).resolves.toHaveProperty("reason", "NOT_ALLOWED_PROPOSAL_SUBMITTED");
+  return expect(tryUpdateProposal(dummyUser, "2"))
+  .resolves.toHaveProperty("reason", "NOT_ALLOWED_PROPOSAL_SUBMITTED");
 });
 
 test("A userofficer can update a proposal in edit mode", () => {
-  return expect(
-    proposalMutations.update(
-      dummyUserOfficer,
-      "1",
-      "New project title",
-      "Project abstract description",
-      [
-        {
-          proposal_question_id: "fasta_seq",
-          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-        }
-      ],
-      undefined,
-      undefined
-    )
-  ).resolves.toBe(dummyProposal);
+  return expect(tryUpdateProposal(dummyUserOfficer, "1"))
+  .resolves.toBe(dummyProposal);
 });
 
 test("A userofficer can update a proposal in submit mode", () => {
-  return expect(
-    proposalMutations.update(
-      dummyUserOfficer,
-      "2",
-      "New project title",
-      "Project abstract description",
-      [
-        {
-          proposal_question_id: "fasta_seq",
-          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-        }
-      ],
-      undefined,
-      undefined
-    )
-  ).resolves.toBe(dummyProposalSubmitted);
+  return expect(tryUpdateProposal(dummyUserOfficer, "2"))
+  .resolves.toBe(dummyProposalSubmitted);
 });
 
 test("A user not on a proposal can not update it", () => {
-  return expect(
-    proposalMutations.update(
-      dummyUserNotOnProposal,
-      "1",
-      "New project title",
-      "Project abstract description",
-      [
-        {
-          proposal_question_id: "fasta_seq",
-          answer: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-        }
-      ],
-      undefined,
-      undefined
-    )
-  ).resolves.toHaveProperty("reason", "NOT_ALLOWED");
+  return expect(tryUpdateProposal(dummyUserNotOnProposal, "1"))
+  .resolves.toHaveProperty("reason", "NOT_ALLOWED");
 });
+
+function tryUpdateProposal(user:User, proposalId:string) {
+  return proposalMutations.update(
+    user,
+    proposalId,
+    "New project title",
+    "Project abstract description",
+    [
+      {
+        proposal_question_id: "fasta_seq",
+        data_type:DataType.TEXT_INPUT,
+        value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+      }
+    ],
+    undefined,
+    undefined
+  )
+}
 
 //Accept
 

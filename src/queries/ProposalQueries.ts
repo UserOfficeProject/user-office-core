@@ -4,7 +4,8 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import {
   ProposalTemplate,
   Proposal,
-  ProposalTemplateField
+  ProposalTemplateField,
+  ProposalAnswer
 } from "../models/Proposal";
 import { Rejection, rejection, isRejection } from "../rejection";
 import { ILogger } from "../utils/Logger";
@@ -45,15 +46,17 @@ export default class ProposalQueries {
       return answers; // rejection
     }
 
-    var answerRef = JSDict.Create<string, ProposalTemplateField>();
+    var answerRef = JSDict.Create<string, ProposalAnswer>();
     answers.forEach(answer => {
-      answerRef[answer.proposal_question_id] = answer;
+      answerRef.put(answer.proposal_question_id, answer);
     })
+
     template.topics.forEach(topic => {
-      topic.fields.forEach(field => {
-        if(answerRef[field.proposal_question_id])
+      topic.fields!.forEach(field => {
+        const answer = answerRef.get(field.proposal_question_id)
+        if(answer)
         {
-          field.value = answerRef[field.proposal_question_id].value;
+          field.value = answer.value;
         }
       });
     });

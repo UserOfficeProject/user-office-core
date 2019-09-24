@@ -20,6 +20,7 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 import { ProposalTemplate } from "../models/Proposal";
+import { Logger } from "../utils/Logger";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -29,7 +30,8 @@ const userAuthorization = new UserAuthorization(
 );
 const proposalQueries = new ProposalQueries(
   new proposalDataSource(),
-  userAuthorization
+  userAuthorization,
+  new Logger()
 );
 
 test("A user on the proposal can get a proposal it belongs to", () => {

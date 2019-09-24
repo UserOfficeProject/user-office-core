@@ -169,7 +169,8 @@ type FieldDependency {
 
 input ProposalAnswerInput {
   proposal_question_id: ID!,
-  answer: String
+  data_type:String,
+  value: String
 }
 
 type ProposalAnswer {

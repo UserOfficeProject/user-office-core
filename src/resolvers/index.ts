@@ -1,5 +1,5 @@
 import { ResolverContext } from "../context";
-import { isRejection, Rejection } from "../rejection";
+import { isRejection, Rejection, rejection } from "../rejection";
 import {
   Proposal,
   ProposalTemplate,
@@ -117,7 +117,7 @@ async function resolveProposal(
   context: ResolverContext
 ) {
   if (proposal == null) {
-    return null;
+    return rejection("Proposal is null");
   }
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
