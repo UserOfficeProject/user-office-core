@@ -16,7 +16,7 @@ export class Logger implements ILogger{
   }
 
   log(level: LEVEL, message: string, context: object) {
-    console.log(+message);
+    console.log(`${level} - ${message} \n ${JSON.stringify(context)}`);
   }
 }
 
