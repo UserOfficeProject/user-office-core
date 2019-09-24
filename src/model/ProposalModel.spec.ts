@@ -2,7 +2,7 @@ import {createTemplate, createFieldlessTemplate} from "../test/ProposalTestBed"
 
 test("Can parse object", () => {
   var template = createTemplate();
-  expect(template.getAllFields().length).toBe(4);
+  expect(template.getAllFields().length).toBe(8);
   expect(template.getFieldById("links_with_industry").dependencies).not.toBe(null);
   expect(template.getFieldById("links_with_industry").dependencies!.length).toBe(1);
 

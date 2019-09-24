@@ -96,6 +96,9 @@ export class ProposalTemplateField {
       if (typeof this.value == "string") {
         this.value = JSON.parse(this.value).value;
       }
+      else {
+        this.value = "";
+      }
     }
   }
 }

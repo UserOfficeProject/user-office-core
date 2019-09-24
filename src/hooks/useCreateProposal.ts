@@ -22,6 +22,7 @@ export function useCreateProposal() {
                 data_type
                 question
                 config
+                value
                 dependencies {
                   proposal_question_dependency
                   condition
