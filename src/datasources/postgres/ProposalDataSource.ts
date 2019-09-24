@@ -14,7 +14,6 @@ import {
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  
   private createProposalObject(proposal: ProposalRecord) {
     return new Proposal(
       proposal.proposal_id,
@@ -303,18 +302,5 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return await database("proposal_answers")
       .where("proposal_id", proposalId)
       .select('proposal_question_id', 'answer as value'); // TODO rename the column
-  }
-
-  async createTopic(title: string): Promise<Topic> {
-    var result = database
-    .insert({ topic_title: title })
-    .into("proposal_topics")
-    .returning(["topic_id", "topic_title", "sort_order"])
-    .then(
-      ([{topic_id, topic_title, sort_order}]:[{topic_id:number, topic_title:string, sort_order:number}]) => {
-        return new Topic(topic_id, topic_title, sort_order, null);
-      }
-    );
-    return result;
   }
 }

@@ -43,9 +43,6 @@ export const dummyAnswers: Array<ProposalAnswer> = [
 ];
 
 export class proposalDataSource implements ProposalDataSource {
-  createTopic(title: string): Promise<Topic> {
-    throw new Error("Method not implemented.");
-  }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
   }
@@ -88,7 +85,7 @@ export class proposalDataSource implements ProposalDataSource {
         )
       ]
     );
-    return new ProposalTemplate([new Topic(1, 'General information', 1, [hasLinksToField, linksToField])]);
+    return new ProposalTemplate([new Topic(1, 'General information', [hasLinksToField, linksToField])]);
   }
 
   async submitReview(

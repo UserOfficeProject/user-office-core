@@ -38,7 +38,6 @@ export class Topic {
   constructor(
     public topic_id:number,
     public topic_title: string,
-    public sort_order:number,
     public fields:ProposalTemplateField[] | null
    ) {}
 }
