@@ -44,13 +44,13 @@ export default function ProposalQuestionareStep(props: {
 
   const template = data.questionary!;
   const topic = template.getTopicById(topicId);
-  let activeFields = topic
+  const activeFields = topic
     ? topic.fields.filter((field: ProposalTemplateField) => {
         return template.areDependenciesSatisfied(field.proposal_question_id);
       })
     : [];
 
-  let { initialValues, validationSchema } = createFormikCofigObjects(
+  const { initialValues, validationSchema } = createFormikCofigObjects(
     activeFields
   );
 
@@ -153,7 +153,7 @@ class ComponentFactory {
     props.templateField = field;
     props.key = field.proposal_question_id;
 
-    let component = this.componentMap.get(field.data_type);
+    const component = this.componentMap.get(field.data_type);
 
     return component
       ? React.createElement(component, props)

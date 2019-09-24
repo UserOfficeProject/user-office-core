@@ -84,7 +84,7 @@ export function FileUploadComponent(props: {
   const amountFilesInfo =
     maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
   return (
-    <React.Fragment>
+    <>
       <input
         type="hidden"
         id={id}
@@ -112,7 +112,7 @@ export function FileUploadComponent(props: {
           })}
         <ListItem key="addNew">{newFileEntry}</ListItem>
       </List>
-    </React.Fragment>
+    </>
   );
 }
 
@@ -150,7 +150,7 @@ export function FileEntry(props: {
   };
 
   return (
-    <React.Fragment>
+    <>
       <ListItemAvatar>
         <Avatar className={classes.avatar}>
           <AttachFileIcon />
@@ -173,7 +173,7 @@ export function FileEntry(props: {
           <DeleteOutlineIcon />
         </IconButton>
       </ListItemSecondaryAction>
-    </React.Fragment>
+    </>
   );
 }
 
@@ -207,7 +207,7 @@ export function NewFileEntry(props: {
   switch (state) {
     case UPLOAD_STATE.PRISTINE:
       return (
-        <React.Fragment>
+        <>
           <label>
             <input
               accept={props.filetype}
@@ -220,11 +220,11 @@ export function NewFileEntry(props: {
               <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
             </Button>
           </label>
-        </React.Fragment>
+        </>
       );
     case UPLOAD_STATE.ERROR:
       return (
-        <React.Fragment>
+        <>
           <ListItemAvatar>
             <Avatar className={classes.avatar}>
               <ErrorIcon />
@@ -234,11 +234,11 @@ export function NewFileEntry(props: {
           <ListItemSecondaryAction>
             <CancelIcon onClick={() => abort() }/>
           </ListItemSecondaryAction>
-        </React.Fragment>
+        </>
       );
     case UPLOAD_STATE.ABORTED:
       return (
-        <React.Fragment>
+        <>
           <ListItemAvatar>
             <Avatar className={classes.avatar}>
               <CancelIcon />
@@ -248,11 +248,11 @@ export function NewFileEntry(props: {
           <ListItemSecondaryAction>
           <CancelIcon onClick={() => abort() }/>
           </ListItemSecondaryAction>
-        </React.Fragment>
+        </>
       );
     case UPLOAD_STATE.UPLOADING:
       return (
-        <React.Fragment>
+        <>
           <ListItemAvatar>
             <CircularProgress variant="static" value={progress} />
           </ListItemAvatar>
@@ -263,7 +263,7 @@ export function NewFileEntry(props: {
           <ListItemSecondaryAction>
             { /* Add cancel upload button */}
           </ListItemSecondaryAction>
-        </React.Fragment>
+        </>
       );
   }
   return <div>Unknown state</div>;

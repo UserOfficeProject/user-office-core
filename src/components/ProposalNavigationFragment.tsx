@@ -20,9 +20,9 @@ const ProposalNavigationFragment = (props:{back:(() => void)|undefined, next:(()
         }
       })();
 
-      let backbutton = props.back ? <Button onClick={() => props.back!()} className={classes.buttons} type="button">{props.backLabel || "Save and back"}</Button> : null;
-      let nextButton = props.next ? <Button onClick={() => props.next!()} className={classes.buttons} type="button" variant="contained" color="primary">{props.nextLabel || "Save and continue"}</Button> : null;
-      let buttonArea = props.isLoading ? <CircularProgress /> : <Fragment>{backbutton}{nextButton}</Fragment>;
+      const backbutton = props.back ? <Button onClick={() => props.back!()} className={classes.buttons} type="button">{props.backLabel || "Save and back"}</Button> : null;
+      const nextButton = props.next ? <Button onClick={() => props.next!()} className={classes.buttons} type="button" variant="contained" color="primary">{props.nextLabel || "Save and continue"}</Button> : null;
+      const buttonArea = props.isLoading ? <CircularProgress /> : <Fragment>{backbutton}{nextButton}</Fragment>;
       
       return <div className={classes.buttons}>{buttonArea}</div>;
 }

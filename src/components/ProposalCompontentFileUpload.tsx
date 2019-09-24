@@ -8,9 +8,9 @@ import { FileUploadComponent } from "./FileUploadComponent";
 export class ProposalCompontentFileUpload extends React.Component<IBasicComponentProps, {files: string[];}> {
 
   render() {
-    let { templateField, touched, errors, onComplete, handleChange } = this.props;
-    let { proposal_question_id, config } = templateField;
-    let isError = touched[proposal_question_id] && errors[proposal_question_id]? true: false;
+    const { templateField, touched, errors, onComplete, handleChange } = this.props;
+    const { proposal_question_id, config } = templateField;
+    const isError = touched[proposal_question_id] && errors[proposal_question_id]? true: false;
     
     return (
     <FormControl error={isError}>

@@ -133,7 +133,6 @@ export default function ProposalContainer(props: { data: ProposalData }) {
               </Step>
             ))}
           </Stepper>
-          <React.Fragment>
             {proposalData.status === ProposalStatus.DRAFT ? (
               <React.Fragment>
                 {getStepContent(stepIndex)}
@@ -146,7 +145,6 @@ export default function ProposalContainer(props: { data: ProposalData }) {
                 </Typography>
               </React.Fragment>
             )}
-          </React.Fragment>
         </Paper>
       </FormApi.Provider>
     </Container>

@@ -29,7 +29,7 @@ export default function ProposalPage({ match }) {
   const classes = useStyles();
 
   return (
-    <React.Fragment>
+    <>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -39,6 +39,6 @@ export default function ProposalPage({ match }) {
           </Grid>
         </Grid>
       </Container>
-    </React.Fragment>
+    </>
   );
 }

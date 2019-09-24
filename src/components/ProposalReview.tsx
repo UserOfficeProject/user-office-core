@@ -25,7 +25,7 @@ export default function ProposalReview({data} : { data: ProposalData }) {
   const { isLoading, submitProposal } = useSubmitProposal();
 
   return (
-    <React.Fragment>
+    <>
       <ProposalInformation data={data} disabled={true} />
       <ProposaQuestionaryReview data={data} />
       <ProposalParticipants data={data} disabled={true} />
@@ -44,6 +44,6 @@ export default function ProposalReview({data} : { data: ProposalData }) {
         disabled={true}
         />
       </div>
-    </React.Fragment>
+    </>
   );
 }
