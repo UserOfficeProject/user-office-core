@@ -94,8 +94,8 @@ CREATE TABLE proposal_question_datatypes (
 CREATE TABLE proposal_topics (
   topic_id  serial PRIMARY KEY
 , topic_title varchar(32) NOT NULL
-, is_enabled BOOLEAN DEFAULT TRUE
-, sort_order INT NOT NULL
+, is_enabled BOOLEAN DEFAULT FALSE
+, sort_order serial NOT NULL
 );
 
 CREATE TABLE proposal_questions (

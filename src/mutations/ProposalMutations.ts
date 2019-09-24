@@ -3,13 +3,19 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { Proposal, ProposalAnswer } from "../models/Proposal";
+import { Proposal, ProposalAnswer, Topic } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
+  async createTopic(agent:User | null, title: string): Promise<Topic | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    return await this.dataSource.createTopic(title);
+  }
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,

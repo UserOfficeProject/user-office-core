@@ -48,6 +48,11 @@ type Query {
     error: String
   }
 
+  type TopicMutationResult {
+    topic: Topic
+    error: String
+  }
+
   type Mutation {
     createProposal: ProposalMutationResult
     updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], status: Int, users: [Int]): ProposalMutationResult
@@ -58,6 +63,7 @@ type Query {
     setPageContent(id: PageName!, text: String): Boolean
     createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     token(token: String!): String
+    createTopic(title: String): TopicMutationResult
     createUser(
         user_title: String, 
         firstname: String!, 
