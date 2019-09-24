@@ -4,7 +4,8 @@ import {
   Proposal,
   ProposalTemplate,
   ProposalAnswer,
-  ProposalInformation
+  ProposalInformation,
+  Topic
 } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
@@ -51,6 +52,10 @@ interface UpdateProposalFilesArgs {
   proposal_id: number;
   question_id: string;
   files: string[];
+}
+
+interface CreateTopicArgs {
+  title:string
 }
 
 interface UpdateUserArgs {
@@ -194,6 +199,7 @@ function createResponseWrapper<T>(key: string) {
 
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
+const wrapTopicMutation = createResponseWrapper<Topic>("topic");
 const wrapProposalInformationMutation = createResponseWrapper<
   ProposalInformation
 >("proposal");
@@ -202,6 +208,7 @@ const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
+
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -249,6 +256,10 @@ export default {
         resolve(newProposalInformation);
       })
     );
+  },
+
+  createTopic(args:CreateTopicArgs, context:ResolverContext) {
+    return wrapTopicMutation(context.mutations.proposal.createTopic(context.user, args.title))
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
