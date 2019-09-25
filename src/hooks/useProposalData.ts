@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { useDataAPI } from "../hooks/useDataAPI";
+import { useDataAPI } from "./useDataAPI";
+import { ProposalInformation, ProposalTemplate } from "../model/ProposalModel";
 
-export function useProposalData(id) {
+export function useProposalData(id: number) {
   const sendRequest = useDataAPI();
-  const [proposalData, setProposalData] = useState(null);
+  const [proposalData, setProposalData] = useState<ProposalInformation | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const getProposalInformation = id => {
+    const getProposalInformation = (id: number) => {
       const query = `
           query($id: ID!) {
             proposal(id: $id) {
@@ -19,6 +22,24 @@ export function useProposalData(id) {
                 lastname
                 username
                 id
+              }
+              questionary {
+                topics {
+                  topic_title
+                  topic_id,
+                  fields {
+                    proposal_question_id
+                    data_type
+                    question
+                    config
+                    value
+                    dependencies {
+                      proposal_question_dependency
+                      condition
+                      proposal_question_id
+                    }
+                  }
+                }
               }
               reviews{
                 id
@@ -45,7 +66,7 @@ export function useProposalData(id) {
           abstract: data.proposal.abstract,
           id: data.proposal.id,
           status: data.proposal.status,
-          users: data.proposal.users.map(user => {
+          users: data.proposal.users.map((user: any) => {
             return {
               name: user.firstname,
               surname: user.lastname,
@@ -53,7 +74,7 @@ export function useProposalData(id) {
               id: user.id
             };
           }),
-          reviews: data.proposal.reviews.map(review => {
+          reviews: data.proposal.reviews.map((review: any) => {
             return {
               id: review.id,
               grade: review.grade,
@@ -61,7 +82,8 @@ export function useProposalData(id) {
               reviewer: review.reviewer,
               status: review.status
             };
-          })
+          }),
+          questionary: new ProposalTemplate(data.proposal.questionary)
         });
         setLoading(false);
       });

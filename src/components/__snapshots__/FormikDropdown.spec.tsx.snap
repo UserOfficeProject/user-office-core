@@ -35,6 +35,7 @@ exports[`Dropdown populated with given values 1`] = `
     </div>
     <input
       name="name"
+      onAnimationStart={[Function]}
       type="hidden"
       value="name"
     />

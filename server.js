@@ -24,4 +24,5 @@ app.get("/*", function(req, res) {
 
 app.use("/", proxy("https://duo2-backend-staging.herokuapp.com"));
 
+
 app.listen(port);

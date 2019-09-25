@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { useDataAPI } from "../hooks/useDataAPI";
+import { FormApi } from "./ProposalContainer";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
 const useStyles = makeStyles({
   errorText: {
@@ -21,29 +22,13 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalParticipants(props) {
+  const api = useContext(FormApi);
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const sendRequest = useDataAPI();
-  const sendProposalUpdate = () => {
-    const query = `
-      mutation($id: ID!, $users: [Int!]) {
-        updateProposal(id: $id, users: $users){
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
+  const {loading, updateProposal} = useUpdateProposal();
 
-    const variables = {
-      id: props.data.id,
-      users: users.map(user => user.id)
-    };
-    sendRequest(query, variables).then(data => props.next({ users }));
-  };
 
   const addUser = user => {
     setUsers([...users, user]);
@@ -56,12 +41,19 @@ export default function ProposalParticipants(props) {
     setUsers(newUsers);
   };
 
-  const handleNext = () => {
-    if (users.length < 1) {
-      setUserError(true);
-    } else {
-      sendProposalUpdate();
-    }
+  const submit = () => {
+    return new Promise((resolve, reject) => {
+      if (users.length < 1) {
+        setUserError(true);
+      } else {
+        const userIds = users.map(user => user.id);
+        updateProposal({
+          id: props.data.id,
+          users: userIds
+        }).then(data => resolve());
+      }
+    })
+    
   };
 
   const openModal = rowData => {
@@ -69,7 +61,7 @@ export default function ProposalParticipants(props) {
   };
 
   return (
-    <React.Fragment>
+    <form>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
@@ -89,21 +81,13 @@ export default function ProposalParticipants(props) {
           You need to add at least one Co-Proposer
         </p>
       )}
-      {props.back ? (
-        <div className={classes.buttons}>
-          <Button onClick={props.back} className={classes.button}>
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNext}
-            className={classes.button}
-          >
-            Next
-          </Button>
-        </div>
-      ) : null}
-    </React.Fragment>
+
+          <ProposalNavigationFragment 
+          disabled={props.disabled}
+           next={ () => { submit().then(api.next({users})) } }
+           back={ () => { submit().then(api.back({users})) } }
+          isLoading={loading} 
+          />
+    </form>
   );
 }

@@ -19,7 +19,7 @@ export function useGetPageContent(pageName) {
       setPageContent(data.getPageContent);
       setLoading(false);
     });
-  }, [pageName]);
+  }, [pageName, sendRequest]);
 
   return [loading, pageContent];
 }

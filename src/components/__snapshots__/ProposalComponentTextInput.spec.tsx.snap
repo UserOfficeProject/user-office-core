@@ -10,7 +10,7 @@ exports[`Textfield rendered without crashing 1`] = `
       data-shrink={true}
       htmlFor="links_with_industry"
     >
-      Please specify
+      If yes, please describe:
     </label>
     <div
       className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-fullWidth MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
@@ -22,6 +22,7 @@ exports[`Textfield rendered without crashing 1`] = `
         disabled={false}
         id="links_with_industry"
         name="links_with_industry"
+        onAnimationStart={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}

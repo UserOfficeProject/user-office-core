@@ -28,6 +28,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         helperText={errors[proposal_question_id]}
         multiline={config.multiline}
         rows={config.multiline ? 4 : 1}
+        rowsMax={config.multiline ? 16 : undefined}
         className={classes.textField}
         InputLabelProps={{
           shrink: true

@@ -1,66 +1,41 @@
-import React from "react";
+import React, { useContext } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { useDataAPI } from "../hooks/useDataAPI";
+import { FormApi } from "./ProposalContainer";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
-const useStyles = makeStyles({
-  buttons: {
-    display: "flex",
-    justifyContent: "flex-end"
-  },
-  button: {
-    marginTop: "25px",
-    marginLeft: "10px"
-  }
-});
+
 
 export default function ProposalInformation(props) {
-  const sendRequest = useDataAPI();
-
-  const sendProposalUpdate = values => {
-    const query = `
-    mutation($id: ID!, $title: String!, $abstract: String!,) {
-      updateProposal(id: $id, title: $title, abstract: $abstract){
-       proposal{
-        id
-      }
-        error
-      }
-    }
-    `;
-
-    const variables = {
-      id: props.data.id,
-      title: values.title,
-      abstract: values.abstract
-    };
-    sendRequest(query, variables).then(data => props.next(values));
-  };
-
-  const classes = useStyles();
+  const api = useContext(FormApi);
+  const {loading, updateProposal} = useUpdateProposal();
   return (
     <Formik
       initialValues={{ title: props.data.title, abstract: props.data.abstract }}
-      onSubmit={(values, actions) => {
-        sendProposalUpdate(values);
+      onSubmit={async values => {
+        await updateProposal({
+          id: props.data.id,
+          title: values.title,
+          abstract: values.abstract
+        });
+        api.next(values);
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
           .min(10, "Title must be at least 10 characters")
-          .max(50, "Title must be at most 50 characters")
+          .max(100, "Title must be at most 100 characters")
           .required("Title must be at least 10 characters"),
         abstract: Yup.string()
           .min(20, "Abstract must be at least 20 characters")
-          .max(200, "Abstract must be at most 200 characters")
+          .max(500, "Abstract must be at most 500 characters")
           .required("Abstract must be at least 20 characters")
       })}
     >
-      {({ values, errors, touched, handleChange, isSubmitting }) => (
+      {({ values, errors, touched, handleChange, submitForm }) => (
         <Form>
           <Typography variant="h6" gutterBottom>
             General Information
@@ -87,6 +62,9 @@ export default function ProposalInformation(props) {
                 id="abstract"
                 name="abstract"
                 label="Abstract"
+                multiline
+                rowsMax="16"
+                rows="4"
                 defaultValue={values.abstract}
                 fullWidth
                 onChange={handleChange}
@@ -97,19 +75,11 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          {props.next ? (
-            <div className={classes.buttons}>
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.button}
-              >
-                Next
-              </Button>
-            </div>
-          ) : null}
+          <ProposalNavigationFragment 
+            disabled = {props.disabled}
+            next={submitForm}
+            isLoading={loading} 
+          />
         </Form>
       )}
     </Formik>
