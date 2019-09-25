@@ -25,6 +25,7 @@ build:
 test:
   stage: test
   script:
+    - npm install
     - NODE_ENV=ci npm run test
   tags:
     - docker
