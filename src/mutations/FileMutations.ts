@@ -4,7 +4,7 @@ import { EventBus } from "../events/eventBus";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import { IFileDataSource } from "../datasources/IFileDataSource";
-import { FileMetaData } from "../models/Blob";
+import { FileMetadata } from "../models/Blob";
 
 export default class FileMutations {
     constructor(
@@ -13,7 +13,7 @@ export default class FileMutations {
       private eventBus: EventBus<ApplicationEvent>
     ) {}
     
-    async put(fileName:string, mimeType:string, sizeImBytes:number, path: string):Promise<FileMetaData | null> {
+    async put(fileName:string, mimeType:string, sizeImBytes:number, path: string):Promise<FileMetadata | null> {
         return await this.dataSource.put(fileName, mimeType, sizeImBytes, path);
     }
 

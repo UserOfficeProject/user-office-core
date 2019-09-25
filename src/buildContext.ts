@@ -24,6 +24,7 @@ import FileQueries from "./queries/FileQueries";
 import FileMutations from "./mutations/FileMutations";
 import AdminQueries from "./queries/AdminQueries";
 import AdminMutations from "./mutations/AdminMutations";
+import { Logger } from "./utils/Logger";
 
 // Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
@@ -32,6 +33,7 @@ const reviewDataSource = new PostgresReviewDataSource();
 const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
+const logger = new Logger();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
@@ -52,8 +54,15 @@ const userMutations = new UserMutations(
 );
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
-  userAuthorization
+  userAuthorization,
+  logger
 );
+const proposalMutations = new ProposalMutations(
+  proposalDataSource,
+  userAuthorization,
+  eventBus
+);
+
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
@@ -64,12 +73,6 @@ const reviewMutations = new ReviewMutations(
 const callQueries = new CallQueries(callDataSource, userAuthorization);
 const callMutations = new CallMutations(
   callDataSource,
-  userAuthorization,
-  eventBus
-);
-
-const proposalMutations = new ProposalMutations(
-  proposalDataSource,
   userAuthorization,
   eventBus
 );

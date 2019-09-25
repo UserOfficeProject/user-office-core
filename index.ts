@@ -2,17 +2,14 @@ import express, { Request, Response } from 'express'
 const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
 const config = require("./config");
-
+const files = require('./src/routes/files')
 
 import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import multer from "multer";
-import { unlink } from 'fs';
 import { NextFunction } from 'connect';
 
-var upload = multer({ dest: "uploads/" });
 
 var app = express();
 
@@ -29,33 +26,6 @@ app.use(authMiddleware, (err:any, req:Request, res:Response, next:NextFunction) 
   return res.sendStatus(400);
 });
 
-app.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    const { originalname, size, mimetype, path } = req.file as Express.Multer.File;
-    var result = await baseContext.mutations.file.put(
-      originalname,
-      mimetype,
-      size,
-      path
-    );
-    res.status(200).send(result);
-  } catch (e) {
-    res.status(500).send(e);
-  }
-});
-
-app.get("/download/:file_id", async (req, res) => {
-  try {
-      const path = await baseContext.mutations.file.prepare(req.params.file_id);
-      await res.download(path, 'file.png', () => {
-        unlink(path, () => {}); // delete file once done
-      });
-  } catch (e) {
-    res.status(500).send(e);
-  }
-});
-
-
 app.use(
   "/graphql",
   graphqlHTTP(async (req: any) => {
@@ -65,7 +35,6 @@ app.use(
     if (req.user) {
       user = await baseContext.queries.user.getAgent(req.user.user.id);
     }
-
 
     const context: ResolverContext = { ...baseContext, user };
 
@@ -77,6 +46,8 @@ app.use(
     };
   })
 );
+
+app.use(files);
 
 app.listen(process.env.PORT || 4000);
 

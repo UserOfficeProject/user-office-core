@@ -1,8 +1,8 @@
-import {FileMetaData} from '../models/Blob'
+import {FileMetadata} from '../models/Blob'
 export interface IFileDataSource {
   prepare(fileId: string, output:string): Promise<void>;
   // Read
-  getMetaData(id: string): Promise<FileMetaData | null>
+  getMetadata(fileIds: string[]): Promise<FileMetadata[]>
   // write
-  put(fileName:string, mimeType:string, sizeImBytes:number, path: string): Promise<FileMetaData | null> 
+  put(fileName:string, mimeType:string, sizeImBytes:number, path: string): Promise<FileMetadata | null> 
 }
