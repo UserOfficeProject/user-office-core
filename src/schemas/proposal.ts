@@ -2,6 +2,7 @@ export const typeDefs = `
     extend type Query {
         proposal(id: ID!): Proposal
         proposals(filter: String, first: Int, offset: Int): ProposalQueryResult
+        proposalTemplate: ProposalTemplate
     }
 
     extend type Mutation {

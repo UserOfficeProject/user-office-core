@@ -205,15 +205,9 @@ function createResponseWrapper<T>(key: string) {
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapTopicMutation = createResponseWrapper<Topic>("topic");
-const wrapProposalInformationMutation = createResponseWrapper<
-  ProposalInformation
->("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<ProposalInformation>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
-const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
-  "template"
-);
 const wrapCallMutation = createResponseWrapper<Call>("call");
-
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -237,9 +231,7 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-    return await wrapProposalTemplate(
-      context.queries.proposal.getProposalTemplate(context.user)
-    );
+     return context.queries.proposal.getProposalTemplate(context.user)
   },
 
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
