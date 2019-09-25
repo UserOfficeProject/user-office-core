@@ -1,12 +1,8 @@
 import ProposalQueries from "./ProposalQueries";
-import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { Rejection, rejection } from "../rejection";
 
-import { ApplicationEvent } from "../events/applicationEvents";
 import {
   proposalDataSource,
-  dummyProposalSubmitted,
   dummyProposal,
   dummyAnswers
 } from "../datasources/mockups/ProposalDataSource";
@@ -20,9 +16,8 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 import { ProposalTemplate } from "../models/Proposal";
-import { Logger } from "../utils/Logger";
+import { DummyLogger } from "../utils/Logger";
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
   new proposalDataSource(),
@@ -31,7 +26,7 @@ const userAuthorization = new UserAuthorization(
 const proposalQueries = new ProposalQueries(
   new proposalDataSource(),
   userAuthorization,
-  new Logger()
+  new DummyLogger()
 );
 
 test("A user on the proposal can get a proposal it belongs to", () => {
