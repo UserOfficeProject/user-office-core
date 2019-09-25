@@ -14,6 +14,5 @@ test('Dropdown populated with given values', () => {
   );
 
   let tree = renderer.toJSON();
-  //expect(tree).toMatchSnapshot();
-  expect(true).toBe(true);
+  expect(tree).toMatchSnapshot();
 });
