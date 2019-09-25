@@ -12,6 +12,7 @@ import CalendarToday from "@material-ui/icons/CalendarToday";
 import SettingsApplications from "@material-ui/icons/SettingsApplications";
 import { Link } from "react-router-dom";
 import { useCallsData } from "../hooks/useCallsData";
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 
 export default function MenuItems({ role }) {
   const { loading, callsData } = useCallsData();
@@ -88,6 +89,12 @@ export default function MenuItems({ role }) {
           <SettingsApplications />
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
+      </ListItem>
+      <ListItem component={Link} to="/QuestionaryEditor" button>
+        <ListItemIcon>
+          <QuestionAnswerIcon />
+        </ListItemIcon>
+        <ListItemText primary="Edit Questionary" />
       </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
