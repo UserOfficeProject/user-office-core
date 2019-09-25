@@ -39,5 +39,6 @@ export interface ProposalDataSource {
     question_id: string
   ): Promise<Boolean | null>;
   getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
-  createTopic(title: string): Promise<Topic> ;
+  createTopic(title: string): Promise<Topic>;
+  updateTopic(id:number, title:string):Promise<Topic>;
 }

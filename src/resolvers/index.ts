@@ -58,6 +58,11 @@ interface CreateTopicArgs {
   title:string
 }
 
+interface UpdateTopicArgs {
+  id:number;
+  title:string
+}
+
 interface UpdateUserArgs {
   id: string;
   firstname: string;
@@ -258,8 +263,15 @@ export default {
     );
   },
 
-  createTopic(args:CreateTopicArgs, context:ResolverContext) {
-    return wrapTopicMutation(context.mutations.proposal.createTopic(context.user, args.title))
+  createTopic(args: CreateTopicArgs, context: ResolverContext) {
+    return wrapTopicMutation(
+      context.mutations.proposal.createTopic(context.user, args.title)
+    );
+  },
+  updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
+    return wrapTopicMutation(
+      context.mutations.proposal.updateTopic(context.user, args.id, args.title)
+    );
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {

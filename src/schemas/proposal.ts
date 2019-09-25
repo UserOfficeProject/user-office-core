@@ -12,6 +12,7 @@ export const typeDefs = `
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
         createTopic(title: String): TopicMutationResult
+        updateTopic(id:Int, title: String): TopicMutationResult
     }
 
     type ProposalQueryResult {
@@ -76,8 +77,7 @@ export const typeDefs = `
 
     input TopicInput {
         topic_id:Int,
-        topic_title: String,
-        sort_order:Int
+        topic_title: String
     }
 
     type ProposalAnswer {

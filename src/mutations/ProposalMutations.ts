@@ -10,17 +10,25 @@ import { ILogger } from "../utils/Logger";
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
-  async createTopic(agent:User | null, title: string): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
-    return await this.dataSource.createTopic(title);
-  }
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) {}
+    ) {}
+    
+    async createTopic(agent:User | null, title: string): Promise<Topic | Rejection> {
+      if (!(await this.userAuth.isUserOfficer(agent))) {
+        return rejection("NOT_AUTHORIZED");
+      }
+      return await this.dataSource.createTopic(title);
+    }
+
+    async updateTopic(agent:User | null, id:number, title:string): Promise<Topic | Rejection> {
+      if (!(await this.userAuth.isUserOfficer(agent))) {
+        return rejection("NOT_AUTHORIZED");
+      }
+      return await this.dataSource.updateTopic(id, title);
+    }
 
   async create(agent: User | null): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(

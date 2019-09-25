@@ -43,8 +43,12 @@ export const dummyAnswers: Array<ProposalAnswer> = [
 ];
 
 export class proposalDataSource implements ProposalDataSource {
-  createTopic(title: string): Promise<Topic> {
-    throw new Error("Method not implemented.");
+
+  async updateTopic(id: number, title: string): Promise<Topic> {
+    return new Topic(id, title, 3, null);
+  }
+  async createTopic(title: string): Promise<Topic> {
+    return new Topic(2, title, 2, null);
   }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
