@@ -2,12 +2,14 @@ import express, { Request, Response } from 'express'
 const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
 const config = require("./config");
+const files = require('./src/routes/files')
 
 import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
 import { NextFunction } from 'connect';
+
 
 var app = express();
 
@@ -45,7 +47,7 @@ app.use(
   })
 );
 
-app.use(require('./src/routes/files'));
+app.use(files);
 
 app.listen(process.env.PORT || 4000);
 

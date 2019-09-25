@@ -20,6 +20,29 @@ export class Logger implements ILogger{
   }
 }
 
+export class DummyLogger implements ILogger {
+  logInfo(message: string, context: object): void {
+    
+  }
+  logWarn(message: string, context: object): void {
+    
+  }
+  logDebug(message: string, context: object): void {
+    
+  }
+  logError(message: string, context: object): void {
+    
+  }
+  log(
+    level: LEVEL,
+    message: string,
+    context: object
+  ): void {
+    
+  }
+}
+
+
 export enum LEVEL {
   INFO = "INFO",
   DEBUG = "DEBUG",
