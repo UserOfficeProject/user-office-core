@@ -67,11 +67,11 @@ test("Non authentificated user can not get the template", () => {
   return expect(proposalQueries.getProposalTemplate(null)).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
-test("Authentificated user can get the template", () => {
-  return expect(proposalQueries.getProposalTemplate(dummyUser)).resolves.toBeInstanceOf(ProposalTemplate);
+test("User officer user can get the template", () => {
+  return expect(proposalQueries.getProposalTemplate(dummyUserOfficer)).resolves.toBeInstanceOf(ProposalTemplate);
 });
 
 test("Proposal template should have fields", async () => {
-  let template = await proposalQueries.getProposalTemplate(dummyUser) as ProposalTemplate;
+  let template = await proposalQueries.getProposalTemplate(dummyUserOfficer) as ProposalTemplate;
   return expect(template.topics[0].fields!.length).toBeGreaterThan(0);
 });
