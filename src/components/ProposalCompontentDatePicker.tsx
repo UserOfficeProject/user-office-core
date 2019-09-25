@@ -29,6 +29,8 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
                   format="dd/MMM/yyyy"
                   helperText={currentError}
                   label={question}
+                  onBlur={ () => {}}
+                  onFocus={ () => {}}
                   onChange={
                     date => {
                       templateField.value = date;

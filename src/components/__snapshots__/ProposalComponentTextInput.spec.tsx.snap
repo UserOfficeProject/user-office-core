@@ -22,6 +22,7 @@ exports[`Textfield rendered without crashing 1`] = `
         disabled={false}
         id="links_with_industry"
         name="links_with_industry"
+        onAnimationStart={[Function]}
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
