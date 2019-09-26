@@ -105,7 +105,7 @@ export default class ProposalQueries {
   async getProposalTemplate(
     agent: User | null
   ): Promise<ProposalTemplate | Rejection> {
-    if (!await this.userAuth.isUserOfficer(agent)) {
+    if (!agent) {
       return rejection("Not authorized");
     }
 
