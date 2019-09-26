@@ -72,7 +72,7 @@ export default function CallPage() {
                 }}
                 actions={[
                   {
-                    icon: () => <Add />,
+                    icon: () => <Add data-cy="add-call" />,
                     isFreeAction: true,
                     tooltip: "Add Call",
                     onClick: (event, rowData) => setShow(true)

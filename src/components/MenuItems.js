@@ -105,7 +105,7 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={Link} to="/LogOut" button>
+      <ListItem component={Link} to="/LogOut" button data-cy="logout">
         <ListItemIcon>
           <ExitToApp />
         </ListItemIcon>

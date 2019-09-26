@@ -61,7 +61,7 @@ export default function ResetPasswordEmail() {
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "" }}
         onSubmit={async (values, actions) => {
           await requestResetEmail(values);
           actions.setSubmitting(false);
@@ -89,7 +89,6 @@ export default function ResetPasswordEmail() {
               margin="normal"
               fullWidth
             />
-            {console.log(emailSuccess)}
             {emailSuccess !== null &&
               (emailSuccess ? (
                 <p className={classes.sentMessageSuccess}>
