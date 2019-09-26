@@ -192,7 +192,7 @@ export default function SignUp() {
             .required("organisation must be at least 2 characters"),
           position: Yup.string()
             .min(2, "position must be at least 2 characters")
-            .max(30, "position must be at most 30 characters")
+            .max(50, "position must be at most 50 characters")
             .required("position must be at least 2 characters"),
           email: Yup.string()
             .email("email is in correct format")
@@ -229,6 +229,7 @@ export default function SignUp() {
                 margin="normal"
                 fullWidth
                 autoComplete="off"
+                data-cy="username"
               />
               <Field
                 name="password"
@@ -238,6 +239,7 @@ export default function SignUp() {
                 margin="normal"
                 fullWidth
                 autoComplete="off"
+                data-cy="password"
               />
             </CardContent>
           </Card>
@@ -256,6 +258,7 @@ export default function SignUp() {
                   { text: "Mr.", value: "Mr." }, 
                   { text: "Dr.", value: "Dr." }, 
                   { text: "Rather not say", value: "unspecified" }]}
+                data-cy="title"
               />
               <Field
                 name="firstname"
@@ -264,6 +267,7 @@ export default function SignUp() {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                data-cy="firstname"
               />
               <Field
                 name="middlename"
@@ -272,6 +276,7 @@ export default function SignUp() {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                data-cy="middlename"
               />
               <Field
                 name="lastname"
@@ -280,6 +285,7 @@ export default function SignUp() {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                data-cy="lastname"
               />
               <Field
                 name="preferredname"
@@ -288,6 +294,7 @@ export default function SignUp() {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                data-cy="preferredname"
               />
               <FormikDropdown
                 name="gender"
@@ -297,11 +304,13 @@ export default function SignUp() {
                   { text: "Male", value: "male" },
                   { text: "Rather not say", value: "unspecified" }
                 ]}
+                data-cy="gender"
               />
               <FormikDropdown
                 name="nationality"
                 label="Nationality"
                 items={nationalitiesList}
+                data-cy="nationality"
               />
               <Field
                 name="birthdate"
@@ -310,6 +319,7 @@ export default function SignUp() {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                data-cy="birthdate"
               />
             </CardContent>
           </Card>
@@ -327,6 +337,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="orcid"
                 />
                 <Field
                   name="organisation"
@@ -335,6 +346,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="organisation"
                 />
                 <Field
                   name="department"
@@ -343,6 +355,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="department"
                 />
                 <Field
                   name="organisation_address"
@@ -351,6 +364,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="organisation-address"
                 />
                 <Field
                   name="position"
@@ -359,6 +373,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="position"
                 />
               </Grid>
             </CardContent>
@@ -377,6 +392,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="email"
                 />
                 <Field
                   name="telephone"
@@ -385,6 +401,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="telephone"
                 />
                 <Field
                   name="telephone_alt"
@@ -393,6 +410,7 @@ export default function SignUp() {
                   component={TextField}
                   margin="normal"
                   fullWidth
+                  data-cy="telephone-alt"
                 />
               </Grid>
             </CardContent>
@@ -404,6 +422,7 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            data-cy="submit"
           >
             Sign Up
           </Button>

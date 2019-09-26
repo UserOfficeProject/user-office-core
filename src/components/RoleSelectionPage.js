@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 export default function RoleSelectionPage() {
   const classes = useStyles();
   const { user, currentRole, handleRole } = useContext(UserContext);
-
+  console.log(user);
   if (!user) {
     return <Redirect to="/SignIn" />;
   }
