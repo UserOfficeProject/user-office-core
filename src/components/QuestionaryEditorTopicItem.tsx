@@ -38,7 +38,7 @@ export default function QuestionaryEditorTopicItem(props: {
     userSelect: "none",
     padding: "12px 8px 8px 8px",
     marginBottom: "4px",
-    background: isDragging ? "#bdf0ff" : isHover ? theme.palette.grey[100] : "white",
+    background: isDragging ? theme.palette.grey[200] : isHover ? theme.palette.grey[100] : "white",
     opacity: isDragging ? 0.5 : 1,
     transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
     boxShadow: "0px 1px 2px 0px rgba(163,163,163,0.66)",
