@@ -1,4 +1,5 @@
 import React from "react";
+import { ThemeProvider } from '@material-ui/styles';
 import SignUp from "./SignUp";
 import SignIn from "./SignIn";
 import ResetPassword from "./ResetPassword";
@@ -11,6 +12,9 @@ import {
   UserContextProvider,
   UserContext
 } from "../context/UserContextProvider";
+import {getTheme} from "../theme"
+
+
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>
@@ -33,6 +37,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 function App() {
   return (
+    <ThemeProvider theme={getTheme()}>
     <UserContextProvider>
       <Router>
         <div className="App">
@@ -59,6 +64,7 @@ function App() {
         </div>
       </Router>
     </UserContextProvider>
+    </ThemeProvider>
   );
 }
 
