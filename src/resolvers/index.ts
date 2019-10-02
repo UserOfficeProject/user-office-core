@@ -55,12 +55,17 @@ interface UpdateProposalFilesArgs {
 }
 
 interface CreateTopicArgs {
-  title:string
+  title: string;
 }
 
 interface UpdateTopicArgs {
-  id:number;
-  title:string
+  id: number;
+  title: string;
+}
+
+interface UpdateFieldTopicRelArgs {
+  topic_id: number;
+  field_ids: string[];
 }
 
 interface UpdateUserArgs {
@@ -126,47 +131,43 @@ async function resolveProposal(
   proposal: Proposal | null,
   context: ResolverContext
 ) {
-  if (proposal == null) {
-    return rejection("Proposal is null");
-  }
-  const { id, title, abstract, status, created, updated } = proposal;
-  const agent = context.user;
+    if (proposal == null) {
+      return rejection("Proposal is null");
+    }
+    const { id, title, abstract, status, created, updated } = proposal;
+    const agent = context.user;
 
-  if(!agent) 
-  {
-    return rejection("Not aututhorized");
-  }
+    if (!agent) {
+      return rejection("Not aututhorized");
+    }
 
-  const users = await context.queries.user.getProposers(agent, id);
-  if (isRejection(users)) {
-    return users;
-  }
+    const users = await context.queries.user.getProposers(agent, id);
+    if (isRejection(users)) {
+      return users;
+    }
 
-  const reviews = await context.queries.review.reviewsForProposal(agent, id);
-  if (isRejection(reviews)) {
-    return reviews;
-  }
+    const reviews = await context.queries.review.reviewsForProposal(agent, id);
+    if (isRejection(reviews)) {
+      return reviews;
+    }
 
-  const questionary = await context.queries.proposal.getQuestionary(agent, id);
-  if (isRejection(questionary)) {
-    return questionary;
-  }
-  if(agent == null) {
-    return rejection("Not authorized");
-  }
+    const questionary = await context.queries.proposal.getQuestionary(agent, id);
+    if (isRejection(questionary)) {
+      return questionary;
+    }
 
-  return new ProposalInformation(
-    id,
-    title,
-    abstract,
-    agent.id,
-    status,
-    created,
-    updated,
-    users,
-    reviews,
-    questionary
-  );
+    return new ProposalInformation(
+      id,
+      title,
+      abstract,
+      agent.id,
+      status,
+      created,
+      updated,
+      users,
+      reviews,
+      questionary || undefined
+    );
 }
 
 function resolveProposals(
@@ -205,7 +206,9 @@ function createResponseWrapper<T>(key: string) {
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapTopicMutation = createResponseWrapper<Topic>("topic");
-const wrapProposalInformationMutation = createResponseWrapper<ProposalInformation>("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<
+  ProposalInformation
+>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapCallMutation = createResponseWrapper<Call>("call");
 
@@ -231,7 +234,7 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-     return context.queries.proposal.getProposalTemplate(context.user)
+    return context.queries.proposal.getProposalTemplate(context.user);
   },
 
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -263,6 +266,16 @@ export default {
   updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
     return wrapTopicMutation(
       context.mutations.proposal.updateTopic(context.user, args.id, args.title)
+    );
+  },
+
+  updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
+    return createResponseWrapper<Boolean>("result")(
+      context.mutations.proposal.updateFieldTopicRel(
+        context.user,
+        args.topic_id,
+        args.field_ids
+      )
     );
   },
 

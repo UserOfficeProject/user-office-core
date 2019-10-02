@@ -47,9 +47,10 @@ export class ProposalTemplateField {
   constructor(
     public proposal_question_id:string,
     public data_type:DataType,
+    public sort_order:number,
     public question:string,
     public topic: number | null,
-    public config: object | null,
+    public config: string | null,
     public dependencies: FieldDependency[] | null,
     public value?:string
   ) {}

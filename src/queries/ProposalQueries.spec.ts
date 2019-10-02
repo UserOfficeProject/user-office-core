@@ -45,12 +45,12 @@ test("A userofficer can get any proposal", () => {
   );
 });
 
-test("Get answers should succeed for authorized user", () => {
-  return expect(proposalQueries.getAnswers(dummyUser, 1)).resolves.toBe(dummyAnswers);
+test("Get questionary should succeed for authorized user", () => {
+  return expect(proposalQueries.getQuestionary(dummyUser, 1)).resolves.not.toBe(null)
 });
 
-test("Get answers should not succeed for unauthorized user", () => {
-  return expect(proposalQueries.getAnswers(dummyUserNotOnProposal, 1)).resolves.not.toBe(dummyAnswers);
+test("Get questionary should not succeed for unauthorized user", () => {
+  return expect(proposalQueries.getQuestionary(dummyUserNotOnProposal, 1)).resolves.toBe(null);
 });
 
 test("A userofficer can get all proposal", () => {

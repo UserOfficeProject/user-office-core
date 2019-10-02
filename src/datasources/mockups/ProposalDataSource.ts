@@ -43,6 +43,17 @@ export const dummyAnswers: Array<ProposalAnswer> = [
 ];
 
 export class proposalDataSource implements ProposalDataSource {
+  async updateField(proposal_question_id: string, values: { data_type?: string | undefined; question?: string | undefined; topic?: number | undefined; config?: string | undefined; sort_order: number; }): Promise<ProposalTemplateField | null> {
+    return new ProposalTemplateField(
+      proposal_question_id,
+      DataType.BOOLEAN,
+      0,
+      "Question",
+      1,
+      null,
+      null
+    );
+  }
 
   async updateTopic(id: number, title: string): Promise<Topic> {
     return new Topic(id, title, 3, null);
@@ -72,15 +83,17 @@ export class proposalDataSource implements ProposalDataSource {
     var hasLinksToField = new ProposalTemplateField(
       "hasLinksToField",
       DataType.SELECTION_FROM_OPTIONS,
+      0,
       "Has any links to field?",
       1,
-      { variant: "radio", options: ["yes", "no"] },
+      JSON.stringify({ variant: "radio", options: ["yes", "no"] }),
       null
     );
 
     var linksToField = new ProposalTemplateField(
       "linksToField",
       DataType.TEXT_INPUT,
+      1,
       "Please specify",
       1,
       null,

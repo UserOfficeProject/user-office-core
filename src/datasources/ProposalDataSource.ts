@@ -2,10 +2,12 @@ import {
   Proposal,
   ProposalTemplate,
   ProposalAnswer,
-  Topic
+  Topic,
+  ProposalTemplateField
 } from "../models/Proposal";
 
 export interface ProposalDataSource {
+  
   // Read
   get(id: number): Promise<Proposal | null>;
   checkActiveCall(): Promise<Boolean>;
@@ -16,6 +18,8 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
+  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
+
 
   // Write
   create(id: number): Promise<Proposal | null>;
@@ -38,7 +42,7 @@ export interface ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<Boolean | null>;
-  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
   createTopic(title: string): Promise<Topic>;
   updateTopic(id:number, title:string):Promise<Topic>;
+  updateField(proposal_question_id: string, values:{data_type?: string, question?: string, topic?: number, config?: string, sort_order:number}): Promise<ProposalTemplateField | null> 
 }

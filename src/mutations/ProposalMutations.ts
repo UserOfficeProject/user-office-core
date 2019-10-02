@@ -238,4 +238,19 @@ export default class ProposalMutations {
     const result = await this.dataSource.submitProposal(proposalID);
     return result || rejection("INTERNAL_ERROR");
   }
+
+  async updateFieldTopicRel(agent: User | null, topicId:number, fieldIds:string[]): Promise<Boolean | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    var result = true;
+    var index = 1;
+    for (const field of fieldIds) {
+      const updatedField = await this.dataSource.updateField(field, { topic: topicId, sort_order: index });
+      result = (result && (updatedField != null));
+      index++;
+    }
+    return result;
+  }
+
 }

@@ -13,7 +13,8 @@ export const typeDefs = `
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
         createTopic(title: String): TopicMutationResult
-        updateTopic(id:Int, title: String): TopicMutationResult
+        updateTopic(id:Int!, title: String!): TopicMutationResult
+        updateFieldTopicRel(topic_id:Int!, field_ids:[String]): BooleanMutationResult
     }
 
     type ProposalQueryResult {
@@ -28,6 +29,11 @@ export const typeDefs = `
 
     type TopicMutationResult {
         topic: Topic
+        error: String
+    }
+
+    type BooleanMutationResult {
+        result: Boolean
         error: String
     }
 
