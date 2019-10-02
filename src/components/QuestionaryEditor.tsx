@@ -2,10 +2,12 @@ import React from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, { ActionType } from "./QuestionaryEditorModel";
-import { Paper, makeStyles, useTheme, Grid } from "@material-ui/core";
+import { Paper, makeStyles, useTheme } from "@material-ui/core";
 
 
 export default function QuestionaryEditor() {
+  var { state, dispatch } = QuestionaryEditorModel();
+  
   const theme = useTheme();
   const classes = makeStyles(theme => ({
     paper: {
@@ -27,7 +29,8 @@ export default function QuestionaryEditor() {
     display:"flex"
   });
 
-  var { state, dispatch } = QuestionaryEditorModel();
+  
+
   const onDragEnd = (result: DropResult) => {
     if(result.type === "field") {
       dispatch({
@@ -36,10 +39,6 @@ export default function QuestionaryEditor() {
       });
     }
   };
-
-  if (!state) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <Paper className={classes.paper}>

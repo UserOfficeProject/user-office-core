@@ -1,8 +1,9 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import { useReducer, Reducer, useEffect } from "react";
+import { Reducer, useEffect } from "react";
 import {
   ProposalTemplate} from "../model/ProposalModel";
 import produce from "immer";
+import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares"
 
 export enum ActionType {
   READY,
@@ -17,17 +18,24 @@ interface IAction {
   payload: any;
 }
 
-type IState = ProposalTemplate | null;
+type IState = ProposalTemplate;
 
 export default function QuestionaryEditorModel() {
+  const [state, dispatch] = useReducerWithMiddleWares<Reducer<IState, IAction>>(reducer, new ProposalTemplate(), [persistModel]);
   const { proposalTemplate } = useProposalQuestionTemplate();
+
   useEffect(() => {
     if (proposalTemplate) {
       dispatch({ type: ActionType.READY, payload: proposalTemplate });
     }
-  }, [proposalTemplate]);
-  
-  let [state, dispatch] = useReducer<Reducer<IState, IAction>>(reducer, null);
+  }, [proposalTemplate, dispatch]);
+
+  function persistModel({ getState } : {getState:Function}) {
+    return (next:Function) => (action:IAction) => {
+      console.log("persist " + action.type)
+      next(action);
+    }
+  }
   
   function reducer(state: IState, action: IAction): IState {
     return produce(state, draft => {
@@ -35,9 +43,6 @@ export default function QuestionaryEditorModel() {
         case ActionType.READY:
           return action.payload;
         case ActionType.MOVE_ITEM:
-          if (!draft) {
-            return draft;
-          }
           if(!action.payload.destination) {
             return draft;
           }

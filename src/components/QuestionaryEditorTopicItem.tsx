@@ -14,9 +14,8 @@ export default function QuestionaryEditorTopicItem(props: {
   dispatch: Function;
   index: number;
 }) {
-
   const theme = useTheme();
-  
+
   const classes = makeStyles(theme => ({
     container: {
       fontSize: "13px",
@@ -26,7 +25,7 @@ export default function QuestionaryEditorTopicItem(props: {
     },
     icon: {
       color: theme.palette.grey[400],
-      justifyItems:"flex-end"
+      justifyItems: "flex-end"
     },
     question: {
       color: "#000"
@@ -35,10 +34,14 @@ export default function QuestionaryEditorTopicItem(props: {
 
   const [isHover, setIsHover] = useState<boolean>(false);
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    display:"flex",
+    display: "flex",
     padding: "12px 8px 8px 8px",
     marginBottom: "4px",
-    backgroundColor: isDragging ? theme.palette.grey[200] : isHover ? theme.palette.grey[100] : "white",
+    backgroundColor: isDragging
+      ? theme.palette.grey[200]
+      : isHover
+      ? theme.palette.grey[100]
+      : "white",
     transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
     boxShadow: "0px 1px 2px 0px rgba(163,163,163,0.66)",
     maxWidth: "100%",
@@ -49,6 +52,8 @@ export default function QuestionaryEditorTopicItem(props: {
     switch (dataType) {
       case DataType.TEXT_INPUT:
         return <ShortTextIcon />;
+      case DataType.SELECTION_FROM_OPTIONS:
+        return <RadioButtonCheckedIcon />;
       case DataType.BOOLEAN:
         return <CheckBoxOutlineBlankIcon />;
       case DataType.DATE:
@@ -57,19 +62,18 @@ export default function QuestionaryEditorTopicItem(props: {
         return <AttachFileIcon />;
       case DataType.EMBELLISHMENT:
         return <TextFieldsIcon />;
-      case DataType.BOOLEAN:
-        return <RadioButtonCheckedIcon />;
+
       default:
         return null;
     }
   };
 
-  const sanitizeEmbellishment = (input:string | undefined) => {
-    if(!input) {
+  const sanitizeEmbellishment = (input: string | undefined) => {
+    if (!input) {
       return "<No content>";
     }
-    return input.replace(/<[^>]+>/g, '');
-  }
+    return input.replace(/<[^>]+>/g, "");
+  };
 
   return (
     <Draggable
@@ -92,9 +96,11 @@ export default function QuestionaryEditorTopicItem(props: {
           onMouseLeave={() => setIsHover(false)}
         >
           <Grid item xs={10} className={classes.question}>
-            {props.data.data_type == DataType.EMBELLISHMENT ? sanitizeEmbellishment(props.data.config.html) :  props.data.question }
+            {props.data.data_type === DataType.EMBELLISHMENT
+              ? sanitizeEmbellishment(props.data.config.html)
+              : props.data.question}
           </Grid>
-          <Grid item xs={2}  className={classes.icon}>
+          <Grid item xs={2} className={classes.icon}>
             {getIcon(props.data.data_type)}
           </Grid>
         </Grid>
