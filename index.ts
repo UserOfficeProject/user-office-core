@@ -1,15 +1,15 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response } from "express";
 const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
 const config = require("./config");
-const files = require('./src/routes/files')
+const files = require("./src/routes/files");
+const proposalDownload = require("./src/routes/pdf");
 
 import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import { NextFunction } from 'connect';
-
+import { NextFunction } from "connect";
 
 var app = express();
 
@@ -19,12 +19,15 @@ const authMiddleware = jwt({
   secret: config.secret
 });
 
-app.use(authMiddleware, (err:any, req:Request, res:Response, next:NextFunction) => {
-  if (err.code === "invalid_token") {
-    return res.status(401).send("jwt expired");
+app.use(
+  authMiddleware,
+  (err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err.code === "invalid_token") {
+      return res.status(401).send("jwt expired");
+    }
+    return res.sendStatus(400);
   }
-  return res.sendStatus(400);
-});
+);
 
 app.use(
   "/graphql",
@@ -48,6 +51,8 @@ app.use(
 );
 
 app.use(files);
+
+app.use(proposalDownload);
 
 app.listen(process.env.PORT || 4000);
 
