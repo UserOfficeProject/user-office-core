@@ -22,11 +22,11 @@ export default function QuestionaryEditorTopicItem(props: {
       fontSize: "13px",
       padding: "0 5px",
       textTransform: "uppercase",
-      fontWeight: 600,
-
+      fontWeight: 600
     },
     icon: {
-      color: theme.palette.grey[400]
+      color: theme.palette.grey[400],
+      justifyItems:"flex-end"
     },
     question: {
       color: "#000"
@@ -35,13 +35,13 @@ export default function QuestionaryEditorTopicItem(props: {
 
   const [isHover, setIsHover] = useState<boolean>(false);
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    userSelect: "none",
+    display:"flex",
     padding: "12px 8px 8px 8px",
     marginBottom: "4px",
-    background: isDragging ? theme.palette.grey[200] : isHover ? theme.palette.grey[100] : "white",
-    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? theme.palette.grey[200] : isHover ? theme.palette.grey[100] : "white",
     transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
     boxShadow: "0px 1px 2px 0px rgba(163,163,163,0.66)",
+    maxWidth: "100%",
     ...draggableStyle
   });
 
@@ -64,6 +64,13 @@ export default function QuestionaryEditorTopicItem(props: {
     }
   };
 
+  const sanitizeEmbellishment = (input:string | undefined) => {
+    if(!input) {
+      return "<No content>";
+    }
+    return input.replace(/<[^>]+>/g, '');
+  }
+
   return (
     <Draggable
       key={props.data.proposal_question_id}
@@ -84,13 +91,12 @@ export default function QuestionaryEditorTopicItem(props: {
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
         >
-          <Grid item xs={12} className={classes.question}>
-            {props.data.question}
+          <Grid item xs={10} className={classes.question}>
+            {props.data.data_type == DataType.EMBELLISHMENT ? sanitizeEmbellishment(props.data.config.html) :  props.data.question }
           </Grid>
-          <Grid item xs={1} className={classes.icon}>
+          <Grid item xs={2}  className={classes.icon}>
             {getIcon(props.data.data_type)}
           </Grid>
-          <Grid item xs={11}></Grid>
         </Grid>
       )}
     </Draggable>

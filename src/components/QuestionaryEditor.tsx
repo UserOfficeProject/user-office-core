@@ -1,10 +1,12 @@
 import React from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, { ActionType } from "./QuestionaryEditorModel";
-import { Container, Grid, Paper, makeStyles } from "@material-ui/core";
+import { Paper, makeStyles, useTheme, Grid } from "@material-ui/core";
+
 
 export default function QuestionaryEditor() {
+  const theme = useTheme();
   const classes = makeStyles(theme => ({
     paper: {
       margin: theme.spacing(3),
@@ -16,12 +18,23 @@ export default function QuestionaryEditor() {
       }
     }
   }))();
+
+  const getTopicListStyle = (isDraggingOver: any) => ({
+    background: isDraggingOver
+      ? theme.palette.primary.light
+      : theme.palette.grey[100],
+    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
+    display:"flex"
+  });
+
   var { state, dispatch } = QuestionaryEditorModel();
   const onDragEnd = (result: DropResult) => {
-    dispatch({
-      type: ActionType.MOVE_ITEM,
-      payload: { source: result.source, destination: result.destination }
-    });
+    if(result.type === "field") {
+      dispatch({
+        type: ActionType.MOVE_ITEM,
+        payload: { source: result.source, destination: result.destination }
+      });
+    }
   };
 
   if (!state) {
@@ -31,11 +44,25 @@ export default function QuestionaryEditor() {
   return (
     <Paper className={classes.paper}>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div style={{ display: "flex" }}>
-          {state.topics.map(topic => (
-            <QuestionaryEditorTopic data={topic} dispatch={dispatch} />
+        <Droppable droppableId="topics" direction="horizontal" type="topic">
+        {(provided, snapshot) => (
+          <div
+          {...provided.droppableProps}
+          ref={provided.innerRef} 
+          style={getTopicListStyle(snapshot.isDraggingOver)}>
+          {state!.topics.map((topic, index) => (
+            <div style={{flexGrow:1}}>
+            <QuestionaryEditorTopic
+              data={topic}
+              dispatch={dispatch}
+              index={index}
+            />
+            </div>
           ))}
-        </div>
+          {provided.placeholder}
+          </div>
+        )}
+        </Droppable>
       </DragDropContext>
     </Paper>
   );

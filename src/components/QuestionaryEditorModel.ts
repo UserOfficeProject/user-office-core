@@ -38,6 +38,10 @@ export default function QuestionaryEditorModel() {
           if (!draft) {
             return draft;
           }
+          if(!action.payload.destination) {
+            return draft;
+          }
+          
           var from: any = draft.topics.find(topic => {
             return (
               topic.topic_id.toString() === action.payload.source.droppableId
