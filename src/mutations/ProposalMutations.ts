@@ -23,11 +23,11 @@ export default class ProposalMutations {
       return await this.dataSource.createTopic(title);
     }
 
-    async updateTopic(agent:User | null, id:number, title:string): Promise<Topic | Rejection> {
+    async updateTopic(agent:User | null, id:number, title?:string, isEnabled?:boolean): Promise<Topic | Rejection> { // <--- wrap values in object here already
       if (!(await this.userAuth.isUserOfficer(agent))) {
         return rejection("NOT_AUTHORIZED");
       }
-      return await this.dataSource.updateTopic(id, title);
+      return await this.dataSource.updateTopic(id, {title, isEnabled}) || rejection("INTERNAL_SERVER_ERROR");
     }
 
   async create(agent: User | null): Promise<Proposal | Rejection> {
@@ -186,7 +186,7 @@ export default class ProposalMutations {
 
   async accept(
     agent: User | null,
-    proposalID: number
+    proposalId: number
   ): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
@@ -194,13 +194,13 @@ export default class ProposalMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
-    const result = await this.dataSource.acceptProposal(proposalID);
+    const result = await this.dataSource.acceptProposal(proposalId);
     return result || rejection("INTERNAL_ERROR");
   }
 
   async reject(
     agent: User | null,
-    proposalID: number
+    proposalId: number
   ): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
@@ -210,19 +210,19 @@ export default class ProposalMutations {
       return rejection("NOT_USER_OFFICER");
     }
 
-    const result = await this.dataSource.rejectProposal(proposalID);
+    const result = await this.dataSource.rejectProposal(proposalId);
     return result || rejection("INTERNAL_ERROR");
   }
 
   async submit(
     agent: User | null,
-    proposalID: number
+    proposalId: number
   ): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }
 
-    let proposal = await this.dataSource.get(proposalID);
+    let proposal = await this.dataSource.get(proposalId);
 
     if (!proposal) {
       return rejection("INTERNAL_ERROR");
@@ -235,22 +235,24 @@ export default class ProposalMutations {
       return rejection("NOT_ALLOWED");
     }
 
-    const result = await this.dataSource.submitProposal(proposalID);
+    const result = await this.dataSource.submitProposal(proposalId);
     return result || rejection("INTERNAL_ERROR");
   }
 
-  async updateFieldTopicRel(agent: User | null, topicId:number, fieldIds:string[]): Promise<Boolean | Rejection> {
+  async updateFieldTopicRel(agent: User | null, topicId:number, fieldIds:string[]): Promise<void | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    var result = true;
+    var isSuccess = true;
     var index = 1;
     for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateField(field, { topic: topicId, sort_order: index });
-      result = (result && (updatedField != null));
+      const updatedField = await this.dataSource.updateField(field, { topic_id: topicId, sort_order: index });
+      isSuccess = (isSuccess && (updatedField != null));
       index++;
     }
-    return result;
+    if(isSuccess === false) {
+      return rejection("INTERNAL_ERROR");
+    }
   }
 
 }

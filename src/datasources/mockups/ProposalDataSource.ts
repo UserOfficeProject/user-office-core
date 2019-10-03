@@ -55,11 +55,11 @@ export class proposalDataSource implements ProposalDataSource {
     );
   }
 
-  async updateTopic(id: number, title: string): Promise<Topic> {
-    return new Topic(id, title, 3, null);
+  async updateTopic(id:number, values:{title?:string, isEnabled?:boolean}):Promise<Topic> {
+    return new Topic(id, values.title || "Topic title", true, 3, null);
   }
   async createTopic(title: string): Promise<Topic> {
-    return new Topic(2, title, 2, null);
+    return new Topic(2, title, false, 2, null);
   }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
@@ -105,7 +105,7 @@ export class proposalDataSource implements ProposalDataSource {
         )
       ]
     );
-    return new ProposalTemplate([new Topic(1, 'General information', 1, [hasLinksToField, linksToField])]);
+    return new ProposalTemplate([new Topic(1, 'General information', true, 1, [hasLinksToField, linksToField])]);
   }
 
   async submitReview(

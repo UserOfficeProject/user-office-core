@@ -2,7 +2,6 @@ import { ResolverContext } from "../context";
 import { isRejection, Rejection, rejection } from "../rejection";
 import {
   Proposal,
-  ProposalTemplate,
   ProposalAnswer,
   ProposalInformation,
   Topic
@@ -61,6 +60,7 @@ interface CreateTopicArgs {
 interface UpdateTopicArgs {
   id: number;
   title: string;
+  is_enabled:boolean;
 }
 
 interface UpdateFieldTopicRelArgs {
@@ -263,14 +263,15 @@ export default {
       context.mutations.proposal.createTopic(context.user, args.title)
     );
   },
+  
   updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
     return wrapTopicMutation(
-      context.mutations.proposal.updateTopic(context.user, args.id, args.title)
+      context.mutations.proposal.updateTopic(context.user, args.id, args.title, args.is_enabled)
     );
   },
 
   updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
-    return createResponseWrapper<Boolean>("result")(
+    return createResponseWrapper<void>("result")(
       context.mutations.proposal.updateFieldTopicRel(
         context.user,
         args.topic_id,

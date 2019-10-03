@@ -38,6 +38,7 @@ export class Topic {
   constructor(
     public topic_id:number,
     public topic_title: string,
+    public isEnabled:boolean,
     public sort_order:number,
     public fields:ProposalTemplateField[] | null
    ) {}
@@ -49,7 +50,7 @@ export class ProposalTemplateField {
     public data_type:DataType,
     public sort_order:number,
     public question:string,
-    public topic: number | null,
+    public topic_id: number | null,
     public config: string | null,
     public dependencies: FieldDependency[] | null,
     public value?:string

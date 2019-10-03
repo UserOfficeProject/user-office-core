@@ -13,7 +13,7 @@ export const typeDefs = `
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
         createTopic(title: String): TopicMutationResult
-        updateTopic(id:Int!, title: String!): TopicMutationResult
+        updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
         updateFieldTopicRel(topic_id:Int!, field_ids:[String]): BooleanMutationResult
     }
 
