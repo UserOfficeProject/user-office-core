@@ -56,6 +56,7 @@ export default function QuestionaryEditor() {
               data={topic}
               dispatch={dispatch}
               index={index}
+              key={topic.topic_id}
             />
           ))}
           {provided.placeholder}

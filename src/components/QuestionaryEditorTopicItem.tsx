@@ -14,8 +14,8 @@ export default function QuestionaryEditorTopicItem(props: {
   dispatch: Function;
   index: number;
 }) {
+  
   const theme = useTheme();
-
   const classes = makeStyles(theme => ({
     container: {
       fontSize: "13px",
@@ -32,7 +32,9 @@ export default function QuestionaryEditorTopicItem(props: {
     }
   }))();
 
+  
   const [isHover, setIsHover] = useState<boolean>(false);
+
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
     display: "flex",
     padding: "12px 8px 8px 8px",
@@ -74,7 +76,7 @@ export default function QuestionaryEditorTopicItem(props: {
     }
     return input.replace(/<[^>]+>/g, "");
   };
-
+  
   return (
     <Draggable
       key={props.data.proposal_question_id}

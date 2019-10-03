@@ -11,9 +11,6 @@ export default function QuestionaryEditorTopic(props: {
   dispatch: Function;
   index: number;
 }) {
-  const { data, dispatch, index } = props;
-  const [title, setTitle] = useState<string>(data.topic_title);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const theme = useTheme();
 
@@ -25,25 +22,27 @@ export default function QuestionaryEditorTopic(props: {
       flexBasis: "100%"
     },
     inputHeading: {
-      fontSize: "13px",
+      fontSize: "15px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      textTransform: "uppercase",
       width: "100%"
     },
     itemContainer: {
       minHeight: "180px"
     },
     topic: {
-      fontSize: "13px",
+      fontSize: "15px",
       padding: "0 5px",
-      marginBottom: "15px",
-      textTransform: "uppercase",
+      marginBottom: "16px",
       color: theme.palette.grey[600],
       fontWeight: 600,
       background: "white"
     }
   }))();
+
+  const { data, dispatch, index } = props;
+  const [title, setTitle] = useState<string>(data.topic_title);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const getListStyle = (isDraggingOver: any) => ({
     background: isDraggingOver
@@ -65,7 +64,7 @@ export default function QuestionaryEditorTopic(props: {
       onChange={event => setTitle(event.target.value)}
       onBlur={() => {
         setIsEditMode(false);
-        dispatch({ type:ActionType.UPDATE_TOPIC, payload:{ topicId:data.topic_title, title:title } })
+        dispatch({ type:ActionType.UPDATE_TOPIC_TITLE, payload:{ topicId:data.topic_id, title:title } })
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -79,7 +78,7 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(true);
       }}
     >
-      {title}
+      {props.data.topic_title}
     </span>
   );
   return (

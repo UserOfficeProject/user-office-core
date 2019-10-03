@@ -8,7 +8,7 @@ export enum ActionType {
   READY,
   MOVE_ITEM,
   MOVE_TOPIC,
-  UPDATE_TOPIC,
+  UPDATE_TOPIC_TITLE,
   UPDATE_ITEM
 }
 
@@ -62,6 +62,9 @@ export default function QuestionaryEditorModel(middlewares?:Array<Function>) {
             ...from.fields.splice(action.payload.source.index, 1)
           );
 
+          return draft;
+        case ActionType.UPDATE_TOPIC_TITLE:
+          draft.getTopicById(action.payload.topicId)!.topic_title = action.payload.title;
           return draft;
       }
     });
