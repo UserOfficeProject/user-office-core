@@ -2,6 +2,8 @@ import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
 import { ProposalTemplate } from "./ProposalModel";
+const jsonwebtoken = require("jsonwebtoken");
+const config = require("./../../config");
 
 const PDFDocument = require("pdfkit");
 const router = express.Router();
@@ -16,13 +18,12 @@ const getAttachments = (attachmentId: string) => {
 
 router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
+    const decoded = jsonwebtoken.verify(req.cookies.token, config.secret);
     const proposalId = req.params.proposal_id;
     let user = null;
 
     // Authenticate user and fecth user, co-proposer and proposal with questionary
-    if (req.user) {
-      user = await baseContext.queries.user.getAgent(req.user.user.id);
-    }
+    user = await baseContext.queries.user.getAgent(decoded.user.id);
 
     if (user == null) {
       return res.status(500).send();

@@ -4,6 +4,7 @@ const jwt = require("express-jwt");
 const config = require("./config");
 const files = require("./src/routes/files");
 const proposalDownload = require("./src/routes/pdf");
+var cookieParser = require("cookie-parser");
 
 import schema from "./src/schema";
 import root from "./src/resolvers";
@@ -18,7 +19,7 @@ const authMiddleware = jwt({
   credentialsRequired: false,
   secret: config.secret
 });
-
+app.use(cookieParser());
 app.use(
   authMiddleware,
   (err: any, req: Request, res: Response, next: NextFunction) => {

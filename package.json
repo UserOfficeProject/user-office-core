@@ -23,6 +23,7 @@
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.4",
+    "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
     "express-graphql": "^0.8.0",
     "express-jwt": "^5.3.1",
