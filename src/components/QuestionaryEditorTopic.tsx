@@ -1,9 +1,10 @@
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import React from "react";
+import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
 import { Topic } from "../model/ProposalModel";
-import { makeStyles, Grid, useTheme } from "@material-ui/core";
+import { makeStyles, Grid, useTheme, TextField } from "@material-ui/core";
+import { ActionType } from "./QuestionaryEditorModel";
 
 export default function QuestionaryEditorTopic(props: {
   data: Topic;
@@ -11,6 +12,8 @@ export default function QuestionaryEditorTopic(props: {
   index: number;
 }) {
   const { data, dispatch, index } = props;
+  const [title, setTitle] = useState<string>(data.topic_title);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const theme = useTheme();
 
@@ -18,7 +21,15 @@ export default function QuestionaryEditorTopic(props: {
     container: {
       alignItems: "flex-start",
       alignContent: "flex-start",
-      background: "#FFF"
+      background: "#FFF",
+      flexBasis: "100%"
+    },
+    inputHeading: {
+      fontSize: "13px",
+      color: theme.palette.grey[600],
+      fontWeight: 600,
+      textTransform: "uppercase",
+      width: "100%"
     },
     itemContainer: {
       minHeight: "180px"
@@ -30,7 +41,7 @@ export default function QuestionaryEditorTopic(props: {
       textTransform: "uppercase",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      background:"white"
+      background: "white"
     }
   }))();
 
@@ -42,10 +53,35 @@ export default function QuestionaryEditorTopic(props: {
   });
 
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    background:"#FFF",
+    background: "#FFF",
     ...draggableStyle
   });
 
+  const titleJsx = isEditMode ? (
+    <input
+      type="text"
+      value={title}
+      className={classes.inputHeading}
+      onChange={event => setTitle(event.target.value)}
+      onBlur={() => {
+        setIsEditMode(false);
+        dispatch({ type:ActionType.UPDATE_TOPIC, payload:{ topicId:data.topic_title, title:title } })
+      }}
+      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+          e.currentTarget.blur();
+        }
+      }}
+    />
+  ) : (
+    <span
+      onClick={() => {
+        setIsEditMode(true);
+      }}
+    >
+      {title}
+    </span>
+  );
   return (
     <Draggable
       key={data.topic_id.toString()}
@@ -53,7 +89,9 @@ export default function QuestionaryEditorTopic(props: {
       index={index}
     >
       {(provided, snapshotDraggable) => (
-        <Grid container className={classes.container}
+        <Grid
+          container
+          className={classes.container}
           {...provided.draggableProps}
           ref={provided.innerRef}
           style={getItemStyle(
@@ -61,10 +99,13 @@ export default function QuestionaryEditorTopic(props: {
             provided.draggableProps.style
           )}
         >
-          <Grid item xs={12} className={classes.topic}
+          <Grid
+            item
+            xs={12}
+            className={classes.topic}
             {...provided.dragHandleProps}
           >
-            {data.topic_title}
+            {titleJsx}
           </Grid>
 
           <Droppable droppableId={data.topic_id.toString()} type="field">

@@ -1,9 +1,8 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import { Reducer, useEffect } from "react";
-import {
-  ProposalTemplate} from "../model/ProposalModel";
+import { ProposalTemplate } from "../model/ProposalModel";
 import produce from "immer";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares"
+import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
 export enum ActionType {
   READY,
@@ -13,15 +12,19 @@ export enum ActionType {
   UPDATE_ITEM
 }
 
-interface IAction {
+export interface IAction {
   type: ActionType;
   payload: any;
 }
 
-type IState = ProposalTemplate;
 
-export default function QuestionaryEditorModel() {
-  const [state, dispatch] = useReducerWithMiddleWares<Reducer<IState, IAction>>(reducer, new ProposalTemplate(), [persistModel]);
+export default function QuestionaryEditorModel(middlewares?:Array<Function>) {
+  const blankInitTemplate = new ProposalTemplate();
+  const [state, dispatch] = useReducerWithMiddleWares<Reducer<ProposalTemplate, IAction>>(
+    reducer,
+    blankInitTemplate,
+    middlewares || []
+  );
   const { proposalTemplate } = useProposalQuestionTemplate();
 
   useEffect(() => {
@@ -30,23 +33,16 @@ export default function QuestionaryEditorModel() {
     }
   }, [proposalTemplate, dispatch]);
 
-  function persistModel({ getState } : {getState:Function}) {
-    return (next:Function) => (action:IAction) => {
-      console.log("persist " + action.type)
-      next(action);
-    }
-  }
-  
-  function reducer(state: IState, action: IAction): IState {
+  function reducer(state: ProposalTemplate, action: IAction): ProposalTemplate {
     return produce(state, draft => {
       switch (action.type) {
         case ActionType.READY:
           return action.payload;
         case ActionType.MOVE_ITEM:
-          if(!action.payload.destination) {
+          if (!action.payload.destination) {
             return draft;
           }
-          
+
           var from: any = draft.topics.find(topic => {
             return (
               topic.topic_id.toString() === action.payload.source.droppableId
@@ -73,6 +69,3 @@ export default function QuestionaryEditorModel() {
 
   return { state, dispatch };
 }
-
-
-

@@ -3,11 +3,14 @@ import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, { ActionType } from "./QuestionaryEditorModel";
 import { Paper, makeStyles, useTheme } from "@material-ui/core";
+import { usePersistModel } from "../hooks/usePersistModel";
 
 
 export default function QuestionaryEditor() {
-  var { state, dispatch } = QuestionaryEditorModel();
-  
+
+  var {persistModel, isLoading} = usePersistModel();
+  var { state, dispatch } = QuestionaryEditorModel([persistModel]);
+
   const theme = useTheme();
   const classes = makeStyles(theme => ({
     paper: {
@@ -29,8 +32,6 @@ export default function QuestionaryEditor() {
     display:"flex"
   });
 
-  
-
   const onDragEnd = (result: DropResult) => {
     if(result.type === "field") {
       dispatch({
@@ -42,6 +43,7 @@ export default function QuestionaryEditor() {
 
   return (
     <Paper className={classes.paper}>
+      {isLoading}
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="topics" direction="horizontal" type="topic">
         {(provided, snapshot) => (
@@ -50,13 +52,11 @@ export default function QuestionaryEditor() {
           ref={provided.innerRef} 
           style={getTopicListStyle(snapshot.isDraggingOver)}>
           {state!.topics.map((topic, index) => (
-            <div style={{flexGrow:1}}>
             <QuestionaryEditorTopic
               data={topic}
               dispatch={dispatch}
               index={index}
             />
-            </div>
           ))}
           {provided.placeholder}
           </div>
