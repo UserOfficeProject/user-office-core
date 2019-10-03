@@ -102,7 +102,7 @@ CREATE TABLE proposal_questions (
   proposal_question_id  VARCHAR(64) PRIMARY KEY   /* f.x.links_with_industry */
 , data_type             VARCHAR(64) NOT NULL REFERENCES proposal_question_datatypes(proposal_question_datatype_id)
 , question              VARCHAR(256) NOT NULL
-, topic                 INT DEFAULT NULL REFERENCES proposal_topics(topic_id)              /* f.x. { "min":2, "max":50 } */
+, topic_id              INT DEFAULT NULL REFERENCES proposal_topics(topic_id)              /* f.x. { "min":2, "max":50 } */
 , config                VARCHAR(512) DEFAULT NULL              /* f.x. { "min":2, "max":50 } */
 , sort_order            INT DEFAULT 0
 , created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
