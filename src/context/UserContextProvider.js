@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { decode } from "jsonwebtoken";
+import { useCookies } from "react-cookie";
 
 const initUserData = {
   user: { roles: [] },
@@ -80,7 +81,12 @@ const reducer = (state, action) => {
 
 export const UserContextProvider = props => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
+  const [, setCookie] = useCookies();
   checkLocalStorage(dispatch, state);
+  useEffect(() => {
+    setCookie("token", state.token, { secure: false });
+  }, [setCookie, state.token]);
+
   return (
     <UserContext.Provider
       value={{
