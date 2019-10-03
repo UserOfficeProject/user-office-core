@@ -1,6 +1,5 @@
-import { ProposalTemplateField, DataType } from "../model/ProposalModel";
-import { Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
 import { makeStyles, Grid, useTheme } from "@material-ui/core";
 import ShortTextIcon from "@material-ui/icons/ShortText";
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
@@ -8,13 +7,14 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import TextFieldsIcon from "@material-ui/icons/TextFields";
+import LockIcon from "@material-ui/icons/Lock";
+import { ProposalTemplateField, DataType } from "../model/ProposalModel";
 
 export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
   dispatch: Function;
   index: number;
 }) {
-  
   const theme = useTheme();
   const classes = makeStyles(theme => ({
     container: {
@@ -25,14 +25,43 @@ export default function QuestionaryEditorTopicItem(props: {
     },
     icon: {
       color: theme.palette.grey[400],
-      justifyItems: "flex-end"
+      justifyItems: "flex-end",
+      justifyContent: "flex-end",
+      display: "flex"
     },
     question: {
-      color: "#000"
+      color: "#000",
+      fontSize:"15px",
+      padding: "6px 0"
+    },
+    questionId: {
+      fontSize: "12px",
+      fontWeight: "bold",
+      color: theme.palette.grey[400]
+    },
+    dependencies: {
+      fontSize: "12px",
+      color: theme.palette.grey[400],
+      display:"flex",
+      padding:"10px 0 5px 0",
+      justifyContent:"flex-end",
+      alignItems:"center",
+      '& ul': {
+        display:"inline-block",
+        padding:"0",
+        margin:"0",
+        '& li': {
+          display: "inline",
+          marginLeft: "3px",
+          listStyle: "none"
+        }
+      }
+    },
+    lockIcon: {
+      fontSize:"17px"
     }
   }))();
 
-  
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
@@ -76,7 +105,20 @@ export default function QuestionaryEditorTopicItem(props: {
     }
     return input.replace(/<[^>]+>/g, "");
   };
-  
+
+  const dependencies = props.data.dependencies;
+  const dependenciesJsx =
+    dependencies && dependencies.length > 0 ? (
+      <>
+        <LockIcon className={classes.lockIcon} />
+        <ul>
+          {dependencies.map(dep => {
+            return <li>{dep.proposal_question_dependency}</li>;
+          })}
+        </ul>
+      </>
+    ) : null;
+
   return (
     <Draggable
       key={props.data.proposal_question_id}
@@ -97,13 +139,21 @@ export default function QuestionaryEditorTopicItem(props: {
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
         >
+          <Grid item xs={10} className={classes.questionId}>
+            {props.data.proposal_question_id}
+          </Grid>
+          <Grid item xs={2} className={classes.icon}>
+            {getIcon(props.data.data_type)}
+          </Grid>
+
           <Grid item xs={10} className={classes.question}>
             {props.data.data_type === DataType.EMBELLISHMENT
               ? sanitizeEmbellishment(props.data.config.html)
               : props.data.question}
           </Grid>
-          <Grid item xs={2} className={classes.icon}>
-            {getIcon(props.data.data_type)}
+          
+          <Grid item xs={12} className={classes.dependencies}>
+            {dependenciesJsx}
           </Grid>
         </Grid>
       )}
