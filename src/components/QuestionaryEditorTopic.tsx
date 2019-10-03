@@ -2,7 +2,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import { Topic } from "../model/ProposalModel";
+import { Topic, ProposalTemplateField } from "../model/ProposalModel";
 import { makeStyles, Grid, useTheme, TextField } from "@material-ui/core";
 import { ActionType } from "./QuestionaryEditorModel";
 
@@ -10,6 +10,7 @@ export default function QuestionaryEditorTopic(props: {
   data: Topic;
   dispatch: Function;
   index: number;
+  onItemClick: {(data:ProposalTemplateField):void}
 }) {
 
   const theme = useTheme();
@@ -121,6 +122,7 @@ export default function QuestionaryEditorTopic(props: {
                     index={index}
                     data={item}
                     dispatch={dispatch}
+                    onClick={props.onItemClick}
                   />
                 ))}
                 {provided.placeholder}

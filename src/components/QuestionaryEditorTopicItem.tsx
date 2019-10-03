@@ -14,15 +14,10 @@ export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
   dispatch: Function;
   index: number;
+  onClick: {(data:ProposalTemplateField):void}
 }) {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
-    container: {
-      fontSize: "13px",
-      padding: "0 5px",
-      textTransform: "uppercase",
-      fontWeight: 600
-    },
     icon: {
       color: theme.palette.grey[400],
       justifyItems: "flex-end",
@@ -138,6 +133,7 @@ export default function QuestionaryEditorTopicItem(props: {
           )}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
+          onClick={() => {props.onClick(props.data)}}
         >
           <Grid item xs={10} className={classes.questionId}>
             {props.data.proposal_question_id}
