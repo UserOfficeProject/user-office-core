@@ -23,7 +23,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
           handleChange(evt); // letting Formik know that there was a change
         }}
         onBlur={() => onComplete()}
-        placeholder={config.small_label}
+        placeholder={config.placeholder}
         error={isError}
         helperText={errors[proposal_question_id]}
         multiline={config.multiline}

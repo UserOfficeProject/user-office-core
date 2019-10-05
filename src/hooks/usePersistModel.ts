@@ -50,6 +50,30 @@ export function usePersistModel() {
     setIsLoading(false);
   };
 
+  const updateItem = async (field:ProposalTemplateField) => {
+    const mutation = `
+    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
+      updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
+        field {
+          proposal_question_id
+        }
+        error
+      }
+    }
+    `;
+    const variables = {
+      id:field.proposal_question_id,
+      question:field.question,
+      config: field.config ? JSON.stringify(field.config) : undefined,
+      isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
+      dependencies: field.dependencies
+    };
+
+    setIsLoading(true);
+    await sendRequest(mutation, variables);
+    setIsLoading(false);
+  };
+
   const persistModel = ({ getState }: { getState: () => ProposalTemplate }) => {
     return (next: Function) => (action: IAction) => {
       next(action);
@@ -62,10 +86,10 @@ export function usePersistModel() {
             action.payload.destination.droppableId
           );
           const reducedTopic = state.topics.find(
-            topic => topic.topic_id == reducedTopicId
+            topic => topic.topic_id === reducedTopicId
           );
           const extendedTopic = state.topics.find(
-            topic => topic.topic_id == extendedTopicId
+            topic => topic.topic_id === extendedTopicId
           );
 
           updateFieldTopicRel(
@@ -83,6 +107,10 @@ export function usePersistModel() {
           updateTopic(action.payload.topicId, {
             title: action.payload.title as string
           });
+          break;
+        case ActionType.UPDATE_ITEM:
+          let field:ProposalTemplateField = action.payload.field;
+          updateItem(field);
           break;
         default:
           break;

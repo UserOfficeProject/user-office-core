@@ -5,17 +5,14 @@ import QuestionaryEditorModel, { ActionType } from "./QuestionaryEditorModel";
 import {
   Paper,
   makeStyles,
-  useTheme,
-  Modal,
-  Backdrop,
-  Fade
+  useTheme
 } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 
 export default function QuestionaryEditor() {
-  var { persistModel, isLoading } = usePersistModel();
+  var { persistModel } = usePersistModel();
   var { state, dispatch } = QuestionaryEditorModel([persistModel]);
   const [selectedField, setSelectedField] = React.useState<ProposalTemplateField | null>(null);
 
@@ -29,11 +26,6 @@ export default function QuestionaryEditor() {
         marginBottom: theme.spacing(6),
         padding: theme.spacing(3)
       }
-    },
-    modal: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     modalContainer: {
       backgroundColor:"white"
@@ -93,22 +85,8 @@ export default function QuestionaryEditor() {
         </DragDropContext>
       </Paper>
 
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        className={classes.modal}
-        open={selectedField != null}
-        onClose={handleFieldEditorClose}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500
-        }}
-      >
-        <Fade in={selectedField != null}>
-          <QuestionaryFieldEditor field={selectedField} />
-        </Fade>
-      </Modal>
+      <QuestionaryFieldEditor field={selectedField} dispatch={dispatch} closeMe={handleFieldEditorClose}/>
+     
     </>
   );
 }

@@ -1,19 +1,39 @@
 import React from "react";
-import { Grid, makeStyles, Typography, Button } from "@material-ui/core";
-import { ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  Grid,
+  Typography,
+  Button,
+  FormControlLabel,
+  Checkbox,
+  Modal,
+  Backdrop,
+  Fade
+} from "@material-ui/core";
+import {
+  ProposalTemplateField,
+  DataType} from "../model/ProposalModel";
 import JSDict from "../utils/Dictionary";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import { TextField, Checkbox } from "formik-material-ui";
+import { TextField } from "formik-material-ui";
+import { IAction, ActionType } from "./QuestionaryEditorModel";
+import { makeStyles } from "@material-ui/core/styles";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
+  dispatch: React.Dispatch<IAction>;
+  closeMe: Function;
 }) {
   const classes = makeStyles(() => ({
     container: {
       backgroundColor: "white",
       padding: "20px",
-      maxWidth: "900px"
+      maxWidth: "700px"
+    },
+    modal: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
     }
   }))();
 
@@ -27,33 +47,61 @@ export default function QuestionaryFieldEditor(props: {
     return <span>Error ocurred</span>;
   }
   return (
-    <Grid container className={classes.container}>
-      {componentMap.get(props.field.data_type)!({ field: props.field })}
-    </Grid>
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      className={classes.modal}
+      open={props.field != null}
+      onClose={() => {
+        props.closeMe();
+      }}
+      closeAfterTransition
+      BackdropComponent={Backdrop}
+      BackdropProps={{
+        timeout: 500
+      }}
+    >
+      <Fade in={props.field != null}>
+        <Grid container className={classes.container}>
+          {componentMap.get(props.field.data_type)!({
+            field: props.field,
+            dispatch: props.dispatch,
+            closeMe: props.closeMe
+          })}
+        </Grid>
+      </Fade>
+    </Modal>
   );
 }
 
-function TextFieldAdminComponent(props: { field: ProposalTemplateField }) {
+const TextFieldAdminComponent: AdminComponentSignature = props => {
   const field = props.field;
 
   return (
     <>
       <Formik
-        initialValues={{
-          question: field.question,
-          min: field.config.min,
-          max: field.config.max,
-          required: field.config.required
+        initialValues={field}
+        onSubmit={async vals => {
+          props.dispatch({
+            type: ActionType.UPDATE_ITEM,
+            payload: {
+              field: { ...field, ...vals }
+            }
+          });
+          props.closeMe();
         }}
-        onSubmit={async () => {}}
         validationSchema={Yup.object().shape({
           question: Yup.string().required("Question is required"),
-          min: Yup.number(),
-          max: Yup.number(),
-          required: Yup.bool()
+          config: Yup.object({
+            min: Yup.number(),
+            max: Yup.number(),
+            required: Yup.bool(),
+            placeholder: Yup.string(),
+            multiline: Yup.boolean()
+          })
         })}
       >
-        {() => (
+        {props => (
           <Form>
             <Typography>Text input</Typography>
 
@@ -68,7 +116,17 @@ function TextFieldAdminComponent(props: { field: ProposalTemplateField }) {
             />
 
             <Field
-              name="min"
+              name="config.required"
+              checked={props.values.config.required}
+              component={CustomCheckbox}
+              label="Is required"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+
+            <Field
+              name="config.min"
               label="Min"
               type="text"
               component={TextField}
@@ -78,7 +136,7 @@ function TextFieldAdminComponent(props: { field: ProposalTemplateField }) {
             />
 
             <Field
-              name="max"
+              name="config.max"
               label="Max"
               type="text"
               component={TextField}
@@ -88,13 +146,23 @@ function TextFieldAdminComponent(props: { field: ProposalTemplateField }) {
             />
 
             <Field
-              name="required"
-              label="Is required"
-              type="checkbox"
-              component={Checkbox}
+              name="config.placeholder"
+              label="Placeholder text"
+              type="text"
+              component={TextField}
               margin="normal"
               fullWidth
               data-cy="max"
+            />
+
+            <Field
+              name="config.multiline"
+              checked={props.values.config.multiline}
+              component={CustomCheckbox}
+              label="Multiple line"
+              margin="normal"
+              fullWidth
+              data-cy="multiline"
             />
 
             <Button
@@ -111,8 +179,21 @@ function TextFieldAdminComponent(props: { field: ProposalTemplateField }) {
       </Formik>
     </>
   );
-}
+};
 
 type AdminComponentSignature = {
-  (props: { field: ProposalTemplateField }): JSX.Element;
+  (props: {
+    field: ProposalTemplateField;
+    dispatch: React.Dispatch<IAction>;
+    closeMe: Function;
+  }): JSX.Element;
 };
+// @ts-ignore
+const CustomCheckbox = ({ field, checked, label }) => {
+  return (
+    <FormControlLabel
+      control={<Checkbox {...field} checked={checked} color="primary" />}
+      label={label}
+    />
+  );
+}

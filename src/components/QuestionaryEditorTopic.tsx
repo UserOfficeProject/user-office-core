@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
 import { Topic, ProposalTemplateField } from "../model/ProposalModel";
-import { makeStyles, Grid, useTheme, TextField } from "@material-ui/core";
+import { makeStyles, Grid, useTheme } from "@material-ui/core";
 import { ActionType } from "./QuestionaryEditorModel";
 
 export default function QuestionaryEditorTopic(props: {
