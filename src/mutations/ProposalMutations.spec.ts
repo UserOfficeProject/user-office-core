@@ -16,8 +16,9 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { DataType } from "../models/Proposal";
+import { DataType, Topic } from "../models/Proposal";
 import { User } from "../models/User";
+import { isRejection } from "../rejection";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -76,6 +77,75 @@ function tryUpdateProposal(user:User, proposalId:string) {
   )
 }
 
+
+test("A userofficer can update topic", async () => {
+  const newTopicTitle = "new topic title";
+  const topicEnabled = false;
+  const topic = await proposalMutations.updateTopic(
+    dummyUserOfficer,
+    1,
+    newTopicTitle,
+    topicEnabled
+  );
+  expect(topic instanceof Topic).toBe(true);
+  expect((topic as Topic).topic_title).toEqual(newTopicTitle)
+  expect((topic as Topic).isEnabled).toEqual(topicEnabled)
+});
+
+test("A user can not update topic", async () => {
+  const topic = await proposalMutations.updateTopic(
+    dummyUser,
+    1,
+    "New topic title",
+    false
+  );
+
+  expect(topic instanceof Topic).toBe(false);
+});
+
+
+
+
+test("A userofficer can create topic", async () => {
+  const newTopicTitle = "new topic title";
+
+  const topic = await proposalMutations.createTopic(
+    dummyUserOfficer,
+    newTopicTitle
+  );
+  expect(topic instanceof Topic).toBe(true);
+  expect((topic as Topic).topic_title).toEqual(newTopicTitle)
+});
+
+test("A userofficer can not create topic", async () => {
+  const newTopicTitle = "new topic title";
+
+  const topic = await proposalMutations.createTopic(
+    dummyUser,
+    newTopicTitle
+  );
+  expect(topic instanceof Topic).toBe(false);
+});
+
+test("A userofficer can update fieltTopicRel", async () => {
+  const response = await proposalMutations.updateFieldTopicRel(
+    dummyUserOfficer,
+    1,
+    ["has_links_with_industry", "enable_crystallization"]
+  );
+  expect(isRejection(response)).toEqual(false);
+});
+
+
+test("A user can not update fieltTopicRel", async () => {
+  const response = await proposalMutations.updateFieldTopicRel(
+    dummyUser,
+    1,
+    ["has_links_with_industry", "enable_crystallization"]
+  );
+  expect(isRejection(response)).toEqual(true);
+});
+
 //Accept
 
 test("A user officer can accept a proposal ", () => {
@@ -103,6 +173,7 @@ test("A user officer can not accept a proposal that does not exist", () => {
     proposalMutations.accept(dummyUserOfficer, -1)
   ).resolves.toHaveProperty("reason", "INTERNAL_ERROR");
 });
+
 
 //Reject
 

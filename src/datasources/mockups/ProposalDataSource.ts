@@ -30,10 +30,10 @@ export const dummyProposalSubmitted = new Proposal(
 );
 
 export const dummyAnswers: Array<ProposalAnswer> = [
-  { 
-    proposal_question_id: "has_references", 
+  {
+    proposal_question_id: "has_references",
     data_type: DataType.BOOLEAN,
-    value: "true" 
+    value: "true"
   },
   {
     proposal_question_id: "fasta_seq",
@@ -43,7 +43,16 @@ export const dummyAnswers: Array<ProposalAnswer> = [
 ];
 
 export class proposalDataSource implements ProposalDataSource {
-  async updateField(proposal_question_id: string, values: { data_type?: string | undefined; question?: string | undefined; topic?: number | undefined; config?: string | undefined; sort_order: number; }): Promise<ProposalTemplateField | null> {
+  async updateField(
+    proposal_question_id: string,
+    values: {
+      data_type?: string | undefined;
+      question?: string | undefined;
+      topic?: number | undefined;
+      config?: string | undefined;
+      sort_order: number;
+    }
+  ): Promise<ProposalTemplateField | null> {
     return new ProposalTemplateField(
       proposal_question_id,
       DataType.BOOLEAN,
@@ -55,24 +64,45 @@ export class proposalDataSource implements ProposalDataSource {
     );
   }
 
-  async updateTopic(id:number, values:{title?:string, isEnabled?:boolean}):Promise<Topic> {
-    return new Topic(id, values.title || "Topic title", true, 3, null);
+  async updateTopic(
+    id: number,
+    values: { title?: string; isEnabled?: boolean }
+  ): Promise<Topic> {
+    return new Topic(
+      id,
+      values.title || "Topic title",
+      values.isEnabled !== undefined ? values.isEnabled : true,
+      3,
+      null
+    );
   }
+
+  
   async createTopic(title: string): Promise<Topic> {
     return new Topic(2, title, false, 2, null);
   }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
   }
-  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
+  async insertFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[]> {
     return files;
   }
-  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean> {
     return true;
   }
-  
-  
-  async updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean> {
+
+  async updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean> {
     return true;
   }
   async checkActiveCall(): Promise<Boolean> {
@@ -105,7 +135,12 @@ export class proposalDataSource implements ProposalDataSource {
         )
       ]
     );
-    return new ProposalTemplate([new Topic(1, 'General information', true, 1, [hasLinksToField, linksToField])]);
+    return new ProposalTemplate([
+      new Topic(1, "General information", true, 1, [
+        hasLinksToField,
+        linksToField
+      ])
+    ]);
   }
 
   async submitReview(
@@ -159,7 +194,7 @@ export class proposalDataSource implements ProposalDataSource {
     return null;
   }
 
-  async create(proposerID:number) {
+  async create(proposerID: number) {
     return dummyProposal;
   }
 
