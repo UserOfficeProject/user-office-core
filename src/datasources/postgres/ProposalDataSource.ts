@@ -387,23 +387,34 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async updateField(
     proposal_question_id: string,
     values: {
-      data_type?: string;
+      dataType?: string;
       question?: string;
-      topic_id?: number;
+      topicId?: number;
       config?: string;
-      sort_order: number;
+      sortOrder?: number;
+      dependencies?: FieldDependency[]
     }
   ): Promise<ProposalTemplateField | null> {
+    const rows = {
+      data_type: values.dataType,
+      question: values.question,
+      topic_id: values.topicId,
+      config: values.config,
+      sort_order: values.sortOrder,
+    }
+
+    // TODO update dependencies if provided
+
     return database
-      .update(values, ["*"])
+      .update(rows, ["*"])
       .from("proposal_questions")
       .where("proposal_question_id", proposal_question_id)
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("Unexpected updateField resultSet encountered", {
+          this.logger.logError("resultSet must contain exactly 1 row", {
             resultSet,
             proposal_question_id,
-            values
+            rows
           });
           return null;
         }

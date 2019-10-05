@@ -15,7 +15,9 @@ export const typeDefs = `
         createTopic(title: String): TopicMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
         updateFieldTopicRel(topic_id:Int!, field_ids:[String]): BooleanMutationResult
+        updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateFieldMutationResult
     }
+
 
     type ProposalQueryResult {
         proposals: [Proposal]
@@ -36,6 +38,12 @@ export const typeDefs = `
         result: Boolean
         error: String
     }
+
+    type ProposalTemplateFieldMutationResult {
+        field: ProposalTemplateField
+        error: String
+    }
+
 
     type Proposal {
         id: Int
@@ -80,6 +88,16 @@ export const typeDefs = `
         proposal_question_id: ID!,
         data_type:String,
         value: String
+    }
+
+    
+
+
+
+    input FieldDependencyInput {
+        proposal_question_dependency: String,
+        proposal_question_id: String,
+        condition: String,
     }
 
     input TopicInput {

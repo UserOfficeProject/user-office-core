@@ -3,7 +3,8 @@ import {
   ProposalTemplate,
   ProposalAnswer,
   Topic,
-  ProposalTemplateField
+  ProposalTemplateField,
+  FieldDependency
 } from "../models/Proposal";
 
 export interface ProposalDataSource {
@@ -48,11 +49,12 @@ export interface ProposalDataSource {
   updateField(
     proposal_question_id: string,
     values: {
-      data_type?: string;
+      dataType?: string;
       question?: string;
-      topic_id?: number;
+      topicId?: number;
       config?: string;
-      sort_order: number;
+      sortOrder?: number;
+      dependencies?: FieldDependency[]
     }
   ): Promise<ProposalTemplateField | null>;
 }

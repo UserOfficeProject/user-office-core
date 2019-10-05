@@ -4,7 +4,10 @@ import {
   Proposal,
   ProposalAnswer,
   ProposalInformation,
-  Topic
+  Topic,
+  FieldDependency,
+  ProposalTemplateField,
+  DataType
 } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
@@ -60,12 +63,22 @@ interface CreateTopicArgs {
 interface UpdateTopicArgs {
   id: number;
   title: string;
-  is_enabled:boolean;
+  is_enabled: boolean;
 }
 
 interface UpdateFieldTopicRelArgs {
   topic_id: number;
   field_ids: string[];
+}
+
+interface UpdateProposalTemplateFieldArgs {
+  id:string;
+  dataType: string;
+  question: string;
+  topicId: number;
+  config: string;
+  sortOrder: number;
+  dependencies: FieldDependency[]
 }
 
 interface UpdateUserArgs {
@@ -131,43 +144,43 @@ async function resolveProposal(
   proposal: Proposal | null,
   context: ResolverContext
 ) {
-    if (proposal == null) {
-      return rejection("Proposal is null");
-    }
-    const { id, title, abstract, status, created, updated } = proposal;
-    const agent = context.user;
+  if (proposal == null) {
+    return rejection("Proposal is null");
+  }
+  const { id, title, abstract, status, created, updated } = proposal;
+  const agent = context.user;
 
-    if (!agent) {
-      return rejection("Not aututhorized");
-    }
+  if (!agent) {
+    return rejection("Not aututhorized");
+  }
 
-    const users = await context.queries.user.getProposers(agent, id);
-    if (isRejection(users)) {
-      return users;
-    }
+  const users = await context.queries.user.getProposers(agent, id);
+  if (isRejection(users)) {
+    return users;
+  }
 
-    const reviews = await context.queries.review.reviewsForProposal(agent, id);
-    if (isRejection(reviews)) {
-      return reviews;
-    }
+  const reviews = await context.queries.review.reviewsForProposal(agent, id);
+  if (isRejection(reviews)) {
+    return reviews;
+  }
 
-    const questionary = await context.queries.proposal.getQuestionary(agent, id);
-    if (isRejection(questionary)) {
-      return questionary;
-    }
+  const questionary = await context.queries.proposal.getQuestionary(agent, id);
+  if (isRejection(questionary)) {
+    return questionary;
+  }
 
-    return new ProposalInformation(
-      id,
-      title,
-      abstract,
-      agent.id,
-      status,
-      created,
-      updated,
-      users,
-      reviews,
-      questionary || undefined
-    );
+  return new ProposalInformation(
+    id,
+    title,
+    abstract,
+    agent.id,
+    status,
+    created,
+    updated,
+    users,
+    reviews,
+    questionary || undefined
+  );
 }
 
 function resolveProposals(
@@ -211,6 +224,9 @@ const wrapProposalInformationMutation = createResponseWrapper<
 >("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapCallMutation = createResponseWrapper<Call>("call");
+const wrapProposalTemplateFieldMutation = createResponseWrapper<
+  ProposalTemplateField
+>("field");
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -263,10 +279,15 @@ export default {
       context.mutations.proposal.createTopic(context.user, args.title)
     );
   },
-  
+
   updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
     return wrapTopicMutation(
-      context.mutations.proposal.updateTopic(context.user, args.id, args.title, args.is_enabled)
+      context.mutations.proposal.updateTopic(
+        context.user,
+        args.id,
+        args.title,
+        args.is_enabled
+      )
     );
   },
 
@@ -276,6 +297,25 @@ export default {
         context.user,
         args.topic_id,
         args.field_ids
+      )
+    );
+  },
+
+  updateProposalTemplateField(
+    args: UpdateProposalTemplateFieldArgs,
+    context: ResolverContext
+  ) {
+
+    return wrapProposalTemplateFieldMutation(
+      context.mutations.proposal.updateProposalTemplateField(
+        context.user,
+        args.id,
+        args.dataType as DataType,
+        args.sortOrder,
+        args.question,
+        args.topicId,
+        args.config,
+        args.dependencies
       )
     );
   },

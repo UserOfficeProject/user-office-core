@@ -3,13 +3,13 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { Proposal, ProposalAnswer, Topic } from "../models/Proposal";
+import { Proposal, ProposalAnswer, Topic, ProposalTemplateField, DataType, FieldDependency} from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { ILogger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
+
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
@@ -246,13 +246,37 @@ export default class ProposalMutations {
     var isSuccess = true;
     var index = 1;
     for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateField(field, { topic_id: topicId, sort_order: index });
+      const updatedField = await this.dataSource.updateField(field, { topicId, sortOrder: index });
       isSuccess = (isSuccess && (updatedField != null));
       index++;
     }
     if(isSuccess === false) {
       return rejection("INTERNAL_ERROR");
     }
+  }
+
+  async updateProposalTemplateField(
+    agent: User | null, 
+    id:string,
+    dataType?:DataType,
+    sortOrder?:number,
+    question?:string,
+    topicId?: number,
+    config?: string,
+    dependencies?: FieldDependency[]): Promise<ProposalTemplateField | Rejection> {
+      if (!(await this.userAuth.isUserOfficer(agent))) {
+        return rejection("NOT_AUTHORIZED");
+      }
+      return await this.dataSource.updateField(
+        id, 
+        {
+          dataType,
+          sortOrder,
+          question,
+          topicId,
+          config,
+          dependencies
+        }) || rejection("INTERNAL_SERVER_ERROR");
   }
 
 }
