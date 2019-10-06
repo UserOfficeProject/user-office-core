@@ -43,6 +43,9 @@ export const dummyAnswers: Array<ProposalAnswer> = [
 ];
 
 export class proposalDataSource implements ProposalDataSource {
+  createTemplateField(fieldId: string, topicId: number, dataType: DataType, question: string, config: string): Promise<ProposalTemplateField | null> {
+    throw new Error("Method not implemented.");
+  }
   async updateField(
     proposal_question_id: string,
     values: {

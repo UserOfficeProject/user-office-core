@@ -81,6 +81,10 @@ interface UpdateProposalTemplateFieldArgs {
   dependencies: FieldDependency[]
 }
 
+interface CreateProposalTemplateFieldArgs {
+  topicId:number;
+  dataType:string;
+}
 interface UpdateUserArgs {
   id: string;
   firstname: string;
@@ -319,6 +323,18 @@ export default {
       )
     );
   },
+  createTemplateField(
+    args: CreateProposalTemplateFieldArgs,
+    context: ResolverContext
+  ) {
+    return wrapProposalTemplateFieldMutation(
+      context.mutations.proposal.createTemplateField(
+        context.user,
+        args.topicId,
+        args.dataType as DataType,
+      )
+    );
+  },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
     const { id, title, abstract, answers, status, users } = args;
@@ -374,6 +390,7 @@ export default {
       context.mutations.proposal.submit(context.user, args.id)
     );
   },
+
 
   review(args: { id: number }, context: ResolverContext) {
     return context.queries.review.get(context.user, args.id);

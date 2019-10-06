@@ -19,7 +19,9 @@ import {
 import { DataType, Topic } from "../models/Proposal";
 import { User } from "../models/User";
 import { isRejection } from "../rejection";
+import { DummyLogger } from "../utils/Logger";
 
+const dummyLogger = new DummyLogger()
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
@@ -29,7 +31,8 @@ const userAuthorization = new UserAuthorization(
 const proposalMutations = new ProposalMutations(
   new proposalDataSource(),
   userAuthorization,
-  dummyEventBus
+  dummyEventBus,
+  dummyLogger
 );
 
 //Update

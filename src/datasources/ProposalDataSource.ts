@@ -4,7 +4,8 @@ import {
   ProposalAnswer,
   Topic,
   ProposalTemplateField,
-  FieldDependency
+  FieldDependency,
+  DataType
 } from "../models/Proposal";
 
 export interface ProposalDataSource {
@@ -44,7 +45,7 @@ export interface ProposalDataSource {
   createTopic(title: string): Promise<Topic>;
   updateTopic(
     id: number,
-    values: { title?: string; isEnabled?: boolean, sortOrder?:number }
+    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
   ): Promise<Topic | null>;
   updateField(
     proposal_question_id: string,
@@ -54,7 +55,14 @@ export interface ProposalDataSource {
       topicId?: number;
       config?: string;
       sortOrder?: number;
-      dependencies?: FieldDependency[]
+      dependencies?: FieldDependency[];
     }
+  ): Promise<ProposalTemplateField | null>;
+  createTemplateField(
+    fieldId:string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
   ): Promise<ProposalTemplateField | null>;
 }

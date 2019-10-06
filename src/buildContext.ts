@@ -60,7 +60,8 @@ const proposalQueries = new ProposalQueries(
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   userAuthorization,
-  eventBus
+  eventBus,
+  logger
 );
 
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);

@@ -3,32 +3,52 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { Proposal, ProposalAnswer, Topic, ProposalTemplateField, DataType, FieldDependency} from "../models/Proposal";
+import {
+  Proposal,
+  ProposalAnswer,
+  Topic,
+  ProposalTemplateField,
+  DataType,
+  FieldDependency
+} from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { ILogger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
-
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
-    ) {}
-    
-    async createTopic(agent:User | null, title: string): Promise<Topic | Rejection> {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("NOT_AUTHORIZED");
-      }
-      return await this.dataSource.createTopic(title);
-    }
+    private eventBus: EventBus<ApplicationEvent>,
+    private logger: ILogger
+  ) {}
 
-    async updateTopic(agent:User | null, id:number, title?:string, isEnabled?:boolean): Promise<Topic | Rejection> { // <--- wrap values in object here already
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("NOT_AUTHORIZED");
-      }
-      return await this.dataSource.updateTopic(id, {title, isEnabled}) || rejection("INTERNAL_SERVER_ERROR");
+  async createTopic(
+    agent: User | null,
+    title: string
+  ): Promise<Topic | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
     }
+    return await this.dataSource.createTopic(title);
+  }
+
+  async updateTopic(
+    agent: User | null,
+    id: number,
+    title?: string,
+    isEnabled?: boolean
+  ): Promise<Topic | Rejection> {
+    // <--- wrap values in object here already
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    return (
+      (await this.dataSource.updateTopic(id, { title, isEnabled })) ||
+      rejection("INTERNAL_SERVER_ERROR")
+    );
+  }
 
   async create(agent: User | null): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
@@ -159,8 +179,7 @@ export default class ProposalMutations {
     questionId: string,
     files: string[]
   ): Promise<string[] | Rejection> {
-    if (agent == null) 
-    {
+    if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }
 
@@ -239,44 +258,72 @@ export default class ProposalMutations {
     return result || rejection("INTERNAL_ERROR");
   }
 
-  async updateFieldTopicRel(agent: User | null, topicId:number, fieldIds:string[]): Promise<void | Rejection> {
+  async updateFieldTopicRel(
+    agent: User | null,
+    topicId: number,
+    fieldIds: string[]
+  ): Promise<void | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
     var isSuccess = true;
     var index = 1;
     for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateField(field, { topicId, sortOrder: index });
-      isSuccess = (isSuccess && (updatedField != null));
+      const updatedField = await this.dataSource.updateField(field, {
+        topicId,
+        sortOrder: index
+      });
+      isSuccess = isSuccess && updatedField != null;
       index++;
     }
-    if(isSuccess === false) {
+    if (isSuccess === false) {
       return rejection("INTERNAL_ERROR");
     }
   }
 
-  async updateProposalTemplateField(
-    agent: User | null, 
-    id:string,
-    dataType?:DataType,
-    sortOrder?:number,
-    question?:string,
-    topicId?: number,
-    config?: string,
-    dependencies?: FieldDependency[]): Promise<ProposalTemplateField | Rejection> {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("NOT_AUTHORIZED");
-      }
-      return await this.dataSource.updateField(
-        id, 
-        {
-          dataType,
-          sortOrder,
-          question,
-          topicId,
-          config,
-          dependencies
-        }) || rejection("INTERNAL_SERVER_ERROR");
+  async createTemplateField(
+    agent: User | null,
+    topicId: number,
+    dataType: DataType
+  ): Promise<ProposalTemplateField | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
+    const config: object = {};
+    return (
+      (await this.dataSource.createTemplateField(
+        newFieldId,
+        topicId,
+        dataType,
+        "New question",
+        JSON.stringify(config)
+      )) || rejection("INTERNAL_SERVER_ERROR")
+    );
   }
 
+  async updateProposalTemplateField(
+    agent: User | null,
+    id: string,
+    dataType?: DataType,
+    sortOrder?: number,
+    question?: string,
+    topicId?: number,
+    config?: string,
+    dependencies?: FieldDependency[]
+  ): Promise<ProposalTemplateField | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    return (
+      (await this.dataSource.updateField(id, {
+        dataType,
+        sortOrder,
+        question,
+        topicId,
+        config,
+        dependencies
+      })) || rejection("INTERNAL_SERVER_ERROR")
+    );
+  }
 }

@@ -1,5 +1,10 @@
 import database from "./database";
-import { ProposalRecord, TopicRecord, ProposalQuestionRecord, FieldDependencyRecord } from "./records";
+import {
+  ProposalRecord,
+  TopicRecord,
+  ProposalQuestionRecord,
+  FieldDependencyRecord
+} from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
@@ -47,9 +52,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       fieldDependency.condition
     );
   }
-
-
-  
 
   private createProposalTemplateFieldObject(question: ProposalQuestionRecord) {
     // <-- make ProposalRespondedQuestinon, because question does not have a value, but ProposalRespondedQuestinon does, ProposalRespondedQuestinon shoudl extend Question
@@ -361,7 +363,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     values: {
       title?: string;
       isEnabled?: boolean;
-      sortOrder?:number;
+      sortOrder?: number;
     }
   ): Promise<Topic | null> {
     return database
@@ -392,7 +394,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       topicId?: number;
       config?: string;
       sortOrder?: number;
-      dependencies?: FieldDependency[]
+      dependencies?: FieldDependency[];
     }
   ): Promise<ProposalTemplateField | null> {
     const rows = {
@@ -400,8 +402,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       question: values.question,
       topic_id: values.topicId,
       config: values.config,
-      sort_order: values.sortOrder,
-    }
+      sort_order: values.sortOrder
+    };
 
     // TODO update dependencies if provided
 
@@ -411,7 +413,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where("proposal_question_id", proposal_question_id)
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("resultSet must contain exactly 1 row", {
+          this.logger.logError("UPDATE field resultSet must contain exactly 1 row", {
             resultSet,
             proposal_question_id,
             rows
@@ -422,12 +424,53 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return this.createProposalTemplateFieldObject(resultSet[0]);
       })
       .catch((e: any) => {
-        this.logger.logError("Could not update field", {
+        this.logger.logError("Exception occurred while updating field", {
           error: e,
           proposal_question_id,
           values
         });
         return null;
       });
+  }
+
+  createTemplateField(
+    fieldId:string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<ProposalTemplateField | null> {
+    return database
+      .insert(
+        {
+          proposal_question_id : fieldId,
+          topic_id: topicId,
+          data_type: dataType,
+          question: question,
+          config: config
+        },
+        ["*"]
+      )
+      .from("proposal_questions")
+      .then((resultSet: ProposalQuestionRecord[]) => {
+        if (!resultSet || resultSet.length != 1) {
+          this.logger.logError("INSERT field resultSet must contain exactly 1 row", {
+            resultSet,
+            topicId,
+            dataType
+          });
+          return null;
+        }
+
+        return this.createProposalTemplateFieldObject(resultSet[0]);
+      })
+      .catch((e: any) => {
+        this.logger.logError("Exception occurred while inserting field", {
+          error: e,
+          topicId,
+          dataType
+        });
+        return null;
+      });;
   }
 }
