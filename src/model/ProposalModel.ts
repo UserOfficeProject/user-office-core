@@ -28,6 +28,11 @@ export class ProposalTemplate {
       }
     }
   }
+
+  public addField(field:ProposalTemplateField):void {
+    this.getTopicById(field.topic_id)!.fields.unshift(field);
+    this.fields.unshift(field);
+  }
   
   public getAllFields():ProposalTemplateField[] {
     return this.fields;
@@ -81,6 +86,7 @@ export class ProposalTemplateField {
   public data_type!: DataType;
   public question!: string;
   public config!: FieldConfig;
+  public topic_id!: number;
   public value: any = "";
   public dependencies!: FieldDependency[] | null;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
-import QuestionaryEditorModel, { ActionType } from "./QuestionaryEditorModel";
+import QuestionaryEditorModel, { EventType } from "./QuestionaryEditorModel";
 import {
   Paper,
   makeStyles,
@@ -14,6 +14,7 @@ import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 export default function QuestionaryEditor() {
   var { persistModel } = usePersistModel();
   var { state, dispatch } = QuestionaryEditorModel([persistModel]);
+
   const [selectedField, setSelectedField] = React.useState<ProposalTemplateField | null>(null);
 
   const theme = useTheme();
@@ -43,7 +44,7 @@ export default function QuestionaryEditor() {
   const onDragEnd = (result: DropResult) => {
     if (result.type === "field") {
       dispatch({
-        type: ActionType.MOVE_ITEM,
+        type: EventType.REORDER_REQUESTED,
         payload: { source: result.source, destination: result.destination }
       });
     }

@@ -2,17 +2,24 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import { Topic, ProposalTemplateField } from "../model/ProposalModel";
-import { makeStyles, Grid, useTheme } from "@material-ui/core";
-import { ActionType } from "./QuestionaryEditorModel";
+import { Topic, ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  makeStyles,
+  Grid,
+  useTheme,
+  Menu,
+  Fade,
+  MenuItem
+} from "@material-ui/core";
+import { EventType, IEvent } from "./QuestionaryEditorModel";
+import AddRoundedIcon from "@material-ui/icons/AddRounded";
 
 export default function QuestionaryEditorTopic(props: {
   data: Topic;
-  dispatch: Function;
+  dispatch: React.Dispatch<IEvent>;
   index: number;
-  onItemClick: {(data:ProposalTemplateField):void}
+  onItemClick: { (data: ProposalTemplateField): void };
 }) {
-
   const theme = useTheme();
 
   const classes = makeStyles(theme => ({
@@ -37,13 +44,33 @@ export default function QuestionaryEditorTopic(props: {
       marginBottom: "16px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      background: "white"
+      background: "white",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
+    },
+    addQuestionMenuItem: {
+      minHeight: 0
+    },
+    addQuestionButton: {
+      cursor: "pointer"
     }
   }))();
 
   const { data, dispatch, index } = props;
   const [title, setTitle] = useState<string>(data.topic_title);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
+  const open = Boolean(anchorEl);
+
+  const onCreateNewFieldClicked = (dataType: DataType) => {
+    let newField = new ProposalTemplateField({ data_type: dataType });
+    dispatch({
+      type: EventType.CREATE_NEW_FIELD_REQUESTED,
+      payload: { newField, topicId: props.data.topic_id }
+    });
+    setAnchorEl(null);
+  };
 
   const getListStyle = (isDraggingOver: any) => ({
     background: isDraggingOver
@@ -65,7 +92,10 @@ export default function QuestionaryEditorTopic(props: {
       onChange={event => setTitle(event.target.value)}
       onBlur={() => {
         setIsEditMode(false);
-        dispatch({ type:ActionType.UPDATE_TOPIC_TITLE, payload:{ topicId:data.topic_id, title:title } })
+        dispatch({
+          type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
+          payload: { topicId: data.topic_id, title: title }
+        });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -101,11 +131,39 @@ export default function QuestionaryEditorTopic(props: {
         >
           <Grid
             item
-            xs={12}
+            xs={10}
             className={classes.topic}
             {...provided.dragHandleProps}
           >
             {titleJsx}
+          </Grid>
+          <Grid item xs={2}>
+            <AddRoundedIcon
+              onClick={(event: React.MouseEvent<SVGSVGElement>) =>
+                setAnchorEl(event.currentTarget)
+              }
+              className={classes.addQuestionButton}
+            />
+            <Menu
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={onCreateNewFieldClicked}
+              TransitionComponent={Fade}
+            >
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
+              >
+                Text
+              </MenuItem>
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
+              >
+                Embellishment
+              </MenuItem>
+            </Menu>
           </Grid>
 
           <Droppable droppableId={data.topic_id.toString()} type="field">

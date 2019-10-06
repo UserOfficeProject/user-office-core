@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ActionType, IAction } from "../components/QuestionaryEditorModel";
+import { EventType, IEvent } from "../components/QuestionaryEditorModel";
 import {
   ProposalTemplateField,
-  ProposalTemplate
+  ProposalTemplate,
+  DataType
 } from "../model/ProposalModel";
 
 export function usePersistModel() {
@@ -50,7 +51,7 @@ export function usePersistModel() {
     setIsLoading(false);
   };
 
-  const updateItem = async (field:ProposalTemplateField) => {
+  const updateItem = async (field: ProposalTemplateField) => {
     const mutation = `
     mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
@@ -62,8 +63,8 @@ export function usePersistModel() {
     }
     `;
     const variables = {
-      id:field.proposal_question_id,
-      question:field.question,
+      id: field.proposal_question_id,
+      question: field.question,
       config: field.config ? JSON.stringify(field.config) : undefined,
       isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
       dependencies: field.dependencies
@@ -74,13 +75,40 @@ export function usePersistModel() {
     setIsLoading(false);
   };
 
-  const persistModel = ({ getState }: { getState: () => ProposalTemplate }) => {
-    return (next: Function) => (action: IAction) => {
+
+  const createField = async (topicId:number, dataType: DataType) => {
+    const mutation = `
+    mutation($topicId:Int!, $dataType:String!) {
+      createTemplateField(topicId:$topicId, dataType:$dataType) {
+        field {
+          proposal_question_id
+          topic_id
+          data_type,
+          question
+        }
+        error
+      }
+    }
+    `;
+    const variables = {
+      topicId: topicId,
+      dataType: dataType
+    };
+
+    setIsLoading(true);
+    return sendRequest(mutation, variables).then(result => {
+      setIsLoading(false);
+      return result.createTemplateField;
+    })
+  };
+
+  const persistModel = ({ getState, dispatch }: { getState: () => ProposalTemplate, dispatch:React.Dispatch<IEvent> }) => {
+    return (next: Function) => (action: IEvent) => {
       next(action);
       const state = getState();
 
       switch (action.type) {
-        case ActionType.MOVE_ITEM:
+        case EventType.REORDER_REQUESTED:
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -103,20 +131,28 @@ export function usePersistModel() {
             );
           }
           break;
-        case ActionType.UPDATE_TOPIC_TITLE:
+        case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           updateTopic(action.payload.topicId, {
             title: action.payload.title as string
           });
           break;
-        case ActionType.UPDATE_ITEM:
-          let field:ProposalTemplateField = action.payload.field;
-          updateItem(field);
+        case EventType.UPDATE_FIELD_REQUESTED:
+          updateItem(action.payload.field as ProposalTemplateField);
+          break;
+        case EventType.CREATE_NEW_FIELD_REQUESTED:
+          createField(action.payload.topicId, (action.payload.newField as ProposalTemplateField).data_type).then(result => {
+            if(result.field) {
+              dispatch({type:EventType.FIELD_CREATED, payload:result.field})
+            }
+          });
           break;
         default:
           break;
       }
     };
   };
+
+
 
   return { isLoading, persistModel };
 }

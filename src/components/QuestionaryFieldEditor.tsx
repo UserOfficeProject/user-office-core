@@ -16,12 +16,12 @@ import JSDict from "../utils/Dictionary";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { TextField } from "formik-material-ui";
-import { IAction, ActionType } from "./QuestionaryEditorModel";
+import { IEvent, EventType } from "./QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
-  dispatch: React.Dispatch<IAction>;
+  dispatch: React.Dispatch<IEvent>;
   closeMe: Function;
 }) {
   const classes = makeStyles(() => ({
@@ -83,7 +83,7 @@ const TextFieldAdminComponent: AdminComponentSignature = props => {
         initialValues={field}
         onSubmit={async vals => {
           props.dispatch({
-            type: ActionType.UPDATE_ITEM,
+            type: EventType.UPDATE_FIELD_REQUESTED,
             payload: {
               field: { ...field, ...vals }
             }
@@ -184,7 +184,7 @@ const TextFieldAdminComponent: AdminComponentSignature = props => {
 type AdminComponentSignature = {
   (props: {
     field: ProposalTemplateField;
-    dispatch: React.Dispatch<IAction>;
+    dispatch: React.Dispatch<IEvent>;
     closeMe: Function;
   }): JSX.Element;
 };

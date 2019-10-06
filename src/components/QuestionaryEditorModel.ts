@@ -1,41 +1,46 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import { Reducer, useEffect } from "react";
-import { ProposalTemplate, ProposalTemplateField } from "../model/ProposalModel";
+import {
+  ProposalTemplate,
+  ProposalTemplateField
+} from "../model/ProposalModel";
 import produce from "immer";
 import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
-export enum ActionType {
+export enum EventType {
   READY,
-  MOVE_ITEM,
-  MOVE_TOPIC,
-  UPDATE_TOPIC_TITLE,
-  UPDATE_ITEM
+  REORDER_REQUESTED,
+  MOVE_TOPIC_REQUESTED,
+  UPDATE_TOPIC_TITLE_REQUESTED,
+  UPDATE_FIELD_REQUESTED,
+  CREATE_NEW_FIELD_REQUESTED,
+  FIELD_CREATED
 }
 
-export interface IAction {
-  type: ActionType;
+export interface IEvent {
+  type: EventType;
   payload: any;
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const blankInitTemplate = new ProposalTemplate();
   const [state, dispatch] = useReducerWithMiddleWares<
-    Reducer<ProposalTemplate, IAction>
+    Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
   const { proposalTemplate } = useProposalQuestionTemplate();
 
   useEffect(() => {
     if (proposalTemplate) {
-      dispatch({ type: ActionType.READY, payload: proposalTemplate });
+      dispatch({ type: EventType.READY, payload: proposalTemplate });
     }
   }, [proposalTemplate, dispatch]);
 
-  function reducer(state: ProposalTemplate, action: IAction): ProposalTemplate {
+  function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
       switch (action.type) {
-        case ActionType.READY:
+        case EventType.READY:
           return action.payload;
-        case ActionType.MOVE_ITEM:
+        case EventType.REORDER_REQUESTED:
           if (!action.payload.destination) {
             return draft;
           }
@@ -60,13 +65,17 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           );
 
           return draft;
-        case ActionType.UPDATE_TOPIC_TITLE:
+        case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           draft.getTopicById(action.payload.topicId)!.topic_title =
             action.payload.title;
           return draft;
-        case ActionType.UPDATE_ITEM:
-          const field:ProposalTemplateField = action.payload.field;
+        case EventType.UPDATE_FIELD_REQUESTED:
+          const field: ProposalTemplateField = action.payload.field;
           Object.assign(draft.getFieldById(field.proposal_question_id), field);
+          return draft;
+        case EventType.FIELD_CREATED:
+          const newField: ProposalTemplateField = action.payload;
+          draft.addField(newField);
           return draft;
       }
     });

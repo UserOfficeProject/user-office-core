@@ -9,10 +9,11 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 import TextFieldsIcon from "@material-ui/icons/TextFields";
 import LockIcon from "@material-ui/icons/Lock";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
+import { IEvent } from "./QuestionaryEditorModel";
 
 export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
-  dispatch: Function;
+  dispatch: React.Dispatch<IEvent>;
   index: number;
   onClick: {(data:ProposalTemplateField):void}
 }) {
