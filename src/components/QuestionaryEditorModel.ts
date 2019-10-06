@@ -1,6 +1,6 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
 import { Reducer, useEffect } from "react";
-import { ProposalTemplate } from "../model/ProposalModel";
+import { ProposalTemplate, ProposalTemplateField } from "../model/ProposalModel";
 import produce from "immer";
 import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
@@ -17,14 +17,11 @@ export interface IAction {
   payload: any;
 }
 
-
-export default function QuestionaryEditorModel(middlewares?:Array<Function>) {
+export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const blankInitTemplate = new ProposalTemplate();
-  const [state, dispatch] = useReducerWithMiddleWares<Reducer<ProposalTemplate, IAction>>(
-    reducer,
-    blankInitTemplate,
-    middlewares || []
-  );
+  const [state, dispatch] = useReducerWithMiddleWares<
+    Reducer<ProposalTemplate, IAction>
+  >(reducer, blankInitTemplate, middlewares || []);
   const { proposalTemplate } = useProposalQuestionTemplate();
 
   useEffect(() => {
@@ -64,7 +61,12 @@ export default function QuestionaryEditorModel(middlewares?:Array<Function>) {
 
           return draft;
         case ActionType.UPDATE_TOPIC_TITLE:
-          draft.getTopicById(action.payload.topicId)!.topic_title = action.payload.title;
+          draft.getTopicById(action.payload.topicId)!.topic_title =
+            action.payload.title;
+          return draft;
+        case ActionType.UPDATE_ITEM:
+          const field:ProposalTemplateField = action.payload.field;
+          Object.assign(draft.getFieldById(field.proposal_question_id), field);
           return draft;
       }
     });
