@@ -82,9 +82,10 @@ export function usePersistModel() {
       createTemplateField(topicId:$topicId, dataType:$dataType) {
         field {
           proposal_question_id
-          topic_id
           data_type,
           question
+          config,
+          topic_id
         }
         error
       }
@@ -142,7 +143,7 @@ export function usePersistModel() {
         case EventType.CREATE_NEW_FIELD_REQUESTED:
           createField(action.payload.topicId, (action.payload.newField as ProposalTemplateField).data_type).then(result => {
             if(result.field) {
-              dispatch({type:EventType.FIELD_CREATED, payload:result.field})
+              dispatch({type:EventType.FIELD_CREATED, payload:new ProposalTemplateField(result.field)})
             }
           });
           break;
