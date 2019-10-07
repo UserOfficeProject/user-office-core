@@ -9,15 +9,14 @@ import {
   Backdrop,
   Fade
 } from "@material-ui/core";
-import {
-  ProposalTemplateField,
-  DataType} from "../model/ProposalModel";
+import { ProposalTemplateField, DataType } from "../model/ProposalModel";
 import JSDict from "../utils/Dictionary";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { TextField } from "formik-material-ui";
 import { IEvent, EventType } from "./QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
+import { Editor } from "@tinymce/tinymce-react";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
@@ -39,6 +38,7 @@ export default function QuestionaryFieldEditor(props: {
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
   componentMap.put(DataType.TEXT_INPUT, TextFieldAdminComponent);
+  componentMap.put(DataType.EMBELLISHMENT, EmbellishmentAdminComponent);
 
   if (props.field === null) {
     return <span>Prepearing...</span>;
@@ -101,7 +101,7 @@ const TextFieldAdminComponent: AdminComponentSignature = props => {
           })
         })}
       >
-        {props => (
+        {formikProps => (
           <Form>
             <Typography>Text input</Typography>
 
@@ -117,7 +117,7 @@ const TextFieldAdminComponent: AdminComponentSignature = props => {
 
             <Field
               name="config.required"
-              checked={props.values.config.required}
+              checked={formikProps.values.config.required}
               component={CustomCheckbox}
               label="Is required"
               margin="normal"
@@ -157,12 +157,79 @@ const TextFieldAdminComponent: AdminComponentSignature = props => {
 
             <Field
               name="config.multiline"
-              checked={props.values.config.multiline}
+              checked={formikProps.values.config.multiline}
               component={CustomCheckbox}
               label="Multiple line"
               margin="normal"
               fullWidth
               data-cy="multiline"
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              data-cy="submit"
+            >
+              Save
+            </Button>
+          </Form>
+        )}
+      </Formik>
+    </>
+  );
+};
+
+const EmbellishmentAdminComponent: AdminComponentSignature = props => {
+  const field = props.field;
+
+  return (
+    <>
+      <Formik
+        initialValues={field}
+        onSubmit={async vals => {
+          props.dispatch({
+            type: EventType.UPDATE_FIELD_REQUESTED,
+            payload: {
+              field: { ...field, ...vals }
+            }
+          });
+          props.closeMe();
+        }}
+        validationSchema={Yup.object().shape({
+          config: Yup.object({
+            html: Yup.string().required("Content is required"),
+            plain: Yup.string().required("Plain description is required")
+          })
+        })}
+      >
+        {formikProps => (
+          <Form>
+            <Typography>Embellishment</Typography>
+
+            <Field
+              name="config.html"
+              value={formikProps.values.config.html}
+              label="Content"
+              type="text"
+              component={CustomEditor}
+              margin="normal"
+              fullWidth
+              data-cy="max"
+              onEditorChange={(content: string) => {
+                formikProps.setFieldValue("config.html", content);
+              }}
+            />
+
+            <Field
+              name="config.plain"
+              label="Plan description"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
             />
 
             <Button
@@ -188,12 +255,52 @@ type AdminComponentSignature = {
     closeMe: Function;
   }): JSX.Element;
 };
-// @ts-ignore
-const CustomCheckbox = ({ field, checked, label }) => {
+
+const CustomCheckbox = ({
+  field,
+  checked,
+  label
+}: {
+  field: any;
+  checked: boolean;
+  label: string;
+}) => {
   return (
     <FormControlLabel
       control={<Checkbox {...field} checked={checked} color="primary" />}
       label={label}
     />
   );
-}
+};
+
+const CustomEditor = ({
+  field,
+  value,
+  label,
+  onEditorChange
+}: {
+  field: any;
+  value: string;
+  label: string;
+  onEditorChange: (content: string) => void;
+}) => {
+  return (
+    <FormControlLabel
+      control={
+        <Editor
+          initialValue={value}
+          init={{
+            skin: false,
+            content_css: false,
+            plugins: ["link", "preview", "image", "code"],
+            toolbar: "bold italic",
+            branding: false
+          }}
+          onEditorChange={content => onEditorChange(content)}
+          {...field}
+        />
+      }
+      label={label}
+    />
+  );
+};

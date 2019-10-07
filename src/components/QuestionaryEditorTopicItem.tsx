@@ -94,14 +94,7 @@ export default function QuestionaryEditorTopicItem(props: {
         return null;
     }
   };
-
-  const sanitizeEmbellishment = (input: string | undefined) => {
-    if (!input) {
-      return "<No content>";
-    }
-    return input.replace(/<[^>]+>/g, "");
-  };
-
+  
   const dependencies = props.data.dependencies;
   const dependenciesJsx =
     dependencies && dependencies.length > 0 ? (
@@ -145,7 +138,7 @@ export default function QuestionaryEditorTopicItem(props: {
 
           <Grid item xs={10} className={classes.question}>
             {props.data.data_type === DataType.EMBELLISHMENT
-              ? sanitizeEmbellishment(props.data.config.html)
+              ? props.data.config.plain
               : props.data.question}
           </Grid>
           
