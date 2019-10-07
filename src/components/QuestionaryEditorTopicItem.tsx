@@ -109,7 +109,7 @@ export default function QuestionaryEditorTopicItem(props: {
         <LockIcon className={classes.lockIcon} />
         <ul>
           {dependencies.map(dep => {
-            return <li>{dep.proposal_question_dependency}</li>;
+            return <li key={dep.proposal_question_id + dep.proposal_question_dependency}>{dep.proposal_question_dependency}</li>;
           })}
         </ul>
       </>

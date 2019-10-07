@@ -74,9 +74,9 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           Object.assign(draft.getFieldById(field.proposal_question_id), field);
           return draft;
         case EventType.FIELD_CREATED:
-          const newField: ProposalTemplateField = action.payload;
+         const newField: ProposalTemplateField = action.payload;
           draft.addField(newField);
-          return draft;
+          return new ProposalTemplate(draft);
       }
     });
   }

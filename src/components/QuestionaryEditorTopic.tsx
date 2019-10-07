@@ -54,6 +54,10 @@ export default function QuestionaryEditorTopic(props: {
     },
     addQuestionButton: {
       cursor: "pointer"
+    },
+    addIcon: {
+      textAlign:"right",
+      paddingRight:"8px"
     }
   }))();
 
@@ -109,7 +113,7 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(true);
       }}
     >
-      {props.data.topic_title}
+      {index + 2 }. {props.data.topic_title}
     </span>
   );
   return (
@@ -135,9 +139,9 @@ export default function QuestionaryEditorTopic(props: {
             className={classes.topic}
             {...provided.dragHandleProps}
           >
-            {titleJsx}
+             {titleJsx}
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={2} className={classes.addIcon}>
             <AddRoundedIcon
               onClick={(event: React.MouseEvent<SVGSVGElement>) =>
                 setAnchorEl(event.currentTarget)
@@ -181,6 +185,7 @@ export default function QuestionaryEditorTopic(props: {
                     data={item}
                     dispatch={dispatch}
                     onClick={props.onItemClick}
+                    key={item.proposal_question_id.toString()}
                   />
                 ))}
                 {provided.placeholder}
