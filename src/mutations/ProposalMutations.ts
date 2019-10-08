@@ -290,7 +290,10 @@ export default class ProposalMutations {
       return rejection("NOT_AUTHORIZED");
     }
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
-    const config: object = {};
+    const config:any = {};
+    if(dataType === DataType.FILE_UPLOAD) {
+      config.file_type = [];
+    }
     return (
       (await this.dataSource.createTemplateField(
         newFieldId,
