@@ -1,40 +1,40 @@
-import React from 'react'
+import React from "react";
 import { TextField } from "formik-material-ui";
-import { MenuItem } from '@material-ui/core';
+import { MenuItem } from "@material-ui/core";
 import { Field } from "formik";
 
 
 class FormikDropdown extends React.Component<TProps> {
-    render() {
-        return (
-          <Field
-          type="text"
-          name={this.props.name}
-          label={this.props.label}
-          select
-          margin="normal"
-          component={TextField}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          fullWidth
-        >
-          {this.props.items.map(option => {
-            return (
-              <MenuItem key={option.value} value={option.value}>
-                {option.text}
-              </MenuItem>
-              );
-          })}
-        </Field>
-        );
-    }
+  render() {
+    return (
+      <Field
+        type="text"
+        name={this.props.name}
+        label={this.props.label}
+        select
+        margin="normal"
+        component={TextField}
+        InputLabelProps={{
+          shrink: true
+        }}
+        fullWidth
+      >
+        {this.props.items.map(option => {
+          return (
+            <MenuItem key={option.value} value={option.value}>
+              {option.text}
+            </MenuItem>
+          );
+        })}
+      </Field>
+    );
+  }
 }
 
-interface TProps { 
-    items: Option[];
-    name: string;
-    label: string;
+interface TProps {
+  items: Option[];
+  name: string;
+  label: string;
 }
 
 interface Option {

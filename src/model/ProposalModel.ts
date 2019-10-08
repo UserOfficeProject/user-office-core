@@ -157,7 +157,7 @@ export interface FieldConfig {
   small_label?:string;
   required?: boolean;
   options?:string[];
-  file_type?:string;
+  file_type?:string[];
   max_files?:number;
   multiline?:boolean;
   min?:number;

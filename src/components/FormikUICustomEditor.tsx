@@ -6,10 +6,10 @@ export const FormikUICustomEditor = ({
   form,
   ...props
 }: {
-  initialValue: string;
-  field:{name:string, onBlur:Function, onChange:Function, value:string},
-  form:FormikActions<any>
-  onEditorChange: (content: string) => void;
+  field: { name: string; onBlur: Function; onChange: Function; value: string };
+  form: FormikActions<any>;
 }) => {
-  return <Editor initialValue={field.value} {...props} onEditorChange={content => form.setFieldValue(field.name, content)} />;
+  return (
+    <Editor initialValue={field.value} {...props} onEditorChange={content => form.setFieldValue(field.name, content)} />
+  );
 };

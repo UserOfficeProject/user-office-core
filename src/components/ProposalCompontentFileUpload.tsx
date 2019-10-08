@@ -19,7 +19,7 @@ export class ProposalCompontentFileUpload extends React.Component<IBasicComponen
         <FileUploadComponent 
         maxFiles={config.max_files} 
         id={templateField.proposal_question_id} 
-        fileType={config.file_type}
+        fileType={config.file_type ? config.file_type.join(',') : ""}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           templateField.value = evt.target.value;
           handleChange(evt); // letting Formik know that there was a change
