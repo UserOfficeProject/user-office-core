@@ -4,9 +4,8 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import {
-  AdminComponentSignature,
-  CustomEditor
-} from "./QuestionaryFieldEditor";
+  AdminComponentSignature} from "./QuestionaryFieldEditor";
+import { FormikUICustomEditor } from "./FormikUICustomEditor";
 import * as Yup from "yup";
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
@@ -40,17 +39,19 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
 
             <Field
               name="config.html"
-              initialValue={formikProps.values.config.html}
-              label="Content"
               type="text"
-              component={CustomEditor}
+              component={FormikUICustomEditor}
               margin="normal"
               fullWidth
-              data-cy="max"
-              onEditorChange={(newValue: string) => {
-                formikProps.setFieldValue("config.html", newValue);
+              init={{
+                skin: false,
+                content_css: false,
+                plugins: ["link", "preview", "image", "code"],
+                toolbar: "bold italic",
+                branding: false
               }}
-            />
+              data-cy="html"
+              />
 
             <Field
               name="config.plain"

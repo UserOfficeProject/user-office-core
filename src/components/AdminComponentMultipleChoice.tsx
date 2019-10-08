@@ -3,7 +3,8 @@ import { Typography, Button } from "@material-ui/core";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
-import { AdminComponentSignature, CustomCheckbox, CustomTable } from "./QuestionaryFieldEditor";
+import { AdminComponentSignature, CustomCheckbox } from "./QuestionaryFieldEditor";
+import { FormikUICustomTable } from "./FormikUICustomTable";
 import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
 
@@ -57,16 +58,15 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
             <Field
               name="config.options"
               label="Options"
-              component={CustomTable}
+              component={FormikUICustomTable}
               columns={[{ title: "Answer", field: "answer" }]}
-              value={formikProps.values.config.options!.map(option => {
-                return { answer: option };
-              })}
-              onTableChange={(list: any[]) => {
-                const options = list.map(row => {
-                  return row.answer;
-                });
-                formikProps.setFieldValue("config.options", options);
+              dataTransforms = {{
+                toTable:(options:string[]) => {
+                  return options.map(option => { return { answer: option }})
+                },
+                fromTable:(rows:any[]) => {
+                  return rows.map(row => row.answer)
+                }
               }}
               margin="normal"
               fullWidth
