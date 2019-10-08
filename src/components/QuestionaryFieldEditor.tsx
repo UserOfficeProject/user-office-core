@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  FormControlLabel,
-  Checkbox,
-  Modal,
-  Backdrop,
-  Fade
-} from "@material-ui/core";
+import { Grid, FormControlLabel, Checkbox, Modal, Backdrop, Fade } from "@material-ui/core";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
 import JSDict from "../utils/Dictionary";
 import { IEvent } from "./QuestionaryEditorModel";
@@ -17,6 +10,7 @@ import { AdminComponentTextInput } from "./AdminComponentTextInput";
 import { AdminComponentMultipleChoice } from "./AdminComponentMultipleChoice";
 import MaterialTable from "material-table";
 import { AdminComponentBoolean } from "./AdminComponentBoolean";
+import { AdminComponentFileUpload } from "./AdminComponentFileUpload";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
@@ -41,6 +35,7 @@ export default function QuestionaryFieldEditor(props: {
   componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
   componentMap.put(DataType.SELECTION_FROM_OPTIONS, AdminComponentMultipleChoice);
   componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
+  componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
 
   if (props.field === null) {
     return null;
@@ -77,105 +72,78 @@ export default function QuestionaryFieldEditor(props: {
 }
 
 export type AdminComponentSignature = {
-  (props: {
-    field: ProposalTemplateField;
-    dispatch: React.Dispatch<IEvent>;
-    closeMe: Function;
-  }): JSX.Element;
+  (props: { field: ProposalTemplateField; dispatch: React.Dispatch<IEvent>; closeMe: Function }): JSX.Element;
 };
 
-export const CustomCheckbox = ({
-  field,
-  checked,
-  label
+export const CustomCheckbox = ({ field, checked, label }: { field: any; checked: boolean; label: string }) => {
+  return <FormControlLabel control={<Checkbox {...field} checked={checked} color="primary" />} label={label} />;
+};
+
+export const CustomEditor = ({
+  initialValue,
+  onEditorChange
 }: {
-  field: any;
-  checked: boolean;
-  label: string;
+  initialValue: string;
+  onEditorChange: (content: string) => void;
 }) => {
   return (
-    <FormControlLabel
-      control={<Checkbox {...field} checked={checked} color="primary" />}
-      label={label}
+    <Editor
+      initialValue={initialValue}
+      init={{
+        skin: false,
+        content_css: false,
+        plugins: ["link", "preview", "image", "code"],
+        toolbar: "bold italic",
+        branding: false
+      }}
+      onEditorChange={content => onEditorChange(content)}
     />
   );
 };
 
-export const CustomEditor = ({
-  field,
-  value,
-  label,
-  onEditorChange
-}: {
-  field: any;
-  value: string;
-  label: string;
-  onEditorChange: (content: string) => void;
-}) => {
-  return (
-        <Editor
-          initialValue={value}
-          init={{
-            skin: false,
-            content_css: false,
-            plugins: ["link", "preview", "image", "code"],
-            toolbar: "bold italic",
-            branding: false
-          }}
-          onEditorChange={content => onEditorChange(content)}
-          {...field}
-        />
-  );
-};
-
 export const CustomTable = ({
-  field,
+  columns,
   value,
   onTableChange
 }: {
-  field: any;
-  value: [];
-  onTableChange: (list: string[]) => void;
+  columns: { title: string; field: string }[];
+  value: any[];
+  onTableChange: (list: Array<any>) => void;
 }) => {
-
-  
-  const columns = [
-    { title: "Answer", field: "value" }
-  ];
-  const [state, setState] = React.useState(value.map((val:string) => { return {value:val} } ));
+  const [state, setState] = React.useState(value);
 
   return (
     <MaterialTable
       title={""}
       // @ts-ignore
       columns={columns}
-      data={ state }
+      data={state}
       editable={{
         onRowAdd: newData =>
           new Promise(resolve => {
             const data = [...state];
             data.push(newData);
-            setState( data );
-            onTableChange(data.map(val => val.value))
+            setState(data);
+            onTableChange(value);
             resolve();
           }),
         onRowUpdate: (newData, oldData) =>
           new Promise(resolve => {
             const data = [...state];
-              data[data.indexOf(oldData!)] = newData;
-              setState(data);
-              onTableChange(data.map(val => val.value))
-              resolve();
+            data[data.indexOf(oldData!)] = newData;
+            setState(data);
+            onTableChange(data);
+            resolve();
           }),
         onRowDelete: oldData =>
           new Promise(resolve => {
             const data = [...state];
-              data.splice(data.indexOf(oldData), 1);
-              setState(data);
-              onTableChange(data.map(val => val.value))
-              resolve();
-          }),
+            data.splice(data.indexOf(oldData), 1);
+            setState(data);
+            onTableChange(data);
+            resolve();
+          })
       }}
     />
   );
-}
+};

@@ -3,11 +3,7 @@ import { Typography, Button } from "@material-ui/core";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
-import {
-  AdminComponentSignature,
-  CustomCheckbox,
-  CustomTable
-} from "./QuestionaryFieldEditor";
+import { AdminComponentSignature, CustomCheckbox, CustomTable } from "./QuestionaryFieldEditor";
 import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
 
@@ -35,7 +31,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
         })}
       >
         {formikProps => (
-          <Form style={{flexGrow:1}}>
+          <Form style={{ flexGrow: 1 }}>
             <Typography>Select from options</Typography>
 
             <Field
@@ -61,31 +57,30 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
             <Field
               name="config.options"
               label="Options"
-              value={formikProps.values.config.options}
               component={CustomTable}
-              onTableChange = {(list:string[]) => formikProps.setFieldValue("config.options", list)}
+              columns={[{ title: "Answer", field: "answer" }]}
+              value={formikProps.values.config.options!.map(option => {
+                return { answer: option };
+              })}
+              onTableChange={(list: any[]) => {
+                const options = list.map(row => {
+                  return row.answer;
+                });
+                formikProps.setFieldValue("config.options", options);
+              }}
               margin="normal"
               fullWidth
               data-cy="options"
             />
 
             <FormikDropdown
-                name="config.variant"
-                label="Variant"
-                items={[
-                  { text: "Radio", value: "radio" },
-                  { text: "Dropdown", value: "dropdown" },
-                ]}
-                data-cy="variant"
-              />
+              name="config.variant"
+              label="Variant"
+              items={[{ text: "Radio", value: "radio" }, { text: "Dropdown", value: "dropdown" }]}
+              data-cy="variant"
+            />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              data-cy="submit"
-            >
+            <Button type="submit" fullWidth variant="contained" color="primary" data-cy="submit">
               Save
             </Button>
           </Form>
