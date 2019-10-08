@@ -51,4 +51,14 @@ export class UserAuthorization {
       return reviews.some(review => review.proposalID === proposalID);
     });
   }
+  async hasAccessRights(
+    agent: User | null,
+    proposal: Proposal
+  ): Promise<boolean> {
+    return (
+      (await this.isUserOfficer(agent)) ||
+      (await this.isMemberOfProposal(agent, proposal)) ||
+      (await this.isReviewerOfProposal(agent, proposal.id))
+    );
+  }
 }
