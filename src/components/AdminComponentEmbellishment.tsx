@@ -9,7 +9,10 @@ import {
 } from "./QuestionaryFieldEditor";
 import * as Yup from "yup";
 
-export const EmbellishmentAdminComponent: AdminComponentSignature = props => {
+export const AdminComponentEmbellishment: AdminComponentSignature = props => {
+
+  
+  
   const field = props.field;
   return (
     <>
@@ -32,7 +35,7 @@ export const EmbellishmentAdminComponent: AdminComponentSignature = props => {
         })}
       >
         {formikProps => (
-          <Form>
+          <Form style={{flexGrow:1}}>
             <Typography>Embellishment</Typography>
 
             <Field
@@ -51,7 +54,7 @@ export const EmbellishmentAdminComponent: AdminComponentSignature = props => {
 
             <Field
               name="config.plain"
-              label="Plan description"
+              label="Plain description"
               type="text"
               component={TextField}
               margin="normal"
