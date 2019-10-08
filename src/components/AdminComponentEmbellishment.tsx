@@ -40,15 +40,15 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
 
             <Field
               name="config.html"
-              value={formikProps.values.config.html}
+              initialValue={formikProps.values.config.html}
               label="Content"
               type="text"
               component={CustomEditor}
               margin="normal"
               fullWidth
               data-cy="max"
-              onEditorChange={(content: string) => {
-                formikProps.setFieldValue("config.html", content);
+              onEditorChange={(newValue: string) => {
+                formikProps.setFieldValue("config.html", newValue);
               }}
             />
 
