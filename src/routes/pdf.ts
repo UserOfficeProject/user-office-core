@@ -122,7 +122,10 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === "EMBELLISHMENT") {
-          writeBold("---- Here will be user set embellishment text ----");
+          doc
+            .fontSize(17)
+            .font("Times-Bold")
+            .text(field.config.plain);
         } else if (field.data_type === "FILE_UPLOAD") {
           writeBold(field.question);
           if (field.value != "") {

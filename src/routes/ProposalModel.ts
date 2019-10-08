@@ -162,6 +162,7 @@ export interface FieldConfig {
   max?: number;
   placeholder?: string;
   html?: string;
+  plain?: string;
 }
 
 export interface ProposalInformation {
