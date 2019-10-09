@@ -134,10 +134,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     question_id: string,
     files: string[]
   ): Promise<string[] | null> {
-    
-    const answerId= await this.getAnswerId(proposal_id, question_id);
-    if(!answerId)
-    {
+    const answerId = await this.getAnswerId(proposal_id, question_id);
+    if (!answerId) {
       return null;
     }
 
@@ -151,11 +149,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async deleteFiles(
     proposal_id: number,
     question_id: string
-  ): Promise<Boolean | null> 
-  {
+  ): Promise<Boolean | null> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
-    if(!answerId)
-    {
+    if (!answerId) {
       return null;
     }
 
@@ -166,12 +162,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  
-
-  
-
-  private async getAnswerId(proposal_id:number, question_id:string):Promise<number | null> {
-   const selectResult = await database
+  private async getAnswerId(
+    proposal_id: number,
+    question_id: string
+  ): Promise<number | null> {
+    const selectResult = await database
       .from("proposal_answers")
       .where({
         proposal_id: proposal_id,
@@ -183,7 +178,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       return null;
     }
 
-    return selectResult[0].answer_id; 
+    return selectResult[0].answer_id;
   }
 
   async update(proposal: Proposal): Promise<Proposal | null> {
@@ -266,6 +261,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where("pc.user_id", id)
       .orWhere("p.proposer_id", id)
+      .groupBy("p.proposal_id")
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => this.createProposalObject(proposal))
       );
@@ -298,9 +294,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new ProposalTemplate(topics);
   }
 
-  async getProposalAnswers(proposalId:number): Promise<ProposalAnswer[]> {
+  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return await database("proposal_answers")
       .where("proposal_id", proposalId)
-      .select('proposal_question_id', 'answer as value'); // TODO rename the column
+      .select("proposal_question_id", "answer as value"); // TODO rename the column
   }
 }
