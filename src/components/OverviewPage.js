@@ -4,8 +4,9 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposalTableUser from "./ProposalTableUser";
-import clsx from "clsx";
 import { UserContext } from "../context/UserContextProvider";
+import { useGetPageContent } from "../hooks/useGetPageContent";
+import parse from "html-react-parser";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -17,31 +18,26 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column"
-  },
-  fixedHeight: {
-    height: 240
   }
 }));
 
 export default function OverviewPage() {
   const classes = useStyles();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const { user } = useContext(UserContext);
-
+  const [loadingHomeContent, homePageContent] = useGetPageContent("HOMEPAGE");
   return (
     <React.Fragment>
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
-              <ProposalTableUser id={user.id} />
+              {loadingHomeContent ? null : parse(homePageContent)}
             </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Paper className={fixedHeightPaper}>Upcoming visits</Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper className={fixedHeightPaper}>Actions to be done</Paper>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <ProposalTableUser id={user.id} />
+            </Paper>
           </Grid>
         </Grid>
       </Container>

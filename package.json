@@ -5,21 +5,28 @@
   "dependencies": {
     "@material-ui/core": "^4.0.1",
     "@material-ui/icons": "^4.0.1",
+    "@tinymce/tinymce-react": "^3.3.2",
+    "@types/yup": "^0.26.23",
+    "clsx": "^1.0.4",
     "dateformat": "^3.0.3",
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
     "express-http-proxy": "^1.5.1",
-    "formik": "^1.5.7",
+    "formik": "^1.5.8",
     "formik-material-ui": "0.0.18",
     "graphql-request": "^1.8.2",
+    "html-react-parser": "^0.9.1",
+    "http-proxy-middleware": "^0.20.0",
     "jsonwebtoken": "^8.5.1",
     "material-table": "^1.40.0",
     "path": "^0.12.7",
     "react": "^16.8.6",
+    "react-cookie": "^4.0.1",
     "react-dom": "^16.8.6",
     "react-router": "^5.0.0",
     "react-router-dom": "^5.0.0",
     "react-scripts": "3.0.1",
+    "tinymce": "^5.0.15",
     "typescript": "3.5.3",
     "yup": "^0.27.0"
   },
@@ -29,7 +36,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start": "node server.js"
+    "start": "node server.js",
+    "cypress:open": "cypress open",
+    "cy:run": "cypress run"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -55,6 +64,8 @@
     "@types/react-router-dom": "^4.3.4",
     "@types/yup": "^0.26.22",
     "@types/react-test-renderer": "^16.8.3",
-    "react-test-renderer": "^16.8.6"
+    "cypress": "^3.4.1",
+    "react-test-renderer": "^16.8.6",
+    "faker": "^4.1.0"
   }
 }

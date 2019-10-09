@@ -5,9 +5,11 @@ import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import NoteAdd from "@material-ui/icons/NoteAdd";
 import People from "@material-ui/icons/People";
+import Help from "@material-ui/icons/Help";
 import FolderOpen from "@material-ui/icons/FolderOpen";
 import ExitToApp from "@material-ui/icons/ExitToApp";
 import CalendarToday from "@material-ui/icons/CalendarToday";
+import SettingsApplications from "@material-ui/icons/SettingsApplications";
 import { Link } from "react-router-dom";
 import { useCallsData } from "../hooks/useCallsData";
 
@@ -46,6 +48,12 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="New Proposal" />
       </ListItem>
+      <ListItem component={Link} to="/HelpPage" button>
+        <ListItemIcon>
+          <Help />
+        </ListItemIcon>
+        <ListItemText primary="Help" />
+      </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
           <ExitToApp />
@@ -75,6 +83,12 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="View People" />
       </ListItem>
+      <ListItem component={Link} to="/PageEditor" button>
+        <ListItemIcon>
+          <SettingsApplications />
+        </ListItemIcon>
+        <ListItemText primary="Edit Pages" />
+      </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
           <ExitToApp />
@@ -91,7 +105,7 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={Link} to="/LogOut" button>
+      <ListItem component={Link} to="/LogOut" button data-cy="logout">
         <ListItemIcon>
           <ExitToApp />
         </ListItemIcon>

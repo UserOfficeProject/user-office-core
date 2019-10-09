@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
-import Button from "@material-ui/core/Button";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { useDataAPI } from "../hooks/useDataAPI";
 
 const useStyles = makeStyles({
   errorText: {
@@ -23,45 +21,16 @@ const useStyles = makeStyles({
 export default function ProposalParticipants(props) {
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
-  const [users, setUsers] = useState(props.data.users || []);
-  const [userError, setUserError] = useState(false);
-  const sendRequest = useDataAPI();
-  const sendProposalUpdate = () => {
-    const query = `
-      mutation($id: ID!, $users: [Int!]) {
-        updateProposal(id: $id, users: $users){
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
-
-    const variables = {
-      id: props.data.id,
-      users: users.map(user => user.id)
-    };
-    sendRequest(query, variables).then(data => props.next({ users }));
-  };
 
   const addUser = user => {
-    setUsers([...users, user]);
+    props.setUsers([...props.users, user]);
     setOpen(false);
   };
 
   const removeUser = user => {
-    let newUsers = [...users];
+    let newUsers = [...props.users];
     newUsers.splice(newUsers.indexOf(user), 1);
-    setUsers(newUsers);
-  };
-
-  const handleNext = () => {
-    if (users.length < 1) {
-      setUserError(true);
-    } else {
-      sendProposalUpdate();
-    }
+    props.setUsers(newUsers);
   };
 
   const openModal = rowData => {
@@ -69,7 +38,7 @@ export default function ProposalParticipants(props) {
   };
 
   return (
-    <React.Fragment>
+    <form>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
@@ -80,30 +49,15 @@ export default function ProposalParticipants(props) {
         actionIcon={<Add />}
         action={openModal}
         isFreeAction={true}
-        data={users}
+        data={props.users}
         search={false}
         onRemove={removeUser}
       />
-      {userError && (
+      {props.error && (
         <p className={classes.errorText}>
           You need to add at least one Co-Proposer
         </p>
       )}
-      {props.back ? (
-        <div className={classes.buttons}>
-          <Button onClick={props.back} className={classes.button}>
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleNext}
-            className={classes.button}
-          >
-            Next
-          </Button>
-        </div>
-      ) : null}
-    </React.Fragment>
+    </form>
   );
 }

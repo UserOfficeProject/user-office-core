@@ -31,7 +31,6 @@ class FormikDropdown extends React.Component<TProps> {
     }
 }
 
-
 interface TProps { 
     items: Option[];
     name: string;
@@ -44,7 +43,3 @@ interface Option {
 }
 
 export default FormikDropdown;
-
-/*
-
-        */
