@@ -4,7 +4,9 @@ import {
   ProposalTemplate,
   ProposalTemplateField,
   DataType,
-  FieldDependency
+  FieldDependency,
+  Topic,
+  ProposalAnswer
 } from "../../models/Proposal";
 
 export const dummyProposal = new Proposal(
@@ -27,7 +29,34 @@ export const dummyProposalSubmitted = new Proposal(
   "2019-07-17 08:25:12.23043+00"
 );
 
+export const dummyAnswers: Array<ProposalAnswer> = [
+  { 
+    proposal_question_id: "has_references", 
+    data_type: DataType.BOOLEAN,
+    value: "true" 
+  },
+  {
+    proposal_question_id: "fasta_seq",
+    data_type: DataType.TEXT_INPUT,
+    value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+  }
+];
+
 export class proposalDataSource implements ProposalDataSource {
+  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
+    return dummyAnswers;
+  }
+  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
+    return files;
+  }
+  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {
+    return true;
+  }
+  
+  
+  async updateAnswer(proposal_id:number, question_id: string, answer: string): Promise<Boolean> {
+    return true;
+  }
   async checkActiveCall(): Promise<Boolean> {
     return true;
   }
@@ -37,13 +66,16 @@ export class proposalDataSource implements ProposalDataSource {
       "hasLinksToField",
       DataType.SELECTION_FROM_OPTIONS,
       "Has any links to field?",
+      1,
       { variant: "radio", options: ["yes", "no"] },
       null
     );
+
     var linksToField = new ProposalTemplateField(
       "linksToField",
-      DataType.SMALL_TEXT,
+      DataType.TEXT_INPUT,
       "Please specify",
+      1,
       null,
       [
         new FieldDependency(
@@ -53,7 +85,7 @@ export class proposalDataSource implements ProposalDataSource {
         )
       ]
     );
-    return new ProposalTemplate([hasLinksToField, linksToField]);
+    return new ProposalTemplate([new Topic(1, 'General information', [hasLinksToField, linksToField])]);
   }
 
   async submitReview(
@@ -107,7 +139,7 @@ export class proposalDataSource implements ProposalDataSource {
     return null;
   }
 
-  async create() {
+  async create(proposerID:number) {
     return dummyProposal;
   }
 

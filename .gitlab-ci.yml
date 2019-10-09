@@ -2,27 +2,25 @@ image: node:7
 
 stages:
   - test
-  - deploy
+  - build
 
 test:
   stage: test
   script:
-    - npm prune
-    - npm update -q
+    - npm install
     - NODE_ENV=ci npm run test
   tags:
     - docker
-    
-deploy_staging:
-  stage: deploy
-  image: ruby:latest
+
+docker build:
+  image: docker:stable
+  stage: build
   script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=duo2-backend-staging --api-key=$HEROKU_API_KEY
-  only:
-    - master
+  - docker info
+  - docker build . -t dmsc/duo-backend
+  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+  - docker push dmsc/duo-backend
   tags:
     - docker
-    
+  only:
+    - master

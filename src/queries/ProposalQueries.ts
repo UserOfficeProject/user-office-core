@@ -1,13 +1,21 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalTemplate } from "../models/Proposal";
-import { Rejection, rejection } from "../rejection";
+import {
+  ProposalTemplate,
+  Proposal,
+  ProposalTemplateField,
+  ProposalAnswer
+} from "../models/Proposal";
+import { Rejection, rejection, isRejection } from "../rejection";
+import { ILogger } from "../utils/Logger";
+import JSDict from "../utils/Dictionary";
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    private logger: ILogger
   ) {}
 
   async get(agent: User | null, id: number) {
@@ -17,15 +25,68 @@ export default class ProposalQueries {
       return null;
     }
 
-    if (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
-      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
-    ) {
+    if ((await this.hasAccessRights(agent, proposal)) === true) {
       return proposal;
     } else {
       return null;
     }
+  }
+
+  async getQuestionary(agent: User, id: number) {
+    const template = await this.getProposalTemplate(agent);
+    const answers = await this.getAnswers(agent, id);
+
+    if (isRejection(template)) {
+      this.logger.logWarn("Unauthorized access", { agent });
+      return template; // rejection
+    }
+
+    if (isRejection(answers)) {
+      this.logger.logWarn("Unauthorized access", { agent });
+      return answers; // rejection
+    }
+
+    var answerRef = JSDict.Create<string, ProposalAnswer>();
+    answers.forEach(answer => {
+      answerRef.put(answer.proposal_question_id, answer);
+    })
+
+    template.topics.forEach(topic => {
+      topic.fields!.forEach(field => {
+        const answer = answerRef.get(field.proposal_question_id)
+        if(answer)
+        {
+          field.value = answer.value;
+        }
+      });
+    });
+
+    return template;    
+  }
+
+  async getAnswers(agent: User | null, id: number) {
+    const proposal = await this.dataSource.get(id);
+
+    if (!proposal) {
+      return rejection("Proposal does not exist");
+    }
+
+    if ((await this.hasAccessRights(agent, proposal)) === true) {
+      return await this.dataSource.getProposalAnswers(proposal.id);
+    } else {
+      return rejection("Not allowed");
+    }
+  }
+
+  private async hasAccessRights(
+    agent: User | null,
+    proposal: Proposal
+  ): Promise<boolean> {
+    return (
+      (await this.userAuth.isUserOfficer(agent)) ||
+      (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
+      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
+    );
   }
 
   async getAll(
@@ -41,8 +102,9 @@ export default class ProposalQueries {
     }
   }
 
-  async getProposalTemplate(agent: User | null):Promise<ProposalTemplate | Rejection>
-  {
+  async getProposalTemplate(
+    agent: User | null
+  ): Promise<ProposalTemplate | Rejection> {
     if (agent == null) {
       return rejection("Not authorized");
     }

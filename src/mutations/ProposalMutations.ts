@@ -3,8 +3,9 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { Proposal } from "../models/Proposal";
+import { Proposal, ProposalAnswer } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { ILogger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
@@ -44,6 +45,7 @@ export default class ProposalMutations {
     id: string,
     title?: string,
     abstract?: string,
+    answers?: ProposalAnswer[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -82,7 +84,6 @@ export default class ProposalMutations {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
 
-        // Check what needs to be updated and update proposal object
         if (title !== undefined) {
           proposal.title = title;
 
@@ -113,6 +114,21 @@ export default class ProposalMutations {
           }
         }
         // This will overwrite the whole proposal with the new object created
+
+        if (answers !== undefined) {
+          // TODO validate input
+          // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
+          answers.forEach(async answer => {
+            if (answer.value !== undefined) {
+              await this.dataSource.updateAnswer(
+                proposal!.id,
+                answer.proposal_question_id,
+                answer.value
+              );
+            }
+          });
+        }
+
         const result = await this.dataSource.update(proposal);
 
         return result || rejection("INTERNAL_ERROR");
@@ -121,6 +137,37 @@ export default class ProposalMutations {
         return { type: "PROPOSAL_UPDATED", proposal };
       }
     );
+  }
+
+  async updateFiles(
+    agent: User | null,
+    proposalId: number,
+    questionId: string,
+    files: string[]
+  ): Promise<string[] | Rejection> {
+    if (agent == null) 
+    {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    let proposal = await this.dataSource.get(proposalId);
+
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection("NOT_ALLOWED");
+    }
+
+    await this.dataSource.deleteFiles(proposalId, questionId);
+
+    const result = await this.dataSource.insertFiles(
+      proposalId,
+      questionId,
+      files
+    );
+
+    return result || rejection("INTERNAL_ERROR");
   }
 
   async accept(

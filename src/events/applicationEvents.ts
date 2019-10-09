@@ -1,5 +1,5 @@
 import { Proposal } from "../models/Proposal";
-import { User } from "../models/user";
+import { User } from "../models/User";
 
 interface ProposalAcceptedEvent {
   type: "PROPOSAL_ACCEPTED";
