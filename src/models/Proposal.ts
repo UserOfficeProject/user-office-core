@@ -80,3 +80,17 @@ export enum DataType {
   FILE_UPLOAD = "FILE_UPLOAD",
   EMBELLISHMENT = "EMBELLISHMENT"
 }
+export interface FieldConfig {
+  variant?: string, 
+  small_label?:string;
+  required?: boolean;
+  options?:string[];
+  file_type?:string[];
+  max_files?:number;
+  multiline?:boolean;
+  min?:number;
+  max?:number;
+  placeholder?:string;
+  html?:string;
+  plain?:string;
+}

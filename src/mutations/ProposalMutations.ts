@@ -9,7 +9,8 @@ import {
   Topic,
   ProposalTemplateField,
   DataType,
-  FieldDependency
+  FieldDependency,
+  FieldConfig
 } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
@@ -281,6 +282,7 @@ export default class ProposalMutations {
     }
   }
 
+
   async createTemplateField(
     agent: User | null,
     topicId: number,
@@ -290,19 +292,27 @@ export default class ProposalMutations {
       return rejection("NOT_AUTHORIZED");
     }
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
-    const config:any = {};
-    if(dataType === DataType.FILE_UPLOAD) {
-      config.file_type = [];
-    }
+    
     return (
       (await this.dataSource.createTemplateField(
         newFieldId,
         topicId,
         dataType,
         "New question",
-        JSON.stringify(config)
+        JSON.stringify(this.createBlankConfig(dataType))
       )) || rejection("INTERNAL_SERVER_ERROR")
     );
+  }
+
+  private createBlankConfig(dataType:DataType):FieldConfig {
+    switch(dataType) {
+      case DataType.FILE_UPLOAD:
+          return {file_type:[]};
+      case DataType.SELECTION_FROM_OPTIONS:
+        return {options:[]}
+      default:
+        return {};
+    }
   }
 
   async updateProposalTemplateField(
