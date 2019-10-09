@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/styles";
 import ProposalInformation from "./ProposalInformation";
-import ProposalParticipants from "./ProposalParticipants";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
 import { ProposalData, ProposalStatus } from "../model/ProposalModel";
@@ -28,7 +27,6 @@ export default function ProposalReview({data} : { data: ProposalData }) {
     <>
       <ProposalInformation data={data} disabled={true} />
       <ProposaQuestionaryReview data={data} />
-      <ProposalParticipants data={data} disabled={true} />
       <div className={classes.buttons}>
         <ProposalNavigationFragment
         back={() => api.back(data)}
