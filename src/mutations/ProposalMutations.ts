@@ -18,6 +18,7 @@ import { ILogger } from "../utils/Logger";
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
+
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
@@ -300,6 +301,17 @@ export default class ProposalMutations {
         dataType,
         "New question",
         JSON.stringify(this.createBlankConfig(dataType))
+      )) || rejection("INTERNAL_SERVER_ERROR")
+    );
+  }
+
+  async deleteTemplateField(agent: User | null, fieldId: string): Promise<ProposalTemplateField | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    return (
+      (await this.dataSource.deleteTemplateField(
+        fieldId
       )) || rejection("INTERNAL_SERVER_ERROR")
     );
   }

@@ -16,9 +16,9 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { DataType, Topic } from "../models/Proposal";
+import { DataType, Topic, ProposalTemplateField } from "../models/Proposal";
 import { User } from "../models/User";
-import { isRejection } from "../rejection";
+import { isRejection, rejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
 
 const dummyLogger = new DummyLogger()
@@ -269,4 +269,32 @@ test("User must have valid session to attach files", () => {
       "1020597501870552"
     ])
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
+});
+
+test("User can not create field", async () => {
+  const response = await proposalMutations.createTemplateField(dummyUser, 1, DataType.EMBELLISHMENT);
+  expect(response).toBeInstanceOf(rejection);
+});
+
+test("User officer can create field", async () => {
+  const response = await proposalMutations.createTemplateField(dummyUserOfficer, 1, DataType.EMBELLISHMENT);
+  expect(response).toBeInstanceOf(ProposalTemplateField);
+  
+  const newField = response as ProposalTemplateField;
+  expect(newField.topic_id).toEqual(1);
+  expect(newField.data_type).toEqual(DataType.EMBELLISHMENT);
+});
+
+
+test("User can not delete field", async () => {
+  const response = await proposalMutations.deleteTemplateField(dummyUser, "field_id");
+  expect(response).toBeInstanceOf(rejection);
+});
+
+test("User officer can delete field", async () => {
+  const response = await proposalMutations.deleteTemplateField(dummyUserOfficer, "field_id");
+  expect(response).toBeInstanceOf(ProposalTemplateField);
+  
+  const newField = response as ProposalTemplateField;
+  expect(newField.proposal_question_id).toEqual('field_id');
 });

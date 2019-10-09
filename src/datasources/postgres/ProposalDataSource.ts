@@ -1,10 +1,5 @@
 import database from "./database";
-import {
-  ProposalRecord,
-  TopicRecord,
-  ProposalQuestionRecord,
-  FieldDependencyRecord
-} from "./records";
+import { ProposalRecord, TopicRecord, ProposalQuestionRecord, FieldDependencyRecord } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
@@ -36,13 +31,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   private createTopicObject(proposal: TopicRecord) {
-    return new Topic(
-      proposal.topic_id,
-      proposal.topic_title,
-      proposal.is_enabled,
-      proposal.sort_order,
-      null
-    );
+    return new Topic(proposal.topic_id, proposal.topic_title, proposal.is_enabled, proposal.sort_order, null);
   }
 
   private createFieldDependencyObject(fieldDependency: FieldDependencyRecord) {
@@ -54,7 +43,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   private createProposalTemplateFieldObject(question: ProposalQuestionRecord) {
-    // <-- make ProposalRespondedQuestinon, because question does not have a value, but ProposalRespondedQuestinon does, ProposalRespondedQuestinon shoudl extend Question
+    /*-- An idea for improvement --
+    make ProposalRespondedQuestinon, 
+    because question does not have a value, but ProposalRespondedQuestinon does, 
+    ProposalRespondedQuestinon shoudl extend Question*/
     return new ProposalTemplateField(
       question.proposal_question_id,
       question.data_type as DataType,
@@ -78,10 +70,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((call: any) => (call ? true : false));
   }
 
-  async setStatusProposal(
-    id: number,
-    status: number
-  ): Promise<Proposal | null> {
+  async setStatusProposal(id: number, status: number): Promise<Proposal | null> {
     return database
       .update(
         {
@@ -135,11 +124,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
   }
 
-  async updateAnswer(
-    proposal_id: number,
-    question_id: string,
-    answer: string
-  ): Promise<Boolean> {
+  async updateAnswer(proposal_id: number, question_id: string, answer: string): Promise<Boolean> {
     const results: { count: string } = await database
       .count()
       .from("proposal_answers")
@@ -170,27 +155,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
-  async insertFiles(
-    proposal_id: number,
-    question_id: string,
-    files: string[]
-  ): Promise<string[] | null> {
+  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[] | null> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
       return null;
     }
 
-    await database("proposal_answers_files").insert(
-      files.map(file => ({ answer_id: answerId, file_id: file }))
-    );
+    await database("proposal_answers_files").insert(files.map(file => ({ answer_id: answerId, file_id: file })));
 
     return files;
   }
 
-  async deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<Boolean | null> {
+  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean | null> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
       return null;
@@ -203,10 +179,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  private async getAnswerId(
-    proposal_id: number,
-    question_id: string
-  ): Promise<number | null> {
+  private async getAnswerId(proposal_id: number, question_id: string): Promise<number | null> {
     const selectResult = await database
       .from("proposal_answers")
       .where({
@@ -270,9 +243,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orderBy("proposal_id", "desc")
       .modify((query: any) => {
         if (filter) {
-          query
-            .where("title", "ilike", `%${filter}%`)
-            .orWhere("abstract", "ilike", `%${filter}%`);
+          query.where("title", "ilike", `%${filter}%`).orWhere("abstract", "ilike", `%${filter}%`);
         }
         if (first) {
           query.limit(first);
@@ -282,9 +253,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
       })
       .then((proposals: ProposalRecord[]) => {
-        const props = proposals.map(proposal =>
-          this.createProposalObject(proposal)
-        );
+        const props = proposals.map(proposal => this.createProposalObject(proposal));
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
           proposals: props
@@ -301,15 +270,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where("pc.user_id", id)
       .orWhere("p.proposer_id", id)
-      .then((proposals: ProposalRecord[]) =>
-        proposals.map(proposal => this.createProposalObject(proposal))
-      );
+      .then((proposals: ProposalRecord[]) => proposals.map(proposal => this.createProposalObject(proposal)));
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const deps: FieldDependency[] = await database
-      .select("*")
-      .from("proposal_question_dependencies");
+    const deps: FieldDependency[] = await database.select("*").from("proposal_question_dependencies");
 
     const fieldRecords: ProposalQuestionRecord[] = await database
       .select("*")
@@ -323,17 +288,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orderBy("sort_order");
 
     const topics = topicRecords.map(record => this.createTopicObject(record));
-    const fields = fieldRecords.map(record =>
-      this.createProposalTemplateFieldObject(record)
-    );
+    const fields = fieldRecords.map(record => this.createProposalTemplateFieldObject(record));
 
     topics.forEach(topic => {
       topic.fields = fields.filter(field => field.topic_id === topic.topic_id);
     });
     fields.forEach(field => {
-      field.dependencies = deps.filter(
-        dep => dep.proposal_question_id === field.proposal_question_id
-      );
+      field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id);
     });
 
     return new ProposalTemplate(topics);
@@ -434,7 +395,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   createTemplateField(
-    fieldId:string,
+    fieldId: string,
     topicId: number,
     dataType: DataType,
     question: string,
@@ -443,7 +404,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .insert(
         {
-          proposal_question_id : fieldId,
+          proposal_question_id: fieldId,
           topic_id: topicId,
           data_type: dataType,
           question: question,
@@ -471,6 +432,32 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           dataType
         });
         return null;
-      });;
+      });
+  }
+
+  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+    return database("proposal_questions")
+      .where({ proposal_question_id: fieldId })
+      .select("*")
+      .then((resultSet: ProposalQuestionRecord[]) => {
+        if (!resultSet || resultSet.length == 0) {
+          this.logger.logWarn("SELECT from proposal_question yielded no results", { fieldId });
+          return null;
+        }
+        if (resultSet.length) {
+          this.logger.logError("Select from proposal_question yelded in more than one row", { fieldId });
+          return null;
+        }
+        return this.createProposalTemplateFieldObject(resultSet[0]);
+      });
+  }
+
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+    return new Promise(async (resolve, reject) => {
+      const proposalTemplateField = await this.getTemplateField(fieldId);
+      await database.where({ proposal_question_id: fieldId }).del();
+      resolve(proposalTemplateField);
+    })
+    
   }
 }

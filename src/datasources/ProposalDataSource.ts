@@ -59,10 +59,11 @@ export interface ProposalDataSource {
     }
   ): Promise<ProposalTemplateField | null>;
   createTemplateField(
-    fieldId:string,
+    fieldId: string,
     topicId: number,
     dataType: DataType,
     question: string,
     config: string
   ): Promise<ProposalTemplateField | null>;
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
 }

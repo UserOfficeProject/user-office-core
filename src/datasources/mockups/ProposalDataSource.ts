@@ -6,8 +6,12 @@ import {
   DataType,
   FieldDependency,
   Topic,
-  ProposalAnswer
+  ProposalAnswer,
+  FieldConfig
 } from "../../models/Proposal";
+import { json } from "body-parser";
+import { config } from "bluebird";
+import { Review } from "../../models/Review";
 
 export const dummyProposal = new Proposal(
   1,
@@ -42,35 +46,59 @@ export const dummyAnswers: Array<ProposalAnswer> = [
   }
 ];
 
+function createDummyField(values: {
+  data_type?: DataType;
+  proposal_question_id?: string;
+  sort_order?: number;
+  topic_id?: number;
+  question?: string;
+  config?: FieldConfig;
+  dependencies?: FieldDependency[];
+}): ProposalTemplateField {
+  return new ProposalTemplateField(
+    values.proposal_question_id || "random_field_name_" + Math.random(),
+    values.data_type || DataType.TEXT_INPUT,
+    values.sort_order || Math.round(Math.random() * 100),
+    values.question || "Some random question",
+    values.topic_id || Math.round(Math.random() * 10),
+    (values.config && JSON.stringify(values.config)) || "{}",
+    values.dependencies || []
+  );
+}
+
 export class proposalDataSource implements ProposalDataSource {
-  createTemplateField(fieldId: string, topicId: number, dataType: DataType, question: string, config: string): Promise<ProposalTemplateField | null> {
-    throw new Error("Method not implemented.");
+  async createTemplateField(
+    fieldId: string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<ProposalTemplateField | null> {
+    return createDummyField({
+      proposal_question_id: fieldId,
+      topic_id: topicId,
+      data_type: dataType,
+      question: question,
+      config: JSON.parse(config || "{}")
+    });
+  }
+  async deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+    return createDummyField({ proposal_question_id: fieldId });
   }
   async updateField(
     proposal_question_id: string,
     values: {
-      data_type?: string | undefined;
+      data_type?: DataType | undefined;
       question?: string | undefined;
       topic?: number | undefined;
       config?: string | undefined;
       sort_order: number;
     }
   ): Promise<ProposalTemplateField | null> {
-    return new ProposalTemplateField(
-      proposal_question_id,
-      DataType.BOOLEAN,
-      0,
-      "Question",
-      1,
-      null,
-      null
-    );
+    return createDummyField({ ...values, proposal_question_id, config: JSON.parse(values.config || "{}") });
   }
 
-  async updateTopic(
-    id: number,
-    values: { title?: string; isEnabled?: boolean }
-  ): Promise<Topic> {
+  async updateTopic(id: number, values: { title?: string; isEnabled?: boolean }): Promise<Topic> {
     return new Topic(
       id,
       values.title || "Topic title",
@@ -80,32 +108,20 @@ export class proposalDataSource implements ProposalDataSource {
     );
   }
 
-  
   async createTopic(title: string): Promise<Topic> {
     return new Topic(2, title, false, 2, null);
   }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
   }
-  async insertFiles(
-    proposal_id: number,
-    question_id: string,
-    files: string[]
-  ): Promise<string[]> {
+  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
     return files;
   }
-  async deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<Boolean> {
+  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {
     return true;
   }
 
-  async updateAnswer(
-    proposal_id: number,
-    question_id: string,
-    answer: string
-  ): Promise<Boolean> {
+  async updateAnswer(proposal_id: number, question_id: string, answer: string): Promise<Boolean> {
     return true;
   }
   async checkActiveCall(): Promise<Boolean> {
@@ -113,44 +129,20 @@ export class proposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    var hasLinksToField = new ProposalTemplateField(
-      "hasLinksToField",
-      DataType.SELECTION_FROM_OPTIONS,
-      0,
-      "Has any links to field?",
-      1,
-      JSON.stringify({ variant: "radio", options: ["yes", "no"] }),
-      null
-    );
+    const hasLinksToField = createDummyField({
+      proposal_question_id: "hasLinksToField",
+      data_type: DataType.SELECTION_FROM_OPTIONS
+    });
+    const linksToField = createDummyField({
+      proposal_question_id: "linksToField",
+      data_type: DataType.TEXT_INPUT,
+      dependencies: [new FieldDependency("linksToField", "hasLinksToField", "{ 'ifValue': 'yes' }")]
+    });
 
-    var linksToField = new ProposalTemplateField(
-      "linksToField",
-      DataType.TEXT_INPUT,
-      1,
-      "Please specify",
-      1,
-      null,
-      [
-        new FieldDependency(
-          "linksToField",
-          "hasLinksToField",
-          "{ 'ifValue': 'yes' }"
-        )
-      ]
-    );
-    return new ProposalTemplate([
-      new Topic(1, "General information", true, 1, [
-        hasLinksToField,
-        linksToField
-      ])
-    ]);
+    return new ProposalTemplate([new Topic(1, "General information", true, 1, [hasLinksToField, linksToField])]);
   }
 
-  async submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<import("../../models/Review").Review | null> {
+  async submitReview(reviewID: number, comment: string, grade: number): Promise<Review | null> {
     throw new Error("Method not implemented.");
   }
   async rejectProposal(id: number): Promise<Proposal | null> {
