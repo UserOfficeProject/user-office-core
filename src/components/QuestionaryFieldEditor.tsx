@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, FormControlLabel, Checkbox, Modal, Backdrop, Fade } from "@material-ui/core";
+import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
 import JSDict from "../utils/Dictionary";
 import { IEvent } from "./QuestionaryEditorModel";
@@ -29,11 +29,11 @@ export default function QuestionaryFieldEditor(props: {
   }))();
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
-  componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
-  componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
-  componentMap.put(DataType.SELECTION_FROM_OPTIONS, AdminComponentMultipleChoice);
   componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
+  componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
   componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
+  componentMap.put(DataType.SELECTION_FROM_OPTIONS, AdminComponentMultipleChoice);
+  componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
 
   if (props.field === null) {
     return null;
@@ -72,9 +72,3 @@ export default function QuestionaryFieldEditor(props: {
 export type AdminComponentSignature = {
   (props: { field: ProposalTemplateField; dispatch: React.Dispatch<IEvent>; closeMe: Function }): JSX.Element;
 };
-
-export const CustomCheckbox = ({ field, checked, label }: { field: any; checked: boolean; label: string }) => {
-  return <FormControlLabel control={<Checkbox {...field} checked={checked} color="primary" />} label={label} />;
-};
-
-

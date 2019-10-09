@@ -1,13 +1,15 @@
-import React from 'react';
-import { Typography, Button } from '@material-ui/core';
-import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
-import { EventType } from './QuestionaryEditorModel';
-import { AdminComponentSignature, CustomCheckbox } from './QuestionaryFieldEditor';
-import * as Yup from 'yup';
+import React from "react";
+import { Typography, Button } from "@material-ui/core";
+import { Formik, Form, Field } from "formik";
+import { TextField } from "formik-material-ui";
+import { EventType } from "./QuestionaryEditorModel";
+import { AdminComponentSignature } from "./QuestionaryFieldEditor";
+import { FormikUICustomCheckbox } from "./FormikUICustomCheckbox";
+import * as Yup from "yup";
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
+
   return (
     <>
       <Formik
@@ -45,17 +47,38 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
             <Field
               name="config.required"
               checked={formikProps.values.config.required}
-              component={CustomCheckbox}
+              component={FormikUICustomCheckbox}
               label="User must check it to continue"
               margin="normal"
               fullWidth
               data-cy="required"
             />
 
-            <Button type="submit" fullWidth variant="contained" color="primary" data-cy="submit">
-              Save
-            </Button>
-
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                data-cy="delete"
+                onClick={() => {
+                  props.dispatch({
+                    type: EventType.DELETE_FIELD_REQUESTED,
+                    payload: { fieldId: field.proposal_question_id }
+                  });
+                  props.closeMe();
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                data-cy="submit"
+              >
+                Save
+              </Button>
+            </div>
           </Form>
         )}
       </Formik>

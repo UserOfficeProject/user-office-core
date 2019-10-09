@@ -1,5 +1,5 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import { Reducer, useEffect } from "react";
+import { Reducer, useEffect, useState } from "react";
 import {
   ProposalTemplate,
   ProposalTemplateField
@@ -14,7 +14,9 @@ export enum EventType {
   UPDATE_TOPIC_TITLE_REQUESTED,
   UPDATE_FIELD_REQUESTED,
   CREATE_NEW_FIELD_REQUESTED,
-  FIELD_CREATED
+  FIELD_CREATED,
+  DELETE_FIELD_REQUESTED,
+  FIELD_DELETED
 }
 
 export interface IEvent {
@@ -27,13 +29,17 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
+  // NOTE: We have this variable here,
+  // otherwise useEffect will cause event to be dispatched on every render
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const { proposalTemplate } = useProposalQuestionTemplate();
 
   useEffect(() => {
-    if (proposalTemplate) {
+    if (proposalTemplate && !isLoaded) {
+      setIsLoaded(true);
       dispatch({ type: EventType.READY, payload: proposalTemplate });
     }
-  }, [proposalTemplate, dispatch]);
+  }, [proposalTemplate, dispatch, isLoaded]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
@@ -74,9 +80,11 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           Object.assign(draft.getFieldById(field.proposal_question_id), field);
           return draft;
         case EventType.FIELD_CREATED:
-         const newField: ProposalTemplateField = action.payload;
+          const newField: ProposalTemplateField = action.payload;
           draft.addField(newField);
           return new ProposalTemplate(draft);
+        case EventType.FIELD_DELETED:
+          return new ProposalTemplate(action.payload);
       }
     });
   }

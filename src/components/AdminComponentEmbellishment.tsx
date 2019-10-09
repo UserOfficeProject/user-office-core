@@ -3,15 +3,11 @@ import { Typography, Button } from "@material-ui/core";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
-import {
-  AdminComponentSignature} from "./QuestionaryFieldEditor";
+import { AdminComponentSignature } from "./QuestionaryFieldEditor";
 import { FormikUICustomEditor } from "./FormikUICustomEditor";
 import * as Yup from "yup";
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
-
-  
-  
   const field = props.field;
   return (
     <>
@@ -34,7 +30,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
         })}
       >
         {formikProps => (
-          <Form style={{flexGrow:1}}>
+          <Form style={{ flexGrow: 1 }}>
             <Typography>Embellishment</Typography>
 
             <Field
@@ -51,7 +47,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
                 branding: false
               }}
               data-cy="html"
-              />
+            />
 
             <Field
               name="config.plain"
@@ -63,15 +59,31 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               data-cy="max"
             />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              data-cy="submit"
-            >
-              Save
-            </Button>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                data-cy="delete"
+                onClick={() => {
+                  props.dispatch({
+                    type: EventType.DELETE_FIELD_REQUESTED,
+                    payload: { fieldId: field.proposal_question_id }
+                  });
+                  props.closeMe();
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                data-cy="submit"
+              >
+                Save
+              </Button>
+            </div>
           </Form>
         )}
       </Formik>

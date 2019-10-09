@@ -75,8 +75,7 @@ export function usePersistModel() {
     setIsLoading(false);
   };
 
-
-  const createField = async (topicId:number, dataType: DataType) => {
+  const createField = async (topicId: number, dataType: DataType) => {
     const mutation = `
     mutation($topicId:Int!, $dataType:String!) {
       createTemplateField(topicId:$topicId, dataType:$dataType) {
@@ -97,13 +96,63 @@ export function usePersistModel() {
     };
 
     setIsLoading(true);
-    return sendRequest(mutation, variables).then(result => {
-      setIsLoading(false);
-      return result.createTemplateField;
-    })
+    return sendRequest(mutation, variables).then(
+      (result: {
+        createTemplateField: { error: string; field: ProposalTemplateField };
+      }) => {
+        setIsLoading(false);
+        return result.createTemplateField;
+      }
+    );
   };
 
-  const persistModel = ({ getState, dispatch }: { getState: () => ProposalTemplate, dispatch:React.Dispatch<IEvent> }) => {
+  const deleteField = async (id: number) => {
+    const mutation = `
+    mutation($id:String!) {
+      deleteTemplateField(id:$id) {
+        template {
+          topics {
+            topic_title
+            topic_id,
+            fields {
+              proposal_question_id
+              data_type
+              question
+              config
+              dependencies {
+                proposal_question_dependency
+                condition
+                proposal_question_id
+              }
+            }
+          }
+        }
+        error
+      }
+    }
+    `;
+    const variables = {
+      id
+    };
+
+    setIsLoading(true);
+    return sendRequest(mutation, variables).then(
+      (data: {
+        deleteTemplateField: { error?: string; template?: ProposalTemplate };
+      }) => {
+        setIsLoading(false);
+        return data.deleteTemplateField;
+      }
+    );
+  };
+
+  const persistModel = ({
+    getState,
+    dispatch
+  }: {
+    getState: () => ProposalTemplate;
+    dispatch: React.Dispatch<IEvent>;
+  }) => {
     return (next: Function) => (action: IEvent) => {
       next(action);
       const state = getState();
@@ -141,9 +190,27 @@ export function usePersistModel() {
           updateItem(action.payload.field as ProposalTemplateField);
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
-          createField(action.payload.topicId, (action.payload.newField as ProposalTemplateField).data_type).then(result => {
-            if(result.field) {
-              dispatch({type:EventType.FIELD_CREATED, payload:new ProposalTemplateField(result.field)})
+          createField(
+            action.payload.topicId,
+            (action.payload.newField as ProposalTemplateField).data_type
+          ).then(result => {
+            if (result.field) {
+              dispatch({
+                type: EventType.FIELD_CREATED,
+                payload: new ProposalTemplateField(result.field)
+              });
+            }
+          });
+          break;
+        case EventType.DELETE_FIELD_REQUESTED:
+          deleteField(action.payload.fieldId).then(result => {
+            if (result.template) {
+              setTimeout(function() {
+                dispatch({
+                  type: EventType.FIELD_DELETED,
+                  payload: result.template!
+                });
+              }, 1000);
             }
           });
           break;
@@ -152,8 +219,6 @@ export function usePersistModel() {
       }
     };
   };
-
-
 
   return { isLoading, persistModel };
 }

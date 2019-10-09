@@ -4,7 +4,7 @@ import { ProposalTemplate } from "../model/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();
-  const [proposalTemplate, setProposalQuestionModel] = useState<ProposalTemplate | null>(null);
+  const [proposalTemplate, setProposalTemplate] = useState<ProposalTemplate | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,10 +32,11 @@ export function useProposalQuestionTemplate() {
 
       sendRequest(query).then(data => {
         setLoading(false);
-        setProposalQuestionModel(
+        setProposalTemplate(
           new ProposalTemplate(data.proposalTemplate)
         );
       });
+      
     };
     getProposalTemplateRequest();
   }, [sendRequest]); // passing empty array as a second param so that effect is called only once on mount

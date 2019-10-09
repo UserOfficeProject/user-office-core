@@ -21,7 +21,7 @@ export const FormikUICustomTable = ({
     onBlur: Function;
     onChange: Function;
     value: string;
-  }; 
+  };
   form: FormikActions<any>;
 }) => {
   const transformedValues = dataTransforms.toTable(field.value);

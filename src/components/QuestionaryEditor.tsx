@@ -2,11 +2,7 @@ import React from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, { EventType } from "./QuestionaryEditorModel";
-import {
-  Paper,
-  makeStyles,
-  useTheme
-} from "@material-ui/core";
+import { Paper, makeStyles, useTheme } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
@@ -15,7 +11,10 @@ export default function QuestionaryEditor() {
   var { persistModel } = usePersistModel();
   var { state, dispatch } = QuestionaryEditorModel([persistModel]);
 
-  const [selectedField, setSelectedField] = React.useState<ProposalTemplateField | null>(null);
+  const [
+    selectedField,
+    setSelectedField
+  ] = React.useState<ProposalTemplateField | null>(null);
 
   const theme = useTheme();
   const classes = makeStyles(theme => ({
@@ -29,7 +28,7 @@ export default function QuestionaryEditor() {
       }
     },
     modalContainer: {
-      backgroundColor:"white"
+      backgroundColor: "white"
     }
   }))();
 
@@ -61,7 +60,6 @@ export default function QuestionaryEditor() {
   return (
     <>
       <Paper className={classes.paper}>
-        
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
             {(provided, snapshot) => (
@@ -86,8 +84,11 @@ export default function QuestionaryEditor() {
         </DragDropContext>
       </Paper>
 
-      <QuestionaryFieldEditor field={selectedField} dispatch={dispatch} closeMe={handleFieldEditorClose}/>
-     
+      <QuestionaryFieldEditor
+        field={selectedField}
+        dispatch={dispatch}
+        closeMe={handleFieldEditorClose}
+      />
     </>
   );
 }
