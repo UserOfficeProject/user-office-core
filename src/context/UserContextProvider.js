@@ -5,7 +5,6 @@ import { useCookies } from "react-cookie";
 const initUserData = {
   user: { roles: [] },
   token: null,
-  expToken: null,
   currentRole: null
 };
 
@@ -57,7 +56,8 @@ const reducer = (state, action) => {
       localStorage.expToken = newToken.exp;
       return {
         ...state,
-        token: action.payload
+        token: action.payload,
+        expToken: newToken.exp
       };
     case "selectRole":
       localStorage.currentRole = action.payload;
