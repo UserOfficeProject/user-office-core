@@ -65,5 +65,5 @@ export interface ProposalDataSource {
     question: string,
     config: string
   ): Promise<ProposalTemplateField | null>;
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
 }

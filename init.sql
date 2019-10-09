@@ -124,8 +124,8 @@ CREATE TABLE proposal_answers (
 );
 
 CREATE TABLE proposal_question_dependencies (
-  proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
-, proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
+  proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id) ON DELETE CASCADE
+, proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id) ON DELETE CASCADE
 , condition                     VARCHAR(64) DEFAULT NULL
 , PRIMARY KEY (proposal_question_id, proposal_question_dependency)
 );

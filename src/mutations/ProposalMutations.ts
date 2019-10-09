@@ -10,7 +10,8 @@ import {
   ProposalTemplateField,
   DataType,
   FieldDependency,
-  FieldConfig
+  FieldConfig,
+  ProposalTemplate
 } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
@@ -305,13 +306,13 @@ export default class ProposalMutations {
     );
   }
 
-  async deleteTemplateField(agent: User | null, fieldId: string): Promise<ProposalTemplateField | Rejection> {
+  async deleteTemplateField(agent: User | null, id: string): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
     return (
       (await this.dataSource.deleteTemplateField(
-        fieldId
+        id
       )) || rejection("INTERNAL_SERVER_ERROR")
     );
   }
@@ -320,6 +321,8 @@ export default class ProposalMutations {
     switch(dataType) {
       case DataType.FILE_UPLOAD:
           return {file_type:[]};
+          case DataType.EMBELLISHMENT:
+            return {plain:"New embellishment", html:"New embellishment"};
       case DataType.SELECTION_FROM_OPTIONS:
         return {options:[]}
       default:

@@ -444,7 +444,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           this.logger.logWarn("SELECT from proposal_question yielded no results", { fieldId });
           return null;
         }
-        if (resultSet.length) {
+        if (resultSet.length > 1) {
           this.logger.logError("Select from proposal_question yelded in more than one row", { fieldId });
           return null;
         }
@@ -452,11 +452,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
     return new Promise(async (resolve, reject) => {
-      const proposalTemplateField = await this.getTemplateField(fieldId);
-      await database.where({ proposal_question_id: fieldId }).del();
-      resolve(proposalTemplateField);
+      await database("proposal_questions").where({ proposal_question_id: fieldId }).del();
+      resolve(await this.getProposalTemplate());
     })
     
   }

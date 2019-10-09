@@ -82,8 +82,8 @@ export class proposalDataSource implements ProposalDataSource {
       config: JSON.parse(config || "{}")
     });
   }
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
-    return createDummyField({ proposal_question_id: fieldId });
+  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
+    return this.getProposalTemplate();
   }
   async updateField(
     proposal_question_id: string,

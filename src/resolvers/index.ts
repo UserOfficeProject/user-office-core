@@ -7,7 +7,8 @@ import {
   Topic,
   FieldDependency,
   ProposalTemplateField,
-  DataType
+  DataType,
+  ProposalTemplate
 } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
@@ -72,7 +73,7 @@ interface UpdateFieldTopicRelArgs {
 }
 
 interface DeleteProposalTemplateFieldArgs {
-  fieldId: string;
+  id: string;
 }
 
 interface UpdateProposalTemplateFieldArgs {
@@ -227,14 +228,11 @@ function createResponseWrapper<T>(key: string) {
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapTopicMutation = createResponseWrapper<Topic>("topic");
-const wrapProposalInformationMutation = createResponseWrapper<
-  ProposalInformation
->("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<ProposalInformation>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapCallMutation = createResponseWrapper<Call>("call");
-const wrapProposalTemplateFieldMutation = createResponseWrapper<
-  ProposalTemplateField
->("field");
+const wrapProposalTemplateFieldMutation = createResponseWrapper<ProposalTemplateField>("field");
+const wrapProposalTemplateMutation = createResponseWrapper<ProposalTemplate>("template");
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -344,10 +342,10 @@ export default {
     args: DeleteProposalTemplateFieldArgs,
     context: ResolverContext
   ) {
-    return wrapProposalTemplateFieldMutation(
+    return wrapProposalTemplateMutation(
       context.mutations.proposal.deleteTemplateField(
         context.user,
-        args.fieldId,
+        args.id,
       )
     );
   },
