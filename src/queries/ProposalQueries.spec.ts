@@ -1,13 +1,10 @@
 import ProposalQueries from "./ProposalQueries";
-import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { Rejection, rejection } from "../rejection";
 
-import { ApplicationEvent } from "../events/applicationEvents";
 import {
   proposalDataSource,
-  dummyProposalSubmitted,
-  dummyProposal
+  dummyProposal,
+  dummyAnswers
 } from "../datasources/mockups/ProposalDataSource";
 
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -19,8 +16,8 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 import { ProposalTemplate } from "../models/Proposal";
+import { DummyLogger } from "../utils/Logger";
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
   new proposalDataSource(),
@@ -28,7 +25,8 @@ const userAuthorization = new UserAuthorization(
 );
 const proposalQueries = new ProposalQueries(
   new proposalDataSource(),
-  userAuthorization
+  userAuthorization,
+  new DummyLogger()
 );
 
 test("A user on the proposal can get a proposal it belongs to", () => {
@@ -45,6 +43,14 @@ test("A userofficer can get any proposal", () => {
   return expect(proposalQueries.get(dummyUserOfficer, 1)).resolves.toBe(
     dummyProposal
   );
+});
+
+test("Get answers should succeed for authorized user", () => {
+  return expect(proposalQueries.getAnswers(dummyUser, 1)).resolves.toBe(dummyAnswers);
+});
+
+test("Get answers should not succeed for unauthorized user", () => {
+  return expect(proposalQueries.getAnswers(dummyUserNotOnProposal, 1)).resolves.not.toBe(dummyAnswers);
 });
 
 test("A userofficer can get all proposal", () => {

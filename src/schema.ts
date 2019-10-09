@@ -8,9 +8,10 @@ type Query {
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
     review(id: ID!): Review
-    proposalTemplate: ProposalTemplateResult
     call(id: ID!): Call
     calls: [Call]
+    getPageContent(id: PageName!): String
+    fileMetadata(fileIds:[String]): [FileMetadata]
   }
 
   type Rejection {
@@ -47,18 +48,14 @@ type Query {
     error: String
   }
 
-  type ProposalTemplateResult {
-    template: ProposalTemplate
-    error: String
-  }
-
   type Mutation {
     createProposal: ProposalMutationResult
-    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswer], status: Int, users: [Int]): ProposalMutationResult
+    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], status: Int, users: [Int]): ProposalMutationResult
     updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
     approveProposal(id: Int!): ProposalMutationResult
     submitProposal(id: Int!): ProposalMutationResult
     rejectProposal(id: Int!): ProposalMutationResult
+    setPageContent(id: PageName!, text: String): Boolean
     createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     token(token: String!): String
     createUser(
@@ -111,12 +108,13 @@ type Call {
 }
 
 type Proposal {
-    id: ID
+    id: Int
     title: String
     abstract: String
     status: Int
     users: [User!]
     proposer: Int
+    questionary: ProposalTemplate
     created: String
     updated: String
     reviews: [Review]
@@ -158,7 +156,7 @@ type ProposalTemplateField {
     proposal_question_id: String,
     data_type: String,
     question: String,
-
+    value: String,
     config: String,
     dependencies: [FieldDependency]
 }
@@ -169,9 +167,28 @@ type FieldDependency {
     condition: String,
 }
 
-input ProposalAnswer {
+input ProposalAnswerInput {
+  proposal_question_id: ID!,
+  data_type:String,
+  value: String
+}
+
+type ProposalAnswer {
   proposal_question_id: ID!,
   answer: String
+}
+
+enum PageName {
+  HOMEPAGE
+  HELPPAGE
+}
+
+type FileMetadata {
+  fileId:String,
+  originalFileName:String,
+  mimeType:String,
+  sizeInBytes:Int,
+  createdDate:String
 }
 
 `);

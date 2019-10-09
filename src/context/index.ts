@@ -9,6 +9,9 @@ import ReviewMutations from "../mutations/ReviewMutations";
 import { User } from "../models/User";
 import FileMutations from "../mutations/FileMutations";
 import FileQueries from "../queries/FileQueries";
+import AdminMutations from "../mutations/AdminMutations";
+import AdminQueries from "../queries/AdminQueries";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -16,6 +19,7 @@ interface ResolverContextQueries {
   review: ReviewQueries;
   call: CallQueries;
   file: FileQueries;
+  admin: AdminQueries;
 }
 
 interface ResolverContextMutations {
@@ -24,9 +28,11 @@ interface ResolverContextMutations {
   review: ReviewMutations;
   call: CallMutations;
   file: FileMutations;
+  admin: AdminMutations;
 }
 
 export interface BasicResolverContext {
+  userAuthorization: UserAuthorization;
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
 }

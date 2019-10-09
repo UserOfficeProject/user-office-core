@@ -1,8 +1,14 @@
 import { ResolverContext } from "../context";
-import { isRejection, Rejection } from "../rejection";
-import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
+import { isRejection, Rejection, rejection } from "../rejection";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalAnswer,
+  ProposalInformation
+} from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
+import { FileMetadata } from "../models/Blob";
 
 interface ProposalArgs {
   id: string;
@@ -12,6 +18,10 @@ interface ProposalsArgs {
   first?: number;
   offset?: number;
   filter?: string;
+}
+
+interface FileMetadataArgs {
+  fileIds: string[];
 }
 
 interface CreateProposalArgs {}
@@ -32,7 +42,7 @@ interface UpdateProposalArgs {
   id: string;
   title: string;
   abstract: string;
-  answers:ProposalAnswer[];
+  answers: ProposalAnswer[];
   status: number;
   users: number[];
 }
@@ -97,23 +107,56 @@ interface CreateUserArgs {
   telephone_alt: string;
 }
 
-function resolveProposal(proposal: Proposal | null, context: ResolverContext) {
+enum PageName {
+  HOMEPAGE = 1,
+  HELPPAGE = 2
+}
+
+async function resolveProposal(
+  proposal: Proposal | null,
+  context: ResolverContext
+) {
   if (proposal == null) {
-    return null;
+    return rejection("Proposal is null");
   }
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
 
-  return {
+  if(!agent) 
+  {
+    return rejection("Not aututhorized");
+  }
+
+  const users = await context.queries.user.getProposers(agent, id);
+  if (isRejection(users)) {
+    return users;
+  }
+
+  const reviews = await context.queries.review.reviewsForProposal(agent, id);
+  if (isRejection(reviews)) {
+    return reviews;
+  }
+
+  const questionary = await context.queries.proposal.getQuestionary(agent, id);
+  if (isRejection(questionary)) {
+    return questionary;
+  }
+  if(agent == null) {
+    return rejection("Not authorized");
+  }
+
+  return new ProposalInformation(
     id,
     title,
     abstract,
+    agent.id,
     status,
     created,
     updated,
-    users: () => context.queries.user.getProposers(agent, id),
-    reviews: () => context.queries.review.reviewsForProposal(agent, id)
-  };
+    users,
+    reviews,
+    questionary
+  );
 }
 
 function resolveProposals(
@@ -151,6 +194,9 @@ function createResponseWrapper<T>(key: string) {
 
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<
+  ProposalInformation
+>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
@@ -184,9 +230,24 @@ export default {
     );
   },
 
-  createProposal(args: CreateProposalArgs, context: ResolverContext) {
-    return wrapProposalMutation(
-      context.mutations.proposal.create(context.user)
+  async createProposal(args: CreateProposalArgs, context: ResolverContext) {
+    return wrapProposalInformationMutation(
+      new Promise(async (resolve, reject) => {
+        let newProposal = await context.mutations.proposal.create(context.user);
+        if (isRejection(newProposal)) {
+          return newProposal;
+        }
+
+        let newProposalInformation = await resolveProposal(
+          newProposal,
+          context
+        );
+        if (isRejection(newProposalInformation)) {
+          return newProposalInformation;
+        }
+
+        resolve(newProposalInformation);
+      })
     );
   },
 
@@ -205,9 +266,12 @@ export default {
     );
   },
 
-  updateProposalFiles(args:UpdateProposalFilesArgs, context:ResolverContext) {
+  async updateProposalFiles(
+    args: UpdateProposalFilesArgs,
+    context: ResolverContext
+  ) {
     const { proposal_id, question_id, files } = args;
-    return wrapFilesMutation(
+    return await wrapFilesMutation(
       context.mutations.proposal.updateFiles(
         context.user,
         proposal_id,
@@ -215,6 +279,13 @@ export default {
         files
       )
     );
+  },
+
+  async fileMetadata(
+    args: FileMetadataArgs,
+    context: ResolverContext
+  ): Promise<FileMetadata[]> {
+    return await context.queries.file.getFileMetadata(args.fileIds);
   },
 
   approveProposal(args: ApproveProposalArgs, context: ResolverContext) {
@@ -364,5 +435,22 @@ export default {
   },
   calls(args: {}, context: ResolverContext) {
     return context.queries.call.getAll(context.user);
+  },
+  setPageContent(
+    args: { id: PageName; text: string },
+    context: ResolverContext
+  ) {
+    console.log(PageName[args.id], args.id);
+    return context.mutations.admin.setPageText(
+      context.user,
+      parseInt(PageName[args.id]),
+      args.text
+    );
+  },
+  getPageContent(args: { id: PageName }, context: ResolverContext) {
+    return context.queries.admin.getPageText(
+      context.user,
+      parseInt(PageName[args.id])
+    );
   }
 };
