@@ -1,7 +1,7 @@
 import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
-import { ProposalTemplate } from "./ProposalModel";
+import { ProposalTemplate, DataType } from "./ProposalModel";
 const jsonwebtoken = require("jsonwebtoken");
 const config = require("./../../config");
 
@@ -121,12 +121,12 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       doc.fontSize(25).text(topic.topic_title);
       doc.moveDown();
       activeFields.forEach(field => {
-        if (field.data_type === "EMBELLISHMENT") {
+        if (field.data_type === DataType.EMBELLISHMENT) {
           doc
             .fontSize(17)
             .font("Times-Bold")
             .text(field.config.plain);
-        } else if (field.data_type === "FILE_UPLOAD") {
+        } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
           if (field.value != "") {
             const fieldAttachmentArray: string[] = field.value.split(",");
