@@ -31,9 +31,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         for (const { firstname, lastname } of participants) {
           const email = "dummy@dummy.com";
           const topic = "Tough luck!";
-          const message = `Sorry ${firstname} ${lastname}, your proposal was rejected because: ${
-            event.reason
-          }`;
+          const message = `Sorry ${firstname} ${lastname}, your proposal was rejected because: ${event.reason}`;
           sendEmail(email, topic, message);
         }
 
@@ -54,11 +52,11 @@ export default function createHandler(userDataSource: UserDataSource) {
             },
             recipients: [{ address: "fredrikbolmsten@esss.se" }]
           })
-          .then(data => {
+          .then((data: any) => {
             console.log("Woohoo! You just sent your first mailing!");
             console.log(data);
           })
-          .catch(err => {
+          .catch((err: any) => {
             console.log("Whoops! Something went wrong");
             console.log(err);
           });

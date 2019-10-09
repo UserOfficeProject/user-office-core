@@ -15,7 +15,6 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 
-const config = require("./../../config");
 const jsonwebtoken = require("jsonwebtoken");
 
 const goodToken = jsonwebtoken.sign(
@@ -23,7 +22,7 @@ const goodToken = jsonwebtoken.sign(
     id: dummyUser.id,
     updated: dummyUser.updated
   },
-  config.secret,
+  process.env.secret,
   { expiresIn: "24h" }
 );
 
@@ -32,7 +31,7 @@ const badToken = jsonwebtoken.sign(
     id: dummyUser.id,
     updated: dummyUser.updated
   },
-  config.secret,
+  process.env.secret,
   { expiresIn: "-24h" }
 );
 
