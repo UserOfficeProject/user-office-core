@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
@@ -7,22 +7,33 @@ import * as Yup from "yup";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
-
-
+import ProposalParticipants from "./ProposalParticipants";
 
 export default function ProposalInformation(props) {
   const api = useContext(FormApi);
-  const {loading, updateProposal} = useUpdateProposal();
+  const { loading, updateProposal } = useUpdateProposal();
+  const [users, setUsers] = useState(props.data.users || []);
+  const [userError, setUserError] = useState(false);
+
   return (
     <Formik
-      initialValues={{ title: props.data.title, abstract: props.data.abstract }}
+      initialValues={{
+        title: props.data.title,
+        abstract: props.data.abstract
+      }}
       onSubmit={async values => {
-        await updateProposal({
-          id: props.data.id,
-          title: values.title,
-          abstract: values.abstract
-        });
-        api.next(values);
+        const userIds = users.map(user => user.id);
+        if (users.length < 1) {
+          setUserError(true);
+        } else {
+          await updateProposal({
+            id: props.data.id,
+            title: values.title,
+            abstract: values.abstract,
+            users: userIds
+          });
+          api.next({ ...values, users });
+        }
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
@@ -75,10 +86,15 @@ export default function ProposalInformation(props) {
               />
             </Grid>
           </Grid>
-          <ProposalNavigationFragment 
-            disabled = {props.disabled}
+          <ProposalParticipants
+            error={userError}
+            setUsers={setUsers}
+            users={users}
+          />
+          <ProposalNavigationFragment
+            disabled={props.disabled}
             next={submitForm}
-            isLoading={loading} 
+            isLoading={loading}
           />
         </Form>
       )}
