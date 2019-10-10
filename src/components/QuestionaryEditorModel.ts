@@ -31,15 +31,19 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   >(reducer, blankInitTemplate, middlewares || []);
 
   const getProposalTemplateRequest = useProposalQuestionTemplate();
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    getProposalTemplateRequest().then(data => {
-      dispatch({
-        type: EventType.READY,
-        payload: data
+    if (!isLoaded) {
+      getProposalTemplateRequest().then(data => {
+        setIsLoaded(true);
+        dispatch({
+          type: EventType.READY,
+          payload: data
+        });
       });
-    });
-  }, []);
+    }
+  }, [getProposalTemplateRequest, dispatch, isLoaded]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
