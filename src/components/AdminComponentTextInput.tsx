@@ -4,7 +4,7 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import { FormikUICustomCheckbox } from "./FormikUICustomCheckbox";
+import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
 import * as Yup from "yup";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {

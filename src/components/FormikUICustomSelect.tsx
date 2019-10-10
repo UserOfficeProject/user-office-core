@@ -1,7 +1,21 @@
 import React from "react";
-import { MenuItem, Select, Checkbox, ListItemText, Input, InputLabel } from "@material-ui/core";
+import {
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
+  Input,
+  InputLabel
+} from "@material-ui/core";
 import { FormikActions } from "formik";
-export const FormikUICustomSelect = ({ field, form, availableOptions, id, label, ...props }: {
+const FormikUICustomSelect = ({
+  field,
+  form,
+  availableOptions,
+  id,
+  label,
+  ...props
+}: {
   field: {
     name: string;
     onBlur: Function;
@@ -23,18 +37,35 @@ export const FormikUICustomSelect = ({ field, form, availableOptions, id, label,
       }
     }
   };
-  const handleChange = (event: React.ChangeEvent<{
-    value: unknown;
-  }>) => {
+  const handleChange = (
+    event: React.ChangeEvent<{
+      value: unknown;
+    }>
+  ) => {
     form.setFieldValue(field.name, event.target.value); // value is string[]
   };
-  return (<>
-    <InputLabel htmlFor={id}>{label}</InputLabel>
-    <Select multiple value={field.value} onChange={handleChange} input={<Input id="select-multiple-checkbox" />} renderValue={selected => (selected as string[]).join(", ")} MenuProps={MenuProps} id={id} {...props}>
-      {availableOptions.map(curOption => (<MenuItem key={curOption} value={curOption}>
-        <Checkbox checked={field.value.indexOf(curOption) > -1} />
-        <ListItemText primary={curOption} />
-      </MenuItem>))}
-    </Select>
-  </>);
+  return (
+    <>
+      <InputLabel htmlFor={id}>{label}</InputLabel>
+      <Select
+        multiple
+        value={field.value}
+        onChange={handleChange}
+        input={<Input id="select-multiple-checkbox" />}
+        renderValue={selected => (selected as string[]).join(", ")}
+        MenuProps={MenuProps}
+        id={id}
+        {...props}
+      >
+        {availableOptions.map(curOption => (
+          <MenuItem key={curOption} value={curOption}>
+            <Checkbox checked={field.value.indexOf(curOption) > -1} />
+            <ListItemText primary={curOption} />
+          </MenuItem>
+        ))}
+      </Select>
+    </>
+  );
 };
+
+export default FormikUICustomSelect;

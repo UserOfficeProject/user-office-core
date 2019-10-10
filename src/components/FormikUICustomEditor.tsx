@@ -1,7 +1,7 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { FormikActions } from "formik";
-export const FormikUICustomEditor = ({
+const FormikUICustomEditor = ({
   field,
   form,
   ...props
@@ -10,6 +10,12 @@ export const FormikUICustomEditor = ({
   form: FormikActions<any>;
 }) => {
   return (
-    <Editor initialValue={field.value} {...props} onEditorChange={content => form.setFieldValue(field.name, content)} />
+    <Editor
+      initialValue={field.value}
+      {...props}
+      onEditorChange={content => form.setFieldValue(field.name, content)}
+    />
   );
 };
+
+export default FormikUICustomEditor;

@@ -4,8 +4,8 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import { FormikUICustomCheckbox } from "./FormikUICustomCheckbox";
-import { FormikUICustomTable } from "./FormikUICustomTable";
+import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
+import FormikUICustomTable from "./FormikUICustomTable";
 import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
 

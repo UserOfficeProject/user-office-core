@@ -60,3 +60,5 @@ export const FormikUICustomTable = ({
     />
   );
 };
+
+export default FormikUICustomTable;
