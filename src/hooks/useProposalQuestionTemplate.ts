@@ -1,15 +1,12 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
 import { ProposalTemplate } from "../model/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();
-  const [proposalTemplate, setProposalTemplate] = useState<ProposalTemplate | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const getProposalTemplateRequest = () => {
-      const query = `
+  const getProposalTemplateRequest = useCallback(async () => {
+    const query = `
             query {
               proposalTemplate {
                 topics {
@@ -30,16 +27,14 @@ export function useProposalQuestionTemplate() {
               }
             }`;
 
-      sendRequest(query).then(data => {
-        setLoading(false);
-        setProposalTemplate(
-          new ProposalTemplate(data.proposalTemplate)
-        );
-      });
-      
-    };
-    getProposalTemplateRequest();
+    return new Promise<ProposalTemplate>((resolve, reject) => {
+      sendRequest(query)
+        .then(data => {
+          resolve(new ProposalTemplate(data.proposalTemplate));
+        })
+        .catch((e: any) => reject(e));
+    });
   }, [sendRequest]); // passing empty array as a second param so that effect is called only once on mount
 
-  return { loading, proposalTemplate };
+  return getProposalTemplateRequest;
 }

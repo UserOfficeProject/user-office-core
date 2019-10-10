@@ -29,17 +29,17 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
-  // NOTE: We have this variable here,
-  // otherwise useEffect will cause event to be dispatched on every render
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const { proposalTemplate } = useProposalQuestionTemplate();
+
+  const getProposalTemplateRequest = useProposalQuestionTemplate();
 
   useEffect(() => {
-    if (proposalTemplate && !isLoaded) {
-      setIsLoaded(true);
-      dispatch({ type: EventType.READY, payload: proposalTemplate });
-    }
-  }, [proposalTemplate, dispatch, isLoaded]);
+    getProposalTemplateRequest().then(data => {
+      dispatch({
+        type: EventType.READY,
+        payload: data
+      });
+    });
+  }, []);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
