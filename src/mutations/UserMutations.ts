@@ -87,12 +87,12 @@ export default class UserMutations {
             type: "emailVerification",
             updated: user.updated
           },
-          config.secret,
+          process.env.secret,
           { expiresIn: "24h" }
         );
 
         // Email verification link
-        const link = config.baseURL + "/emailVerification/" + token;
+        const link = process.env.baseURL + "/emailVerification/" + token;
 
         return { user, link };
       },
@@ -233,7 +233,7 @@ export default class UserMutations {
   async emailVerification(token: string) {
     // Check that token is valid
     try {
-      const decoded = jsonwebtoken.verify(token, config.secret);
+      const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation

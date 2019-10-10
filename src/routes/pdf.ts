@@ -3,7 +3,6 @@ import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
 import { ProposalTemplate, DataType } from "./ProposalModel";
 const jsonwebtoken = require("jsonwebtoken");
-const config = require("./../../config");
 
 const PDFDocument = require("pdfkit");
 const router = express.Router();
@@ -18,7 +17,7 @@ const getAttachments = (attachmentId: string) => {
 
 router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
-    const decoded = jsonwebtoken.verify(req.cookies.token, config.secret);
+    const decoded = jsonwebtoken.verify(req.cookies.token, process.env.secret);
     const proposalId = req.params.proposal_id;
     let user = null;
 

@@ -5,7 +5,7 @@ const options = {
   endpoint: "https://api.eu.sparkpost.com:443"
 };
 const client = new SparkPost(
-  "912cf7ccce97c1bacf463658cabe75e6629c397f",
+  "7b00d31b034c99335e85ecc27843a0b5da2a2149",
   options
 );
 
@@ -114,13 +114,14 @@ export default function createHandler(userDataSource: UserDataSource) {
       }
 
       case "ACCOUNT_CREATED": {
+        console.log("asda");
         client.transmissions
           .send({
             options: {
               sandbox: true
             },
             content: {
-              from: "testing@sparkpostbox.com",
+              from: "noreply@demax.esss.se",
               subject: "Hello, World!",
               html: createEmail(
                 "ESS User portal reset password",
