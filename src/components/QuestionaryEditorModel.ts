@@ -77,7 +77,13 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           return draft;
         case EventType.UPDATE_FIELD_REQUESTED:
           const field: ProposalTemplateField = action.payload.field;
-          Object.assign(draft.getFieldById(field.proposal_question_id), field);
+          const fieldToUpdate = draft.getFieldById(field.proposal_question_id);
+          if (field && fieldToUpdate) {
+            Object.assign(fieldToUpdate, field);
+          } else {
+            console.error("Object(s) are not defined", field, fieldToUpdate);
+          }
+
           return draft;
         case EventType.FIELD_CREATED:
           const newField: ProposalTemplateField = action.payload;
