@@ -4,7 +4,8 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  makeStyles
 } from "@material-ui/core";
 import { FormikActions } from "formik";
 import {
@@ -14,6 +15,7 @@ import {
   FieldCondition,
   ProposalTemplateField
 } from "../model/ProposalModel";
+import getTemplateFieldIcon from "./getTemplateFieldIcon";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -30,6 +32,16 @@ const FormikUICustomDependencySelector = ({
   const [operator, setOperator] = useState<string | undefined>();
   const [dependencyValue, setDependencyValue] = useState<string | undefined>();
   const [availableValues, setAvailableValues] = useState<string[]>([]);
+
+  const classes = makeStyles(theme => ({
+    menuItem: {
+      display: "flex",
+      alignItems: "center",
+      "& SVG": {
+        marginRight: theme.spacing(1)
+      }
+    }
+  }))();
 
   useEffect(() => {
     if (!question) {
@@ -90,13 +102,24 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {template.getAllFields().map(option => {
-              return (
-                <MenuItem value={option.proposal_question_id}>
-                  {option.question}
-                </MenuItem>
-              );
-            })}
+            {template
+              .getAllFields()
+              .filter(option =>
+                [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
+                  option.data_type
+                )
+              )
+              .map(option => {
+                return (
+                  <MenuItem
+                    value={option.proposal_question_id}
+                    className={classes.menuItem}
+                  >
+                    {/* {getTemplateFieldIcon(option.data_type)}  */}
+                    {option.question}
+                  </MenuItem>
+                );
+              })}
           </Select>
         </FormControl>
       </Grid>
