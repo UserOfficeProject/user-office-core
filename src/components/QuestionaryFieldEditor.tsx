@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
 import {
   ProposalTemplateField,
@@ -78,11 +78,18 @@ export default function QuestionaryFieldEditor(props: {
   );
 }
 
-export type AdminComponentSignature = {
-  (props: {
-    field: ProposalTemplateField;
-    template: ProposalTemplate;
-    dispatch: React.Dispatch<IEvent>;
-    closeMe: Function;
-  }): JSX.Element;
-};
+interface AdminComponentProps {
+  field: ProposalTemplateField;
+  template: ProposalTemplate;
+  dispatch: React.Dispatch<IEvent>;
+  closeMe: Function;
+}
+
+interface AdminComponentShellProps extends AdminComponentProps {
+  label: string;
+}
+export interface AdminComponentSignature
+  extends FunctionComponent<AdminComponentProps> {}
+
+export interface AdminComponentShellSignature
+  extends FunctionComponent<AdminComponentShellProps> {}

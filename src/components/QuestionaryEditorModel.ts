@@ -29,18 +29,18 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
-  const newDispatch = useCallback(dispatch, []);
+  const memoizedDispatch = useCallback(dispatch, []);
 
   const getProposalTemplateRequest = useProposalQuestionTemplate();
 
   useEffect(() => {
     getProposalTemplateRequest().then(data => {
-      newDispatch({
+      memoizedDispatch({
         type: EventType.READY,
         payload: data
       });
     });
-  }, [getProposalTemplateRequest, newDispatch]);
+  }, [getProposalTemplateRequest, memoizedDispatch]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {

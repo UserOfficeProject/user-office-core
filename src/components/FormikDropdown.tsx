@@ -3,7 +3,6 @@ import { TextField } from "formik-material-ui";
 import { MenuItem } from "@material-ui/core";
 import { Field } from "formik";
 
-
 class FormikDropdown extends React.Component<TProps> {
   render() {
     return (
@@ -19,6 +18,7 @@ class FormikDropdown extends React.Component<TProps> {
         }}
         fullWidth
       >
+        {this.props.children}
         {this.props.items.map(option => {
           return (
             <MenuItem key={option.value} value={option.value}>

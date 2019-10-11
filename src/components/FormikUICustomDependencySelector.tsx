@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Grid,
   Select,
@@ -43,24 +43,36 @@ const FormikUICustomDependencySelector = ({
     }
   }, [question]);
 
-  useEffect(() => {
+  const updateFormik = () => {
     var dep = new FieldDependency(null);
+    dep.proposal_question_id = question.proposal_question_id; // currently only 1 supported
+    dep.proposal_question_dependency = dependencyId!;
+    var cond = new FieldCondition(null);
+    cond!.condition = operator!;
+    cond.params = dependencyValue;
+    dep.condition = cond;
+    form.setFieldValue(field.name, [dep]);
+  };
+
+  const updateFormikMemoized = useCallback(updateFormik, [
+    dependencyId,
+    operator,
+    dependencyValue
+  ]);
+
+  useEffect(() => {
     if (dependencyId && operator && dependencyValue) {
-      dep.proposal_question_id = question.proposal_question_id; // currently only 1 supported
-      dep.proposal_question_dependency = dependencyId;
-      var cond = new FieldCondition(null);
-      cond.condition = operator;
-      cond.params = dependencyValue;
-      dep.condition = cond;
-      form.setFieldValue(field.name, [dep]);
+      updateFormikMemoized();
     }
-  }, [dependencyId, operator, dependencyValue]);
+  }, [dependencyId, operator, dependencyValue, updateFormikMemoized]);
 
   return (
     <Grid container>
       <Grid item xs={5}>
         <FormControl fullWidth>
-          <InputLabel htmlFor="dependency-id">If field</InputLabel>
+          <InputLabel htmlFor="dependency-id" shrink>
+            If field
+          </InputLabel>
           <Select
             id="dependency-id"
             value={dependencyId}
@@ -91,7 +103,9 @@ const FormikUICustomDependencySelector = ({
 
       <Grid item xs={3}>
         <FormControl fullWidth>
-          <InputLabel htmlFor="operator">Compares</InputLabel>
+          <InputLabel shrink htmlFor="operator">
+            Compares
+          </InputLabel>
           <Select
             fullWidth
             id="operator"
@@ -108,7 +122,9 @@ const FormikUICustomDependencySelector = ({
 
       <Grid item xs={4}>
         <FormControl fullWidth>
-          <InputLabel htmlFor="dependencyValue">Value</InputLabel>
+          <InputLabel shrink htmlFor="dependencyValue">
+            Value
+          </InputLabel>
           <Select
             fullWidth
             id="dependencyValue"

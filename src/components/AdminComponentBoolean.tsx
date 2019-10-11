@@ -1,5 +1,4 @@
 import React from "react";
-import { Typography, Button } from "@material-ui/core";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
@@ -7,12 +6,13 @@ import { AdminComponentSignature } from "./QuestionaryFieldEditor";
 import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 import * as Yup from "yup";
+import { AdminComponentShell } from "./AdminComponentShell";
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
 
   return (
-    <>
+    <AdminComponentShell {...props} label="Checkbox">
       <Formik
         initialValues={field}
         onSubmit={async vals => {
@@ -33,8 +33,6 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
       >
         {formikProps => (
           <Form style={{ flexGrow: 1 }}>
-            <Typography>Checkbox</Typography>
-
             <Field
               name="question"
               label="Question"
@@ -65,35 +63,9 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               fullWidth
               data-cy="required"
             />
-
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                data-cy="delete"
-                onClick={() => {
-                  props.dispatch({
-                    type: EventType.DELETE_FIELD_REQUESTED,
-                    payload: { fieldId: field.proposal_question_id }
-                  });
-                  props.closeMe();
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                data-cy="submit"
-              >
-                Save
-              </Button>
-            </div>
           </Form>
         )}
       </Formik>
-    </>
+    </AdminComponentShell>
   );
 };

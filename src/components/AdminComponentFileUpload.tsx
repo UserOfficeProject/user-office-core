@@ -1,17 +1,18 @@
 import React from "react";
-import { Typography, Button } from "@material-ui/core";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
 import * as Yup from "yup";
 import FormikUICustomSelect from "./FormikUICustomSelect";
+import { AdminComponentShell } from "./AdminComponentShell";
+import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 
 export const AdminComponentFileUpload: AdminComponentSignature = props => {
   const field = props.field;
 
   return (
-    <>
+    <AdminComponentShell {...props} label="File upload">
       <Formik
         initialValues={field}
         onSubmit={async vals => {
@@ -34,8 +35,6 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
       >
         {() => (
           <Form style={{ flexGrow: 1 }}>
-            <Typography>Checkbox</Typography>
-
             <Field
               name="question"
               label="Question"
@@ -84,35 +83,19 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
               fullWidth
               data-cy="max_files"
             />
-
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                data-cy="delete"
-                onClick={() => {
-                  props.dispatch({
-                    type: EventType.DELETE_FIELD_REQUESTED,
-                    payload: { fieldId: field.proposal_question_id }
-                  });
-                  props.closeMe();
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                data-cy="submit"
-              >
-                Save
-              </Button>
-            </div>
+            <Field
+              name="dependencies"
+              component={FormikUICustomDependencySelector}
+              question={props.field}
+              template={props.template}
+              label="User must check it to continue"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
           </Form>
         )}
       </Formik>
-    </>
+    </AdminComponentShell>
   );
 };
