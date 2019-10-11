@@ -25,9 +25,16 @@ export function usePersistModel() {
       fieldIds
     };
 
-    setIsLoading(true);
-    await sendRequest(mutation, variables);
-    setIsLoading(false);
+    return sendRequest(mutation, variables).then(
+      (result: {
+        updateFieldTopicRel: {
+          error?: string;
+          result?: boolean;
+        };
+      }) => {
+        return result.updateFieldTopicRel;
+      }
+    );
   };
 
   const updateTopic = async (
@@ -37,6 +44,9 @@ export function usePersistModel() {
     const mutation = `
     mutation($topicId:Int!, $title:String, $isEnabled:Boolean) {
       updateTopic(id:$topicId, title:$title, isEnabled:$isEnabled) {
+        topic {
+          topic_id
+        }
         error
       }
     }
@@ -46,9 +56,16 @@ export function usePersistModel() {
       topicId
     };
 
-    setIsLoading(true);
-    await sendRequest(mutation, variables);
-    setIsLoading(false);
+    return sendRequest(mutation, variables).then(
+      (result: {
+        updateTopic: {
+          error?: string;
+          topic?: { topic_id: number };
+        };
+      }) => {
+        return result.updateTopic;
+      }
+    );
   };
 
   const updateItem = async (field: ProposalTemplateField) => {
@@ -74,12 +91,19 @@ export function usePersistModel() {
         : []
     };
 
-    setIsLoading(true);
-    await sendRequest(mutation, variables);
-    setIsLoading(false);
+    return sendRequest(mutation, variables).then(
+      (result: {
+        updateProposalTemplateField: {
+          error?: string;
+          field?: { proposal_question_id: string };
+        };
+      }) => {
+        return result.updateProposalTemplateField;
+      }
+    );
   };
 
-  const createField = async (topicId: number, dataType: DataType) => {
+  const createTemplateField = async (topicId: number, dataType: DataType) => {
     const mutation = `
     mutation($topicId:Int!, $dataType:String!) {
       createTemplateField(topicId:$topicId, dataType:$dataType) {
@@ -102,7 +126,16 @@ export function usePersistModel() {
     setIsLoading(true);
     return sendRequest(mutation, variables).then(
       (result: {
-        createTemplateField: { error: string; field: ProposalTemplateField };
+        createTemplateField: {
+          error?: string;
+          field?: {
+            proposal_question_id: string;
+            ddata_type: DataType;
+            question: string;
+            config: string;
+            topic_id: number;
+          };
+        };
       }) => {
         setIsLoading(false);
         return result.createTemplateField;
@@ -145,10 +178,13 @@ export function usePersistModel() {
         deleteTemplateField: { error?: string; template?: ProposalTemplate };
       }) => {
         setIsLoading(false);
+        data.deleteTemplateField.error = "NOT_ENOUGHT_MINERALS";
         return data.deleteTemplateField;
       }
     );
   };
+
+  type MonitorableServiceCall = () => Promise<{ error?: string }>;
 
   const persistModel = ({
     getState,
@@ -157,6 +193,19 @@ export function usePersistModel() {
     getState: () => ProposalTemplate;
     dispatch: React.Dispatch<IEvent>;
   }) => {
+    const executeAndMonitorCall = (call: MonitorableServiceCall) => {
+      setIsLoading(true);
+      call().then(result => {
+        if (result.error) {
+          dispatch({
+            type: EventType.SERVICE_ERROR_OCCURRED,
+            payload: result.error
+          });
+        }
+        setIsLoading(false);
+      });
+    };
+
     return (next: Function) => (action: IEvent) => {
       next(action);
       const state = getState();
@@ -174,49 +223,67 @@ export function usePersistModel() {
             topic => topic.topic_id === extendedTopicId
           );
 
-          updateFieldTopicRel(
-            reducedTopic!.topic_id,
-            reducedTopic!.fields.map(field => field.proposal_question_id)
+          executeAndMonitorCall(() =>
+            updateFieldTopicRel(
+              reducedTopic!.topic_id,
+              reducedTopic!.fields.map(field => field.proposal_question_id)
+            )
           );
           if (reducedTopicId !== extendedTopicId) {
-            updateFieldTopicRel(
-              extendedTopic!.topic_id,
-              extendedTopic!.fields.map(field => field.proposal_question_id)
+            executeAndMonitorCall(() =>
+              updateFieldTopicRel(
+                extendedTopic!.topic_id,
+                extendedTopic!.fields.map(field => field.proposal_question_id)
+              )
             );
           }
           break;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          updateTopic(action.payload.topicId, {
-            title: action.payload.title as string
-          });
+          executeAndMonitorCall(() =>
+            updateTopic(action.payload.topicId, {
+              title: action.payload.title as string
+            })
+          );
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
-          updateItem(action.payload.field as ProposalTemplateField);
+          executeAndMonitorCall(() =>
+            updateItem(action.payload.field as ProposalTemplateField)
+          );
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
-          createField(
-            action.payload.topicId,
-            (action.payload.newField as ProposalTemplateField).data_type
-          ).then(result => {
-            if (result.field) {
-              dispatch({
-                type: EventType.FIELD_CREATED,
-                payload: new ProposalTemplateField(result.field)
-              });
-            }
-          });
+          executeAndMonitorCall(
+            () =>
+              new Promise((resolve, reject) =>
+                createTemplateField(
+                  action.payload.topicId,
+                  (action.payload.newField as ProposalTemplateField).data_type
+                ).then(result => {
+                  if (result.field) {
+                    dispatch({
+                      type: EventType.FIELD_CREATED,
+                      payload: new ProposalTemplateField(result.field)
+                    });
+                    resolve(result);
+                  }
+                })
+              )
+          );
           break;
         case EventType.DELETE_FIELD_REQUESTED:
-          deleteField(action.payload.fieldId).then(result => {
-            if (result.template) {
-              setTimeout(function() {
-                dispatch({
-                  type: EventType.FIELD_DELETED,
-                  payload: result.template!
-                });
-              }, 1000);
-            }
-          });
+          executeAndMonitorCall(
+            () =>
+              new Promise((resolve, reject) =>
+                deleteField(action.payload.fieldId).then(result => {
+                  if (result.template) {
+                    dispatch({
+                      type: EventType.FIELD_DELETED,
+                      payload: result.template!
+                    });
+                    resolve(result);
+                  }
+                })
+              )
+          );
           break;
         default:
           break;

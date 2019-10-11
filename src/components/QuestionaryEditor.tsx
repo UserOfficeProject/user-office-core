@@ -1,15 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
-import QuestionaryEditorModel, { EventType } from "./QuestionaryEditorModel";
+import QuestionaryEditorModel, {
+  EventType,
+  IEvent
+} from "./QuestionaryEditorModel";
 import { Paper, makeStyles, useTheme } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
+import Notification from "./Notification";
 
 export default function QuestionaryEditor() {
+  const reducerMiddleware = () => {
+    return (next: Function) => (action: IEvent) => {
+      next(action);
+      if (action.type === EventType.SERVICE_ERROR_OCCURRED) {
+        setErrorState({ ...errorState, open: true, message: action.payload });
+      }
+    };
+  };
+
   var { persistModel } = usePersistModel();
-  var { state, dispatch } = QuestionaryEditorModel([persistModel]);
+  var { state, dispatch } = QuestionaryEditorModel([
+    persistModel,
+    reducerMiddleware
+  ]);
+  const [errorState, setErrorState] = useState({
+    open: false,
+    message: "",
+    variant: "error"
+  });
 
   const [
     selectedField,
@@ -59,6 +80,14 @@ export default function QuestionaryEditor() {
 
   return (
     <>
+      <Notification
+        open={errorState.open}
+        onClose={() => {
+          setErrorState({ ...errorState, open: false });
+        }}
+        variant={errorState.variant}
+        message={errorState.message}
+      />
       <Paper className={classes.paper}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
