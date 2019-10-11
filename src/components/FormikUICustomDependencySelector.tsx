@@ -15,7 +15,6 @@ import {
   FieldCondition,
   ProposalTemplateField
 } from "../model/ProposalModel";
-import getTemplateFieldIcon from "./getTemplateFieldIcon";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -31,7 +30,7 @@ const FormikUICustomDependencySelector = ({
   const [dependencyId, setDependencyId] = useState<string | undefined>();
   const [operator, setOperator] = useState<string | undefined>();
   const [dependencyValue, setDependencyValue] = useState<string | undefined>();
-  const [availableValues, setAvailableValues] = useState<string[]>([]);
+  const [availableValues, setAvailableValues] = useState<IOption[]>([]);
 
   const classes = makeStyles(theme => ({
     menuItem: {
@@ -92,11 +91,18 @@ const FormikUICustomDependencySelector = ({
               const depFieldId = event.target.value as string;
               const depField = template.getFieldById(depFieldId);
               if (depField.data_type === DataType.BOOLEAN) {
-                setAvailableValues(["true", "false"]); // use options
+                setAvailableValues([
+                  { label: "true", value: true },
+                  { label: "false", value: false }
+                ]);
               } else if (
                 depField.data_type === DataType.SELECTION_FROM_OPTIONS
               ) {
-                setAvailableValues(depField.config.options!); // use options
+                setAvailableValues(
+                  depField.config.options!.map(option => {
+                    return { value: option, label: option };
+                  })
+                ); // use options
               }
 
               setDependencyId(depFieldId);
@@ -157,7 +163,8 @@ const FormikUICustomDependencySelector = ({
             }}
           >
             {availableValues.map(option => {
-              return <MenuItem value={option}>{option}</MenuItem>;
+              // @ts-ignore should work
+              return <MenuItem value={option.value}>{option.label}</MenuItem>;
             })}
           </Select>
         </FormControl>
@@ -167,3 +174,8 @@ const FormikUICustomDependencySelector = ({
 };
 
 export default FormikUICustomDependencySelector;
+
+interface IOption {
+  value: string | boolean | number;
+  label: string;
+}

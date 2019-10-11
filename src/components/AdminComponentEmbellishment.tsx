@@ -7,31 +7,32 @@ import FormikUICustomEditor from "./FormikUICustomEditor";
 import * as Yup from "yup";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
+import TitledContainer from "./TitledContainer";
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
   const field = props.field;
   return (
-    <AdminComponentShell {...props} label="Embellishment">
-      <Formik
-        initialValues={field}
-        onSubmit={async vals => {
-          props.dispatch({
-            type: EventType.UPDATE_FIELD_REQUESTED,
-            payload: {
-              field: { ...field, ...vals }
-            }
-          });
-          props.closeMe();
-        }}
-        validationSchema={Yup.object().shape({
-          config: Yup.object({
-            html: Yup.string().required("Content is required"),
-            plain: Yup.string().required("Plain description is required")
-          })
-        })}
-      >
-        {formikProps => (
-          <Form style={{ flexGrow: 1 }}>
+    <Formik
+      initialValues={field}
+      onSubmit={async vals => {
+        props.dispatch({
+          type: EventType.UPDATE_FIELD_REQUESTED,
+          payload: {
+            field: { ...field, ...vals }
+          }
+        });
+        props.closeMe();
+      }}
+      validationSchema={Yup.object().shape({
+        config: Yup.object({
+          html: Yup.string().required("Content is required"),
+          plain: Yup.string().required("Plain description is required")
+        })
+      })}
+    >
+      {formikProps => (
+        <Form style={{ flexGrow: 1 }}>
+          <AdminComponentShell {...props} label="Embellishment">
             <Field
               name="config.html"
               type="text"
@@ -57,19 +58,21 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               fullWidth
               data-cy="max"
             />
-            <Field
-              name="dependencies"
-              component={FormikUICustomDependencySelector}
-              question={props.field}
-              template={props.template}
-              label="User must check it to continue"
-              margin="normal"
-              fullWidth
-              data-cy="required"
-            />
-          </Form>
-        )}
-      </Formik>
-    </AdminComponentShell>
+            <TitledContainer label="Dependencies">
+              <Field
+                name="dependencies"
+                component={FormikUICustomDependencySelector}
+                question={props.field}
+                template={props.template}
+                label="User must check it to continue"
+                margin="normal"
+                fullWidth
+                data-cy="required"
+              />
+            </TitledContainer>
+          </AdminComponentShell>
+        </Form>
+      )}
+    </Formik>
   );
 };

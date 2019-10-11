@@ -9,9 +9,11 @@ import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
+import TitledContainer from "./TitledContainer";
 
 export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
   const field = props.field;
+
   return (
     <Formik
       initialValues={field}
@@ -45,55 +47,63 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
               data-cy="question"
             />
 
-            <Field
-              name="config.required"
-              label="Is required"
-              checked={formikProps.values.config.required}
-              component={FormikUICustomCheckbox}
-              margin="normal"
-              fullWidth
-              data-cy="required"
-            />
+            <TitledContainer label="Constraints">
+              <Field
+                name="config.required"
+                label="Is required"
+                checked={formikProps.values.config.required}
+                component={FormikUICustomCheckbox}
+                margin="normal"
+                fullWidth
+                data-cy="required"
+              />
+            </TitledContainer>
 
-            <Field
-              name="config.options"
-              label="Options"
-              component={FormikUICustomTable}
-              columns={[{ title: "Answer", field: "answer" }]}
-              dataTransforms={{
-                toTable: (options: string[]) => {
-                  return options.map(option => {
-                    return { answer: option };
-                  });
-                },
-                fromTable: (rows: any[]) => {
-                  return rows.map(row => row.answer);
-                }
-              }}
-              margin="normal"
-              fullWidth
-              data-cy="options"
-            />
+            <TitledContainer label="Options">
+              <FormikDropdown
+                name="config.variant"
+                label="Variant"
+                items={[
+                  { text: "Radio", value: "radio" },
+                  { text: "Dropdown", value: "dropdown" }
+                ]}
+                data-cy="variant"
+              />
+            </TitledContainer>
 
-            <FormikDropdown
-              name="config.variant"
-              label="Variant"
-              items={[
-                { text: "Radio", value: "radio" },
-                { text: "Dropdown", value: "dropdown" }
-              ]}
-              data-cy="variant"
-            />
-            <Field
-              name="dependencies"
-              component={FormikUICustomDependencySelector}
-              question={props.field}
-              template={props.template}
-              label="User must check it to continue"
-              margin="normal"
-              fullWidth
-              data-cy="required"
-            />
+            <TitledContainer label="Items">
+              <Field
+                title=""
+                name="config.options"
+                component={FormikUICustomTable}
+                columns={[{ title: "Answer", field: "answer" }]}
+                dataTransforms={{
+                  toTable: (options: string[]) => {
+                    return options.map(option => {
+                      return { answer: option };
+                    });
+                  },
+                  fromTable: (rows: any[]) => {
+                    return rows.map(row => row.answer);
+                  }
+                }}
+                margin="normal"
+                fullWidth
+                data-cy="options"
+              />
+            </TitledContainer>
+            <TitledContainer label="Dependencies">
+              <Field
+                name="dependencies"
+                component={FormikUICustomDependencySelector}
+                question={props.field}
+                template={props.template}
+                label="User must check it to continue"
+                margin="normal"
+                fullWidth
+                data-cy="required"
+              />
+            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}
