@@ -5,7 +5,7 @@ const FormikUICustomCheckbox = ({
   checked,
   label
 }: {
-  field: any;
+  field: { name: string; value: string };
   checked: boolean;
   label: string;
 }) => {

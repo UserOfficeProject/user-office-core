@@ -88,6 +88,7 @@ export default function QuestionaryEditor() {
         field={selectedField}
         dispatch={dispatch}
         closeMe={handleFieldEditorClose}
+        template={state}
       />
     </>
   );

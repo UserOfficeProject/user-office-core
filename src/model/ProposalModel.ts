@@ -16,29 +16,32 @@ export class ProposalData {
 export class ProposalTemplate {
   public topics: Topic[] = [];
   private fields: ProposalTemplateField[] = []; // reference to all fields for quick lookup
-  
+
   private conditionEvalator = new ConditionEvaluator();
-  
+
   constructor(obj: object | null = null) {
     if (obj !== null) {
       Object.assign(this, obj);
       if (this.topics !== null) {
         this.topics = this.topics.map(x => new Topic(x));
-        this.topics.forEach(topic => topic.fields && (this.fields = this.fields.concat(topic.fields)));
+        this.topics.forEach(
+          topic =>
+            topic.fields && (this.fields = this.fields.concat(topic.fields))
+        );
       }
     }
   }
 
-  public addField(field:ProposalTemplateField):void {
+  public addField(field: ProposalTemplateField): void {
     this.getTopicById(field.topic_id)!.fields.unshift(field);
     this.fields.unshift(field);
   }
-  
-  public getAllFields():ProposalTemplateField[] {
+
+  public getAllFields(): ProposalTemplateField[] {
     return this.fields;
   }
 
-  public getTopicById(topicId:number):Topic | undefined {
+  public getTopicById(topicId: number): Topic | undefined {
     return this.topics.find(topic => topic.topic_id === topicId);
   }
 
@@ -53,13 +56,17 @@ export class ProposalTemplate {
     this.fields.find(field => field.proposal_question_id === questionId)!;
 
   private isDependencySatisfied(dependency: FieldDependency): boolean {
-    const { condition, params } = JSON.parse(dependency.condition);
+    const { condition, params } = dependency.condition;
     const field = this.getFieldById(dependency.proposal_question_dependency);
-    const isParentSattisfied = this.areDependenciesSatisfied(dependency.proposal_question_dependency);
-    return isParentSattisfied &&
+    const isParentSattisfied = this.areDependenciesSatisfied(
+      dependency.proposal_question_dependency
+    );
+    return (
+      isParentSattisfied &&
       this.conditionEvalator
-      .getConfitionEvaluator(condition)
-      .isSattisfied(field, params);
+        .getConfitionEvaluator(condition)
+        .isSattisfied(field, params)
+    );
   }
 }
 
@@ -72,13 +79,13 @@ export class Topic {
       }
     }
   }
-  public topic_id!:number;
+  public topic_id!: number;
   public topic_title!: string;
-  public fields!:ProposalTemplateField[];
+  public fields!: ProposalTemplateField[];
 
   public getFieldById = (questionId: string) =>
-    this.fields && this.fields.find(field => field.proposal_question_id === questionId)!;
-
+    this.fields &&
+    this.fields.find(field => field.proposal_question_id === questionId)!;
 }
 
 export class ProposalTemplateField {
@@ -102,10 +109,8 @@ export class ProposalTemplateField {
       if (typeof this.value == "string") {
         try {
           this.value = JSON.parse(this.value).value;
-        }
-        catch(e) {}
-      }
-      else {
+        } catch (e) {}
+      } else {
         this.value = "";
       }
     }
@@ -115,10 +120,24 @@ export class ProposalTemplateField {
 export class FieldDependency {
   public proposal_question_id!: string;
   public proposal_question_dependency!: string;
+  public condition!: FieldCondition;
+
+  constructor(obj: any | null = null) {
+    if (obj != null) {
+      Object.assign(this, obj);
+      if (this.condition != null) {
+        this.condition = new FieldCondition(JSON.parse(obj.condition));
+      }
+    }
+  }
+}
+
+export class FieldCondition {
   public condition!: string;
+  public params: any;
 
   constructor(obj: object | null = null) {
-    if (obj != null) {
+    if (obj) {
       Object.assign(this, obj);
     }
   }
@@ -136,37 +155,36 @@ export enum DataType {
   EMBELLISHMENT = "EMBELLISHMENT",
   FILE_UPLOAD = "FILE_UPLOAD",
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT",
+  TEXT_INPUT = "TEXT_INPUT"
 }
 
 export interface DataTypeSpec {
-  readonly:boolean;
+  readonly: boolean;
 }
 
-export function getDataTypeSpec(type:DataType):DataTypeSpec {
-  switch(type) {
+export function getDataTypeSpec(type: DataType): DataTypeSpec {
+  switch (type) {
     case DataType.EMBELLISHMENT:
-      return {readonly:true};
+      return { readonly: true };
     default:
-      return {readonly:false};   
+      return { readonly: false };
   }
 }
 
 export interface FieldConfig {
-  variant?: string, 
-  small_label?:string;
+  variant?: string;
+  small_label?: string;
   required?: boolean;
-  options?:string[];
-  file_type?:string[];
-  max_files?:number;
-  multiline?:boolean;
-  min?:number;
-  max?:number;
-  placeholder?:string;
-  html?:string;
-  plain?:string;
+  options?: string[];
+  file_type?: string[];
+  max_files?: number;
+  multiline?: boolean;
+  min?: number;
+  max?: number;
+  placeholder?: string;
+  html?: string;
+  plain?: string;
 }
-
 
 export interface ProposalInformation {
   id: number;
@@ -178,7 +196,7 @@ export interface ProposalInformation {
   updated?: string;
   users?: any; // TODO implement
   questionary?: ProposalTemplate;
-  reviews?: any // TODO implement
+  reviews?: any; // TODO implement
 }
 
 export enum ProposalStatus {

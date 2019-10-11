@@ -4,7 +4,8 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import { FormikUICustomCheckbox } from "./FormikUICustomCheckbox";
+import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
+import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 import * as Yup from "yup";
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
@@ -48,6 +49,17 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               name="config.required"
               checked={formikProps.values.config.required}
               component={FormikUICustomCheckbox}
+              label="User must check it to continue"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+
+            <Field
+              name="dependencies"
+              component={FormikUICustomDependencySelector}
+              question={props.field}
+              template={props.template}
               label="User must check it to continue"
               margin="normal"
               fullWidth

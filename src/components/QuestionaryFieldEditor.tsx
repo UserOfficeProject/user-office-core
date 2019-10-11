@@ -1,6 +1,10 @@
 import React from "react";
 import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
-import { ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  ProposalTemplateField,
+  DataType,
+  ProposalTemplate
+} from "../model/ProposalModel";
 import JSDict from "../utils/Dictionary";
 import { IEvent } from "./QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +18,7 @@ export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
   dispatch: React.Dispatch<IEvent>;
   closeMe: Function;
+  template: ProposalTemplate;
 }) {
   const classes = makeStyles(() => ({
     container: {
@@ -32,7 +37,10 @@ export default function QuestionaryFieldEditor(props: {
   componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
   componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
   componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
-  componentMap.put(DataType.SELECTION_FROM_OPTIONS, AdminComponentMultipleChoice);
+  componentMap.put(
+    DataType.SELECTION_FROM_OPTIONS,
+    AdminComponentMultipleChoice
+  );
   componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
 
   if (props.field === null) {
@@ -61,7 +69,8 @@ export default function QuestionaryFieldEditor(props: {
           {componentMap.get(props.field.data_type)!({
             field: props.field,
             dispatch: props.dispatch,
-            closeMe: props.closeMe
+            closeMe: props.closeMe,
+            template: props.template
           })}
         </Grid>
       </Fade>
@@ -70,5 +79,10 @@ export default function QuestionaryFieldEditor(props: {
 }
 
 export type AdminComponentSignature = {
-  (props: { field: ProposalTemplateField; dispatch: React.Dispatch<IEvent>; closeMe: Function }): JSX.Element;
+  (props: {
+    field: ProposalTemplateField;
+    template: ProposalTemplate;
+    dispatch: React.Dispatch<IEvent>;
+    closeMe: Function;
+  }): JSX.Element;
 };

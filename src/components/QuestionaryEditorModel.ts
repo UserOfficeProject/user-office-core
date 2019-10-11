@@ -1,5 +1,5 @@
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import { Reducer, useEffect, useState } from "react";
+import { Reducer, useEffect, useCallback } from "react";
 import {
   ProposalTemplate,
   ProposalTemplateField
@@ -29,21 +29,18 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
+  const newDispatch = useCallback(dispatch, []);
 
   const getProposalTemplateRequest = useProposalQuestionTemplate();
-  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded) {
-      getProposalTemplateRequest().then(data => {
-        setIsLoaded(true);
-        dispatch({
-          type: EventType.READY,
-          payload: data
-        });
+    getProposalTemplateRequest().then(data => {
+      newDispatch({
+        type: EventType.READY,
+        payload: data
       });
-    }
-  }, [getProposalTemplateRequest, dispatch, isLoaded]);
+    });
+  }, [getProposalTemplateRequest, newDispatch]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
@@ -87,7 +84,6 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           } else {
             console.error("Object(s) are not defined", field, fieldToUpdate);
           }
-
           return draft;
         case EventType.FIELD_CREATED:
           const newField: ProposalTemplateField = action.payload;
