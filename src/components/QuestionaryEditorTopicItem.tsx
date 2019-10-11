@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { makeStyles, Grid, useTheme } from "@material-ui/core";
-import ShortTextIcon from "@material-ui/icons/ShortText";
-import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import TextFieldsIcon from "@material-ui/icons/TextFields";
+
 import LockIcon from "@material-ui/icons/Lock";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
 import { IEvent } from "./QuestionaryEditorModel";
+import getTemplateFieldIcon from "./getTemplateFieldIcon";
 
 export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
   dispatch: React.Dispatch<IEvent>;
   index: number;
-  onClick: {(data:ProposalTemplateField):void}
+  onClick: { (data: ProposalTemplateField): void };
 }) {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
@@ -27,7 +23,7 @@ export default function QuestionaryEditorTopicItem(props: {
     },
     question: {
       color: "#000",
-      fontSize:"15px",
+      fontSize: "15px",
       padding: "6px 0"
     },
     questionId: {
@@ -38,15 +34,15 @@ export default function QuestionaryEditorTopicItem(props: {
     dependencies: {
       fontSize: "12px",
       color: theme.palette.grey[400],
-      display:"flex",
-      padding:"10px 0 5px 0",
-      justifyContent:"flex-end",
-      alignItems:"center",
-      '& ul': {
-        display:"inline-block",
-        padding:"0",
-        margin:"0",
-        '& li': {
+      display: "flex",
+      padding: "10px 0 5px 0",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      "& ul": {
+        display: "inline-block",
+        padding: "0",
+        margin: "0",
+        "& li": {
           display: "inline",
           marginLeft: "3px",
           listStyle: "none"
@@ -54,7 +50,7 @@ export default function QuestionaryEditorTopicItem(props: {
       }
     },
     lockIcon: {
-      fontSize:"17px"
+      fontSize: "17px"
     }
   }))();
 
@@ -75,26 +71,6 @@ export default function QuestionaryEditorTopicItem(props: {
     ...draggableStyle
   });
 
-  const getIcon = (dataType: DataType) => {
-    switch (dataType) {
-      case DataType.TEXT_INPUT:
-        return <ShortTextIcon />;
-      case DataType.SELECTION_FROM_OPTIONS:
-        return <RadioButtonCheckedIcon />;
-      case DataType.BOOLEAN:
-        return <CheckBoxOutlineBlankIcon />;
-      case DataType.DATE:
-        return <CalendarTodayIcon />;
-      case DataType.FILE_UPLOAD:
-        return <AttachFileIcon />;
-      case DataType.EMBELLISHMENT:
-        return <TextFieldsIcon />;
-
-      default:
-        return null;
-    }
-  };
-  
   const dependencies = props.data.dependencies;
   const dependenciesJsx =
     dependencies && dependencies.length > 0 ? (
@@ -102,7 +78,15 @@ export default function QuestionaryEditorTopicItem(props: {
         <LockIcon className={classes.lockIcon} />
         <ul>
           {dependencies.map(dep => {
-            return <li key={dep.proposal_question_id + dep.proposal_question_dependency}>{dep.proposal_question_dependency}</li>;
+            return (
+              <li
+                key={
+                  dep.proposal_question_id + dep.proposal_question_dependency
+                }
+              >
+                {dep.proposal_question_dependency}
+              </li>
+            );
           })}
         </ul>
       </>
@@ -127,13 +111,15 @@ export default function QuestionaryEditorTopicItem(props: {
           )}
           onMouseEnter={() => setIsHover(true)}
           onMouseLeave={() => setIsHover(false)}
-          onClick={() => {props.onClick(props.data)}}
+          onClick={() => {
+            props.onClick(props.data);
+          }}
         >
           <Grid item xs={10} className={classes.questionId}>
             {props.data.proposal_question_id}
           </Grid>
           <Grid item xs={2} className={classes.icon}>
-            {getIcon(props.data.data_type)}
+            {getTemplateFieldIcon(props.data.data_type)}
           </Grid>
 
           <Grid item xs={10} className={classes.question}>
@@ -141,7 +127,7 @@ export default function QuestionaryEditorTopicItem(props: {
               ? props.data.config.plain
               : props.data.question}
           </Grid>
-          
+
           <Grid item xs={12} className={classes.dependencies}>
             {dependenciesJsx}
           </Grid>
