@@ -67,9 +67,11 @@ export function usePersistModel() {
       question: field.question,
       config: field.config ? JSON.stringify(field.config) : undefined,
       isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
-      dependencies: field.dependencies!.map(dep => {
-        return { ...dep, condition: JSON.stringify(dep.condition) };
-      })
+      dependencies: field.dependencies
+        ? field.dependencies.map(dep => {
+            return { ...dep, condition: JSON.stringify(dep.condition) };
+          })
+        : []
     };
 
     setIsLoading(true);

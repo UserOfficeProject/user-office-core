@@ -126,7 +126,7 @@ export class FieldDependency {
     if (obj != null) {
       Object.assign(this, obj);
       if (this.condition != null) {
-        this.condition = new FieldCondition(JSON.parse(obj.condition));
+        this.condition = new FieldCondition(obj.condition);
       }
     }
   }
