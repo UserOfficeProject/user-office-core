@@ -21,7 +21,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     const decoded = jsonwebtoken.verify(req.cookies.token, config.secret);
     const proposalId = req.params.proposal_id;
     let user = null;
-
+    const notAnswered = "This question is not mandatory and was not answered.";
     // Authenticate user and fecth user, co-proposer and proposal with questionary
     user = await baseContext.queries.user.getAgent(decoded.user.id);
 
@@ -79,7 +79,10 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
     let attachmentIds: string[] = []; // Save attachments for appendix
     doc.image("./images/ESS.png", 15, 15, { width: 100 });
-    doc.fontSize(30).text(`Proposal: ${proposal.title}`);
+    doc
+      .fontSize(14)
+      .font("Times-Bold")
+      .text(`Proposal: ${proposal.title}`);
     doc.moveDown();
 
     writeBold("Brief summary:");
@@ -87,12 +90,12 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
     doc.moveDown();
 
-    writeBold("Main proposer:");
+    writeBold("Proposal Team");
+    doc.moveDown();
+    writeBold("Principal Investigator:");
     write(
       `${principalInvestigator.firstname} ${principalInvestigator.lastname}`
     );
-    write(principalInvestigator.email);
-    write(principalInvestigator.telephone);
     write(principalInvestigator.organisation);
     write(principalInvestigator.position);
 
@@ -100,8 +103,9 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
     writeBold("Co-proposer:");
     coProposers.forEach(coProposer => {
-      write(`${coProposer.firstname} ${coProposer.lastname}`);
-      write(coProposer.email);
+      write(
+        `${coProposer.firstname} ${coProposer.lastname}, ${coProposer.organisation}`
+      );
     });
 
     questionary.topics.forEach((x: any) => {
@@ -137,12 +141,18 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
             );
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
           } else {
-            write("NA");
+            write(notAnswered);
           }
           // Default case, a ordinary question type
+        } else if (field.data_type === DataType.DATE) {
+          write(
+            field.value != ""
+              ? new Date(field.value).toISOString().split("T")[0]
+              : notAnswered
+          );
         } else {
           writeBold(field.question);
-          write(field.value != "" ? field.value : "NA");
+          write(field.value != "" ? field.value : notAnswered);
         }
         doc.moveDown(0.5);
       });
