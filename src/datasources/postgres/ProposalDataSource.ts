@@ -274,7 +274,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const deps: FieldDependency[] = await database.select("*").from("proposal_question_dependencies");
+    const dependencies: FieldDependency[] = await database.select("*").from("proposal_question_dependencies");
 
     const fieldRecords: ProposalQuestionRecord[] = await database
       .select("*")
@@ -294,7 +294,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       topic.fields = fields.filter(field => field.topic_id === topic.topic_id);
     });
     fields.forEach(field => {
-      field.dependencies = deps.filter(dep => dep.proposal_question_id === field.proposal_question_id);
+      field.dependencies = dependencies.filter(dep => dep.proposal_question_id === field.proposal_question_id);
     });
 
     return new ProposalTemplate(topics);
@@ -367,6 +367,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     };
 
     // TODO update dependencies if provided
+
+    await database("proposal_question_dependencies")
+    .where("proposal_question_id", proposal_question_id)
+    .del();
+    
+    if(values.dependencies) {
+      values.dependencies.forEach(async dependency => {
+        await database("proposal_question_dependencies")
+        .insert({
+          proposal_question_id:dependency.proposal_question_id,
+          proposal_question_dependency:dependency.proposal_question_dependency,
+          condition:dependency.condition, // TODO rename consitancy
+        })
+      })
+    }
+    
 
     return database
       .update(rows, ["*"])

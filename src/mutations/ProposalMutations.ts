@@ -322,7 +322,7 @@ export default class ProposalMutations {
       case DataType.FILE_UPLOAD:
           return {file_type:[]};
           case DataType.EMBELLISHMENT:
-            return {plain:"New embellishment", html:"New embellishment"};
+            return {"plain":"New embellishment","html":"<p>New embellishment</p>"};
       case DataType.SELECTION_FROM_OPTIONS:
         return {options:[]}
       default:

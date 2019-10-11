@@ -62,7 +62,7 @@ export class FieldDependency {
   constructor(
     public proposal_question_id:string,
     public proposal_question_dependency:string,
-    public conditions:string,
+    public condition:string,
   ) {}
 }
 
