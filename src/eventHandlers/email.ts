@@ -4,53 +4,7 @@ const SparkPost = require("sparkpost");
 const options = {
   endpoint: "https://api.eu.sparkpost.com:443"
 };
-const client = new SparkPost(
-  "7b00d31b034c99335e85ecc27843a0b5da2a2149",
-  options
-);
-
-const createEmail = (title: string, buttonText: string, link: string) => {
-  return `<!DOCTYPE html>
-  <html>
-  <head>
-  <style>
-  *{
-  font-family: "Titillium Web", "Helvetica Neue", sans-serif;
-  text-align: center;
-  }
-  button{
-  padding: 1rem;
-  width: 200px;
-  color: white;
-  background-color: #009EDD;
-  }
-  hr{
-  background-color: #009EDD;
-  border: solid #009EDD 1px;
-  color: #009EDD;
-  width: 80%;
-  }
-  footer{
-  margin-top: 5rem;
-  }
-  </style>
-  </head>
-  <body>
-  <header>
-  <h3>${title}</h3>
-  </header>
-  <hr>
-  <a href="${link}}">
-  <button>
-    ${buttonText}
-  </button>
-  </a>
-  <footer>
-  <small>You received this email because you registered an account at https://demax.esss.se.</small>
-  </footer>
-  </body>
-  </html>`;
-};
+const client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
 
 export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
@@ -90,19 +44,15 @@ export default function createHandler(userDataSource: UserDataSource) {
       case "PASSWORD_RESET_EMAIL": {
         client.transmissions
           .send({
-            options: {
-              sandbox: true
-            },
             content: {
-              from: "testing@sparkpostbox.com",
-              subject: "Hello, World!",
-              html: createEmail(
-                "ESS User portal reset password",
-                "Click to reset password",
-                event.link
-              )
+              template_id: "user-office-account-reset-password"
             },
-            recipients: [{ address: "bolmsten@gmail.com" }]
+            substitution_data: {
+              title: "ESS User reset account password",
+              buttonText: "Click to reset",
+              link: event.link
+            },
+            recipients: [{ address: event.user.email }]
           })
           .then((res: string) => {
             console.log(res);
@@ -114,29 +64,29 @@ export default function createHandler(userDataSource: UserDataSource) {
       }
 
       case "ACCOUNT_CREATED": {
-        console.log("asda");
-        client.transmissions
-          .send({
-            options: {
-              sandbox: true
-            },
-            content: {
-              from: "noreply@demax.esss.se",
-              subject: "Hello, World!",
-              html: createEmail(
-                "ESS User portal reset password",
-                "Click to reset password",
-                "XXXX  Link for Account email verification XXXXXX"
-              )
-            },
-            recipients: [{ address: "bolmsten@gmail.com" }]
-          })
-          .then((res: string) => {
-            console.log(res);
-          })
-          .catch((err: string) => {
-            console.log(err);
-          });
+        if (process.env.NODE_ENV === "development") {
+          await userDataSource.setUserEmailVerified(event.user.id);
+          console.log("verify user without email in development");
+        } else {
+          client.transmissions
+            .send({
+              content: {
+                template_id: "user-office-account-verification"
+              },
+              substitution_data: {
+                title: "ESS User portal verify account",
+                buttonText: "Click to verify",
+                link: event.link
+              },
+              recipients: [{ address: "asda" }]
+            })
+            .then((res: string) => {
+              console.log(res);
+            })
+            .catch((err: string) => {
+              console.log(err);
+            });
+        }
         return;
       }
     }
