@@ -20,6 +20,7 @@ const jsonwebtoken = require("jsonwebtoken");
 const goodToken = jsonwebtoken.sign(
   {
     id: dummyUser.id,
+    type: "passwordReset",
     updated: dummyUser.updated
   },
   process.env.secret,
@@ -100,7 +101,7 @@ test("A user should be able to login with credentials and get a token", () => {
 test("A user should not be able to login with unvalid credentials", () => {
   return expect(
     userMutations.login(dummyUser.username, "Wrong_Password!")
-  ).resolves.toHaveProperty("reason", "WRONG_PASSWORD");
+  ).resolves.toHaveProperty("reason", "WRONG_USERNAME_OR_PASSWORD");
 });
 
 test("A user should not be able to update a token if it is unvalid", () => {
@@ -116,7 +117,7 @@ test("A user should not be able to update a token if it is expired", () => {
   );
 });
 
-test("A user should  be able to update a token if valid", () => {
+test("A user should be able to update a token if valid", () => {
   return expect(
     userMutations.token(goodToken).then(data => typeof data)
   ).resolves.toBe("string");
@@ -140,7 +141,7 @@ test("A user can update it's password if it has a valid token", () => {
   ).resolves.toBe(true);
 });
 
-test("A user not update it's password if it has a bad token", () => {
+test("A user can not update it's password if it has a bad token", () => {
   return expect(
     userMutations.resetPassword(badToken, "Test1234!")
   ).resolves.toBe(false);

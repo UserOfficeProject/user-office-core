@@ -44,38 +44,62 @@ export default class UserMutations {
     email: string,
     telephone: string,
     telephone_alt: string
-  ): Promise<User | Rejection> {
-    if (firstname === "") {
-      return rejection("INVALID_FIRST_NAME");
-    }
+  ): Promise<{ user: User; link: string } | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        if (firstname === "") {
+          return rejection("INVALID_FIRST_NAME");
+        }
 
-    if (lastname === "") {
-      return rejection("INVALID_LAST_NAME");
-    }
+        if (lastname === "") {
+          return rejection("INVALID_LAST_NAME");
+        }
 
-    const hash = this.createPasswordHash(password);
+        const hash = this.createPasswordHash(password);
 
-    const result = await this.dataSource.create(
-      user_title,
-      firstname,
-      middlename,
-      lastname,
-      username,
-      hash,
-      preferredname,
-      orcid,
-      gender,
-      nationality,
-      birthdate,
-      organisation,
-      department,
-      organisation_address,
-      position,
-      email,
-      telephone,
-      telephone_alt
+        const user = await this.dataSource.create(
+          user_title,
+          firstname,
+          middlename,
+          lastname,
+          username,
+          hash,
+          preferredname,
+          orcid,
+          gender,
+          nationality,
+          birthdate,
+          organisation,
+          department,
+          organisation_address,
+          position,
+          email,
+          telephone,
+          telephone_alt
+        );
+        if (!user) {
+          return rejection("INTERNAL_ERROR");
+        }
+
+        const token = jsonwebtoken.sign(
+          {
+            id: user.id,
+            type: "emailVerification",
+            updated: user.updated
+          },
+          process.env.secret,
+          { expiresIn: "24h" }
+        );
+
+        // Email verification link
+        const link = process.env.baseURL + "/emailVerification/" + token;
+
+        return { user, link };
+      },
+      res => {
+        return { type: "ACCOUNT_CREATED", user: res.user, link: res.link };
+      }
     );
-    return result || rejection("INTERNAL_ERROR");
   }
 
   async update(
@@ -133,19 +157,23 @@ export default class UserMutations {
     const user = await this.dataSource.getByUsername(username);
 
     if (!user) {
-      return rejection("INTERNAL_ERROR");
+      return rejection("WRONG_USERNAME_OR_PASSWORD");
     }
     const roles = await this.dataSource.getUserRoles(user.id);
     const result = await this.dataSource.getPasswordByUsername(username);
 
     if (!result) {
-      return rejection("INTERNAL_ERROR");
+      return rejection("WRONG_USERNAME_OR_PASSWORD");
     }
 
     const valid = bcrypt.compareSync(password, result);
 
     if (!valid) {
-      return rejection("WRONG_PASSWORD");
+      return rejection("WRONG_USERNAME_OR_PASSWORD");
+    }
+
+    if (!user.emailVerified) {
+      return rejection("EMAIL_NOT_VERIFIED");
     }
     const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
       expiresIn: process.env.tokenLife
@@ -184,6 +212,7 @@ export default class UserMutations {
         const token = jsonwebtoken.sign(
           {
             id: user.id,
+            type: "passwordReset",
             updated: user.updated
           },
           process.env.secret,
@@ -201,16 +230,40 @@ export default class UserMutations {
     );
   }
 
+  async emailVerification(token: string) {
+    // Check that token is valid
+    try {
+      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      const user = await this.dataSource.get(decoded.id);
+
+      //Check that user exist and that it has not been updated since token creation
+      if (
+        user &&
+        user.updated === decoded.updated &&
+        decoded.type === "emailVerification"
+      ) {
+        return this.dataSource.setUserEmailVerified(user.id);
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
+
   async resetPassword(token: string, password: string): Promise<Boolean> {
     // Check that token is valid
-
     try {
       const hash = this.createPasswordHash(password);
       const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation
-      if (user && user.updated === decoded.updated) {
+      if (
+        user &&
+        user.updated === decoded.updated &&
+        decoded.type === "passwordReset"
+      ) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
         return false;

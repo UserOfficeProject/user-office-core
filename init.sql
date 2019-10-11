@@ -61,6 +61,7 @@ CREATE TABLE users (
 , organisation_address varchar(100) NOT NULL
 , position  varchar(30) NOT NULL
 , email     varchar(30) UNIQUE
+, email_verified boolean DEFAULT False
 , telephone varchar(20) NOT NULL
 , telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -228,6 +229,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -249,6 +251,7 @@ VALUES
                   'Estonia, New Gabriella, 4056 Cronin Motorway',
                   'Strategist',
                   'Javon4@hotmail.com',
+                  true,
                   '(288) 431-1443',
                   '(370) 386-8976'
                   );
@@ -296,6 +299,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -316,6 +320,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'Aaron_Harris49@gmail.com',
+                 true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );
@@ -339,6 +344,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -359,6 +365,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'nils@ess.se',
+                true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );

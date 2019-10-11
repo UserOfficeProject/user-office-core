@@ -40,4 +40,5 @@ export interface UserDataSource {
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
   setUserPassword(id: number, password: string): Promise<Boolean>;
   getPasswordByUsername(username: string): Promise<string | null>;
+  setUserEmailVerified(id: number): Promise<Boolean>;
 }

@@ -198,6 +198,7 @@ const wrapProposalInformationMutation = createResponseWrapper<
   ProposalInformation
 >("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
+const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
 );
@@ -341,7 +342,9 @@ export default {
   },
 
   login(args: LoginArgs, context: ResolverContext) {
-    return context.mutations.user.login(args.username, args.password);
+    return wrapLoginMutation(
+      context.mutations.user.login(args.username, args.password)
+    );
   },
 
   token(args: { token: string }, context: ResolverContext) {
@@ -365,28 +368,30 @@ export default {
     return context.queries.user.getRoles(context.user);
   },
 
-  createUser(args: CreateUserArgs, context: ResolverContext) {
+  async createUser(args: CreateUserArgs, context: ResolverContext) {
+    const res = await context.mutations.user.create(
+      args.user_title,
+      args.firstname,
+      args.middlename,
+      args.lastname,
+      args.username,
+      args.password,
+      args.preferredname,
+      args.orcid,
+      args.gender,
+      args.nationality,
+      args.birthdate,
+      args.organisation,
+      args.department,
+      args.organisation_address,
+      args.position,
+      args.email,
+      args.telephone,
+      args.telephone_alt
+    );
+
     return wrapUserMutation(
-      context.mutations.user.create(
-        args.user_title,
-        args.firstname,
-        args.middlename,
-        args.lastname,
-        args.username,
-        args.password,
-        args.preferredname,
-        args.orcid,
-        args.gender,
-        args.nationality,
-        args.birthdate,
-        args.organisation,
-        args.department,
-        args.organisation_address,
-        args.position,
-        args.email,
-        args.telephone,
-        args.telephone_alt
-      )
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user)
     );
   },
 
@@ -412,6 +417,10 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  emailVerification(args: { token: string }, context: ResolverContext) {
+    return context.mutations.user.emailVerification(args.token);
   },
 
   createCall(args: CreateCallArgs, context: ResolverContext) {
