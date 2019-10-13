@@ -178,7 +178,6 @@ export function usePersistModel() {
         deleteTemplateField: { error?: string; template?: ProposalTemplate };
       }) => {
         setIsLoading(false);
-        data.deleteTemplateField.error = "NOT_ENOUGHT_MINERALS";
         return data.deleteTemplateField;
       }
     );

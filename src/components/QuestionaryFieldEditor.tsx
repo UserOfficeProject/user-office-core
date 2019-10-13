@@ -13,6 +13,7 @@ import { AdminComponentTextInput } from "./AdminComponentTextInput";
 import { AdminComponentMultipleChoice } from "./AdminComponentMultipleChoice";
 import { AdminComponentBoolean } from "./AdminComponentBoolean";
 import { AdminComponentFileUpload } from "./AdminComponentFileUpload";
+import { AdminComponentDate } from "./AdminComponentDate";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
@@ -36,6 +37,7 @@ export default function QuestionaryFieldEditor(props: {
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
   componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
   componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
+  componentMap.put(DataType.DATE, AdminComponentDate);
   componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
   componentMap.put(
     DataType.SELECTION_FROM_OPTIONS,
