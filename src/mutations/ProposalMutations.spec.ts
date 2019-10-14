@@ -16,9 +16,12 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { DataType } from "../models/Proposal";
+import { DataType, Topic, ProposalTemplateField, ProposalTemplate } from "../models/Proposal";
 import { User } from "../models/User";
+import { isRejection, rejection } from "../rejection";
+import { DummyLogger } from "../utils/Logger";
 
+const dummyLogger = new DummyLogger()
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
@@ -28,7 +31,8 @@ const userAuthorization = new UserAuthorization(
 const proposalMutations = new ProposalMutations(
   new proposalDataSource(),
   userAuthorization,
-  dummyEventBus
+  dummyEventBus,
+  dummyLogger
 );
 
 //Update
@@ -76,6 +80,75 @@ function tryUpdateProposal(user:User, proposalId:string) {
   )
 }
 
+
+test("A userofficer can update topic", async () => {
+  const newTopicTitle = "new topic title";
+  const topicEnabled = false;
+  const topic = await proposalMutations.updateTopic(
+    dummyUserOfficer,
+    1,
+    newTopicTitle,
+    topicEnabled
+  );
+  expect(topic instanceof Topic).toBe(true);
+  expect((topic as Topic).topic_title).toEqual(newTopicTitle)
+  expect((topic as Topic).isEnabled).toEqual(topicEnabled)
+});
+
+test("A user can not update topic", async () => {
+  const topic = await proposalMutations.updateTopic(
+    dummyUser,
+    1,
+    "New topic title",
+    false
+  );
+
+  expect(topic instanceof Topic).toBe(false);
+});
+
+
+
+
+test("A userofficer can create topic", async () => {
+  const newTopicTitle = "new topic title";
+
+  const topic = await proposalMutations.createTopic(
+    dummyUserOfficer,
+    newTopicTitle
+  );
+  expect(topic instanceof Topic).toBe(true);
+  expect((topic as Topic).topic_title).toEqual(newTopicTitle)
+});
+
+test("A userofficer can not create topic", async () => {
+  const newTopicTitle = "new topic title";
+
+  const topic = await proposalMutations.createTopic(
+    dummyUser,
+    newTopicTitle
+  );
+  expect(topic instanceof Topic).toBe(false);
+});
+
+test("A userofficer can update fieltTopicRel", async () => {
+  const response = await proposalMutations.updateFieldTopicRel(
+    dummyUserOfficer,
+    1,
+    ["has_links_with_industry", "enable_crystallization"]
+  );
+  expect(isRejection(response)).toEqual(false);
+});
+
+
+test("A user can not update fieltTopicRel", async () => {
+  const response = await proposalMutations.updateFieldTopicRel(
+    dummyUser,
+    1,
+    ["has_links_with_industry", "enable_crystallization"]
+  );
+  expect(isRejection(response)).toEqual(true);
+});
+
 //Accept
 
 test("A user officer can accept a proposal ", () => {
@@ -103,6 +176,7 @@ test("A user officer can not accept a proposal that does not exist", () => {
     proposalMutations.accept(dummyUserOfficer, -1)
   ).resolves.toHaveProperty("reason", "INTERNAL_ERROR");
 });
+
 
 //Reject
 
@@ -195,4 +269,30 @@ test("User must have valid session to attach files", () => {
       "1020597501870552"
     ])
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
+});
+
+test("User can not create field", async () => {
+  const response = await proposalMutations.createTemplateField(dummyUser, 1, DataType.EMBELLISHMENT);
+  expect(response).not.toBeInstanceOf(ProposalTemplate);
+});
+
+test("User officer can create field", async () => {
+  const response = await proposalMutations.createTemplateField(dummyUserOfficer, 1, DataType.EMBELLISHMENT);
+  expect(response).toBeInstanceOf(ProposalTemplateField);
+  
+  const newField = response as ProposalTemplateField;
+  expect(newField.topic_id).toEqual(1);
+  expect(newField.data_type).toEqual(DataType.EMBELLISHMENT);
+});
+
+
+test("User can not delete field", async () => {
+  const response = await proposalMutations.deleteTemplateField(dummyUser, "field_id");
+  expect(response).not.toBeInstanceOf(ProposalTemplate);
+});
+
+test("User officer can delete field", async () => {
+  const response = await proposalMutations.deleteTemplateField(dummyUserOfficer, "field_id");
+  expect(response).toBeInstanceOf(ProposalTemplate);
+
 });

@@ -27,13 +27,13 @@ import AdminMutations from "./mutations/AdminMutations";
 import { Logger } from "./utils/Logger";
 
 // Site specific data sources and event handlers (only ESS atm)
+const logger = new Logger();
 const userDataSource = new PostgresUserDataSource();
-const proposalDataSource = new PostgresProposalDataSource();
+const proposalDataSource = new PostgresProposalDataSource(logger);
 const reviewDataSource = new PostgresReviewDataSource();
 const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
-const logger = new Logger();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
@@ -60,7 +60,8 @@ const proposalQueries = new ProposalQueries(
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   userAuthorization,
-  eventBus
+  eventBus,
+  logger
 );
 
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);

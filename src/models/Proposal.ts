@@ -38,6 +38,8 @@ export class Topic {
   constructor(
     public topic_id:number,
     public topic_title: string,
+    public isEnabled:boolean,
+    public sort_order:number,
     public fields:ProposalTemplateField[] | null
    ) {}
 }
@@ -46,9 +48,10 @@ export class ProposalTemplateField {
   constructor(
     public proposal_question_id:string,
     public data_type:DataType,
+    public sort_order:number,
     public question:string,
-    public topic: number | null,
-    public config: object | null,
+    public topic_id: number | null,
+    public config: string | null,
     public dependencies: FieldDependency[] | null,
     public value?:string
   ) {}
@@ -59,7 +62,7 @@ export class FieldDependency {
   constructor(
     public proposal_question_id:string,
     public proposal_question_dependency:string,
-    public conditions:string,
+    public condition:string,
   ) {}
 }
 
@@ -76,4 +79,18 @@ export enum DataType {
   DATE = "DATE",
   FILE_UPLOAD = "FILE_UPLOAD",
   EMBELLISHMENT = "EMBELLISHMENT"
+}
+export interface FieldConfig {
+  variant?: string, 
+  small_label?:string;
+  required?: boolean;
+  options?:string[];
+  file_type?:string[];
+  max_files?:number;
+  multiline?:boolean;
+  min?:number;
+  max?:number;
+  placeholder?:string;
+  html?:string;
+  plain?:string;
 }

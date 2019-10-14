@@ -45,12 +45,12 @@ test("A userofficer can get any proposal", () => {
   );
 });
 
-test("Get answers should succeed for authorized user", () => {
-  return expect(proposalQueries.getAnswers(dummyUser, 1)).resolves.toBe(dummyAnswers);
+test("Get questionary should succeed for authorized user", () => {
+  return expect(proposalQueries.getQuestionary(dummyUser, 1)).resolves.not.toBe(null)
 });
 
-test("Get answers should not succeed for unauthorized user", () => {
-  return expect(proposalQueries.getAnswers(dummyUserNotOnProposal, 1)).resolves.not.toBe(dummyAnswers);
+test("Get questionary should not succeed for unauthorized user", () => {
+  return expect(proposalQueries.getQuestionary(dummyUserNotOnProposal, 1)).resolves.toBe(null);
 });
 
 test("A userofficer can get all proposal", () => {
@@ -67,11 +67,11 @@ test("Non authentificated user can not get the template", () => {
   return expect(proposalQueries.getProposalTemplate(null)).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
-test("Authentificated user can get the template", () => {
-  return expect(proposalQueries.getProposalTemplate(dummyUser)).resolves.toBeInstanceOf(ProposalTemplate);
+test("User officer user can get the template", () => {
+  return expect(proposalQueries.getProposalTemplate(dummyUserOfficer)).resolves.toBeInstanceOf(ProposalTemplate);
 });
 
 test("Proposal template should have fields", async () => {
-  let template = await proposalQueries.getProposalTemplate(dummyUser) as ProposalTemplate;
+  let template = await proposalQueries.getProposalTemplate(dummyUserOfficer) as ProposalTemplate;
   return expect(template.topics[0].fields!.length).toBeGreaterThan(0);
 });

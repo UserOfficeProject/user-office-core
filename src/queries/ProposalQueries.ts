@@ -4,10 +4,8 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import {
   ProposalTemplate,
   Proposal,
-  ProposalTemplateField,
   ProposalAnswer
 } from "../models/Proposal";
-import { Rejection, rejection, isRejection } from "../rejection";
 import { ILogger } from "../utils/Logger";
 import JSDict from "../utils/Dictionary";
 
@@ -33,18 +31,18 @@ export default class ProposalQueries {
   }
 
   async getQuestionary(agent: User, id: number) {
-    const template = await this.getProposalTemplate(agent);
-    const answers = await this.getAnswers(agent, id);
+    const proposal = await this.dataSource.get(id);
 
-    if (isRejection(template)) {
-      this.logger.logWarn("Unauthorized access", { agent });
-      return template; // rejection
+    if (!proposal) {
+      return null;
     }
 
-    if (isRejection(answers)) {
-      this.logger.logWarn("Unauthorized access", { agent });
-      return answers; // rejection
-    }
+    if ((await this.hasAccessRights(agent, proposal)) === false) {
+      return null;
+    } 
+    
+    const template = await this.dataSource.getProposalTemplate();
+    const answers = await this.dataSource.getProposalAnswers(id);
 
     var answerRef = JSDict.Create<string, ProposalAnswer>();
     answers.forEach(answer => {
@@ -64,19 +62,16 @@ export default class ProposalQueries {
     return template;    
   }
 
-  async getAnswers(agent: User | null, id: number) {
-    const proposal = await this.dataSource.get(id);
-
-    if (!proposal) {
-      return rejection("Proposal does not exist");
+  async getProposalTemplate(
+    agent: User | null
+  ): Promise<ProposalTemplate | null> {
+    if (agent == null) {
+      return null;
     }
 
-    if ((await this.hasAccessRights(agent, proposal)) === true) {
-      return await this.dataSource.getProposalAnswers(proposal.id);
-    } else {
-      return rejection("Not allowed");
-    }
+    return await this.dataSource.getProposalTemplate();
   }
+
 
   private async hasAccessRights(
     agent: User | null,
@@ -102,13 +97,4 @@ export default class ProposalQueries {
     }
   }
 
-  async getProposalTemplate(
-    agent: User | null
-  ): Promise<ProposalTemplate | Rejection> {
-    if (agent == null) {
-      return rejection("Not authorized");
-    }
-
-    return await this.dataSource.getProposalTemplate();
-  }
 }
