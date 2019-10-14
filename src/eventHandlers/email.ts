@@ -78,7 +78,7 @@ export default function createHandler(userDataSource: UserDataSource) {
                 buttonText: "Click to verify",
                 link: event.link
               },
-              recipients: [{ address: "asda" }]
+              recipients: [{ address: event.user.email }]
             })
             .then((res: string) => {
               console.log(res);
