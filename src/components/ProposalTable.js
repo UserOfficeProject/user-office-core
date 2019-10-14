@@ -3,6 +3,7 @@ import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { Edit } from "@material-ui/icons";
+import GetAppIcon from "@material-ui/icons/GetApp";
 
 export default function ProposalTable(props) {
   const columns = [
@@ -16,6 +17,19 @@ export default function ProposalTable(props) {
   if (editProposalID) {
     return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;
   }
+
+  const download = proposalId => {
+    var element = document.createElement("a");
+    element.setAttribute("href", "/proposal/download/" + proposalId);
+    element.setAttribute("download", "download");
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  };
 
   return (
     <MaterialTable
@@ -32,6 +46,11 @@ export default function ProposalTable(props) {
           icon: () => <Edit />,
           tooltip: "Edit proposal",
           onClick: (event, rowData) => setEditProposalID(rowData.id)
+        },
+        {
+          icon: () => <GetAppIcon />,
+          tooltip: "Download proposal",
+          onClick: (event, rowData) => download(rowData.id)
         }
       ]}
     />

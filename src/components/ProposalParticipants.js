@@ -1,11 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import PeopleTable from "./PeopleTable";
 import { Add } from "@material-ui/icons";
-import { FormApi } from "./ProposalContainer";
-import { useUpdateProposal } from "../hooks/useUpdateProposal";
-import ProposalNavigationFragment from "./ProposalNavigationFragment";
 
 const useStyles = makeStyles({
   errorText: {
@@ -22,38 +19,18 @@ const useStyles = makeStyles({
 });
 
 export default function ProposalParticipants(props) {
-  const api = useContext(FormApi);
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
-  const [users, setUsers] = useState(props.data.users || []);
-  const [userError, setUserError] = useState(false);
-  const {loading, updateProposal} = useUpdateProposal();
-
 
   const addUser = user => {
-    setUsers([...users, user]);
+    props.setUsers([...props.users, user]);
     setOpen(false);
   };
 
   const removeUser = user => {
-    let newUsers = [...users];
+    let newUsers = [...props.users];
     newUsers.splice(newUsers.indexOf(user), 1);
-    setUsers(newUsers);
-  };
-
-  const submit = () => {
-    return new Promise((resolve, reject) => {
-      if (users.length < 1) {
-        setUserError(true);
-      } else {
-        const userIds = users.map(user => user.id);
-        updateProposal({
-          id: props.data.id,
-          users: userIds
-        }).then(data => resolve());
-      }
-    })
-    
+    props.setUsers(newUsers);
   };
 
   const openModal = rowData => {
@@ -72,22 +49,15 @@ export default function ProposalParticipants(props) {
         actionIcon={<Add />}
         action={openModal}
         isFreeAction={true}
-        data={users}
+        data={props.users}
         search={false}
         onRemove={removeUser}
       />
-      {userError && (
+      {props.error && (
         <p className={classes.errorText}>
           You need to add at least one Co-Proposer
         </p>
       )}
-
-          <ProposalNavigationFragment 
-          disabled={props.disabled}
-           next={ () => { submit().then(api.next({users})) } }
-           back={ () => { submit().then(api.back({users})) } }
-          isLoading={loading} 
-          />
     </form>
   );
 }

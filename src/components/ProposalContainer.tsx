@@ -5,7 +5,6 @@ import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Typography from "@material-ui/core/Typography";
-import ProposalParticipants from "./ProposalParticipants";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
@@ -86,12 +85,6 @@ export default function ProposalContainer(props: { data: ProposalData }) {
                 />
               )
             )
-        )
-      );
-      allProposalSteps.push(
-        new ProposalStep(
-          "Participants",
-          <ProposalParticipants data={proposalData} />
         )
       );
       allProposalSteps.push(
