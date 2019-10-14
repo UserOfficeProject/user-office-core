@@ -400,7 +400,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplateField | null> {
+  ): Promise<ProposalTemplate | null> {
     const rows = {
       data_type: values.dataType,
       question: values.question,
@@ -425,33 +425,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
     }
 
-    return database
-      .update(rows, ["*"])
-      .from("proposal_questions")
-      .where("proposal_question_id", proposal_question_id)
-      .then((resultSet: ProposalQuestionRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError(
-            "UPDATE field resultSet must contain exactly 1 row",
-            {
-              resultSet,
-              proposal_question_id,
-              rows
-            }
-          );
-          return null;
-        }
-
-        return this.createProposalTemplateFieldObject(resultSet[0]);
-      })
-      .catch((e: any) => {
-        this.logger.logError("Exception occurred while updating field", {
-          error: e,
-          proposal_question_id,
-          values
-        });
-        return null;
-      });
+    return new Promise(async (resolve, reject) => {
+      await database
+        .update(rows, ["*"])
+        .from("proposal_questions")
+        .where("proposal_question_id", proposal_question_id);
+      resolve(await this.getProposalTemplate());
+    });
   }
 
   createTemplateField(

@@ -316,7 +316,7 @@ export default {
     context: ResolverContext
   ) {
 
-    return wrapProposalTemplateFieldMutation(
+    return wrapProposalTemplateMutation(
       context.mutations.proposal.updateProposalTemplateField(
         context.user,
         args.id,

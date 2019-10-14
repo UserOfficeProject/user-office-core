@@ -15,7 +15,7 @@ export const typeDefs = `
         createTopic(title: String): TopicMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
         updateFieldTopicRel(topic_id:Int!, field_ids:[String]): BooleanMutationResult
-        updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateFieldMutationResult
+        updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateMutationResult
         createTemplateField(topicId:Int!, dataType:String!): ProposalTemplateFieldMutationResult
         deleteTemplateField(id:String!): ProposalTemplateMutationResult
     }

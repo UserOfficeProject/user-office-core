@@ -57,7 +57,7 @@ export interface ProposalDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplateField | null>;
+  ): Promise<ProposalTemplate | null>;
   createTemplateField(
     fieldId: string,
     topicId: number,

@@ -339,7 +339,7 @@ export default class ProposalMutations {
     topicId?: number,
     config?: string,
     dependencies?: FieldDependency[]
-  ): Promise<ProposalTemplateField | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }

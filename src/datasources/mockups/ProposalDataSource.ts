@@ -94,12 +94,18 @@ export class proposalDataSource implements ProposalDataSource {
       config?: string | undefined;
       sort_order: number;
     }
-  ): Promise<ProposalTemplateField | null> {
-    return createDummyField({
-      ...values,
-      proposal_question_id,
-      config: JSON.parse(values.config || "{}")
-    });
+  ): Promise<ProposalTemplate | null> {
+
+    var template = await this.getProposalTemplate();
+    template.topics.forEach(topic => {
+      topic.fields!.forEach(field => {
+        if(field.proposal_question_id === proposal_question_id) {
+          Object.assign(field, values);
+        }
+      });
+    })
+
+    return template;
   }
 
   async updateTopic(
