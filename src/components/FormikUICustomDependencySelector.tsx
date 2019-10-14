@@ -91,7 +91,7 @@ const FormikUICustomDependencySelector = ({
   ]);
 
   useEffect(() => {
-    if (dependencyId && operator && dependencyValue) {
+    if (dependencyId !== "" && operator !== "" && dependencyValue !== "") {
       updateFormikMemoized();
     }
   }, [dependencyId, operator, dependencyValue, updateFormikMemoized]);

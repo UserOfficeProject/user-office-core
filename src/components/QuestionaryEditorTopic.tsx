@@ -5,7 +5,8 @@ import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
 import { Topic, ProposalTemplateField, DataType } from '../model/ProposalModel';
 import { makeStyles, Grid, useTheme, Menu, Fade, MenuItem } from '@material-ui/core';
 import { EventType, IEvent } from './QuestionaryEditorModel';
-import AddRoundedIcon from '@material-ui/icons/AddRounded';
+import AddCommentIcon from '@material-ui/icons/AddComment';
+import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
 
 export default function QuestionaryEditorTopic(props: {
   data: Topic;
@@ -117,12 +118,16 @@ export default function QuestionaryEditorTopic(props: {
           ref={provided.innerRef}
           style={getItemStyle(snapshotDraggable.isDragging, provided.draggableProps.style)}
         >
-          <Grid item xs={10} className={classes.topic} {...provided.dragHandleProps}>
+          <Grid item xs={9} className={classes.topic} {...provided.dragHandleProps}>
             {titleJsx}
           </Grid>
-          <Grid item xs={2} className={classes.addIcon}>
-            <AddRoundedIcon
+          <Grid item xs={3} className={classes.addIcon}>
+            <AddCommentIcon
               onClick={(event: React.MouseEvent<SVGSVGElement>) => setAnchorEl(event.currentTarget)}
+              className={classes.addQuestionButton}
+            />
+            <DeleteRoundedIcon
+              onClick={(event: React.MouseEvent<SVGSVGElement>) => dispatch({type:EventType.DELETE_TOPIC_REQUESTED, payload:data.topic_id})}
               className={classes.addQuestionButton}
             />
             <Menu
@@ -169,7 +174,9 @@ export default function QuestionaryEditorTopic(props: {
                 Multiple choice
               </MenuItem>
             </Menu>
+            
           </Grid>
+
 
           <Droppable droppableId={data.topic_id.toString()} type="field">
             {(provided, snapshot) => (

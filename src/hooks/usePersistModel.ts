@@ -15,7 +15,6 @@ export function usePersistModel() {
     const mutation = `
     mutation($topicId:Int!, $fieldIds:[String]) {
       updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
-        result
         error
       }
     }
@@ -29,7 +28,6 @@ export function usePersistModel() {
       (result: {
         updateFieldTopicRel: {
           error?: string;
-          result?: boolean;
         };
       }) => {
         return result.updateFieldTopicRel;
@@ -197,6 +195,29 @@ export function usePersistModel() {
     );
   };
 
+  const deleteTopic = async (id: number) => {
+    const mutation = `
+    mutation($id:Int!) {
+      deleteTopic(id:$id) {
+        error
+      }
+    }
+    `;
+    const variables = {
+      id
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        deleteTopic: {
+          error?: string
+        };
+      }) => {
+        return result.deleteTopic;
+      }
+    );
+  };
+
   type MonitorableServiceCall = () => Promise<{ error?: string }>;
 
   const persistModel = ({
@@ -259,9 +280,11 @@ export function usePersistModel() {
           );
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
-          executeAndMonitorCall( () => 
+          executeAndMonitorCall(
+            () =>
               new Promise(async (resolve, reject) => {
-                const result = await updateItem(action.payload.field as ProposalTemplateField)
+                const result = await updateItem(action.payload
+                  .field as ProposalTemplateField);
                 dispatch({
                   type: EventType.FIELD_UPDATED,
                   payload: new ProposalTemplateField(result.template)
@@ -304,6 +327,9 @@ export function usePersistModel() {
                 })
               )
           );
+          break;
+        case EventType.DELETE_TOPIC_REQUESTED:
+          executeAndMonitorCall(() => deleteTopic(action.payload));
           break;
         default:
           break;
