@@ -101,7 +101,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                data-cy="required"
+                data-cy="dependencies"
               />
             </TitledContainer>
           </AdminComponentShell>

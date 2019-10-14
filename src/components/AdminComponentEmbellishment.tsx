@@ -56,7 +56,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="max"
+              data-cy="plain"
             />
             <TitledContainer label="Dependencies">
               <Field
@@ -67,7 +67,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                data-cy="required"
+                data-cy="dependencies"
               />
             </TitledContainer>
           </AdminComponentShell>

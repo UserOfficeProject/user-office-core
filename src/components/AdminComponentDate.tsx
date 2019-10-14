@@ -26,10 +26,6 @@ export const AdminComponentDate: AdminComponentSignature = props => {
       }}
       validationSchema={Yup.object().shape({
         question: Yup.string().required("Question is required")
-        // config: Yup.object({
-        //   minDate: Yup.date(),
-        //   maxDate: Yup.date(),
-        // })
       })}
     >
       {formikProps => (
@@ -64,7 +60,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                data-cy="required"
+                data-cy="dependencies"
               />
             </TitledContainer>
           </AdminComponentShell>

@@ -27,9 +27,9 @@ const FormikUICustomDependencySelector = ({
   template: ProposalTemplate;
   templateField: ProposalTemplateField;
 }) => {
-  const [dependencyId, setDependencyId] = useState<string | undefined>();
-  const [operator, setOperator] = useState<string | undefined>();
-  const [dependencyValue, setDependencyValue] = useState<string | undefined>();
+  const [dependencyId, setDependencyId] = useState<string>("");
+  const [operator, setOperator] = useState<string>("");
+  const [dependencyValue, setDependencyValue] = useState<string>("");
 
   const [availableValues, setAvailableValues] = useState<IOption[]>([]);
 
@@ -123,6 +123,7 @@ const FormikUICustomDependencySelector = ({
                   <MenuItem
                     value={option.proposal_question_id}
                     className={classes.menuItem}
+                    key={option.proposal_question_id}
                   >
                     {/* {getTemplateFieldIcon(option.data_type)}  */}
                     {option.question}
@@ -166,8 +167,12 @@ const FormikUICustomDependencySelector = ({
             }}
           >
             {availableValues.map(option => {
-              // @ts-ignore value property of MenuItem.
-              return <MenuItem value={option.value}>{option.label}</MenuItem>;
+              return (
+                // @ts-ignore boolean will work
+                <MenuItem value={option.value} key={option.label}>
+                  {option.label}
+                </MenuItem>
+              );
             })}
           </Select>
         </FormControl>
@@ -179,6 +184,6 @@ const FormikUICustomDependencySelector = ({
 export default FormikUICustomDependencySelector;
 
 interface IOption {
-  value: string | boolean | number;
+  value: string | boolean;
   label: string;
 }
