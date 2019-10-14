@@ -509,4 +509,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       resolve(await this.getProposalTemplate());
     });
   }
+
+  async deleteTopic(id: number): Promise<Boolean | null> {
+    return database("proposal_topics")
+    .where({ topic_id: id })
+    .del()
+    .then(() => true)
+    .catch((e:any) => {
+      this.logger.logError("Could not delete topic ", e)
+      return false;
+    })
+  }
 }

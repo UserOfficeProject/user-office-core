@@ -67,6 +67,9 @@ function createDummyField(values: {
 }
 
 export class proposalDataSource implements ProposalDataSource {
+  deleteTopic(id: number): Promise<Boolean | null> {
+    throw new Error("Method not implemented.");
+  }
   async createTemplateField(
     fieldId: string,
     topicId: number,

@@ -72,6 +72,10 @@ interface UpdateFieldTopicRelArgs {
   field_ids: string[];
 }
 
+interface DeleteTopicArgs {
+  id: number;
+}
+
 interface DeleteProposalTemplateFieldArgs {
   id: string;
 }
@@ -307,6 +311,15 @@ export default {
         context.user,
         args.topic_id,
         args.field_ids
+      )
+    );
+  },
+
+  deleteTopic(args: DeleteTopicArgs, context: ResolverContext) {
+    return createResponseWrapper<void>("result")(
+      context.mutations.proposal.deleteTopic(
+        context.user,
+        args.id
       )
     );
   },

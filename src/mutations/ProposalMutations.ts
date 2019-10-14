@@ -283,6 +283,18 @@ export default class ProposalMutations {
     }
   }
 
+  async deleteTopic(
+    agent: User | null,
+    topicId: number
+  ): Promise<void | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+
+    var result = await this.dataSource.deleteTopic(topicId);
+    return result ? undefined : rejection("INTERNAL_ERROR");
+  }
+
   async createTemplateField(
     agent: User | null,
     topicId: number,
@@ -341,7 +353,7 @@ export default class ProposalMutations {
     dependencies?: FieldDependency[]
   ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
+     return rejection("NOT_AUTHORIZED");
     }
     return (
       (await this.dataSource.updateField(id, {
