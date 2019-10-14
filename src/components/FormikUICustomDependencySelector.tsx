@@ -20,16 +20,17 @@ const FormikUICustomDependencySelector = ({
   field,
   template,
   form,
-  question
+  templateField
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
   template: ProposalTemplate;
-  question: ProposalTemplateField;
+  templateField: ProposalTemplateField;
 }) => {
   const [dependencyId, setDependencyId] = useState<string | undefined>();
   const [operator, setOperator] = useState<string | undefined>();
   const [dependencyValue, setDependencyValue] = useState<string | undefined>();
+
   const [availableValues, setAvailableValues] = useState<IOption[]>([]);
 
   const classes = makeStyles(theme => ({
@@ -43,20 +44,20 @@ const FormikUICustomDependencySelector = ({
   }))();
 
   useEffect(() => {
-    if (!question) {
+    if (!templateField) {
       return;
     }
-    if (question.dependencies && question.dependencies.length > 0) {
-      var dependency = question.dependencies[0]; // currently only 1 supported
+    if (templateField.dependencies && templateField.dependencies.length > 0) {
+      var dependency = templateField.dependencies[0]; // currently only 1 supported
       setDependencyId(dependency.proposal_question_dependency);
       setOperator(dependency.condition.condition);
       setDependencyValue(dependency.condition.params);
     }
-  }, [question]);
+  }, [templateField]);
 
   const updateFormik = () => {
     var dep = new FieldDependency(null);
-    dep.proposal_question_id = question.proposal_question_id; // currently only 1 supported
+    dep.proposal_question_id = templateField.proposal_question_id; // currently only 1 supported
     dep.proposal_question_dependency = dependencyId!;
     var cond = new FieldCondition(null);
     cond!.condition = operator!;
@@ -64,6 +65,24 @@ const FormikUICustomDependencySelector = ({
     dep.condition = cond;
     form.setFieldValue(field.name, [dep]);
   };
+
+  useEffect(() => {
+    if (dependencyId) {
+      const depField = template.getFieldById(dependencyId);
+      if (depField.data_type === DataType.BOOLEAN) {
+        setAvailableValues([
+          { label: "true", value: true },
+          { label: "false", value: false }
+        ]);
+      } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
+        setAvailableValues(
+          depField.config.options!.map(option => {
+            return { value: option, label: option };
+          })
+        ); // use options
+      }
+    }
+  }, [dependencyId, template]);
 
   const updateFormikMemoized = useCallback(updateFormik, [
     dependencyId,
@@ -82,29 +101,13 @@ const FormikUICustomDependencySelector = ({
       <Grid item xs={5}>
         <FormControl fullWidth>
           <InputLabel htmlFor="dependency-id" shrink>
-            If field
+            Field
           </InputLabel>
           <Select
             id="dependency-id"
             value={dependencyId}
             onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
               const depFieldId = event.target.value as string;
-              const depField = template.getFieldById(depFieldId);
-              if (depField.data_type === DataType.BOOLEAN) {
-                setAvailableValues([
-                  { label: "true", value: true },
-                  { label: "false", value: false }
-                ]);
-              } else if (
-                depField.data_type === DataType.SELECTION_FROM_OPTIONS
-              ) {
-                setAvailableValues(
-                  depField.config.options!.map(option => {
-                    return { value: option, label: option };
-                  })
-                ); // use options
-              }
-
               setDependencyId(depFieldId);
             }}
           >
@@ -133,7 +136,7 @@ const FormikUICustomDependencySelector = ({
       <Grid item xs={3}>
         <FormControl fullWidth>
           <InputLabel shrink htmlFor="operator">
-            Compares
+            Compare
           </InputLabel>
           <Select
             fullWidth
@@ -163,7 +166,7 @@ const FormikUICustomDependencySelector = ({
             }}
           >
             {availableValues.map(option => {
-              // @ts-ignore should work
+              // @ts-ignore value property of MenuItem.
               return <MenuItem value={option.value}>{option.label}</MenuItem>;
             })}
           </Select>

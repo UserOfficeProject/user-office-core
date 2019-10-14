@@ -104,7 +104,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               <Field
                 name="dependencies"
                 component={FormikUICustomDependencySelector}
-                question={props.field}
+                templateField={props.field}
                 template={props.template}
                 label="User must check it to continue"
                 margin="normal"
