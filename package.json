@@ -30,7 +30,8 @@
     "react-scripts": "3.0.1",
     "tinymce": "^5.0.15",
     "typescript": "3.5.3",
-    "yup": "^0.27.0"
+    "yup": "^0.27.0",
+    "@types/react-beautiful-dnd": "^11.0.3"
   },
   "proxy": "http://localhost:4000",
   "scripts": {
@@ -63,7 +64,6 @@
     "@types/jest": "24.0.16",
     "@types/node": "12.6.9",
     "@types/react": "16.8.24",
-    "@types/react-beautiful-dnd": "^11.0.3",
     "@types/react-dom": "16.8.5",
     "@types/react-router-dom": "^4.3.4",
     "@types/react-test-renderer": "^16.8.3",
