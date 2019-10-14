@@ -18,8 +18,6 @@
     "html-react-parser": "^0.9.1",
     "http-proxy-middleware": "^0.20.0",
     "immer": "^4.0.0",
-    "html-react-parser": "^0.9.1",
-    "http-proxy-middleware": "^0.20.0",
     "jsonwebtoken": "^8.5.1",
     "material-table": "^1.40.0",
     "path": "^0.12.7",
