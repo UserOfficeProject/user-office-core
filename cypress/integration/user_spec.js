@@ -45,7 +45,7 @@ context("User tests", () => {
 
     // Personal details
     cy.get("#select-user_title").click();
-    
+
     cy.contains("Mr.").click();
 
     cy.get("[data-cy=firstname] input")
@@ -113,6 +113,7 @@ context("User tests", () => {
     //Submit
     cy.get("[data-cy=submit]").click();
 
+    cy.contains("Click here for sign in").click();
     //Check redirect to Sign in page
     cy.contains("Sign in");
   });
