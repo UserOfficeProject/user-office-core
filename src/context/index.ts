@@ -11,6 +11,7 @@ import FileMutations from "../mutations/FileMutations";
 import FileQueries from "../queries/FileQueries";
 import AdminMutations from "../mutations/AdminMutations";
 import AdminQueries from "../queries/AdminQueries";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -31,6 +32,7 @@ interface ResolverContextMutations {
 }
 
 export interface BasicResolverContext {
+  userAuthorization: UserAuthorization;
   mutations: ResolverContextMutations;
   queries: ResolverContextQueries;
 }

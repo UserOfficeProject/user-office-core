@@ -61,6 +61,7 @@ CREATE TABLE users (
 , organisation_address varchar(100) NOT NULL
 , position  varchar(30) NOT NULL
 , email     varchar(30) UNIQUE
+, email_verified boolean DEFAULT False
 , telephone varchar(20) NOT NULL
 , telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -229,6 +230,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -250,6 +252,7 @@ VALUES
                   'Estonia, New Gabriella, 4056 Cronin Motorway',
                   'Strategist',
                   'Javon4@hotmail.com',
+                  true,
                   '(288) 431-1443',
                   '(370) 386-8976'
                   );
@@ -297,6 +300,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -317,6 +321,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'Aaron_Harris49@gmail.com',
+                 true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );
@@ -340,6 +345,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -360,6 +366,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'nils@ess.se',
+                true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );
@@ -379,15 +386,15 @@ INSERT INTO proposal_question_datatypes VALUES ('DATE');
 INSERT INTO proposal_question_datatypes VALUES ('FILE_UPLOAD');
 INSERT INTO proposal_question_datatypes VALUES ('EMBELLISHMENT');
 
-INSERT INTO proposal_questions VALUES('ttl_general','EMBELLISHMENT','',1,'{"html":"<h2>Indicators</h2>"}');
+INSERT INTO proposal_questions VALUES('ttl_general','EMBELLISHMENT','',1,'{"html":"<h2>Indicators</h2>", "plain": "Indicators"}');
 INSERT INTO proposal_questions VALUES('has_links_with_industry','SELECTION_FROM_OPTIONS','Links with industry?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('links_with_industry','TEXT_INPUT','If yes, please describe:',1,'{"placeholder":"Please specify links with industry"}');
 INSERT INTO proposal_questions VALUES('is_student_proposal','SELECTION_FROM_OPTIONS','Are any of the co-proposers students?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('is_towards_degree','SELECTION_FROM_OPTIONS','Does the proposal work towards a students degree?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
-INSERT INTO proposal_questions VALUES('ttl_delivery_date','EMBELLISHMENT','',1,'{"html":"<h2>Final delivery date</h2>"}');
+INSERT INTO proposal_questions VALUES('ttl_delivery_date','EMBELLISHMENT','',1,'{"html":"<h2>Final delivery date</h2>", "plain": "Final delivery date"}');
 INSERT INTO proposal_questions VALUES('final_delivery_date','DATE','Choose a date',1,'{"min":"now", "required":true}');
 INSERT INTO proposal_questions VALUES('final_delivery_date_motivation','TEXT_INPUT','Please motivate the chosen date',1,'{"min":10, "multiline":true, "max":500, "placeholder":"(e.g. based on awarded beamtime, or described intention to apply)"}');
-INSERT INTO proposal_questions VALUES('ttl_crystallization','EMBELLISHMENT','',2,'{"html":"<h2>Crystallization</h2>"}');
+INSERT INTO proposal_questions VALUES('ttl_crystallization','EMBELLISHMENT','',2,'{"html":"<h2>Crystallization</h2>", "plain": "Crustallization"}');
 INSERT INTO proposal_questions VALUES('has_crystallization','BOOLEAN','Is crystallization applicable',2,'{"variant":"checkbox"}');
 INSERT INTO proposal_questions VALUES('crystallization_molecule_name','TEXT_INPUT','Name of molecule to be crystallized',2,'{"min":2, "max":40, "placeholder":"(e.g. superoxide dismutase)"}');
 INSERT INTO proposal_questions VALUES('amino_seq','TEXT_INPUT','FASTA sequence or Uniprot number:',2,'{"min":2, "max":200}');
@@ -401,7 +408,7 @@ INSERT INTO proposal_questions VALUES('prec_composition','TEXT_INPUT','Known cry
 INSERT INTO proposal_questions VALUES('crystallization_experience','TEXT_INPUT','What crystallization method, volume, and temperature have you used in the past?',2,'{ "multiline":true,"min":2, "max":500,"placeholder":"(e.g. vapour diffusion, 10 µL drops, room temperature)"}');
 INSERT INTO proposal_questions VALUES('crystallization_time','TEXT_INPUT','How long do your crystals take to appear?',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('crystal_size','TEXT_INPUT','What is the typical size of your crystal?',2,'{"min":2, "max":200,"placeholder":"( µm x µm x µm )"}');
-INSERT INTO proposal_questions VALUES('ttl_details_for_prep','EMBELLISHMENT','',2,'{"html":"<h2>Details from protein preparation</h2>"}');
+INSERT INTO proposal_questions VALUES('ttl_details_for_prep','EMBELLISHMENT','',2,'{"html":"<h2>Details from protein preparation</h2>", "plain": "Details from protein preparation"}');
 INSERT INTO proposal_questions VALUES('typical_yield','TEXT_INPUT','Typical yield:',2,'{"min":2, "max":200, "placeholder":"(mg per liter of culture)"}');
 INSERT INTO proposal_questions VALUES('storage_conditions','TEXT_INPUT','Storage conditions:',2,'{"min":2, "max":200,"placeholder":"(e.g. stable at 4 °C or frozen at -20 °C)"}');
 INSERT INTO proposal_questions VALUES('stability','TEXT_INPUT','Stability:',2,'{"min":2, "max":200}');
@@ -409,7 +416,7 @@ INSERT INTO proposal_questions VALUES('protein_buffer','TEXT_INPUT','What buffer
 INSERT INTO proposal_questions VALUES('is_deuterated','TEXT_INPUT','Is your protein partially or fully deuterated?',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('protein_concentration','TEXT_INPUT','What protein concentration do you usually use for crystallization?',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('slide_select_deuteration','BOOLEAN','Is biological deuteration applicable',3,'{"variant":"slider"}');
-INSERT INTO proposal_questions VALUES('ttl_select_deuteration_type','EMBELLISHMENT','',3,'{"html":"<h3>Select deuteration type(s)</h3>"}');
+INSERT INTO proposal_questions VALUES('ttl_select_deuteration_type','EMBELLISHMENT','',3,'{"html":"<h3>Select deuteration type(s)</h3>", "plain": "Select deuteration type(s)"}');
 INSERT INTO proposal_questions VALUES('is_biomass','BOOLEAN','Biomass (E. coli)',3,'{"variant":"checkbox"}');
 INSERT INTO proposal_questions VALUES('will_provide_organism','BOOLEAN','Will user provide the organism for us to grow under deuterated conditions?',3,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('organism_name','TEXT_INPUT','What is the organism',3,'{"min":2, "max":200}');
@@ -443,7 +450,7 @@ INSERT INTO proposal_questions VALUES('yeast_derived_d_lvl_req','SELECTION_FROM_
 INSERT INTO proposal_questions VALUES('yeast_derived_d_lvl_req_justification','TEXT_INPUT','Justify level of D incorporation:',3,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('bio_deu_other','BOOLEAN','Other',3,'{"variant":"slider"}');
 INSERT INTO proposal_questions VALUES('bio_deu_other_desc','TEXT_INPUT','For requests that do not fit any of options above',3,'{"min":10, "max":500, "multiline":true}');
-INSERT INTO proposal_questions VALUES('ttl_biosafety','EMBELLISHMENT','',3,'{"html":"<h2>Biosafety</h2>"}');
+INSERT INTO proposal_questions VALUES('ttl_biosafety','EMBELLISHMENT','',3,'{"html":"<h2>Biosafety</h2>", "plain": "Biosafety"}');
 INSERT INTO proposal_questions VALUES('biosafety_containment_level','SELECTION_FROM_OPTIONS','Which biosafety containment level is required to work with your sample?',3,'{"variant":"radio", "options":["L1", "L2"]}');
 INSERT INTO proposal_questions VALUES('biosafety_has_risks','SELECTION_FROM_OPTIONS','Is your organism a live virus,3, toxin-producing, or pose ay risk to human health and/or the environment?',3,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('biosafety_is_recombinant','SELECTION_FROM_OPTIONS','Is the protein recombinant?',3,'{"variant":"radio", "options":["yes", "no"]}');

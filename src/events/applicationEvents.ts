@@ -1,5 +1,5 @@
 import { Proposal } from "../models/Proposal";
-import { User } from "../models/user";
+import { User } from "../models/User";
 
 interface ProposalAcceptedEvent {
   type: "PROPOSAL_ACCEPTED";
@@ -28,9 +28,16 @@ interface UserResetPasswordEmailEvent {
   link: string;
 }
 
+interface AccountCreation {
+  type: "ACCOUNT_CREATED";
+  user: User;
+  link: string;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
+  | AccountCreation
   | UserResetPasswordEmailEvent;

@@ -155,7 +155,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     }
   }
 
-  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[] | null> {
+  async insertFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[] | null> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
       return null;
@@ -166,7 +170,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return files;
   }
 
-  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean | null> {
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean | null> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
       return null;
@@ -179,7 +186,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  private async getAnswerId(proposal_id: number, question_id: string): Promise<number | null> {
+  private async getAnswerId(
+    proposal_id: number,
+    question_id: string
+  ): Promise<number | null> {
     const selectResult = await database
       .from("proposal_answers")
       .where({
@@ -270,7 +280,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .where("pc.user_id", id)
       .orWhere("p.proposer_id", id)
-      .then((proposals: ProposalRecord[]) => proposals.map(proposal => this.createProposalObject(proposal)));
+      .groupBy("p.proposal_id")
+      .then((proposals: ProposalRecord[]) =>
+        proposals.map(proposal => this.createProposalObject(proposal))
+      );
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {

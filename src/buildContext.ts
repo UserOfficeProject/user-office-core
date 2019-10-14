@@ -93,6 +93,7 @@ const adminMutations = new AdminMutations(
 );
 
 const context: BasicResolverContext = {
+  userAuthorization,
   queries: {
     user: userQueries,
     proposal: proposalQueries,
