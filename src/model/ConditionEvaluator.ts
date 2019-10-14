@@ -31,6 +31,6 @@ export class EqualityValidator implements IFieldConditionEvaluator {
 
 export class InequalityValidator implements IFieldConditionEvaluator {
   isSattisfied(field: ProposalTemplateField, params: object): boolean {
-    return field.value != params;
+    return field.value !== params;
   }
 }

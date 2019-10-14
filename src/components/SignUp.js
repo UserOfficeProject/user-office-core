@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
-import { Redirect } from "react-router-dom";
 import FormikDropdown from "./FormikDropdown";
 import nationalities from "../model/nationalities";
 import dateformat from "dateformat";
