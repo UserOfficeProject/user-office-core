@@ -72,8 +72,22 @@ export function usePersistModel() {
     const mutation = `
     mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
-        field {
-          proposal_question_id
+        template {
+          topics {
+            topic_title
+            topic_id,
+            fields {
+              proposal_question_id
+              data_type
+              question
+              config
+              dependencies {
+                proposal_question_dependency
+                condition
+                proposal_question_id
+              }
+            }
+          }
         }
         error
       }
@@ -95,7 +109,7 @@ export function usePersistModel() {
       (result: {
         updateProposalTemplateField: {
           error?: string;
-          field?: { proposal_question_id: string };
+          template?: ProposalTemplate;
         };
       }) => {
         return result.updateProposalTemplateField;
@@ -245,8 +259,15 @@ export function usePersistModel() {
           );
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
-          executeAndMonitorCall(() =>
-            updateItem(action.payload.field as ProposalTemplateField)
+          executeAndMonitorCall( () => 
+              new Promise(async (resolve, reject) => {
+                const result = await updateItem(action.payload.field as ProposalTemplateField)
+                dispatch({
+                  type: EventType.FIELD_UPDATED,
+                  payload: new ProposalTemplateField(result.template)
+                });
+                resolve(result);
+              })
           );
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:

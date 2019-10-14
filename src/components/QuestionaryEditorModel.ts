@@ -17,7 +17,8 @@ export enum EventType {
   FIELD_CREATED,
   DELETE_FIELD_REQUESTED,
   FIELD_DELETED,
-  SERVICE_ERROR_OCCURRED
+  SERVICE_ERROR_OCCURRED,
+  FIELD_UPDATED
 }
 
 export interface IEvent {
@@ -90,6 +91,8 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           const newField: ProposalTemplateField = action.payload;
           draft.addField(newField);
           return new ProposalTemplate(draft);
+        case EventType.FIELD_UPDATED:
+            return new ProposalTemplate(action.payload);
         case EventType.FIELD_DELETED:
           return new ProposalTemplate(action.payload);
       }

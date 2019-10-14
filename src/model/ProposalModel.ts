@@ -22,6 +22,7 @@ export class ProposalTemplate {
   constructor(obj: object | null = null) {
     if (obj !== null) {
       Object.assign(this, obj);
+      this.fields = []; // reset
       if (this.topics !== null) {
         this.topics = this.topics.map(x => new Topic(x));
         this.topics.forEach(
