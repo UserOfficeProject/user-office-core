@@ -95,10 +95,17 @@ export class proposalDataSource implements ProposalDataSource {
       sort_order: number;
     }
   ): Promise<ProposalTemplateField | null> {
-    return createDummyField({ ...values, proposal_question_id, config: JSON.parse(values.config || "{}") });
+    return createDummyField({
+      ...values,
+      proposal_question_id,
+      config: JSON.parse(values.config || "{}")
+    });
   }
 
-  async updateTopic(id: number, values: { title?: string; isEnabled?: boolean }): Promise<Topic> {
+  async updateTopic(
+    id: number,
+    values: { title?: string; isEnabled?: boolean }
+  ): Promise<Topic> {
     return new Topic(
       id,
       values.title || "Topic title",
@@ -114,14 +121,25 @@ export class proposalDataSource implements ProposalDataSource {
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
   }
-  async insertFiles(proposal_id: number, question_id: string, files: string[]): Promise<string[]> {
+  async insertFiles(
+    proposal_id: number,
+    question_id: string,
+    files: string[]
+  ): Promise<string[]> {
     return files;
   }
-  async deleteFiles(proposal_id: number, question_id: string): Promise<Boolean> {
+  async deleteFiles(
+    proposal_id: number,
+    question_id: string
+  ): Promise<Boolean> {
     return true;
   }
 
-  async updateAnswer(proposal_id: number, question_id: string, answer: string): Promise<Boolean> {
+  async updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean> {
     return true;
   }
   async checkActiveCall(): Promise<Boolean> {
@@ -136,13 +154,28 @@ export class proposalDataSource implements ProposalDataSource {
     const linksToField = createDummyField({
       proposal_question_id: "linksToField",
       data_type: DataType.TEXT_INPUT,
-      dependencies: [new FieldDependency("linksToField", "hasLinksToField", "{ 'ifValue': 'yes' }")]
+      dependencies: [
+        new FieldDependency(
+          "linksToField",
+          "hasLinksToField",
+          "{ 'ifValue': 'yes' }"
+        )
+      ]
     });
 
-    return new ProposalTemplate([new Topic(1, "General information", true, 1, [hasLinksToField, linksToField])]);
+    return new ProposalTemplate([
+      new Topic(1, "General information", true, 1, [
+        hasLinksToField,
+        linksToField
+      ])
+    ]);
   }
 
-  async submitReview(reviewID: number, comment: string, grade: number): Promise<Review | null> {
+  async submitReview(
+    reviewID: number,
+    comment: string,
+    grade: number
+  ): Promise<Review | null> {
     throw new Error("Method not implemented.");
   }
   async rejectProposal(id: number): Promise<Proposal | null> {

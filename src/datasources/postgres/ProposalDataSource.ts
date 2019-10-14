@@ -1,5 +1,10 @@
 import database from "./database";
-import { ProposalRecord, TopicRecord, ProposalQuestionRecord, FieldDependencyRecord } from "./records";
+import {
+  ProposalRecord,
+  TopicRecord,
+  ProposalQuestionRecord,
+  FieldDependencyRecord
+} from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
@@ -31,7 +36,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   private createTopicObject(proposal: TopicRecord) {
-    return new Topic(proposal.topic_id, proposal.topic_title, proposal.is_enabled, proposal.sort_order, null);
+    return new Topic(
+      proposal.topic_id,
+      proposal.topic_title,
+      proposal.is_enabled,
+      proposal.sort_order,
+      null
+    );
   }
 
   private createFieldDependencyObject(fieldDependency: FieldDependencyRecord) {
@@ -70,7 +81,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((call: any) => (call ? true : false));
   }
 
-  async setStatusProposal(id: number, status: number): Promise<Proposal | null> {
+  async setStatusProposal(
+    id: number,
+    status: number
+  ): Promise<Proposal | null> {
     return database
       .update(
         {
@@ -124,7 +138,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
   }
 
-  async updateAnswer(proposal_id: number, question_id: string, answer: string): Promise<Boolean> {
+  async updateAnswer(
+    proposal_id: number,
+    question_id: string,
+    answer: string
+  ): Promise<Boolean> {
     const results: { count: string } = await database
       .count()
       .from("proposal_answers")
@@ -165,7 +183,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       return null;
     }
 
-    await database("proposal_answers_files").insert(files.map(file => ({ answer_id: answerId, file_id: file })));
+    await database("proposal_answers_files").insert(
+      files.map(file => ({ answer_id: answerId, file_id: file }))
+    );
 
     return files;
   }
@@ -253,7 +273,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orderBy("proposal_id", "desc")
       .modify((query: any) => {
         if (filter) {
-          query.where("title", "ilike", `%${filter}%`).orWhere("abstract", "ilike", `%${filter}%`);
+          query
+            .where("title", "ilike", `%${filter}%`)
+            .orWhere("abstract", "ilike", `%${filter}%`);
         }
         if (first) {
           query.limit(first);
@@ -263,7 +285,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
       })
       .then((proposals: ProposalRecord[]) => {
-        const props = proposals.map(proposal => this.createProposalObject(proposal));
+        const props = proposals.map(proposal =>
+          this.createProposalObject(proposal)
+        );
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
           proposals: props
@@ -287,7 +311,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const dependencies: FieldDependency[] = await database.select("*").from("proposal_question_dependencies");
+    const dependencies: FieldDependency[] = await database
+      .select("*")
+      .from("proposal_question_dependencies");
 
     const fieldRecords: ProposalQuestionRecord[] = await database
       .select("*")
@@ -301,13 +327,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orderBy("sort_order");
 
     const topics = topicRecords.map(record => this.createTopicObject(record));
-    const fields = fieldRecords.map(record => this.createProposalTemplateFieldObject(record));
+    const fields = fieldRecords.map(record =>
+      this.createProposalTemplateFieldObject(record)
+    );
 
     topics.forEach(topic => {
       topic.fields = fields.filter(field => field.topic_id === topic.topic_id);
     });
     fields.forEach(field => {
-      field.dependencies = dependencies.filter(dep => dep.proposal_question_id === field.proposal_question_id);
+      field.dependencies = dependencies.filter(
+        dep => dep.proposal_question_id === field.proposal_question_id
+      );
     });
 
     return new ProposalTemplate(topics);
@@ -382,20 +412,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     // TODO update dependencies if provided
 
     await database("proposal_question_dependencies")
-    .where("proposal_question_id", proposal_question_id)
-    .del();
-    
-    if(values.dependencies) {
+      .where("proposal_question_id", proposal_question_id)
+      .del();
+
+    if (values.dependencies) {
       values.dependencies.forEach(async dependency => {
-        await database("proposal_question_dependencies")
-        .insert({
-          proposal_question_id:dependency.proposal_question_id,
-          proposal_question_dependency:dependency.proposal_question_dependency,
-          condition:dependency.condition, // TODO rename consitancy
-        })
-      })
+        await database("proposal_question_dependencies").insert({
+          proposal_question_id: dependency.proposal_question_id,
+          proposal_question_dependency: dependency.proposal_question_dependency,
+          condition: dependency.condition // TODO rename consitancy
+        });
+      });
     }
-    
 
     return database
       .update(rows, ["*"])
@@ -403,11 +431,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where("proposal_question_id", proposal_question_id)
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("UPDATE field resultSet must contain exactly 1 row", {
-            resultSet,
-            proposal_question_id,
-            rows
-          });
+          this.logger.logError(
+            "UPDATE field resultSet must contain exactly 1 row",
+            {
+              resultSet,
+              proposal_question_id,
+              rows
+            }
+          );
           return null;
         }
 
@@ -444,11 +475,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from("proposal_questions")
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("INSERT field resultSet must contain exactly 1 row", {
-            resultSet,
-            topicId,
-            dataType
-          });
+          this.logger.logError(
+            "INSERT field resultSet must contain exactly 1 row",
+            {
+              resultSet,
+              topicId,
+              dataType
+            }
+          );
           return null;
         }
 
@@ -470,11 +504,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select("*")
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length == 0) {
-          this.logger.logWarn("SELECT from proposal_question yielded no results", { fieldId });
+          this.logger.logWarn(
+            "SELECT from proposal_question yielded no results",
+            { fieldId }
+          );
           return null;
         }
         if (resultSet.length > 1) {
-          this.logger.logError("Select from proposal_question yelded in more than one row", { fieldId });
+          this.logger.logError(
+            "Select from proposal_question yelded in more than one row",
+            { fieldId }
+          );
           return null;
         }
         return this.createProposalTemplateFieldObject(resultSet[0]);
@@ -483,9 +523,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
     return new Promise(async (resolve, reject) => {
-      await database("proposal_questions").where({ proposal_question_id: fieldId }).del();
+      await database("proposal_questions")
+        .where({ proposal_question_id: fieldId })
+        .del();
       resolve(await this.getProposalTemplate());
-    })
-    
+    });
   }
 }

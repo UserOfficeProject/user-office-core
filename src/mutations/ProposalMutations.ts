@@ -19,7 +19,6 @@ import { ILogger } from "../utils/Logger";
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
-
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
@@ -284,7 +283,6 @@ export default class ProposalMutations {
     }
   }
 
-
   async createTemplateField(
     agent: User | null,
     topicId: number,
@@ -294,7 +292,7 @@ export default class ProposalMutations {
       return rejection("NOT_AUTHORIZED");
     }
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
-    
+
     return (
       (await this.dataSource.createTemplateField(
         newFieldId,
@@ -306,25 +304,27 @@ export default class ProposalMutations {
     );
   }
 
-  async deleteTemplateField(agent: User | null, id: string): Promise<ProposalTemplate | Rejection> {
+  async deleteTemplateField(
+    agent: User | null,
+    id: string
+  ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
     return (
-      (await this.dataSource.deleteTemplateField(
-        id
-      )) || rejection("INTERNAL_SERVER_ERROR")
+      (await this.dataSource.deleteTemplateField(id)) ||
+      rejection("INTERNAL_SERVER_ERROR")
     );
   }
 
-  private createBlankConfig(dataType:DataType):FieldConfig {
-    switch(dataType) {
+  private createBlankConfig(dataType: DataType): FieldConfig {
+    switch (dataType) {
       case DataType.FILE_UPLOAD:
-          return {file_type:[]};
-          case DataType.EMBELLISHMENT:
-            return {"plain":"New embellishment","html":"<p>New embellishment</p>"};
+        return { file_type: [] };
+      case DataType.EMBELLISHMENT:
+        return { plain: "New embellishment", html: "<p>New embellishment</p>" };
       case DataType.SELECTION_FROM_OPTIONS:
-        return {options:[]}
+        return { options: [] };
       default:
         return {};
     }
