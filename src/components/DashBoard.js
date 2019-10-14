@@ -30,6 +30,7 @@ import OverviewPage from "./OverviewPage";
 import HelpPage from "./HelpPage";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
+import QuestionaryEditor from "./QuestionaryEditor"
 
 const drawerWidth = 240;
 
@@ -184,6 +185,7 @@ export default function Dashboard({ match }) {
           <Route path="/PageEditor" component={PageEditor} />
           <Route path="/CallPage" component={CallPage} />
           <Route path="/HelpPage" component={HelpPage} />
+          <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
           <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route
             path="/ProposalTableReviewer"

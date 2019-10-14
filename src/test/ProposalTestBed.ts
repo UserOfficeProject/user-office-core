@@ -33,7 +33,7 @@ export const createTemplate = () => {
             dependencies: [
               {
                 proposal_question_dependency: "has_links_with_industry",
-                condition: '{ "condition": "equals", "params":"yes"}',
+                condition: '{ "condition": "eq", "params":"yes"}',
                 proposal_question_id: "links_with_industry"
               }
             ]

@@ -9,10 +9,14 @@ import DashBoard from "./DashBoard";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Redirect } from "react-router-dom";
 import { CookiesProvider } from "react-cookie";
+import { ThemeProvider } from '@material-ui/styles';
 import {
   UserContextProvider,
   UserContext
 } from "../context/UserContextProvider";
+import { getTheme } from "../theme"
+
+
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>
@@ -35,41 +39,43 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 function App() {
   return (
-    <CookiesProvider>
-      <UserContextProvider>
-        <Router>
-          <div className="App">
-            <Switch>
-              <Route path="/SignUp" component={SignUp} />
-              <Route path="/SignIn" component={SignIn} />
-              <Route
-                path="/ResetPasswordEmail"
-                component={ResetPasswordEmail}
-              />
-              <Route path="/ResetPassword/:token" component={ResetPassword} />
-              <Route
-                path="/EmailVerification/:token"
-                component={EmailVerification}
-              />
-              <Route
-                path="/LogOut"
-                render={() => (
-                  <UserContext.Consumer>
-                    {({ handleLogout }) => {
-                      handleLogout();
-                      return <Redirect to="/" />;
-                    }}
-                  </UserContext.Consumer>
-                )}
-              />
+    <ThemeProvider theme={getTheme()}>
+      <CookiesProvider>
+        <UserContextProvider>
+          <Router>
+            <div className="App">
+              <Switch>
+                <Route path="/SignUp" component={SignUp} />
+                <Route path="/SignIn" component={SignIn} />
+                <Route
+                  path="/ResetPasswordEmail"
+                  component={ResetPasswordEmail}
+                />
+                <Route path="/ResetPassword/:token" component={ResetPassword} />
+                <Route
+                  path="/EmailVerification/:token"
+                  component={EmailVerification}
+                />
+                <Route
+                  path="/LogOut"
+                  render={() => (
+                    <UserContext.Consumer>
+                      {({ handleLogout }) => {
+                        handleLogout();
+                        return <Redirect to="/" />;
+                      }}
+                    </UserContext.Consumer>
+                  )}
+                />
 
-              <Route path="/RoleSelectionPage" component={RoleSelectionPage} />
-              <PrivateRoute path="/" component={DashBoard} />
-            </Switch>
-          </div>
-        </Router>
-      </UserContextProvider>
-    </CookiesProvider>
+                <Route path="/RoleSelectionPage" component={RoleSelectionPage} />
+                <PrivateRoute path="/" component={DashBoard} />
+              </Switch>
+            </div>
+          </Router>
+        </UserContextProvider>
+      </CookiesProvider>
+    </ThemeProvider>
   );
 }
 

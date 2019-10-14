@@ -25,6 +25,7 @@ exports[`Textfield rendered without crashing 1`] = `
         onBlur={[Function]}
         onChange={[Function]}
         onFocus={[Function]}
+        placeholder="Please specify links with industry"
         required={false}
         rows={1}
         type="text"

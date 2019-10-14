@@ -3,7 +3,7 @@ import { FormControl, FormControlLabel, Checkbox } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 
-export function ProposalComponentCheckBox(props: IBasicComponentProps) {
+export function ProposalComponentBoolean(props: IBasicComponentProps) {
 
   let { templateField, onComplete, touched, errors, handleChange } = props;
   let { proposal_question_id, config, question } = templateField;

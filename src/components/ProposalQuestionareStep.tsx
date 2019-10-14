@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { ProposalComponentCheckBox } from "./ProposalComponentCheckBox";
+import { ProposalComponentBoolean } from "./ProposalComponentBoolean";
 import { ProposalCompontentDatePicker } from "./ProposalCompontentDatePicker";
 import { ProposalCompontentFileUpload } from "./ProposalCompontentFileUpload";
 import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
@@ -134,7 +134,7 @@ class ComponentFactory {
 
   constructor() {
     this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentCheckBox);
+    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
     this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
     this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
     this.componentMap.put(
