@@ -19,6 +19,7 @@ export const dummyUserOfficer = new User(
   "Vietnam, Consueloburgh, 4788 Frederik Parkways",
   "Producer",
   "Dorris83@gmail.com",
+  true,
   "(012) 325-1151",
   "1-316-182-3694",
   "2019-07-17 08:25:12.23043+00",
@@ -41,6 +42,7 @@ export const dummyUser = new User(
   "Sudan, North Catalina, 7486 Schimmel Pine",
   "Architect",
   "Cleve30@yahoo.com",
+  true,
   "045-272-7984 x34539",
   "028-065-8228 x08367",
   "2019-07-17 08:25:12.23043+00",
@@ -64,6 +66,7 @@ export const dummyUserNotOnProposal = new User(
   "Andorra, Strackeview, 81436 Summer Mill",
   "Facilitator",
   "Tyrique41@hotmail.com",
+  true,
   "1-272-760-1466 x03877",
   "174-603-1024",
   "2019-07-17 08:25:12.23043+00",
@@ -71,6 +74,9 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  setUserEmailVerified(id: number): Promise<Boolean> {
+    throw new Error("Method not implemented.");
+  }
   async setUserPassword(id: number, password: string): Promise<Boolean> {
     return true;
   }

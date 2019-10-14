@@ -61,6 +61,7 @@ CREATE TABLE users (
 , organisation_address varchar(100) NOT NULL
 , position  varchar(30) NOT NULL
 , email     varchar(30) UNIQUE
+, email_verified boolean DEFAULT False
 , telephone varchar(20) NOT NULL
 , telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -94,16 +95,17 @@ CREATE TABLE proposal_question_datatypes (
 CREATE TABLE proposal_topics (
   topic_id  serial PRIMARY KEY
 , topic_title varchar(32) NOT NULL
-, is_enabled BOOLEAN DEFAULT TRUE
-, sort_order INT NOT NULL
+, is_enabled BOOLEAN DEFAULT FALSE
+, sort_order serial NOT NULL
 );
 
 CREATE TABLE proposal_questions (
   proposal_question_id  VARCHAR(64) PRIMARY KEY   /* f.x.links_with_industry */
 , data_type             VARCHAR(64) NOT NULL REFERENCES proposal_question_datatypes(proposal_question_datatype_id)
 , question              VARCHAR(256) NOT NULL
-, topic                 int DEFAULT NULL REFERENCES proposal_topics(topic_id)              /* f.x. { "min":2, "max":50 } */
+, topic_id              INT DEFAULT NULL REFERENCES proposal_topics(topic_id)              /* f.x. { "min":2, "max":50 } */
 , config                VARCHAR(512) DEFAULT NULL              /* f.x. { "min":2, "max":50 } */
+, sort_order            INT DEFAULT 0
 , created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -123,8 +125,8 @@ CREATE TABLE proposal_answers (
 );
 
 CREATE TABLE proposal_question_dependencies (
-  proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
-, proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id)
+  proposal_question_id          VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id) ON DELETE CASCADE
+, proposal_question_dependency  VARCHAR(64) NOT NULL REFERENCES proposal_questions(proposal_question_id) ON DELETE CASCADE
 , condition                     VARCHAR(64) DEFAULT NULL
 , PRIMARY KEY (proposal_question_id, proposal_question_dependency)
 );
@@ -228,6 +230,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -249,6 +252,7 @@ VALUES
                   'Estonia, New Gabriella, 4056 Cronin Motorway',
                   'Strategist',
                   'Javon4@hotmail.com',
+                  true,
                   '(288) 431-1443',
                   '(370) 386-8976'
                   );
@@ -296,6 +300,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -316,6 +321,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'Aaron_Harris49@gmail.com',
+                 true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );
@@ -339,6 +345,7 @@ INSERT INTO users (
                   organisation_address,
                   position,
                   email,
+                  email_verified,
                   telephone,
                   telephone_alt
                   ) 
@@ -359,6 +366,7 @@ VALUES (
                 'Congo, Alleneville, 35823 Mueller Glens',
                 'Liaison',
                 'nils@ess.se',
+                true,
                 '711-316-5728',
                 '1-359-864-3489 x7390'
                 );
@@ -385,24 +393,24 @@ INSERT INTO proposal_questions VALUES('is_student_proposal','SELECTION_FROM_OPTI
 INSERT INTO proposal_questions VALUES('is_towards_degree','SELECTION_FROM_OPTIONS','Does the proposal work towards a students degree?',1,'{"required":true, "options":["yes", "no"], "variant":"radio"}');
 INSERT INTO proposal_questions VALUES('ttl_delivery_date','EMBELLISHMENT','',1,'{"html":"<h2>Final delivery date</h2>", "plain": "Final delivery date"}');
 INSERT INTO proposal_questions VALUES('final_delivery_date','DATE','Choose a date',1,'{"min":"now", "required":true}');
-INSERT INTO proposal_questions VALUES('final_delivery_date_motivation','TEXT_INPUT','Please motivate the chosen date',1,'{"min":10, "multiline":true, "max":500, "small_label":"(e.g. based on awarded beamtime, or described intention to apply)"}');
-INSERT INTO proposal_questions VALUES('ttl_crystallization','EMBELLISHMENT','',2,'{"html":"<h2>Crystallization</h2>", "plain": "Crystallization"}');
+INSERT INTO proposal_questions VALUES('final_delivery_date_motivation','TEXT_INPUT','Please motivate the chosen date',1,'{"min":10, "multiline":true, "max":500, "placeholder":"(e.g. based on awarded beamtime, or described intention to apply)"}');
+INSERT INTO proposal_questions VALUES('ttl_crystallization','EMBELLISHMENT','',2,'{"html":"<h2>Crystallization</h2>", "plain": "Crustallization"}');
 INSERT INTO proposal_questions VALUES('has_crystallization','BOOLEAN','Is crystallization applicable',2,'{"variant":"checkbox"}');
-INSERT INTO proposal_questions VALUES('crystallization_molecule_name','TEXT_INPUT','Name of molecule to be crystallized',2,'{"min":2, "max":40, "small_label":"(e.g. superoxide dismutase)"}');
+INSERT INTO proposal_questions VALUES('crystallization_molecule_name','TEXT_INPUT','Name of molecule to be crystallized',2,'{"min":2, "max":40, "placeholder":"(e.g. superoxide dismutase)"}');
 INSERT INTO proposal_questions VALUES('amino_seq','TEXT_INPUT','FASTA sequence or Uniprot number:',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('molecular_weight','TEXT_INPUT','Molecular weight(kDA):',2,'{"min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('oligomerization_state','TEXT_INPUT','Oligomerization state:',2,'{"min":2, "max":200, "small_label":"(e.g. homodimer, tetramer etc.)"}');
+INSERT INTO proposal_questions VALUES('oligomerization_state','TEXT_INPUT','Oligomerization state:',2,'{"min":2, "max":200, "placeholder":"(e.g. homodimer, tetramer etc.)"}');
 INSERT INTO proposal_questions VALUES('pdb_id','TEXT_INPUT','PDB ID of crystal structure',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('doi_or_alike','TEXT_INPUT','If the reference is publicly available, please provide the DOI or an accessible link:',2,'{"min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('reference_file','FILE_UPLOAD','If the reference is not publicly available, please upload a copy.',2,'{ "max_files":3}');
+INSERT INTO proposal_questions VALUES('reference_file','FILE_UPLOAD','If the reference is not publicly available, please upload a copy.',2,'{ "max_files":3, "file_type":[]}');
 INSERT INTO proposal_questions VALUES('crystallization_cofactors_ligands','TEXT_INPUT','Does the protein have any co-factors or ligands required for crystallization? Specify:',2,'{"min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('prec_composition','TEXT_INPUT','Known crystallization precipitant composition:',2,'{"min":2, "max":200,"small_label":"(inc.buffer, salt, additives, pH)"}');
-INSERT INTO proposal_questions VALUES('crystallization_experience','TEXT_INPUT','What crystallization method, volume, and temperature have you used in the past?',2,'{ "multiline":true,"min":2, "max":500,"small_label":"(e.g. vapour diffusion, 10 µL drops, room temperature)"}');
+INSERT INTO proposal_questions VALUES('prec_composition','TEXT_INPUT','Known crystallization precipitant composition:',2,'{"min":2, "max":200,"placeholder":"(inc.buffer, salt, additives, pH)"}');
+INSERT INTO proposal_questions VALUES('crystallization_experience','TEXT_INPUT','What crystallization method, volume, and temperature have you used in the past?',2,'{ "multiline":true,"min":2, "max":500,"placeholder":"(e.g. vapour diffusion, 10 µL drops, room temperature)"}');
 INSERT INTO proposal_questions VALUES('crystallization_time','TEXT_INPUT','How long do your crystals take to appear?',2,'{"min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('crystal_size','TEXT_INPUT','What is the typical size of your crystal?',2,'{"min":2, "max":200,"small_label":"( µm x µm x µm )"}');
+INSERT INTO proposal_questions VALUES('crystal_size','TEXT_INPUT','What is the typical size of your crystal?',2,'{"min":2, "max":200,"placeholder":"( µm x µm x µm )"}');
 INSERT INTO proposal_questions VALUES('ttl_details_for_prep','EMBELLISHMENT','',2,'{"html":"<h2>Details from protein preparation</h2>", "plain": "Details from protein preparation"}');
-INSERT INTO proposal_questions VALUES('typical_yield','TEXT_INPUT','Typical yield:',2,'{"min":2, "max":200, "small_label":"(mg per liter of culture)"}');
-INSERT INTO proposal_questions VALUES('storage_conditions','TEXT_INPUT','Storage conditions:',2,'{"min":2, "max":200,"small_label":"(e.g. stable at 4 °C or frozen at -20 °C)"}');
+INSERT INTO proposal_questions VALUES('typical_yield','TEXT_INPUT','Typical yield:',2,'{"min":2, "max":200, "placeholder":"(mg per liter of culture)"}');
+INSERT INTO proposal_questions VALUES('storage_conditions','TEXT_INPUT','Storage conditions:',2,'{"min":2, "max":200,"placeholder":"(e.g. stable at 4 °C or frozen at -20 °C)"}');
 INSERT INTO proposal_questions VALUES('stability','TEXT_INPUT','Stability:',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('protein_buffer','TEXT_INPUT','What buffer is your protein in?',2,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('is_deuterated','TEXT_INPUT','Is your protein partially or fully deuterated?',2,'{"min":2, "max":200}');
@@ -412,19 +420,19 @@ INSERT INTO proposal_questions VALUES('ttl_select_deuteration_type','EMBELLISHME
 INSERT INTO proposal_questions VALUES('is_biomass','BOOLEAN','Biomass (E. coli)',3,'{"variant":"checkbox"}');
 INSERT INTO proposal_questions VALUES('will_provide_organism','BOOLEAN','Will user provide the organism for us to grow under deuterated conditions?',3,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('organism_name','TEXT_INPUT','What is the organism',3,'{"min":2, "max":200}');
-INSERT INTO proposal_questions VALUES('reference_pdf','FILE_UPLOAD','Please attach a reference or protocol of culture conditions and media composition',3,'{"small_label":"Accepted formats: PDF", "file_type":"application/pdf"}');
+INSERT INTO proposal_questions VALUES('reference_pdf','FILE_UPLOAD','Please attach a reference or protocol of culture conditions and media composition',3,'{"small_label":"Accepted formats: PDF", "file_type":[".pdf"]}');
 INSERT INTO proposal_questions VALUES('material_amount','TEXT_INPUT','How much material do you need',3,'{"min":2, "max":200}');
 INSERT INTO proposal_questions VALUES('material_condition','TEXT_INPUT','Indicate wet or dry mass',3,'{"min":2, "max":5}');
 INSERT INTO proposal_questions VALUES('amount_justification','TEXT_INPUT','Justify amount',3,'{"min":10, "max":500, "multiline":true}');
 INSERT INTO proposal_questions VALUES('rq_deuteration_level','SELECTION_FROM_OPTIONS','Level of deuteration required',3,'{"variant":"dropdown","options":["Partial (65-80% with unlabeled carbon source)", "Full (~99% with labeled carbon source)"]}');
 INSERT INTO proposal_questions VALUES('d_level_justification','TEXT_INPUT','Justify level of D incorporation',3,'{"min":10, "max":500, "multiline":true}');
 INSERT INTO proposal_questions VALUES('recombinant_protein','BOOLEAN','Recombinant protein (E. coli)',3,'{"variant":"slider"}');
-INSERT INTO proposal_questions VALUES('molecule_name_for_deuteration','TEXT_INPUT','Name of molecule to be deuterated:',3,'{"small_label":"(e.g. superoxide dismutase)"}');
+INSERT INTO proposal_questions VALUES('molecule_name_for_deuteration','TEXT_INPUT','Name of molecule to be deuterated:',3,'{"placeholder":"(e.g. superoxide dismutase)"}');
 INSERT INTO proposal_questions VALUES('bio_deu_fasta','TEXT_INPUT','FASTA sequence or Uniprot number',3,'{}');
 INSERT INTO proposal_questions VALUES('bio_deu_molecular_weight','TEXT_INPUT','Molecular weight (kDA)',3,'{}');
-INSERT INTO proposal_questions VALUES('bio_deu_oligomerization_state','TEXT_INPUT','Oligomerization state',3,'{ "small_label":"(e.g. homodimer, tetramer etc.)"}');
+INSERT INTO proposal_questions VALUES('bio_deu_oligomerization_state','TEXT_INPUT','Oligomerization state',3,'{ "placeholder":"(e.g. homodimer, tetramer etc.)"}');
 INSERT INTO proposal_questions VALUES('bio_deu_cofactors_ligands','TEXT_INPUT','Does the protein have any co-factors or ligands required for expression? Specify:',3,'{ "multiline":true}');
-INSERT INTO proposal_questions VALUES('bio_deu_origin','TEXT_INPUT','Origin of molecules:',3,'{ "small_label":"(e.g. human, E. coli, S. cerevisiae)"}');
+INSERT INTO proposal_questions VALUES('bio_deu_origin','TEXT_INPUT','Origin of molecules:',3,'{ "placeholder":"(e.g. human, E. coli, S. cerevisiae)"}');
 INSERT INTO proposal_questions VALUES('bio_deu_plasmid_provided','SELECTION_FROM_OPTIONS','Will you provide an expression plasmid?',3,'{"variant":"radio", "options":["yes", "no"], "TEXT_INPUT":"If you choose no, we will design & order a plasmid commercially"}');
 INSERT INTO proposal_questions VALUES('bio_deu_material_amount','TEXT_INPUT','How much material do you need?',3,'{}');
 INSERT INTO proposal_questions VALUES('bio_deu_material_amount_justification','TEXT_INPUT','Justify amount:',3,'{}');
@@ -458,85 +466,85 @@ INSERT INTO proposal_questions VALUES('chem_deu_amount','TEXT_INPUT','Amount of 
 INSERT INTO proposal_questions VALUES('chem_deu_amount_justification','TEXT_INPUT','Justify amount',4,'{"variant":"radio", "options":["yes", "no"], "multiline":true}');
 INSERT INTO proposal_questions VALUES('chem_deu_d_percentage','TEXT_INPUT','indicate percentage and location of deuteration',4,'{"variant":"radio", "options":["yes", "no"]}');
 INSERT INTO proposal_questions VALUES('chem_deu_structure_justification','TEXT_INPUT','Justify level of deuteration',4,'{"variant":"radio", "options":["yes", "no"], "multiline":true}');
-INSERT INTO proposal_questions VALUES('chem_deu_chem_structure','FILE_UPLOAD','Attach chemical structure',4,'{"file_type":"application/pdf"}');
+INSERT INTO proposal_questions VALUES('chem_deu_chem_structure','FILE_UPLOAD','Attach chemical structure',4,'{"file_type":[".pdf"]}');
 INSERT INTO proposal_questions VALUES('chem_deu_prep_source','SELECTION_FROM_OPTIONS','Has this molecule (or an unlabeled/isotopic analogue) been prepared by yourself or others?',4,'{"variant":"radio", "options":["yes", "no"]}');
-INSERT INTO proposal_questions VALUES('chem_deu_protocol','FILE_UPLOAD','If yes, please provide a protocol (attach a reference PDF if published)',4,'{ "file_type":"application/pdf"}');
+INSERT INTO proposal_questions VALUES('chem_deu_protocol','FILE_UPLOAD','If yes, please provide a protocol (attach a reference PDF if published)',4,'{ "file_type":[".pdf"]}');
 
-INSERT INTO proposal_question_dependencies VALUES('links_with_industry', 'has_links_with_industry', '{ "condition": "equals", "params":"yes"}');
-INSERT INTO proposal_question_dependencies VALUES('crystallization_molecule_name', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('amino_seq', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('molecular_weight', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('oligomerization_state', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('pdb_id', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('doi_or_alike', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('reference_file', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('crystallization_cofactors_ligands', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('prec_composition', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('crystallization_experience', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('crystallization_time', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('crystal_size', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('ttl_crystallization', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('ttl_details_for_prep', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('typical_yield', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('storage_conditions', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('stability', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('protein_buffer', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('is_deuterated', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('protein_concentration', 'has_crystallization', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('ttl_select_deuteration_type', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('is_biomass', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('recombinant_protein', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('yeast_derived_lipid_amnt', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_other', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('will_provide_organism', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('organism_name', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('organism_name', 'will_provide_organism', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'will_provide_organism', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('material_amount', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('material_condition', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('amount_justification', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('rq_deuteration_level', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('d_level_justification', 'is_biomass', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('molecule_name_for_deuteration', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_fasta', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_molecular_weight', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_oligomerization_state', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_cofactors_ligands', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_origin', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_plasmid_provided', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_material_amount', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_material_amount_justification', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_d_lvl_req', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_d_lvl_req_justification', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_purification_need', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_has_expressed', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_typical_yield', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_purification_done', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_has_deuteration_experience', 'recombinant_protein', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('yeast_derived_material_amount', 'yeast_derived_lipid_amnt', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('yeast_derived_material_amount_justification', 'yeast_derived_lipid_amnt', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('yeast_derived_d_lvl_req', 'yeast_derived_lipid_amnt', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('yeast_derived_d_lvl_req_justification', 'yeast_derived_lipid_amnt', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('bio_deu_other_desc', 'bio_deu_other', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('ttl_biosafety', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_containment_level', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_has_risks', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_is_recombinant', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_is_toxin', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_is_virulence', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_is_prion', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_has_hazard_ligand', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_is_organism_active', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('biosafety_explanation', 'slide_select_deuteration', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_molecule_name', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_amount', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_amount_justification', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_d_percentage', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_structure_justification', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_chem_structure', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_prep_source', 'chem_deu_enabled', '{ "condition": "equals", "params":true }');
-INSERT INTO proposal_question_dependencies VALUES('chem_deu_protocol', 'chem_deu_prep_source', '{ "condition": "equals", "params":"yes" }');
+INSERT INTO proposal_question_dependencies VALUES('links_with_industry', 'has_links_with_industry', '{ "condition": "eq", "params":"yes"}');
+INSERT INTO proposal_question_dependencies VALUES('crystallization_molecule_name', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('amino_seq', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('molecular_weight', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('oligomerization_state', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('pdb_id', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('doi_or_alike', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('reference_file', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('crystallization_cofactors_ligands', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('prec_composition', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('crystallization_experience', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('crystallization_time', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('crystal_size', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('ttl_crystallization', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('ttl_details_for_prep', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('typical_yield', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('storage_conditions', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('stability', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('protein_buffer', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('is_deuterated', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('protein_concentration', 'has_crystallization', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('ttl_select_deuteration_type', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('is_biomass', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('recombinant_protein', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('yeast_derived_lipid_amnt', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_other', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('will_provide_organism', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('organism_name', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('organism_name', 'will_provide_organism', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'will_provide_organism', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('reference_pdf', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('material_amount', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('material_condition', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('amount_justification', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('rq_deuteration_level', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('d_level_justification', 'is_biomass', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('molecule_name_for_deuteration', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_fasta', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_molecular_weight', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_oligomerization_state', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_cofactors_ligands', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_origin', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_plasmid_provided', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_material_amount', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_material_amount_justification', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_d_lvl_req', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_d_lvl_req_justification', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_purification_need', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_has_expressed', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_typical_yield', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_purification_done', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_has_deuteration_experience', 'recombinant_protein', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('yeast_derived_material_amount', 'yeast_derived_lipid_amnt', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('yeast_derived_material_amount_justification', 'yeast_derived_lipid_amnt', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('yeast_derived_d_lvl_req', 'yeast_derived_lipid_amnt', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('yeast_derived_d_lvl_req_justification', 'yeast_derived_lipid_amnt', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('bio_deu_other_desc', 'bio_deu_other', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('ttl_biosafety', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_containment_level', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_has_risks', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_is_recombinant', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_is_toxin', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_is_virulence', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_is_prion', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_has_hazard_ligand', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_is_organism_active', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('biosafety_explanation', 'slide_select_deuteration', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_molecule_name', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_amount', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_amount_justification', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_d_percentage', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_structure_justification', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_chem_structure', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_prep_source', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
+INSERT INTO proposal_question_dependencies VALUES('chem_deu_protocol', 'chem_deu_prep_source', '{ "condition": "eq", "params":"yes" }');
 
 
 

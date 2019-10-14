@@ -1,4 +1,12 @@
-import { Proposal, ProposalTemplate, ProposalAnswer } from "../models/Proposal";
+import {
+  Proposal,
+  ProposalTemplate,
+  ProposalAnswer,
+  Topic,
+  ProposalTemplateField,
+  FieldDependency,
+  DataType
+} from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read
@@ -11,6 +19,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
+  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
 
   // Write
   create(id: number): Promise<Proposal | null>;
@@ -33,5 +42,28 @@ export interface ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<Boolean | null>;
-  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
+  createTopic(title: string): Promise<Topic>;
+  updateTopic(
+    id: number,
+    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
+  ): Promise<Topic | null>;
+  updateField(
+    proposal_question_id: string,
+    values: {
+      dataType?: string;
+      question?: string;
+      topicId?: number;
+      config?: string;
+      sortOrder?: number;
+      dependencies?: FieldDependency[];
+    }
+  ): Promise<ProposalTemplateField | null>;
+  createTemplateField(
+    fieldId: string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<ProposalTemplateField | null>;
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
 }

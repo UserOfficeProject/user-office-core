@@ -1,9 +1,11 @@
 var { buildSchema } = require("graphql");
+import { makeExecutableSchema } from 'graphql-tools'
+import { typeDefs as proposal } from  './schemas/proposal'
 
-export default buildSchema(`
+
+
+export default makeExecutableSchema({typeDefs:[proposal, `
 type Query {
-    proposal(id: ID!): Proposal
-    proposals(filter: String, first: Int, offset: Int): ProposalQueryResult
     user(id: ID!): User
     users(filter: String, first: Int, offset: Int): UserQueryResult
     roles: [Roles]
@@ -18,19 +20,9 @@ type Query {
     reason: String
   }
 
-  type ProposalQueryResult {
-    proposals: [Proposal]
-    totalCount: Int
-  }
-
   type UserQueryResult {
     users: [User]
     totalCount: Int
-  }
-
-  type ProposalMutationResult {
-    proposal: Proposal
-    error: String
   }
 
   type FilesMutationResult {
@@ -48,13 +40,17 @@ type Query {
     error: String
   }
 
+  type LoginMutationResult {
+    token: String
+    error: String
+  }
+
+  type ProposalTemplateResult {
+    template: ProposalTemplate
+    error: String
+  }
+
   type Mutation {
-    createProposal: ProposalMutationResult
-    updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], status: Int, users: [Int]): ProposalMutationResult
-    updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
-    approveProposal(id: Int!): ProposalMutationResult
-    submitProposal(id: Int!): ProposalMutationResult
-    rejectProposal(id: Int!): ProposalMutationResult
     setPageContent(id: PageName!, text: String): Boolean
     createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     token(token: String!): String
@@ -80,12 +76,13 @@ type Query {
         ): UserMutationResult
     updateUser(id: ID!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
     addUserRole(userID: Int!, roleID: Int!): Boolean
-    login(username: String!, password: String!): String
+    login(username: String!, password: String!): LoginMutationResult
     addUserForReview(userID: Int!, proposalID: Int!): Boolean
     removeUserForReview(reviewID: Int!): Boolean
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
     resetPasswordEmail(email: String!): Boolean
     resetPassword(token: String!, password: String!): Boolean
+    emailVerification(token: String!): Boolean
   }
 
 type Roles {
@@ -105,19 +102,6 @@ type Call {
   endNotify: String
   cycleComment: String
   surveyComment: String
-}
-
-type Proposal {
-    id: Int
-    title: String
-    abstract: String
-    status: Int
-    users: [User!]
-    proposer: Int
-    questionary: ProposalTemplate
-    created: String
-    updated: String
-    reviews: [Review]
 }
 
 type User {
@@ -142,42 +126,6 @@ type Review {
   status: Int
 }
 
-type ProposalTemplate {
-    topics: [Topic]
-}
-
-type Topic {
-  topic_id:Int,
-  topic_title: String,
-  fields:[ProposalTemplateField]
-}
-  
-type ProposalTemplateField {
-    proposal_question_id: String,
-    data_type: String,
-    question: String,
-    value: String,
-    config: String,
-    dependencies: [FieldDependency]
-}
-  
-type FieldDependency {
-    proposal_question_dependency: String,
-    proposal_question_id: String,
-    condition: String,
-}
-
-input ProposalAnswerInput {
-  proposal_question_id: ID!,
-  data_type:String,
-  value: String
-}
-
-type ProposalAnswer {
-  proposal_question_id: ID!,
-  answer: String
-}
-
 enum PageName {
   HOMEPAGE
   HELPPAGE
@@ -190,5 +138,4 @@ type FileMetadata {
   sizeInBytes:Int,
   createdDate:String
 }
-
-`);
+`]});

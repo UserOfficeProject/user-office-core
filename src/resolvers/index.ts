@@ -2,9 +2,13 @@ import { ResolverContext } from "../context";
 import { isRejection, Rejection, rejection } from "../rejection";
 import {
   Proposal,
-  ProposalTemplate,
   ProposalAnswer,
-  ProposalInformation
+  ProposalInformation,
+  Topic,
+  FieldDependency,
+  ProposalTemplateField,
+  DataType,
+  ProposalTemplate
 } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
@@ -53,6 +57,39 @@ interface UpdateProposalFilesArgs {
   files: string[];
 }
 
+interface CreateTopicArgs {
+  title: string;
+}
+
+interface UpdateTopicArgs {
+  id: number;
+  title: string;
+  is_enabled: boolean;
+}
+
+interface UpdateFieldTopicRelArgs {
+  topic_id: number;
+  field_ids: string[];
+}
+
+interface DeleteProposalTemplateFieldArgs {
+  id: string;
+}
+
+interface UpdateProposalTemplateFieldArgs {
+  id:string;
+  dataType: string;
+  question: string;
+  topicId: number;
+  config: string;
+  sortOrder: number;
+  dependencies: FieldDependency[]
+}
+
+interface CreateProposalTemplateFieldArgs {
+  topicId:number;
+  dataType:string;
+}
 interface UpdateUserArgs {
   id: string;
   firstname: string;
@@ -122,8 +159,7 @@ async function resolveProposal(
   const { id, title, abstract, status, created, updated } = proposal;
   const agent = context.user;
 
-  if(!agent) 
-  {
+  if (!agent) {
     return rejection("Not aututhorized");
   }
 
@@ -141,9 +177,6 @@ async function resolveProposal(
   if (isRejection(questionary)) {
     return questionary;
   }
-  if(agent == null) {
-    return rejection("Not authorized");
-  }
 
   return new ProposalInformation(
     id,
@@ -155,7 +188,7 @@ async function resolveProposal(
     updated,
     users,
     reviews,
-    questionary
+    questionary || undefined
   );
 }
 
@@ -194,14 +227,16 @@ function createResponseWrapper<T>(key: string) {
 
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
-const wrapProposalInformationMutation = createResponseWrapper<
-  ProposalInformation
->("proposal");
+const wrapTopicMutation = createResponseWrapper<Topic>("topic");
+const wrapProposalInformationMutation = createResponseWrapper<ProposalInformation>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
+const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
+const wrapProposalTemplateFieldMutation = createResponseWrapper<ProposalTemplateField>("field");
+const wrapProposalTemplateMutation = createResponseWrapper<ProposalTemplate>("template");
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -225,9 +260,7 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-    return await wrapProposalTemplate(
-      context.queries.proposal.getProposalTemplate(context.user)
-    );
+    return context.queries.proposal.getProposalTemplate(context.user);
   },
 
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -248,6 +281,76 @@ export default {
 
         resolve(newProposalInformation);
       })
+    );
+  },
+
+  createTopic(args: CreateTopicArgs, context: ResolverContext) {
+    return wrapTopicMutation(
+      context.mutations.proposal.createTopic(context.user, args.title)
+    );
+  },
+
+  updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
+    return wrapTopicMutation(
+      context.mutations.proposal.updateTopic(
+        context.user,
+        args.id,
+        args.title,
+        args.is_enabled
+      )
+    );
+  },
+
+  updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
+    return createResponseWrapper<void>("result")(
+      context.mutations.proposal.updateFieldTopicRel(
+        context.user,
+        args.topic_id,
+        args.field_ids
+      )
+    );
+  },
+
+  updateProposalTemplateField(
+    args: UpdateProposalTemplateFieldArgs,
+    context: ResolverContext
+  ) {
+
+    return wrapProposalTemplateFieldMutation(
+      context.mutations.proposal.updateProposalTemplateField(
+        context.user,
+        args.id,
+        args.dataType as DataType,
+        args.sortOrder,
+        args.question,
+        args.topicId,
+        args.config,
+        args.dependencies
+      )
+    );
+  },
+  createTemplateField(
+    args: CreateProposalTemplateFieldArgs,
+    context: ResolverContext
+  ) {
+    return wrapProposalTemplateFieldMutation(
+      context.mutations.proposal.createTemplateField(
+        context.user,
+        args.topicId,
+        args.dataType as DataType,
+      )
+    );
+  },
+
+  deleteTemplateField(
+    args: DeleteProposalTemplateFieldArgs,
+    context: ResolverContext
+  ) {
+    return wrapProposalTemplateMutation(
+      context.mutations.proposal.deleteTemplateField(
+        context.user,
+        args.id,
+      )
     );
   },
 
@@ -306,6 +409,7 @@ export default {
     );
   },
 
+
   review(args: { id: number }, context: ResolverContext) {
     return context.queries.review.get(context.user, args.id);
   },
@@ -341,7 +445,9 @@ export default {
   },
 
   login(args: LoginArgs, context: ResolverContext) {
-    return context.mutations.user.login(args.username, args.password);
+    return wrapLoginMutation(
+      context.mutations.user.login(args.username, args.password)
+    );
   },
 
   token(args: { token: string }, context: ResolverContext) {
@@ -365,28 +471,30 @@ export default {
     return context.queries.user.getRoles(context.user);
   },
 
-  createUser(args: CreateUserArgs, context: ResolverContext) {
+  async createUser(args: CreateUserArgs, context: ResolverContext) {
+    const res = await context.mutations.user.create(
+      args.user_title,
+      args.firstname,
+      args.middlename,
+      args.lastname,
+      args.username,
+      args.password,
+      args.preferredname,
+      args.orcid,
+      args.gender,
+      args.nationality,
+      args.birthdate,
+      args.organisation,
+      args.department,
+      args.organisation_address,
+      args.position,
+      args.email,
+      args.telephone,
+      args.telephone_alt
+    );
+
     return wrapUserMutation(
-      context.mutations.user.create(
-        args.user_title,
-        args.firstname,
-        args.middlename,
-        args.lastname,
-        args.username,
-        args.password,
-        args.preferredname,
-        args.orcid,
-        args.gender,
-        args.nationality,
-        args.birthdate,
-        args.organisation,
-        args.department,
-        args.organisation_address,
-        args.position,
-        args.email,
-        args.telephone,
-        args.telephone_alt
-      )
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user)
     );
   },
 
@@ -412,6 +520,10 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  emailVerification(args: { token: string }, context: ResolverContext) {
+    return context.mutations.user.emailVerification(args.token);
   },
 
   createCall(args: CreateCallArgs, context: ResolverContext) {

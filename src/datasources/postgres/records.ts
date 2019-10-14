@@ -17,6 +17,36 @@ export interface ProposalRecord {
   readonly full_count: number;
 }
 
+export interface TopicRecord {
+  readonly topic_id: number;
+  readonly topic_title: string;
+  readonly is_enabled: boolean;
+  readonly sort_order: number;
+}
+
+
+export interface FieldDependencyRecord {
+  readonly proposal_question_id: string;
+  readonly proposal_question_dependency: string;
+  readonly condition: string;
+}
+
+
+
+
+export interface ProposalQuestionRecord {
+  readonly proposal_question_id: string;
+  readonly data_type: string;
+  readonly question: string;
+  readonly topic_id: number;
+  readonly config: string;
+  readonly sort_order: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+
+
 export interface UserRecord {
   readonly user_id: number;
   readonly user_title: string;
@@ -34,6 +64,7 @@ export interface UserRecord {
   readonly organisation_address: string;
   readonly position: string;
   readonly email: string;
+  readonly email_verified: boolean;
   readonly telephone: string;
   readonly telephone_alt: string;
   readonly created_at: Date;

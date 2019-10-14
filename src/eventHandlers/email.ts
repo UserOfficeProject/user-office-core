@@ -1,7 +1,10 @@
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserDataSource } from "../datasources/UserDataSource";
 const SparkPost = require("sparkpost");
-const client = new SparkPost("bc16dc4667eea20f0d1ba9c47d067ac97df322c8");
+const options = {
+  endpoint: "https://api.eu.sparkpost.com:443"
+};
+const client = new SparkPost(process.env.SPARKPOST_TOKEN, options);
 
 export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
@@ -41,25 +44,49 @@ export default function createHandler(userDataSource: UserDataSource) {
       case "PASSWORD_RESET_EMAIL": {
         client.transmissions
           .send({
-            options: {
-              sandbox: true
-            },
             content: {
-              from: "testing@sparkpostbox.com",
-              subject: "Hello, World!",
-              html:
-                "<html><body><p>Testing SparkPost - the world's most awesomest email service!</p></body></html>"
+              template_id: "user-office-account-reset-password"
             },
-            recipients: [{ address: "fredrikbolmsten@esss.se" }]
+            substitution_data: {
+              title: "ESS User reset account password",
+              buttonText: "Click to reset",
+              link: event.link
+            },
+            recipients: [{ address: event.user.email }]
           })
-          .then((data: any) => {
-            console.log("Woohoo! You just sent your first mailing!");
-            console.log(data);
+          .then((res: string) => {
+            console.log(res);
           })
-          .catch((err: any) => {
-            console.log("Whoops! Something went wrong");
+          .catch((err: string) => {
             console.log(err);
           });
+        return;
+      }
+
+      case "ACCOUNT_CREATED": {
+        if (process.env.NODE_ENV === "development") {
+          await userDataSource.setUserEmailVerified(event.user.id);
+          console.log("verify user without email in development");
+        } else {
+          client.transmissions
+            .send({
+              content: {
+                template_id: "user-office-account-verification"
+              },
+              substitution_data: {
+                title: "ESS User portal verify account",
+                buttonText: "Click to verify",
+                link: event.link
+              },
+              recipients: [{ address: "asda" }]
+            })
+            .then((res: string) => {
+              console.log(res);
+            })
+            .catch((err: string) => {
+              console.log(err);
+            });
+        }
         return;
       }
     }

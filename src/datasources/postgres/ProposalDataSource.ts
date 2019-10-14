@@ -1,5 +1,10 @@
 import database from "./database";
-import { ProposalRecord } from "./records";
+import {
+  ProposalRecord,
+  TopicRecord,
+  ProposalQuestionRecord,
+  FieldDependencyRecord
+} from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
@@ -8,12 +13,16 @@ import {
   ProposalTemplateField,
   FieldDependency,
   Topic,
-  ProposalAnswer
+  ProposalAnswer,
+  DataType
 } from "../../models/Proposal";
+import { ILogger } from "../../utils/Logger";
 
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  constructor(private logger: ILogger) {}
+
   private createProposalObject(proposal: ProposalRecord) {
     return new Proposal(
       proposal.proposal_id,
@@ -23,6 +32,41 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       proposal.status,
       proposal.created_at,
       proposal.updated_at
+    );
+  }
+
+  private createTopicObject(proposal: TopicRecord) {
+    return new Topic(
+      proposal.topic_id,
+      proposal.topic_title,
+      proposal.is_enabled,
+      proposal.sort_order,
+      null
+    );
+  }
+
+  private createFieldDependencyObject(fieldDependency: FieldDependencyRecord) {
+    return new FieldDependency(
+      fieldDependency.proposal_question_id,
+      fieldDependency.proposal_question_dependency,
+      fieldDependency.condition
+    );
+  }
+
+  private createProposalTemplateFieldObject(question: ProposalQuestionRecord) {
+    /*-- An idea for improvement --
+    make ProposalRespondedQuestinon, 
+    because question does not have a value, but ProposalRespondedQuestinon does, 
+    ProposalRespondedQuestinon shoudl extend Question*/
+    return new ProposalTemplateField(
+      question.proposal_question_id,
+      question.data_type as DataType,
+      question.sort_order,
+      question.question,
+      question.topic_id,
+      question.config,
+      null,
+      undefined
     );
   }
 
@@ -212,14 +256,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async create(proposerID: number) {
     return database
-      .insert({ proposer_id: proposerID })
-      .into("proposals")
-      .returning(["*"])
-      .then((proposal: ProposalRecord[]) => {
-        return this.createProposalObject(proposal[0]);
+      .insert({ proposer_id: proposerID }, ["*"])
+      .from("proposals")
+      .then((resultSet: ProposalRecord[]) => {
+        return this.createProposalObject(resultSet[0]);
       })
-      .catch(() => {
-        console.log("Should do something here");
+      .catch((error: any) => {
+        this.logger.logError("Failed to create proposal", { error });
       });
   }
 
@@ -268,25 +311,31 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const deps: FieldDependency[] = await database
+    const dependencies: FieldDependency[] = await database
       .select("*")
       .from("proposal_question_dependencies");
 
-    const fields: ProposalTemplateField[] = await database
+    const fieldRecords: ProposalQuestionRecord[] = await database
       .select("*")
-      .from("proposal_questions");
+      .from("proposal_questions")
+      .orderBy("sort_order");
 
-    const topics: Topic[] = await database
+    const topicRecords: TopicRecord[] = await database
       .select("p.*")
       .from("proposal_topics as p")
       .where("p.is_enabled", true)
       .orderBy("sort_order");
 
+    const topics = topicRecords.map(record => this.createTopicObject(record));
+    const fields = fieldRecords.map(record =>
+      this.createProposalTemplateFieldObject(record)
+    );
+
     topics.forEach(topic => {
-      topic.fields = fields.filter(field => field.topic === topic.topic_id);
+      topic.fields = fields.filter(field => field.topic_id === topic.topic_id);
     });
     fields.forEach(field => {
-      field.dependencies = deps.filter(
+      field.dependencies = dependencies.filter(
         dep => dep.proposal_question_id === field.proposal_question_id
       );
     });
@@ -298,5 +347,186 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return await database("proposal_answers")
       .where("proposal_id", proposalId)
       .select("proposal_question_id", "answer as value"); // TODO rename the column
+  }
+
+  async createTopic(title: string): Promise<Topic> {
+    return database
+      .insert({ topic_title: title }, ["*"])
+      .from("proposal_topics")
+      .then((resultSet: TopicRecord[]) => {
+        if (!resultSet || resultSet.length != 1) {
+          this.logger.logError("Failed to create topic", { title });
+          return null;
+        }
+        return this.createTopicObject(resultSet[0]);
+      });
+  }
+
+  async updateTopic(
+    id: number,
+    values: {
+      title?: string;
+      isEnabled?: boolean;
+      sortOrder?: number;
+    }
+  ): Promise<Topic | null> {
+    return database
+      .update(
+        {
+          topic_title: values.title,
+          is_enabled: values.isEnabled,
+          sortOrder: values.sortOrder
+        },
+        ["*"]
+      )
+      .from("proposal_topics")
+      .where({ topic_id: id })
+      .then((resultSet: TopicRecord[]) => {
+        if (!resultSet || resultSet.length != 1) {
+          this.logger.logError("Failed to update topic", { data: values, id });
+          return null;
+        }
+        return this.createTopicObject(resultSet[0]);
+      });
+  }
+
+  async updateField(
+    proposal_question_id: string,
+    values: {
+      dataType?: string;
+      question?: string;
+      topicId?: number;
+      config?: string;
+      sortOrder?: number;
+      dependencies?: FieldDependency[];
+    }
+  ): Promise<ProposalTemplateField | null> {
+    const rows = {
+      data_type: values.dataType,
+      question: values.question,
+      topic_id: values.topicId,
+      config: values.config,
+      sort_order: values.sortOrder
+    };
+
+    // TODO update dependencies if provided
+
+    await database("proposal_question_dependencies")
+      .where("proposal_question_id", proposal_question_id)
+      .del();
+
+    if (values.dependencies) {
+      values.dependencies.forEach(async dependency => {
+        await database("proposal_question_dependencies").insert({
+          proposal_question_id: dependency.proposal_question_id,
+          proposal_question_dependency: dependency.proposal_question_dependency,
+          condition: dependency.condition // TODO rename consitancy
+        });
+      });
+    }
+
+    return database
+      .update(rows, ["*"])
+      .from("proposal_questions")
+      .where("proposal_question_id", proposal_question_id)
+      .then((resultSet: ProposalQuestionRecord[]) => {
+        if (!resultSet || resultSet.length != 1) {
+          this.logger.logError(
+            "UPDATE field resultSet must contain exactly 1 row",
+            {
+              resultSet,
+              proposal_question_id,
+              rows
+            }
+          );
+          return null;
+        }
+
+        return this.createProposalTemplateFieldObject(resultSet[0]);
+      })
+      .catch((e: any) => {
+        this.logger.logError("Exception occurred while updating field", {
+          error: e,
+          proposal_question_id,
+          values
+        });
+        return null;
+      });
+  }
+
+  createTemplateField(
+    fieldId: string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<ProposalTemplateField | null> {
+    return database
+      .insert(
+        {
+          proposal_question_id: fieldId,
+          topic_id: topicId,
+          data_type: dataType,
+          question: question,
+          config: config
+        },
+        ["*"]
+      )
+      .from("proposal_questions")
+      .then((resultSet: ProposalQuestionRecord[]) => {
+        if (!resultSet || resultSet.length != 1) {
+          this.logger.logError(
+            "INSERT field resultSet must contain exactly 1 row",
+            {
+              resultSet,
+              topicId,
+              dataType
+            }
+          );
+          return null;
+        }
+
+        return this.createProposalTemplateFieldObject(resultSet[0]);
+      })
+      .catch((e: any) => {
+        this.logger.logError("Exception occurred while inserting field", {
+          error: e,
+          topicId,
+          dataType
+        });
+        return null;
+      });
+  }
+
+  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+    return database("proposal_questions")
+      .where({ proposal_question_id: fieldId })
+      .select("*")
+      .then((resultSet: ProposalQuestionRecord[]) => {
+        if (!resultSet || resultSet.length == 0) {
+          this.logger.logWarn(
+            "SELECT from proposal_question yielded no results",
+            { fieldId }
+          );
+          return null;
+        }
+        if (resultSet.length > 1) {
+          this.logger.logError(
+            "Select from proposal_question yelded in more than one row",
+            { fieldId }
+          );
+          return null;
+        }
+        return this.createProposalTemplateFieldObject(resultSet[0]);
+      });
+  }
+
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
+    return new Promise(async (resolve, reject) => {
+      await database("proposal_questions")
+        .where({ proposal_question_id: fieldId })
+        .del();
+      resolve(await this.getProposalTemplate());
+    });
   }
 }
