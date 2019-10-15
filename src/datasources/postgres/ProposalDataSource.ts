@@ -349,17 +349,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select("proposal_question_id", "answer as value"); // TODO rename the column
   }
 
-  async createTopic(title: string): Promise<Topic> {
-    return database
-      .insert({ topic_title: title }, ["*"])
-      .from("proposal_topics")
-      .then((resultSet: TopicRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("Failed to create topic", { title });
-          return null;
-        }
-        return this.createTopicObject(resultSet[0]);
-      });
+  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
+    await database("proposal_topics")
+      .update({ sort_order: sortOrder + 1 })
+      .where("sort_order", ">=", sortOrder);
+
+    await database("proposal_topics").insert({
+      topic_title: "New Topic",
+      sort_order: sortOrder,
+      is_enabled: true
+    });
+    return this.getProposalTemplate();
   }
 
   async updateTopic(
@@ -512,12 +512,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   async deleteTopic(id: number): Promise<Boolean | null> {
     return database("proposal_topics")
-    .where({ topic_id: id })
-    .del()
-    .then(() => true)
-    .catch((e:any) => {
-      this.logger.logError("Could not delete topic ", e)
-      return false;
-    })
+      .where({ topic_id: id })
+      .del()
+      .then(() => true)
+      .catch((e: any) => {
+        this.logger.logError("Could not delete topic ", e);
+        return false;
+      });
   }
 }

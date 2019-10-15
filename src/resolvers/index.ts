@@ -58,7 +58,7 @@ interface UpdateProposalFilesArgs {
 }
 
 interface CreateTopicArgs {
-  title: string;
+  sortOrder: number;
 }
 
 interface UpdateTopicArgs {
@@ -81,18 +81,18 @@ interface DeleteProposalTemplateFieldArgs {
 }
 
 interface UpdateProposalTemplateFieldArgs {
-  id:string;
+  id: string;
   dataType: string;
   question: string;
   topicId: number;
   config: string;
   sortOrder: number;
-  dependencies: FieldDependency[]
+  dependencies: FieldDependency[];
 }
 
 interface CreateProposalTemplateFieldArgs {
-  topicId:number;
-  dataType:string;
+  topicId: number;
+  dataType: string;
 }
 interface UpdateUserArgs {
   id: string;
@@ -232,15 +232,21 @@ function createResponseWrapper<T>(key: string) {
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapTopicMutation = createResponseWrapper<Topic>("topic");
-const wrapProposalInformationMutation = createResponseWrapper<ProposalInformation>("proposal");
+const wrapProposalInformationMutation = createResponseWrapper<
+  ProposalInformation
+>("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
-const wrapProposalTemplateFieldMutation = createResponseWrapper<ProposalTemplateField>("field");
-const wrapProposalTemplateMutation = createResponseWrapper<ProposalTemplate>("template");
+const wrapProposalTemplateFieldMutation = createResponseWrapper<
+  ProposalTemplateField
+>("field");
+const wrapProposalTemplateMutation = createResponseWrapper<ProposalTemplate>(
+  "template"
+);
 
 export default {
   async proposal(args: ProposalArgs, context: ResolverContext) {
@@ -289,8 +295,8 @@ export default {
   },
 
   createTopic(args: CreateTopicArgs, context: ResolverContext) {
-    return wrapTopicMutation(
-      context.mutations.proposal.createTopic(context.user, args.title)
+    return wrapProposalTemplateMutation(
+      context.mutations.proposal.createTopic(context.user, args.sortOrder)
     );
   },
 
@@ -317,10 +323,7 @@ export default {
 
   deleteTopic(args: DeleteTopicArgs, context: ResolverContext) {
     return createResponseWrapper<void>("result")(
-      context.mutations.proposal.deleteTopic(
-        context.user,
-        args.id
-      )
+      context.mutations.proposal.deleteTopic(context.user, args.id)
     );
   },
 
@@ -328,7 +331,6 @@ export default {
     args: UpdateProposalTemplateFieldArgs,
     context: ResolverContext
   ) {
-
     return wrapProposalTemplateMutation(
       context.mutations.proposal.updateProposalTemplateField(
         context.user,
@@ -350,7 +352,7 @@ export default {
       context.mutations.proposal.createTemplateField(
         context.user,
         args.topicId,
-        args.dataType as DataType,
+        args.dataType as DataType
       )
     );
   },
@@ -360,10 +362,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.deleteTemplateField(
-        context.user,
-        args.id,
-      )
+      context.mutations.proposal.deleteTemplateField(context.user, args.id)
     );
   },
 
@@ -421,7 +420,6 @@ export default {
       context.mutations.proposal.submit(context.user, args.id)
     );
   },
-
 
   review(args: { id: number }, context: ResolverContext) {
     return context.queries.review.get(context.user, args.id);

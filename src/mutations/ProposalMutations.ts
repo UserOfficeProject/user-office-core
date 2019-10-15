@@ -28,12 +28,12 @@ export default class ProposalMutations {
 
   async createTopic(
     agent: User | null,
-    title: string
-  ): Promise<Topic | Rejection> {
+    sortOrder: number
+  ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return await this.dataSource.createTopic(title);
+    return await this.dataSource.createTopic(sortOrder);
   }
 
   async updateTopic(
@@ -353,7 +353,7 @@ export default class ProposalMutations {
     dependencies?: FieldDependency[]
   ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
-     return rejection("NOT_AUTHORIZED");
+      return rejection("NOT_AUTHORIZED");
     }
     return (
       (await this.dataSource.updateField(id, {

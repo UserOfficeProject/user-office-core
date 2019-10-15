@@ -12,7 +12,7 @@ export const typeDefs = `
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
-        createTopic(title: String): TopicMutationResult
+        createTopic(sortOrder:Int!): ProposalTemplateMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
         updateFieldTopicRel(topic_id:Int!, field_ids:[String]): VoidMutationResult
         updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateMutationResult
