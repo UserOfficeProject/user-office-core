@@ -66,6 +66,29 @@ export function usePersistModel() {
     );
   };
 
+  const updateTopicOrder = async (topicOrder: number[]) => {
+    const mutation = `
+    mutation($topicOrder:[Int]!) {
+      updateTopicOrder(topicOrder:$topicOrder) {
+        error
+      }
+    }
+    `;
+    const variables = {
+      topicOrder
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        updateTopicOrder: {
+          error?: string;
+        };
+      }) => {
+        return result.updateTopicOrder;
+      }
+    );
+  };
+
   const updateItem = async (field: ProposalTemplateField) => {
     const mutation = `
     mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
@@ -286,7 +309,7 @@ export function usePersistModel() {
       const state = getState();
 
       switch (action.type) {
-        case EventType.REORDER_REQUESTED:
+        case EventType.REORDER_FIELD_REQUESTED:
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -312,6 +335,10 @@ export function usePersistModel() {
               )
             );
           }
+          break;
+        case EventType.REORDER_TOPIC_REQUESTED:
+          const topicOrder = state.topics.map(topic => topic.topic_id);
+          executeAndMonitorCall(() => updateTopicOrder(topicOrder));
           break;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           executeAndMonitorCall(() =>

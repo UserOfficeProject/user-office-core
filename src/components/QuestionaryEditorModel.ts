@@ -9,7 +9,7 @@ import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
 export enum EventType {
   READY,
-  REORDER_REQUESTED,
+  REORDER_FIELD_REQUESTED,
   MOVE_TOPIC_REQUESTED,
   UPDATE_TOPIC_TITLE_REQUESTED,
   UPDATE_FIELD_REQUESTED,
@@ -21,7 +21,8 @@ export enum EventType {
   FIELD_UPDATED,
   DELETE_TOPIC_REQUESTED,
   CREATE_TOPIC_REQUESTED,
-  TOPIC_CREATED
+  TOPIC_CREATED,
+  REORDER_TOPIC_REQUESTED
 }
 
 export interface IEvent {
@@ -52,7 +53,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
       switch (action.type) {
         case EventType.READY:
           return action.payload;
-        case EventType.REORDER_REQUESTED:
+        case EventType.REORDER_FIELD_REQUESTED:
           if (!action.payload.destination) {
             return draft;
           }
@@ -74,6 +75,18 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             action.payload.destination.index,
             0,
             ...from.fields.splice(action.payload.source.index, 1)
+          );
+
+          return draft;
+        case EventType.REORDER_TOPIC_REQUESTED:
+          if (!action.payload.destination) {
+            return draft;
+          }
+
+          draft.topics.splice(
+            action.payload.destination.index,
+            0,
+            ...draft.topics.splice(action.payload.source.index, 1)
           );
 
           return draft;

@@ -25,6 +25,7 @@ export default function QuestionaryEditorTopic(props: {
   dispatch: React.Dispatch<IEvent>;
   index: number;
   onItemClick: { (data: ProposalTemplateField): void };
+  condenseMode: boolean;
 }) {
   const theme = useTheme();
 
@@ -122,6 +123,23 @@ export default function QuestionaryEditorTopic(props: {
       {index + 2}. {props.data.topic_title}
     </span>
   );
+
+  const getItems = () => {
+    if (props.condenseMode) {
+      return null;
+    } else {
+      return data.fields.map((item, index) => (
+        <QuestionaryEditorTopicItem
+          index={index}
+          data={item}
+          dispatch={dispatch}
+          onClick={props.onItemClick}
+          key={item.proposal_question_id.toString()}
+        />
+      ));
+    }
+  };
+
   return (
     <Draggable
       key={data.topic_id.toString()}
@@ -265,15 +283,7 @@ export default function QuestionaryEditorTopic(props: {
                 style={getListStyle(snapshot.isDraggingOver)}
                 className={classes.itemContainer}
               >
-                {data.fields.map((item, index) => (
-                  <QuestionaryEditorTopicItem
-                    index={index}
-                    data={item}
-                    dispatch={dispatch}
-                    onClick={props.onItemClick}
-                    key={item.proposal_question_id.toString()}
-                  />
-                ))}
+                {getItems()}
                 {provided.placeholder}
               </Grid>
             )}

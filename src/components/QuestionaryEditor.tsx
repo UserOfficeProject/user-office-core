@@ -5,7 +5,15 @@ import QuestionaryEditorModel, {
   EventType,
   IEvent
 } from "./QuestionaryEditorModel";
-import { Paper, makeStyles, useTheme, Button } from "@material-ui/core";
+import {
+  Paper,
+  makeStyles,
+  useTheme,
+  Button,
+  FormGroup,
+  FormControlLabel,
+  Checkbox
+} from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
@@ -32,6 +40,8 @@ export default function QuestionaryEditor() {
     message: "",
     variant: "error"
   });
+
+  const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const [
     selectedField,
@@ -69,7 +79,13 @@ export default function QuestionaryEditor() {
   const onDragEnd = (result: DropResult) => {
     if (result.type === "field") {
       dispatch({
-        type: EventType.REORDER_REQUESTED,
+        type: EventType.REORDER_FIELD_REQUESTED,
+        payload: { source: result.source, destination: result.destination }
+      });
+    }
+    if (result.type === "topic") {
+      dispatch({
+        type: EventType.REORDER_TOPIC_REQUESTED,
         payload: { source: result.source, destination: result.destination }
       });
     }
@@ -89,7 +105,7 @@ export default function QuestionaryEditor() {
         variant="outlined"
         color="primary"
         className={classes.centeredButton}
-        onClick={(event: any) =>
+        onClick={() =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
             payload: { sortOrder: 0 }
@@ -111,6 +127,19 @@ export default function QuestionaryEditor() {
         message={errorState.message}
       />
       <Paper className={classes.paper}>
+        <FormGroup row style={{ justifyContent: "flex-end" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isTopicReorderMode}
+                onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
+                value="checkedB"
+                color="primary"
+              />
+            }
+            label="Enable reordering topics"
+          />
+        </FormGroup>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
             {(provided, snapshot) => (
@@ -126,6 +155,7 @@ export default function QuestionaryEditor() {
                     index={index}
                     key={topic.topic_id}
                     onItemClick={onClick}
+                    condenseMode={isTopicReorderMode}
                   />
                 ))}
                 {provided.placeholder}
