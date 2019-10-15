@@ -5,11 +5,12 @@ import QuestionaryEditorModel, {
   EventType,
   IEvent
 } from "./QuestionaryEditorModel";
-import { Paper, makeStyles, useTheme } from "@material-ui/core";
+import { Paper, makeStyles, useTheme, Button } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 import Notification from "./Notification";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
@@ -50,6 +51,10 @@ export default function QuestionaryEditor() {
     },
     modalContainer: {
       backgroundColor: "white"
+    },
+    centeredButton: {
+      display: "flex",
+      margin: "10px auto"
     }
   }))();
 
@@ -78,6 +83,23 @@ export default function QuestionaryEditor() {
     setSelectedField(null);
   };
 
+  const addNewTopicFallbackButton =
+    state.topics.length === 0 ? (
+      <Button
+        variant="outlined"
+        color="primary"
+        className={classes.centeredButton}
+        onClick={(event: any) =>
+          dispatch({
+            type: EventType.CREATE_TOPIC_REQUESTED,
+            payload: { sortOrder: 0 }
+          })
+        }
+      >
+        <PlaylistAddIcon />
+        &nbsp; Add topic
+      </Button>
+    ) : null;
   return (
     <>
       <Notification
@@ -97,7 +119,7 @@ export default function QuestionaryEditor() {
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
               >
-                {state!.topics.map((topic, index) => (
+                {state.topics.map((topic, index) => (
                   <QuestionaryEditorTopic
                     data={topic}
                     dispatch={dispatch}
@@ -111,6 +133,7 @@ export default function QuestionaryEditor() {
             )}
           </Droppable>
         </DragDropContext>
+        {addNewTopicFallbackButton}
       </Paper>
 
       <QuestionaryFieldEditor

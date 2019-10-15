@@ -15,7 +15,6 @@ import {
   Divider
 } from "@material-ui/core";
 import { EventType, IEvent } from "./QuestionaryEditorModel";
-import AddCommentIcon from "@material-ui/icons/AddComment";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
@@ -148,62 +147,114 @@ export default function QuestionaryEditorTopic(props: {
           >
             {titleJsx}
           </Grid>
-          <Grid item xs={3} className={classes.addIcon}>
-            <AddCommentIcon
-              onClick={(event: React.MouseEvent<SVGSVGElement>) => setAnchorEl(event.currentTarget)}
-              className={classes.addQuestionButton}
-            />
-            <DeleteRoundedIcon
-              onClick={(event: React.MouseEvent<SVGSVGElement>) => dispatch({type:EventType.DELETE_TOPIC_REQUESTED, payload:data.topic_id})}
-              className={classes.addQuestionButton}
+          <Grid item xs={2} className={classes.addIcon}>
+            <MoreHorizIcon
+              onClick={(event: React.MouseEvent<SVGSVGElement>) =>
+                setAnchorEl(event.currentTarget)
+              }
+              className={classes.showMoreButton}
             />
             <Menu
               anchorEl={anchorEl}
               keepMounted
               open={open}
-              onClose={onCreateNewFieldClicked}
+              onClose={() => setAnchorEl(null)}
               TransitionComponent={Fade}
             >
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
               >
-                Text input
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Text input</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
               >
-                Embellishment
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Embellishment</Typography>
               </MenuItem>
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
-              >
-                Boolean
-              </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.DATE)}
               >
-                Date
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.DATE)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Date</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.FILE_UPLOAD)}
               >
-                File upload
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add File upload</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)}
+                onClick={() =>
+                  onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)
+                }
               >
-                Multiple choice
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Multiple choice</Typography>
+              </MenuItem>
+
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
+              >
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.BOOLEAN)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Boolean</Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={(event: any) =>
+                  dispatch({
+                    type: EventType.DELETE_TOPIC_REQUESTED,
+                    payload: data.topic_id
+                  })
+                }
+              >
+                <ListItemIcon>
+                  <DeleteRoundedIcon />
+                </ListItemIcon>
+                <Typography variant="inherit">Delete topic</Typography>
+              </MenuItem>
+
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={(event: any) =>
+                  dispatch({
+                    type: EventType.CREATE_TOPIC_REQUESTED,
+                    payload: { sortOrder: index + 1 }
+                    // +1 means - add immediately after this topic
+                  })
+                }
+              >
+                <ListItemIcon>
+                  <PlaylistAddIcon />
+                </ListItemIcon>
+                <Typography variant="inherit">Add topic</Typography>
               </MenuItem>
             </Menu>
-            
           </Grid>
-
 
           <Droppable droppableId={data.topic_id.toString()} type="field">
             {(provided, snapshot) => (

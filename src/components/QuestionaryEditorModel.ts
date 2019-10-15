@@ -19,7 +19,9 @@ export enum EventType {
   FIELD_DELETED,
   SERVICE_ERROR_OCCURRED,
   FIELD_UPDATED,
-  DELETE_TOPIC_REQUESTED
+  DELETE_TOPIC_REQUESTED,
+  CREATE_TOPIC_REQUESTED,
+  TOPIC_CREATED
 }
 
 export interface IEvent {
@@ -92,10 +94,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           const newField: ProposalTemplateField = action.payload;
           draft.addField(newField);
           return new ProposalTemplate(draft);
-        case EventType.FIELD_UPDATED:
-          return new ProposalTemplate(action.payload);
-        case EventType.FIELD_DELETED:
-          return new ProposalTemplate(action.payload);
+
         case EventType.DELETE_TOPIC_REQUESTED:
           const topic = draft.topics.find(
             topic => topic.topic_id === action.payload
@@ -106,6 +105,10 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           const topicIdx = draft.topics.indexOf(topic);
           draft.topics.splice(topicIdx, 1);
           return new ProposalTemplate(draft);
+        case EventType.TOPIC_CREATED:
+        case EventType.FIELD_UPDATED:
+        case EventType.FIELD_DELETED:
+          return new ProposalTemplate(action.payload);
       }
     });
   }

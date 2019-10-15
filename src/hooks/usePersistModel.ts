@@ -218,6 +218,47 @@ export function usePersistModel() {
     );
   };
 
+  const createTopic = async (sortOrder: number) => {
+    const mutation = `
+    mutation($sortOrder:Int!) {
+      createTopic(sortOrder:$sortOrder) {
+        template {
+          topics {
+            topic_title
+            topic_id,
+            fields {
+              proposal_question_id
+              data_type
+              question
+              config
+              dependencies {
+                proposal_question_dependency
+                condition
+                proposal_question_id
+              }
+            }
+          }
+        }
+        error
+      }
+    }
+    `;
+    const variables = {
+      sortOrder
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        createTopic: {
+          template?: ProposalTemplate;
+          error?: string;
+        };
+      }) => {
+        return result.createTopic;
+      }
+    );
+  };
+
   type MonitorableServiceCall = () => Promise<{ error?: string }>;
 
   const persistModel = ({
@@ -319,6 +360,18 @@ export function usePersistModel() {
           break;
         case EventType.DELETE_TOPIC_REQUESTED:
           executeAndMonitorCall(() => deleteTopic(action.payload));
+          break;
+        case EventType.CREATE_TOPIC_REQUESTED:
+          executeAndMonitorCall(async () => {
+            const result = await createTopic(action.payload.sortOrder);
+            if (result.template) {
+              dispatch({
+                type: EventType.TOPIC_CREATED,
+                payload: result.template
+              });
+            }
+            return result;
+          });
           break;
         default:
           break;
