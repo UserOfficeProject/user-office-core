@@ -3,7 +3,7 @@ import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
 import { ProposalTemplate, DataType } from "./ProposalModel";
 const jsonwebtoken = require("jsonwebtoken");
-
+const createTOC = require("@ocelot-consulting/hummus-toc");
 const PDFDocument = require("pdfkit");
 const router = express.Router();
 const fs = require("fs");
@@ -59,29 +59,48 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     }
 
     // Create a PDF document
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ bufferPages: true });
 
+    let toc: any = [];
+    let pageNumber = 1;
+    toc.push({ title: "First Page", page: 1, children: [] });
+    doc.on("pageAdded", () => {
+      pageNumber++;
+    });
+
+    const writeStream = fs.createWriteStream(
+      `downloads/proposal-${proposalId}.pdf`
+    );
+
+    doc.pipe(writeStream);
     //Helper functions
+
     const write = (text: string) => {
       return doc
-        .font("Times-Roman")
-        .fontSize(12)
+        .font("fonts/Calibri_Regular.ttf")
+        .fontSize(11)
         .text(text);
     };
 
     const writeBold = (text: string) => {
       return doc
-        .font("Times-Bold")
-        .fontSize(12)
+        .font("fonts/Calibri_Bold.ttf")
+        .fontSize(11)
+        .text(text);
+    };
+
+    const writeHeading = (text: string) => {
+      return doc
+        .font("fonts/Calibri_Bold.ttf")
+        .fontSize(14)
         .text(text);
     };
 
     let attachmentIds: string[] = []; // Save attachments for appendix
     doc.image("./images/ESS.png", 15, 15, { width: 100 });
-    doc
-      .fontSize(14)
-      .font("Times-Bold")
-      .text(`Proposal: ${proposal.title}`);
+
+    writeHeading(`Proposal: ${proposal.title}`);
+    doc.outline.addItem(`Proposal: ${proposal.title}`);
     doc.moveDown();
 
     writeBold("Brief summary:");
@@ -121,24 +140,19 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       if (!topic) {
         return res.status(500).send();
       }
-      doc.fontSize(25).text(topic.topic_title);
+      writeBold(topic.topic_title);
+      doc.outline.addItem(topic.topic_title);
+      toc.push({ title: topic.topic_title, page: pageNumber, children: [] });
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          doc
-            .fontSize(17)
-            .font("Times-Bold")
-            .text(field.config.plain);
+          writeBold(field.config.plain!);
         } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
           if (field.value != "") {
             const fieldAttachmentArray: string[] = field.value.split(",");
-            write(
-              `See Appendix ${fieldAttachmentArray.map(
-                (id, i) => `A${i + attachmentIds.length}`
-              )}`
-            );
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
+            write("This document has been appended to the proposal");
           } else {
             write(notAnswered);
           }
@@ -149,6 +163,13 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
               ? new Date(field.value).toISOString().split("T")[0]
               : notAnswered
           );
+        } else if (field.data_type === DataType.BOOLEAN) {
+          writeBold(field.question);
+          if (field.value) {
+            write("Yes");
+          } else {
+            write("No");
+          }
         } else {
           writeBold(field.question);
           write(field.value != "" ? field.value : notAnswered);
@@ -156,18 +177,13 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
         doc.moveDown(0.5);
       });
     });
-    const writeStream = fs.createWriteStream(
-      `downloads/proposal-${proposalId}.pdf`
-    );
-
-    doc.pipe(writeStream);
     doc.end();
-
+    pageNumber++;
     // Stitch togethere PDF proposal with attachments
     writeStream.on("finish", async function() {
-      await Promise.all(attachmentIds.map(getAttachments)).catch(error =>
-        res.status(500).send()
-      );
+      await Promise.all(attachmentIds.map(getAttachments))
+        .then((res: any) => console.log(res))
+        .catch(error => res.status(500).send());
 
       var pdfWriter = hummus.createWriter(
         `downloads/proposalWithAttachments-${proposalId}.pdf`
@@ -175,18 +191,11 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
 
       attachmentIds.forEach(async (attachmentId, i) => {
-        var page = pdfWriter.createPage(0, 0, 595, 842);
-        var cxt = pdfWriter.startPageContentContext(page);
-        var arialFont = pdfWriter.getFontForFile("./fonts/arial.ttf");
-        var textOptions = {
-          font: arialFont,
-          size: 25,
-          colorspace: "gray",
-          color: 0x00
-        };
-        cxt.writeText(`Appendix A${i}`, 75, 805, textOptions);
-        pdfWriter.writePage(page);
         pdfWriter.appendPDFPagesFromPDF(`downloads/${attachmentId}`);
+        var pdfReader = hummus.createReader(`downloads/${attachmentId}`);
+        toc.push({ title: `${attachmentId}`, page: pageNumber, children: [] });
+        pageNumber = pageNumber + pdfReader.getPagesCount();
+
         fs.unlink(`downloads/${attachmentId}`, () => {});
       });
       fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {});
@@ -196,6 +205,11 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
         `downloads/proposalWithAttachments-${proposalId}.pdf`,
         `${proposal.title}.pdf`,
         () => {
+          createTOC(
+            `downloads/proposalWithAttachments-${proposalId}.pdf`,
+            `downloads/test.pdf`,
+            toc
+          );
           fs.unlink(
             `downloads/proposalWithAttachments-${proposalId}.pdf`,
             () => {}
