@@ -9,9 +9,33 @@ import {
   ProposalAnswer,
   FieldConfig
 } from "../../models/Proposal";
-import { json } from "body-parser";
-import { config } from "bluebird";
 import { Review } from "../../models/Review";
+
+var dummyTemplate: ProposalTemplate;
+beforeEach(() => {
+  const hasLinksToField = createDummyField({
+    proposal_question_id: "hasLinksToField",
+    data_type: DataType.SELECTION_FROM_OPTIONS
+  });
+  const linksToField = createDummyField({
+    proposal_question_id: "linksToField",
+    data_type: DataType.TEXT_INPUT,
+    dependencies: [
+      new FieldDependency(
+        "linksToField",
+        "hasLinksToField",
+        "{ 'ifValue': 'yes' }"
+      )
+    ]
+  });
+
+  dummyTemplate = new ProposalTemplate([
+    new Topic(1, "General information", true, 1, [
+      hasLinksToField,
+      linksToField
+    ])
+  ]);
+});
 
 export const dummyProposal = new Proposal(
   1,
@@ -67,6 +91,9 @@ function createDummyField(values: {
 }
 
 export class proposalDataSource implements ProposalDataSource {
+  deleteTopic(id: number): Promise<Boolean | null> {
+    throw new Error("Method not implemented.");
+  }
   async createTemplateField(
     fieldId: string,
     topicId: number,
@@ -94,12 +121,17 @@ export class proposalDataSource implements ProposalDataSource {
       config?: string | undefined;
       sort_order: number;
     }
-  ): Promise<ProposalTemplateField | null> {
-    return createDummyField({
-      ...values,
-      proposal_question_id,
-      config: JSON.parse(values.config || "{}")
+  ): Promise<ProposalTemplate | null> {
+    var template = await this.getProposalTemplate();
+    template.topics.forEach(topic => {
+      topic.fields!.forEach(field => {
+        if (field.proposal_question_id === proposal_question_id) {
+          Object.assign(field, values);
+        }
+      });
     });
+
+    return template;
   }
 
   async updateTopic(
@@ -115,8 +147,14 @@ export class proposalDataSource implements ProposalDataSource {
     );
   }
 
-  async createTopic(title: string): Promise<Topic> {
-    return new Topic(2, title, false, 2, null);
+  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
+    var newTemplate = await this.getProposalTemplate();
+    newTemplate.topics.splice(
+      sortOrder,
+      0,
+      new Topic(2, "New Topic", false, sortOrder, null)
+    );
+    return newTemplate;
   }
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
     return dummyAnswers;
@@ -147,28 +185,7 @@ export class proposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const hasLinksToField = createDummyField({
-      proposal_question_id: "hasLinksToField",
-      data_type: DataType.SELECTION_FROM_OPTIONS
-    });
-    const linksToField = createDummyField({
-      proposal_question_id: "linksToField",
-      data_type: DataType.TEXT_INPUT,
-      dependencies: [
-        new FieldDependency(
-          "linksToField",
-          "hasLinksToField",
-          "{ 'ifValue': 'yes' }"
-        )
-      ]
-    });
-
-    return new ProposalTemplate([
-      new Topic(1, "General information", true, 1, [
-        hasLinksToField,
-        linksToField
-      ])
-    ]);
+    return dummyTemplate;
   }
 
   async submitReview(

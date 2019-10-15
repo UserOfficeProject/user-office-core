@@ -12,12 +12,13 @@ export const typeDefs = `
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
-        createTopic(title: String): TopicMutationResult
+        createTopic(sortOrder:Int!): ProposalTemplateMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
-        updateFieldTopicRel(topic_id:Int!, field_ids:[String]): BooleanMutationResult
-        updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateFieldMutationResult
+        updateFieldTopicRel(topic_id:Int!, field_ids:[String]): VoidMutationResult
+        updateProposalTemplateField(id:String!, question:String, config:String, isEnabled:Boolean, dependencies:[FieldDependencyInput]): ProposalTemplateMutationResult
         createTemplateField(topicId:Int!, dataType:String!): ProposalTemplateFieldMutationResult
         deleteTemplateField(id:String!): ProposalTemplateMutationResult
+        deleteTopic(id:Int!): VoidMutationResult
     }
 
 
@@ -36,8 +37,7 @@ export const typeDefs = `
         error: String
     }
 
-    type BooleanMutationResult {
-        result: Boolean
+    type VoidMutationResult {
         error: String
     }
 

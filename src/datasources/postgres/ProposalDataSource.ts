@@ -349,17 +349,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select("proposal_question_id", "answer as value"); // TODO rename the column
   }
 
-  async createTopic(title: string): Promise<Topic> {
-    return database
-      .insert({ topic_title: title }, ["*"])
-      .from("proposal_topics")
-      .then((resultSet: TopicRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("Failed to create topic", { title });
-          return null;
-        }
-        return this.createTopicObject(resultSet[0]);
-      });
+  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
+    await database("proposal_topics")
+      .update({ sort_order: sortOrder + 1 })
+      .where("sort_order", ">=", sortOrder);
+
+    await database("proposal_topics").insert({
+      topic_title: "New Topic",
+      sort_order: sortOrder,
+      is_enabled: true
+    });
+    return this.getProposalTemplate();
   }
 
   async updateTopic(
@@ -400,7 +400,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplateField | null> {
+  ): Promise<ProposalTemplate | null> {
     const rows = {
       data_type: values.dataType,
       question: values.question,
@@ -425,33 +425,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
     }
 
-    return database
-      .update(rows, ["*"])
-      .from("proposal_questions")
-      .where("proposal_question_id", proposal_question_id)
-      .then((resultSet: ProposalQuestionRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError(
-            "UPDATE field resultSet must contain exactly 1 row",
-            {
-              resultSet,
-              proposal_question_id,
-              rows
-            }
-          );
-          return null;
-        }
-
-        return this.createProposalTemplateFieldObject(resultSet[0]);
-      })
-      .catch((e: any) => {
-        this.logger.logError("Exception occurred while updating field", {
-          error: e,
-          proposal_question_id,
-          values
-        });
-        return null;
-      });
+    return new Promise(async (resolve, reject) => {
+      await database
+        .update(rows, ["*"])
+        .from("proposal_questions")
+        .where("proposal_question_id", proposal_question_id);
+      resolve(await this.getProposalTemplate());
+    });
   }
 
   createTemplateField(
@@ -528,5 +508,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .del();
       resolve(await this.getProposalTemplate());
     });
+  }
+
+  async deleteTopic(id: number): Promise<Boolean | null> {
+    return database("proposal_topics")
+      .where({ topic_id: id })
+      .del()
+      .then(() => true)
+      .catch((e: any) => {
+        this.logger.logError("Could not delete topic ", e);
+        return false;
+      });
   }
 }

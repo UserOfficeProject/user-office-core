@@ -42,7 +42,7 @@ export interface ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<Boolean | null>;
-  createTopic(title: string): Promise<Topic>;
+  createTopic(sortOrder: number): Promise<ProposalTemplate>;
   updateTopic(
     id: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
@@ -57,7 +57,7 @@ export interface ProposalDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplateField | null>;
+  ): Promise<ProposalTemplate | null>;
   createTemplateField(
     fieldId: string,
     topicId: number,
@@ -66,4 +66,5 @@ export interface ProposalDataSource {
     config: string
   ): Promise<ProposalTemplateField | null>;
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
+  deleteTopic(id: number): Promise<Boolean | null>;
 }

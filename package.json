@@ -9,7 +9,8 @@
     "dev": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere ts-node-dev --respawn --transpileOnly ./index.ts",
     "prod": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 node ./build/index.js",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "start": "tsc && node ./build/index.js"
+    "start": "tsc && node ./build/index.js",
+    "debug": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere node --inspect ./build/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -30,6 +31,7 @@
     "graphql": "^14.2.1",
     "hummus": "^1.0.107",
     "graphql-tools": "^4.0.5",
+    "graphql-union-input-type": "^0.4.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.16.5",
     "multer": "^1.4.2",
@@ -50,6 +52,7 @@
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.7.1",
+    "nodemon": "^1.19.1",
     "prettier": "^1.17.0",
     "ts-jest": "^24.0.2"
   }
