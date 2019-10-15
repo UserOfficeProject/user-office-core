@@ -15,7 +15,6 @@ export function usePersistModel() {
     const mutation = `
     mutation($topicId:Int!, $fieldIds:[String]) {
       updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
-        result
         error
       }
     }
@@ -29,7 +28,6 @@ export function usePersistModel() {
       (result: {
         updateFieldTopicRel: {
           error?: string;
-          result?: boolean;
         };
       }) => {
         return result.updateFieldTopicRel;
@@ -68,12 +66,49 @@ export function usePersistModel() {
     );
   };
 
+  const updateTopicOrder = async (topicOrder: number[]) => {
+    const mutation = `
+    mutation($topicOrder:[Int]!) {
+      updateTopicOrder(topicOrder:$topicOrder) {
+        error
+      }
+    }
+    `;
+    const variables = {
+      topicOrder
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        updateTopicOrder: {
+          error?: string;
+        };
+      }) => {
+        return result.updateTopicOrder;
+      }
+    );
+  };
+
   const updateItem = async (field: ProposalTemplateField) => {
     const mutation = `
     mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
-        field {
-          proposal_question_id
+        template {
+          topics {
+            topic_title
+            topic_id,
+            fields {
+              proposal_question_id
+              data_type
+              question
+              config
+              dependencies {
+                proposal_question_dependency
+                condition
+                proposal_question_id
+              }
+            }
+          }
         }
         error
       }
@@ -95,7 +130,7 @@ export function usePersistModel() {
       (result: {
         updateProposalTemplateField: {
           error?: string;
-          field?: { proposal_question_id: string };
+          template?: ProposalTemplate;
         };
       }) => {
         return result.updateProposalTemplateField;
@@ -183,6 +218,70 @@ export function usePersistModel() {
     );
   };
 
+  const deleteTopic = async (id: number) => {
+    const mutation = `
+    mutation($id:Int!) {
+      deleteTopic(id:$id) {
+        error
+      }
+    }
+    `;
+    const variables = {
+      id
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        deleteTopic: {
+          error?: string;
+        };
+      }) => {
+        return result.deleteTopic;
+      }
+    );
+  };
+
+  const createTopic = async (sortOrder: number) => {
+    const mutation = `
+    mutation($sortOrder:Int!) {
+      createTopic(sortOrder:$sortOrder) {
+        template {
+          topics {
+            topic_title
+            topic_id,
+            fields {
+              proposal_question_id
+              data_type
+              question
+              config
+              dependencies {
+                proposal_question_dependency
+                condition
+                proposal_question_id
+              }
+            }
+          }
+        }
+        error
+      }
+    }
+    `;
+    const variables = {
+      sortOrder
+    };
+
+    return sendRequest(mutation, variables).then(
+      (result: {
+        createTopic: {
+          template?: ProposalTemplate;
+          error?: string;
+        };
+      }) => {
+        return result.createTopic;
+      }
+    );
+  };
+
   type MonitorableServiceCall = () => Promise<{ error?: string }>;
 
   const persistModel = ({
@@ -210,7 +309,7 @@ export function usePersistModel() {
       const state = getState();
 
       switch (action.type) {
-        case EventType.REORDER_REQUESTED:
+        case EventType.REORDER_FIELD_REQUESTED:
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -237,6 +336,10 @@ export function usePersistModel() {
             );
           }
           break;
+        case EventType.REORDER_TOPIC_REQUESTED:
+          const topicOrder = state.topics.map(topic => topic.topic_id);
+          executeAndMonitorCall(() => updateTopicOrder(topicOrder));
+          break;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           executeAndMonitorCall(() =>
             updateTopic(action.payload.topicId, {
@@ -245,44 +348,57 @@ export function usePersistModel() {
           );
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
-          executeAndMonitorCall(() =>
-            updateItem(action.payload.field as ProposalTemplateField)
-          );
+          executeAndMonitorCall(async () => {
+            const field = action.payload.field as ProposalTemplateField;
+            const result = await updateItem(field);
+            dispatch({
+              type: EventType.FIELD_UPDATED,
+              payload: new ProposalTemplateField(result.template)
+            });
+            return result;
+          });
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
-          executeAndMonitorCall(
-            () =>
-              new Promise((resolve, reject) =>
-                createTemplateField(
-                  action.payload.topicId,
-                  (action.payload.newField as ProposalTemplateField).data_type
-                ).then(result => {
-                  if (result.field) {
-                    dispatch({
-                      type: EventType.FIELD_CREATED,
-                      payload: new ProposalTemplateField(result.field)
-                    });
-                    resolve(result);
-                  }
-                })
-              )
-          );
+          executeAndMonitorCall(async () => {
+            const result = await createTemplateField(
+              action.payload.topicId,
+              (action.payload.newField as ProposalTemplateField).data_type
+            );
+            if (result.field) {
+              dispatch({
+                type: EventType.FIELD_CREATED,
+                payload: new ProposalTemplateField(result.field)
+              });
+            }
+            return result;
+          });
           break;
         case EventType.DELETE_FIELD_REQUESTED:
-          executeAndMonitorCall(
-            () =>
-              new Promise((resolve, reject) =>
-                deleteField(action.payload.fieldId).then(result => {
-                  if (result.template) {
-                    dispatch({
-                      type: EventType.FIELD_DELETED,
-                      payload: result.template!
-                    });
-                    resolve(result);
-                  }
-                })
-              )
-          );
+          executeAndMonitorCall(async () => {
+            const result = await deleteField(action.payload.fieldId);
+            if (result.template) {
+              dispatch({
+                type: EventType.FIELD_DELETED,
+                payload: result.template
+              });
+            }
+            return result;
+          });
+          break;
+        case EventType.DELETE_TOPIC_REQUESTED:
+          executeAndMonitorCall(() => deleteTopic(action.payload));
+          break;
+        case EventType.CREATE_TOPIC_REQUESTED:
+          executeAndMonitorCall(async () => {
+            const result = await createTopic(action.payload.sortOrder);
+            if (result.template) {
+              dispatch({
+                type: EventType.TOPIC_CREATED,
+                payload: result.template
+              });
+            }
+            return result;
+          });
           break;
         default:
           break;

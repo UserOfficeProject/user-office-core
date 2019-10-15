@@ -9,6 +9,7 @@ export class ConditionEvaluator {
       // lazy initialization
       this.validatorMap = JSDict.Create<string, IFieldConditionEvaluator>();
       this.validatorMap.put("eq", new EqualityValidator());
+      this.validatorMap.put("neq", new InequalityValidator());
     }
     return this.validatorMap;
   }
@@ -25,5 +26,11 @@ export interface IFieldConditionEvaluator {
 export class EqualityValidator implements IFieldConditionEvaluator {
   isSattisfied(field: ProposalTemplateField, params: object): boolean {
     return field.value === params;
+  }
+}
+
+export class InequalityValidator implements IFieldConditionEvaluator {
+  isSattisfied(field: ProposalTemplateField, params: object): boolean {
+    return field.value !== params;
   }
 }

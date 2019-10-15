@@ -9,7 +9,7 @@ import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
 export enum EventType {
   READY,
-  REORDER_REQUESTED,
+  REORDER_FIELD_REQUESTED,
   MOVE_TOPIC_REQUESTED,
   UPDATE_TOPIC_TITLE_REQUESTED,
   UPDATE_FIELD_REQUESTED,
@@ -17,7 +17,12 @@ export enum EventType {
   FIELD_CREATED,
   DELETE_FIELD_REQUESTED,
   FIELD_DELETED,
-  SERVICE_ERROR_OCCURRED
+  SERVICE_ERROR_OCCURRED,
+  FIELD_UPDATED,
+  DELETE_TOPIC_REQUESTED,
+  CREATE_TOPIC_REQUESTED,
+  TOPIC_CREATED,
+  REORDER_TOPIC_REQUESTED
 }
 
 export interface IEvent {
@@ -48,7 +53,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
       switch (action.type) {
         case EventType.READY:
           return action.payload;
-        case EventType.REORDER_REQUESTED:
+        case EventType.REORDER_FIELD_REQUESTED:
           if (!action.payload.destination) {
             return draft;
           }
@@ -73,6 +78,18 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           );
 
           return draft;
+        case EventType.REORDER_TOPIC_REQUESTED:
+          if (!action.payload.destination) {
+            return draft;
+          }
+
+          draft.topics.splice(
+            action.payload.destination.index,
+            0,
+            ...draft.topics.splice(action.payload.source.index, 1)
+          );
+
+          return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           draft.getTopicById(action.payload.topicId)!.topic_title =
             action.payload.title;
@@ -90,6 +107,19 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           const newField: ProposalTemplateField = action.payload;
           draft.addField(newField);
           return new ProposalTemplate(draft);
+
+        case EventType.DELETE_TOPIC_REQUESTED:
+          const topic = draft.topics.find(
+            topic => topic.topic_id === action.payload
+          );
+          if (!topic) {
+            return;
+          }
+          const topicIdx = draft.topics.indexOf(topic);
+          draft.topics.splice(topicIdx, 1);
+          return new ProposalTemplate(draft);
+        case EventType.TOPIC_CREATED:
+        case EventType.FIELD_UPDATED:
         case EventType.FIELD_DELETED:
           return new ProposalTemplate(action.payload);
       }

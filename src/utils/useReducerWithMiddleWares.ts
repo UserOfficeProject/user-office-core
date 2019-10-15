@@ -11,9 +11,9 @@ function useReducerWithMiddleWares<R extends Reducer<any, any>>(reducer:R, initi
   let state = hook[0]
   const setState = hook[1]
   const dispatch = (action: any) => {
-    state = reducer(state, action)
-    setState(state)
-    return action
+    state = reducer(state, action);
+    setState(state);
+    return action;
   }
   let enhancedDispatch:any;
   const store = {

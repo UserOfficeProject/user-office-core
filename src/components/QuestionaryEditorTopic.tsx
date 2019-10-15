@@ -1,56 +1,70 @@
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import React, { useState } from 'react';
+import { Droppable, Draggable } from "react-beautiful-dnd";
+import React, { useState } from "react";
 
-import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
-import { Topic, ProposalTemplateField, DataType } from '../model/ProposalModel';
-import { makeStyles, Grid, useTheme, Menu, Fade, MenuItem } from '@material-ui/core';
-import { EventType, IEvent } from './QuestionaryEditorModel';
-import AddRoundedIcon from '@material-ui/icons/AddRounded';
+import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
+import { Topic, ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  makeStyles,
+  Grid,
+  useTheme,
+  Menu,
+  Fade,
+  MenuItem,
+  ListItemIcon,
+  Typography,
+  Divider
+} from "@material-ui/core";
+import { EventType, IEvent } from "./QuestionaryEditorModel";
+import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import getTemplateFieldIcon from "./getTemplateFieldIcon";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 
 export default function QuestionaryEditorTopic(props: {
   data: Topic;
   dispatch: React.Dispatch<IEvent>;
   index: number;
   onItemClick: { (data: ProposalTemplateField): void };
+  condenseMode: boolean;
 }) {
   const theme = useTheme();
 
   const classes = makeStyles(theme => ({
     container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      background: '#FFF',
-      flexBasis: '100%'
+      alignItems: "flex-start",
+      alignContent: "flex-start",
+      background: "#FFF",
+      flexBasis: "100%"
     },
     inputHeading: {
-      fontSize: '15px',
+      fontSize: "15px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      width: '100%'
+      width: "100%"
     },
     itemContainer: {
-      minHeight: '180px'
+      minHeight: "180px"
     },
     topic: {
-      fontSize: '15px',
-      padding: '0 5px',
-      marginBottom: '16px',
+      fontSize: "15px",
+      padding: "0 5px",
+      marginBottom: "16px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      background: 'white',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
+      background: "white",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     },
     addQuestionMenuItem: {
       minHeight: 0
     },
-    addQuestionButton: {
-      cursor: 'pointer'
+    showMoreButton: {
+      cursor: "pointer"
     },
     addIcon: {
-      textAlign: 'right',
-      paddingRight: '8px'
+      textAlign: "right",
+      paddingRight: "8px"
     }
   }))();
 
@@ -70,12 +84,14 @@ export default function QuestionaryEditorTopic(props: {
   };
 
   const getListStyle = (isDraggingOver: any) => ({
-    background: isDraggingOver ? theme.palette.primary.light : theme.palette.grey[100],
-    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)'
+    background: isDraggingOver
+      ? theme.palette.primary.light
+      : theme.palette.grey[100],
+    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)"
   });
 
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    background: '#FFF',
+    background: "#FFF",
     ...draggableStyle
   });
 
@@ -93,7 +109,7 @@ export default function QuestionaryEditorTopic(props: {
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
           e.currentTarget.blur();
         }
       }}
@@ -107,66 +123,153 @@ export default function QuestionaryEditorTopic(props: {
       {index + 2}. {props.data.topic_title}
     </span>
   );
+
+  const getItems = () => {
+    if (props.condenseMode) {
+      return null;
+    } else {
+      return data.fields.map((item, index) => (
+        <QuestionaryEditorTopicItem
+          index={index}
+          data={item}
+          dispatch={dispatch}
+          onClick={props.onItemClick}
+          key={item.proposal_question_id.toString()}
+        />
+      ));
+    }
+  };
+
   return (
-    <Draggable key={data.topic_id.toString()} draggableId={data.topic_id.toString()} index={index}>
+    <Draggable
+      key={data.topic_id.toString()}
+      draggableId={data.topic_id.toString()}
+      index={index}
+    >
       {(provided, snapshotDraggable) => (
         <Grid
           container
           className={classes.container}
           {...provided.draggableProps}
           ref={provided.innerRef}
-          style={getItemStyle(snapshotDraggable.isDragging, provided.draggableProps.style)}
+          style={getItemStyle(
+            snapshotDraggable.isDragging,
+            provided.draggableProps.style
+          )}
         >
-          <Grid item xs={10} className={classes.topic} {...provided.dragHandleProps}>
+          <Grid
+            item
+            xs={10}
+            className={classes.topic}
+            {...provided.dragHandleProps}
+          >
             {titleJsx}
           </Grid>
           <Grid item xs={2} className={classes.addIcon}>
-            <AddRoundedIcon
-              onClick={(event: React.MouseEvent<SVGSVGElement>) => setAnchorEl(event.currentTarget)}
-              className={classes.addQuestionButton}
+            <MoreHorizIcon
+              onClick={(event: React.MouseEvent<SVGSVGElement>) =>
+                setAnchorEl(event.currentTarget)
+              }
+              className={classes.showMoreButton}
             />
             <Menu
               anchorEl={anchorEl}
               keepMounted
               open={open}
-              onClose={onCreateNewFieldClicked}
+              onClose={() => setAnchorEl(null)}
               TransitionComponent={Fade}
             >
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
               >
-                Text input
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Text input</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
               >
-                Embellishment
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Embellishment</Typography>
               </MenuItem>
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
-              >
-                Boolean
-              </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.DATE)}
               >
-                Date
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.DATE)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Date</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() => onCreateNewFieldClicked(DataType.FILE_UPLOAD)}
               >
-                File upload
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add File upload</Typography>
               </MenuItem>
+
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)}
+                onClick={() =>
+                  onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)
+                }
               >
-                Multiple choice
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Multiple choice</Typography>
+              </MenuItem>
+
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
+              >
+                <ListItemIcon>
+                  {getTemplateFieldIcon(DataType.BOOLEAN)!}
+                </ListItemIcon>
+                <Typography variant="inherit">Add Boolean</Typography>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={(event: any) =>
+                  dispatch({
+                    type: EventType.DELETE_TOPIC_REQUESTED,
+                    payload: data.topic_id
+                  })
+                }
+              >
+                <ListItemIcon>
+                  <DeleteRoundedIcon />
+                </ListItemIcon>
+                <Typography variant="inherit">Delete topic</Typography>
+              </MenuItem>
+
+              <MenuItem
+                className={classes.addQuestionMenuItem}
+                onClick={(event: any) =>
+                  dispatch({
+                    type: EventType.CREATE_TOPIC_REQUESTED,
+                    payload: { sortOrder: index + 1 }
+                    // +1 means - add immediately after this topic
+                  })
+                }
+              >
+                <ListItemIcon>
+                  <PlaylistAddIcon />
+                </ListItemIcon>
+                <Typography variant="inherit">Add topic</Typography>
               </MenuItem>
             </Menu>
           </Grid>
@@ -180,15 +283,7 @@ export default function QuestionaryEditorTopic(props: {
                 style={getListStyle(snapshot.isDraggingOver)}
                 className={classes.itemContainer}
               >
-                {data.fields.map((item, index) => (
-                  <QuestionaryEditorTopicItem
-                    index={index}
-                    data={item}
-                    dispatch={dispatch}
-                    onClick={props.onItemClick}
-                    key={item.proposal_question_id.toString()}
-                  />
-                ))}
+                {getItems()}
                 {provided.placeholder}
               </Grid>
             )}

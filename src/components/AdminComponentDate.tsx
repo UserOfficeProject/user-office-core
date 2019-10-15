@@ -3,7 +3,6 @@ import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "./QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import FormikUICustomEditor from "./FormikUICustomEditor";
 import * as Yup from "yup";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";

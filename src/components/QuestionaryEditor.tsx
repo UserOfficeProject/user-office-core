@@ -5,18 +5,33 @@ import QuestionaryEditorModel, {
   EventType,
   IEvent
 } from "./QuestionaryEditorModel";
-import { Paper, makeStyles, useTheme } from "@material-ui/core";
+import {
+  Paper,
+  makeStyles,
+  useTheme,
+  Button,
+  FormGroup,
+  FormControlLabel,
+  Checkbox
+} from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 import Notification from "./Notification";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
     return (next: Function) => (action: IEvent) => {
       next(action);
-      if (action.type === EventType.SERVICE_ERROR_OCCURRED) {
-        setErrorState({ ...errorState, open: true, message: action.payload });
+      switch (action.type) {
+        case EventType.SERVICE_ERROR_OCCURRED:
+          setErrorState({ ...errorState, open: true, message: action.payload });
+          break;
+
+        case EventType.FIELD_CREATED:
+          setSelectedField(action.payload);
+          break;
       }
     };
   };
@@ -31,6 +46,8 @@ export default function QuestionaryEditor() {
     message: "",
     variant: "error"
   });
+
+  const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const [
     selectedField,
@@ -50,6 +67,10 @@ export default function QuestionaryEditor() {
     },
     modalContainer: {
       backgroundColor: "white"
+    },
+    centeredButton: {
+      display: "flex",
+      margin: "10px auto"
     }
   }))();
 
@@ -64,7 +85,13 @@ export default function QuestionaryEditor() {
   const onDragEnd = (result: DropResult) => {
     if (result.type === "field") {
       dispatch({
-        type: EventType.REORDER_REQUESTED,
+        type: EventType.REORDER_FIELD_REQUESTED,
+        payload: { source: result.source, destination: result.destination }
+      });
+    }
+    if (result.type === "topic") {
+      dispatch({
+        type: EventType.REORDER_TOPIC_REQUESTED,
         payload: { source: result.source, destination: result.destination }
       });
     }
@@ -78,6 +105,23 @@ export default function QuestionaryEditor() {
     setSelectedField(null);
   };
 
+  const addNewTopicFallbackButton =
+    state.topics.length === 0 ? (
+      <Button
+        variant="outlined"
+        color="primary"
+        className={classes.centeredButton}
+        onClick={() =>
+          dispatch({
+            type: EventType.CREATE_TOPIC_REQUESTED,
+            payload: { sortOrder: 0 }
+          })
+        }
+      >
+        <PlaylistAddIcon />
+        &nbsp; Add topic
+      </Button>
+    ) : null;
   return (
     <>
       <Notification
@@ -89,6 +133,19 @@ export default function QuestionaryEditor() {
         message={errorState.message}
       />
       <Paper className={classes.paper}>
+        <FormGroup row style={{ justifyContent: "flex-end" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isTopicReorderMode}
+                onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
+                value="checkedB"
+                color="primary"
+              />
+            }
+            label="Enable reordering topics"
+          />
+        </FormGroup>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
             {(provided, snapshot) => (
@@ -97,13 +154,14 @@ export default function QuestionaryEditor() {
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
               >
-                {state!.topics.map((topic, index) => (
+                {state.topics.map((topic, index) => (
                   <QuestionaryEditorTopic
                     data={topic}
                     dispatch={dispatch}
                     index={index}
                     key={topic.topic_id}
                     onItemClick={onClick}
+                    condenseMode={isTopicReorderMode}
                   />
                 ))}
                 {provided.placeholder}
@@ -111,6 +169,7 @@ export default function QuestionaryEditor() {
             )}
           </Droppable>
         </DragDropContext>
+        {addNewTopicFallbackButton}
       </Paper>
 
       <QuestionaryFieldEditor
