@@ -97,14 +97,15 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
         case EventType.FIELD_DELETED:
           return new ProposalTemplate(action.payload);
         case EventType.DELETE_TOPIC_REQUESTED:
-          const topic = draft.topics.find(topic => topic.topic_id === action.payload);
-          if(!topic) {
+          const topic = draft.topics.find(
+            topic => topic.topic_id === action.payload
+          );
+          if (!topic) {
             return;
           }
           const topicIdx = draft.topics.indexOf(topic);
-          draft.topics.splice(topicIdx,1);
+          draft.topics.splice(topicIdx, 1);
           return new ProposalTemplate(draft);
-
       }
     });
   }

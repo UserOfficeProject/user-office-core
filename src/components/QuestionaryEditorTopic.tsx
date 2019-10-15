@@ -1,12 +1,25 @@
-import { Droppable, Draggable } from 'react-beautiful-dnd';
-import React, { useState } from 'react';
+import { Droppable, Draggable } from "react-beautiful-dnd";
+import React, { useState } from "react";
 
-import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
-import { Topic, ProposalTemplateField, DataType } from '../model/ProposalModel';
-import { makeStyles, Grid, useTheme, Menu, Fade, MenuItem } from '@material-ui/core';
-import { EventType, IEvent } from './QuestionaryEditorModel';
-import AddCommentIcon from '@material-ui/icons/AddComment';
-import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
+import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
+import { Topic, ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  makeStyles,
+  Grid,
+  useTheme,
+  Menu,
+  Fade,
+  MenuItem,
+  ListItemIcon,
+  Typography,
+  Divider
+} from "@material-ui/core";
+import { EventType, IEvent } from "./QuestionaryEditorModel";
+import AddCommentIcon from "@material-ui/icons/AddComment";
+import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import getTemplateFieldIcon from "./getTemplateFieldIcon";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 
 export default function QuestionaryEditorTopic(props: {
   data: Topic;
@@ -18,40 +31,40 @@ export default function QuestionaryEditorTopic(props: {
 
   const classes = makeStyles(theme => ({
     container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      background: '#FFF',
-      flexBasis: '100%'
+      alignItems: "flex-start",
+      alignContent: "flex-start",
+      background: "#FFF",
+      flexBasis: "100%"
     },
     inputHeading: {
-      fontSize: '15px',
+      fontSize: "15px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      width: '100%'
+      width: "100%"
     },
     itemContainer: {
-      minHeight: '180px'
+      minHeight: "180px"
     },
     topic: {
-      fontSize: '15px',
-      padding: '0 5px',
-      marginBottom: '16px',
+      fontSize: "15px",
+      padding: "0 5px",
+      marginBottom: "16px",
       color: theme.palette.grey[600],
       fontWeight: 600,
-      background: 'white',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
+      background: "white",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     },
     addQuestionMenuItem: {
       minHeight: 0
     },
-    addQuestionButton: {
-      cursor: 'pointer'
+    showMoreButton: {
+      cursor: "pointer"
     },
     addIcon: {
-      textAlign: 'right',
-      paddingRight: '8px'
+      textAlign: "right",
+      paddingRight: "8px"
     }
   }))();
 
@@ -71,12 +84,14 @@ export default function QuestionaryEditorTopic(props: {
   };
 
   const getListStyle = (isDraggingOver: any) => ({
-    background: isDraggingOver ? theme.palette.primary.light : theme.palette.grey[100],
-    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)'
+    background: isDraggingOver
+      ? theme.palette.primary.light
+      : theme.palette.grey[100],
+    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)"
   });
 
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    background: '#FFF',
+    background: "#FFF",
     ...draggableStyle
   });
 
@@ -94,7 +109,7 @@ export default function QuestionaryEditorTopic(props: {
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
           e.currentTarget.blur();
         }
       }}
@@ -109,16 +124,28 @@ export default function QuestionaryEditorTopic(props: {
     </span>
   );
   return (
-    <Draggable key={data.topic_id.toString()} draggableId={data.topic_id.toString()} index={index}>
+    <Draggable
+      key={data.topic_id.toString()}
+      draggableId={data.topic_id.toString()}
+      index={index}
+    >
       {(provided, snapshotDraggable) => (
         <Grid
           container
           className={classes.container}
           {...provided.draggableProps}
           ref={provided.innerRef}
-          style={getItemStyle(snapshotDraggable.isDragging, provided.draggableProps.style)}
+          style={getItemStyle(
+            snapshotDraggable.isDragging,
+            provided.draggableProps.style
+          )}
         >
-          <Grid item xs={9} className={classes.topic} {...provided.dragHandleProps}>
+          <Grid
+            item
+            xs={10}
+            className={classes.topic}
+            {...provided.dragHandleProps}
+          >
             {titleJsx}
           </Grid>
           <Grid item xs={3} className={classes.addIcon}>
