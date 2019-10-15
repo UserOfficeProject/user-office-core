@@ -24,8 +24,14 @@ export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
     return (next: Function) => (action: IEvent) => {
       next(action);
-      if (action.type === EventType.SERVICE_ERROR_OCCURRED) {
-        setErrorState({ ...errorState, open: true, message: action.payload });
+      switch (action.type) {
+        case EventType.SERVICE_ERROR_OCCURRED:
+          setErrorState({ ...errorState, open: true, message: action.payload });
+          break;
+
+        case EventType.FIELD_CREATED:
+          setSelectedField(action.payload);
+          break;
       }
     };
   };
