@@ -210,7 +210,7 @@ export function usePersistModel() {
     return sendRequest(mutation, variables).then(
       (result: {
         deleteTopic: {
-          error?: string
+          error?: string;
         };
       }) => {
         return result.deleteTopic;
@@ -280,53 +280,42 @@ export function usePersistModel() {
           );
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
-          executeAndMonitorCall(
-            () =>
-              new Promise(async (resolve, reject) => {
-                const result = await updateItem(action.payload
-                  .field as ProposalTemplateField);
-                dispatch({
-                  type: EventType.FIELD_UPDATED,
-                  payload: new ProposalTemplateField(result.template)
-                });
-                resolve(result);
-              })
-          );
+          executeAndMonitorCall(async () => {
+            const field = action.payload.field as ProposalTemplateField;
+            const result = await updateItem(field);
+            dispatch({
+              type: EventType.FIELD_UPDATED,
+              payload: new ProposalTemplateField(result.template)
+            });
+            return result;
+          });
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
-          executeAndMonitorCall(
-            () =>
-              new Promise((resolve, reject) =>
-                createTemplateField(
-                  action.payload.topicId,
-                  (action.payload.newField as ProposalTemplateField).data_type
-                ).then(result => {
-                  if (result.field) {
-                    dispatch({
-                      type: EventType.FIELD_CREATED,
-                      payload: new ProposalTemplateField(result.field)
-                    });
-                    resolve(result);
-                  }
-                })
-              )
-          );
+          executeAndMonitorCall(async () => {
+            const result = await createTemplateField(
+              action.payload.topicId,
+              (action.payload.newField as ProposalTemplateField).data_type
+            );
+            if (result.field) {
+              dispatch({
+                type: EventType.FIELD_CREATED,
+                payload: new ProposalTemplateField(result.field)
+              });
+            }
+            return result;
+          });
           break;
         case EventType.DELETE_FIELD_REQUESTED:
-          executeAndMonitorCall(
-            () =>
-              new Promise((resolve, reject) =>
-                deleteField(action.payload.fieldId).then(result => {
-                  if (result.template) {
-                    dispatch({
-                      type: EventType.FIELD_DELETED,
-                      payload: result.template!
-                    });
-                    resolve(result);
-                  }
-                })
-              )
-          );
+          executeAndMonitorCall(async () => {
+            const result = await deleteField(action.payload.fieldId);
+            if (result.template) {
+              dispatch({
+                type: EventType.FIELD_DELETED,
+                payload: result.template
+              });
+            }
+            return result;
+          });
           break;
         case EventType.DELETE_TOPIC_REQUESTED:
           executeAndMonitorCall(() => deleteTopic(action.payload));
