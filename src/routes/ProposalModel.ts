@@ -32,6 +32,11 @@ export class ProposalTemplate {
     }
   }
 
+  public addField(field: ProposalTemplateField): void {
+    this.getTopicById(field.topic_id)!.fields.unshift(field);
+    this.fields.unshift(field);
+  }
+
   public getAllFields(): ProposalTemplateField[] {
     return this.fields;
   }
@@ -51,7 +56,7 @@ export class ProposalTemplate {
     this.fields.find(field => field.proposal_question_id === questionId)!;
 
   private isDependencySatisfied(dependency: FieldDependency): boolean {
-    const { condition, params } = JSON.parse(dependency.condition);
+    const { condition, params } = dependency.condition;
     const field = this.getFieldById(dependency.proposal_question_dependency);
     const isParentSattisfied = this.areDependenciesSatisfied(
       dependency.proposal_question_dependency
@@ -88,6 +93,7 @@ export class ProposalTemplateField {
   public data_type!: DataType;
   public question!: string;
   public config!: FieldConfig;
+  public topic_id!: number;
   public value: any = "";
   public dependencies!: FieldDependency[] | null;
 
@@ -100,9 +106,10 @@ export class ProposalTemplateField {
       if (typeof this.config == "string") {
         this.config = JSON.parse(this.config);
       }
-      if (this.value != "" && typeof this.value == "string") {
-        // embellishment problems
-        this.value = JSON.parse(this.value).value;
+      if (typeof this.value == "string") {
+        try {
+          this.value = JSON.parse(this.value).value;
+        } catch (e) {}
       } else {
         this.value = "";
       }
@@ -113,10 +120,24 @@ export class ProposalTemplateField {
 export class FieldDependency {
   public proposal_question_id!: string;
   public proposal_question_dependency!: string;
+  public condition!: FieldCondition;
+
+  constructor(obj: any | null = null) {
+    if (obj != null) {
+      Object.assign(this, obj);
+      if (typeof this.condition == "string") {
+        this.condition = JSON.parse(this.condition);
+      }
+    }
+  }
+}
+
+export class FieldCondition {
   public condition!: string;
+  public params: any;
 
   constructor(obj: object | null = null) {
-    if (obj != null) {
+    if (obj) {
       Object.assign(this, obj);
     }
   }
@@ -129,12 +150,12 @@ export interface ProposalAnswer {
 }
 
 export enum DataType {
-  TEXT_INPUT = "TEXT_INPUT",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",
+  EMBELLISHMENT = "EMBELLISHMENT",
   FILE_UPLOAD = "FILE_UPLOAD",
-  EMBELLISHMENT = "EMBELLISHMENT"
+  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
+  TEXT_INPUT = "TEXT_INPUT"
 }
 
 export interface DataTypeSpec {
@@ -155,7 +176,7 @@ export interface FieldConfig {
   small_label?: string;
   required?: boolean;
   options?: string[];
-  file_type?: string;
+  file_type?: string[];
   max_files?: number;
   multiline?: boolean;
   min?: number;

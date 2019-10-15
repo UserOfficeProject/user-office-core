@@ -8,7 +8,7 @@ export class ConditionEvaluator {
     if (!this.validatorMap) {
       // lazy initialization
       this.validatorMap = JSDict.Create<string, IFieldConditionEvaluator>();
-      this.validatorMap.put("equals", new EqualityValidator());
+      this.validatorMap.put("eq", new EqualityValidator());
     }
     return this.validatorMap;
   }
