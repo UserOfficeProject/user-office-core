@@ -17,6 +17,7 @@ services:
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
       tokenLife: 7d
       baseURL: localhost:3000
+      SPARKPOST_TOKEN: dummytoken
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql"
       - "traefik.port=4000"

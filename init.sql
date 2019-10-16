@@ -1,16 +1,20 @@
-drop table IF EXISTS users;
-drop table IF EXISTS proposals;
-drop table IF EXISTS proposal_questions;
-drop table IF EXISTS proposal_answers;
 drop table IF EXISTS proposal_answers_files;
-drop table IF EXISTS proposal_question_datatypes;
+drop table IF EXISTS proposal_answers;
 drop table IF EXISTS proposal_question_dependencies;
+drop table IF EXISTS proposal_questions;
+drop table IF EXISTS proposal_question_datatypes;
 drop table IF EXISTS proposal_users;
-drop table IF EXISTS roles;
 drop table IF EXISTS role_users;
+drop table IF EXISTS proposal_user;
 drop table IF EXISTS reviews;
+drop table IF EXISTS proposals;
+drop table IF EXISTS role_user;
+drop table IF EXISTS users;
+drop table IF EXISTS roles;
 drop table IF EXISTS proposal_topics;
 drop table IF EXISTS files;
+drop table IF EXISTS call;
+drop table IF EXISTS pagetext;
 
 
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
@@ -545,6 +549,7 @@ INSERT INTO proposal_question_dependencies VALUES('chem_deu_structure_justificat
 INSERT INTO proposal_question_dependencies VALUES('chem_deu_chem_structure', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('chem_deu_prep_source', 'chem_deu_enabled', '{ "condition": "eq", "params":true }');
 INSERT INTO proposal_question_dependencies VALUES('chem_deu_protocol', 'chem_deu_prep_source', '{ "condition": "eq", "params":"yes" }');
+
 
 
 

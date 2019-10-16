@@ -44,7 +44,7 @@ export function createToC(
   }
 
   // before writer closes, add outline to PDF
-  events.on("OnCatalogWrite", e => {
+  events.on("OnCatalogWrite", (e: any) => {
     let d = e.catalogDictionaryContext;
     if (outline !== null) {
       d.writeKey("Outlines")
