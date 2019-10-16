@@ -2,8 +2,8 @@ import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
 import { ProposalTemplate, DataType } from "./ProposalModel";
+import { createToC } from "./pdfTableofContents/index";
 const jsonwebtoken = require("jsonwebtoken");
-const createTOC = require("@ocelot-consulting/hummus-toc");
 const PDFDocument = require("pdfkit");
 const router = express.Router();
 const fs = require("fs");
@@ -19,9 +19,10 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
     const decoded = jsonwebtoken.verify(req.cookies.token, process.env.secret);
     const proposalId = req.params.proposal_id;
-    let user = null;
     const notAnswered = "This question is not mandatory and was not answered.";
+
     // Authenticate user and fecth user, co-proposer and proposal with questionary
+    let user = null;
     user = await baseContext.queries.user.getAgent(decoded.user.id);
 
     if (user == null) {
@@ -62,8 +63,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     const doc = new PDFDocument({ bufferPages: true });
 
     let toc: any = [];
-    let pageNumber = 1;
-    toc.push({ title: "First Page", page: 1, children: [] });
+    let pageNumber = 0;
     doc.on("pageAdded", () => {
       pageNumber++;
     });
@@ -100,7 +100,6 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     doc.image("./images/ESS.png", 15, 15, { width: 100 });
 
     writeHeading(`Proposal: ${proposal.title}`);
-    doc.outline.addItem(`Proposal: ${proposal.title}`);
     doc.moveDown();
 
     writeBold("Brief summary:");
@@ -141,7 +140,6 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
         return res.status(500).send();
       }
       writeBold(topic.topic_title);
-      doc.outline.addItem(topic.topic_title);
       toc.push({ title: topic.topic_title, page: pageNumber, children: [] });
       doc.moveDown();
       activeFields.forEach(field => {
@@ -181,37 +179,62 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     pageNumber++;
     // Stitch togethere PDF proposal with attachments
     writeStream.on("finish", async function() {
-      await Promise.all(attachmentIds.map(getAttachments))
-        .then((res: any) => console.log(res))
-        .catch(error => res.status(500).send());
-
+      const attachmentsMetadata = await Promise.all(
+        attachmentIds.map(getAttachments)
+      ).catch(() => {
+        res.status(500).send();
+        return [];
+      });
       var pdfWriter = hummus.createWriter(
         `downloads/proposalWithAttachments-${proposalId}.pdf`
       );
       pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
+      let attachmentToC = {
+        title: "Attachment",
+        page: pageNumber,
+        children: <any>[]
+      };
 
-      attachmentIds.forEach(async (attachmentId, i) => {
-        pdfWriter.appendPDFPagesFromPDF(`downloads/${attachmentId}`);
-        var pdfReader = hummus.createReader(`downloads/${attachmentId}`);
-        toc.push({ title: `${attachmentId}`, page: pageNumber, children: [] });
+      attachmentsMetadata.forEach(async attachmentMeta => {
+        pdfWriter.appendPDFPagesFromPDF(
+          `downloads/${attachmentMeta[0].fileId}`
+        );
+        var pdfReader = hummus.createReader(
+          `downloads/${attachmentMeta[0].fileId}`
+        );
+        attachmentToC.children.push({
+          title: `${attachmentMeta[0].originalFileName}`,
+          page: pageNumber,
+          children: []
+        });
         pageNumber = pageNumber + pdfReader.getPagesCount();
 
-        fs.unlink(`downloads/${attachmentId}`, () => {});
+        fs.unlink(`downloads/${attachmentMeta[0].fileId}`, () => {});
       });
+
+      if (attachmentsMetadata[0]) {
+        toc.push(attachmentToC);
+      }
       fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {});
       pdfWriter.end();
 
-      res.download(
+      createToC(
         `downloads/proposalWithAttachments-${proposalId}.pdf`,
+        `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
+        toc
+      );
+
+      fs.unlink(
+        `downloads/proposalWithAttachments-${proposalId}.pdf`,
+        () => {}
+      ); // delete file once done
+
+      res.download(
+        `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
         `${proposal.title}.pdf`,
         () => {
-          createTOC(
-            `downloads/proposalWithAttachments-${proposalId}.pdf`,
-            `downloads/test.pdf`,
-            toc
-          );
           fs.unlink(
-            `downloads/proposalWithAttachments-${proposalId}.pdf`,
+            `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
             () => {}
           ); // delete file once done
         }
