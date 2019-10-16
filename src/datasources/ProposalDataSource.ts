@@ -67,4 +67,5 @@ export interface ProposalDataSource {
   ): Promise<ProposalTemplateField | null>;
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
   deleteTopic(id: number): Promise<Boolean | null>;
+  updateTopicOrder(topicOrder: number[]): Promise<Boolean | null>;
 }

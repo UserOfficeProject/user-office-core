@@ -47,8 +47,10 @@ export default class ProposalMutations {
       return rejection("NOT_AUTHORIZED");
     }
     return (
-      (await this.dataSource.updateTopic(id, { title, isEnabled })) ||
-      rejection("INTERNAL_SERVER_ERROR")
+      (await this.dataSource.updateTopic(id, {
+        title,
+        isEnabled
+      })) || rejection("INTERNAL_SERVER_ERROR")
     );
   }
 
@@ -329,12 +331,28 @@ export default class ProposalMutations {
     );
   }
 
+  async updateTopicOrder(
+    agent: User | null,
+    topicOrder: number[]
+  ): Promise<Boolean | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("NOT_AUTHORIZED");
+    }
+    return (
+      (await this.dataSource.updateTopicOrder(topicOrder)) ||
+      rejection("INTERNAL_SERVER_ERROR")
+    );
+  }
+
   private createBlankConfig(dataType: DataType): FieldConfig {
     switch (dataType) {
       case DataType.FILE_UPLOAD:
         return { file_type: [] };
       case DataType.EMBELLISHMENT:
-        return { plain: "New embellishment", html: "<p>New embellishment</p>" };
+        return {
+          plain: "New embellishment",
+          html: "<p>New embellishment</p>"
+        };
       case DataType.SELECTION_FROM_OPTIONS:
         return { options: [] };
       default:
