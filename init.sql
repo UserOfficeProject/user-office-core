@@ -374,10 +374,10 @@ VALUES (
 INSERT INTO role_user (role_id, user_id) VALUES (3, 3);
 
 
-INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('General information',true,1);
-INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Crystallization',true,2);
-INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Biological deuteration',true,3);
-INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Chemical deuteration',true,4);
+INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('General information',true,0);
+INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Crystallization',true,1);
+INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Biological deuteration',true,2);
+INSERT INTO proposal_topics(topic_title, is_enabled, sort_order) VALUES ('Chemical deuteration',true,3);
 
 INSERT INTO proposal_question_datatypes VALUES ('TEXT_INPUT');
 INSERT INTO proposal_question_datatypes VALUES ('SELECTION_FROM_OPTIONS');
