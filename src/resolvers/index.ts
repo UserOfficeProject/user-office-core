@@ -76,6 +76,10 @@ interface DeleteTopicArgs {
   id: number;
 }
 
+interface UpdateTopicOrderArgs {
+  topicOrder: number[];
+}
+
 interface DeleteProposalTemplateFieldArgs {
   id: string;
 }
@@ -324,6 +328,11 @@ export default {
   deleteTopic(args: DeleteTopicArgs, context: ResolverContext) {
     return createResponseWrapper<void>("result")(
       context.mutations.proposal.deleteTopic(context.user, args.id)
+    );
+  },
+  updateTopicOrder(args: UpdateTopicOrderArgs, context: ResolverContext) {
+    return createResponseWrapper<Boolean>("result")(
+      context.mutations.proposal.updateTopicOrder(context.user, args.topicOrder)
     );
   },
 

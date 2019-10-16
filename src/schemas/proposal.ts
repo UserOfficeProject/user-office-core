@@ -19,6 +19,7 @@ export const typeDefs = `
         createTemplateField(topicId:Int!, dataType:String!): ProposalTemplateFieldMutationResult
         deleteTemplateField(id:String!): ProposalTemplateMutationResult
         deleteTopic(id:Int!): VoidMutationResult
+        updateTopicOrder(topicOrder:[Int]!): VoidMutationResult
     }
 
 
