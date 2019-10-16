@@ -139,7 +139,6 @@ export default function QuestionaryEditor() {
               <Checkbox
                 checked={isTopicReorderMode}
                 onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
-                value="checkedB"
                 color="primary"
               />
             }

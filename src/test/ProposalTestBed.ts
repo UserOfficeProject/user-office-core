@@ -1,4 +1,4 @@
-import { ProposalTemplate } from "../model/ProposalModel";
+import { ProposalTemplate, DataType, FieldDependency, Topic, FieldConfig, ProposalTemplateField } from "../model/ProposalModel";
 
 export const createTemplate = () => {
   return new ProposalTemplate({
@@ -98,3 +98,49 @@ export const createFieldlessTemplate = () => {
     ]
   });
 };
+
+export const createDummyTemplate = () => {
+  const hasLinksToField = createDummyField({
+    proposal_question_id: "hasLinksToField",
+    data_type: DataType.SELECTION_FROM_OPTIONS
+  });
+  const linksToField = createDummyField({
+    proposal_question_id: "linksToField",
+    data_type: DataType.TEXT_INPUT,
+    dependencies: [
+      new FieldDependency(
+        "linksToField",
+        "hasLinksToField",
+        "{ 'ifValue': 'yes' }"
+      )
+    ]
+  });
+
+  return new ProposalTemplate([
+    new Topic(1, "General information", true, 1, [
+      hasLinksToField,
+      linksToField
+    ])
+  ]);
+};
+
+
+const createDummyField = (values: {
+  data_type?: DataType;
+  proposal_question_id?: string;
+  sort_order?: number;
+  topic_id?: number;
+  question?: string;
+  config?: FieldConfig;
+  dependencies?: FieldDependency[];
+}): ProposalTemplateField => {
+  return new ProposalTemplateField({
+    proposal_question_id: values.proposal_question_id || "random_field_name_" + Math.random(),
+    values.data_type || DataType.TEXT_INPUT,
+    values.sort_order || Math.round(Math.random() * 100),
+    values.question || "Some random question",
+    values.topic_id || Math.round(Math.random() * 10),
+    (values.config && JSON.stringify(values.config)) || "{}",
+    values.dependencies || []}
+  );
+}
