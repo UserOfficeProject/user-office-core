@@ -11,8 +11,7 @@ import {
 } from "../../models/Proposal";
 import { Review } from "../../models/Review";
 
-var dummyTemplate: ProposalTemplate;
-beforeEach(() => {
+const createDummyTemplate = () => {
   const hasLinksToField = createDummyField({
     proposal_question_id: "hasLinksToField",
     data_type: DataType.SELECTION_FROM_OPTIONS
@@ -29,13 +28,13 @@ beforeEach(() => {
     ]
   });
 
-  dummyTemplate = new ProposalTemplate([
+  return new ProposalTemplate([
     new Topic(1, "General information", true, 1, [
       hasLinksToField,
       linksToField
     ])
   ]);
-});
+};
 
 export const dummyProposal = new Proposal(
   1,
@@ -148,7 +147,7 @@ export class proposalDataSource implements ProposalDataSource {
   }
 
   async createTopic(sortOrder: number): Promise<ProposalTemplate> {
-    var newTemplate = await this.getProposalTemplate();
+    var newTemplate = createDummyTemplate();
     newTemplate.topics.splice(
       sortOrder,
       0,
@@ -185,7 +184,7 @@ export class proposalDataSource implements ProposalDataSource {
   }
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    return dummyTemplate;
+    return createDummyTemplate();
   }
 
   async submitReview(
