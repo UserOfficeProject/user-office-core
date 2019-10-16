@@ -1,5 +1,4 @@
 node_modules
-src/**/*.js
 index.js
 build
 coverage

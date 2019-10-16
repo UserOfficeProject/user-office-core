@@ -9,6 +9,8 @@ RUN npm install --only=production
 
 COPY . .
 
+RUN mkdir downloads
+
 RUN npm run tsc
 
 EXPOSE 4000

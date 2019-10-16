@@ -2,8 +2,8 @@ import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
 import { ProposalTemplate, DataType } from "./ProposalModel";
+import { createToC } from "./pdfTableofContents/index";
 const jsonwebtoken = require("jsonwebtoken");
-
 const PDFDocument = require("pdfkit");
 const router = express.Router();
 const fs = require("fs");
@@ -19,9 +19,10 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
     const decoded = jsonwebtoken.verify(req.cookies.token, process.env.secret);
     const proposalId = req.params.proposal_id;
-    let user = null;
+    const notAnswered = "This question is not mandatory and was not answered.";
 
     // Authenticate user and fecth user, co-proposer and proposal with questionary
+    let user = null;
     user = await baseContext.queries.user.getAgent(decoded.user.id);
 
     if (user == null) {
@@ -59,26 +60,46 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     }
 
     // Create a PDF document
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ bufferPages: true });
 
+    let toc: any = [];
+    let pageNumber = 0;
+    doc.on("pageAdded", () => {
+      pageNumber++;
+    });
+
+    const writeStream = fs.createWriteStream(
+      `downloads/proposal-${proposalId}.pdf`
+    );
+
+    doc.pipe(writeStream);
     //Helper functions
+
     const write = (text: string) => {
       return doc
-        .font("Times-Roman")
-        .fontSize(12)
+        .font("fonts/Calibri_Regular.ttf")
+        .fontSize(11)
         .text(text);
     };
 
     const writeBold = (text: string) => {
       return doc
-        .font("Times-Bold")
-        .fontSize(12)
+        .font("fonts/Calibri_Bold.ttf")
+        .fontSize(11)
+        .text(text);
+    };
+
+    const writeHeading = (text: string) => {
+      return doc
+        .font("fonts/Calibri_Bold.ttf")
+        .fontSize(14)
         .text(text);
     };
 
     let attachmentIds: string[] = []; // Save attachments for appendix
     doc.image("./images/ESS.png", 15, 15, { width: 100 });
-    doc.fontSize(30).text(`Proposal: ${proposal.title}`);
+
+    writeHeading(`Proposal: ${proposal.title}`);
     doc.moveDown();
 
     writeBold("Brief summary:");
@@ -86,12 +107,12 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
     doc.moveDown();
 
-    writeBold("Main proposer:");
+    writeBold("Proposal Team");
+    doc.moveDown();
+    writeBold("Principal Investigator:");
     write(
       `${principalInvestigator.firstname} ${principalInvestigator.lastname}`
     );
-    write(principalInvestigator.email);
-    write(principalInvestigator.telephone);
     write(principalInvestigator.organisation);
     write(principalInvestigator.position);
 
@@ -99,8 +120,9 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
     writeBold("Co-proposer:");
     coProposers.forEach(coProposer => {
-      write(`${coProposer.firstname} ${coProposer.lastname}`);
-      write(coProposer.email);
+      write(
+        `${coProposer.firstname} ${coProposer.lastname}, ${coProposer.organisation}`
+      );
     });
 
     questionary.topics.forEach((x: any) => {
@@ -117,77 +139,102 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       if (!topic) {
         return res.status(500).send();
       }
-      doc.fontSize(25).text(topic.topic_title);
+      writeBold(topic.topic_title);
+      toc.push({ title: topic.topic_title, page: pageNumber, children: [] });
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          doc
-            .fontSize(17)
-            .font("Times-Bold")
-            .text(field.config.plain);
+          writeBold(field.config.plain!);
         } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
           if (field.value != "") {
             const fieldAttachmentArray: string[] = field.value.split(",");
-            write(
-              `See Appendix ${fieldAttachmentArray.map(
-                (id, i) => `A${i + attachmentIds.length}`
-              )}`
-            );
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
+            write("This document has been appended to the proposal");
           } else {
-            write("NA");
+            write(notAnswered);
           }
           // Default case, a ordinary question type
+        } else if (field.data_type === DataType.DATE) {
+          write(
+            field.value != ""
+              ? new Date(field.value).toISOString().split("T")[0]
+              : notAnswered
+          );
+        } else if (field.data_type === DataType.BOOLEAN) {
+          writeBold(field.question);
+          if (field.value) {
+            write("Yes");
+          } else {
+            write("No");
+          }
         } else {
           writeBold(field.question);
-          write(field.value != "" ? field.value : "NA");
+          write(field.value != "" ? field.value : notAnswered);
         }
         doc.moveDown(0.5);
       });
     });
-    const writeStream = fs.createWriteStream(
-      `downloads/proposal-${proposalId}.pdf`
-    );
-
-    doc.pipe(writeStream);
     doc.end();
-
+    pageNumber++;
     // Stitch togethere PDF proposal with attachments
     writeStream.on("finish", async function() {
-      await Promise.all(attachmentIds.map(getAttachments)).catch(error =>
-        res.status(500).send()
-      );
-
+      const attachmentsMetadata = await Promise.all(
+        attachmentIds.map(getAttachments)
+      ).catch(() => {
+        res.status(500).send();
+        return [];
+      });
       var pdfWriter = hummus.createWriter(
         `downloads/proposalWithAttachments-${proposalId}.pdf`
       );
       pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
+      let attachmentToC = {
+        title: "Attachment",
+        page: pageNumber,
+        children: <any>[]
+      };
 
-      attachmentIds.forEach(async (attachmentId, i) => {
-        var page = pdfWriter.createPage(0, 0, 595, 842);
-        var cxt = pdfWriter.startPageContentContext(page);
-        var arialFont = pdfWriter.getFontForFile("./fonts/arial.ttf");
-        var textOptions = {
-          font: arialFont,
-          size: 25,
-          colorspace: "gray",
-          color: 0x00
-        };
-        cxt.writeText(`Appendix A${i}`, 75, 805, textOptions);
-        pdfWriter.writePage(page);
-        pdfWriter.appendPDFPagesFromPDF(`downloads/${attachmentId}`);
-        fs.unlink(`downloads/${attachmentId}`, () => {});
+      attachmentsMetadata.forEach(async attachmentMeta => {
+        pdfWriter.appendPDFPagesFromPDF(
+          `downloads/${attachmentMeta[0].fileId}`
+        );
+        var pdfReader = hummus.createReader(
+          `downloads/${attachmentMeta[0].fileId}`
+        );
+        attachmentToC.children.push({
+          title: `${attachmentMeta[0].originalFileName}`,
+          page: pageNumber,
+          children: []
+        });
+        pageNumber = pageNumber + pdfReader.getPagesCount();
+
+        fs.unlink(`downloads/${attachmentMeta[0].fileId}`, () => {});
       });
+
+      if (attachmentsMetadata[0]) {
+        toc.push(attachmentToC);
+      }
       fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {});
       pdfWriter.end();
 
-      res.download(
+      createToC(
         `downloads/proposalWithAttachments-${proposalId}.pdf`,
+        `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
+        toc
+      );
+
+      fs.unlink(
+        `downloads/proposalWithAttachments-${proposalId}.pdf`,
+        () => {}
+      ); // delete file once done
+
+      res.download(
+        `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
         `${proposal.title}.pdf`,
         () => {
           fs.unlink(
-            `downloads/proposalWithAttachments-${proposalId}.pdf`,
+            `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
             () => {}
           ); // delete file once done
         }
