@@ -520,4 +520,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return false;
       });
   }
+
+  async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
+    topicOrder.forEach(async (topicId, index) => {
+      database("proposal_topics")
+        .update({ sort_order: index })
+        .where({ topic_id: topicId })
+        .catch((e: any) => {
+          this.logger.logError("Could not updateTopicOrder", topicOrder);
+        });
+    });
+    return true;
+  }
 }
