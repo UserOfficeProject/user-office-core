@@ -37,7 +37,7 @@ export const FormikUICustomTable = ({
     name: string;
     onBlur: Function;
     onChange: Function;
-    value: string;
+    value: string | undefined;
   };
   form: FormikActions<any>;
 }) => {

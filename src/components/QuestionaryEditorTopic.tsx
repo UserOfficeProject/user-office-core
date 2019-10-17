@@ -75,10 +75,9 @@ export default function QuestionaryEditorTopic(props: {
   const open = Boolean(anchorEl);
 
   const onCreateNewFieldClicked = (dataType: DataType) => {
-    let newField = new ProposalTemplateField({ data_type: dataType });
     dispatch({
       type: EventType.CREATE_NEW_FIELD_REQUESTED,
-      payload: { newField, topicId: props.data.topic_id }
+      payload: { topicId: props.data.topic_id, dataType: dataType }
     });
     setAnchorEl(null);
   };

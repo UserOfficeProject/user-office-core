@@ -1,20 +1,28 @@
 import JSDict from "../utils/Dictionary";
 import { ProposalTemplateField } from "./ProposalModel";
 
+export enum EvaluatorOperator {
+  EQ = "eq",
+  NEQ = "neq"
+}
+
 export class ConditionEvaluator {
-  private validatorMap!: JSDict<string, IFieldConditionEvaluator>;
+  private validatorMap!: JSDict<EvaluatorOperator, IFieldConditionEvaluator>;
 
   private getMappings() {
     if (!this.validatorMap) {
       // lazy initialization
-      this.validatorMap = JSDict.Create<string, IFieldConditionEvaluator>();
-      this.validatorMap.put("eq", new EqualityValidator());
-      this.validatorMap.put("neq", new InequalityValidator());
+      this.validatorMap = JSDict.Create<
+        EvaluatorOperator,
+        IFieldConditionEvaluator
+      >();
+      this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
+      this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
     }
     return this.validatorMap;
   }
 
-  getConfitionEvaluator(id: string): IFieldConditionEvaluator {
+  getConfitionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
     return this.getMappings().get(id)!;
   }
 }

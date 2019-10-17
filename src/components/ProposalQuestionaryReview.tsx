@@ -1,7 +1,8 @@
 import React, { Fragment } from "react";
 import {
   ProposalData,
-  ProposalTemplateField
+  ProposalTemplateField,
+  ProposalTemplate
 } from "../model/ProposalModel";
 import {
   Paper,
@@ -30,7 +31,7 @@ export default function ProposaQuestionaryReview(props: {
     }
   }))();
 
-  const allFields = template.getAllFields();
+  const allFields = ProposalTemplate.getAllFields(template);
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });

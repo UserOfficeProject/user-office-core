@@ -30,7 +30,7 @@ export function useProposalQuestionTemplate() {
     return new Promise<ProposalTemplate>((resolve, reject) => {
       sendRequest(query)
         .then(data => {
-          resolve(new ProposalTemplate(data.proposalTemplate));
+          resolve(ProposalTemplate.fromObject(data.proposalTemplate));
         })
         .catch((e: any) => reject(e));
     });

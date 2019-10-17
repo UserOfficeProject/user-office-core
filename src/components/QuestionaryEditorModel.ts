@@ -91,12 +91,17 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          draft.getTopicById(action.payload.topicId)!.topic_title =
-            action.payload.title;
+          ProposalTemplate.getTopicById(
+            draft,
+            action.payload.topicId
+          )!.topic_title = action.payload.title;
           return draft;
         case EventType.UPDATE_FIELD_REQUESTED:
           const field: ProposalTemplateField = action.payload.field;
-          const fieldToUpdate = draft.getFieldById(field.proposal_question_id);
+          const fieldToUpdate = ProposalTemplate.getFieldById(
+            draft,
+            field.proposal_question_id
+          );
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
           } else {
@@ -105,9 +110,8 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           return draft;
         case EventType.FIELD_CREATED:
           const newField: ProposalTemplateField = action.payload;
-          draft.addField(newField);
-          return new ProposalTemplate(draft);
-
+          ProposalTemplate.addField(draft, newField);
+          return draft;
         case EventType.DELETE_TOPIC_REQUESTED:
           const topic = draft.topics.find(
             topic => topic.topic_id === action.payload
@@ -117,11 +121,11 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           }
           const topicIdx = draft.topics.indexOf(topic);
           draft.topics.splice(topicIdx, 1);
-          return new ProposalTemplate(draft);
+          return draft;
         case EventType.TOPIC_CREATED:
         case EventType.FIELD_UPDATED:
         case EventType.FIELD_DELETED:
-          return new ProposalTemplate(action.payload);
+          return { ...action.payload };
       }
     });
   }

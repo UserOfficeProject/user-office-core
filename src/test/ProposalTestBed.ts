@@ -1,7 +1,16 @@
-import { ProposalTemplate } from "../model/ProposalModel";
+import {
+  ProposalTemplate,
+  DataType,
+  FieldDependency,
+  Topic,
+  FieldConfig,
+  ProposalTemplateField,
+  FieldCondition
+} from "../model/ProposalModel";
+import { EvaluatorOperator } from "../model/ConditionEvaluator";
 
 export const createTemplate = () => {
-  return new ProposalTemplate({
+  return ProposalTemplate.fromObject({
     topics: [
       {
         topic_title: "General information",
@@ -88,7 +97,7 @@ export const createTemplate = () => {
 };
 
 export const createFieldlessTemplate = () => {
-  return new ProposalTemplate({
+  return ProposalTemplate.fromObject({
     topics: [
       {
         topic_title: "General information",
@@ -97,4 +106,50 @@ export const createFieldlessTemplate = () => {
       }
     ]
   });
+};
+
+export const createDummyTemplate = () => {
+  const hasLinksToField = createDummyField({
+    proposal_question_id: "hasLinksToField",
+    data_type: DataType.SELECTION_FROM_OPTIONS
+  });
+  const linksToField = createDummyField({
+    proposal_question_id: "linksToField",
+    data_type: DataType.TEXT_INPUT,
+    dependencies: [
+      new FieldDependency(
+        "linksToField",
+        "hasLinksToField",
+        new FieldCondition(EvaluatorOperator.EQ, "yes")
+      )
+    ]
+  });
+
+  return new ProposalTemplate([
+    new Topic(1, "General information", 0, true, [
+      hasLinksToField,
+      linksToField
+    ])
+  ]);
+};
+
+export const createDummyField = (values: {
+  data_type?: DataType;
+  proposal_question_id?: string;
+  sort_order?: number;
+  topic_id?: number;
+  question?: string;
+  config?: FieldConfig;
+  dependencies?: FieldDependency[];
+}): ProposalTemplateField => {
+  return new ProposalTemplateField(
+    values.proposal_question_id || "random_field_name_" + Math.random(),
+    values.data_type || DataType.TEXT_INPUT,
+    values.sort_order || Math.round(Math.random() * 100),
+    values.question || "Some random question",
+    values.config || {},
+    values.topic_id || Math.round(Math.random() * 10),
+    "",
+    values.dependencies || []
+  );
 };
