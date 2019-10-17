@@ -79,8 +79,11 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"query\": \"\\n      mutation{\\n        createProposal{\\n         proposal{\\n          id\\n          status\\n          questionary {\\n            topics {\\n              topic_title\\n              topic_id,\\n              fields {\\n                proposal_question_id\\n                data_type\\n                question\\n                config\\n                value\\n                dependencies {\\n                  proposal_question_dependency\\n                  condition\\n                  proposal_question_id\\n                }\\n              }\\n            }\\n          }\\n        }\\n          error\\n        }\\n      }\\n      \"\n}",
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        topics {\n          topic_title\n          topic_id\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            value\n            dependencies {\n              proposal_question_dependency\n              condition\n              proposal_question_id\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"variables": ""
+					},
 					"options": {
 						"raw": {
 							"language": "json"
@@ -170,7 +173,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "          query($id: ID!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                username\n                id\n              }\n              questionary {\n                topics {\n                  topic_title\n                  topic_id,\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                grade\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  username\n                  id\n                }\n              }\n            }\n          }\n          ",
+						"query": "query ($id: ID!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    users {\n      firstname\n      lastname\n      username\n      id\n    }\n    questionary {\n      topics {\n        topic_title\n        topic_id\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          value\n          dependencies {\n            proposal_question_dependency\n            condition\n            proposal_question_id\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      grade\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        username\n        id\n      }\n    }\n  }\n}\n",
 						"variables": "{\n\t\"id\":\"1\"\n}"
 					}
 				},
@@ -263,7 +266,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:3000/graphql"
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -341,10 +344,13 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"query\": \"\\n      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $users:[Int]) {\\n        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, users:$users){\\n         proposal{\\n          id\\n  title \\n abstract      }\\n          error\\n        }\\n      }\\n      \",\n    \"variables\": {\n        \"id\": 1,\n        \"title\": \"Postman Title\",\n        \"abstract\": \"Postman Proposal Abstract Text\",\n        \"answers\": []\n    }\n}"
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($id: ID!, $title: String, $abstract: String, $answers: [ProposalAnswerInput], $users: [Int]) {\n  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
+						"variables": "{\n        \"id\": 1,\n        \"title\": \"Postman Title\",\n        \"abstract\": \"Postman Proposal Abstract Text\",\n        \"answers\": []\n    }"
+					}
 				},
-				"url": "http://localhost:3000/graphql"
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -402,15 +408,18 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"query\": \"\\n    mutation($topicId:Int!, $title:String, $isEnabled:Boolean) {\\n      updateTopic(id:$topicId, title:$title, isEnabled:$isEnabled) {\\n  topic { topic_title }\\n      error\\n      }\\n    }\\n    \",\n    \"variables\": {\n        \"title\": \"Postman New Information\",\n        \"topicId\": 1\n    }\n}",
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {\n    topic {\n      topic_title\n    }\n    error\n  }\n}\n",
+						"variables": "{\n        \"title\": \"Postman New Information\",\n        \"topicId\": 1\n    }"
+					},
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:3000/graphql"
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		},
@@ -473,15 +482,18 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"query\": \"\\n    mutation($topicId:Int!, $fieldIds:[String]) {\\n      updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {\\n        result\\n        error\\n      }\\n    }\\n    \",\n    \"variables\": {\n        \"topicId\": 1,\n        \"fieldIds\": [\n            \"ttl_delivery_date\",\n            \"is_towards_degree\",\n            \"has_links_with_industry\",\n            \"final_delivery_date\",\n            \"ttl_general\",\n            \"final_delivery_date_motivation\",\n            \"pdb_id\"\n        ]\n    }\n}",
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($topicId: Int!, $fieldIds: [String]) {\n  updateFieldTopicRel(topic_id: $topicId, field_ids: $fieldIds) {\n    error\n  }\n}",
+						"variables": "{\n        \"topicId\": 1,\n        \"fieldIds\": [\n            \"ttl_delivery_date\",\n            \"is_towards_degree\",\n            \"has_links_with_industry\",\n            \"final_delivery_date\",\n            \"ttl_general\",\n            \"final_delivery_date_motivation\",\n            \"pdb_id\"\n        ]\n    }"
+					},
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:3000/graphql"
+				"url": "http://localhost:4000/graphql"
 			},
 			"response": []
 		}
