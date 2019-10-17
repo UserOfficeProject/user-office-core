@@ -12,7 +12,8 @@ import {
   Button,
   FormGroup,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  LinearProgress
 } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../model/ProposalModel";
@@ -36,7 +37,7 @@ export default function QuestionaryEditor() {
     };
   };
 
-  var { persistModel } = usePersistModel();
+  var { persistModel, isLoading } = usePersistModel();
   var { state, dispatch } = QuestionaryEditorModel([
     persistModel,
     reducerMiddleware
@@ -105,6 +106,18 @@ export default function QuestionaryEditor() {
     setSelectedField(null);
   };
 
+  const getContainerStyle = (isBusy: boolean): any => {
+    return isLoading
+      ? {
+          pointerEvents: "none",
+          userSelect: "none",
+          opacity: 0.5
+        }
+      : {};
+  };
+
+  const progressJsx = isLoading ? <LinearProgress /> : null;
+
   const addNewTopicFallbackButton =
     state.topics.length === 0 ? (
       <Button
@@ -132,7 +145,8 @@ export default function QuestionaryEditor() {
         variant={errorState.variant}
         message={errorState.message}
       />
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} style={getContainerStyle(isLoading)}>
+        {progressJsx}
         <FormGroup row style={{ justifyContent: "flex-end" }}>
           <FormControlLabel
             control={

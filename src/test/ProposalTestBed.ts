@@ -133,7 +133,7 @@ export const createDummyTemplate = () => {
   ]);
 };
 
-const createDummyField = (values: {
+export const createDummyField = (values: {
   data_type?: DataType;
   proposal_question_id?: string;
   sort_order?: number;
