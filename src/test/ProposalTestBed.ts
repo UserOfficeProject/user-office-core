@@ -1,7 +1,16 @@
-import { ProposalTemplate, DataType, FieldDependency, Topic, FieldConfig, ProposalTemplateField } from "../model/ProposalModel";
+import {
+  ProposalTemplate,
+  DataType,
+  FieldDependency,
+  Topic,
+  FieldConfig,
+  ProposalTemplateField,
+  FieldCondition
+} from "../model/ProposalModel";
+import { EvaluatorOperator } from "../model/ConditionEvaluator";
 
 export const createTemplate = () => {
-  return new ProposalTemplate({
+  return ProposalTemplate.fromObject({
     topics: [
       {
         topic_title: "General information",
@@ -88,7 +97,7 @@ export const createTemplate = () => {
 };
 
 export const createFieldlessTemplate = () => {
-  return new ProposalTemplate({
+  return ProposalTemplate.fromObject({
     topics: [
       {
         topic_title: "General information",
@@ -111,19 +120,18 @@ export const createDummyTemplate = () => {
       new FieldDependency(
         "linksToField",
         "hasLinksToField",
-        "{ 'ifValue': 'yes' }"
+        new FieldCondition(EvaluatorOperator.EQ, "yes")
       )
     ]
   });
 
   return new ProposalTemplate([
-    new Topic(1, "General information", true, 1, [
+    new Topic(1, "General information", 0, true, [
       hasLinksToField,
       linksToField
     ])
   ]);
 };
-
 
 const createDummyField = (values: {
   data_type?: DataType;
@@ -134,13 +142,14 @@ const createDummyField = (values: {
   config?: FieldConfig;
   dependencies?: FieldDependency[];
 }): ProposalTemplateField => {
-  return new ProposalTemplateField({
-    proposal_question_id: values.proposal_question_id || "random_field_name_" + Math.random(),
+  return new ProposalTemplateField(
+    values.proposal_question_id || "random_field_name_" + Math.random(),
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
+    values.config || {},
     values.topic_id || Math.round(Math.random() * 10),
-    (values.config && JSON.stringify(values.config)) || "{}",
-    values.dependencies || []}
+    "",
+    values.dependencies || []
   );
-}
+};

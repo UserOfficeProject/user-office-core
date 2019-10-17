@@ -15,6 +15,7 @@ import {
   FieldCondition,
   ProposalTemplateField
 } from "../model/ProposalModel";
+import { EvaluatorOperator } from "../model/ConditionEvaluator";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -28,7 +29,9 @@ const FormikUICustomDependencySelector = ({
   templateField: ProposalTemplateField;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>("");
-  const [operator, setOperator] = useState<string>("");
+  const [operator, setOperator] = useState<EvaluatorOperator>(
+    EvaluatorOperator.EQ
+  );
   const [dependencyValue, setDependencyValue] = useState<string>("");
 
   const [availableValues, setAvailableValues] = useState<IOption[]>([]);
@@ -56,19 +59,20 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = () => {
-    var dep = new FieldDependency(null);
-    dep.proposal_question_id = templateField.proposal_question_id; // currently only 1 supported
-    dep.proposal_question_dependency = dependencyId!;
-    var cond = new FieldCondition(null);
-    cond!.condition = operator!;
-    cond.params = dependencyValue;
-    dep.condition = cond;
+    var dep = new FieldDependency(
+      templateField.proposal_question_id,
+      dependencyId,
+      new FieldCondition(operator, dependencyValue)
+    );
     form.setFieldValue(field.name, [dep]);
   };
 
   useEffect(() => {
     if (dependencyId) {
-      const depField = template.getFieldById(dependencyId);
+      const depField = ProposalTemplate.getFieldById(template, dependencyId);
+      if (!depField) {
+        return;
+      }
       if (depField.data_type === DataType.BOOLEAN) {
         setAvailableValues([
           { label: "true", value: true },
@@ -91,7 +95,7 @@ const FormikUICustomDependencySelector = ({
   ]);
 
   useEffect(() => {
-    if (dependencyId !== "" && operator !== "" && dependencyValue !== "") {
+    if (dependencyId !== "" && dependencyValue !== "") {
       updateFormikMemoized();
     }
   }, [dependencyId, operator, dependencyValue, updateFormikMemoized]);
@@ -111,8 +115,7 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {template
-              .getAllFields()
+            {ProposalTemplate.getAllFields(template)
               .filter(option =>
                 [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
                   option.data_type
@@ -144,7 +147,7 @@ const FormikUICustomDependencySelector = ({
             id="operator"
             value={operator}
             onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-              setOperator(event.target.value as string);
+              setOperator(event.target.value as EvaluatorOperator);
             }}
           >
             <MenuItem value="eq">equals</MenuItem>

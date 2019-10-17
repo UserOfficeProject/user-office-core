@@ -1,5 +1,4 @@
-import { ConditionEvaluator } from "./ConditionEvaluator";
-import { object } from "prop-types";
+import { ConditionEvaluator, EvaluatorOperator } from "./ConditionEvaluator";
 
 export class ProposalData {
   constructor(
@@ -15,23 +14,34 @@ export class ProposalData {
 }
 
 export class ProposalTemplate {
-  private conditionEvalator = new ConditionEvaluator();
-
   constructor(public topics: Topic[] = []) {}
 
   static fromObject(obj: any) {
     return new ProposalTemplate(
       obj.topics
-        ? obj.topics.forEach((topicObj: any) => Topic.fromObject(topicObj))
+        ? obj.topics.map((topicObj: any) => Topic.fromObject(topicObj))
         : []
     );
   }
+
+  private static conditionEvalator = new ConditionEvaluator();
 
   public static getTopicById(
     template: ProposalTemplate,
     topicId: number
   ): Topic | undefined {
     return template.topics.find(topic => topic.topic_id === topicId);
+  }
+
+  public static addField(
+    template: ProposalTemplate,
+    field: ProposalTemplateField
+  ) {
+    const topic = ProposalTemplate.getTopicById(template, field.topic_id);
+    if (!topic) {
+      return;
+    }
+    Topic.addField(topic, field);
   }
 
   public static getFieldById = (
@@ -43,10 +53,21 @@ export class ProposalTemplate {
       needle = topic.fields.find(
         field => field.proposal_question_id === questionId
       );
-      return needle;
+      return needle !== undefined;
     });
     return needle;
   };
+
+  public static getAllFields(
+    template: ProposalTemplate
+  ): ProposalTemplateField[] {
+    let allFields = new Array<ProposalTemplateField>();
+    template.topics.forEach(topic => {
+      allFields = allFields.concat(topic.fields);
+    });
+    return allFields;
+  }
+
   public static areDependenciesSatisfied(
     template: ProposalTemplate,
     fieldId: string
@@ -55,21 +76,33 @@ export class ProposalTemplate {
     if (!field) {
       return true;
     }
-    const isAtLeastOneDissasisfied = field.dependencies!.some(dep =>
-      ProposalTemplate.isDependencySatisfied(dep)
-    );
+    const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
+      let result =
+        ProposalTemplate.isDependencySatisfied(template, dep) === false;
+      return result;
+    });
     return isAtLeastOneDissasisfied === false;
   }
 
-  public static isDependencySatisfied(dependency: FieldDependency): boolean {
+  public static isDependencySatisfied(
+    template: ProposalTemplate,
+    dependency: FieldDependency
+  ): boolean {
     const { condition, params } = dependency.condition;
-    const field = this.getFieldById(dependency.proposal_question_dependency);
-    const isParentSattisfied = this.areDependenciesSatisfied(
+    const field = ProposalTemplate.getFieldById(
+      template,
+      dependency.proposal_question_dependency
+    );
+    if (!field) {
+      return true;
+    }
+    const isParentSattisfied = ProposalTemplate.areDependenciesSatisfied(
+      template,
       dependency.proposal_question_dependency
     );
     return (
       isParentSattisfied &&
-      this.conditionEvalator
+      ProposalTemplate.conditionEvalator
         .getConfitionEvaluator(condition)
         .isSattisfied(field, params)
     );
@@ -80,6 +113,8 @@ export class Topic {
   constructor(
     public topic_id: number,
     public topic_title: string,
+    public sort_order: number,
+    public is_enabled: boolean,
     public fields: ProposalTemplateField[]
   ) {}
 
@@ -95,9 +130,11 @@ export class Topic {
     return new Topic(
       obj.topic_id,
       obj.topic_title,
+      obj.sort_order,
+      obj.is_enabled,
       obj.fields
         ? obj.fields.map((field: any) =>
-            ProposalTemplateField.formObject(field)
+            ProposalTemplateField.fromObject(field)
           )
         : []
     );
@@ -108,6 +145,7 @@ export class ProposalTemplateField {
   constructor(
     public proposal_question_id: string,
     public data_type: DataType,
+    public sort_order: number,
     public question: string,
     public config: FieldConfig,
     public topic_id: number,
@@ -115,14 +153,15 @@ export class ProposalTemplateField {
     public dependencies: FieldDependency[] | null
   ) {}
 
-  static formObject(obj: any) {
+  static fromObject(obj: any) {
     return new ProposalTemplateField(
       obj.proposal_question_id,
       obj.data_type,
+      obj.sort_order,
       obj.question,
       typeof obj.config == "string" ? JSON.parse(obj.config) : obj.config,
       obj.topic_id,
-      obj.value,
+      obj.value ? JSON.parse(obj.value).value : undefined,
       obj.dependencies
         ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
         : null
@@ -149,7 +188,7 @@ export class FieldDependency {
 }
 
 export class FieldCondition {
-  constructor(public condition: string, public params: any) {}
+  constructor(public condition: EvaluatorOperator, public params: any) {}
 
   static fromObject(obj: any) {
     return new FieldCondition(obj.condition, obj.params);

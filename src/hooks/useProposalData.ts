@@ -83,7 +83,7 @@ export function useProposalData(id: number) {
               status: review.status
             };
           }),
-          questionary: new ProposalTemplate(data.proposal.questionary)
+          questionary: ProposalTemplate.fromObject(data.proposal.questionary)
         });
         setLoading(false);
       });

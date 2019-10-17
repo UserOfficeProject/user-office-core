@@ -4,7 +4,8 @@ import { EventType, IEvent } from "../components/QuestionaryEditorModel";
 import {
   ProposalTemplateField,
   ProposalTemplate,
-  DataType
+  DataType,
+  Topic
 } from "../model/ProposalModel";
 
 export function usePersistModel() {
@@ -61,7 +62,8 @@ export function usePersistModel() {
           topic?: { topic_id: number };
         };
       }) => {
-        return result.updateTopic;
+        const { error, topic } = result.updateTopic;
+        return { error, topic: topicFromServerResponse(topic) };
       }
     );
   };
@@ -130,10 +132,11 @@ export function usePersistModel() {
       (result: {
         updateProposalTemplateField: {
           error?: string;
-          template?: ProposalTemplate;
+          template?: object;
         };
       }) => {
-        return result.updateProposalTemplateField;
+        const { error, template } = result.updateProposalTemplateField;
+        return { error, template: templateFromServerResponse(template) };
       }
     );
   };
@@ -173,7 +176,11 @@ export function usePersistModel() {
         };
       }) => {
         setIsLoading(false);
-        return result.createTemplateField;
+        const { error, field } = result.createTemplateField;
+        return {
+          error,
+          field: templateFieldFromServerResponse(field)
+        };
       }
     );
   };
@@ -209,11 +216,12 @@ export function usePersistModel() {
 
     setIsLoading(true);
     return sendRequest(mutation, variables).then(
-      (data: {
-        deleteTemplateField: { error?: string; template?: ProposalTemplate };
+      (result: {
+        deleteTemplateField: { error?: string; template?: object };
       }) => {
         setIsLoading(false);
-        return data.deleteTemplateField;
+        const { error, template } = result.deleteTemplateField;
+        return { error, template: templateFromServerResponse(template) };
       }
     );
   };
@@ -273,13 +281,35 @@ export function usePersistModel() {
     return sendRequest(mutation, variables).then(
       (result: {
         createTopic: {
-          template?: ProposalTemplate;
+          template?: object;
           error?: string;
         };
       }) => {
-        return result.createTopic;
+        const { error, template } = result.createTopic;
+        return { error, template: templateFromServerResponse(template) };
       }
     );
+  };
+
+  const templateFromServerResponse = (obj: any) => {
+    if (obj) {
+      return ProposalTemplate.fromObject(obj);
+    }
+    return obj;
+  };
+
+  const topicFromServerResponse = (obj: any) => {
+    if (obj) {
+      return Topic.fromObject(obj);
+    }
+    return obj;
+  };
+
+  const templateFieldFromServerResponse = (obj: any) => {
+    if (obj) {
+      return ProposalTemplateField.fromObject(obj);
+    }
+    return obj;
   };
 
   type MonitorableServiceCall = () => Promise<{ error?: string }>;
@@ -353,7 +383,7 @@ export function usePersistModel() {
             const result = await updateItem(field);
             dispatch({
               type: EventType.FIELD_UPDATED,
-              payload: new ProposalTemplateField(result.template)
+              payload: result.template
             });
             return result;
           });
@@ -362,12 +392,12 @@ export function usePersistModel() {
           executeAndMonitorCall(async () => {
             const result = await createTemplateField(
               action.payload.topicId,
-              (action.payload.newField as ProposalTemplateField).data_type
+              action.payload.dataType
             );
             if (result.field) {
               dispatch({
                 type: EventType.FIELD_CREATED,
-                payload: new ProposalTemplateField(result.field)
+                payload: { ...result.field }
               });
             }
             return result;

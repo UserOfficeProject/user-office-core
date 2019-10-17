@@ -5,7 +5,8 @@ import {
   DataType,
   ProposalTemplateField,
   ProposalAnswer,
-  ProposalData
+  ProposalData,
+  ProposalTemplate
 } from "../model/ProposalModel";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
@@ -43,10 +44,10 @@ export default function ProposalQuestionareStep(props: {
   }
 
   const template = data.questionary!;
-  const topic = template.getTopicById(topicId);
+  const topic = ProposalTemplate.getTopicById(template, topicId);
   const activeFields = topic
     ? topic.fields.filter((field: ProposalTemplateField) => {
-        return template.areDependenciesSatisfied(field.proposal_question_id);
+        return ProposalTemplate.areDependenciesSatisfied(template, field.proposal_question_id);
       })
     : [];
 
