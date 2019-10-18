@@ -15,7 +15,7 @@ import {
 } from "../model/ProposalModel";
 import ProposalInformation from "./ProposalInformation";
 import ErrorIcon from "@material-ui/icons/Error";
-import { Zoom } from "@material-ui/core";
+import { Zoom, StepButton } from "@material-ui/core";
 
 export default function ProposalContainer(props: { data: ProposalData }) {
   const [proposalData, setProposalData] = useState(props.data);
@@ -119,25 +119,31 @@ export default function ProposalContainer(props: { data: ProposalData }) {
           <Typography component="h1" variant="h4" align="center">
             {false ? "Update Proposal" : "New Proposal"}
           </Typography>
-          <Stepper activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map(proposalStep => (
+          <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
+            {proposalSteps.map((proposalStep, index) => (
               <Step key={proposalStep.title}>
-                <StepLabel>{proposalStep.title}</StepLabel>
+                <StepButton
+                  onClick={() => {
+                    setStepIndex(index);
+                  }}
+                >
+                  {proposalStep.title}
+                </StepButton>
               </Step>
             ))}
           </Stepper>
-            {proposalData.status === ProposalStatus.DRAFT ? (
-              <React.Fragment>
-                {getStepContent(stepIndex)}
-                <ErrorMessageBox message={errorMessage} />
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  {false ? "Update Proposal" : "Sent Proposal"}
-                </Typography>
-              </React.Fragment>
-            )}
+          {proposalData.status === ProposalStatus.DRAFT ? (
+            <React.Fragment>
+              {getStepContent(stepIndex)}
+              <ErrorMessageBox message={errorMessage} />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Typography variant="h5" gutterBottom>
+                {false ? "Update Proposal" : "Sent Proposal"}
+              </Typography>
+            </React.Fragment>
+          )}
         </Paper>
       </FormApi.Provider>
     </Container>
