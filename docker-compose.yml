@@ -36,7 +36,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db_patches/0000_init.sql:/docker-entrypoint-initdb.d/0000_init.sql
+      - ./db_patches/0001_CreateTopicReadinessState.sql:/docker-entrypoint-initdb.d/0001_CreateTopicReadinessState.sql
   rabbitmq:
     image: "rabbitmq:3-management"
     hostname: "rabbit"
