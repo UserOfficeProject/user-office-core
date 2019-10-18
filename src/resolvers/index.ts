@@ -48,6 +48,7 @@ interface UpdateProposalArgs {
   abstract: string;
   answers: ProposalAnswer[];
   status: number;
+  topicsCompleted: number[];
   users: number[];
 }
 
@@ -376,7 +377,15 @@ export default {
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
-    const { id, title, abstract, answers, status, users } = args;
+    const {
+      id,
+      title,
+      abstract,
+      answers,
+      topicsCompleted,
+      status,
+      users
+    } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
         context.user,
@@ -384,6 +393,7 @@ export default {
         title,
         abstract,
         answers,
+        topicsCompleted,
         status,
         users
       )

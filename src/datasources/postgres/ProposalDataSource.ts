@@ -532,4 +532,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
     return true;
   }
+
+  async updateTopicCompletenesses(
+    proposalId: number,
+    topicsCompleted: number[]
+  ): Promise<Boolean | null> {
+    return database
+      .transaction(async (tr: any) => {
+        for (const topic_id of topicsCompleted) {
+          await database
+            .raw(
+              `INSERT into proposal_topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true`,
+              [proposalId, topic_id, true]
+            )
+            .transacting(tr);
+        }
+      })
+      .then(() => {
+        return true;
+      })
+      .catch((error: any) => {
+        this.logger.logError("Could not update topic completeness", error);
+        return null;
+      });
+  }
 }

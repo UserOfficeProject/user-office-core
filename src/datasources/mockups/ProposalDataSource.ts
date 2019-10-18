@@ -90,6 +90,12 @@ function createDummyField(values: {
 }
 
 export class proposalDataSource implements ProposalDataSource {
+  updateTopicCompletenesses(
+    id: number,
+    topicsCompleted: number[]
+  ): Promise<Boolean | null> {
+    throw new Error("Method not implemented.");
+  }
   async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
     return true;
   }

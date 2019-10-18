@@ -7,7 +7,7 @@ export const typeDefs = `
 
     extend type Mutation {
         createProposal: ProposalMutationResult
-        updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], status: Int, users: [Int]): ProposalMutationResult
+        updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], topicsCompleted:[Int], status: Int, users: [Int]): ProposalMutationResult
         updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult

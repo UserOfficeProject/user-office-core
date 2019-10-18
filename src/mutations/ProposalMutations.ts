@@ -84,6 +84,7 @@ export default class ProposalMutations {
     title?: string,
     abstract?: string,
     answers?: ProposalAnswer[],
+    topicsCompleted?: number[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -165,6 +166,13 @@ export default class ProposalMutations {
               );
             }
           });
+        }
+
+        if (topicsCompleted !== undefined) {
+          await this.dataSource.updateTopicCompletenesses(
+            proposal.id,
+            topicsCompleted
+          );
         }
 
         const result = await this.dataSource.update(proposal);
