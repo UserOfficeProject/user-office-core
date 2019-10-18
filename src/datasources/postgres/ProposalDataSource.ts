@@ -54,10 +54,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   private createProposalTemplateFieldObject(question: ProposalQuestionRecord) {
-    /*-- An idea for improvement --
-    make ProposalRespondedQuestinon, 
-    because question does not have a value, but ProposalRespondedQuestinon does, 
-    ProposalRespondedQuestinon shoudl extend Question*/
     return new ProposalTemplateField(
       question.proposal_question_id,
       question.data_type as DataType,
@@ -65,8 +61,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       question.question,
       question.topic_id,
       question.config,
-      null,
-      undefined
+      null
     );
   }
 

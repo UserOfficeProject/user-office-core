@@ -24,51 +24,82 @@ export class ProposalInformation {
     public updated?: string,
     public users?: User[],
     public reviews?: Review[],
-    public questionary?: ProposalTemplate
+    public questionary?: Questionary
   ) {}
 }
 
 export class ProposalTemplate {
-  constructor(
-    public topics: Topic[]
-    ) {}
-  }
+  constructor(public topics: Topic[]) {}
+}
+
+export class Questionary {
+  constructor(public steps: QuestionaryStep[]) {}
+}
 
 export class Topic {
   constructor(
-    public topic_id:number,
+    public topic_id: number,
     public topic_title: string,
-    public isEnabled:boolean,
-    public sort_order:number,
-    public fields:ProposalTemplateField[] | null
-   ) {}
-}
-  
-export class ProposalTemplateField {
-  constructor(
-    public proposal_question_id:string,
-    public data_type:DataType,
-    public sort_order:number,
-    public question:string,
-    public topic_id: number | null,
-    public config: string | null,
-    public dependencies: FieldDependency[] | null,
-    public value?:string
+    public isEnabled: boolean,
+    public sort_order: number,
+    public fields: ProposalTemplateField[] | null
   ) {}
 }
-  
-export class FieldDependency {
-  
+
+export class QuestionaryStep {
   constructor(
-    public proposal_question_id:string,
-    public proposal_question_dependency:string,
-    public condition:string,
+    public topic: Topic,
+    public isCompleted: boolean,
+    public fields: QuestionaryField[]
+  ) {}
+}
+
+export class ProposalTemplateField {
+  constructor(
+    public proposal_question_id: string,
+    public data_type: DataType,
+    public sort_order: number,
+    public question: string,
+    public topic_id: number | null,
+    public config: string | null,
+    public dependencies: FieldDependency[] | null
+  ) {}
+}
+
+export class QuestionaryField extends ProposalTemplateField {
+  constructor(
+    proposal_question_id: string,
+    data_type: DataType,
+    sort_order: number,
+    question: string,
+    topic_id: number | null,
+    config: string | null,
+    dependencies: FieldDependency[] | null,
+    public value: string
+  ) {
+    super(
+      proposal_question_id,
+      data_type,
+      sort_order,
+      question,
+      topic_id,
+      config,
+      dependencies
+    );
+  }
+}
+
+export class FieldDependency {
+  constructor(
+    public proposal_question_id: string,
+    public proposal_question_dependency: string,
+    public condition: string
   ) {}
 }
 
 export interface ProposalAnswer {
   proposal_question_id: string;
-  data_type:DataType;
+  data_type: DataType;
   value: string;
 }
 
@@ -81,16 +112,16 @@ export enum DataType {
   EMBELLISHMENT = "EMBELLISHMENT"
 }
 export interface FieldConfig {
-  variant?: string, 
-  small_label?:string;
+  variant?: string;
+  small_label?: string;
   required?: boolean;
-  options?:string[];
-  file_type?:string[];
-  max_files?:number;
-  multiline?:boolean;
-  min?:number;
-  max?:number;
-  placeholder?:string;
-  html?:string;
-  plain?:string;
+  options?: string[];
+  file_type?: string[];
+  max_files?: number;
+  multiline?: boolean;
+  min?: number;
+  max?: number;
+  placeholder?: string;
+  html?: string;
+  plain?: string;
 }
