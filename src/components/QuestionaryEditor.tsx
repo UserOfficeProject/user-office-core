@@ -119,7 +119,7 @@ export default function QuestionaryEditor() {
   const progressJsx = isLoading ? <LinearProgress /> : null;
 
   const addNewTopicFallbackButton =
-    state.topics.length === 0 ? (
+    state.steps.length === 0 ? (
       <Button
         variant="outlined"
         color="primary"
@@ -167,12 +167,12 @@ export default function QuestionaryEditor() {
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
               >
-                {state.topics.map((topic, index) => (
+                {state.steps.map((step, index) => (
                   <QuestionaryEditorTopic
-                    data={topic}
+                    data={step}
                     dispatch={dispatch}
                     index={index}
-                    key={topic.topic_id}
+                    key={step.topic.topic_id}
                     onItemClick={onClick}
                     condenseMode={isTopicReorderMode}
                   />

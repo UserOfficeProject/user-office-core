@@ -1,142 +1,39 @@
-import { ConditionEvaluator, EvaluatorOperator } from "./ConditionEvaluator";
+import { EvaluatorOperator } from "./ConditionEvaluator";
 
-export class ProposalData {
+export class ProposalInformation {
   constructor(
     public id: number,
     public title?: string,
     public abstract?: string,
     public proposer?: number,
     public status?: ProposalStatus,
-    public questionary?: ProposalTemplate,
     public created?: string,
-    public updated?: string
+    public updated?: string,
+    public users?: any,
+    public reviews?: any,
+    public questionary?: Questionary
   ) {}
 }
 
 export class ProposalTemplate {
-  constructor(public topics: Topic[] = []) {}
+  constructor(public steps: TemplateStep[] = []) {}
 
   static fromObject(obj: any) {
     return new ProposalTemplate(
-      obj.topics
-        ? obj.topics.map((topicObj: any) => Topic.fromObject(topicObj))
+      obj.steps
+        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
         : []
-    );
-  }
-
-  private static conditionEvalator = new ConditionEvaluator();
-
-  public static getTopicById(
-    template: ProposalTemplate,
-    topicId: number
-  ): Topic | undefined {
-    return template.topics.find(topic => topic.topic_id === topicId);
-  }
-
-  public static addField(
-    template: ProposalTemplate,
-    field: ProposalTemplateField
-  ) {
-    const topic = ProposalTemplate.getTopicById(template, field.topic_id);
-    if (!topic) {
-      return;
-    }
-    Topic.addField(topic, field);
-  }
-
-  public static getFieldById = (
-    template: ProposalTemplate,
-    questionId: string
-  ) => {
-    let needle: ProposalTemplateField | undefined;
-    template.topics.some(topic => {
-      needle = topic.fields.find(
-        field => field.proposal_question_id === questionId
-      );
-      return needle !== undefined;
-    });
-    return needle;
-  };
-
-  public static getAllFields(
-    template: ProposalTemplate
-  ): ProposalTemplateField[] {
-    let allFields = new Array<ProposalTemplateField>();
-    template.topics.forEach(topic => {
-      allFields = allFields.concat(topic.fields);
-    });
-    return allFields;
-  }
-
-  public static areDependenciesSatisfied(
-    template: ProposalTemplate,
-    fieldId: string
-  ) {
-    const field = ProposalTemplate.getFieldById(template, fieldId);
-    if (!field) {
-      return true;
-    }
-    const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
-      let result =
-        ProposalTemplate.isDependencySatisfied(template, dep) === false;
-      return result;
-    });
-    return isAtLeastOneDissasisfied === false;
-  }
-
-  public static isDependencySatisfied(
-    template: ProposalTemplate,
-    dependency: FieldDependency
-  ): boolean {
-    const { condition, params } = dependency.condition;
-    const field = ProposalTemplate.getFieldById(
-      template,
-      dependency.proposal_question_dependency
-    );
-    if (!field) {
-      return true;
-    }
-    const isParentSattisfied = ProposalTemplate.areDependenciesSatisfied(
-      template,
-      dependency.proposal_question_dependency
-    );
-    return (
-      isParentSattisfied &&
-      ProposalTemplate.conditionEvalator
-        .getConfitionEvaluator(condition)
-        .isSattisfied(field, params)
     );
   }
 }
 
-export class Topic {
-  constructor(
-    public topic_id: number,
-    public topic_title: string,
-    public sort_order: number,
-    public is_enabled: boolean,
-    public fields: ProposalTemplateField[]
-  ) {}
-
-  public static getFieldById = (topic: Topic, questionId: string) =>
-    topic.fields &&
-    topic.fields.find(field => field.proposal_question_id === questionId)!;
-
-  public static addField(topic: Topic, tempfield: ProposalTemplateField): void {
-    topic.fields.unshift(tempfield);
-  }
+export class TemplateStep {
+  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
 
   public static fromObject(obj: any) {
-    return new Topic(
-      obj.topic_id,
-      obj.topic_title,
-      obj.sort_order,
-      obj.is_enabled,
-      obj.fields
-        ? obj.fields.map((field: any) =>
-            ProposalTemplateField.fromObject(field)
-          )
-        : []
+    return new TemplateStep(
+      Topic.fromObject(obj.topic),
+      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
     );
   }
 }
@@ -149,7 +46,6 @@ export class ProposalTemplateField {
     public question: string,
     public config: FieldConfig,
     public topic_id: number,
-    public value: any = "",
     public dependencies: FieldDependency[] | null
   ) {}
 
@@ -159,12 +55,81 @@ export class ProposalTemplateField {
       obj.data_type,
       obj.sort_order,
       obj.question,
-      typeof obj.config == "string" ? JSON.parse(obj.config) : obj.config,
+      typeof obj.config === "string" ? JSON.parse(obj.config) : obj.config,
       obj.topic_id,
-      obj.value ? JSON.parse(obj.value).value : undefined,
       obj.dependencies
         ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
         : null
+    );
+  }
+}
+
+export class Questionary {
+  constructor(public steps: QuestionaryStep[]) {}
+
+  static fromObject(obj: any): Questionary {
+    return new Questionary(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
+        : []
+    );
+  }
+}
+
+export class QuestionaryStep {
+  constructor(
+    public topic: Topic,
+    public isCompleted: boolean,
+    public fields: QuestionaryField[]
+  ) {}
+  static fromObject(obj: any): QuestionaryStep | undefined {
+    return new QuestionaryStep(
+      Topic.fromObject(obj.topic),
+      obj.isCompleted,
+      obj.fields
+        ? obj.fields.map((fieldObj: any) =>
+            QuestionaryField.fromObject(fieldObj)
+          )
+        : []
+    );
+  }
+}
+
+export class QuestionaryField extends ProposalTemplateField {
+  constructor(templateField: ProposalTemplateField, public value: any) {
+    super(
+      templateField.proposal_question_id,
+      templateField.data_type,
+      templateField.sort_order,
+      templateField.question,
+      templateField.config,
+      templateField.topic_id,
+      templateField.dependencies
+    );
+  }
+  static fromObject(obj: any) {
+    const templateField = ProposalTemplateField.fromObject(obj);
+    return new QuestionaryField(
+      templateField,
+      obj.value ? JSON.parse(obj.value).value : undefined
+    );
+  }
+}
+
+export class Topic {
+  constructor(
+    public topic_id: number,
+    public topic_title: string,
+    public sort_order: number,
+    public is_enabled: boolean
+  ) {}
+
+  public static fromObject(obj: any) {
+    return new Topic(
+      obj.topic_id,
+      obj.topic_title,
+      obj.sort_order,
+      obj.is_enabled
     );
   }
 }
@@ -195,12 +160,6 @@ export class FieldCondition {
   }
 }
 
-export interface ProposalAnswer {
-  proposal_question_id: string;
-  value: boolean | number | string;
-  data_type: DataType;
-}
-
 export enum DataType {
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",
@@ -210,17 +169,19 @@ export enum DataType {
   TEXT_INPUT = "TEXT_INPUT"
 }
 
-export interface DataTypeSpec {
-  readonly: boolean;
+export enum ProposalStatus {
+  DRAFT = 0,
+  SUBMITTED = 1
 }
 
-export function getDataTypeSpec(type: DataType): DataTypeSpec {
-  switch (type) {
-    case DataType.EMBELLISHMENT:
-      return { readonly: true };
-    default:
-      return { readonly: false };
-  }
+export interface ProposalAnswer {
+  proposal_question_id: string;
+  value: boolean | number | string;
+  data_type: DataType;
+}
+
+export interface DataTypeSpec {
+  readonly: boolean;
 }
 
 export interface FieldConfig {
@@ -236,22 +197,4 @@ export interface FieldConfig {
   placeholder?: string;
   html?: string;
   plain?: string;
-}
-
-export interface ProposalInformation {
-  id: number;
-  title?: string;
-  abstract?: string;
-  proposer?: number;
-  status?: number;
-  created?: string;
-  updated?: string;
-  users?: any; // TODO implement
-  questionary?: ProposalTemplate;
-  reviews?: any; // TODO implement
-}
-
-export enum ProposalStatus {
-  DRAFT = 0,
-  SUBMITTED = 1
 }

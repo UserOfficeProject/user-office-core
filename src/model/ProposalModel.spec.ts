@@ -1,24 +1,28 @@
 import {
-  createTemplate,
-  createFieldlessTemplate
+  create1Topic3FieldWithDependenciesQuestionary,
+  create1TopicFieldlessTemplate
 } from "../test/ProposalTestBed";
-import { ProposalTemplate } from "./ProposalModel";
+import {
+  getAllFields,
+  getFieldById,
+  getTopicById,
+  getQuestionaryStepByTopicId
+} from "./ProposalModelFunctions";
 
 test("Can parse object", () => {
-  var template = createTemplate();
+  var template = create1Topic3FieldWithDependenciesQuestionary();
   debugger;
-  expect(ProposalTemplate.getAllFields(template).length).toBe(8);
+  expect(getAllFields(template).length).toBe(3);
+  expect(getFieldById(template, "links_with_industry")!.dependencies).not.toBe(
+    null
+  );
   expect(
-    ProposalTemplate.getFieldById(template, "links_with_industry")!.dependencies
-  ).not.toBe(null);
-  expect(
-    ProposalTemplate.getFieldById(template, "links_with_industry")!
-      .dependencies!.length
+    getFieldById(template, "links_with_industry")!.dependencies!.length
   ).toBe(1);
 
-  var fieldlessTemplate = createFieldlessTemplate();
-  expect(
-    ProposalTemplate.getTopicById(fieldlessTemplate, 0)!.fields.length
-  ).toBe(0);
-  expect(ProposalTemplate.getTopicById(fieldlessTemplate, 1)).toBe(undefined);
+  var fieldlessTemplate = create1TopicFieldlessTemplate();
+  expect(getQuestionaryStepByTopicId(fieldlessTemplate, 0)!.fields.length).toBe(
+    0
+  );
+  expect(getTopicById(fieldlessTemplate, 1)).toBe(undefined);
 });

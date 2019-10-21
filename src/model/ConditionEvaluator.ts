@@ -1,5 +1,5 @@
 import JSDict from "../utils/Dictionary";
-import { ProposalTemplateField } from "./ProposalModel";
+import { QuestionaryField } from "./ProposalModel";
 
 export enum EvaluatorOperator {
   EQ = "eq",
@@ -28,17 +28,17 @@ export class ConditionEvaluator {
 }
 
 export interface IFieldConditionEvaluator {
-  isSattisfied(field: ProposalTemplateField, params: object): boolean;
+  isSattisfied(field: QuestionaryField, params: object): boolean;
 }
 
 export class EqualityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: ProposalTemplateField, params: object): boolean {
+  isSattisfied(field: QuestionaryField, params: object): boolean {
     return field.value === params;
   }
 }
 
 export class InequalityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: ProposalTemplateField, params: object): boolean {
+  isSattisfied(field: QuestionaryField, params: object): boolean {
     return field.value !== params;
   }
 }

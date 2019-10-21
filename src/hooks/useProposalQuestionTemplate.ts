@@ -9,9 +9,11 @@ export function useProposalQuestionTemplate() {
     const query = `
             query {
               proposalTemplate {
-                topics {
-                  topic_title
-                  topic_id,
+                steps {
+                  topic {
+                    topic_title
+                    topic_id
+                  }
                   fields {
                     proposal_question_id
                     data_type

@@ -2,14 +2,15 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { createTemplate } from '../test/ProposalTestBed';
-import { ProposalTemplate } from '../model/ProposalModel';
+import { create1Topic3FieldWithDependenciesQuestionary } from '../test/ProposalTestBed';
+import { QuestionaryField } from '../model/ProposalModel';
+import { getFieldById } from '../model/ProposalModelFunctions';
 
 test('Textfield rendered without crashing', () => {
-  var template = createTemplate();
+  var template = create1Topic3FieldWithDependenciesQuestionary();
   const renderer = ReactTestRenderer.create(
     <ProposalComponentTextInput
-      templateField={ProposalTemplate.getFieldById(template, "links_with_industry")!}
+      templateField={getFieldById(template, "links_with_industry")! as QuestionaryField}
       onComplete={() => {}}
       handleChange={() => {}}
       errors={{}}

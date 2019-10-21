@@ -3,24 +3,23 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
 import Typography from "@material-ui/core/Typography";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import {
-  ProposalTemplate,
-  ProposalData,
-  ProposalStatus
+  ProposalStatus,
+  Questionary
 } from "../model/ProposalModel";
-import ProposalInformation from "./ProposalInformation";
+import { ProposalInformation } from "../model/ProposalModel";
+import ProposalInformationView from "./ProposalInformationView";
 import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom, StepButton } from "@material-ui/core";
 
-export default function ProposalContainer(props: { data: ProposalData }) {
+export default function ProposalContainer(props: { data: ProposalInformation }) {
   const [proposalData, setProposalData] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
-  const [proposalSteps, setProposalSteps] = useState<ProposalStep[]>([]);
+  const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
@@ -40,7 +39,7 @@ export default function ProposalContainer(props: { data: ProposalData }) {
     }
   }))();
 
-  const handleNext = (data: ProposalData) => {
+  const handleNext = (data: ProposalInformation) => {
     setProposalData({
       ...proposalData,
       ...data
@@ -49,7 +48,7 @@ export default function ProposalContainer(props: { data: ProposalData }) {
     setStepIndex(stepIndex + 1);
   };
 
-  const handleBack = (data: ProposalData) => {
+  const handleBack = (data: ProposalInformation) => {
     setProposalData({
       ...proposalData,
       ...data
@@ -63,24 +62,24 @@ export default function ProposalContainer(props: { data: ProposalData }) {
 
   useEffect(() => {
     const createProposalSteps = (
-      proposalTemplate: ProposalTemplate
-    ): ProposalStep[] => {
-      var allProposalSteps = new Array<ProposalStep>();
+      questionary: Questionary
+    ): QuestionaryUIStep[] => {
+      var allProposalSteps = new Array<QuestionaryUIStep>();
 
       allProposalSteps.push(
-        new ProposalStep(
+        new QuestionaryUIStep(
           "New Proposal",
-          <ProposalInformation data={proposalData} />
+          <ProposalInformationView data={proposalData} />
         )
       );
       allProposalSteps = allProposalSteps.concat(
-        proposalTemplate.topics.map(
-          topic =>
-            new ProposalStep(
-              topic.topic_title,
+        questionary.steps.map(
+          step =>
+            new QuestionaryUIStep(
+              step.topic.topic_title,
               (
                 <ProposalQuestionareStep
-                  topicId={topic.topic_id}
+                  topicId={step.topic.topic_id}
                   data={proposalData}
                 />
               )
@@ -88,7 +87,7 @@ export default function ProposalContainer(props: { data: ProposalData }) {
         )
       );
       allProposalSteps.push(
-        new ProposalStep("Review", <ProposalReview data={proposalData} />)
+        new QuestionaryUIStep("Review", <ProposalReview data={proposalData} />)
       );
       return allProposalSteps;
     };
@@ -150,7 +149,7 @@ export default function ProposalContainer(props: { data: ProposalData }) {
   );
 }
 
-class ProposalStep {
+class QuestionaryUIStep {
   constructor(public title: string, public element: JSX.Element) {}
 }
 
@@ -176,20 +175,20 @@ const ErrorMessageBox = (props: { message?: string | undefined }) => {
   );
 };
 
-type CallbackSignature = (data: ProposalData) => void;
+type CallbackSignature = (data: ProposalInformation) => void;
 
 export const FormApi = createContext<{
   next: CallbackSignature;
   back: CallbackSignature;
   error: (msg: string) => void;
 }>({
-  next: (data: ProposalData) => {
+  next: () => {
     console.warn("Using default implementation for next");
   },
-  back: (data: ProposalData) => {
+  back: () => {
     console.warn("Using default implementation for back");
   },
-  error: (msg: string) => {
+  error: () => {
     console.warn("Using default implementation for error");
   }
 });

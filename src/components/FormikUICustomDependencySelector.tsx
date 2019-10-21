@@ -13,8 +13,8 @@ import {
   ProposalTemplate,
   DataType,
   FieldCondition,
-  ProposalTemplateField
-} from "../model/ProposalModel";
+  ProposalTemplateField} from "../model/ProposalModel";
+import { getFieldById, getAllFields } from "../model/ProposalModelFunctions";
 import { EvaluatorOperator } from "../model/ConditionEvaluator";
 
 const FormikUICustomDependencySelector = ({
@@ -69,7 +69,7 @@ const FormikUICustomDependencySelector = ({
 
   useEffect(() => {
     if (dependencyId) {
-      const depField = ProposalTemplate.getFieldById(template, dependencyId);
+      const depField = getFieldById(template, dependencyId);
       if (!depField) {
         return;
       }
@@ -115,7 +115,7 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {ProposalTemplate.getAllFields(template)
+            {getAllFields(template)
               .filter(option =>
                 [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
                   option.data_type

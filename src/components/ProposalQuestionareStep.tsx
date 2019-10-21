@@ -3,11 +3,12 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import {
   DataType,
-  ProposalTemplateField,
   ProposalAnswer,
-  ProposalData,
-  ProposalTemplate
+  QuestionaryField,
+  QuestionaryStep
 } from "../model/ProposalModel";
+import { ProposalInformation } from "../model/ProposalModel";
+import { areDependenciesSatisfied, getQuestionaryStepByTopicId as getStepByTopicId } from "../model/ProposalModelFunctions";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -24,7 +25,7 @@ import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
 
 export default function ProposalQuestionareStep(props: {
-  data: ProposalData;
+  data: ProposalInformation;
   topicId: number;
 }) {
   const { data, topicId } = props;
@@ -43,11 +44,15 @@ export default function ProposalQuestionareStep(props: {
     return <div>loading...</div>;
   }
 
-  const template = data.questionary!;
-  const topic = ProposalTemplate.getTopicById(template, topicId);
-  const activeFields = topic
-    ? topic.fields.filter((field: ProposalTemplateField) => {
-        return ProposalTemplate.areDependenciesSatisfied(template, field.proposal_question_id);
+  const questionary = data.questionary!;
+  const questionaryStep = getStepByTopicId(questionary, topicId) as QuestionaryStep | undefined;
+  if(!questionaryStep) {
+    return null;
+  }
+
+  const activeFields = questionaryStep
+    ? questionaryStep.fields.filter(field => {
+        return areDependenciesSatisfied(questionary, field.proposal_question_id);
       })
     : [];
 
@@ -55,7 +60,7 @@ export default function ProposalQuestionareStep(props: {
     activeFields
   );
 
-  const onFormSubmit = async (values: any) => {
+  const onFormSubmit = async () => {
     const proposalId: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields.map(field => {
@@ -148,7 +153,7 @@ class ComponentFactory {
     );
   }
   createComponent(
-    field: ProposalTemplateField,
+    field: QuestionaryField,
     props: any
   ): React.ComponentElement<IBasicComponentProps, any> {
     props.templateField = field;

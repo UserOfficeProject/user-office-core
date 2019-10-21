@@ -5,107 +5,70 @@ import {
   Topic,
   FieldConfig,
   ProposalTemplateField,
-  FieldCondition
+  FieldCondition,
+  TemplateStep,
+  Questionary,
+  QuestionaryStep,
+  QuestionaryField
 } from "../model/ProposalModel";
-import { EvaluatorOperator } from "../model/ConditionEvaluator";
+import {
+  EvaluatorOperator,
+  ConditionEvaluator
+} from "../model/ConditionEvaluator";
 
-export const createTemplate = () => {
-  return ProposalTemplate.fromObject({
-    topics: [
-      {
-        topic_title: "General information",
-        topic_id: 1,
-        fields: [
-          {
-            proposal_question_id: "ttl_general",
-            data_type: "EMBELLISHMENT",
-            question: "",
-            config: '{"html":"<h2>Indicators</h2>"}',
-            value: null,
-            dependencies: []
-          },
-          {
-            proposal_question_id: "has_links_with_industry",
-            data_type: "SELECTION_FROM_OPTIONS",
-            question: "Links with industry?",
-            config:
-              '{"required":true, "options":["yes", "no"], "variant":"radio"}',
-            value: '{"value":"no"}',
-            dependencies: []
-          },
-          {
-            proposal_question_id: "links_with_industry",
-            data_type: "TEXT_INPUT",
-            question: "If yes, please describe:",
-            config: '{"placeholder":"Please specify links with industry"}',
-            value: null,
-            dependencies: [
-              {
-                proposal_question_dependency: "has_links_with_industry",
-                condition: '{ "condition": "eq", "params":"yes"}',
-                proposal_question_id: "links_with_industry"
-              }
-            ]
-          },
-          {
-            proposal_question_id: "is_student_proposal",
-            data_type: "SELECTION_FROM_OPTIONS",
-            question: "Are any of the co-proposers students?",
-            config:
-              '{"required":true, "options":["yes", "no"], "variant":"radio"}',
-            value: '{"value":"yes"}',
-            dependencies: []
-          },
-          {
-            proposal_question_id: "is_towards_degree",
-            data_type: "SELECTION_FROM_OPTIONS",
-            question: "Does the proposal work towards a students degree?",
-            config:
-              '{"required":true, "options":["yes", "no"], "variant":"radio"}',
-            value: '{"value":"yes"}',
-            dependencies: []
-          },
-          {
-            proposal_question_id: "ttl_delivery_date",
-            data_type: "EMBELLISHMENT",
-            question: "",
-            config: '{"html":"<h2>Final delivery date</h2>"}',
-            value: null,
-            dependencies: []
-          },
-          {
-            proposal_question_id: "final_delivery_date",
-            data_type: "DATE",
-            question: "Choose a date",
-            config: '{"min":"now", "required":true}',
-            value: '{"value":"2019-09-26T08:57:00.000Z"}',
-            dependencies: []
-          },
-          {
-            proposal_question_id: "final_delivery_date_motivation",
-            data_type: "TEXT_INPUT",
-            question: "Please motivate the chosen date",
-            config:
-              '{"min":10, "multiline":true, "max":500, "small_label":"(e.g. based on awarded beamtime, or described intention to apply)"}',
-            value: '{"value":""}',
-            dependencies: []
-          }
-        ]
-      }
-    ]
-  });
+export const create1Topic3FieldWithDependenciesQuestionary = () => {
+  return new Questionary([
+    new QuestionaryStep(new Topic(0, "General information", 0, true), false, [
+      new QuestionaryField(
+        new ProposalTemplateField(
+          "ttl_general",
+          DataType.EMBELLISHMENT,
+          0,
+          "",
+          { html: "General informaiton", plain: "General information" },
+          0,
+          []
+        ),
+        ""
+      ),
+      new QuestionaryField(
+        new ProposalTemplateField(
+          "has_links_with_industry",
+          DataType.SELECTION_FROM_OPTIONS,
+          1,
+          "Has links with industry",
+          { options: ["yes", "no"], variant: "radio" },
+          0,
+          []
+        ),
+        ""
+      ),
+      new QuestionaryField(
+        new ProposalTemplateField(
+          "links_with_industry",
+          DataType.TEXT_INPUT,
+          2,
+          "If yes, please describe:",
+          { placeholder: "Please specify links with industry" },
+          0,
+          [
+            new FieldDependency(
+              "links_with_industry",
+              "has_links_with_industry",
+              new FieldCondition(EvaluatorOperator.EQ, "yes")
+            )
+          ]
+        ),
+        ""
+      )
+    ])
+  ]);
 };
 
-export const createFieldlessTemplate = () => {
-  return ProposalTemplate.fromObject({
-    topics: [
-      {
-        topic_title: "General information",
-        topic_id: 0,
-        fields: []
-      }
-    ]
-  });
+export const create1TopicFieldlessTemplate = () => {
+  return new ProposalTemplate([
+    new TemplateStep(new Topic(0, "General information", 0, true), [])
+  ]);
 };
 
 export const createDummyTemplate = () => {
@@ -126,7 +89,7 @@ export const createDummyTemplate = () => {
   });
 
   return new ProposalTemplate([
-    new Topic(1, "General information", 0, true, [
+    new TemplateStep(new Topic(1, "General information", 0, true), [
       hasLinksToField,
       linksToField
     ])
@@ -149,7 +112,6 @@ export const createDummyField = (values: {
     values.question || "Some random question",
     values.config || {},
     values.topic_id || Math.round(Math.random() * 10),
-    "",
     values.dependencies || []
   );
 };

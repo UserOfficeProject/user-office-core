@@ -9,7 +9,7 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
 
-export default function ProposalInformation(props) {
+export default function ProposalInformationView(props) {
   const api = useContext(FormApi);
   const { loading, updateProposal } = useUpdateProposal();
   const [users, setUsers] = useState(props.data.users || []);

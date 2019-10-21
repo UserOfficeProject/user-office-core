@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalInformation, ProposalTemplate } from "../model/ProposalModel";
+import { Questionary } from "../model/ProposalModel";
+import { ProposalInformation } from "../model/ProposalModel";
 
 export function useProposalData(id: number) {
   const sendRequest = useDataAPI();
@@ -24,9 +25,11 @@ export function useProposalData(id: number) {
                 id
               }
               questionary {
-                topics {
-                  topic_title
-                  topic_id,
+                steps {
+                  topic {
+                    topic_title
+                    topic_id
+                  }
                   fields {
                     proposal_question_id
                     data_type
@@ -83,7 +86,7 @@ export function useProposalData(id: number) {
               status: review.status
             };
           }),
-          questionary: ProposalTemplate.fromObject(data.proposal.questionary)
+          questionary: Questionary.fromObject(data.proposal.questionary)
         });
         setLoading(false);
       });
