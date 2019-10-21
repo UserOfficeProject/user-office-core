@@ -14,9 +14,12 @@ import {
   FieldDependency,
   Topic,
   ProposalAnswer,
-  DataType
+  DataType,
+  TemplateStep,
+  FieldCondition
 } from "../../models/Proposal";
 import { ILogger } from "../../utils/Logger";
+import to from "await-to-js";
 
 const BluePromise = require("bluebird");
 
@@ -39,17 +42,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Topic(
       proposal.topic_id,
       proposal.topic_title,
-      proposal.is_enabled,
       proposal.sort_order,
-      null
+      proposal.is_enabled
     );
   }
 
   private createFieldDependencyObject(fieldDependency: FieldDependencyRecord) {
+    if (!fieldDependency) {
+      return null;
+    }
+    const conditionJson = JSON.parse(fieldDependency.condition);
     return new FieldDependency(
       fieldDependency.proposal_question_id,
       fieldDependency.proposal_question_dependency,
-      fieldDependency.condition
+      new FieldCondition(conditionJson.condition, conditionJson.params)
     );
   }
 
@@ -59,8 +65,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       question.data_type as DataType,
       question.sort_order,
       question.question,
-      question.topic_id,
       question.config,
+      question.topic_id,
       null
     );
   }
@@ -326,16 +332,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       this.createProposalTemplateFieldObject(record)
     );
 
+    let steps = Array<TemplateStep>();
     topics.forEach(topic => {
-      topic.fields = fields.filter(field => field.topic_id === topic.topic_id);
+      steps.push(
+        new TemplateStep(
+          topic,
+          fields.filter(field => field.topic_id === topic.topic_id)
+        )
+      );
     });
+
     fields.forEach(field => {
       field.dependencies = dependencies.filter(
         dep => dep.proposal_question_id === field.proposal_question_id
       );
     });
 
-    return new ProposalTemplate(topics);
+    return new ProposalTemplate(steps);
   }
 
   async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
@@ -498,10 +511,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
     return new Promise(async (resolve, reject) => {
-      await database("proposal_questions")
-        .where({ proposal_question_id: fieldId })
-        .del();
-      resolve(await this.getProposalTemplate());
+      const [err] = await to(
+        database("proposal_questions")
+          .where({ proposal_question_id: fieldId })
+          .del()
+      );
+      if (err) {
+        this.logger.logError("Could not delete field ", err);
+        resolve(null);
+      } else {
+        resolve(await this.getProposalTemplate());
+      }
     });
   }
 

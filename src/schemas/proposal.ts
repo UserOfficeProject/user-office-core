@@ -9,9 +9,11 @@ export const typeDefs = `
         createProposal: ProposalMutationResult
         updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], topicsCompleted:[Int], status: Int, users: [Int]): ProposalMutationResult
         updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
+        
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
+
         createTopic(sortOrder:Int!): ProposalTemplateMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult
         updateFieldTopicRel(topic_id:Int!, field_ids:[String]): VoidMutationResult
@@ -53,6 +55,15 @@ export const typeDefs = `
     }
 
 
+
+    type Topic {
+        topic_id:Int,
+        topic_title: String,
+        sort_order:Int,
+    }
+
+
+
     type Proposal {
         id: Int
         title: String
@@ -60,20 +71,40 @@ export const typeDefs = `
         status: Int
         users: [User!]
         proposer: Int
-        questionary: ProposalTemplate
+        questionary: Questionary
         created: String
         updated: String
         reviews: [Review]
     }
 
-    type ProposalTemplate {
-        topics: [Topic]
+    type Questionary {
+        steps: [QuestionaryStep]
     }
 
-    type Topic {
+    type QuestionaryStep {
+        topic:Topic,
+        isCompleted: Boolean,
+        fields:[QuestionaryField]
+    }
+
+    type QuestionaryField {
+        proposal_question_id: String,
+        data_type: String,
+        question: String,
         topic_id:Int,
-        topic_title: String,
-        sort_order:Int,
+        config: String,
+        dependencies: [FieldDependency],
+        value: String
+    }
+
+
+
+    type ProposalTemplate {
+        steps: [ProposalTemplateStep]
+    }
+
+    type ProposalTemplateStep {
+        topic: Topic,
         fields:[ProposalTemplateField]
     }
 
@@ -81,11 +112,11 @@ export const typeDefs = `
         proposal_question_id: String,
         data_type: String,
         question: String,
-        value: String,
         topic_id:Int,
         config: String,
         dependencies: [FieldDependency]
     }
+    
 
     type FieldDependency {
         proposal_question_dependency: String,

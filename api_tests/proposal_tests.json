@@ -81,7 +81,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        topics {\n          topic_title\n          topic_id\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            value\n            dependencies {\n              proposal_question_dependency\n              condition\n              proposal_question_id\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            value\n            dependencies {\n              proposal_question_dependency\n              condition\n              proposal_question_id\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": ""
 					},
 					"options": {
@@ -173,7 +173,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id: ID!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    users {\n      firstname\n      lastname\n      username\n      id\n    }\n    questionary {\n      topics {\n        topic_title\n        topic_id\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          value\n          dependencies {\n            proposal_question_dependency\n            condition\n            proposal_question_id\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      grade\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        username\n        id\n      }\n    }\n  }\n}\n",
+						"query": "query($id: ID!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                username\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                grade\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  username\n                  id\n                }\n              }\n            }\n          }",
 						"variables": "{\n\t\"id\":\"1\"\n}"
 					}
 				},
@@ -425,6 +425,21 @@
 		},
 		{
 			"name": "Test update field",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad64f991-52bc-4f0e-9910-29a02216aec8",
+						"exec": [
+							"pm.test(\"Update field should not resut in failure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.updateFieldTopicRel.error).to.be.eql(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",

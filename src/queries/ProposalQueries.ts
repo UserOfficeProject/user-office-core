@@ -53,16 +53,17 @@ export default class ProposalQueries {
     });
 
     const questionarySteps = Array<QuestionaryStep>();
-    template.topics.forEach(topic => {
+    template.steps.forEach(templateStep => {
       const questionaryFields = Array<QuestionaryField>();
-      topic.fields!.forEach(field => {
+      templateStep.fields.forEach(field => {
         const answer = answerRef.get(field.proposal_question_id);
-        if (answer) {
-          questionaryFields.push({ ...field, value: answer.value });
-        }
+        questionaryFields.push({
+          ...field,
+          value: answer ? answer.value : undefined
+        });
       });
       questionarySteps.push(
-        new QuestionaryStep(topic, false, questionaryFields)
+        new QuestionaryStep(templateStep.topic, false, questionaryFields)
       );
     });
 
