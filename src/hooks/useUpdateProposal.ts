@@ -13,11 +13,12 @@ export function useUpdateProposal() {
       title?: string;
       abstract?: string;
       answers?: ProposalAnswer[];
+      topicsCompleted?: number[];
       users?: number[];
     }) => {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $users:[Int]) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, users:$users){
+      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $users:[Int]) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users){
          proposal{
           id
         }

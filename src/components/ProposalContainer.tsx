@@ -17,7 +17,7 @@ import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom, StepButton } from "@material-ui/core";
 
 export default function ProposalContainer(props: { data: ProposalInformation }) {
-  const [proposalData, setProposalData] = useState(props.data);
+  const [proposalInfo, setProposalInfo] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
@@ -36,12 +36,31 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
     },
     stepper: {
       padding: theme.spacing(3, 0, 5)
+    },
+    active: {
+      color: '#784af4',
+    },
+    circle: {
+      width: 8,
+      height: 8,
+      borderRadius: '50%',
+      backgroundColor: 'currentColor',
+    },
+    completed: {
+      color: '#784af4',
+      zIndex: 1,
+      fontSize: 18,
+    },
+    incomplete: {
+      color: "black",
+      zIndex: 1,
+      fontSize: 18,
     }
   }))();
 
   const handleNext = (data: ProposalInformation) => {
-    setProposalData({
-      ...proposalData,
+    setProposalInfo({
+      ...proposalInfo,
       ...data
     });
 
@@ -49,8 +68,8 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
   };
 
   const handleBack = (data: ProposalInformation) => {
-    setProposalData({
-      ...proposalData,
+    setProposalInfo({
+      ...proposalInfo,
       ...data
     });
     setStepIndex(stepIndex - 1);
@@ -69,7 +88,8 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
       allProposalSteps.push(
         new QuestionaryUIStep(
           "New Proposal",
-          <ProposalInformationView data={proposalData} />
+          true,
+          <ProposalInformationView data={proposalInfo} />
         )
       );
       allProposalSteps = allProposalSteps.concat(
@@ -77,24 +97,25 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
           step =>
             new QuestionaryUIStep(
               step.topic.topic_title,
+              step.isCompleted,
               (
                 <ProposalQuestionareStep
                   topicId={step.topic.topic_id}
-                  data={proposalData}
+                  data={proposalInfo}
                 />
               )
             )
         )
       );
       allProposalSteps.push(
-        new QuestionaryUIStep("Review", <ProposalReview data={proposalData} />)
+        new QuestionaryUIStep("Review", proposalInfo.status === ProposalStatus.SUBMITTED, <ProposalReview data={proposalInfo} />)
       );
       return allProposalSteps;
     };
 
-    const proposalSteps = createProposalSteps(proposalData.questionary!);
+    const proposalSteps = createProposalSteps(proposalInfo.questionary!);
     setProposalSteps(proposalSteps);
-  }, [proposalData]);
+  }, [proposalInfo]);
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
@@ -122,6 +143,8 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
             {proposalSteps.map((proposalStep, index) => (
               <Step key={proposalStep.title}>
                 <StepButton
+                  completed={proposalStep.completed}
+                  disabled={!proposalStep.completed}
                   onClick={() => {
                     setStepIndex(index);
                   }}
@@ -131,7 +154,7 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
               </Step>
             ))}
           </Stepper>
-          {proposalData.status === ProposalStatus.DRAFT ? (
+          {proposalInfo.status === ProposalStatus.DRAFT ? (
             <React.Fragment>
               {getStepContent(stepIndex)}
               <ErrorMessageBox message={errorMessage} />
@@ -150,7 +173,7 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
 }
 
 class QuestionaryUIStep {
-  constructor(public title: string, public element: JSX.Element) {}
+  constructor(public title: string, public completed:boolean, public element: JSX.Element) {}
 }
 
 const ErrorMessageBox = (props: { message?: string | undefined }) => {

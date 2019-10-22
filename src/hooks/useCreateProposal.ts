@@ -20,6 +20,7 @@ export function useCreateProposal() {
                 topic_title
                 topic_id
               }
+              isCompleted
               fields {
                 proposal_question_id
                 data_type

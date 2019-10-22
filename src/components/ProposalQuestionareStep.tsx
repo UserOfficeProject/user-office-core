@@ -71,7 +71,7 @@ export default function ProposalQuestionareStep(props: {
       }))(field); // convert field to answer objcet
     });
 
-    const result = await updateProposal({ id: proposalId, answers: answers });
+    const result = await updateProposal({ id: proposalId, answers: answers, topicsCompleted:[topicId] });
 
     if (result && result.error) {
       api.error && api.error(result.error);
