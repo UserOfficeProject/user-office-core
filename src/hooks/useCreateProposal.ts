@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalData } from "../model/ProposalModel";
+import { ProposalData, ProposalTemplate } from "../model/ProposalModel";
 
 export function useCreateProposal() {
   const sendRequest = useDataAPI();
@@ -38,7 +38,7 @@ export function useCreateProposal() {
       `;
     sendRequest(query).then(data => {
       const proposal = data.createProposal.proposal;
-      proposal.questionary = { ...proposal.questionary };
+      proposal.questionary = ProposalTemplate.fromObject(proposal.questionary);
       setProposal(proposal);
     });
   }, [sendRequest]);
