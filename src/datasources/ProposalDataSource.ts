@@ -5,7 +5,8 @@ import {
   Topic,
   ProposalTemplateField,
   FieldDependency,
-  DataType
+  DataType,
+  Questionary
 } from "../models/Proposal";
 
 export interface ProposalDataSource {
@@ -19,7 +20,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
-  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
+  getQuestionary(proposalId: number): Promise<Questionary>;
 
   // Write
   create(id: number): Promise<Proposal | null>;

@@ -9,7 +9,8 @@ import {
   ProposalAnswer,
   FieldConfig,
   TemplateStep,
-  FieldCondition
+  FieldCondition,
+  Questionary
 } from "../../models/Proposal";
 import { Review } from "../../models/Review";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
@@ -26,7 +27,7 @@ const createDummyTemplate = () => {
       new FieldDependency(
         "linksToField",
         "hasLinksToField",
-        new FieldCondition(EvaluatorOperator.EQ, "yes")
+        JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes")) // TODO SWAP-341. Remove stringifying
       )
     ]
   });
@@ -167,8 +168,9 @@ export class proposalDataSource implements ProposalDataSource {
     );
     return newTemplate;
   }
-  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
-    return dummyAnswers;
+  async getQuestionary(proposalId: number): Promise<Questionary> {
+    throw new Error("Not implemented");
+    // return dummyAnswers;
   }
   async insertFiles(
     proposal_id: number,

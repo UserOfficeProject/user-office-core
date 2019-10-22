@@ -24,15 +24,11 @@ export interface TopicRecord {
   readonly sort_order: number;
 }
 
-
 export interface FieldDependencyRecord {
   readonly proposal_question_id: string;
   readonly proposal_question_dependency: string;
   readonly condition: string;
 }
-
-
-
 
 export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
@@ -44,8 +40,6 @@ export interface ProposalQuestionRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
 }
-
-
 
 export interface UserRecord {
   readonly user_id: number;

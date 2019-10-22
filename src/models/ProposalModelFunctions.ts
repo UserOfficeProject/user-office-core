@@ -52,7 +52,8 @@ export function isDependencySatisfied(
   collection: Questionary,
   dependency: FieldDependency
 ): boolean {
-  const { condition, params } = dependency.condition;
+  //const { condition, params } = dependency.condition;
+  const { condition, params } = JSON.parse(dependency.condition); // TODO SWAP-341. strongly type this after making GraphQL able to return more custom objects
   const field = getFieldById(
     collection,
     dependency.proposal_question_dependency

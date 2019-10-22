@@ -13,10 +13,12 @@ import {
   ProposalTemplateField,
   FieldDependency,
   Topic,
-  ProposalAnswer,
   DataType,
   TemplateStep,
-  FieldCondition
+  FieldCondition,
+  QuestionaryStep,
+  Questionary,
+  QuestionaryField
 } from "../../models/Proposal";
 import { ILogger } from "../../utils/Logger";
 import to from "await-to-js";
@@ -55,7 +57,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new FieldDependency(
       fieldDependency.proposal_question_id,
       fieldDependency.proposal_question_dependency,
-      new FieldCondition(conditionJson.condition, conditionJson.params)
+      JSON.stringify(
+        new FieldCondition(conditionJson.condition, conditionJson.params)
+      ) // TODO SWAP-341. Remove stringifying
     );
   }
 
@@ -68,6 +72,23 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       question.config,
       question.topic_id,
       null
+    );
+  }
+
+  private createQuestionaryFieldObject(
+    question: ProposalQuestionRecord & { value: any }
+  ) {
+    return new QuestionaryField(
+      new ProposalTemplateField(
+        question.proposal_question_id,
+        question.data_type as DataType,
+        question.sort_order,
+        question.question,
+        question.config,
+        question.topic_id,
+        null
+      ),
+      question.value || ""
     );
   }
 
@@ -351,10 +372,72 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new ProposalTemplate(steps);
   }
 
-  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
-    return await database("proposal_answers")
-      .where("proposal_id", proposalId)
-      .select("proposal_question_id", "answer as value"); // TODO rename the column
+  async getQuestionary(proposalId: number): Promise<Questionary> {
+    const dependencyRecords: FieldDependencyRecord[] = await database
+      .select("*")
+      .from("proposal_question_dependencies");
+
+    const fieldRecords: Array<
+      ProposalQuestionRecord & { value: any }
+    > = (await database.raw(`
+          SELECT 
+            proposal_questions.*, proposal_answers.answer as value
+          FROM 
+            proposal_questions
+          LEFT JOIN
+            proposal_answers 
+          ON 
+            proposal_questions.proposal_question_id = 
+            proposal_answers.proposal_question_id
+          WHERE
+            proposal_answers.proposal_id=${proposalId}
+          OR
+            proposal_answers.proposal_id IS NULL`)).rows;
+
+    const topicRecords: (TopicRecord & {
+      is_complete: boolean;
+    })[] = (await database.raw(`
+          SELECT 
+            proposal_topics.*, proposal_topic_completenesses.is_complete
+          FROM 
+            proposal_topics
+          LEFT JOIN
+            proposal_topic_completenesses
+          ON 
+            proposal_topics.topic_id = proposal_topic_completenesses.topic_id
+            AND proposal_topic_completenesses.proposal_id = ${proposalId}`))
+      .rows;
+
+    const fields = fieldRecords.map(record =>
+      this.createQuestionaryFieldObject(record)
+    );
+
+    const dependencies = dependencyRecords.map(record =>
+      this.createFieldDependencyObject(record)
+    );
+
+    let steps = Array<QuestionaryStep>();
+    topicRecords.forEach(topic => {
+      steps.push(
+        new QuestionaryStep(
+          topic,
+          topic.is_complete,
+          fields.filter(field => field.topic_id === topic.topic_id)
+        )
+      );
+    });
+
+    fields.forEach(field => {
+      // @ts-ignore we are nullchecking inside the filter callbackfn
+      field.dependencies = dependencies.filter(dep => {
+        return (
+          dep !== null &&
+          dep.proposal_question_id === field.proposal_question_id
+        );
+      });
+    });
+
+    return new Questionary(steps);
   }
 
   async createTopic(sortOrder: number): Promise<ProposalTemplate> {

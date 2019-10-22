@@ -44,30 +44,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    const template = await this.dataSource.getProposalTemplate();
-    const answers = await this.dataSource.getProposalAnswers(id);
-
-    var answerRef = JSDict.Create<string, ProposalAnswer>();
-    answers.forEach(answer => {
-      answerRef.put(answer.proposal_question_id, answer);
-    });
-
-    const questionarySteps = Array<QuestionaryStep>();
-    template.steps.forEach(templateStep => {
-      const questionaryFields = Array<QuestionaryField>();
-      templateStep.fields.forEach(field => {
-        const answer = answerRef.get(field.proposal_question_id);
-        questionaryFields.push({
-          ...field,
-          value: answer ? answer.value : undefined
-        });
-      });
-      questionarySteps.push(
-        new QuestionaryStep(templateStep.topic, false, questionaryFields)
-      );
-    });
-
-    return new Questionary(questionarySteps);
+    return await this.dataSource.getQuestionary(id);
   }
 
   async getProposalTemplate(
