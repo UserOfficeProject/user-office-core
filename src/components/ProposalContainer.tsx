@@ -68,7 +68,7 @@ export default function ProposalContainer(props: {
       allProposalSteps.push(
         new QuestionaryUIStep(
           "New Proposal",
-          true,
+          false,
           <ProposalInformationView data={proposalInfo} />
         )
       );
@@ -99,6 +99,18 @@ export default function ProposalContainer(props: {
 
     const proposalSteps = createProposalSteps(proposalInfo.questionary!);
     setProposalSteps(proposalSteps);
+
+    var lastFinishedStep = proposalSteps
+      .slice()
+      .reverse()
+      .find(step => step.completed === true);
+
+    setStepIndex(
+      Math.max(
+        0,
+        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0
+      )
+    );
   }, [proposalInfo]);
 
   const getStepContent = (step: number) => {
@@ -124,14 +136,18 @@ export default function ProposalContainer(props: {
             {false ? "Update Proposal" : "New Proposal"}
           </Typography>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map((proposalStep, index) => (
+            {proposalSteps.map((proposalStep, index, steps) => (
               <Step key={proposalStep.title}>
                 <QuestionaryStepButton
-                  completed={proposalStep.completed}
-                  disabled={!proposalStep.completed}
                   onClick={() => {
                     setStepIndex(index);
                   }}
+                  completed={proposalStep.completed}
+                  isClickable={
+                    index === 0 ||
+                    proposalStep.completed ||
+                    steps[index - 1].completed === true
+                  }
                 >
                   {proposalStep.title}
                 </QuestionaryStepButton>
@@ -210,13 +226,25 @@ function QuestionaryStepButton(props: any) {
       "& SVG": {
         color: theme.palette.secondary.main + "!important"
       }
+    },
+    clickable: {
+      "& SVG": {
+        color: theme.palette.primary.main + "!important"
+      }
     }
   }))();
 
-  const { active } = props;
+  const { active, isClickable } = props;
+
+  var buttonClasses = null;
+  if (active) {
+    buttonClasses = classes.active;
+  } else if (isClickable) {
+    buttonClasses = classes.clickable;
+  }
 
   return (
-    <StepButton {...props} className={active ? classes.active : null}>
+    <StepButton {...props} disabled={!isClickable} className={buttonClasses}>
       {props.children}
     </StepButton>
   );
