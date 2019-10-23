@@ -351,6 +351,7 @@ export default function SignUp(props) {
                       { text: "Ms.", value: "Ms." },
                       { text: "Mr.", value: "Mr." },
                       { text: "Dr.", value: "Dr." },
+                      { text: "Prof.", value: "Prof." },
                       { text: "Rather not say", value: "unspecified" }
                     ]}
                     data-cy="title"
@@ -397,7 +398,7 @@ export default function SignUp(props) {
                     items={[
                       { text: "Female", value: "female" },
                       { text: "Male", value: "male" },
-                      { text: "Rather not say", value: "unspecified" }
+                      { text: "Other", value: "other" }
                     ]}
                     data-cy="gender"
                   />
