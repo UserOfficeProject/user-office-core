@@ -389,10 +389,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           ON 
             proposal_questions.proposal_question_id = 
             proposal_answers.proposal_question_id
-          WHERE
+          AND
             proposal_answers.proposal_id=${proposalId}
-          OR
-            proposal_answers.proposal_id IS NULL`)).rows;
+          ORDER BY
+            proposal_questions.sort_order`)).rows;
 
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
