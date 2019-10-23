@@ -1,7 +1,7 @@
 import React from "react";
 import ReactTestRenderer from "react-test-renderer";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { create1Topic3FieldWithDependenciesQuestionary } from "../test/ProposalTestBed";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
 import { QuestionaryField } from "../models/ProposalModel";
 import { getFieldById } from "../models/ProposalModelFunctions";
 

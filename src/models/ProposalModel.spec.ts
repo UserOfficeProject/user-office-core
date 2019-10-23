@@ -1,7 +1,7 @@
 import {
   create1Topic3FieldWithDependenciesQuestionary,
   create1TopicFieldlessTemplate
-} from "../test/ProposalTestBed";
+} from "../tests/ProposalTestBed";
 import {
   getAllFields,
   getFieldById,

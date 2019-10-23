@@ -1,4 +1,4 @@
-import { create1Topic3FieldWithDependenciesQuestionary } from "../test/ProposalTestBed";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
 import { ProposalTemplate } from "./ProposalModel";
 import {
   areDependenciesSatisfied,
