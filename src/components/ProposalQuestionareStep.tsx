@@ -8,7 +8,7 @@ import {
   QuestionaryStep
 } from "../model/ProposalModel";
 import { ProposalInformation } from "../model/ProposalModel";
-import { areDependenciesSatisfied, getQuestionaryStepByTopicId as getStepByTopicId } from "../model/ProposalModelFunctions";
+import { areDependenciesSatisfied, getQuestionaryStepByTopicId as getStepByTopicId, getQuestionaryStepByTopicId } from "../model/ProposalModelFunctions";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -113,7 +113,8 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    api.back(values);
+                    (getQuestionaryStepByTopicId(props.data.questionary!, topicId) as QuestionaryStep).isCompleted = true;
+                    api.back({...props.data});
                   }
                 }
               );
@@ -122,7 +123,8 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    api.next(values);
+                    (getQuestionaryStepByTopicId(props.data.questionary!, topicId) as QuestionaryStep).isCompleted = true;
+                    api.next({...props.data});
                   }
                 }
               );
