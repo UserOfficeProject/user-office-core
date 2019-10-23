@@ -21,7 +21,7 @@ import {
   Topic,
   ProposalTemplateField,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
 import { User } from "../models/User";
 import { isRejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";

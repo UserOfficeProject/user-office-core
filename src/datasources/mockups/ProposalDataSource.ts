@@ -14,6 +14,7 @@ import {
 import { Proposal } from "../../models/Proposal";
 import { Review } from "../../models/Review";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../../tests/ProposalTestBed";
 
 const createDummyTemplate = () => {
   const hasLinksToField = createDummyField({
@@ -169,8 +170,7 @@ export class proposalDataSource implements ProposalDataSource {
     return newTemplate;
   }
   async getQuestionary(proposalId: number): Promise<Questionary> {
-    throw new Error("Not implemented");
-    // return dummyAnswers;
+    return create1Topic3FieldWithDependenciesQuestionary();
   }
   async insertFiles(
     proposal_id: number,
