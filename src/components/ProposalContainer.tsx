@@ -7,16 +7,15 @@ import Typography from "@material-ui/core/Typography";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import {
-  ProposalStatus,
-  Questionary
-} from "../model/ProposalModel";
+import { ProposalStatus, Questionary } from "../model/ProposalModel";
 import { ProposalInformation } from "../model/ProposalModel";
 import ProposalInformationView from "./ProposalInformationView";
 import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom, StepButton } from "@material-ui/core";
 
-export default function ProposalContainer(props: { data: ProposalInformation }) {
+export default function ProposalContainer(props: {
+  data: ProposalInformation;
+}) {
   const [proposalInfo, setProposalInfo] = useState(props.data);
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
@@ -36,25 +35,6 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
     },
     stepper: {
       padding: theme.spacing(3, 0, 5)
-    },
-    active: {
-      color: '#784af4',
-    },
-    circle: {
-      width: 8,
-      height: 8,
-      borderRadius: '50%',
-      backgroundColor: 'currentColor',
-    },
-    completed: {
-      color: '#784af4',
-      zIndex: 1,
-      fontSize: 18,
-    },
-    incomplete: {
-      color: "black",
-      zIndex: 1,
-      fontSize: 18,
     }
   }))();
 
@@ -108,7 +88,11 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
         )
       );
       allProposalSteps.push(
-        new QuestionaryUIStep("Review", proposalInfo.status === ProposalStatus.SUBMITTED, <ProposalReview data={proposalInfo} />)
+        new QuestionaryUIStep(
+          "Review",
+          proposalInfo.status === ProposalStatus.SUBMITTED,
+          <ProposalReview data={proposalInfo} />
+        )
       );
       return allProposalSteps;
     };
@@ -142,7 +126,7 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
             {proposalSteps.map((proposalStep, index) => (
               <Step key={proposalStep.title}>
-                <StepButton
+                <QuestionaryStepButton
                   completed={proposalStep.completed}
                   disabled={!proposalStep.completed}
                   onClick={() => {
@@ -150,7 +134,7 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
                   }}
                 >
                   {proposalStep.title}
-                </StepButton>
+                </QuestionaryStepButton>
               </Step>
             ))}
           </Stepper>
@@ -173,7 +157,11 @@ export default function ProposalContainer(props: { data: ProposalInformation }) 
 }
 
 class QuestionaryUIStep {
-  constructor(public title: string, public completed:boolean, public element: JSX.Element) {}
+  constructor(
+    public title: string,
+    public completed: boolean,
+    public element: JSX.Element
+  ) {}
 }
 
 const ErrorMessageBox = (props: { message?: string | undefined }) => {
@@ -215,3 +203,21 @@ export const FormApi = createContext<{
     console.warn("Using default implementation for error");
   }
 });
+
+function QuestionaryStepButton(props: any) {
+  const classes = makeStyles(theme => ({
+    active: {
+      "& SVG": {
+        color: theme.palette.secondary.main + "!important"
+      }
+    }
+  }))();
+
+  const { active } = props;
+
+  return (
+    <StepButton {...props} className={active ? classes.active : null}>
+      {props.children}
+    </StepButton>
+  );
+}
