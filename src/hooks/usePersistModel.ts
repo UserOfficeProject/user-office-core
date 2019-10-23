@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { EventType, IEvent } from "../components/QuestionaryEditorModel";
+import { EventType, IEvent } from "../model/QuestionaryEditorModel";
 import {
   ProposalTemplateField,
   ProposalTemplate,

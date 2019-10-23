@@ -4,12 +4,12 @@ import {
   ProposalTemplate,
   ProposalTemplateField,
   TemplateStep
-} from "../model/ProposalModel";
+} from "./ProposalModel";
 import {
   getTopicById,
   getFieldById,
   getQuestionaryStepByTopicId
-} from "../model/ProposalModelFunctions";
+} from "./ProposalModelFunctions";
 import produce from "immer";
 import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 

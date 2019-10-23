@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { EventType } from "./QuestionaryEditorModel";
+import { EventType } from "../model/QuestionaryEditorModel";
 import { AdminComponentSignature } from "./QuestionaryFieldEditor";
 import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
 import * as Yup from "yup";

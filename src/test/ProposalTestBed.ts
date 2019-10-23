@@ -11,10 +11,7 @@ import {
   QuestionaryStep,
   QuestionaryField
 } from "../model/ProposalModel";
-import {
-  EvaluatorOperator,
-  ConditionEvaluator
-} from "../model/ConditionEvaluator";
+import { EvaluatorOperator } from "../model/ConditionEvaluator";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -68,31 +65,6 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
 export const create1TopicFieldlessTemplate = () => {
   return new ProposalTemplate([
     new TemplateStep(new Topic(0, "General information", 0, true), [])
-  ]);
-};
-
-export const createDummyTemplate = () => {
-  const hasLinksToField = createDummyField({
-    proposal_question_id: "hasLinksToField",
-    data_type: DataType.SELECTION_FROM_OPTIONS
-  });
-  const linksToField = createDummyField({
-    proposal_question_id: "linksToField",
-    data_type: DataType.TEXT_INPUT,
-    dependencies: [
-      new FieldDependency(
-        "linksToField",
-        "hasLinksToField",
-        new FieldCondition(EvaluatorOperator.EQ, "yes")
-      )
-    ]
-  });
-
-  return new ProposalTemplate([
-    new TemplateStep(new Topic(1, "General information", 0, true), [
-      hasLinksToField,
-      linksToField
-    ])
   ]);
 };
 

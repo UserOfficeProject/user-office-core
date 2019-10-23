@@ -4,7 +4,7 @@ import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, {
   EventType,
   IEvent
-} from "./QuestionaryEditorModel";
+} from "../model/QuestionaryEditorModel";
 import {
   Paper,
   makeStyles,

@@ -2,7 +2,11 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import { ProposalTemplateField, DataType, TemplateStep } from "../model/ProposalModel";
+import {
+  ProposalTemplateField,
+  DataType,
+  TemplateStep
+} from "../model/ProposalModel";
 import {
   makeStyles,
   Grid,
@@ -14,7 +18,7 @@ import {
   Typography,
   Divider
 } from "@material-ui/core";
-import { EventType, IEvent } from "./QuestionaryEditorModel";
+import { EventType, IEvent } from "../model/QuestionaryEditorModel";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";

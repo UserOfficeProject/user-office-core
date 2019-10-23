@@ -4,7 +4,7 @@ import { makeStyles, Grid, useTheme } from "@material-ui/core";
 
 import LockIcon from "@material-ui/icons/Lock";
 import { ProposalTemplateField, DataType } from "../model/ProposalModel";
-import { IEvent } from "./QuestionaryEditorModel";
+import { IEvent } from "../model/QuestionaryEditorModel";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
 
 export default function QuestionaryEditorTopicItem(props: {
