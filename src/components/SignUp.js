@@ -156,7 +156,6 @@ export default function SignUp(props) {
   if (authCodeOrcID && loading) {
     return <p>loading</p>;
   }
-  console.log(orcData);
   return (
     <Container component="main" maxWidth="xs">
       <Formik
