@@ -1,4 +1,4 @@
-import { DataType, QuestionaryField } from "../model/ProposalModel";
+import { DataType, QuestionaryField } from "../models/ProposalModel";
 import * as Yup from "yup";
 
 export const createFormikCofigObjects = (

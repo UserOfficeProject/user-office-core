@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalAnswer } from "../model/ProposalModel";
-import { getDataTypeSpec } from "../model/ProposalModelFunctions";
+import { ProposalAnswer } from "../models/ProposalModel";
+import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 
 export function useUpdateProposal() {
   const sendRequest = useDataAPI();

@@ -6,9 +6,13 @@ import {
   ProposalAnswer,
   QuestionaryField,
   QuestionaryStep
-} from "../model/ProposalModel";
-import { ProposalInformation } from "../model/ProposalModel";
-import { areDependenciesSatisfied, getQuestionaryStepByTopicId as getStepByTopicId, getQuestionaryStepByTopicId } from "../model/ProposalModelFunctions";
+} from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
+import {
+  areDependenciesSatisfied,
+  getQuestionaryStepByTopicId as getStepByTopicId,
+  getQuestionaryStepByTopicId
+} from "../models/ProposalModelFunctions";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -45,14 +49,19 @@ export default function ProposalQuestionareStep(props: {
   }
 
   const questionary = data.questionary!;
-  const questionaryStep = getStepByTopicId(questionary, topicId) as QuestionaryStep | undefined;
-  if(!questionaryStep) {
+  const questionaryStep = getStepByTopicId(questionary, topicId) as
+    | QuestionaryStep
+    | undefined;
+  if (!questionaryStep) {
     return null;
   }
 
   const activeFields = questionaryStep
     ? questionaryStep.fields.filter(field => {
-        return areDependenciesSatisfied(questionary, field.proposal_question_id);
+        return areDependenciesSatisfied(
+          questionary,
+          field.proposal_question_id
+        );
       })
     : [];
 
@@ -71,7 +80,11 @@ export default function ProposalQuestionareStep(props: {
       }))(field); // convert field to answer objcet
     });
 
-    const result = await updateProposal({ id: proposalId, answers: answers, topicsCompleted:[topicId] });
+    const result = await updateProposal({
+      id: proposalId,
+      answers: answers,
+      topicsCompleted: [topicId]
+    });
 
     if (result && result.error) {
       api.error && api.error(result.error);
@@ -113,8 +126,11 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    (getQuestionaryStepByTopicId(props.data.questionary!, topicId) as QuestionaryStep).isCompleted = true;
-                    api.back({...props.data});
+                    (getQuestionaryStepByTopicId(
+                      props.data.questionary!,
+                      topicId
+                    ) as QuestionaryStep).isCompleted = true;
+                    api.back({ ...props.data });
                   }
                 }
               );
@@ -123,8 +139,11 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    (getQuestionaryStepByTopicId(props.data.questionary!, topicId) as QuestionaryStep).isCompleted = true;
-                    api.next({...props.data});
+                    (getQuestionaryStepByTopicId(
+                      props.data.questionary!,
+                      topicId
+                    ) as QuestionaryStep).isCompleted = true;
+                    api.next({ ...props.data });
                   }
                 }
               );

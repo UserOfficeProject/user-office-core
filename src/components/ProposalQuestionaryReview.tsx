@@ -1,8 +1,7 @@
 import React, { Fragment } from "react";
-import {
-  QuestionaryField} from "../model/ProposalModel";
-import { ProposalInformation } from "../model/ProposalModel";
-import { getAllFields } from "../model/ProposalModelFunctions";
+import { QuestionaryField } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
+import { getAllFields } from "../models/ProposalModelFunctions";
 import {
   Paper,
   Table,
@@ -17,9 +16,8 @@ import {
 export default function ProposaQuestionaryReview(props: {
   data: ProposalInformation;
 }) {
-
   const questionary = props.data.questionary!;
-  
+
   if (!props.data) {
     return <div>Loading...</div>;
   }

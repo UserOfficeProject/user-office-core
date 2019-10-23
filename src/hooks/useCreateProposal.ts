@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { Questionary } from "../model/ProposalModel";
-import { ProposalInformation } from "../model/ProposalModel";
+import { Questionary } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
 
 export function useCreateProposal() {
   const sendRequest = useDataAPI();

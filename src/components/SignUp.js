@@ -13,7 +13,7 @@ import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
-import nationalities from "../model/nationalities";
+import nationalities from "../models/nationalities";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 
@@ -215,220 +215,220 @@ export default function SignUp() {
               verify before login.
             </p>
           ) : (
-            <React.Fragment>
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Login details
+              <React.Fragment>
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Login details
                 </Typography>
-                <CardContent>
-                  <Field
-                    name="username"
-                    label="Username"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    autoComplete="off"
-                    data-cy="username"
-                  />
-                  <Field
-                    name="password"
-                    label="Password"
-                    type="password"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    autoComplete="off"
-                    data-cy="password"
-                  />
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <Field
+                      name="username"
+                      label="Username"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      autoComplete="off"
+                      data-cy="username"
+                    />
+                    <Field
+                      name="password"
+                      label="Password"
+                      type="password"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      autoComplete="off"
+                      data-cy="password"
+                    />
+                  </CardContent>
+                </Card>
 
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Personal details
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Personal details
                 </Typography>
 
-                <CardContent>
-                  <FormikDropdown
-                    name="user_title"
-                    label="Title"
-                    items={[
-                      { text: "Ms.", value: "Ms." },
-                      { text: "Mr.", value: "Mr." },
-                      { text: "Dr.", value: "Dr." },
-                      { text: "Rather not say", value: "unspecified" }
-                    ]}
-                    data-cy="title"
-                  />
-                  <Field
-                    name="firstname"
-                    label="Firstname"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="firstname"
-                  />
-                  <Field
-                    name="middlename"
-                    label="Middle name"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="middlename"
-                  />
-                  <Field
-                    name="lastname"
-                    label="Lastname"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="lastname"
-                  />
-                  <Field
-                    name="preferredname"
-                    label="Preferred name"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="preferredname"
-                  />
-                  <FormikDropdown
-                    name="gender"
-                    label="Gender"
-                    items={[
-                      { text: "Female", value: "female" },
-                      { text: "Male", value: "male" },
-                      { text: "Rather not say", value: "unspecified" }
-                    ]}
-                    data-cy="gender"
-                  />
-                  <FormikDropdown
-                    name="nationality"
-                    label="Nationality"
-                    items={nationalitiesList}
-                    data-cy="nationality"
-                  />
-                  <Field
-                    name="birthdate"
-                    label="Birthdate"
-                    type="date"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="birthdate"
-                  />
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <FormikDropdown
+                      name="user_title"
+                      label="Title"
+                      items={[
+                        { text: "Ms.", value: "Ms." },
+                        { text: "Mr.", value: "Mr." },
+                        { text: "Dr.", value: "Dr." },
+                        { text: "Rather not say", value: "unspecified" }
+                      ]}
+                      data-cy="title"
+                    />
+                    <Field
+                      name="firstname"
+                      label="Firstname"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="firstname"
+                    />
+                    <Field
+                      name="middlename"
+                      label="Middle name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="middlename"
+                    />
+                    <Field
+                      name="lastname"
+                      label="Lastname"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="lastname"
+                    />
+                    <Field
+                      name="preferredname"
+                      label="Preferred name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="preferredname"
+                    />
+                    <FormikDropdown
+                      name="gender"
+                      label="Gender"
+                      items={[
+                        { text: "Female", value: "female" },
+                        { text: "Male", value: "male" },
+                        { text: "Rather not say", value: "unspecified" }
+                      ]}
+                      data-cy="gender"
+                    />
+                    <FormikDropdown
+                      name="nationality"
+                      label="Nationality"
+                      items={nationalitiesList}
+                      data-cy="nationality"
+                    />
+                    <Field
+                      name="birthdate"
+                      label="Birthdate"
+                      type="date"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="birthdate"
+                    />
+                  </CardContent>
+                </Card>
 
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Organization details
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Organization details
                 </Typography>
-                <CardContent>
-                  <Grid container spacing={1}>
-                    <Field
-                      name="orcid"
-                      label="ORCID"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="orcid"
-                    />
-                    <Field
-                      name="organisation"
-                      label="Organisation"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="organisation"
-                    />
-                    <Field
-                      name="department"
-                      label="Department"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="department"
-                    />
-                    <Field
-                      name="organisation_address"
-                      label="Organization address"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="organisation-address"
-                    />
-                    <Field
-                      name="position"
-                      label="Position"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="position"
-                    />
-                  </Grid>
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <Grid container spacing={1}>
+                      <Field
+                        name="orcid"
+                        label="ORCID"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="orcid"
+                      />
+                      <Field
+                        name="organisation"
+                        label="Organisation"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="organisation"
+                      />
+                      <Field
+                        name="department"
+                        label="Department"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="department"
+                      />
+                      <Field
+                        name="organisation_address"
+                        label="Organization address"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="organisation-address"
+                      />
+                      <Field
+                        name="position"
+                        label="Position"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="position"
+                      />
+                    </Grid>
+                  </CardContent>
+                </Card>
 
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Contact details
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Contact details
                 </Typography>
-                <CardContent>
-                  <Grid container spacing={1}>
-                    <Field
-                      name="email"
-                      label="E-mail"
-                      type="email"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="email"
-                    />
-                    <Field
-                      name="telephone"
-                      label="Telephone"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="telephone"
-                    />
-                    <Field
-                      name="telephone_alt"
-                      label="Telephone Alt."
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="telephone-alt"
-                    />
-                  </Grid>
-                </CardContent>
-              </Card>
+                  <CardContent>
+                    <Grid container spacing={1}>
+                      <Field
+                        name="email"
+                        label="E-mail"
+                        type="email"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="email"
+                      />
+                      <Field
+                        name="telephone"
+                        label="Telephone"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="telephone"
+                      />
+                      <Field
+                        name="telephone_alt"
+                        label="Telephone Alt."
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="telephone-alt"
+                      />
+                    </Grid>
+                  </CardContent>
+                </Card>
 
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                data-cy="submit"
-              >
-                Sign Up
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  data-cy="submit"
+                >
+                  Sign Up
               </Button>
-            </React.Fragment>
-          )}
+              </React.Fragment>
+            )}
           <Grid container>
             <Grid item>
               <Link to="/SignIn/">

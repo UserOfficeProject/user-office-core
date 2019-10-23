@@ -4,7 +4,7 @@ import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, {
   EventType,
   IEvent
-} from "../model/QuestionaryEditorModel";
+} from "../models/QuestionaryEditorModel";
 import {
   Paper,
   makeStyles,
@@ -16,7 +16,7 @@ import {
   LinearProgress
 } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
-import { ProposalTemplateField } from "../model/ProposalModel";
+import { ProposalTemplateField } from "../models/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 import Notification from "./Notification";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";

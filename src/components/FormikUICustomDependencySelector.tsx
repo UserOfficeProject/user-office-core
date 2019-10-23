@@ -13,9 +13,10 @@ import {
   ProposalTemplate,
   DataType,
   FieldCondition,
-  ProposalTemplateField} from "../model/ProposalModel";
-import { getFieldById, getAllFields } from "../model/ProposalModelFunctions";
-import { EvaluatorOperator } from "../model/ConditionEvaluator";
+  ProposalTemplateField
+} from "../models/ProposalModel";
+import { getFieldById, getAllFields } from "../models/ProposalModelFunctions";
+import { EvaluatorOperator } from "../models/ConditionEvaluator";
 
 const FormikUICustomDependencySelector = ({
   field,

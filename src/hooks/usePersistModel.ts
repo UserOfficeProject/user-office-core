@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { EventType, IEvent } from "../model/QuestionaryEditorModel";
+import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import {
   ProposalTemplateField,
   ProposalTemplate,
   DataType,
   Topic
-} from "../model/ProposalModel";
+} from "../models/ProposalModel";
 
 export function usePersistModel() {
   const sendRequest = useDataAPI();

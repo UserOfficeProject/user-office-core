@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalTemplate } from "../model/ProposalModel";
+import { ProposalTemplate } from "../models/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();

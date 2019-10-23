@@ -3,8 +3,8 @@ import { makeStyles } from "@material-ui/styles";
 import ProposalInformationView from "./ProposalInformationView";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
-import { ProposalStatus } from "../model/ProposalModel";
-import { ProposalInformation } from "../model/ProposalModel";
+import { ProposalStatus } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 
@@ -19,7 +19,11 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProposalReview({data} : { data: ProposalInformation }) {
+export default function ProposalReview({
+  data
+}: {
+  data: ProposalInformation;
+}) {
   const api = useContext(FormApi);
   const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
@@ -30,17 +34,17 @@ export default function ProposalReview({data} : { data: ProposalInformation }) {
       <ProposaQuestionaryReview data={data} />
       <div className={classes.buttons}>
         <ProposalNavigationFragment
-        back={() => api.back(data)}
-        backLabel="Back"
-        next={() => {
-          submitProposal(data.id).then(isSubmitted => {
-            data.status = ProposalStatus.SUBMITTED;
-            api.next(data);
-          });
-        }}
-        nextLabel={data.status ? "Update" : "Submit"}
-        isLoading={isLoading}
-        disabled={true}
+          back={() => api.back(data)}
+          backLabel="Back"
+          next={() => {
+            submitProposal(data.id).then(isSubmitted => {
+              data.status = ProposalStatus.SUBMITTED;
+              api.next(data);
+            });
+          }}
+          nextLabel={data.status ? "Update" : "Submit"}
+          isLoading={isLoading}
+          disabled={true}
         />
       </div>
     </>

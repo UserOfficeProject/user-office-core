@@ -10,8 +10,8 @@ import {
   Questionary,
   QuestionaryStep,
   QuestionaryField
-} from "../model/ProposalModel";
-import { EvaluatorOperator } from "../model/ConditionEvaluator";
+} from "../models/ProposalModel";
+import { EvaluatorOperator } from "../models/ConditionEvaluator";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([

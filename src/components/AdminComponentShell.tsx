@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Typography, makeStyles } from "@material-ui/core";
-import { EventType } from "../model/QuestionaryEditorModel";
+import { EventType } from "../models/QuestionaryEditorModel";
 import { AdminComponentShellSignature } from "./QuestionaryFieldEditor";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
 

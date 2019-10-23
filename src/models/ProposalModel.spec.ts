@@ -11,7 +11,6 @@ import {
 
 test("Can parse object", () => {
   var template = create1Topic3FieldWithDependenciesQuestionary();
-  debugger;
   expect(getAllFields(template).length).toBe(3);
   expect(getFieldById(template, "links_with_industry")!.dependencies).not.toBe(
     null
