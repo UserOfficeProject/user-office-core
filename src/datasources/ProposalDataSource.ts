@@ -1,5 +1,4 @@
 import {
-  Proposal,
   ProposalTemplate,
   Topic,
   ProposalTemplateField,
@@ -7,6 +6,7 @@ import {
   DataType,
   Questionary
 } from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read

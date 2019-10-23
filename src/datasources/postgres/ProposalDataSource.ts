@@ -8,7 +8,6 @@ import {
 
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
-  Proposal,
   ProposalTemplate,
   ProposalTemplateField,
   FieldDependency,
@@ -20,6 +19,7 @@ import {
   Questionary,
   QuestionaryField
 } from "../../models/ProposalModel";
+import { Proposal } from "../../models/Proposal";
 import { ILogger } from "../../utils/Logger";
 import to from "await-to-js";
 

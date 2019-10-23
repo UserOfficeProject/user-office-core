@@ -1,6 +1,5 @@
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
-  Proposal,
   ProposalTemplate,
   ProposalTemplateField,
   DataType,
@@ -12,6 +11,7 @@ import {
   FieldCondition,
   Questionary
 } from "../../models/ProposalModel";
+import { Proposal } from "../../models/Proposal";
 import { Review } from "../../models/Review";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 

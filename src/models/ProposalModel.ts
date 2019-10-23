@@ -2,18 +2,6 @@ import { User } from "./User";
 import { Review } from "./Review";
 import { EvaluatorOperator } from "./ConditionEvaluator";
 
-export class Proposal {
-  constructor(
-    public id: number,
-    public title: string,
-    public abstract: string,
-    public proposer: number,
-    public status: ProposalStatus,
-    public created: string,
-    public updated: string
-  ) {}
-}
-
 export class ProposalInformation {
   constructor(
     public id: number,

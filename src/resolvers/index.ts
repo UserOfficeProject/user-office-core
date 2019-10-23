@@ -1,7 +1,6 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection, rejection } from "../rejection";
 import {
-  Proposal,
   ProposalAnswer,
   ProposalInformation,
   Topic,
@@ -10,6 +9,7 @@ import {
   DataType,
   ProposalTemplate
 } from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";

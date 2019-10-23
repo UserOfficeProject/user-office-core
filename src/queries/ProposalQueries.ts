@@ -3,12 +3,12 @@ import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import {
   ProposalTemplate,
-  Proposal,
   ProposalAnswer,
   Questionary,
   QuestionaryStep,
   QuestionaryField
 } from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
 import JSDict from "../utils/Dictionary";
 

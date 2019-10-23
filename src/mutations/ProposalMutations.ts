@@ -4,7 +4,6 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import {
-  Proposal,
   ProposalAnswer,
   Topic,
   ProposalTemplateField,
@@ -13,6 +12,7 @@ import {
   FieldConfig,
   ProposalTemplate
 } from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 
