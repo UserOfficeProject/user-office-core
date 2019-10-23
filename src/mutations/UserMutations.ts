@@ -15,7 +15,7 @@ export default class UserMutations {
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
-  createPasswordHash(password: string): string {
+  createHash(password: string): string {
     //Check that password follows rules
 
     //Setting fixed salt for development
@@ -34,6 +34,8 @@ export default class UserMutations {
     password: string,
     preferredname: string,
     orcid: string,
+    orcidHash: string,
+    refreshToken: string,
     gender: string,
     nationality: string,
     birthdate: string,
@@ -55,7 +57,11 @@ export default class UserMutations {
           return rejection("INVALID_LAST_NAME");
         }
 
-        const hash = this.createPasswordHash(password);
+        if (this.createHash(orcid) !== orcidHash) {
+          return rejection("ORCID_HASH_MISMATCH");
+        }
+
+        const hash = this.createHash(password);
 
         const user = await this.dataSource.create(
           user_title,
@@ -66,6 +72,7 @@ export default class UserMutations {
           hash,
           preferredname,
           orcid,
+          refreshToken,
           gender,
           nationality,
           birthdate,
@@ -254,7 +261,7 @@ export default class UserMutations {
   async resetPassword(token: string, password: string): Promise<Boolean> {
     // Check that token is valid
     try {
-      const hash = this.createPasswordHash(password);
+      const hash = this.createHash(password);
       const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
 

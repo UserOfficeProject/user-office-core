@@ -57,6 +57,7 @@ CREATE TABLE users (
 , password     varchar(100) NOT NULL
 , preferredname varchar(20) DEFAULT NULL
 , orcid       varchar(100) NOT NULL
+, orcid_refreshToken  varchar(100) NOT NULL
 , gender      varchar(12) NOT NULL
 , nationality varchar(30) NOT NULL
 , birthdate   DATE NOT NULL
@@ -226,6 +227,7 @@ INSERT INTO users (
                   password,
                   preferredname,
                   orcid,
+                  orcid_refreshToken,
                   gender,
                   nationality,
                   birthdate,
@@ -246,7 +248,8 @@ VALUES
                   'Carlsson', 
                   'testuser', 
                   '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
-                  null,
+                  '123123123',
+                  '123123123',
                   '581459604',
                   'male',
                   'Norwegian',
@@ -296,6 +299,7 @@ INSERT INTO users (
                   password,
                   preferredname,
                   orcid,
+                  orcid_refreshToken,
                   gender,
                   nationality,
                   birthdate,
@@ -317,6 +321,7 @@ VALUES (
                 '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
                 'Rhiannon',
                 '878321897',
+                '123123123',
                 'male',
                 'French',
                 '1981-08-05',
@@ -341,6 +346,7 @@ INSERT INTO users (
                   password,
                   preferredname,
                   orcid,
+                  orcid_refreshToken,
                   gender,
                   nationality,
                   birthdate,
@@ -362,6 +368,7 @@ VALUES (
                 '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
                 'Rhiannon',
                 '878321897',
+                '123123123',
                 'male',
                 'French',
                 '1981-08-05',

@@ -140,6 +140,8 @@ interface CreateUserArgs {
   password: string;
   preferredname: string;
   orcid: string;
+  orcidHash: string;
+  refreshToken: string;
   gender: string;
   nationality: string;
   birthdate: string;
@@ -478,6 +480,16 @@ export default {
     return context.queries.user.get(context.user, parseInt(args.id));
   },
 
+  getOrcIDInformation(
+    args: { authorizationCode: string },
+    context: ResolverContext
+  ) {
+    return context.queries.user.getOrcIDInformation(
+      context.user,
+      args.authorizationCode
+    );
+  },
+
   users(args: UsersArgs, context: ResolverContext) {
     return context.queries.user.getAll(
       context.user,
@@ -501,6 +513,8 @@ export default {
       args.password,
       args.preferredname,
       args.orcid,
+      args.orcidHash,
+      args.refreshToken,
       args.gender,
       args.nationality,
       args.birthdate,

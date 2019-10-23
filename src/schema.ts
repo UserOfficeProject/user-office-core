@@ -1,10 +1,11 @@
 var { buildSchema } = require("graphql");
-import { makeExecutableSchema } from 'graphql-tools'
-import { typeDefs as proposal } from  './schemas/proposal'
+import { makeExecutableSchema } from "graphql-tools";
+import { typeDefs as proposal } from "./schemas/proposal";
 
-
-
-export default makeExecutableSchema({typeDefs:[proposal, `
+export default makeExecutableSchema({
+  typeDefs: [
+    proposal,
+    `
 type Query {
     user(id: ID!): User
     users(filter: String, first: Int, offset: Int): UserQueryResult
@@ -14,6 +15,15 @@ type Query {
     calls: [Call]
     getPageContent(id: PageName!): String
     fileMetadata(fileIds:[String]): [FileMetadata]
+    getOrcIDInformation(authorizationCode: String): OrcIDInformation
+  }
+
+  type OrcIDInformation {
+    firstname: String,
+    lastname: String,
+    orcid: String
+    orcidHash: String
+    refreshToken: String
   }
 
   type Rejection {
@@ -63,6 +73,8 @@ type Query {
         password: String!,
         preferredname: String,
         orcid: String!,
+        orcidHash: String!,
+        refreshToken: String!,
         gender: String!,
         nationality: String!,
         birthdate: String!,
@@ -138,4 +150,6 @@ type FileMetadata {
   sizeInBytes:Int,
   createdDate:String
 }
-`]});
+`
+  ]
+});

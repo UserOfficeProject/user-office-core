@@ -1,6 +1,8 @@
 import { UserDataSource } from "../datasources/UserDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
+var rp = require("request-promise");
+import * as bcrypt from "bcryptjs";
 
 export default class UserQueries {
   constructor(
@@ -21,6 +23,68 @@ export default class UserQueries {
     } else {
       return null;
     }
+  }
+
+  async getOrcIDAccessToken(authorizationCode: string) {
+    var options = {
+      method: "POST",
+      uri: process.env.ORCID_TOKEN_URL,
+      qs: {
+        client_id: process.env.ORCID_CLIENT_ID,
+        client_secret: process.env.ORCID_CLIENT_SECRET,
+        grant_type: "authorization_code",
+        code: authorizationCode
+      },
+      headers: {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+    return rp(options)
+      .then(function(resp: any) {
+        return {
+          ...resp
+        };
+      })
+      .catch(function(err: any) {
+        return null;
+      });
+  }
+
+  async getOrcIDInformation(user: User | null, authorizationCode: string) {
+    const orcData = await this.getOrcIDAccessToken(authorizationCode);
+    if (!orcData) {
+      return null;
+    }
+    var options = {
+      uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
+      headers: {
+        Accept: "application/vnd.orcid+json",
+        Authorization: `Bearer ${orcData.access_token}`
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    return rp(options)
+      .then(function(resp: any) {
+        // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
+        const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+        const hash = bcrypt.hashSync(resp.name.path, salt);
+        return {
+          orcid: resp.name.path,
+          orcidHash: hash,
+          refreshToken: orcData.refresh_token,
+          firstname: resp.name["given-names"]
+            ? resp.name["given-names"].value
+            : null,
+          lastname: resp.name["family-name"]
+            ? resp.name["family-name"].value
+            : null
+        };
+      })
+      .catch(function(err: any) {
+        return null;
+      });
   }
 
   async getAll(

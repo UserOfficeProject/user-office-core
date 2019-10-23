@@ -25,6 +25,7 @@ export interface UserDataSource {
     password: string,
     preferredname: string,
     orcid: string,
+    orcidRefreshToken: string,
     gender: string,
     nationality: string,
     birthdate: string,
