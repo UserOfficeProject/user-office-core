@@ -16,6 +16,10 @@ import FormikDropdown from "./FormikDropdown";
 import nationalities from "../model/nationalities";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
+import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
+import orcid from "../images/orcid.png";
+
+const queryString = require("query-string");
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -42,8 +46,32 @@ const useStyles = makeStyles(theme => ({
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3)
   },
+  orcButton: {
+    "&:hover": {
+      border: "1px solid #338caf",
+      color: "#338caf"
+    },
+    border: "1px solid #D3D3D3",
+    padding: ".3em",
+    "background-color": "#fff !important",
+    "border-radius": "8px",
+    "box-shadow": "1px 1px 3px #999",
+    cursor: "pointer",
+    color: "#999",
+    "font-weight": "bold",
+    "font-size": ".8em",
+    "line-height": "24px",
+    "vertical-align": "middle"
+  },
+
   submit: {
     margin: theme.spacing(3, 0, 2)
+  },
+  orcidIcon: {
+    display: "block",
+    margin: "0 .5em 0 0",
+    padding: 0,
+    float: "left"
   },
   gridRoot: {
     flexGrow: 1
@@ -57,9 +85,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SignUp() {
+export default function SignUp(props) {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
+  let authCodeOrcID = queryString.parse(props.location.search).code;
+  const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
   const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
     return { text: nationality, value: nationality };
   });
@@ -74,6 +104,8 @@ export default function SignUp() {
                             $password: String!,
                             $preferredname: String,
                             $orcid: String!,
+                            $orcidHash: String!,
+                            $refreshToken: String!,
                             $gender: String!,
                             $nationality: String!,
                             $birthdate: String!,
@@ -95,6 +127,8 @@ export default function SignUp() {
                               password: $password,
                               preferredname: $preferredname
                               orcid: $orcid
+                              orcidHash: $orcidHash
+                              refreshToken: $refreshToken
                               gender: $gender
                               nationality: $nationality
                               birthdate: $birthdate
@@ -111,23 +145,29 @@ export default function SignUp() {
                         error
                      }
                   }`;
-    request("/graphql", query, values).then(data =>
-      setUserID(data.createUser.user.id)
-    );
+    request("/graphql", query, {
+      ...values,
+      orcid: orcData.orcid,
+      orcidHash: orcData.orcidHash,
+      refreshToken: orcData.refreshToken
+    }).then(data => setUserID(data.createUser.user.id));
   };
 
+  if (authCodeOrcID && loading) {
+    return <p>loading</p>;
+  }
+  console.log(orcData);
   return (
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
           user_title: "",
-          firstname: "",
+          firstname: orcData ? orcData.firstname : "",
           middlename: "",
-          lastname: "",
+          lastname: orcData ? orcData.lastname : "",
           username: "",
           password: "",
           preferredname: "",
-          orcid: "",
           gender: "",
           nationality: "",
           birthdate: dateformat(
@@ -164,9 +204,6 @@ export default function SignUp() {
             .min(8, "Password must be at least 8 characters")
             .max(25, "Password must be at most 25 characters")
             .required("Password must be at least 8 characters"),
-          orcid: Yup.string()
-            .min(8, "ORCID must be at least 8 characters")
-            .required("ORCID must be at least 8 characters"),
           gender: Yup.string().required("please specify your gender"),
           nationality: Yup.string().required("please specify your nationality"),
           birthdate: Yup.date()
@@ -216,6 +253,49 @@ export default function SignUp() {
             </p>
           ) : (
             <React.Fragment>
+              <Card className={classes.card}>
+                <Typography className={classes.cardHeader}>
+                  {orcData ? "Found OrcID" : "Register OrcID"}
+                </Typography>
+                <CardContent>
+                  {orcData ? (
+                    <p>{orcData.orcid}</p>
+                  ) : (
+                    <React.Fragment>
+                      <p>
+                        ESS is collecting your ORCID iD so we can verify and
+                        update your record. When you click the “Register”
+                        button, we will ask you to share your iD using an
+                        authenticated process: either by registering for an
+                        ORCID iD or, if you already have one, by signing into
+                        your ORCID account, then granting us permission to get
+                        your ORCID iD. We do this to ensure that you are
+                        correctly identified and securely connecting your ORCID
+                        iD.
+                      </p>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.orcButton}
+                        onClick={() =>
+                          (window.location.href =
+                            process.env.REACT_APP_ORCID_REDIRECT)
+                        }
+                      >
+                        <img
+                          className={classes.orcidIcon}
+                          src={orcid}
+                          width="24"
+                          height="24"
+                          alt="ORCID iD icon"
+                        />
+                        Register your ORCID iD
+                      </Button>
+                    </React.Fragment>
+                  )}
+                </CardContent>
+              </Card>
               <Card className={classes.card}>
                 <Typography className={classes.cardHeader}>
                   Login details
@@ -331,15 +411,6 @@ export default function SignUp() {
                 </Typography>
                 <CardContent>
                   <Grid container spacing={1}>
-                    <Field
-                      name="orcid"
-                      label="ORCID"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="orcid"
-                    />
                     <Field
                       name="organisation"
                       label="Organisation"
