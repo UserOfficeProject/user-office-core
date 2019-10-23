@@ -28,10 +28,10 @@ export default class UserQueries {
   async getOrcIDAccessToken(authorizationCode: string) {
     var options = {
       method: "POST",
-      uri: "https://sandbox.orcid.org/oauth/token",
+      uri: process.env.ORCID_TOKEN_URL,
       qs: {
-        client_id: "APP-CIF25IJ0S3CDB3C8",
-        client_secret: "c3ba31f8-7e79-4d0d-bf4c-b6e6c300addd",
+        client_id: process.env.ORCID_CLIENT_ID,
+        client_secret: process.env.ORCID_CLIENT_SECRET,
         grant_type: "authorization_code",
         code: authorizationCode
       },
@@ -42,13 +42,11 @@ export default class UserQueries {
     };
     return rp(options)
       .then(function(resp: any) {
-        console.log(resp);
         return {
           ...resp
         };
       })
       .catch(function(err: any) {
-        console.log(err);
         return null;
       });
   }
@@ -59,7 +57,7 @@ export default class UserQueries {
       return null;
     }
     var options = {
-      uri: `https://api.sandbox.orcid.org/v2.1/${orcData.orcid}/person`,
+      uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
         Accept: "application/vnd.orcid+json",
         Authorization: `Bearer ${orcData.access_token}`
@@ -69,7 +67,6 @@ export default class UserQueries {
 
     return rp(options)
       .then(function(resp: any) {
-        console.log(resp);
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
         const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
         const hash = bcrypt.hashSync(resp.name.path, salt);
