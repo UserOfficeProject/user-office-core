@@ -18,6 +18,7 @@ import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
 import orcid from "../images/orcid.png";
+import clsx from "clsx";
 
 const queryString = require("query-string");
 
@@ -45,6 +46,9 @@ const useStyles = makeStyles(theme => ({
   form: {
     width: "100%", // Fix IE 11 issue.
     marginTop: theme.spacing(3)
+  },
+  errorBox: {
+    border: "2px solid red"
   },
   orcButton: {
     "&:hover": {
@@ -88,6 +92,7 @@ const useStyles = makeStyles(theme => ({
 export default function SignUp(props) {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
+  const [orcidError, setOrcidError] = useState(false);
   let authCodeOrcID = queryString.parse(props.location.search).code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
   const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
@@ -182,7 +187,11 @@ export default function SignUp(props) {
           telephone_alt: ""
         }}
         onSubmit={async (values, actions) => {
-          await sendSignUpRequest(values);
+          if (orcData && orcData.orcid) {
+            await sendSignUpRequest(values);
+          } else {
+            setOrcidError(true);
+          }
           actions.setSubmitting(false);
         }}
         validationSchema={Yup.object().shape({
@@ -252,7 +261,12 @@ export default function SignUp(props) {
             </p>
           ) : (
             <React.Fragment>
-              <Card className={classes.card}>
+              <Card
+                className={clsx({
+                  [classes.card]: true,
+                  [classes.errorBox]: orcidError
+                })}
+              >
                 <Typography className={classes.cardHeader}>
                   {orcData ? "Found OrcID" : "Register OrcID"}
                 </Typography>
@@ -261,6 +275,7 @@ export default function SignUp(props) {
                     <p>{orcData.orcid}</p>
                   ) : (
                     <React.Fragment>
+                      {orcidError ? "OrcID is require" : ""}
                       <p>
                         ESS is collecting your ORCID iD so we can verify and
                         update your record. When you click the “Register”
