@@ -500,13 +500,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       sort_order: values.sortOrder
     };
 
-    // TODO update dependencies if provided
-
-    await database("proposal_question_dependencies")
-      .where("proposal_question_id", proposal_question_id)
-      .del();
-
     if (values.dependencies) {
+      await database("proposal_question_dependencies")
+        .where("proposal_question_id", proposal_question_id)
+        .del();
       values.dependencies.forEach(async dependency => {
         await database("proposal_question_dependencies").insert({
           proposal_question_id: dependency.proposal_question_id,
