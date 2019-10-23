@@ -19,7 +19,7 @@ import {
   QuestionaryStep,
   Questionary,
   QuestionaryField
-} from "../../models/Proposal";
+} from "../../models/ProposalModel";
 import { ILogger } from "../../utils/Logger";
 import to from "await-to-js";
 

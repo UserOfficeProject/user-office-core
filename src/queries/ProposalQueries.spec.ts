@@ -14,7 +14,7 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { ProposalTemplate } from "../models/Proposal";
+import { ProposalTemplate } from "../models/ProposalModel";
 import { DummyLogger } from "../utils/Logger";
 
 const userAuthorization = new UserAuthorization(

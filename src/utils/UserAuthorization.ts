@@ -1,5 +1,5 @@
 import { User } from "../models/User";
-import { Proposal } from "../models/Proposal";
+import { Proposal } from "../models/ProposalModel";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { ReviewDataSource } from "../datasources/ReviewDataSource";

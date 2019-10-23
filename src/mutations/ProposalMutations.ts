@@ -12,7 +12,7 @@ import {
   FieldDependency,
   FieldConfig,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 

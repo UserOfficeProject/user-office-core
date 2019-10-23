@@ -9,7 +9,7 @@ import {
   ProposalTemplateField,
   DataType,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";

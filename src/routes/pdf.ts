@@ -1,7 +1,11 @@
 import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
-import { DataType, Questionary, QuestionaryField } from "../models/Proposal";
+import {
+  DataType,
+  Questionary,
+  QuestionaryField
+} from "../models/ProposalModel";
 import { createToC } from "./pdfTableofContents/index";
 import {
   getQuestionaryStepByTopicId,

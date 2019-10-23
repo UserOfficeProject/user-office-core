@@ -1,4 +1,4 @@
-import { Proposal } from "../models/Proposal";
+import { Proposal } from "../models/ProposalModel";
 import { User } from "../models/User";
 
 interface ProposalAcceptedEvent {

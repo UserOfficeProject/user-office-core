@@ -11,7 +11,7 @@ import {
   TemplateStep,
   FieldCondition,
   Questionary
-} from "../../models/Proposal";
+} from "../../models/ProposalModel";
 import { Review } from "../../models/Review";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 

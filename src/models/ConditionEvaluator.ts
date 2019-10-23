@@ -1,5 +1,5 @@
 import JSDict from "../utils/Dictionary";
-import { QuestionaryField } from "./Proposal";
+import { QuestionaryField } from "./ProposalModel";
 
 export enum EvaluatorOperator {
   EQ = "eq",

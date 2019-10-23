@@ -8,7 +8,7 @@ import {
   Questionary,
   QuestionaryStep,
   QuestionaryField
-} from "../models/Proposal";
+} from "../models/ProposalModel";
 import { ILogger } from "../utils/Logger";
 import JSDict from "../utils/Dictionary";
 

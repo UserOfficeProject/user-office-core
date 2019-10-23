@@ -7,7 +7,7 @@ import {
   DataType,
   DataTypeSpec,
   FieldDependency
-} from "./Proposal";
+} from "./ProposalModel";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
