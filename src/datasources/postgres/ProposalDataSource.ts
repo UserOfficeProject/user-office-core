@@ -408,19 +408,19 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             AND proposal_topic_completenesses.proposal_id = ${proposalId}`))
       .rows;
 
-    const fields = fieldRecords.map(record =>
-      this.createQuestionaryFieldObject(record)
-    );
-
     const dependencies = dependencyRecords.map(record =>
       this.createFieldDependencyObject(record)
+    );
+
+    const fields = fieldRecords.map(record =>
+      this.createQuestionaryFieldObject(record)
     );
 
     let steps = Array<QuestionaryStep>();
     topicRecords.forEach(topic => {
       steps.push(
         new QuestionaryStep(
-          topic,
+          this.createTopicObject(topic),
           topic.is_complete,
           fields.filter(field => field.topic_id === topic.topic_id)
         )
