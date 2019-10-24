@@ -61,7 +61,7 @@ export default function ProposalInformationView(props) {
                 label="Title"
                 defaultValue={values.title}
                 fullWidth
-                onChange={() => { props.setIsDirty(true); handleChange() }}
+                onChange={(e) => { props.setIsDirty(true); handleChange(e) }}
                 error={touched.title && errors.title}
                 helperText={touched.title && errors.title && errors.title}
               />
@@ -78,7 +78,7 @@ export default function ProposalInformationView(props) {
                 rows="4"
                 defaultValue={values.abstract}
                 fullWidth
-                onChange={() => { props.setIsDirty(true); handleChange() }}
+                onChange={(e) => { props.setIsDirty(true); handleChange(e) }}
                 error={touched.abstract && errors.abstract}
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
