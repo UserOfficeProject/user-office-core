@@ -50,7 +50,7 @@ export default function ProposalReview({
               api.next(data);
             });
           }}
-          reset={() => api.reset()}
+          reset={undefined}
           nextLabel={"Submit"}
           isLoading={isLoading}
           disabled={false}
