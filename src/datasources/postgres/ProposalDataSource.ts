@@ -405,8 +405,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             proposal_topic_completenesses
           ON 
             proposal_topics.topic_id = proposal_topic_completenesses.topic_id
-            AND proposal_topic_completenesses.proposal_id = ${proposalId}`))
-      .rows;
+            AND proposal_topic_completenesses.proposal_id = ${proposalId}
+          ORDER BY
+            proposal_topics.sort_order`)).rows;
 
     const dependencies = dependencyRecords.map(record =>
       this.createFieldDependencyObject(record)
