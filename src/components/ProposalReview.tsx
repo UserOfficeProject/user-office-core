@@ -6,6 +6,8 @@ import { useSubmitProposal } from "../hooks/useSubmitProposal";
 import { ProposalData, ProposalStatus } from "../model/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
+import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
+import { Button } from "@material-ui/core";
 
 const useStyles = makeStyles({
   buttons: {
@@ -13,15 +15,20 @@ const useStyles = makeStyles({
     justifyContent: "flex-end"
   },
   button: {
-    marginTop: "25px",
-    marginLeft: "10px"
+    marginTop: "30px",
+    marginLeft: "10px",
+    backgroundColor: "#00C851",
+    color: "#ffff" ,
+    "&:hover": {
+      backgroundColor: "#007E33",
+    },
   }
 });
-
 export default function ProposalReview({data} : { data: ProposalData }) {
   const api = useContext(FormApi);
   const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
+  const downloadPDFProposal = useDownloadPDFProposal();
 
   return (
     <>
@@ -37,10 +44,11 @@ export default function ProposalReview({data} : { data: ProposalData }) {
             api.next(data);
           });
         }}
-        nextLabel={data.status ? "Update" : "Submit"}
+        nextLabel={"Submit"}
         isLoading={isLoading}
-        disabled={true}
         />
+        <Button className={classes.button} onClick={() => downloadPDFProposal(data.id)}>Download PDF</Button>
+
       </div>
     </>
   );

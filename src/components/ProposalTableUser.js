@@ -28,7 +28,7 @@ export default function ProposalTableUser(props) {
           return {
             id: proposal.id,
             title: proposal.title,
-            status: proposal.status
+            status: proposal.status === 0 ? "Open" : "Submitted"
           };
         })
       };
