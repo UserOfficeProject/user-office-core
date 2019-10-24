@@ -61,7 +61,7 @@ export default function ProposalInformationView(props) {
                 label="Title"
                 defaultValue={values.title}
                 fullWidth
-                onChange={handleChange}
+                onChange={() => { props.setIsDirty(true); handleChange() }}
                 error={touched.title && errors.title}
                 helperText={touched.title && errors.title && errors.title}
               />
@@ -78,7 +78,7 @@ export default function ProposalInformationView(props) {
                 rows="4"
                 defaultValue={values.abstract}
                 fullWidth
-                onChange={handleChange}
+                onChange={() => { props.setIsDirty(true); handleChange() }}
                 error={touched.abstract && errors.abstract}
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
@@ -88,11 +88,12 @@ export default function ProposalInformationView(props) {
           </Grid>
           <ProposalParticipants
             error={userError}
-            setUsers={setUsers}
+            setUsers={(users) => { props.setIsDirty(true); setUsers(users) }}
             users={users}
           />
           <ProposalNavigationFragment
             disabled={props.disabled}
+            reset={api.reset}
             next={submitForm}
             isLoading={loading}
           />

@@ -23,6 +23,7 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import ErrorIcon from "@material-ui/icons/Error";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { usePrevious } from "../hooks/usePrevious";
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -33,6 +34,7 @@ export function FileUploadComponent(props: {
 }) {
   const { getFileMetadata, filesMetadata } = useGetFileMetadata();
   const [files, setFiles] = useState<FileMetaData[]>([]);
+  const previousFiles = usePrevious(files);
   const inputRef = useRef(null);
 
   const classes = makeStyles(theme => ({
@@ -47,11 +49,19 @@ export function FileUploadComponent(props: {
   }))();
 
   useEffect(() => {
+    if (previousFiles === undefined) {
+      return; // first call
+    }
+
+    if (previousFiles.length === files.length) {
+      return; // no files added or removed
+    }
+
     const inputElement: HTMLInputElement = inputRef.current!;
     let event: any = {};
     event.target = inputElement;
     props.onChange(event);
-  }, [files]); // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
+  }, [files, previousFiles]); // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
 
   useEffect(() => {
     if (props.value) {

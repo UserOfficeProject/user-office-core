@@ -42,6 +42,7 @@ export default function ProposalReview({
               api.next(data);
             });
           }}
+          reset={() => api.reset()}
           nextLabel={data.status ? "Update" : "Submit"}
           isLoading={isLoading}
           disabled={true}

@@ -12,13 +12,19 @@ import { ProposalInformation } from "../models/ProposalModel";
 import ProposalInformationView from "./ProposalInformationView";
 import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom, StepButton } from "@material-ui/core";
+import { useLoadProposal } from "../hooks/useLoadProposal";
+import withConfirm from "../utils/withConfirm";
 
-export default function ProposalContainer(props: {
+export default withConfirm(function ProposalContainer(props: {
   data: ProposalInformation;
+  confirm: Function;
 }) {
+  const { loadProposal } = useLoadProposal();
   const [proposalInfo, setProposalInfo] = useState(props.data);
+
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
+  const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
@@ -43,16 +49,37 @@ export default function ProposalContainer(props: {
       ...proposalInfo,
       ...data
     });
-
     setStepIndex(stepIndex + 1);
+    setIsDirty(false);
   };
 
-  const handleBack = (data: ProposalInformation) => {
+  const handleBack = async (data: ProposalInformation) => {
     setProposalInfo({
       ...proposalInfo,
       ...data
     });
     setStepIndex(stepIndex - 1);
+    setIsDirty(false);
+  };
+
+  /**
+   * Returns true if state is clean, false otherwise if clean
+   */
+  const handleReset = async (): Promise<boolean> => {
+    if (isDirty) {
+      const confirmed = window.confirm(
+        "Are you sure? You will lose any recently made changes?"
+      );
+      if (confirmed) {
+        const proposalData = await loadProposal(proposalInfo.id);
+        setProposalInfo(proposalData);
+        setIsDirty(false);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
   };
 
   const handleError = (msg: string) => {
@@ -69,7 +96,12 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           "New Proposal",
           false,
-          <ProposalInformationView data={proposalInfo} />
+          (
+            <ProposalInformationView
+              data={proposalInfo}
+              setIsDirty={setIsDirty}
+            />
+          )
         )
       );
       allProposalSteps = allProposalSteps.concat(
@@ -82,6 +114,7 @@ export default function ProposalContainer(props: {
                 <ProposalQuestionareStep
                   topicId={step.topic.topic_id}
                   data={proposalInfo}
+                  setIsDirty={setIsDirty}
                 />
               )
             )
@@ -126,7 +159,17 @@ export default function ProposalContainer(props: {
     return proposalSteps[step].element;
   };
 
-  const api = { next: handleNext, back: handleBack, error: handleError };
+  const api = {
+    next: handleNext,
+    back: handleBack,
+    reset: async () => {
+      const stepBeforeReset = stepIndex;
+      if (await handleReset()) {
+        setStepIndex(stepBeforeReset);
+      }
+    },
+    error: handleError
+  };
 
   return (
     <Container maxWidth="lg">
@@ -139,8 +182,10 @@ export default function ProposalContainer(props: {
             {proposalSteps.map((proposalStep, index, steps) => (
               <Step key={proposalStep.title}>
                 <QuestionaryStepButton
-                  onClick={() => {
-                    setStepIndex(index);
+                  onClick={async () => {
+                    if (!isDirty || (await handleReset())) {
+                      setStepIndex(index);
+                    }
                   }}
                   completed={proposalStep.completed}
                   isClickable={
@@ -170,7 +215,7 @@ export default function ProposalContainer(props: {
       </FormApi.Provider>
     </Container>
   );
-}
+});
 
 class QuestionaryUIStep {
   constructor(
@@ -203,10 +248,12 @@ const ErrorMessageBox = (props: { message?: string | undefined }) => {
 };
 
 type CallbackSignature = (data: ProposalInformation) => void;
+type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{
   next: CallbackSignature;
   back: CallbackSignature;
+  reset: VoidCallbackSignature;
   error: (msg: string) => void;
 }>({
   next: () => {
@@ -214,6 +261,9 @@ export const FormApi = createContext<{
   },
   back: () => {
     console.warn("Using default implementation for back");
+  },
+  reset: () => {
+    console.warn("Using default implementation for reset");
   },
   error: () => {
     console.warn("Using default implementation for error");

@@ -31,6 +31,7 @@ import submitFormAsync from "../utils/FormikAsyncFormHandler";
 export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
   topicId: number;
+  setIsDirty: (isDirty: boolean) => void;
 }) {
   const { data, topicId } = props;
   const api = useContext(FormApi);
@@ -113,7 +114,10 @@ export default function ProposalQuestionareStep(props: {
                 key={field.proposal_question_id}
               >
                 {componentFactory.createComponent(field, {
-                  onComplete: forceUpdate, // for re-rendering when input changes
+                  onComplete: () => {
+                    forceUpdate();
+                    props.setIsDirty(true);
+                  }, // for re-rendering when input changes
                   touched: touched, // for formik
                   errors: errors, // for formik
                   handleChange: handleChange // for formik
@@ -135,6 +139,7 @@ export default function ProposalQuestionareStep(props: {
                 }
               );
             }}
+            reset={() => api.reset()}
             next={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
@@ -182,8 +187,10 @@ class ComponentFactory {
 
     const component = this.componentMap.get(field.data_type);
 
-    return component
-      ? React.createElement(component, props)
-      : React.createElement(this.componentMap.get(DataType.TEXT_INPUT), props); // TMP
+    if (!component) {
+      throw new Error(`Could not create component for type ${field.data_type}`);
+    }
+
+    return React.createElement(component, props);
   }
 }
