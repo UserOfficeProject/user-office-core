@@ -4,7 +4,7 @@ import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryEditorModel, {
   EventType,
   IEvent
-} from "./QuestionaryEditorModel";
+} from "../models/QuestionaryEditorModel";
 import {
   Paper,
   makeStyles,
@@ -16,7 +16,7 @@ import {
   LinearProgress
 } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
-import { ProposalTemplateField } from "../model/ProposalModel";
+import { ProposalTemplateField } from "../models/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 import Notification from "./Notification";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
@@ -119,7 +119,7 @@ export default function QuestionaryEditor() {
   const progressJsx = isLoading ? <LinearProgress /> : null;
 
   const addNewTopicFallbackButton =
-    state.topics.length === 0 ? (
+    state.steps.length === 0 ? (
       <Button
         variant="outlined"
         color="primary"
@@ -167,12 +167,12 @@ export default function QuestionaryEditor() {
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
               >
-                {state.topics.map((topic, index) => (
+                {state.steps.map((step, index) => (
                   <QuestionaryEditorTopic
-                    data={topic}
+                    data={step}
                     dispatch={dispatch}
                     index={index}
-                    key={topic.topic_id}
+                    key={step.topic.topic_id}
                     onItemClick={onClick}
                     condenseMode={isTopicReorderMode}
                   />

@@ -1,15 +1,17 @@
-
-import React from 'react';
-import ReactTestRenderer from 'react-test-renderer';
+import React from "react";
+import ReactTestRenderer from "react-test-renderer";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { createTemplate } from '../test/ProposalTestBed';
-import { ProposalTemplate } from '../model/ProposalModel';
+import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
+import { QuestionaryField } from "../models/ProposalModel";
+import { getFieldById } from "../models/ProposalModelFunctions";
 
-test('Textfield rendered without crashing', () => {
-  var template = createTemplate();
+test("Textfield rendered without crashing", () => {
+  var template = create1Topic3FieldWithDependenciesQuestionary();
   const renderer = ReactTestRenderer.create(
     <ProposalComponentTextInput
-      templateField={ProposalTemplate.getFieldById(template, "links_with_industry")!}
+      templateField={
+        getFieldById(template, "links_with_industry")! as QuestionaryField
+      }
       onComplete={() => {}}
       handleChange={() => {}}
       errors={{}}

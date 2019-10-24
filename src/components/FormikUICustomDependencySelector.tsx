@@ -14,8 +14,9 @@ import {
   DataType,
   FieldCondition,
   ProposalTemplateField
-} from "../model/ProposalModel";
-import { EvaluatorOperator } from "../model/ConditionEvaluator";
+} from "../models/ProposalModel";
+import { getFieldById, getAllFields } from "../models/ProposalModelFunctions";
+import { EvaluatorOperator } from "../models/ConditionEvaluator";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -69,7 +70,7 @@ const FormikUICustomDependencySelector = ({
 
   useEffect(() => {
     if (dependencyId) {
-      const depField = ProposalTemplate.getFieldById(template, dependencyId);
+      const depField = getFieldById(template, dependencyId);
       if (!depField) {
         return;
       }
@@ -115,7 +116,7 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {ProposalTemplate.getAllFields(template)
+            {getAllFields(template)
               .filter(option =>
                 [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
                   option.data_type

@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState, useRef, useEffect } from "react";
-import { FileMetaData } from "../model/FileUpload";
+import { FileMetaData } from "../models/FileUpload";
 import {
   useFileUpload,
   useGetFileMetadata,
@@ -16,12 +16,14 @@ import {
   ListItemSecondaryAction,
   Button,
   makeStyles,
-  List} from "@material-ui/core";
+  List
+} from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import ErrorIcon from "@material-ui/icons/Error";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { usePrevious } from "../hooks/usePrevious";
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -32,26 +34,34 @@ export function FileUploadComponent(props: {
 }) {
   const { getFileMetadata, filesMetadata } = useGetFileMetadata();
   const [files, setFiles] = useState<FileMetaData[]>([]);
+  const previousFiles = usePrevious(files);
   const inputRef = useRef(null);
 
   const classes = makeStyles(theme => ({
     list: {
       listStyle: "none",
-      padding: 0, 
+      padding: 0,
       marginBottom: 0,
-      '& li': {
+      "& li": {
         paddingLeft: 0
       }
     }
   }))();
 
-   
   useEffect(() => {
+    if (previousFiles === undefined) {
+      return; // first call
+    }
+
+    if (previousFiles.length === files.length) {
+      return; // no files added or removed
+    }
+
     const inputElement: HTMLInputElement = inputRef.current!;
     let event: any = {};
     event.target = inputElement;
     props.onChange(event);
-  }, [files]);  // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
+  }, [files, previousFiles]); // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
 
   useEffect(() => {
     if (props.value) {
@@ -94,10 +104,7 @@ export function FileUploadComponent(props: {
         ref={inputRef}
       />
       {amountFilesInfo}
-      <List
-        component="ul"
-        className={classes.list}
-      >
+      <List component="ul" className={classes.list}>
         {files.map &&
           files.map((metaData: FileMetaData) => {
             return (
@@ -130,8 +137,8 @@ export function FileEntry(props: {
       color: "white"
     },
     downloadLink: {
-      display:"inline-flex",
-      color:"rgba(0, 0, 0, 0.54)"
+      display: "inline-flex",
+      color: "rgba(0, 0, 0, 0.54)"
     }
   }))();
 
@@ -162,7 +169,9 @@ export function FileEntry(props: {
       />
       <ListItemSecondaryAction>
         <IconButton edge="end">
-          <a href={downloadLink} className={classes.downloadLink} download><GetAppIcon /></a>
+          <a href={downloadLink} className={classes.downloadLink} download>
+            <GetAppIcon />
+          </a>
         </IconButton>
         <IconButton
           edge="end"
@@ -232,7 +241,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText primary="Error occurred" />
           <ListItemSecondaryAction>
-            <CancelIcon onClick={() => abort() }/>
+            <CancelIcon onClick={() => abort()} />
           </ListItemSecondaryAction>
         </>
       );
@@ -246,7 +255,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText primary="Upload cancelled" />
           <ListItemSecondaryAction>
-          <CancelIcon onClick={() => abort() }/>
+            <CancelIcon onClick={() => abort()} />
           </ListItemSecondaryAction>
         </>
       );
@@ -261,7 +270,7 @@ export function NewFileEntry(props: {
             secondary={Math.round(progress) + "%"}
           />
           <ListItemSecondaryAction>
-            { /* Add cancel upload button */}
+            {/* Add cancel upload button */}
           </ListItemSecondaryAction>
         </>
       );

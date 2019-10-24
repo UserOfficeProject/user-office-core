@@ -5,7 +5,7 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import TextFieldsIcon from "@material-ui/icons/TextFields";
-import { DataType } from "../model/ProposalModel";
+import { DataType } from "../models/ProposalModel";
 
 const getTemplateFieldIcon = (dataType: DataType) => {
   switch (dataType) {

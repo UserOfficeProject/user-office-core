@@ -3,24 +3,26 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
 import Typography from "@material-ui/core/Typography";
 import ProposalReview from "./ProposalReview";
 import Container from "@material-ui/core/Container";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import {
-  ProposalTemplate,
-  ProposalData,
-  ProposalStatus
-} from "../model/ProposalModel";
-import ProposalInformation from "./ProposalInformation";
+import { ProposalStatus, Questionary } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
+import ProposalInformationView from "./ProposalInformationView";
 import ErrorIcon from "@material-ui/icons/Error";
-import { Zoom } from "@material-ui/core";
+import { Zoom, StepButton } from "@material-ui/core";
+import { useLoadProposal } from "../hooks/useLoadProposal";
 
-export default function ProposalContainer(props: { data: ProposalData }) {
-  const [proposalData, setProposalData] = useState(props.data);
+export default function ProposalContainer(props: {
+  data: ProposalInformation;
+}) {
+  const { loadProposal } = useLoadProposal();
+  const [proposalInfo, setProposalInfo] = useState(props.data);
+
   const [stepIndex, setStepIndex] = useState(0);
-  const [proposalSteps, setProposalSteps] = useState<ProposalStep[]>([]);
+  const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
+  const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
@@ -40,21 +42,42 @@ export default function ProposalContainer(props: { data: ProposalData }) {
     }
   }))();
 
-  const handleNext = (data: ProposalData) => {
-    setProposalData({
-      ...proposalData,
+  const handleNext = (data: ProposalInformation) => {
+    setProposalInfo({
+      ...proposalInfo,
       ...data
     });
-
     setStepIndex(stepIndex + 1);
+    setIsDirty(false);
   };
 
-  const handleBack = (data: ProposalData) => {
-    setProposalData({
-      ...proposalData,
+  const handleBack = async (data: ProposalInformation) => {
+    setProposalInfo({
+      ...proposalInfo,
       ...data
     });
     setStepIndex(stepIndex - 1);
+    setIsDirty(false);
+  };
+
+  /**
+   * Returns true if state is clean, false otherwise
+   */
+  const handleReset = async (): Promise<boolean> => {
+    if (isDirty) {
+      const confirmed = window.confirm(
+        "Changes you recently made in this step will not be saved! Are you sure?"
+      );
+      if (confirmed) {
+        const proposalData = await loadProposal(proposalInfo.id);
+        setProposalInfo(proposalData);
+        setIsDirty(false);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
   };
 
   const handleError = (msg: string) => {
@@ -63,39 +86,63 @@ export default function ProposalContainer(props: { data: ProposalData }) {
 
   useEffect(() => {
     const createProposalSteps = (
-      proposalTemplate: ProposalTemplate
-    ): ProposalStep[] => {
-      var allProposalSteps = new Array<ProposalStep>();
+      questionary: Questionary
+    ): QuestionaryUIStep[] => {
+      var allProposalSteps = new Array<QuestionaryUIStep>();
 
       allProposalSteps.push(
-        new ProposalStep(
+        new QuestionaryUIStep(
           "New Proposal",
-          <ProposalInformation data={proposalData} />
+          false,
+          (
+            <ProposalInformationView
+              data={proposalInfo}
+              setIsDirty={setIsDirty}
+            />
+          )
         )
       );
       allProposalSteps = allProposalSteps.concat(
-        proposalTemplate.topics.map(
-          topic =>
-            new ProposalStep(
-              topic.topic_title,
+        questionary.steps.map(
+          step =>
+            new QuestionaryUIStep(
+              step.topic.topic_title,
+              step.isCompleted,
               (
                 <ProposalQuestionareStep
-                  topicId={topic.topic_id}
-                  data={proposalData}
+                  topicId={step.topic.topic_id}
+                  data={proposalInfo}
+                  setIsDirty={setIsDirty}
                 />
               )
             )
         )
       );
       allProposalSteps.push(
-        new ProposalStep("Review", <ProposalReview data={proposalData} />)
+        new QuestionaryUIStep(
+          "Review",
+          proposalInfo.status === ProposalStatus.SUBMITTED,
+          <ProposalReview data={proposalInfo} />
+        )
       );
       return allProposalSteps;
     };
 
-    const proposalSteps = createProposalSteps(proposalData.questionary!);
+    const proposalSteps = createProposalSteps(proposalInfo.questionary!);
     setProposalSteps(proposalSteps);
-  }, [proposalData]);
+
+    var lastFinishedStep = proposalSteps
+      .slice()
+      .reverse()
+      .find(step => step.completed === true);
+
+    setStepIndex(
+      Math.max(
+        0,
+        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0
+      )
+    );
+  }, [proposalInfo]);
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
@@ -110,7 +157,17 @@ export default function ProposalContainer(props: { data: ProposalData }) {
     return proposalSteps[step].element;
   };
 
-  const api = { next: handleNext, back: handleBack, error: handleError };
+  const api = {
+    next: handleNext,
+    back: handleBack,
+    reset: async () => {
+      const stepBeforeReset = stepIndex;
+      if (await handleReset()) {
+        setStepIndex(stepBeforeReset);
+      }
+    },
+    error: handleError
+  };
 
   return (
     <Container maxWidth="lg">
@@ -119,33 +176,51 @@ export default function ProposalContainer(props: { data: ProposalData }) {
           <Typography component="h1" variant="h4" align="center">
             {false ? "Update Proposal" : "New Proposal"}
           </Typography>
-          <Stepper activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map(proposalStep => (
+          <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
+            {proposalSteps.map((proposalStep, index, steps) => (
               <Step key={proposalStep.title}>
-                <StepLabel>{proposalStep.title}</StepLabel>
+                <QuestionaryStepButton
+                  onClick={async () => {
+                    if (!isDirty || (await handleReset())) {
+                      setStepIndex(index);
+                    }
+                  }}
+                  completed={proposalStep.completed}
+                  isClickable={
+                    index === 0 ||
+                    proposalStep.completed ||
+                    steps[index - 1].completed === true
+                  }
+                >
+                  {proposalStep.title}
+                </QuestionaryStepButton>
               </Step>
             ))}
           </Stepper>
-            {proposalData.status === ProposalStatus.DRAFT ? (
-              <React.Fragment>
-                {getStepContent(stepIndex)}
-                <ErrorMessageBox message={errorMessage} />
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  {false ? "Update Proposal" : "Sent Proposal"}
-                </Typography>
-              </React.Fragment>
-            )}
+          {proposalInfo.status === ProposalStatus.DRAFT ? (
+            <React.Fragment>
+              {getStepContent(stepIndex)}
+              <ErrorMessageBox message={errorMessage} />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Typography variant="h5" gutterBottom>
+                {false ? "Update Proposal" : "Sent Proposal"}
+              </Typography>
+            </React.Fragment>
+          )}
         </Paper>
       </FormApi.Provider>
     </Container>
   );
 }
 
-class ProposalStep {
-  constructor(public title: string, public element: JSX.Element) {}
+class QuestionaryUIStep {
+  constructor(
+    public title: string,
+    public completed: boolean,
+    public element: JSX.Element
+  ) {}
 }
 
 const ErrorMessageBox = (props: { message?: string | undefined }) => {
@@ -170,20 +245,55 @@ const ErrorMessageBox = (props: { message?: string | undefined }) => {
   );
 };
 
-type CallbackSignature = (data: ProposalData) => void;
+type CallbackSignature = (data: ProposalInformation) => void;
+type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{
   next: CallbackSignature;
   back: CallbackSignature;
+  reset: VoidCallbackSignature;
   error: (msg: string) => void;
 }>({
-  next: (data: ProposalData) => {
+  next: () => {
     console.warn("Using default implementation for next");
   },
-  back: (data: ProposalData) => {
+  back: () => {
     console.warn("Using default implementation for back");
   },
-  error: (msg: string) => {
+  reset: () => {
+    console.warn("Using default implementation for reset");
+  },
+  error: () => {
     console.warn("Using default implementation for error");
   }
 });
+
+function QuestionaryStepButton(props: any) {
+  const classes = makeStyles(theme => ({
+    active: {
+      "& SVG": {
+        color: theme.palette.secondary.main + "!important"
+      }
+    },
+    clickable: {
+      "& SVG": {
+        color: theme.palette.primary.main + "!important"
+      }
+    }
+  }))();
+
+  const { active, isClickable } = props;
+
+  var buttonClasses = null;
+  if (active) {
+    buttonClasses = classes.active;
+  } else if (isClickable) {
+    buttonClasses = classes.clickable;
+  }
+
+  return (
+    <StepButton {...props} disabled={!isClickable} className={buttonClasses}>
+      {props.children}
+    </StepButton>
+  );
+}

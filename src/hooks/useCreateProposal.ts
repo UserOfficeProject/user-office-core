@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalData, ProposalTemplate } from "../model/ProposalModel";
+import { Questionary } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
 
 export function useCreateProposal() {
   const sendRequest = useDataAPI();
-  const [proposal, setProposal] = useState<ProposalData | null>(null);
+  const [proposal, setProposal] = useState<ProposalInformation | null>(null);
 
   useEffect(() => {
     const query = `
@@ -14,9 +15,12 @@ export function useCreateProposal() {
           id
           status
           questionary {
-            topics {
-              topic_title
-              topic_id,
+            steps {
+              topic {
+                topic_title
+                topic_id
+              }
+              isCompleted
               fields {
                 proposal_question_id
                 data_type
@@ -38,7 +42,7 @@ export function useCreateProposal() {
       `;
     sendRequest(query).then(data => {
       const proposal = data.createProposal.proposal;
-      proposal.questionary = ProposalTemplate.fromObject(proposal.questionary);
+      proposal.questionary = Questionary.fromObject(proposal.questionary);
       setProposal(proposal);
     });
   }, [sendRequest]);

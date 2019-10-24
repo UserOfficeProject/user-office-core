@@ -1,9 +1,7 @@
 import React, { Fragment } from "react";
-import {
-  ProposalData,
-  ProposalTemplateField,
-  ProposalTemplate
-} from "../model/ProposalModel";
+import { QuestionaryField } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
+import { getAllFields } from "../models/ProposalModelFunctions";
 import {
   Paper,
   Table,
@@ -16,11 +14,10 @@ import {
 } from "@material-ui/core";
 
 export default function ProposaQuestionaryReview(props: {
-  data: ProposalData;
+  data: ProposalInformation;
 }) {
+  const questionary = props.data.questionary!;
 
-  const template = props.data.questionary!;
-  
   if (!props.data) {
     return <div>Loading...</div>;
   }
@@ -31,7 +28,7 @@ export default function ProposaQuestionaryReview(props: {
     }
   }))();
 
-  const allFields = ProposalTemplate.getAllFields(template);
+  const allFields = getAllFields(questionary) as QuestionaryField[];
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
@@ -50,7 +47,7 @@ export default function ProposaQuestionaryReview(props: {
             </TableRow>
           </TableHead>
           <TableBody>
-            {completedFields.map((row: ProposalTemplateField) => (
+            {completedFields.map((row: QuestionaryField) => (
               <TableRow key={row.proposal_question_id}>
                 <TableCell>{row.question}</TableCell>
                 <TableCell>{row.value.toString()}</TableCell>

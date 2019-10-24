@@ -13,7 +13,7 @@ import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
-import nationalities from "../model/nationalities";
+import nationalities from "../models/nationalities";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
@@ -513,8 +513,8 @@ export default function SignUp(props) {
               >
                 Sign Up
               </Button>
-            </React.Fragment>
-          )}
+              </React.Fragment>
+            )}
           <Grid container>
             <Grid item>
               <Link to="/SignIn/">

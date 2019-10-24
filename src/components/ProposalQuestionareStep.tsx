@@ -3,11 +3,16 @@ import * as Yup from "yup";
 import { Formik } from "formik";
 import {
   DataType,
-  ProposalTemplateField,
   ProposalAnswer,
-  ProposalData,
-  ProposalTemplate
-} from "../model/ProposalModel";
+  QuestionaryField,
+  QuestionaryStep
+} from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
+import {
+  areDependenciesSatisfied,
+  getQuestionaryStepByTopicId as getStepByTopicId,
+  getQuestionaryStepByTopicId
+} from "../models/ProposalModelFunctions";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
@@ -24,8 +29,9 @@ import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
 
 export default function ProposalQuestionareStep(props: {
-  data: ProposalData;
+  data: ProposalInformation;
   topicId: number;
+  setIsDirty: (isDirty: boolean) => void;
 }) {
   const { data, topicId } = props;
   const api = useContext(FormApi);
@@ -43,11 +49,20 @@ export default function ProposalQuestionareStep(props: {
     return <div>loading...</div>;
   }
 
-  const template = data.questionary!;
-  const topic = ProposalTemplate.getTopicById(template, topicId);
-  const activeFields = topic
-    ? topic.fields.filter((field: ProposalTemplateField) => {
-        return ProposalTemplate.areDependenciesSatisfied(template, field.proposal_question_id);
+  const questionary = data.questionary!;
+  const questionaryStep = getStepByTopicId(questionary, topicId) as
+    | QuestionaryStep
+    | undefined;
+  if (!questionaryStep) {
+    return null;
+  }
+
+  const activeFields = questionaryStep
+    ? questionaryStep.fields.filter(field => {
+        return areDependenciesSatisfied(
+          questionary,
+          field.proposal_question_id
+        );
       })
     : [];
 
@@ -55,7 +70,7 @@ export default function ProposalQuestionareStep(props: {
     activeFields
   );
 
-  const onFormSubmit = async (values: any) => {
+  const onFormSubmit = async () => {
     const proposalId: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields.map(field => {
@@ -66,7 +81,11 @@ export default function ProposalQuestionareStep(props: {
       }))(field); // convert field to answer objcet
     });
 
-    const result = await updateProposal({ id: proposalId, answers: answers });
+    const result = await updateProposal({
+      id: proposalId,
+      answers: answers,
+      topicsCompleted: [topicId]
+    });
 
     if (result && result.error) {
       api.error && api.error(result.error);
@@ -95,7 +114,10 @@ export default function ProposalQuestionareStep(props: {
                 key={field.proposal_question_id}
               >
                 {componentFactory.createComponent(field, {
-                  onComplete: forceUpdate, // for re-rendering when input changes
+                  onComplete: () => {
+                    forceUpdate();
+                    props.setIsDirty(true);
+                  }, // for re-rendering when input changes
                   touched: touched, // for formik
                   errors: errors, // for formik
                   handleChange: handleChange // for formik
@@ -108,16 +130,25 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    api.back(values);
+                    (getQuestionaryStepByTopicId(
+                      props.data.questionary!,
+                      topicId
+                    ) as QuestionaryStep).isCompleted = true;
+                    api.back({ ...props.data });
                   }
                 }
               );
             }}
+            reset={() => api.reset()}
             next={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    api.next(values);
+                    (getQuestionaryStepByTopicId(
+                      props.data.questionary!,
+                      topicId
+                    ) as QuestionaryStep).isCompleted = true;
+                    api.next({ ...props.data });
                   }
                 }
               );
@@ -148,7 +179,7 @@ class ComponentFactory {
     );
   }
   createComponent(
-    field: ProposalTemplateField,
+    field: QuestionaryField,
     props: any
   ): React.ComponentElement<IBasicComponentProps, any> {
     props.templateField = field;
@@ -156,8 +187,10 @@ class ComponentFactory {
 
     const component = this.componentMap.get(field.data_type);
 
-    return component
-      ? React.createElement(component, props)
-      : React.createElement(this.componentMap.get(DataType.TEXT_INPUT), props); // TMP
+    if (!component) {
+      throw new Error(`Could not create component for type ${field.data_type}`);
+    }
+
+    return React.createElement(component, props);
   }
 }

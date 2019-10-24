@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/styles";
-import ProposalInformation from "./ProposalInformation";
+import ProposalInformationView from "./ProposalInformationView";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
-import { ProposalData, ProposalStatus } from "../model/ProposalModel";
+import { ProposalStatus } from "../models/ProposalModel";
+import { ProposalInformation } from "../models/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 
@@ -18,28 +19,33 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProposalReview({data} : { data: ProposalData }) {
+export default function ProposalReview({
+  data
+}: {
+  data: ProposalInformation;
+}) {
   const api = useContext(FormApi);
   const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
 
   return (
     <>
-      <ProposalInformation data={data} disabled={true} />
+      <ProposalInformationView data={data} disabled={true} />
       <ProposaQuestionaryReview data={data} />
       <div className={classes.buttons}>
         <ProposalNavigationFragment
-        back={() => api.back(data)}
-        backLabel="Back"
-        next={() => {
-          submitProposal(data.id).then(isSubmitted => {
-            data.status = ProposalStatus.SUBMITTED;
-            api.next(data);
-          });
-        }}
-        nextLabel={data.status ? "Update" : "Submit"}
-        isLoading={isLoading}
-        disabled={true}
+          back={() => api.back(data)}
+          backLabel="Back"
+          next={() => {
+            submitProposal(data.id).then(isSubmitted => {
+              data.status = ProposalStatus.SUBMITTED;
+              api.next(data);
+            });
+          }}
+          reset={() => api.reset()}
+          nextLabel={data.status ? "Update" : "Submit"}
+          isLoading={isLoading}
+          disabled={true}
         />
       </div>
     </>
