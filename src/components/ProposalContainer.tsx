@@ -61,7 +61,7 @@ export default function ProposalContainer(props: {
   };
 
   /**
-   * Returns true if state is clean, false otherwise
+   * Returns true if reset was peformed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
