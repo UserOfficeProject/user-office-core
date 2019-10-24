@@ -160,7 +160,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
           writeBold(JSON.parse(field.config).plain!);
         } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
-          if (field.value != "") {
+          if (field.value) {
             const fieldAttachmentArray: string[] = field.value.split(",");
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
             write("This document has been appended to the proposal");
@@ -170,7 +170,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
           // Default case, a ordinary question type
         } else if (field.data_type === DataType.DATE) {
           write(
-            field.value != ""
+            field.value
               ? new Date(field.value).toISOString().split("T")[0]
               : notAnswered
           );
@@ -183,7 +183,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
           }
         } else {
           writeBold(field.question);
-          write(field.value != "" ? field.value : notAnswered);
+          write(field.value ? field.value : notAnswered);
         }
         doc.moveDown(0.5);
       });
