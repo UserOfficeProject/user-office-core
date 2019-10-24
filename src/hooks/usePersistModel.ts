@@ -101,7 +101,6 @@ export function usePersistModel() {
               topic_title
               topic_id
             }
-            isCompleted
             fields {
               proposal_question_id
               data_type
@@ -198,7 +197,6 @@ export function usePersistModel() {
               topic_title
               topic_id
             }
-            isCompleted
             fields {
               proposal_question_id
               data_type
@@ -265,7 +263,6 @@ export function usePersistModel() {
               topic_title
               topic_id
             }
-            isCompleted
             fields {
               proposal_question_id
               data_type
