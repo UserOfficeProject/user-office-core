@@ -2,7 +2,11 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import { Topic, ProposalTemplateField, DataType } from "../model/ProposalModel";
+import {
+  ProposalTemplateField,
+  DataType,
+  TemplateStep
+} from "../models/ProposalModel";
 import {
   makeStyles,
   Grid,
@@ -14,14 +18,14 @@ import {
   Typography,
   Divider
 } from "@material-ui/core";
-import { EventType, IEvent } from "./QuestionaryEditorModel";
+import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 
 export default function QuestionaryEditorTopic(props: {
-  data: Topic;
+  data: TemplateStep;
   dispatch: React.Dispatch<IEvent>;
   index: number;
   onItemClick: { (data: ProposalTemplateField): void };
@@ -69,7 +73,7 @@ export default function QuestionaryEditorTopic(props: {
   }))();
 
   const { data, dispatch, index } = props;
-  const [title, setTitle] = useState<string>(data.topic_title);
+  const [title, setTitle] = useState<string>(data.topic.topic_title);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
@@ -77,7 +81,7 @@ export default function QuestionaryEditorTopic(props: {
   const onCreateNewFieldClicked = (dataType: DataType) => {
     dispatch({
       type: EventType.CREATE_NEW_FIELD_REQUESTED,
-      payload: { topicId: props.data.topic_id, dataType: dataType }
+      payload: { topicId: props.data.topic.topic_id, dataType: dataType }
     });
     setAnchorEl(null);
   };
@@ -104,7 +108,7 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(false);
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
-          payload: { topicId: data.topic_id, title: title }
+          payload: { topicId: data.topic.topic_id, title: title }
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -119,7 +123,7 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(true);
       }}
     >
-      {index + 2}. {props.data.topic_title}
+      {index + 2}. {props.data.topic.topic_title}
     </span>
   );
 
@@ -141,8 +145,8 @@ export default function QuestionaryEditorTopic(props: {
 
   return (
     <Draggable
-      key={data.topic_id.toString()}
-      draggableId={data.topic_id.toString()}
+      key={data.topic.topic_id.toString()}
+      draggableId={data.topic.topic_id.toString()}
       index={index}
     >
       {(provided, snapshotDraggable) => (
@@ -242,10 +246,10 @@ export default function QuestionaryEditorTopic(props: {
               <Divider />
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={(event: any) =>
+                onClick={() =>
                   dispatch({
                     type: EventType.DELETE_TOPIC_REQUESTED,
-                    payload: data.topic_id
+                    payload: data.topic.topic_id
                   })
                 }
               >
@@ -257,7 +261,7 @@ export default function QuestionaryEditorTopic(props: {
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={(event: any) =>
+                onClick={() =>
                   dispatch({
                     type: EventType.CREATE_TOPIC_REQUESTED,
                     payload: { sortOrder: index + 1 }
@@ -273,7 +277,7 @@ export default function QuestionaryEditorTopic(props: {
             </Menu>
           </Grid>
 
-          <Droppable droppableId={data.topic_id.toString()} type="field">
+          <Droppable droppableId={data.topic.topic_id.toString()} type="field">
             {(provided, snapshot) => (
               <Grid
                 item

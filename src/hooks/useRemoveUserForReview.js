@@ -7,9 +7,9 @@ export function useRemoveUserForReview() {
   const sendRemoveReviewer = useCallback(
     async reviewID => {
       const query = `
-    mutation($reviewID: Int!) {
-      removeUserForReview(reviewID: $reviewID)
-    }
+        mutation($reviewID: Int!) {
+          removeUserForReview(reviewID: $reviewID)
+        }
     `;
       const variables = {
         reviewID

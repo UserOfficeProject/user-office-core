@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileMetaData } from "../model/FileUpload";
+import { FileMetaData } from "../models/FileUpload";
 import { useDataAPI } from "./useDataAPI";
 
 export enum UPLOAD_STATE {

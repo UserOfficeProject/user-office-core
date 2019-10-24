@@ -4,9 +4,9 @@ import {
   ProposalTemplateField,
   DataType,
   ProposalTemplate
-} from "../model/ProposalModel";
+} from "../models/ProposalModel";
 import JSDict from "../utils/Dictionary";
-import { IEvent } from "./QuestionaryEditorModel";
+import { IEvent } from "../models/QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
 import { AdminComponentEmbellishment } from "./AdminComponentEmbellishment";
 import { AdminComponentTextInput } from "./AdminComponentTextInput";

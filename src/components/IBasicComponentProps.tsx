@@ -1,6 +1,6 @@
-import { ProposalTemplateField } from "../model/ProposalModel";
+import { QuestionaryField } from "../models/ProposalModel";
 export interface IBasicComponentProps {
-  templateField: ProposalTemplateField;
+  templateField: QuestionaryField;
   onComplete: Function;
   touched: any;
   errors: any;

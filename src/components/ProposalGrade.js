@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-import ProposalInformation from "./ProposalInformation";
+import ProposalInformationView from "./ProposalInformationView";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { Formik, Field, Form } from "formik";
@@ -51,7 +51,7 @@ export default function ProposalGrade({ match }) {
   return (
     <Container maxWidth="lg" className={classes.container}>
       <Paper className={classes.paper}>
-        <ProposalInformation data={reviewData.proposal} disabled={true} />
+        <ProposalInformationView data={reviewData.proposal} disabled={true} />
       </Paper>
 
       <Paper className={classes.paper}>

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalTemplate } from "../model/ProposalModel";
+import { ProposalTemplate } from "../models/ProposalModel";
 
 export function useProposalQuestionTemplate() {
   const sendRequest = useDataAPI();
@@ -9,9 +9,11 @@ export function useProposalQuestionTemplate() {
     const query = `
             query {
               proposalTemplate {
-                topics {
-                  topic_title
-                  topic_id,
+                steps {
+                  topic {
+                    topic_title
+                    topic_id
+                  }
                   fields {
                     proposal_question_id
                     data_type

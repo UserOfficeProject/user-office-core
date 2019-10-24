@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { EventType, IEvent } from "../components/QuestionaryEditorModel";
+import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import {
   ProposalTemplateField,
   ProposalTemplate,
   DataType,
   Topic
-} from "../model/ProposalModel";
+} from "../models/ProposalModel";
 
 export function usePersistModel() {
   const sendRequest = useDataAPI();
@@ -96,9 +96,12 @@ export function usePersistModel() {
     mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
         template {
-          topics {
-            topic_title
-            topic_id,
+          steps {
+            topic {
+              topic_title
+              topic_id
+            }
+            isCompleted
             fields {
               proposal_question_id
               data_type
@@ -190,9 +193,12 @@ export function usePersistModel() {
     mutation($id:String!) {
       deleteTemplateField(id:$id) {
         template {
-          topics {
-            topic_title
-            topic_id,
+          steps {
+            topic {
+              topic_title
+              topic_id
+            }
+            isCompleted
             fields {
               proposal_question_id
               data_type
@@ -254,9 +260,12 @@ export function usePersistModel() {
     mutation($sortOrder:Int!) {
       createTopic(sortOrder:$sortOrder) {
         template {
-          topics {
-            topic_title
-            topic_id,
+          steps {
+            topic {
+              topic_title
+              topic_id
+            }
+            isCompleted
             fields {
               proposal_question_id
               data_type
@@ -344,30 +353,30 @@ export function usePersistModel() {
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
           );
-          const reducedTopic = state.topics.find(
-            topic => topic.topic_id === reducedTopicId
+          const reducedTopic = state.steps.find(
+            step => step.topic.topic_id === reducedTopicId
           );
-          const extendedTopic = state.topics.find(
-            topic => topic.topic_id === extendedTopicId
+          const extendedTopic = state.steps.find(
+            step => step.topic.topic_id === extendedTopicId
           );
 
           executeAndMonitorCall(() =>
             updateFieldTopicRel(
-              reducedTopic!.topic_id,
+              reducedTopic!.topic.topic_id,
               reducedTopic!.fields.map(field => field.proposal_question_id)
             )
           );
           if (reducedTopicId !== extendedTopicId) {
             executeAndMonitorCall(() =>
               updateFieldTopicRel(
-                extendedTopic!.topic_id,
+                extendedTopic!.topic.topic_id,
                 extendedTopic!.fields.map(field => field.proposal_question_id)
               )
             );
           }
           break;
         case EventType.REORDER_TOPIC_REQUESTED:
-          const topicOrder = state.topics.map(topic => topic.topic_id);
+          const topicOrder = state.steps.map(step => step.topic.topic_id);
           executeAndMonitorCall(() => updateTopicOrder(topicOrder));
           break;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
