@@ -13,11 +13,9 @@ import ProposalInformationView from "./ProposalInformationView";
 import ErrorIcon from "@material-ui/icons/Error";
 import { Zoom, StepButton } from "@material-ui/core";
 import { useLoadProposal } from "../hooks/useLoadProposal";
-import withConfirm from "../utils/withConfirm";
 
-export default withConfirm(function ProposalContainer(props: {
+export default function ProposalContainer(props: {
   data: ProposalInformation;
-  confirm: Function;
 }) {
   const { loadProposal } = useLoadProposal();
   const [proposalInfo, setProposalInfo] = useState(props.data);
@@ -63,12 +61,12 @@ export default withConfirm(function ProposalContainer(props: {
   };
 
   /**
-   * Returns true if state is clean, false otherwise if clean
+   * Returns true if state is clean, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
       const confirmed = window.confirm(
-        "Are you sure? You will lose any recently made changes?"
+        "Changes you recently made in this step will not be saved! Are you sure?"
       );
       if (confirmed) {
         const proposalData = await loadProposal(proposalInfo.id);
@@ -215,7 +213,7 @@ export default withConfirm(function ProposalContainer(props: {
       </FormApi.Provider>
     </Container>
   );
-});
+}
 
 class QuestionaryUIStep {
   constructor(
