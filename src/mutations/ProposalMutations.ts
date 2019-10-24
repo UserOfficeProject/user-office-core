@@ -4,7 +4,6 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import {
-  Proposal,
   ProposalAnswer,
   Topic,
   ProposalTemplateField,
@@ -12,7 +11,8 @@ import {
   FieldDependency,
   FieldConfig,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 
@@ -84,6 +84,7 @@ export default class ProposalMutations {
     title?: string,
     abstract?: string,
     answers?: ProposalAnswer[],
+    topicsCompleted?: number[],
     status?: number,
     users?: number[]
   ): Promise<Proposal | Rejection> {
@@ -165,6 +166,13 @@ export default class ProposalMutations {
               );
             }
           });
+        }
+
+        if (topicsCompleted !== undefined) {
+          await this.dataSource.updateTopicCompletenesses(
+            proposal.id,
+            topicsCompleted
+          );
         }
 
         const result = await this.dataSource.update(proposal);

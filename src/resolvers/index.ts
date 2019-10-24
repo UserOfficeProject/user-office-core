@@ -1,7 +1,6 @@
 import { ResolverContext } from "../context";
 import { isRejection, Rejection, rejection } from "../rejection";
 import {
-  Proposal,
   ProposalAnswer,
   ProposalInformation,
   Topic,
@@ -9,7 +8,8 @@ import {
   ProposalTemplateField,
   DataType,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { User } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
@@ -48,6 +48,7 @@ interface UpdateProposalArgs {
   abstract: string;
   answers: ProposalAnswer[];
   status: number;
+  topicsCompleted: number[];
   users: number[];
 }
 
@@ -378,7 +379,15 @@ export default {
   },
 
   updateProposal(args: UpdateProposalArgs, context: ResolverContext) {
-    const { id, title, abstract, answers, status, users } = args;
+    const {
+      id,
+      title,
+      abstract,
+      answers,
+      topicsCompleted,
+      status,
+      users
+    } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
         context.user,
@@ -386,6 +395,7 @@ export default {
         title,
         abstract,
         answers,
+        topicsCompleted,
         status,
         users
       )

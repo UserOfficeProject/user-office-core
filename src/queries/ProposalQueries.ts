@@ -3,9 +3,12 @@ import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import {
   ProposalTemplate,
-  Proposal,
-  ProposalAnswer
-} from "../models/Proposal";
+  ProposalAnswer,
+  Questionary,
+  QuestionaryStep,
+  QuestionaryField
+} from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
 import JSDict from "../utils/Dictionary";
 
@@ -39,27 +42,9 @@ export default class ProposalQueries {
 
     if ((await this.hasAccessRights(agent, proposal)) === false) {
       return null;
-    } 
-    
-    const template = await this.dataSource.getProposalTemplate();
-    const answers = await this.dataSource.getProposalAnswers(id);
+    }
 
-    var answerRef = JSDict.Create<string, ProposalAnswer>();
-    answers.forEach(answer => {
-      answerRef.put(answer.proposal_question_id, answer);
-    })
-
-    template.topics.forEach(topic => {
-      topic.fields!.forEach(field => {
-        const answer = answerRef.get(field.proposal_question_id)
-        if(answer)
-        {
-          field.value = answer.value;
-        }
-      });
-    });
-
-    return template;    
+    return await this.dataSource.getQuestionary(id);
   }
 
   async getProposalTemplate(
@@ -71,7 +56,6 @@ export default class ProposalQueries {
 
     return await this.dataSource.getProposalTemplate();
   }
-
 
   private async hasAccessRights(
     agent: User | null,
@@ -96,5 +80,4 @@ export default class ProposalQueries {
       return null;
     }
   }
-
 }

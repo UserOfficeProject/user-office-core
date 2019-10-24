@@ -1,8 +1,16 @@
 import express from "express";
 import baseContext from "../buildContext";
 import { isRejection } from "../rejection";
-import { ProposalTemplate, DataType } from "./ProposalModel";
+import {
+  DataType,
+  Questionary,
+  QuestionaryField
+} from "../models/ProposalModel";
 import { createToC } from "./pdfTableofContents/index";
+import {
+  getQuestionaryStepByTopicId,
+  areDependenciesSatisfied
+} from "../models/ProposalModelFunctions";
 const jsonwebtoken = require("jsonwebtoken");
 const PDFDocument = require("pdfkit");
 const router = express.Router();
@@ -18,7 +26,7 @@ const getAttachments = (attachmentId: string) => {
 router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
     const decoded = jsonwebtoken.verify(req.cookies.token, process.env.secret);
-    const proposalId = req.params.proposal_id;
+    const proposalId = parseInt(req.params.proposal_id);
     const notAnswered = "This question is not mandatory and was not answered.";
 
     // Authenticate user and fecth user, co-proposer and proposal with questionary
@@ -36,16 +44,16 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       return res.status(500).send();
     }
 
-    const questionary = await baseContext.queries.proposal.getQuestionary(
+    const questionaryObj = await baseContext.queries.proposal.getQuestionary(
       user,
       proposalId
     );
 
-    if (isRejection(questionary) || questionary == null) {
+    if (isRejection(questionaryObj) || questionaryObj == null) {
       return res.status(500).send();
     }
 
-    const template = new ProposalTemplate(questionary);
+    const questionary = Questionary.fromObject(questionaryObj);
     const principalInvestigator = await baseContext.queries.user.get(
       user,
       proposal.proposer
@@ -125,26 +133,31 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       );
     });
 
-    questionary.topics.forEach((x: any) => {
+    questionary.steps.forEach(x => {
       doc.addPage();
       doc.image("./images/ESS.png", 15, 15, { width: 100 });
-      const topic = template.getTopicById(x.topic_id);
-      const activeFields = topic
-        ? topic.fields.filter((field: any) => {
-            return template.areDependenciesSatisfied(
+      const step = getQuestionaryStepByTopicId(questionary, x.topic.topic_id);
+      const activeFields = step
+        ? (step.fields.filter(field => {
+            return areDependenciesSatisfied(
+              questionary,
               field.proposal_question_id
             );
-          })
+          }) as QuestionaryField[])
         : [];
-      if (!topic) {
+      if (!step) {
         return res.status(500).send();
       }
-      writeBold(topic.topic_title);
-      toc.push({ title: topic.topic_title, page: pageNumber, children: [] });
+      writeBold(step.topic.topic_title);
+      toc.push({
+        title: step.topic.topic_title,
+        page: pageNumber,
+        children: []
+      });
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          writeBold(field.config.plain!);
+          writeBold(JSON.parse(field.config).plain!);
         } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
           if (field.value != "") {

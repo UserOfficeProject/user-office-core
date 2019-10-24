@@ -21,9 +21,9 @@ import {
   Topic,
   ProposalTemplateField,
   ProposalTemplate
-} from "../models/Proposal";
+} from "../models/ProposalModel";
 import { User } from "../models/User";
-import { isRejection, rejection } from "../rejection";
+import { isRejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
 
 const dummyLogger = new DummyLogger();
@@ -39,8 +39,6 @@ const proposalMutations = new ProposalMutations(
   dummyEventBus,
   dummyLogger
 );
-
-//Update
 
 test("A user on the proposal can update it's title if it is in edit mode", () => {
   return expect(tryUpdateProposal(dummyUser, "1")).resolves.toBe(dummyProposal);
@@ -100,7 +98,7 @@ test("A userofficer can update topic", async () => {
   );
   expect(topic instanceof Topic).toBe(true);
   expect((topic as Topic).topic_title).toEqual(newTopicTitle);
-  expect((topic as Topic).isEnabled).toEqual(topicEnabled);
+  expect((topic as Topic).is_enabled).toEqual(topicEnabled);
 });
 
 test("A user can not update topic", async () => {
@@ -116,11 +114,13 @@ test("A user can not update topic", async () => {
 
 test("A userofficer can create topic", async () => {
   let template = await proposalMutations.createTopic(dummyUserOfficer, 0);
-  expect(template instanceof ProposalTemplate).toBe(true);
-  expect((template as ProposalTemplate).topics[0].sort_order).toEqual(0);
+  expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
+  var numbefOfTopics = (template as ProposalTemplate).steps.length;
 
   template = await proposalMutations.createTopic(dummyUserOfficer, 1);
-  expect((template as ProposalTemplate).topics[1].sort_order).toEqual(1);
+  expect((template as ProposalTemplate).steps.length).toEqual(
+    numbefOfTopics + 1
+  ); // added new one
 });
 
 test("A user can not create topic", async () => {

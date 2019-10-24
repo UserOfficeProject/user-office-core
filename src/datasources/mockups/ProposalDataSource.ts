@@ -1,15 +1,20 @@
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
-  Proposal,
   ProposalTemplate,
   ProposalTemplateField,
   DataType,
   FieldDependency,
   Topic,
   ProposalAnswer,
-  FieldConfig
-} from "../../models/Proposal";
+  FieldConfig,
+  TemplateStep,
+  FieldCondition,
+  Questionary
+} from "../../models/ProposalModel";
+import { Proposal } from "../../models/Proposal";
 import { Review } from "../../models/Review";
+import { EvaluatorOperator } from "../../models/ConditionEvaluator";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../../tests/ProposalTestBed";
 
 const createDummyTemplate = () => {
   const hasLinksToField = createDummyField({
@@ -23,18 +28,20 @@ const createDummyTemplate = () => {
       new FieldDependency(
         "linksToField",
         "hasLinksToField",
-        "{ 'ifValue': 'yes' }"
+        JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes")) // TODO SWAP-341. Remove stringifying
       )
     ]
   });
 
   return new ProposalTemplate([
-    new Topic(1, "General information", true, 1, [
+    new TemplateStep(new Topic(1, "General information", 1, true), [
       hasLinksToField,
       linksToField
     ])
   ]);
 };
+
+const newTemplate = createDummyTemplate();
 
 export const dummyProposal = new Proposal(
   1,
@@ -83,13 +90,19 @@ function createDummyField(values: {
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
-    values.topic_id || Math.round(Math.random() * 10),
     (values.config && JSON.stringify(values.config)) || "{}",
+    values.topic_id || Math.round(Math.random() * 10),
     values.dependencies || []
   );
 }
 
 export class proposalDataSource implements ProposalDataSource {
+  updateTopicCompletenesses(
+    id: number,
+    topicsCompleted: number[]
+  ): Promise<Boolean | null> {
+    throw new Error("Method not implemented.");
+  }
   async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
     return true;
   }
@@ -125,7 +138,7 @@ export class proposalDataSource implements ProposalDataSource {
     }
   ): Promise<ProposalTemplate | null> {
     var template = await this.getProposalTemplate();
-    template.topics.forEach(topic => {
+    template.steps.forEach(topic => {
       topic.fields!.forEach(field => {
         if (field.proposal_question_id === proposal_question_id) {
           Object.assign(field, values);
@@ -143,23 +156,21 @@ export class proposalDataSource implements ProposalDataSource {
     return new Topic(
       id,
       values.title || "Topic title",
-      values.isEnabled !== undefined ? values.isEnabled : true,
       3,
-      null
+      values.isEnabled !== undefined ? values.isEnabled : true
     );
   }
 
   async createTopic(sortOrder: number): Promise<ProposalTemplate> {
-    var newTemplate = createDummyTemplate();
-    newTemplate.topics.splice(
+    newTemplate.steps.splice(
       sortOrder,
       0,
-      new Topic(2, "New Topic", false, sortOrder, null)
+      new TemplateStep(new Topic(2, "New Topic", sortOrder, false), [])
     );
     return newTemplate;
   }
-  async getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]> {
-    return dummyAnswers;
+  async getQuestionary(proposalId: number): Promise<Questionary> {
+    return create1Topic3FieldWithDependenciesQuestionary();
   }
   async insertFiles(
     proposal_id: number,

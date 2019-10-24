@@ -3,8 +3,7 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 
 import {
   proposalDataSource,
-  dummyProposal,
-  dummyAnswers
+  dummyProposal
 } from "../datasources/mockups/ProposalDataSource";
 
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -15,7 +14,7 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { ProposalTemplate } from "../models/Proposal";
+import { ProposalTemplate } from "../models/ProposalModel";
 import { DummyLogger } from "../utils/Logger";
 
 const userAuthorization = new UserAuthorization(
@@ -46,11 +45,15 @@ test("A userofficer can get any proposal", () => {
 });
 
 test("Get questionary should succeed for authorized user", () => {
-  return expect(proposalQueries.getQuestionary(dummyUser, 1)).resolves.not.toBe(null)
+  return expect(proposalQueries.getQuestionary(dummyUser, 1)).resolves.not.toBe(
+    null
+  );
 });
 
 test("Get questionary should not succeed for unauthorized user", () => {
-  return expect(proposalQueries.getQuestionary(dummyUserNotOnProposal, 1)).resolves.toBe(null);
+  return expect(
+    proposalQueries.getQuestionary(dummyUserNotOnProposal, 1)
+  ).resolves.toBe(null);
 });
 
 test("A userofficer can get all proposal", () => {
@@ -64,14 +67,20 @@ test("A user cannot query all proposals", () => {
 });
 
 test("Non authentificated user can not get the template", () => {
-  return expect(proposalQueries.getProposalTemplate(null)).resolves.not.toBeInstanceOf(ProposalTemplate);
+  return expect(
+    proposalQueries.getProposalTemplate(null)
+  ).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
 test("User officer user can get the template", () => {
-  return expect(proposalQueries.getProposalTemplate(dummyUserOfficer)).resolves.toBeInstanceOf(ProposalTemplate);
+  return expect(
+    proposalQueries.getProposalTemplate(dummyUserOfficer)
+  ).resolves.toBeInstanceOf(ProposalTemplate);
 });
 
 test("Proposal template should have fields", async () => {
-  let template = await proposalQueries.getProposalTemplate(dummyUserOfficer) as ProposalTemplate;
-  return expect(template.topics[0].fields!.length).toBeGreaterThan(0);
+  let template = (await proposalQueries.getProposalTemplate(
+    dummyUserOfficer
+  )) as ProposalTemplate;
+  return expect(template.steps[0].fields!.length).toBeGreaterThan(0);
 });

@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 jest --env=node --colors --coverage",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "tsc": "tsc",
     "dev": "ORCID_TOKEN_URL=https://sandbox.orcid.org/oauth/token ORCID_API_URL=https://api.sandbox.orcid.org/v2.1/  ORCID_CLIENT_ID=APP-CIF25IJ0S3CDB3C8 ORCID_CLIENT_SECRET=c3ba31f8-7e79-4d0d-bf4c-b6e6c300addd DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere ts-node-dev --respawn --transpileOnly ./index.ts",
     "prod": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 node ./build/index.js",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "tsc && node ./build/index.js",
+    "apitest": "newman run api_tests/proposal_tests.json --environment api_tests/environment.json",
     "debug": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere node --inspect ./build/index.js"
   },
   "author": "",
@@ -54,6 +56,7 @@
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.7.1",
+    "newman": "^4.5.5",
     "nodemon": "^1.19.1",
     "prettier": "^1.17.0",
     "ts-jest": "^24.0.2"

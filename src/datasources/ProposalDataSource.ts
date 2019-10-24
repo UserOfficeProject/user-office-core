@@ -1,12 +1,12 @@
 import {
-  Proposal,
   ProposalTemplate,
-  ProposalAnswer,
   Topic,
   ProposalTemplateField,
   FieldDependency,
-  DataType
-} from "../models/Proposal";
+  DataType,
+  Questionary
+} from "../models/ProposalModel";
+import { Proposal } from "../models/Proposal";
 
 export interface ProposalDataSource {
   // Read
@@ -19,7 +19,7 @@ export interface ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
-  getProposalAnswers(proposalId: number): Promise<ProposalAnswer[]>;
+  getQuestionary(proposalId: number): Promise<Questionary>;
 
   // Write
   create(id: number): Promise<Proposal | null>;
@@ -68,4 +68,8 @@ export interface ProposalDataSource {
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
   deleteTopic(id: number): Promise<Boolean | null>;
   updateTopicOrder(topicOrder: number[]): Promise<Boolean | null>;
+  updateTopicCompletenesses(
+    id: number,
+    topicsCompleted: number[]
+  ): Promise<Boolean | null>;
 }
