@@ -194,7 +194,8 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     writeStream.on("finish", async function() {
       const attachmentsMetadata = await Promise.all(
         attachmentIds.map(getAttachments)
-      ).catch(() => {
+      ).catch(e => {
+        console.log(e);
         res.status(500).send();
         return [];
       });
@@ -254,6 +255,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       );
     });
   } catch (e) {
+    console.log(e);
     res.status(500).send(e);
   }
 });
