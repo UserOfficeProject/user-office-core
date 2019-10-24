@@ -53,7 +53,7 @@ export default function ProposalReview({
           reset={() => api.reset()}
           nextLabel={"Submit"}
           isLoading={isLoading}
-          disabled={true}
+          disabled={false}
         />
         <Button className={classes.button} onClick={() => downloadPDFProposal(data.id)}>Download PDF</Button>
 
