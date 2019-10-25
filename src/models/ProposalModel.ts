@@ -13,7 +13,8 @@ export class ProposalInformation {
     public updated?: string,
     public users?: User[],
     public reviews?: Review[],
-    public questionary?: Questionary
+    public questionary?: Questionary,
+    public shortCode?: string
   ) {}
 }
 

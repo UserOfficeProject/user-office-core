@@ -7,6 +7,7 @@ export class Proposal {
     public proposer: number,
     public status: ProposalStatus,
     public created: string,
-    public updated: string
+    public updated: string,
+    public shortCode: string
   ) {}
 }

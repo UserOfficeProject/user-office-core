@@ -167,7 +167,7 @@ async function resolveProposal(
   if (proposal == null) {
     return rejection("Proposal is null");
   }
-  const { id, title, abstract, status, created, updated } = proposal;
+  const { id, title, abstract, status, created, updated, shortCode } = proposal;
   const agent = context.user;
 
   if (!agent) {
@@ -199,7 +199,8 @@ async function resolveProposal(
     updated,
     users,
     reviews,
-    questionary || undefined
+    questionary || undefined,
+    shortCode
   );
 }
 

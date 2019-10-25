@@ -36,7 +36,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       proposal.proposer_id,
       proposal.status,
       proposal.created_at,
-      proposal.updated_at
+      proposal.updated_at,
+      proposal.short_code
     );
   }
 

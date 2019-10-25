@@ -15,6 +15,7 @@ export interface ProposalRecord {
   readonly created_at: string;
   readonly updated_at: string;
   readonly full_count: number;
+  readonly short_code: string;
 }
 
 export interface TopicRecord {
