@@ -11,6 +11,7 @@ export default function ProposalTableUser(props) {
       user(id: $id){
         proposals {
           id
+          shortCode
           title
           status
         }
@@ -28,7 +29,8 @@ export default function ProposalTableUser(props) {
           return {
             id: proposal.id,
             title: proposal.title,
-            status: proposal.status === 0 ? "Open" : "Submitted"
+            status: proposal.status === 0 ? "Open" : "Submitted",
+            shortCode: proposal.shortCode,
           };
         })
       };

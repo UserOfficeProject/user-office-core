@@ -18,6 +18,7 @@ export function useProposalData(id: number) {
               title
               abstract
               status
+              shortCode
               users{
                 firstname
                 lastname
