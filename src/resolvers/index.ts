@@ -85,6 +85,10 @@ interface DeleteProposalTemplateFieldArgs {
   id: string;
 }
 
+interface DeleteProposalArgs {
+  id: number;
+}
+
 interface UpdateProposalTemplateFieldArgs {
   id: string;
   dataType: string;
@@ -442,6 +446,12 @@ export default {
     );
   },
 
+  deleteProposal(args: DeleteProposalArgs, context: ResolverContext) {
+    return wrapProposalMutation(
+      context.mutations.proposal.delete(context.user, args.id)
+    );
+  },
+
   review(args: { id: number }, context: ResolverContext) {
     return context.queries.review.get(context.user, args.id);
   },
@@ -596,7 +606,6 @@ export default {
     args: { id: PageName; text: string },
     context: ResolverContext
   ) {
-    console.log(PageName[args.id], args.id);
     return context.mutations.admin.setPageText(
       context.user,
       parseInt(PageName[args.id]),

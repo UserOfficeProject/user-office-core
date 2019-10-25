@@ -97,6 +97,9 @@ function createDummyField(values: {
 }
 
 export class proposalDataSource implements ProposalDataSource {
+  deleteProposal(id: number): Promise<Proposal | null> {
+    throw new Error("Method not implemented.");
+  }
   updateTopicCompletenesses(
     id: number,
     topicsCompleted: number[]

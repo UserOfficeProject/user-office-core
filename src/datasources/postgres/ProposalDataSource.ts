@@ -134,6 +134,24 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return this.setStatusProposal(id, 3);
   }
 
+  async deleteProposal(id: number): Promise<Proposal | null> {
+    return database("proposals")
+      .where("proposals.proposal_id", id)
+      .del()
+      .from("proposals")
+      .returning("*")
+      .then((proposal: ProposalRecord[]) => {
+        if (proposal === undefined || !proposal.length) {
+          this.logger.logError("Could not delete proposal", { id });
+          return null;
+        }
+        return this.createProposalObject(proposal[0]);
+      })
+      .catch((e: any) => {
+        console.log("Exception while deleting proposal", e);
+      });
+  }
+
   async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
     return database.transaction(function(trx: { commit: any; rollback: any }) {
       return database
@@ -284,7 +302,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return this.createProposalObject(resultSet[0]);
       })
       .catch((error: any) => {
-        this.logger.logError("Failed to create proposal", { error });
+        this.logger.logError("Failed to create proposal", {
+          error
+        });
       });
   }
 
@@ -475,7 +495,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where({ topic_id: id })
       .then((resultSet: TopicRecord[]) => {
         if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("Failed to update topic", { data: values, id });
+          this.logger.logError("Failed to update topic", {
+            data: values,
+            id
+          });
           return null;
         }
         return this.createTopicObject(resultSet[0]);
