@@ -38,5 +38,5 @@ export function useProposalsData(filter) {
     sendAllProposalRequest(filter);
   }, [filter, sendRequest]);
 
-  return { loading, proposalsData };
+  return { loading, proposalsData, setProposalsData };
 }
