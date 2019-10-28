@@ -270,6 +270,28 @@ export default class ProposalMutations {
     return result || rejection("INTERNAL_ERROR");
   }
 
+  async delete(agent: User | null, proposalId: number) {
+    if (agent == null) {
+      return rejection("NOT_LOGGED_IN");
+    }
+
+    let proposal = await this.dataSource.get(proposalId);
+
+    if (!proposal) {
+      return rejection("INTERNAL_ERROR");
+    }
+
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection("NOT_ALLOWED");
+    }
+
+    const result = await this.dataSource.deleteProposal(proposalId);
+    return result || rejection("INTERNAL_ERROR");
+  }
+
   async updateFieldTopicRel(
     agent: User | null,
     topicId: number,

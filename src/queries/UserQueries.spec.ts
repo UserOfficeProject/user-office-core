@@ -4,13 +4,11 @@ import {
   dummyUser,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const userQueries = new UserQueries(new userDataSource(), userAuthorization);

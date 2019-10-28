@@ -2,8 +2,8 @@ import ProposalQueries from "./ProposalQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 
 import {
-  proposalDataSource,
-  dummyProposal
+  dummyProposal,
+  proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
 
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -17,16 +17,19 @@ import {
 import { ProposalTemplate } from "../models/ProposalModel";
 import { DummyLogger } from "../utils/Logger";
 
+const dummyProposalDataSource = new proposalDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const proposalQueries = new ProposalQueries(
-  new proposalDataSource(),
+  dummyProposalDataSource,
   userAuthorization,
   new DummyLogger()
 );
+beforeEach(() => {
+  dummyProposalDataSource.init();
+});
 
 test("A user on the proposal can get a proposal it belongs to", () => {
   return expect(proposalQueries.get(dummyUser, 1)).resolves.toBe(dummyProposal);

@@ -6,7 +6,6 @@ import {
   dummyReview
 } from "../datasources/mockups/ReviewDataSource";
 import { ApplicationEvent } from "../events/applicationEvents";
-import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
 
 import {
   userDataSource,
@@ -18,7 +17,6 @@ import {
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const reviewQueries = new ReviewQueries(

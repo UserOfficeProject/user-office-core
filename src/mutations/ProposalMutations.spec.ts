@@ -5,9 +5,9 @@ import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
-  proposalDataSource,
   dummyProposalSubmitted,
-  dummyProposal
+  dummyProposal,
+  proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
 
 import {
@@ -23,22 +23,29 @@ import {
   ProposalTemplate
 } from "../models/ProposalModel";
 import { User } from "../models/User";
-import { isRejection } from "../rejection";
+import { isRejection, rejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
+import { bool } from "prop-types";
+import { Proposal } from "../models/Proposal";
+import ProposalQueries from "../queries/ProposalQueries";
 
 const dummyLogger = new DummyLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
+const dummyProposalDataSource = new proposalDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const proposalMutations = new ProposalMutations(
-  new proposalDataSource(),
+  dummyProposalDataSource,
   userAuthorization,
   dummyEventBus,
   dummyLogger
 );
+
+beforeEach(() => {
+  dummyProposalDataSource.init();
+});
 
 test("A user on the proposal can update it's title if it is in edit mode", () => {
   return expect(tryUpdateProposal(dummyUser, "1")).resolves.toBe(dummyProposal);
@@ -289,17 +296,54 @@ test("User officer can create field", async () => {
 });
 
 test("User can not delete field", async () => {
-  const response = await proposalMutations.deleteTemplateField(
-    dummyUser,
-    "field_id"
-  );
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
+  expect(
+    proposalMutations.deleteTemplateField(dummyUser, "field_id")
+  ).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
 test("User officer can delete field", async () => {
-  const response = await proposalMutations.deleteTemplateField(
-    dummyUserOfficer,
-    "field_id"
+  expect(
+    proposalMutations.deleteTemplateField(dummyUserOfficer, "field_id")
+  ).resolves.toBeInstanceOf(ProposalTemplate);
+});
+
+test("User officer can delete a proposal", () => {
+  return expect(
+    proposalMutations.delete(dummyUserOfficer, 1)
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test("User cannot delete a proposal", () => {
+  return expect(
+    proposalMutations.delete(dummyUserNotOnProposal, 1)
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test("Has to be logged in to create proposal", () => {
+  return expect(proposalMutations.create(null)).resolves.not.toBeInstanceOf(
+    Proposal
   );
-  expect(response).toBeInstanceOf(ProposalTemplate);
+});
+
+test("Can create a proposal", () => {
+  return expect(proposalMutations.create(dummyUser)).resolves.toBeInstanceOf(
+    Proposal
+  );
+});
+
+test("Proposal title should not be short", () => {
+  return expect(
+    proposalMutations.update(dummyUser, "1", "a")
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test("Officer can update topic order", async () => {
+  return expect(
+    proposalMutations.updateTopicOrder(dummyUserOfficer, [1, 3, 2])
+  ).resolves.toBeTruthy();
+});
+
+test("User can not update topic order", async () => {
+  const result = await proposalMutations.updateTopicOrder(dummyUser, [1, 3, 2]);
+  return expect(isRejection(result)).toBeTruthy();
 });

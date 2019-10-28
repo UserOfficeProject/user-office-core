@@ -28,6 +28,7 @@ export interface ProposalDataSource {
   acceptProposal(id: number): Promise<Proposal | null>;
   rejectProposal(id: number): Promise<Proposal | null>;
   submitProposal(id: number): Promise<Proposal | null>;
+  deleteProposal(id: number): Promise<Proposal | null>;
   updateAnswer(
     proposal_id: number,
     question_id: string,
