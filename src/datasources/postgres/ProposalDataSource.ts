@@ -147,8 +147,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         return this.createProposalObject(proposal[0]);
       })
-      .catch((e: any) => {
-        console.log("Exception while deleting proposal", e);
+      .catch((e: Error) => {
+        this.logger.logException("Exception while deleting proposal", e);
       });
   }
 
@@ -302,9 +302,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return this.createProposalObject(resultSet[0]);
       })
       .catch((error: any) => {
-        this.logger.logError("Failed to create proposal", {
-          error
-        });
+        this.logger.logException("Failed to create proposal", error);
       });
   }
 
@@ -580,12 +578,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         return this.createProposalTemplateFieldObject(resultSet[0]);
       })
-      .catch((e: any) => {
-        this.logger.logError("Exception occurred while inserting field", {
-          error: e,
-          topicId,
-          dataType
-        });
+      .catch((e: Error) => {
+        this.logger.logException(
+          "Exception occurred while inserting field",
+          e,
+          {
+            topicId,
+            dataType
+          }
+        );
         return null;
       });
   }
@@ -634,8 +635,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where({ topic_id: id })
       .del()
       .then(() => true)
-      .catch((e: any) => {
-        this.logger.logError("Could not delete topic ", e);
+      .catch((e: Error) => {
+        this.logger.logException("Could not delete topic ", e, { id });
         return false;
       });
   }
@@ -645,8 +646,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       database("proposal_topics")
         .update({ sort_order: index })
         .where({ topic_id: topicId })
-        .catch((e: any) => {
-          this.logger.logError("Could not updateTopicOrder", topicOrder);
+        .catch((e: Error) => {
+          this.logger.logError("Could not updateTopicOrder", e);
         });
     });
     return true;
@@ -670,8 +671,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then(() => {
         return true;
       })
-      .catch((error: any) => {
-        this.logger.logError("Could not update topic completeness", error);
+      .catch((error: Error) => {
+        this.logger.logException("Could not update topic completeness", error);
         return null;
       });
   }
