@@ -82,7 +82,7 @@ function tryUpdateProposal(user: User, proposalId: string) {
       {
         proposal_question_id: "fasta_seq",
         data_type: DataType.TEXT_INPUT,
-        value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}'
       }
     ],
     undefined,
