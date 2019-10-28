@@ -1,21 +1,13 @@
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
   ProposalTemplate,
-  ProposalTemplateField,
   DataType,
-  Topic,
   ProposalAnswer,
-  TemplateStep,
   Questionary,
   ProposalStatus
 } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
-import { Review } from "../../models/Review";
-import {
-  create1Topic3FieldWithDependenciesQuestionary,
-  createDummyTemplate,
-  createDummyField
-} from "../../tests/ProposalTestBed";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../../tests/ProposalTestBed";
 
 export var dummyTemplate: ProposalTemplate;
 export var dummyQuestionary: Questionary;
@@ -25,7 +17,6 @@ export var dummyAnswers: ProposalAnswer[];
 
 export class proposalDataSource implements ProposalDataSource {
   public init() {
-    dummyTemplate = createDummyTemplate();
     dummyQuestionary = create1Topic3FieldWithDependenciesQuestionary();
 
     dummyProposal = new Proposal(
@@ -70,72 +61,6 @@ export class proposalDataSource implements ProposalDataSource {
   ): Promise<Boolean | null> {
     return true;
   }
-  async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
-    return true;
-  }
-  async deleteTopic(id: number): Promise<Boolean | null> {
-    return true;
-  }
-  async createTemplateField(
-    fieldId: string,
-    topicId: number,
-    dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<ProposalTemplateField | null> {
-    return createDummyField({
-      proposal_question_id: fieldId,
-      topic_id: topicId,
-      data_type: dataType,
-      question: question,
-      config: JSON.parse(config || "{}")
-    });
-  }
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
-    return this.getProposalTemplate();
-  }
-  async updateField(
-    proposal_question_id: string,
-    values: {
-      data_type?: DataType | undefined;
-      question?: string | undefined;
-      topic?: number | undefined;
-      config?: string | undefined;
-      sort_order: number;
-    }
-  ): Promise<ProposalTemplate | null> {
-    var template = await this.getProposalTemplate();
-    template.steps.forEach(topic => {
-      topic.fields!.forEach(field => {
-        if (field.proposal_question_id === proposal_question_id) {
-          Object.assign(field, values);
-        }
-      });
-    });
-
-    return template;
-  }
-
-  async updateTopic(
-    id: number,
-    values: { title?: string; isEnabled?: boolean }
-  ): Promise<Topic> {
-    return new Topic(
-      id,
-      values.title || "Topic title",
-      3,
-      values.isEnabled !== undefined ? values.isEnabled : true
-    );
-  }
-
-  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
-    dummyTemplate.steps.splice(
-      sortOrder,
-      0,
-      new TemplateStep(new Topic(2, "New Topic", sortOrder, false), [])
-    );
-    return dummyTemplate;
-  }
   async getQuestionary(proposalId: number): Promise<Questionary> {
     return dummyQuestionary;
   }
@@ -164,17 +89,6 @@ export class proposalDataSource implements ProposalDataSource {
     return true;
   }
 
-  async getProposalTemplate(): Promise<ProposalTemplate> {
-    return createDummyTemplate();
-  }
-
-  async submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review | null> {
-    throw new Error("Method not implemented.");
-  }
   async rejectProposal(id: number): Promise<Proposal | null> {
     if (id && id > 0) {
       return dummyProposal;
