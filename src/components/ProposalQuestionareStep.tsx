@@ -87,8 +87,8 @@ export default function ProposalQuestionareStep(props: {
       topicsCompleted: [topicId]
     });
 
-    if (result && result.error) {
-      api.error && api.error(result.error);
+    if (result && result.updateProposal && result.updateProposal.error) {
+      api.error && api.error(result.updateProposal.error);
     }
   };
 
