@@ -12,6 +12,7 @@ import {
   QuestionaryField
 } from "../models/ProposalModel";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
+import { Proposal } from "../models/Proposal";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -89,4 +90,29 @@ export const createDummyField = (values: {
     values.topic_id || Math.round(Math.random() * 10),
     values.dependencies || []
   );
+};
+
+export const createDummyTemplate = () => {
+  const hasLinksToField = createDummyField({
+    proposal_question_id: "hasLinksToField",
+    data_type: DataType.SELECTION_FROM_OPTIONS
+  });
+  const linksToField = createDummyField({
+    proposal_question_id: "linksToField",
+    data_type: DataType.TEXT_INPUT,
+    dependencies: [
+      new FieldDependency(
+        "linksToField",
+        "hasLinksToField",
+        JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes")) // TODO SWAP-341. Remove stringifying
+      )
+    ]
+  });
+
+  return new ProposalTemplate([
+    new TemplateStep(new Topic(1, "General information", 1, true), [
+      hasLinksToField,
+      linksToField
+    ])
+  ]);
 };

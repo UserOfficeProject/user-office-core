@@ -4,11 +4,6 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
-  proposalDataSource,
-  dummyProposalSubmitted,
-  dummyProposal
-} from "../datasources/mockups/ProposalDataSource";
-import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
@@ -39,7 +34,6 @@ const badToken = jsonwebtoken.sign(
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const userMutations = new UserMutations(

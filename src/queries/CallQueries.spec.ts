@@ -1,7 +1,6 @@
 import CallQueries from "./CallQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
 
 import {
   callDataSource,
@@ -15,7 +14,6 @@ import {
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const callMutations = new CallQueries(new callDataSource(), userAuthorization);

@@ -3,7 +3,6 @@ import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 import { ApplicationEvent } from "../events/applicationEvents";
-import { proposalDataSource } from "../datasources/mockups/ProposalDataSource";
 import { adminDataSource } from "../datasources/mockups/AdminDataSource";
 import {
   userDataSource,
@@ -14,7 +13,6 @@ import {
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const adminMutations = new AdminMutations(
