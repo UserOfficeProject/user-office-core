@@ -25,6 +25,7 @@ export interface TemplateDataSource {
     question: string,
     config: string
   ): Promise<ProposalTemplateField | null>;
+  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
   updateField(
     proposal_question_id: string,
     values: {

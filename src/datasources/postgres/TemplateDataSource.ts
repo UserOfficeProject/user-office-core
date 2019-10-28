@@ -213,7 +213,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
         return createProposalTemplateFieldObject(resultSet[0]);
-      });
+      })
+      .catch((e:Error) => this.logger.logException("Exception occurred while fetching template field", e, { fieldId }));
   }
 
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {

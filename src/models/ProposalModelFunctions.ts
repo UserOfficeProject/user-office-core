@@ -6,8 +6,12 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency
+  FieldDependency,
+  FieldConfig
 } from "./ProposalModel";
+import { file } from "@babel/types";
+import JSDict from "../utils/Dictionary";
+import { type } from "os";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -85,4 +89,97 @@ export function areDependenciesSatisfied(
     return result;
   });
   return isAtLeastOneDissasisfied === false;
+}
+
+export function isMatchingConstraints(
+  value: any,
+  field: ProposalTemplateField
+): boolean {
+  const val = JSON.parse(value).value;
+  const validator = validatorMap.get(field.data_type) || new BaseValidator();
+  return validator.validate(val, field);
+}
+
+interface IValidator {
+  validate(value: any, field: ProposalTemplateField): boolean;
+}
+
+class BaseValidator implements IValidator {
+  constructor(private dataType?: DataType | undefined) {}
+
+  validate(value: any, field: QuestionaryField) {
+    if (this.dataType && field.data_type !== this.dataType) {
+      throw new Error("Field validator ");
+    }
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (config.required && !value) {
+      return false;
+    }
+    return true;
+  }
+}
+
+class TextInputValidator extends BaseValidator {
+  constructor() {
+    super(DataType.TEXT_INPUT);
+  }
+  validate(value: any, field: QuestionaryField) {
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (!super.validate(value, field)) {
+      return false;
+    }
+    if (config.min && value && value.length < 100) {
+      return false;
+    }
+    if (config.max && value && value.length > config.max) {
+      return false;
+    }
+    return true;
+  }
+}
+
+class SelectFromOptionsInputValidator extends BaseValidator {
+  constructor() {
+    super(DataType.SELECTION_FROM_OPTIONS);
+  }
+  validate(value: any, field: QuestionaryField) {
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (!super.validate(value, field)) {
+      return false;
+    }
+
+    if (config.required && config.options!.indexOf(value) === -1) {
+      return false;
+    }
+
+    return true;
+  }
+}
+
+const validatorMap = JSDict.Create<DataType, IValidator>();
+validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
+validatorMap.put(
+  DataType.SELECTION_FROM_OPTIONS,
+  new SelectFromOptionsInputValidator()
+);
+
+function SWAP_341_tmp_convert_field(value: any): FieldConfig {
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as FieldConfig;
+    } catch (e) {
+      return {};
+    }
+  }
+  return value;
+}
+
+function SWAP_341_tmp_convert_value(value: any): any {
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value).value;
+    } catch (e) {
+      return value;
+    }
+  }
 }

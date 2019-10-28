@@ -3,7 +3,6 @@ import {
   DataType,
   FieldDependency,
   Topic,
-  FieldConfig,
   ProposalTemplateField,
   FieldCondition,
   TemplateStep,
@@ -12,7 +11,6 @@ import {
   QuestionaryField
 } from "../models/ProposalModel";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
-import { Proposal } from "../models/Proposal";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -115,4 +113,20 @@ export const createDummyTemplate = () => {
       linksToField
     ])
   ]);
+};
+
+export const createDummyTopic = (
+  id: number,
+  values: {
+    title?: string;
+    sortOrder?: number;
+    isEnabled?: boolean;
+  }
+) => {
+  return new Topic(
+    id,
+    values.title || "Genera information",
+    values.sortOrder || 0,
+    values.isEnabled || true
+  );
 };

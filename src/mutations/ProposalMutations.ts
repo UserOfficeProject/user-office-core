@@ -3,16 +3,20 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
-import { ProposalAnswer } from "../models/ProposalModel";
+import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
+import { isMatchingConstraints } from "../models/ProposalModelFunctions";
+import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import { rejects } from "assert";
 
 // TODO: it is here much of the logic reside
 
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
+    private templataDataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>,
     private logger: ILogger
@@ -82,7 +86,7 @@ export default class ProposalMutations {
         }
         if (
           (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
-          proposal.status !== 0
+          proposal.status !== ProposalStatus.DRAFT
         ) {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
@@ -116,20 +120,30 @@ export default class ProposalMutations {
             return rejection("INTERNAL_ERROR");
           }
         }
-        // This will overwrite the whole proposal with the new object created
 
         if (answers !== undefined) {
-          // TODO validate input
-          // if(<condition not matched>) { return rejection("<INVALID_VALUE_REASON>"); }
-          answers.forEach(async answer => {
+          for (const answer of answers) {
             if (answer.value !== undefined) {
+              const templateField = await this.templataDataSource.getTemplateField(
+                answer.proposal_question_id
+              );
+              if (!templateField) {
+                return rejection("INTERNAL_ERROR");
+              }
+              if (!isMatchingConstraints(answer.value, templateField)) {
+                this.logger.logError(
+                  "User provided value not matching constraint",
+                  { answer, templateField }
+                );
+                return rejection("VALUE_CONSTRAINT_REJECTION");
+              }
               await this.dataSource.updateAnswer(
                 proposal!.id,
                 answer.proposal_question_id,
                 answer.value
               );
             }
-          });
+          }
         }
 
         if (topicsCompleted !== undefined) {

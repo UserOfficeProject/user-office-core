@@ -10,34 +10,30 @@ import {
   proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
 
+import { templateDataSource } from "../datasources/mockups/TemplateDataSource";
+
 import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import {
-  DataType,
-  Topic,
-  ProposalTemplateField,
-  ProposalTemplate
-} from "../models/ProposalModel";
+import { DataType } from "../models/ProposalModel";
 import { User } from "../models/User";
-import { isRejection, rejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
-import { bool } from "prop-types";
 import { Proposal } from "../models/Proposal";
-import ProposalQueries from "../queries/ProposalQueries";
 
 const dummyLogger = new DummyLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyProposalDataSource = new proposalDataSource();
+const dummyTemplateDataSource = new templateDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
   new reviewDataSource()
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
+  dummyTemplateDataSource,
   userAuthorization,
   dummyEventBus,
   dummyLogger

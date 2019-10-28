@@ -51,6 +51,13 @@ export class templateDataSource implements TemplateDataSource {
       config: JSON.parse(config || "{}")
     });
   }
+
+  async getTemplateField(
+    fieldId: string
+  ): Promise<ProposalTemplateField | null> {
+    return createDummyField({ proposal_question_id: fieldId });
+  }
+
   async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
     return this.getProposalTemplate();
   }

@@ -62,6 +62,7 @@ const proposalQueries = new ProposalQueries(
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
+  templateDataSource,
   userAuthorization,
   eventBus,
   logger
