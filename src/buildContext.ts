@@ -37,7 +37,6 @@ const adminDataSource = new PostgresAdminDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
-  proposalDataSource,
   reviewDataSource
 );
 
