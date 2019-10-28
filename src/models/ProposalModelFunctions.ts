@@ -128,7 +128,7 @@ class TextInputValidator extends BaseValidator {
     if (!super.validate(value, field)) {
       return false;
     }
-    if (config.min && value && value.length < 100) {
+    if (config.min && value && value.length < config.min) {
       return false;
     }
     if (config.max && value && value.length > config.max) {
