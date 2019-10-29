@@ -1,13 +1,11 @@
 import { User } from "../models/User";
 import { Proposal } from "../models/Proposal";
 import { UserDataSource } from "../datasources/UserDataSource";
-import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { ReviewDataSource } from "../datasources/ReviewDataSource";
 
 export class UserAuthorization {
   constructor(
     private userDataSource: UserDataSource,
-    private proposalDataSource: ProposalDataSource,
     private reviewDataSource: ReviewDataSource
   ) {}
 

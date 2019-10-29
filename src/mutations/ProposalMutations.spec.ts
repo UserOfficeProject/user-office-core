@@ -5,10 +5,12 @@ import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 
 import { ApplicationEvent } from "../events/applicationEvents";
 import {
-  proposalDataSource,
   dummyProposalSubmitted,
-  dummyProposal
+  dummyProposal,
+  proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
+
+import { templateDataSource } from "../datasources/mockups/TemplateDataSource";
 
 import {
   userDataSource,
@@ -16,29 +18,30 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import {
-  DataType,
-  Topic,
-  ProposalTemplateField,
-  ProposalTemplate
-} from "../models/ProposalModel";
+import { DataType } from "../models/ProposalModel";
 import { User } from "../models/User";
-import { isRejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
+import { Proposal } from "../models/Proposal";
 
 const dummyLogger = new DummyLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
+const dummyProposalDataSource = new proposalDataSource();
+const dummyTemplateDataSource = new templateDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const proposalMutations = new ProposalMutations(
-  new proposalDataSource(),
+  dummyProposalDataSource,
+  dummyTemplateDataSource,
   userAuthorization,
   dummyEventBus,
   dummyLogger
 );
+
+beforeEach(() => {
+  dummyProposalDataSource.init();
+});
 
 test("A user on the proposal can update it's title if it is in edit mode", () => {
   return expect(tryUpdateProposal(dummyUser, "1")).resolves.toBe(dummyProposal);
@@ -79,71 +82,13 @@ function tryUpdateProposal(user: User, proposalId: string) {
       {
         proposal_question_id: "fasta_seq",
         data_type: DataType.TEXT_INPUT,
-        value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}'
       }
     ],
     undefined,
     undefined
   );
 }
-
-test("A userofficer can update topic", async () => {
-  const newTopicTitle = "new topic title";
-  const topicEnabled = false;
-  const topic = await proposalMutations.updateTopic(
-    dummyUserOfficer,
-    1,
-    newTopicTitle,
-    topicEnabled
-  );
-  expect(topic instanceof Topic).toBe(true);
-  expect((topic as Topic).topic_title).toEqual(newTopicTitle);
-  expect((topic as Topic).is_enabled).toEqual(topicEnabled);
-});
-
-test("A user can not update topic", async () => {
-  const topic = await proposalMutations.updateTopic(
-    dummyUser,
-    1,
-    "New topic title",
-    false
-  );
-
-  expect(topic instanceof Topic).toBe(false);
-});
-
-test("A userofficer can create topic", async () => {
-  let template = await proposalMutations.createTopic(dummyUserOfficer, 0);
-  expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
-  var numbefOfTopics = (template as ProposalTemplate).steps.length;
-
-  template = await proposalMutations.createTopic(dummyUserOfficer, 1);
-  expect((template as ProposalTemplate).steps.length).toEqual(
-    numbefOfTopics + 1
-  ); // added new one
-});
-
-test("A user can not create topic", async () => {
-  const topic = await proposalMutations.createTopic(dummyUser, 0);
-  expect(topic instanceof ProposalTemplate).toBe(false);
-});
-
-test("A userofficer can update fieltTopicRel", async () => {
-  const response = await proposalMutations.updateFieldTopicRel(
-    dummyUserOfficer,
-    1,
-    ["has_links_with_industry", "enable_crystallization"]
-  );
-  expect(isRejection(response)).toEqual(false);
-});
-
-test("A user can not update fieltTopicRel", async () => {
-  const response = await proposalMutations.updateFieldTopicRel(dummyUser, 1, [
-    "has_links_with_industry",
-    "enable_crystallization"
-  ]);
-  expect(isRejection(response)).toEqual(true);
-});
 
 //Accept
 
@@ -266,40 +211,32 @@ test("User must have valid session to attach files", () => {
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
 
-test("User can not create field", async () => {
-  const response = await proposalMutations.createTemplateField(
-    dummyUser,
-    1,
-    DataType.EMBELLISHMENT
-  );
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
+test("User officer can delete a proposal", () => {
+  return expect(
+    proposalMutations.delete(dummyUserOfficer, 1)
+  ).resolves.toBeInstanceOf(Proposal);
 });
 
-test("User officer can create field", async () => {
-  const response = await proposalMutations.createTemplateField(
-    dummyUserOfficer,
-    1,
-    DataType.EMBELLISHMENT
-  );
-  expect(response).toBeInstanceOf(ProposalTemplateField);
-
-  const newField = response as ProposalTemplateField;
-  expect(newField.topic_id).toEqual(1);
-  expect(newField.data_type).toEqual(DataType.EMBELLISHMENT);
+test("User cannot delete a proposal", () => {
+  return expect(
+    proposalMutations.delete(dummyUserNotOnProposal, 1)
+  ).resolves.not.toBeInstanceOf(Proposal);
 });
 
-test("User can not delete field", async () => {
-  const response = await proposalMutations.deleteTemplateField(
-    dummyUser,
-    "field_id"
+test("Has to be logged in to create proposal", () => {
+  return expect(proposalMutations.create(null)).resolves.not.toBeInstanceOf(
+    Proposal
   );
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
 });
 
-test("User officer can delete field", async () => {
-  const response = await proposalMutations.deleteTemplateField(
-    dummyUserOfficer,
-    "field_id"
+test("Can create a proposal", () => {
+  return expect(proposalMutations.create(dummyUser)).resolves.toBeInstanceOf(
+    Proposal
   );
-  expect(response).toBeInstanceOf(ProposalTemplate);
+});
+
+test("Proposal title should not be short", () => {
+  return expect(
+    proposalMutations.update(dummyUser, "1", "a")
+  ).resolves.not.toBeInstanceOf(Proposal);
 });
