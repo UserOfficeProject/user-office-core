@@ -102,12 +102,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         values,
         id
       });
+      return null;
     }
 
     if (!resultSet || resultSet.length != 1) {
       this.logger.logError(
-        "Unexpected resultSet returned while updating topic",
-        { values, id }
+        "INSERT Topic resultSet must contain exactly 1 row",
+        { values, id, resultSet }
       );
       return null;
     }
@@ -141,7 +142,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         await database("proposal_question_dependencies").insert({
           proposal_question_id: dependency.proposal_question_id,
           proposal_question_dependency: dependency.proposal_question_dependency,
-          condition: dependency.condition // TODO rename consitancy
+          condition: dependency.condition
         });
       });
     }
@@ -155,51 +156,53 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     });
   }
 
-  createTemplateField(
+  async createTemplateField(
     fieldId: string,
     topicId: number,
     dataType: DataType,
     question: string,
     config: string
   ): Promise<ProposalTemplateField | null> {
-    return database
-      .insert(
-        {
-          proposal_question_id: fieldId,
-          topic_id: topicId,
-          data_type: dataType,
-          question: question,
-          config: config
-        },
-        ["*"]
-      )
-      .from("proposal_questions")
-      .then((resultSet: ProposalQuestionRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError(
-            "INSERT field resultSet must contain exactly 1 row",
-            {
-              resultSet,
-              topicId,
-              dataType
-            }
-          );
-          return null;
-        }
-
-        return createProposalTemplateFieldObject(resultSet[0]);
-      })
-      .catch((e: Error) => {
-        this.logger.logException(
-          "Exception occurred while inserting field",
-          e,
+    const [error, resultSet] = await to<ProposalQuestionRecord[]>(
+      database
+        .insert(
           {
-            topicId,
-            dataType
-          }
-        );
-        return null;
-      });
+            proposal_question_id: fieldId,
+            topic_id: topicId,
+            data_type: dataType,
+            question: question,
+            config: config
+          },
+          ["*"]
+        )
+        .from("proposal_questions")
+    );
+
+    if (error) {
+      this.logger.logException(
+        "Exception occurred while inserting field",
+        error,
+        {
+          topicId,
+          dataType
+        }
+      );
+      return null;
+    }
+
+    if (!resultSet || resultSet.length != 1) {
+      this.logger.logError(
+        "INSERT field resultSet must contain exactly 1 row",
+        {
+          resultSet,
+          topicId,
+          dataType
+        }
+      );
+      return null;
+    }
+
+    return createProposalTemplateFieldObject(resultSet[0]);
   }
 
   getTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
