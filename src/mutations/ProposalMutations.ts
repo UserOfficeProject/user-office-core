@@ -9,7 +9,6 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 import { isMatchingConstraints } from "../models/ProposalModelFunctions";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
-import { rejects } from "assert";
 
 // TODO: it is here much of the logic reside
 

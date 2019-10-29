@@ -10,7 +10,6 @@ import {
   FieldConfig
 } from "./ProposalModel";
 import JSDict from "../utils/Dictionary";
-import { FieldCondition } from "../../build/src/models/ProposalModel";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
