@@ -63,6 +63,50 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
+      case "PROPOSAL_SUBMITTED": {
+        const principalInvestigator = await userDataSource.get(
+          event.proposal.proposer
+        );
+        const participants = await userDataSource.getProposalUsers(
+          event.proposal.id
+        );
+        if (!principalInvestigator) {
+          return;
+        }
+        client.transmissions
+          .send({
+            content: {
+              template_id: "proposal-submitted"
+            },
+            substitution_data: {
+              piPreferredname: principalInvestigator.preferredname,
+              piLastname: principalInvestigator.lastname,
+              proposalNumber: event.proposal.id,
+              proposalTitle: event.proposal.title,
+              coProposers: participants.map(
+                partipant => `${partipant.preferredname} ${partipant.lastname} `
+              ),
+              call: ""
+            },
+            recipients: [
+              { address: principalInvestigator.email },
+              ...participants.map(partipant => {
+                return {
+                  address: partipant.email,
+                  header_to: principalInvestigator.email
+                };
+              })
+            ]
+          })
+          .then((res: string) => {
+            console.log(res);
+          })
+          .catch((err: string) => {
+            console.log(err);
+          });
+        return;
+      }
+
       case "ACCOUNT_CREATED": {
         if (process.env.NODE_ENV === "development") {
           await userDataSource.setUserEmailVerified(event.user.id);

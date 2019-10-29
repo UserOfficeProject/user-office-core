@@ -249,25 +249,32 @@ export default class ProposalMutations {
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
+    return this.eventBus.wrap(
+      async () => {
+        if (agent == null) {
+          return rejection("NOT_LOGGED_IN");
+        }
 
-    let proposal = await this.dataSource.get(proposalId);
+        let proposal = await this.dataSource.get(proposalId);
 
-    if (!proposal) {
-      return rejection("INTERNAL_ERROR");
-    }
+        if (!proposal) {
+          return rejection("INTERNAL_ERROR");
+        }
 
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isMemberOfProposal(agent, proposal))
-    ) {
-      return rejection("NOT_ALLOWED");
-    }
+        if (
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.userAuth.isMemberOfProposal(agent, proposal))
+        ) {
+          return rejection("NOT_ALLOWED");
+        }
 
-    const result = await this.dataSource.submitProposal(proposalId);
-    return result || rejection("INTERNAL_ERROR");
+        const result = await this.dataSource.submitProposal(proposalId);
+        return result || rejection("INTERNAL_ERROR");
+      },
+      proposal => {
+        return { type: "PROPOSAL_SUBMITTED", proposal };
+      }
+    );
   }
 
   async updateFieldTopicRel(
