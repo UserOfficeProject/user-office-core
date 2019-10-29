@@ -71,6 +71,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       sort_order: sortOrder,
       is_enabled: true
     });
+
     return this.getProposalTemplate();
   }
 
@@ -82,27 +83,35 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       sortOrder?: number;
     }
   ): Promise<Topic | null> {
-    return database
-      .update(
-        {
-          topic_title: values.title,
-          is_enabled: values.isEnabled,
-          sortOrder: values.sortOrder
-        },
-        ["*"]
-      )
-      .from("proposal_topics")
-      .where({ topic_id: id })
-      .then((resultSet: TopicRecord[]) => {
-        if (!resultSet || resultSet.length != 1) {
-          this.logger.logError("Failed to update topic", {
-            data: values,
-            id
-          });
-          return null;
-        }
-        return createTopicObject(resultSet[0]);
+    const [error, resultSet] = await to<TopicRecord[]>(
+      database
+        .update(
+          {
+            topic_title: values.title,
+            is_enabled: values.isEnabled,
+            sortOrder: values.sortOrder
+          },
+          ["*"]
+        )
+        .from("proposal_topics")
+        .where({ topic_id: id })
+    );
+
+    if (error) {
+      this.logger.logError("Error occurred while updating topic", {
+        values,
+        id
       });
+    }
+
+    if (!resultSet || resultSet.length != 1) {
+      this.logger.logError(
+        "Unexpected resultSet returned while updating topic",
+        { values, id }
+      );
+      return null;
+    }
+    return createTopicObject(resultSet[0]);
   }
 
   async updateTemplateField(
