@@ -105,7 +105,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async updateField(
+  async updateTemplateField(
     proposal_question_id: string,
     values: {
       dataType?: string;
@@ -214,7 +214,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         }
         return createProposalTemplateFieldObject(resultSet[0]);
       })
-      .catch((e:Error) => this.logger.logException("Exception occurred while fetching template field", e, { fieldId }));
+      .catch((e: Error) =>
+        this.logger.logException(
+          "Exception occurred while fetching template field",
+          e,
+          { fieldId }
+        )
+      );
   }
 
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {

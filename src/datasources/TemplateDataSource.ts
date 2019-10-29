@@ -7,17 +7,9 @@ import {
 } from "../models/ProposalModel";
 
 export interface TemplateDataSource {
-  // Read
   getProposalTemplate(): Promise<ProposalTemplate>;
 
-  // Write
-  createTopic(sortOrder: number): Promise<ProposalTemplate>;
-  updateTopic(
-    id: number,
-    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
-  ): Promise<Topic | null>;
-  deleteTopic(id: number): Promise<Topic | null>;
-
+  // TemplateField
   createTemplateField(
     fieldId: string,
     topicId: number,
@@ -26,7 +18,7 @@ export interface TemplateDataSource {
     config: string
   ): Promise<ProposalTemplateField | null>;
   getTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
-  updateField(
+  updateTemplateField(
     proposal_question_id: string,
     values: {
       dataType?: string;
@@ -38,6 +30,14 @@ export interface TemplateDataSource {
     }
   ): Promise<ProposalTemplate | null>;
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
+
+  // Topic
+  createTopic(sortOrder: number): Promise<ProposalTemplate>;
+  updateTopic(
+    id: number,
+    values: { title?: string; isEnabled?: boolean; sortOrder?: number }
+  ): Promise<Topic | null>;
+  deleteTopic(id: number): Promise<Topic | null>;
 
   updateTopicOrder(topicOrder: number[]): Promise<Boolean | null>;
 }

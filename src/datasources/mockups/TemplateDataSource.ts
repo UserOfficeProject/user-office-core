@@ -1,4 +1,3 @@
-import { ProposalDataSource } from "../ProposalDataSource";
 import {
   ProposalTemplate,
   ProposalTemplateField,
@@ -6,13 +5,10 @@ import {
   Topic,
   ProposalAnswer,
   TemplateStep,
-  Questionary,
-  ProposalStatus
+  Questionary
 } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
-import { Review } from "../../models/Review";
 import {
-  create1Topic3FieldWithDependenciesQuestionary,
   createDummyTemplate,
   createDummyField,
   createDummyTopic
@@ -61,7 +57,7 @@ export class templateDataSource implements TemplateDataSource {
   async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
     return this.getProposalTemplate();
   }
-  async updateField(
+  async updateTemplateField(
     proposal_question_id: string,
     values: {
       data_type?: DataType | undefined;

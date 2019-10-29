@@ -97,7 +97,7 @@ export default class TemplateMutations {
       return rejection("NOT_AUTHORIZED");
     }
     return (
-      (await this.dataSource.updateField(id, {
+      (await this.dataSource.updateTemplateField(id, {
         dataType,
         sortOrder,
         question,
@@ -145,7 +145,7 @@ export default class TemplateMutations {
     var isSuccess = true;
     var index = 1;
     for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateField(field, {
+      const updatedField = await this.dataSource.updateTemplateField(field, {
         topicId,
         sortOrder: index
       });

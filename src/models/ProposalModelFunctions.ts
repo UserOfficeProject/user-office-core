@@ -9,9 +9,8 @@ import {
   FieldDependency,
   FieldConfig
 } from "./ProposalModel";
-import { file } from "@babel/types";
 import JSDict from "../utils/Dictionary";
-import { type } from "os";
+import { FieldCondition } from "../../build/src/models/ProposalModel";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -100,11 +99,11 @@ export function isMatchingConstraints(
   return validator.validate(val, field);
 }
 
-interface IValidator {
+interface IConstraintValidator {
   validate(value: any, field: ProposalTemplateField): boolean;
 }
 
-class BaseValidator implements IValidator {
+class BaseValidator implements IConstraintValidator {
   constructor(private dataType?: DataType | undefined) {}
 
   validate(value: any, field: QuestionaryField) {
@@ -156,30 +155,9 @@ class SelectFromOptionsInputValidator extends BaseValidator {
   }
 }
 
-const validatorMap = JSDict.Create<DataType, IValidator>();
+const validatorMap = JSDict.Create<DataType, IConstraintValidator>();
 validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
 validatorMap.put(
   DataType.SELECTION_FROM_OPTIONS,
   new SelectFromOptionsInputValidator()
 );
-
-function SWAP_341_tmp_convert_field(value: any): FieldConfig {
-  if (typeof value === "string") {
-    try {
-      return JSON.parse(value) as FieldConfig;
-    } catch (e) {
-      return {};
-    }
-  }
-  return value;
-}
-
-function SWAP_341_tmp_convert_value(value: any): any {
-  if (typeof value === "string") {
-    try {
-      return JSON.parse(value).value;
-    } catch (e) {
-      return value;
-    }
-  }
-}
