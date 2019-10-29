@@ -1,6 +1,6 @@
-import { User } from "../models/User";
+import { User, UpdateUserArgs, checkUserArgs } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
-import { rejection, Rejection } from "../rejection";
+import { isRejection, rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserAuthorization } from "../utils/UserAuthorization";
@@ -111,46 +111,40 @@ export default class UserMutations {
 
   async update(
     agent: User | null,
-    id: string,
-    firstname?: string,
-    lastname?: string,
-    roles?: number[]
+    args: UpdateUserArgs
   ): Promise<User | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, parseInt(id)))
+      !(await this.userAuth.isUser(agent, args.id))
     ) {
       return rejection("WRONG_PERMISSIONS");
     }
-    let user = await this.dataSource.get(parseInt(id)); //Hacky
+
+    const checkArgs = checkUserArgs(args);
+    if (isRejection(checkArgs)) {
+      return checkArgs;
+    }
+
+    let user = await this.dataSource.get(args.id); //Hacky
 
     if (!user) {
       return rejection("INTERNAL_ERROR");
     }
+    user = {
+      ...user,
+      ...args,
+      roles: user.roles,
+      reviews: user.reviews,
+      proposals: user.proposals
+    };
 
-    if (firstname !== undefined) {
-      user.firstname = firstname;
-
-      if (firstname.length < 2) {
-        return rejection("TOO_SHORT_NAME");
-      }
-    }
-
-    if (lastname !== undefined) {
-      user.lastname = lastname;
-
-      if (lastname.length < 2) {
-        return rejection("TOO_SHORT_NAME");
-      }
-    }
-
-    if (roles !== undefined) {
+    if (args.roles !== undefined) {
       if (!(await this.userAuth.isUserOfficer(agent))) {
         return rejection("WRONG_PERMISSIONS");
       }
       const resultUpdateRoles = await this.dataSource.setUserRoles(
-        parseInt(id),
-        roles
+        args.id,
+        args.roles
       );
       if (!resultUpdateRoles) {
         return rejection("INTERNAL_ERROR");

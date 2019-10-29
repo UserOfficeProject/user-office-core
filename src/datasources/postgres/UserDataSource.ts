@@ -42,15 +42,47 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   update(user: User): Promise<User | null> {
+    const {
+      firstname,
+      middlename,
+      lastname,
+      preferredname,
+      gender,
+      nationality,
+      birthdate,
+      organisation,
+      department,
+      organisation_address,
+      position,
+      email,
+      telephone,
+      telephone_alt
+    } = user;
     return database
       .update({
-        firstname: user.firstname,
-        lastname: user.lastname
+        firstname,
+        middlename,
+        lastname,
+        preferredname,
+        gender,
+        nationality,
+        birthdate,
+        organisation,
+        department,
+        organisation_address,
+        position,
+        email,
+        telephone,
+        telephone_alt
       })
       .from("users")
       .where("user_id", user.id)
       .then(() => {
         return user;
+      })
+      .catch((e: string) => {
+        console.log(e);
+        return null;
       });
   }
 
