@@ -125,7 +125,7 @@ export const createDummyTopic = (
 ) => {
   return new Topic(
     id,
-    values.title || "Genera information",
+    values.title || "General information",
     values.sortOrder || 0,
     values.isEnabled || true
   );
