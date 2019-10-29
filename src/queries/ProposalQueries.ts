@@ -40,16 +40,6 @@ export default class ProposalQueries {
     return await this.dataSource.getQuestionary(id);
   }
 
-  async getProposalTemplate(
-    agent: User | null
-  ): Promise<ProposalTemplate | null> {
-    if (agent == null) {
-      return null;
-    }
-
-    return await this.dataSource.getProposalTemplate();
-  }
-
   private async hasAccessRights(
     agent: User | null,
     proposal: Proposal

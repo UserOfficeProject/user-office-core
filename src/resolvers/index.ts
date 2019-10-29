@@ -281,7 +281,7 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.getProposalTemplate(context.user);
+    return context.queries.template.getProposalTemplate(context.user);
   },
 
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -307,13 +307,13 @@ export default {
 
   createTopic(args: CreateTopicArgs, context: ResolverContext) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.createTopic(context.user, args.sortOrder)
+      context.mutations.template.createTopic(context.user, args.sortOrder)
     );
   },
 
   updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
     return wrapTopicMutation(
-      context.mutations.proposal.updateTopic(
+      context.mutations.template.updateTopic(
         context.user,
         args.id,
         args.title,
@@ -324,7 +324,7 @@ export default {
 
   updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
     return createResponseWrapper<void>("result")(
-      context.mutations.proposal.updateFieldTopicRel(
+      context.mutations.template.updateFieldTopicRel(
         context.user,
         args.topic_id,
         args.field_ids
@@ -333,13 +333,14 @@ export default {
   },
 
   deleteTopic(args: DeleteTopicArgs, context: ResolverContext) {
-    return createResponseWrapper<void>("result")(
-      context.mutations.proposal.deleteTopic(context.user, args.id)
+    return createResponseWrapper<Topic>("result")(
+      context.mutations.template.deleteTopic(context.user, args.id)
     );
   },
+
   updateTopicOrder(args: UpdateTopicOrderArgs, context: ResolverContext) {
     return createResponseWrapper<Boolean>("result")(
-      context.mutations.proposal.updateTopicOrder(context.user, args.topicOrder)
+      context.mutations.template.updateTopicOrder(context.user, args.topicOrder)
     );
   },
 
@@ -348,7 +349,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.updateProposalTemplateField(
+      context.mutations.template.updateProposalTemplateField(
         context.user,
         args.id,
         args.dataType as DataType,
@@ -365,7 +366,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateFieldMutation(
-      context.mutations.proposal.createTemplateField(
+      context.mutations.template.createTemplateField(
         context.user,
         args.topicId,
         args.dataType as DataType
@@ -378,7 +379,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.deleteTemplateField(context.user, args.id)
+      context.mutations.template.deleteTemplateField(context.user, args.id)
     );
   },
 

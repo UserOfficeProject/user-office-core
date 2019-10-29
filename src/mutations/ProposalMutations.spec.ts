@@ -10,34 +10,30 @@ import {
   proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
 
+import { templateDataSource } from "../datasources/mockups/TemplateDataSource";
+
 import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import {
-  DataType,
-  Topic,
-  ProposalTemplateField,
-  ProposalTemplate
-} from "../models/ProposalModel";
+import { DataType } from "../models/ProposalModel";
 import { User } from "../models/User";
-import { isRejection, rejection } from "../rejection";
 import { DummyLogger } from "../utils/Logger";
-import { bool } from "prop-types";
 import { Proposal } from "../models/Proposal";
-import ProposalQueries from "../queries/ProposalQueries";
 
 const dummyLogger = new DummyLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyProposalDataSource = new proposalDataSource();
+const dummyTemplateDataSource = new templateDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
   new reviewDataSource()
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
+  dummyTemplateDataSource,
   userAuthorization,
   dummyEventBus,
   dummyLogger
@@ -86,71 +82,13 @@ function tryUpdateProposal(user: User, proposalId: string) {
       {
         proposal_question_id: "fasta_seq",
         data_type: DataType.TEXT_INPUT,
-        value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
+        value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}'
       }
     ],
     undefined,
     undefined
   );
 }
-
-test("A userofficer can update topic", async () => {
-  const newTopicTitle = "new topic title";
-  const topicEnabled = false;
-  const topic = await proposalMutations.updateTopic(
-    dummyUserOfficer,
-    1,
-    newTopicTitle,
-    topicEnabled
-  );
-  expect(topic instanceof Topic).toBe(true);
-  expect((topic as Topic).topic_title).toEqual(newTopicTitle);
-  expect((topic as Topic).is_enabled).toEqual(topicEnabled);
-});
-
-test("A user can not update topic", async () => {
-  const topic = await proposalMutations.updateTopic(
-    dummyUser,
-    1,
-    "New topic title",
-    false
-  );
-
-  expect(topic instanceof Topic).toBe(false);
-});
-
-test("A userofficer can create topic", async () => {
-  let template = await proposalMutations.createTopic(dummyUserOfficer, 0);
-  expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
-  var numbefOfTopics = (template as ProposalTemplate).steps.length;
-
-  template = await proposalMutations.createTopic(dummyUserOfficer, 1);
-  expect((template as ProposalTemplate).steps.length).toEqual(
-    numbefOfTopics + 1
-  ); // added new one
-});
-
-test("A user can not create topic", async () => {
-  const topic = await proposalMutations.createTopic(dummyUser, 0);
-  expect(topic instanceof ProposalTemplate).toBe(false);
-});
-
-test("A userofficer can update fieltTopicRel", async () => {
-  const response = await proposalMutations.updateFieldTopicRel(
-    dummyUserOfficer,
-    1,
-    ["has_links_with_industry", "enable_crystallization"]
-  );
-  expect(isRejection(response)).toEqual(false);
-});
-
-test("A user can not update fieltTopicRel", async () => {
-  const response = await proposalMutations.updateFieldTopicRel(dummyUser, 1, [
-    "has_links_with_industry",
-    "enable_crystallization"
-  ]);
-  expect(isRejection(response)).toEqual(true);
-});
 
 //Accept
 
@@ -273,40 +211,6 @@ test("User must have valid session to attach files", () => {
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
 
-test("User can not create field", async () => {
-  const response = await proposalMutations.createTemplateField(
-    dummyUser,
-    1,
-    DataType.EMBELLISHMENT
-  );
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
-});
-
-test("User officer can create field", async () => {
-  const response = await proposalMutations.createTemplateField(
-    dummyUserOfficer,
-    1,
-    DataType.EMBELLISHMENT
-  );
-  expect(response).toBeInstanceOf(ProposalTemplateField);
-
-  const newField = response as ProposalTemplateField;
-  expect(newField.topic_id).toEqual(1);
-  expect(newField.data_type).toEqual(DataType.EMBELLISHMENT);
-});
-
-test("User can not delete field", async () => {
-  expect(
-    proposalMutations.deleteTemplateField(dummyUser, "field_id")
-  ).resolves.not.toBeInstanceOf(ProposalTemplate);
-});
-
-test("User officer can delete field", async () => {
-  expect(
-    proposalMutations.deleteTemplateField(dummyUserOfficer, "field_id")
-  ).resolves.toBeInstanceOf(ProposalTemplate);
-});
-
 test("User officer can delete a proposal", () => {
   return expect(
     proposalMutations.delete(dummyUserOfficer, 1)
@@ -335,15 +239,4 @@ test("Proposal title should not be short", () => {
   return expect(
     proposalMutations.update(dummyUser, "1", "a")
   ).resolves.not.toBeInstanceOf(Proposal);
-});
-
-test("Officer can update topic order", async () => {
-  return expect(
-    proposalMutations.updateTopicOrder(dummyUserOfficer, [1, 3, 2])
-  ).resolves.toBeTruthy();
-});
-
-test("User can not update topic order", async () => {
-  const result = await proposalMutations.updateTopicOrder(dummyUser, [1, 3, 2]);
-  return expect(isRejection(result)).toBeTruthy();
 });

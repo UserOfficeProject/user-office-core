@@ -6,8 +6,10 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency
+  FieldDependency,
+  FieldConfig
 } from "./ProposalModel";
+import JSDict from "../utils/Dictionary";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -86,3 +88,75 @@ export function areDependenciesSatisfied(
   });
   return isAtLeastOneDissasisfied === false;
 }
+
+export function isMatchingConstraints(
+  value: any,
+  field: ProposalTemplateField
+): boolean {
+  const val = JSON.parse(value).value;
+  const validator = validatorMap.get(field.data_type) || new BaseValidator();
+  return validator.validate(val, field);
+}
+
+interface IConstraintValidator {
+  validate(value: any, field: ProposalTemplateField): boolean;
+}
+
+class BaseValidator implements IConstraintValidator {
+  constructor(private dataType?: DataType | undefined) {}
+
+  validate(value: any, field: QuestionaryField) {
+    if (this.dataType && field.data_type !== this.dataType) {
+      throw new Error("Field validator ");
+    }
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (config.required && !value) {
+      return false;
+    }
+    return true;
+  }
+}
+
+class TextInputValidator extends BaseValidator {
+  constructor() {
+    super(DataType.TEXT_INPUT);
+  }
+  validate(value: any, field: QuestionaryField) {
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (!super.validate(value, field)) {
+      return false;
+    }
+    if (config.min && value && value.length < config.min) {
+      return false;
+    }
+    if (config.max && value && value.length > config.max) {
+      return false;
+    }
+    return true;
+  }
+}
+
+class SelectFromOptionsInputValidator extends BaseValidator {
+  constructor() {
+    super(DataType.SELECTION_FROM_OPTIONS);
+  }
+  validate(value: any, field: QuestionaryField) {
+    const config = JSON.parse(field.config) as FieldConfig;
+    if (!super.validate(value, field)) {
+      return false;
+    }
+
+    if (config.required && config.options!.indexOf(value) === -1) {
+      return false;
+    }
+
+    return true;
+  }
+}
+
+const validatorMap = JSDict.Create<DataType, IConstraintValidator>();
+validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
+validatorMap.put(
+  DataType.SELECTION_FROM_OPTIONS,
+  new SelectFromOptionsInputValidator()
+);
