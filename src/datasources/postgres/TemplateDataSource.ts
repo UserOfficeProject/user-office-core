@@ -138,13 +138,14 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       await database("proposal_question_dependencies")
         .where("proposal_question_id", proposal_question_id)
         .del();
-      values.dependencies.forEach(async dependency => {
+
+      for (const dependency of values.dependencies) {
         await database("proposal_question_dependencies").insert({
           proposal_question_id: dependency.proposal_question_id,
           proposal_question_dependency: dependency.proposal_question_dependency,
           condition: dependency.condition
         });
-      });
+      }
     }
 
     return new Promise(async (resolve, reject) => {
