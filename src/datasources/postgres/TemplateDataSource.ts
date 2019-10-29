@@ -236,20 +236,17 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       );
   }
 
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
-    return new Promise(async (resolve, reject) => {
-      const [err] = await to(
-        database("proposal_questions")
-          .where({ proposal_question_id: fieldId })
-          .del()
-      );
-      if (err) {
-        this.logger.logError("Could not delete field ", err);
-        resolve(null);
-      } else {
-        resolve(await this.getProposalTemplate());
-      }
-    });
+  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
+    const [error] = await to(
+      database("proposal_questions")
+        .where({ proposal_question_id: fieldId })
+        .del()
+    );
+    if (error) {
+      this.logger.logException("Could not delete field", error, { fieldId });
+      return null;
+    }
+    return await this.getProposalTemplate();
   }
 
   async deleteTopic(id: number): Promise<Topic | null> {
