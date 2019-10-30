@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from "react";
 import { TextField, makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
+import { getIn } from "formik";
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
     textField: {
@@ -9,7 +10,8 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
   })();
   let { templateField, onComplete, touched, errors, handleChange } = props;
   let { proposal_question_id, config, question } = templateField;
-  let isError = errors[proposal_question_id] ? true : false;
+  const fieldError = getIn(errors, proposal_question_id);
+  const isError = getIn(touched, proposal_question_id) && !!fieldError;
   return (
     <div>
       <TextField
@@ -25,7 +27,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         onBlur={() => onComplete()}
         placeholder={config.placeholder}
         error={isError}
-        helperText={errors[proposal_question_id]}
+        helperText={isError && errors[proposal_question_id]}
         multiline={config.multiline}
         rows={config.multiline ? 4 : 1}
         rowsMax={config.multiline ? 16 : undefined}

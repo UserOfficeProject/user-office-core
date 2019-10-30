@@ -4,7 +4,7 @@ import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, onComplete, touched, errors, handleChange } = props;
+  let { templateField, onComplete, errors, handleChange } = props;
   let { proposal_question_id, config, question } = templateField;
   let isError = errors[proposal_question_id] ? true : false;
 

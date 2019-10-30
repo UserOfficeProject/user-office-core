@@ -97,6 +97,7 @@ export default function ProposalQuestionareStep(props: {
       initialValues={initialValues}
       validationSchema={Yup.object().shape(validationSchema)}
       onSubmit={onFormSubmit}
+      enableReinitialize={true}
     >
       {({
         values,

@@ -6,13 +6,11 @@ import {
   FormControlLabel,
   Radio,
   makeStyles,
-  InputLabel,
-  Select,
   MenuItem,
   TextField
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalErrorLabel } from "./ProposalErrorLabel";
+import { getIn } from "formik";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -29,27 +27,9 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   })();
 
   let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id, config, question } = templateField;
-  let isError = errors[proposal_question_id] ? true : false;
-
-  const currencies = [
-    {
-      value: "USD",
-      label: "$"
-    },
-    {
-      value: "EUR",
-      label: "€"
-    },
-    {
-      value: "BTC",
-      label: "฿"
-    },
-    {
-      value: "JPY",
-      label: "¥"
-    }
-  ];
+  let { proposal_question_id, config } = templateField;
+  const fieldError = getIn(errors, proposal_question_id);
+  const isError = getIn(touched, proposal_question_id) && !!fieldError;
 
   switch (templateField.config.variant) {
     case "dropdown":
@@ -80,11 +60,6 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               );
             })}
           </TextField>
-          {isError && (
-            <ProposalErrorLabel>
-              {errors[proposal_question_id]}
-            </ProposalErrorLabel>
-          )}
         </FormControl>
       );
 
@@ -119,11 +94,6 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               );
             })}
           </RadioGroup>
-          {isError && (
-            <ProposalErrorLabel>
-              {errors[proposal_question_id]}
-            </ProposalErrorLabel>
-          )}
         </FormControl>
       );
   }

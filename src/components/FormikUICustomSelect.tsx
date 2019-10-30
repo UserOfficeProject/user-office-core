@@ -59,7 +59,9 @@ const FormikUICustomSelect = ({
       >
         {availableOptions.map(curOption => (
           <MenuItem key={curOption} value={curOption}>
-            <Checkbox checked={field.value.indexOf(curOption) > -1} />
+            <Checkbox
+              checked={field.value && field.value.indexOf(curOption) > -1}
+            />
             <ListItemText primary={curOption} />
           </MenuItem>
         ))}

@@ -9,13 +9,7 @@ export class ProposalCompontentFileUpload extends React.Component<
   { files: string[] }
 > {
   render() {
-    const {
-      templateField,
-      touched,
-      errors,
-      onComplete,
-      handleChange
-    } = this.props;
+    const { templateField, errors, onComplete, handleChange } = this.props;
     const { proposal_question_id, config } = templateField;
     const isError = errors[proposal_question_id] ? true : false;
 
