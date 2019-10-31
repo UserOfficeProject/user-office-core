@@ -10,7 +10,7 @@ import {
   ProposalTemplate
 } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
-import { User } from "../models/User";
+import { User, UpdateUserArgs } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 
@@ -85,6 +85,10 @@ interface DeleteProposalTemplateFieldArgs {
   id: string;
 }
 
+interface DeleteProposalArgs {
+  id: number;
+}
+
 interface UpdateProposalTemplateFieldArgs {
   id: string;
   dataType: string;
@@ -98,12 +102,6 @@ interface UpdateProposalTemplateFieldArgs {
 interface CreateProposalTemplateFieldArgs {
   topicId: number;
   dataType: string;
-}
-interface UpdateUserArgs {
-  id: string;
-  firstname: string;
-  lastname: string;
-  roles: number[];
 }
 
 interface ApproveProposalArgs {
@@ -278,7 +276,7 @@ export default {
   },
 
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
-    return context.queries.proposal.getProposalTemplate(context.user);
+    return context.queries.template.getProposalTemplate(context.user);
   },
 
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
@@ -304,13 +302,13 @@ export default {
 
   createTopic(args: CreateTopicArgs, context: ResolverContext) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.createTopic(context.user, args.sortOrder)
+      context.mutations.template.createTopic(context.user, args.sortOrder)
     );
   },
 
   updateTopic(args: UpdateTopicArgs, context: ResolverContext) {
     return wrapTopicMutation(
-      context.mutations.proposal.updateTopic(
+      context.mutations.template.updateTopic(
         context.user,
         args.id,
         args.title,
@@ -321,7 +319,7 @@ export default {
 
   updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
     return createResponseWrapper<void>("result")(
-      context.mutations.proposal.updateFieldTopicRel(
+      context.mutations.template.updateFieldTopicRel(
         context.user,
         args.topic_id,
         args.field_ids
@@ -330,13 +328,14 @@ export default {
   },
 
   deleteTopic(args: DeleteTopicArgs, context: ResolverContext) {
-    return createResponseWrapper<void>("result")(
-      context.mutations.proposal.deleteTopic(context.user, args.id)
+    return createResponseWrapper<Topic>("result")(
+      context.mutations.template.deleteTopic(context.user, args.id)
     );
   },
+
   updateTopicOrder(args: UpdateTopicOrderArgs, context: ResolverContext) {
     return createResponseWrapper<Boolean>("result")(
-      context.mutations.proposal.updateTopicOrder(context.user, args.topicOrder)
+      context.mutations.template.updateTopicOrder(context.user, args.topicOrder)
     );
   },
 
@@ -345,7 +344,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.updateProposalTemplateField(
+      context.mutations.template.updateProposalTemplateField(
         context.user,
         args.id,
         args.dataType as DataType,
@@ -362,7 +361,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateFieldMutation(
-      context.mutations.proposal.createTemplateField(
+      context.mutations.template.createTemplateField(
         context.user,
         args.topicId,
         args.dataType as DataType
@@ -375,7 +374,7 @@ export default {
     context: ResolverContext
   ) {
     return wrapProposalTemplateMutation(
-      context.mutations.proposal.deleteTemplateField(context.user, args.id)
+      context.mutations.template.deleteTemplateField(context.user, args.id)
     );
   },
 
@@ -440,6 +439,12 @@ export default {
   submitProposal(args: ApproveProposalArgs, context: ResolverContext) {
     return wrapProposalMutation(
       context.mutations.proposal.submit(context.user, args.id)
+    );
+  },
+
+  deleteProposal(args: DeleteProposalArgs, context: ResolverContext) {
+    return wrapProposalMutation(
+      context.mutations.proposal.delete(context.user, args.id)
     );
   },
 
@@ -544,15 +549,7 @@ export default {
   },
 
   updateUser(args: UpdateUserArgs, context: ResolverContext) {
-    return wrapUserMutation(
-      context.mutations.user.update(
-        context.user,
-        args.id,
-        args.firstname,
-        args.lastname,
-        args.roles
-      )
-    );
+    return wrapUserMutation(context.mutations.user.update(context.user, args));
   },
 
   async resetPasswordEmail(args: { email: string }, context: ResolverContext) {
@@ -565,6 +562,17 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  updatePassword(
+    args: { id: number; password: string },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.updatePassword(
+      context.user,
+      args.id,
+      args.password
+    );
   },
 
   emailVerification(args: { token: string }, context: ResolverContext) {
@@ -597,7 +605,6 @@ export default {
     args: { id: PageName; text: string },
     context: ResolverContext
   ) {
-    console.log(PageName[args.id], args.id);
     return context.mutations.admin.setPageText(
       context.user,
       parseInt(PageName[args.id]),

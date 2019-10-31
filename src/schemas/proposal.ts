@@ -13,6 +13,7 @@ export const typeDefs = `
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult
         rejectProposal(id: Int!): ProposalMutationResult
+        deleteProposal(id: Int!): ProposalMutationResult
 
         createTopic(sortOrder:Int!): ProposalTemplateMutationResult
         updateTopic(id:Int!, title: String, isEnabled: Boolean): TopicMutationResult

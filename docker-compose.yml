@@ -1,16 +1,16 @@
 # Use postgres/example user/password credentials
-version: '3.1'
+version: "3.1"
 
 services:
   reverse-proxy:
     image: traefik:1.7 # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
     ports:
-      - "80:80"     # The HTTP port
+      - "80:80" # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  backend: 
+  backend:
     image: dmsc/duo-backend
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
@@ -21,7 +21,7 @@ services:
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
       - "traefik.port=4000"
-  frontend: 
+  frontend:
     image: dmsc/duo-frontend
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
@@ -39,6 +39,8 @@ services:
       - ./db_patches/0000_init.sql:/docker-entrypoint-initdb.d/0000_init.sql
       - ./db_patches/0001_CreateTopicReadinessState.sql:/docker-entrypoint-initdb.d/0001_CreateTopicReadinessState.sql
       - ./db_patches/0002_AlterProposals.sql:/docker-entrypoint-initdb.d/0002_AlterProposals.sql
+      - ./db_patches/0003_AlterProposalUser.sql:/docker-entrypoint-initdb.d/0003_AlterProposalUser.sql
+      - ./db_patches/0004_AlterProposalQuestions.sql:/docker-entrypoint-initdb.d/0004_AlterProposalQuestions.sql
   rabbitmq:
     image: "rabbitmq:3-management"
     hostname: "rabbit"

@@ -1,32 +1,31 @@
 import ProposalQueries from "./ProposalQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
-
 import {
-  proposalDataSource,
-  dummyProposal
+  dummyProposal,
+  proposalDataSource
 } from "../datasources/mockups/ProposalDataSource";
-
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-
 import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { ProposalTemplate } from "../models/ProposalModel";
 import { DummyLogger } from "../utils/Logger";
 
+const dummyProposalDataSource = new proposalDataSource();
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
-  new proposalDataSource(),
   new reviewDataSource()
 );
 const proposalQueries = new ProposalQueries(
-  new proposalDataSource(),
+  dummyProposalDataSource,
   userAuthorization,
   new DummyLogger()
 );
+beforeEach(() => {
+  dummyProposalDataSource.init();
+});
 
 test("A user on the proposal can get a proposal it belongs to", () => {
   return expect(proposalQueries.get(dummyUser, 1)).resolves.toBe(dummyProposal);
@@ -64,23 +63,4 @@ test("A userofficer can get all proposal", () => {
 
 test("A user cannot query all proposals", () => {
   return expect(proposalQueries.getAll(dummyUser)).resolves.toBe(null);
-});
-
-test("Non authentificated user can not get the template", () => {
-  return expect(
-    proposalQueries.getProposalTemplate(null)
-  ).resolves.not.toBeInstanceOf(ProposalTemplate);
-});
-
-test("User officer user can get the template", () => {
-  return expect(
-    proposalQueries.getProposalTemplate(dummyUserOfficer)
-  ).resolves.toBeInstanceOf(ProposalTemplate);
-});
-
-test("Proposal template should have fields", async () => {
-  let template = (await proposalQueries.getProposalTemplate(
-    dummyUserOfficer
-  )) as ProposalTemplate;
-  return expect(template.steps[0].fields!.length).toBeGreaterThan(0);
 });

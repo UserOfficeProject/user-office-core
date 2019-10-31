@@ -1,3 +1,13 @@
+import {
+  Topic,
+  ProposalTemplateField,
+  DataType,
+  FieldDependency,
+  FieldCondition,
+  QuestionaryField
+} from "../../models/ProposalModel";
+import { Proposal } from "../../models/Proposal";
+
 // Interfaces corresponding exactly to database tables
 
 export interface ProposalUserRecord {
@@ -94,3 +104,71 @@ export interface CallRecord {
   readonly cycle_comment: string;
   readonly survey_comment: string;
 }
+
+export const createTopicObject = (proposal: TopicRecord) => {
+  return new Topic(
+    proposal.topic_id,
+    proposal.topic_title,
+    proposal.sort_order,
+    proposal.is_enabled
+  );
+};
+
+export const createProposalTemplateFieldObject = (
+  question: ProposalQuestionRecord
+) => {
+  return new ProposalTemplateField(
+    question.proposal_question_id,
+    question.data_type as DataType,
+    question.sort_order,
+    question.question,
+    question.config,
+    question.topic_id,
+    null
+  );
+};
+
+export const createProposalObject = (proposal: ProposalRecord) => {
+  return new Proposal(
+    proposal.proposal_id,
+    proposal.title,
+    proposal.abstract,
+    proposal.proposer_id,
+    proposal.status,
+    proposal.created_at,
+    proposal.updated_at
+  );
+};
+
+export const createFieldDependencyObject = (
+  fieldDependency: FieldDependencyRecord
+) => {
+  if (!fieldDependency) {
+    return null;
+  }
+  const conditionJson = JSON.parse(fieldDependency.condition);
+  return new FieldDependency(
+    fieldDependency.proposal_question_id,
+    fieldDependency.proposal_question_dependency,
+    JSON.stringify(
+      new FieldCondition(conditionJson.condition, conditionJson.params)
+    ) // TODO SWAP-341. Remove stringifying
+  );
+};
+
+export const createQuestionaryFieldObject = (
+  question: ProposalQuestionRecord & { value: any }
+) => {
+  return new QuestionaryField(
+    new ProposalTemplateField(
+      question.proposal_question_id,
+      question.data_type as DataType,
+      question.sort_order,
+      question.question,
+      question.config,
+      question.topic_id,
+      null
+    ),
+    question.value || ""
+  );
+};

@@ -1,16 +1,9 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import {
-  ProposalTemplate,
-  ProposalAnswer,
-  Questionary,
-  QuestionaryStep,
-  QuestionaryField
-} from "../models/ProposalModel";
+import { ProposalTemplate } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
-import JSDict from "../utils/Dictionary";
 
 export default class ProposalQueries {
   constructor(
@@ -45,16 +38,6 @@ export default class ProposalQueries {
     }
 
     return await this.dataSource.getQuestionary(id);
-  }
-
-  async getProposalTemplate(
-    agent: User | null
-  ): Promise<ProposalTemplate | null> {
-    if (agent == null) {
-      return null;
-    }
-
-    return await this.dataSource.getProposalTemplate();
   }
 
   private async hasAccessRights(

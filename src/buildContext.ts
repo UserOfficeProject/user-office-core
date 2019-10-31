@@ -7,6 +7,7 @@ import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
 import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
 import PostgresFileDataSource from "./datasources/postgres/FileDataSource";
 import PostgresAdminDataSource from "./datasources/postgres/AdminDataSource";
+import TemplateDataSource from "./datasources/postgres/TemplateDataSource";
 
 import UserQueries from "./queries/UserQueries";
 import UserMutations from "./mutations/UserMutations";
@@ -25,6 +26,8 @@ import FileMutations from "./mutations/FileMutations";
 import AdminQueries from "./queries/AdminQueries";
 import AdminMutations from "./mutations/AdminMutations";
 import { Logger } from "./utils/Logger";
+import TemplateMutations from "./mutations/TemplateMutations";
+import TemplateQueries from "./queries/TemplateQueries";
 
 // Site specific data sources and event handlers (only ESS atm)
 const logger = new Logger();
@@ -34,10 +37,10 @@ const reviewDataSource = new PostgresReviewDataSource();
 const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
+const templateDataSource = new TemplateDataSource(logger);
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
-  proposalDataSource,
   reviewDataSource
 );
 
@@ -59,6 +62,7 @@ const proposalQueries = new ProposalQueries(
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
+  templateDataSource,
   userAuthorization,
   eventBus,
   logger
@@ -92,6 +96,18 @@ const adminMutations = new AdminMutations(
   eventBus
 );
 
+const templateQueries = new TemplateQueries(
+  templateDataSource,
+  userAuthorization,
+  logger
+);
+const templateMutations = new TemplateMutations(
+  templateDataSource,
+  userAuthorization,
+  eventBus,
+  logger
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -100,7 +116,8 @@ const context: BasicResolverContext = {
     review: reviewQueries,
     call: callQueries,
     file: fileQueries,
-    admin: adminQueries
+    admin: adminQueries,
+    template: templateQueries
   },
   mutations: {
     user: userMutations,
@@ -108,7 +125,8 @@ const context: BasicResolverContext = {
     review: reviewMutations,
     call: callMutations,
     file: fileMutations,
-    admin: adminMutations
+    admin: adminMutations,
+    template: templateMutations
   }
 };
 

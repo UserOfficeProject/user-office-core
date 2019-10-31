@@ -12,7 +12,7 @@
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "tsc && node ./build/index.js",
     "apitest": "newman run api_tests/proposal_tests.json --environment api_tests/environment.json",
-    "debug": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere node --inspect ./build/index.js"
+    "debug": "rm -R ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere node --inspect ./build/index.js"
   },
   "author": "",
   "license": "ISC",

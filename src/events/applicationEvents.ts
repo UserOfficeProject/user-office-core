@@ -6,6 +6,11 @@ interface ProposalAcceptedEvent {
   proposal: Proposal;
 }
 
+interface ProposalSubmittedEvent {
+  type: "PROPOSAL_SUBMITTED";
+  proposal: Proposal;
+}
+
 interface ProposalUpdatedEvent {
   type: "PROPOSAL_UPDATED";
   proposal: Proposal;
@@ -37,6 +42,7 @@ interface AccountCreation {
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
+  | ProposalSubmittedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | AccountCreation
