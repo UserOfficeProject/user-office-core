@@ -10,7 +10,7 @@ import {
   ProposalTemplate
 } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
-import { User } from "../models/User";
+import { User, UpdateUserArgs } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 
@@ -102,12 +102,6 @@ interface UpdateProposalTemplateFieldArgs {
 interface CreateProposalTemplateFieldArgs {
   topicId: number;
   dataType: string;
-}
-interface UpdateUserArgs {
-  id: string;
-  firstname: string;
-  lastname: string;
-  roles: number[];
 }
 
 interface ApproveProposalArgs {
@@ -554,15 +548,7 @@ export default {
   },
 
   updateUser(args: UpdateUserArgs, context: ResolverContext) {
-    return wrapUserMutation(
-      context.mutations.user.update(
-        context.user,
-        args.id,
-        args.firstname,
-        args.lastname,
-        args.roles
-      )
-    );
+    return wrapUserMutation(context.mutations.user.update(context.user, args));
   },
 
   async resetPasswordEmail(args: { email: string }, context: ResolverContext) {
@@ -575,6 +561,17 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  updatePassword(
+    args: { id: number; password: string },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.updatePassword(
+      context.user,
+      args.id,
+      args.password
+    );
   },
 
   emailVerification(args: { token: string }, context: ResolverContext) {
