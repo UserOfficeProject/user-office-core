@@ -256,7 +256,7 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, id))
     ) {
-      return rejection("WRONG_PERMISSIONS");
+      return false;
     }
     // Check that token is valid
     try {

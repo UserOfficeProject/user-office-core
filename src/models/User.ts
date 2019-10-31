@@ -39,7 +39,6 @@ export class User {
 }
 
 export interface UpdateUserArgs {
-  agent: User | null;
   id: number;
   user_title?: string;
   firstname?: string;

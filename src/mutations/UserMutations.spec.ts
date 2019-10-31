@@ -44,43 +44,63 @@ const userMutations = new UserMutations(
 
 test("A user can update it's own name", () => {
   return expect(
-    userMutations.update(dummyUser, "2", "klara", undefined, undefined)
+    userMutations.update(dummyUser, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined"
+    })
   ).resolves.toBe(dummyUser);
 });
 
 test("A user cannot update another users name", () => {
   return expect(
-    userMutations.update(
-      dummyUserNotOnProposal,
-      "2",
-      "klara",
-      undefined,
-      undefined
-    )
+    userMutations.update(dummyUserNotOnProposal, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined"
+    })
   ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
 });
 
 test("A not logged in user cannot update another users name", () => {
   return expect(
-    userMutations.update(null, "2", "klara", undefined, undefined)
+    userMutations.update(null, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined"
+    })
   ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
 });
 
 test("A userofficer can update another users name", () => {
   return expect(
-    userMutations.update(dummyUserOfficer, "2", "klara", undefined, undefined)
+    userMutations.update(dummyUserOfficer, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined"
+    })
   ).resolves.toBe(dummyUser);
 });
 
 test("A user cannot update it's roles", () => {
   return expect(
-    userMutations.update(dummyUser, "2", undefined, undefined, [1, 2])
+    userMutations.update(dummyUser, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined",
+      roles: [1, 2]
+    })
   ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
 });
 
 test("A userofficer can update users roles", () => {
   return expect(
-    userMutations.update(dummyUserOfficer, "2", undefined, undefined, [1, 2])
+    userMutations.update(dummyUserOfficer, {
+      id: 2,
+      firstname: "klara",
+      lastname: "undefined",
+      roles: [1, 2]
+    })
   ).resolves.toBe(dummyUser);
 });
 
@@ -139,4 +159,32 @@ test("A user can not update it's password if it has a bad token", () => {
   return expect(
     userMutations.resetPassword(badToken, "Test1234!")
   ).resolves.toBe(false);
+});
+
+test("A user can it's password ", () => {
+  return expect(
+    userMutations.updatePassword(dummyUser, dummyUser.id, "Test1234!")
+  ).resolves.toBe(true);
+});
+
+test("A user can not update another users password ", () => {
+  return expect(
+    userMutations.updatePassword(
+      dummyUserNotOnProposal,
+      dummyUser.id,
+      "Test1234!"
+    )
+  ).resolves.toBe(false);
+});
+
+test("A not logged in users can not update passwords ", () => {
+  return expect(
+    userMutations.updatePassword(null, dummyUser.id, "Test1234!")
+  ).resolves.toBe(false);
+});
+
+test("A user officer can update any password ", () => {
+  return expect(
+    userMutations.updatePassword(dummyUserOfficer, dummyUser.id, "Test1234!")
+  ).resolves.toBe(true);
 });
