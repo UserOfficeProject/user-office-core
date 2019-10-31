@@ -4,9 +4,11 @@ import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { Edit } from "@material-ui/icons";
+import { useDeleteProposal } from "../hooks/useDeleteProposal";
 
 export default function ProposalTableOfficer() {
-  const { loading, proposalsData } = useProposalsData("");
+  const { loading, proposalsData, setProposalsData } = useProposalsData("");
+  const deleteProposal = useDeleteProposal();
 
   const columns = [
     { title: "Sortcode", field: "shortCode" },
@@ -43,6 +45,17 @@ export default function ProposalTableOfficer() {
           onClick: (event, rowData) => setEditProposalID(rowData.id)
         }
       ]}
+      editable={
+        {
+          onRowDelete: oldData =>
+            new Promise(async resolve => {
+              await deleteProposal(oldData.id)
+              proposalsData.splice(proposalsData.indexOf(oldData), 1)
+              setProposalsData(proposalsData.slice(0))
+              resolve();
+            })
+        }
+      }
     />
   );
 }

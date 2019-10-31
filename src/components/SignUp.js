@@ -11,7 +11,6 @@ import { request } from "graphql-request";
 import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
-import * as Yup from "yup";
 import FormikDropdown from "./FormikDropdown";
 import nationalities from "../models/nationalities";
 import dateformat from "dateformat";
@@ -19,6 +18,10 @@ import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
 import orcid from "../images/orcid.png";
 import clsx from "clsx";
+import {
+  userFieldSchema,
+  userPasswordFieldSchema
+} from "../utils/userFieldValidationSchema";
 
 const queryString = require("query-string");
 
@@ -194,56 +197,7 @@ export default function SignUp(props) {
           }
           actions.setSubmitting(false);
         }}
-        validationSchema={Yup.object().shape({
-          firstname: Yup.string()
-            .min(2, "firstname must be at least 2 characters")
-            .max(15, "firstname must be at most 15 characters")
-            .required("firstname must be at least 2 characters"),
-          lastname: Yup.string()
-            .min(2, "lastname must be at least 2 characters")
-            .max(15, "lastname must be at most 15 characters")
-            .required("lastname must be at least 2 characters"),
-          username: Yup.string()
-            .min(2, "Username must be at least 2 characters")
-            .max(20, "Username must be at most 20 characters")
-            .required("Username must be at least 2 characters"),
-          user_title: Yup.string().required("User title is required"),
-          password: Yup.string()
-            .min(8, "Password must be at least 8 characters")
-            .max(25, "Password must be at most 25 characters")
-            .required("Password must be at least 8 characters"),
-          gender: Yup.string().required("please specify your gender"),
-          nationality: Yup.string().required("please specify your nationality"),
-          birthdate: Yup.date()
-            .max(new Date())
-            .required("Please specify your birth date"),
-          organisation: Yup.string()
-            .min(2, "organisation must be at least 2 characters")
-            .max(50, "organisation must be at most 50 characters")
-            .required("organisation must be at least 2 characters"),
-          department: Yup.string()
-            .min(2, "department must be at least 2 characters")
-            .max(50, "department must be at most 50 characters")
-            .required("department must be at least 2 characters"),
-          organisation_address: Yup.string()
-            .min(2, "organisation address must be at least 2 characters")
-            .max(100, "organisation must be at most 100 characters")
-            .required("organisation must be at least 2 characters"),
-          position: Yup.string()
-            .min(2, "position must be at least 2 characters")
-            .max(50, "position must be at most 50 characters")
-            .required("position must be at least 2 characters"),
-          email: Yup.string()
-            .email("email is in correct format")
-            .required("please specify email"),
-          telephone: Yup.string()
-            .min(2, "telephone must be at least 2 characters")
-            .max(20, "telephone must be at most 20 characters")
-            .required("telephone must be at least 2 characters"),
-          telephone_alt: Yup.string()
-            .min(2, "telephone must be at least 2 characters")
-            .max(20, "telephone must be at most 20 characters")
-        })}
+        validationSchema={userFieldSchema.concat(userPasswordFieldSchema)}
       >
         <Form>
           <CssBaseline />
@@ -334,6 +288,16 @@ export default function SignUp(props) {
                     fullWidth
                     autoComplete="off"
                     data-cy="password"
+                  />
+                  <Field
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    type="password"
+                    component={TextField}
+                    margin="normal"
+                    fullWidth
+                    autoComplete="off"
+                    data-cy="confirmPassword"
                   />
                 </CardContent>
               </Card>
@@ -513,8 +477,8 @@ export default function SignUp(props) {
               >
                 Sign Up
               </Button>
-              </React.Fragment>
-            )}
+            </React.Fragment>
+          )}
           <Grid container>
             <Grid item>
               <Link to="/SignIn/">

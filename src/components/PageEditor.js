@@ -63,7 +63,6 @@ export default function PageEditor() {
   });
 
   const handleClick = async (pageName, text) => {
-    console.log(pageName)
     const resp = await sendPageContent(pageName, text);
     if (resp) {
       setState({
@@ -98,23 +97,25 @@ export default function PageEditor() {
         </Typography>
         <Divider />
         {loadingHomeContent ? null : (
-        <Editor
-          initialValue={homeContent}
-          init={{
-            skin: false,
-            content_css: false,
-            plugins: ["link", "preview", "image", "code"],
-            toolbar: "bold italic",
-            branding: false
-          }}
-          onEditorChange={content => setHomeContent(content)}
-        /> )}
+          <Editor
+            initialValue={homeContent}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ["link", "preview", "image", "code"],
+              toolbar: "bold italic",
+              branding: false
+            }}
+            onEditorChange={content => setHomeContent(content)}
+          />
+        )}
         <div className={classes.buttons}>
           <Button
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => handleClick("HOMEPAGE", homeContent)}          >
+            onClick={() => handleClick("HOMEPAGE", homeContent)}
+          >
             Update
           </Button>
         </div>
