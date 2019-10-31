@@ -12,6 +12,7 @@ export function useProposalsData(filter) {
           proposals(filter: $filter) {
             proposals{
               id
+              shortCode
               title
               status
               }
@@ -27,8 +28,9 @@ export function useProposalsData(filter) {
           data.proposals.proposals.map(proposal => {
             return {
               id: proposal.id,
+              shortCode: proposal.shortCode,
               title: proposal.title,
-              status: proposal.status
+              status: proposal.status === 0 ? "Open" : "Submitted",
             };
           })
         );

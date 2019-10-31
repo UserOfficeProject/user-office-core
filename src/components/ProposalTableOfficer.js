@@ -9,7 +9,7 @@ export default function ProposalTableOfficer() {
   const { loading, proposalsData } = useProposalsData("");
 
   const columns = [
-    { title: "ID", field: "id" },
+    { title: "Sortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Status", field: "status" }
   ];
