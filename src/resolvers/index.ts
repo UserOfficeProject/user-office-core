@@ -562,6 +562,17 @@ export default {
     return context.mutations.user.resetPassword(args.token, args.password);
   },
 
+  updatePassword(
+    args: { id: number; password: string },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.updatePassword(
+      context.user,
+      args.id,
+      args.password
+    );
+  },
+
   emailVerification(args: { token: string }, context: ResolverContext) {
     return context.mutations.user.emailVerification(args.token);
   },

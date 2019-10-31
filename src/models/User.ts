@@ -46,7 +46,6 @@ export interface UpdateUserArgs {
   middlename?: string;
   lastname?: string;
   username?: string;
-  password?: string;
   preferredname?: string;
   gender?: string;
   nationality?: string;

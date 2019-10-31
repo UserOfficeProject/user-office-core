@@ -44,6 +44,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   update(user: User): Promise<User | null> {
     const {
       firstname,
+      user_title,
       middlename,
       lastname,
       preferredname,
@@ -61,6 +62,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .update({
         firstname,
+        user_title,
         middlename,
         lastname,
         preferredname,

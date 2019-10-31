@@ -251,7 +251,29 @@ export default class UserMutations {
       return false;
     }
   }
+  async updatePassword(agent: User | null, id: number, password: string) {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUser(agent, id))
+    ) {
+      return rejection("WRONG_PERMISSIONS");
+    }
+    // Check that token is valid
+    try {
+      const hash = this.createHash(password);
 
+      let user = await this.dataSource.get(id);
+
+      //Check that user exist and that it has not been updated since token creation
+      if (user) {
+        return this.dataSource.setUserPassword(user.id, hash);
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
   async resetPassword(token: string, password: string): Promise<Boolean> {
     // Check that token is valid
     try {

@@ -11,7 +11,25 @@ export const typeDefs = `
         addUserForReview(userID: Int!, proposalID: Int!): Boolean
         removeUserForReview(reviewID: Int!): Boolean
         addUserRole(userID: Int!, roleID: Int!): Boolean
-        updateUser(id: Int!, firstname: String, lastname: String, roles: [Int]): UserMutationResult
+        updateUser(
+          id: Int!, 
+          user_title: String, 
+          firstname: String, 
+          middlename:String, 
+          lastname: String, 
+          preferredname: String,
+          gender: String,
+          nationality: String,
+          birthdate: String,
+          organisation: String,
+          department: String,
+          organisation_address: String,
+          position: String,
+          email: String,
+          telephone: String,
+          telephone_alt: String, 
+          roles: [Int]): UserMutationResult
+        updatePassword(id: Int!,  password: String!): Boolean
         login(username: String!, password: String!): LoginMutationResult
         resetPasswordEmail(email: String!): Boolean
         resetPassword(token: String!, password: String!): Boolean
