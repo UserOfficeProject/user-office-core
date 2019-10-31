@@ -50,7 +50,8 @@ export const dummyProposal = new Proposal(
   1, // main proposer
   0, // status
   "2019-07-17 08:25:12.23043+00",
-  "2019-07-17 08:25:12.23043+00"
+  "2019-07-17 08:25:12.23043+00",
+  "GXQ639"
 );
 
 export const dummyProposalSubmitted = new Proposal(
@@ -60,7 +61,8 @@ export const dummyProposalSubmitted = new Proposal(
   1, // main proposer
   1, // status
   "2019-07-17 08:25:12.23043+00",
-  "2019-07-17 08:25:12.23043+00"
+  "2019-07-17 08:25:12.23043+00",
+  "GXQ639"
 );
 
 export const dummyAnswers: Array<ProposalAnswer> = [
