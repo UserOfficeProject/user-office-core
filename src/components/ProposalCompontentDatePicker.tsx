@@ -8,12 +8,9 @@ import {
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { Field } from "formik";
 export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
-  const { templateField, onComplete, touched, errors } = props;
+  const { templateField, onComplete, errors } = props;
   const { proposal_question_id, config, question } = templateField;
   const isError = errors[proposal_question_id] ? true : false;
-  if (!templateField.value) {
-    templateField.value = new Date();
-  }
 
   return (
     <FormControl error={isError}>
@@ -25,14 +22,13 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
             const currentError = form.errors[field.name];
             return (
               <KeyboardDatePicker
+                clearable={true}
                 error={isError}
                 name={field.name}
-                value={field.value}
+                value={field.value || ""}
                 format="dd/MMM/yyyy"
                 helperText={currentError}
                 label={question}
-                onBlur={() => {}}
-                onFocus={() => {}}
                 onChange={date => {
                   templateField.value = date;
                   form.setFieldValue(field.name, date, false);

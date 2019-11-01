@@ -6,12 +6,11 @@ import {
   FormControlLabel,
   Radio,
   makeStyles,
-  InputLabel,
-  Select,
-  MenuItem
+  MenuItem,
+  TextField
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalErrorLabel } from "./ProposalErrorLabel";
+import { getIn } from "formik";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -28,26 +27,30 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   })();
 
   let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id, config, question } = templateField;
-  let isError = errors[proposal_question_id] ? true : false;
+  let { proposal_question_id, config } = templateField;
+  const fieldError = getIn(errors, proposal_question_id);
+  const isError = getIn(touched, proposal_question_id) && !!fieldError;
 
   switch (templateField.config.variant) {
     case "dropdown":
       return (
-        <FormControl className={classes.wrapper} error={isError}>
-          <InputLabel htmlFor={proposal_question_id} shrink={true}>
-            {question}
-          </InputLabel>
-          <span>{templateField.config.small_label}</span>
-          <Select
+        <FormControl error={isError} fullWidth>
+          <TextField
             id={proposal_question_id}
             name={proposal_question_id}
             value={templateField.value}
-            onChange={evt => {
+            label={templateField.question}
+            select
+            onChange={(evt: any) => {
               templateField.value = (evt.target as HTMLInputElement).value;
               handleChange(evt); // letting Formik know that there was a change
               onComplete();
             }}
+            SelectProps={{
+              MenuProps: {}
+            }}
+            helperText={templateField.config.small_label}
+            margin="normal"
           >
             {(config.options as string[]).map(option => {
               return (
@@ -56,12 +59,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
                 </MenuItem>
               );
             })}
-          </Select>
-          {isError && (
-            <ProposalErrorLabel>
-              {errors[proposal_question_id]}
-            </ProposalErrorLabel>
-          )}
+          </TextField>
         </FormControl>
       );
 
@@ -96,11 +94,6 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               );
             })}
           </RadioGroup>
-          {isError && (
-            <ProposalErrorLabel>
-              {errors[proposal_question_id]}
-            </ProposalErrorLabel>
-          )}
         </FormControl>
       );
   }
