@@ -110,6 +110,11 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     writeHeading(`Proposal: ${proposal.title}`);
     doc.moveDown();
 
+    writeBold("Shortcode:");
+    write(proposal.shortCode);
+
+    doc.moveDown();
+
     writeBold("Brief summary:");
     write(proposal.abstract);
 

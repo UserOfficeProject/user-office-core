@@ -38,6 +38,7 @@ services:
     volumes:
       - ./db_patches/0000_init.sql:/docker-entrypoint-initdb.d/0000_init.sql
       - ./db_patches/0001_CreateTopicReadinessState.sql:/docker-entrypoint-initdb.d/0001_CreateTopicReadinessState.sql
+      - ./db_patches/0002_AlterProposals.sql:/docker-entrypoint-initdb.d/0002_AlterProposals.sql
       - ./db_patches/0003_AlterProposalUser.sql:/docker-entrypoint-initdb.d/0003_AlterProposalUser.sql
       - ./db_patches/0004_AlterProposalQuestions.sql:/docker-entrypoint-initdb.d/0004_AlterProposalQuestions.sql
   rabbitmq:

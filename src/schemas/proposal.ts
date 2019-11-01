@@ -76,6 +76,7 @@ export const typeDefs = `
         created: String
         updated: String
         reviews: [Review]
+        shortCode:String
     }
 
     type Questionary {

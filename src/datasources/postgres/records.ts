@@ -25,6 +25,7 @@ export interface ProposalRecord {
   readonly created_at: string;
   readonly updated_at: string;
   readonly full_count: number;
+  readonly short_code: string;
 }
 
 export interface TopicRecord {
@@ -135,7 +136,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.proposer_id,
     proposal.status,
     proposal.created_at,
-    proposal.updated_at
+    proposal.updated_at,
+    proposal.short_code
   );
 };
 

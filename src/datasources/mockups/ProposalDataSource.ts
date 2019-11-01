@@ -26,7 +26,8 @@ export class proposalDataSource implements ProposalDataSource {
       1, // main proposer
       ProposalStatus.DRAFT, // status
       "2019-07-17 08:25:12.23043+00",
-      "2019-07-17 08:25:12.23043+00"
+      "2019-07-17 08:25:12.23043+00",
+      "GQX639"
     );
 
     dummyProposalSubmitted = new Proposal(
@@ -36,7 +37,8 @@ export class proposalDataSource implements ProposalDataSource {
       1, // main proposer
       ProposalStatus.SUBMITTED, // status
       "2019-07-17 08:25:12.23043+00",
-      "2019-07-17 08:25:12.23043+00"
+      "2019-07-17 08:25:12.23043+00",
+      "GQX639"
     );
 
     dummyAnswers = [
