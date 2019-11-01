@@ -9,7 +9,7 @@ import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 export default function ProposalTable(props) {
   const downloadPDFProposal = useDownloadPDFProposal();
   const columns = [
-    { title: "ID", field: "id" },
+    { title: "Shortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Status", field: "status" }
   ];

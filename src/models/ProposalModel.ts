@@ -11,7 +11,8 @@ export class ProposalInformation {
     public updated?: string,
     public users?: any,
     public reviews?: any,
-    public questionary?: Questionary
+    public questionary?: Questionary,
+    public shortCode?: string
   ) {}
 }
 

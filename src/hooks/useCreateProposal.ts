@@ -14,6 +14,7 @@ export function useCreateProposal() {
          proposal{
           id
           status
+          shortCode
           questionary {
             steps {
               topic {

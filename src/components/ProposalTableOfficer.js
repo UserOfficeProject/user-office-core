@@ -11,7 +11,7 @@ export default function ProposalTableOfficer() {
   const deleteProposal = useDeleteProposal();
 
   const columns = [
-    { title: "ID", field: "id" },
+    { title: "Sortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Status", field: "status" }
   ];
