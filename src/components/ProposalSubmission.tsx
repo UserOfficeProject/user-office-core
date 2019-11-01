@@ -1,9 +1,9 @@
 import React, {  } from "react";
 import ProposalContainer from "./ProposalContainer";
-import { useCreateProposal } from "../hooks/useCreateProposal";
+import { useBlankProposal } from "../hooks/useBlankProposal";
 
 export default function ProposalSubmission() {
-  const { proposal } = useCreateProposal();
+  const { proposal } = useBlankProposal();
 
   if (!proposal) {
     return <p>Loading</p>;
