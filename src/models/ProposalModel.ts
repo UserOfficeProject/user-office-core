@@ -4,7 +4,7 @@ import { EvaluatorOperator } from "./ConditionEvaluator";
 
 export class ProposalInformation {
   constructor(
-    public id: number,
+    public id?: number,
     public title?: string,
     public abstract?: string,
     public proposer?: number,

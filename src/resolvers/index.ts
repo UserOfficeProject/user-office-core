@@ -197,7 +197,7 @@ async function resolveProposal(
     updated,
     users,
     reviews,
-    questionary || undefined,
+    questionary!,
     shortCode
   );
 }
@@ -261,6 +261,11 @@ export default {
       parseInt(args.id)
     );
 
+    return resolveProposal(proposal, context);
+  },
+
+  async blankProposal(args: ProposalArgs, context: ResolverContext) {
+    const proposal = await context.queries.proposal.getBlank(context.user);
     return resolveProposal(proposal, context);
   },
 

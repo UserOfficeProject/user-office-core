@@ -250,7 +250,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
 
       res.download(
         `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
-        `${proposal.title}.pdf`,
+        `${proposal.shortCode}-${proposal.title}.pdf`,
         () => {
           fs.unlink(
             `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,

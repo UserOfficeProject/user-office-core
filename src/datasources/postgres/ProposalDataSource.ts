@@ -219,7 +219,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from("proposals")
       .where("proposal_id", id)
       .first()
-      .then((proposal: ProposalRecord) => createProposalObject(proposal));
+      .then((proposal: ProposalRecord) => {
+        return proposal ? createProposalObject(proposal) : null;
+      });
   }
 
   async create(proposerID: number) {
