@@ -1,7 +1,11 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalTemplate } from "../models/ProposalModel";
+import {
+  ProposalTemplate,
+  ProposalStatus,
+  ProposalInformation
+} from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
 
@@ -29,10 +33,6 @@ export default class ProposalQueries {
   async getQuestionary(agent: User, id: number) {
     const proposal = await this.dataSource.get(id);
 
-    if (!proposal) {
-      return null;
-    }
-
     if ((await this.hasAccessRights(agent, proposal)) === false) {
       return null;
     }
@@ -42,8 +42,11 @@ export default class ProposalQueries {
 
   private async hasAccessRights(
     agent: User | null,
-    proposal: Proposal
+    proposal: Proposal | null
   ): Promise<boolean> {
+    if (proposal == null) {
+      return true;
+    }
     return (
       (await this.userAuth.isUserOfficer(agent)) ||
       (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
@@ -62,5 +65,30 @@ export default class ProposalQueries {
     } else {
       return null;
     }
+  }
+
+  async getBlank(agent: User | null) {
+    if (agent == null) {
+      return null;
+    }
+
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.dataSource.checkActiveCall())
+    ) {
+      return null;
+    }
+
+    const blankProposal = new Proposal(
+      0,
+      "",
+      "",
+      agent.id,
+      ProposalStatus.DRAFT,
+      new Date().toTimeString(),
+      new Date().toTimeString(),
+      ""
+    );
+    return blankProposal;
   }
 }
