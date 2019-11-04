@@ -28,15 +28,20 @@ export default function ProposalInformationView(props) {
         if (users.length < 1) {
           setUserError(true);
         } else {
-          const proposalId = props.data.id || await createProposal();
+          var { id, status } = props.data;
+          if (!id) {
+            ({ id, status } = await createProposal());
+          }
+
 
           await updateProposal({
-            id: proposalId,
+            id: id,
+            status: status,
             title: values.title,
             abstract: values.abstract,
             users: userIds
           });
-          api.next({ ...values, id: proposalId, users });
+          api.next({ ...values, id, status, users });
         }
       }}
       validationSchema={Yup.object().shape({

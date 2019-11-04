@@ -93,7 +93,7 @@ export default function ProposalContainer(props: {
       allProposalSteps.push(
         new QuestionaryUIStep(
           "New Proposal",
-          false,
+          proposalInfo.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
               data={proposalInfo}
@@ -197,7 +197,7 @@ export default function ProposalContainer(props: {
               </Step>
             ))}
           </Stepper>
-          {proposalInfo.status === ProposalStatus.DRAFT ? (
+          {proposalInfo.status !== ProposalStatus.SUBMITTED ? (
             <React.Fragment>
               {getStepContent(stepIndex)}
               <ErrorMessageBox message={errorMessage} />
