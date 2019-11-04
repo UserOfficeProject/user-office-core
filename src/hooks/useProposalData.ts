@@ -23,6 +23,7 @@ export function useProposalData(id: number) {
                 firstname
                 lastname
                 username
+                organisation
                 id
               }
               questionary {
@@ -76,6 +77,7 @@ export function useProposalData(id: number) {
               name: user.firstname,
               surname: user.lastname,
               username: user.username,
+              organisation: user.organisation,
               id: user.id
             };
           }),

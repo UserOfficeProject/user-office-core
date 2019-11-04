@@ -19,6 +19,7 @@ export function useLoadProposal() {
                 firstname
                 lastname
                 username
+                organisation
                 id
               }
               questionary {
@@ -73,6 +74,7 @@ export function useLoadProposal() {
             name: user.firstname,
             surname: user.lastname,
             username: user.username,
+            organisation: user.organisation,
             id: user.id
           };
         }),
