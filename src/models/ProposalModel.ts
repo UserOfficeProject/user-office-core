@@ -177,6 +177,7 @@ export enum DataType {
 }
 
 export enum ProposalStatus {
+  BLANK = -1,
   DRAFT = 0,
   SUBMITTED = 1
 }

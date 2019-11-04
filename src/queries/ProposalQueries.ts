@@ -1,11 +1,7 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import {
-  ProposalTemplate,
-  ProposalStatus,
-  ProposalInformation
-} from "../models/ProposalModel";
+import { ProposalStatus } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
 
@@ -84,7 +80,7 @@ export default class ProposalQueries {
       "",
       "",
       agent.id,
-      ProposalStatus.DRAFT,
+      ProposalStatus.BLANK,
       new Date().toTimeString(),
       new Date().toTimeString(),
       ""
