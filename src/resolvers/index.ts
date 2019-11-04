@@ -126,6 +126,8 @@ interface UsersArgs {
   first?: number;
   offset?: number;
   filter?: string;
+  usersOnly?: boolean;
+  subtractUsers?: [number];
 }
 
 interface RolesArgs {}
@@ -511,7 +513,9 @@ export default {
       context.user,
       args.filter,
       args.first,
-      args.offset
+      args.offset,
+      args.usersOnly,
+      args.subtractUsers
     );
   },
 

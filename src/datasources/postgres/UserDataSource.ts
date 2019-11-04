@@ -233,7 +233,13 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  async getUsers(filter?: string, first?: number, offset?: number) {
+  async getUsers(
+    filter?: string,
+    first?: number,
+    offset?: number,
+    usersOnly?: boolean,
+    subtractUsers?: [number]
+  ) {
     return database
       .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("users")
@@ -241,7 +247,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .modify((query: any) => {
         if (filter) {
           query
-            .where("username", "ilike", `%${filter}%`)
+            .where("organisation", "ilike", `%${filter}%`)
             .orWhere("firstname", "ilike", `%${filter}%`)
             .orWhere("lastname", "ilike", `%${filter}%`);
         }
@@ -250,6 +256,16 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
         if (offset) {
           query.offset(offset);
+        }
+        if (usersOnly) {
+          query.whereIn("user_id", function(this: any) {
+            this.select("user_id")
+              .from("role_user")
+              .where("role_id", 1);
+          });
+        }
+        if (subtractUsers) {
+          query.whereNotIn("user_id", subtractUsers);
         }
       })
       .then((usersRecord: UserRecord[]) => {

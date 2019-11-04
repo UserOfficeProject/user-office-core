@@ -2,7 +2,7 @@ export const typeDefs = `
     extend type Query {
         user(id: ID!): User
         roles: [Roles]
-        users(filter: String, first: Int, offset: Int): UserQueryResult
+        users(filter: String, first: Int, offset: Int, usersOnly: Boolean, subtractUsers: [Int]): UserQueryResult
         getOrcIDInformation(authorizationCode: String): OrcIDInformation
     }
 
