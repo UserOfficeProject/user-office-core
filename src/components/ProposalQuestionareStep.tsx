@@ -107,6 +107,7 @@ export default function ProposalQuestionareStep(props: {
     } else {
       api.reportStatus({ variant: "success", message: "Saved" });
       setIsDirty(false);
+      props.setIsDirty(false);
     }
   };
 

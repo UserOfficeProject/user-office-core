@@ -97,6 +97,7 @@ export default function ProposalContainer(props: {
 
       allProposalSteps.push(
         new QuestionaryUIStep(
+          StepType.GENERAL,
           "New Proposal",
           proposalInfo.status !== ProposalStatus.BLANK,
           (
@@ -111,6 +112,7 @@ export default function ProposalContainer(props: {
         questionary.steps.map(
           (step, index, steps) =>
             new QuestionaryUIStep(
+              StepType.QUESTIONARY,
               step.topic.topic_title,
               step.isCompleted,
               (
@@ -131,6 +133,7 @@ export default function ProposalContainer(props: {
       );
       allProposalSteps.push(
         new QuestionaryUIStep(
+          StepType.REVIEW,
           "Review",
           proposalInfo.status === ProposalStatus.SUBMITTED,
           <ProposalReview data={proposalInfo} />
@@ -212,7 +215,14 @@ export default function ProposalContainer(props: {
                     step.completed ||
                     steps[index - 1].completed === true
                   }
-                  clickable={true}
+                  clickable={
+                    step.stepType !== StepType.REVIEW ||
+                    steps.every(step => {
+                      return (
+                        step.stepType === StepType.REVIEW || step.completed
+                      );
+                    })
+                  }
                 >
                   <span>{step.title}</span>
                 </QuestionaryStepButton>
@@ -236,6 +246,7 @@ export default function ProposalContainer(props: {
 
 class QuestionaryUIStep {
   constructor(
+    public stepType: StepType,
     public title: string,
     public completed: boolean,
     public element: JSX.Element
@@ -310,4 +321,10 @@ function QuestionaryStepButton(
 export interface INotification {
   variant: "error" | "success";
   message: string;
+}
+
+enum StepType {
+  GENERAL,
+  QUESTIONARY,
+  REVIEW
 }
