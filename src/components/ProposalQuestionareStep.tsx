@@ -70,21 +70,23 @@ export default function ProposalQuestionareStep(props: {
     activeFields
   );
 
-  const onFormSubmit = async () => {
-    const proposalId: number = props.data.id;
+  const saveStepData = async (markAsComplete: boolean) => {
+    const id: number = props.data.id;
 
-    const answers: ProposalAnswer[] = activeFields.map(field => {
-      return (({ proposal_question_id, data_type, value }) => ({
-        proposal_question_id,
-        data_type,
-        value
-      }))(field); // convert field to answer objcet
-    });
+    const answers: ProposalAnswer[] = activeFields
+      .filter(field => field.value !== undefined)
+      .map(field => {
+        return (({ proposal_question_id, data_type, value }) => ({
+          proposal_question_id,
+          data_type,
+          value
+        }))(field); // convert field to answer object
+      });
 
     const result = await updateProposal({
-      id: proposalId,
-      answers: answers,
-      topicsCompleted: [topicId]
+      id,
+      answers,
+      topicsCompleted: markAsComplete ? [topicId] : []
     });
 
     if (result && result.updateProposal && result.updateProposal.error) {
@@ -96,17 +98,10 @@ export default function ProposalQuestionareStep(props: {
     <Formik
       initialValues={initialValues}
       validationSchema={Yup.object().shape(validationSchema)}
-      onSubmit={onFormSubmit}
+      onSubmit={() => {}}
       enableReinitialize={true}
     >
-      {({
-        values,
-        errors,
-        touched,
-        handleChange,
-        submitForm,
-        validateForm
-      }) => (
+      {({ errors, touched, handleChange, submitForm, validateForm }) => (
         <form>
           {activeFields.map(field => {
             return (
@@ -131,6 +126,7 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
+                    saveStepData(isValid);
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
                       topicId
@@ -144,6 +140,7 @@ export default function ProposalQuestionareStep(props: {
             next={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
+                  saveStepData(isValid);
                   if (isValid) {
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
