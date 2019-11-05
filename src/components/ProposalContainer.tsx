@@ -10,9 +10,9 @@ import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import { ProposalStatus, Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalInformationView from "./ProposalInformationView";
-import ErrorIcon from "@material-ui/icons/Error";
-import { Zoom, StepButton } from "@material-ui/core";
 import { useLoadProposal } from "../hooks/useLoadProposal";
+import Notification from "./Notification";
+import { StepButton } from "@material-ui/core";
 
 export default function ProposalContainer(props: {
   data: ProposalInformation;
@@ -23,9 +23,13 @@ export default function ProposalContainer(props: {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isDirty, setIsDirty] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
+  const [notification, setNotification] = useState<
+    INotification & { isOpen: boolean }
+  >({
+    isOpen: false,
+    variant: "success",
+    message: ""
+  });
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -80,10 +84,6 @@ export default function ProposalContainer(props: {
     return false;
   };
 
-  const handleError = (msg: string) => {
-    setErrorMessage(msg);
-  };
-
   useEffect(() => {
     const createProposalSteps = (
       questionary: Questionary
@@ -113,6 +113,7 @@ export default function ProposalContainer(props: {
                   topicId={step.topic.topic_id}
                   data={proposalInfo}
                   setIsDirty={setIsDirty}
+                  key={step.topic.topic_id}
                 />
               )
             )
@@ -166,11 +167,22 @@ export default function ProposalContainer(props: {
         setStepIndex(stepBeforeReset);
       }
     },
-    error: handleError
+    reportStatus: (notification: INotification) => {
+      setNotification({ ...notification, isOpen: true });
+    }
   };
 
   return (
     <Container maxWidth="lg">
+      <Notification
+        open={notification.isOpen}
+        onClose={() => {
+          setNotification({ ...notification, isOpen: false });
+        }}
+        // @ts-ignore
+        variant={notification.variant}
+        message={notification.message}
+      />
       <FormApi.Provider value={api}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
@@ -198,10 +210,7 @@ export default function ProposalContainer(props: {
             ))}
           </Stepper>
           {proposalInfo.status !== ProposalStatus.SUBMITTED ? (
-            <React.Fragment>
-              {getStepContent(stepIndex)}
-              <ErrorMessageBox message={errorMessage} />
-            </React.Fragment>
+            <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
           ) : (
             <React.Fragment>
               <Typography variant="h5" gutterBottom>
@@ -223,28 +232,6 @@ class QuestionaryUIStep {
   ) {}
 }
 
-const ErrorMessageBox = (props: { message?: string | undefined }) => {
-  const classes = makeStyles(() => ({
-    error: {
-      color: "#ff0000",
-      padding: "10px 0",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "flex-end"
-    },
-    icon: {
-      margin: "5px"
-    }
-  }))();
-  return (
-    <Zoom in={props.message !== undefined} mountOnEnter unmountOnExit>
-      <div className={classes.error}>
-        <ErrorIcon className={classes.icon} /> {props.message}
-      </div>
-    </Zoom>
-  );
-};
-
 type CallbackSignature = (data: ProposalInformation) => void;
 type VoidCallbackSignature = () => void;
 
@@ -252,7 +239,7 @@ export const FormApi = createContext<{
   next: CallbackSignature;
   back: CallbackSignature;
   reset: VoidCallbackSignature;
-  error: (msg: string) => void;
+  reportStatus: (notification: INotification) => void;
 }>({
   next: () => {
     console.warn("Using default implementation for next");
@@ -263,8 +250,8 @@ export const FormApi = createContext<{
   reset: () => {
     console.warn("Using default implementation for reset");
   },
-  error: () => {
-    console.warn("Using default implementation for error");
+  reportStatus: () => {
+    console.warn("Using default implementation for reportError");
   }
 });
 
@@ -296,4 +283,9 @@ function QuestionaryStepButton(props: any) {
       {props.children}
     </StepButton>
   );
+}
+
+export interface INotification {
+  variant: "error" | "success";
+  message: string;
 }

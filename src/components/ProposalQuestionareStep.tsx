@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import {
@@ -39,11 +39,16 @@ export default function ProposalQuestionareStep(props: {
   const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
   const { loading: formSaving, updateProposal } = useUpdateProposal();
+  const [isDirty, setIsDirty] = useState<boolean>(false);
   const classes = makeStyles({
     componentWrapper: {
       margin: "10px 0"
     }
   })();
+  useEffect(() => {
+    setIsDirty(false);
+    console.log("mount");
+  }, []);
 
   if (data == null) {
     return <div>loading...</div>;
@@ -71,6 +76,9 @@ export default function ProposalQuestionareStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
+    if (!isDirty) {
+      return;
+    }
     const id: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields
@@ -90,7 +98,13 @@ export default function ProposalQuestionareStep(props: {
     });
 
     if (result && result.updateProposal && result.updateProposal.error) {
-      api.error && api.error(result.updateProposal.error);
+      api.reportStatus({
+        variant: "error",
+        message: result.updateProposal.error
+      });
+      setIsDirty(false);
+    } else {
+      api.reportStatus({ variant: "success", message: "Saved" });
     }
   };
 
@@ -112,6 +126,7 @@ export default function ProposalQuestionareStep(props: {
                 {componentFactory.createComponent(field, {
                   onComplete: () => {
                     forceUpdate();
+                    setIsDirty(true);
                     props.setIsDirty(true);
                   }, // for re-rendering when input changes
                   touched: touched, // for formik
@@ -136,7 +151,7 @@ export default function ProposalQuestionareStep(props: {
                 }
               );
             }}
-            reset={() => api.reset()}
+            reset={isDirty ? () => api.reset() : undefined}
             next={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
