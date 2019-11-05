@@ -1,4 +1,9 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  PropsWithChildren
+} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -104,7 +109,7 @@ export default function ProposalContainer(props: {
       );
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map(
-          step =>
+          (step, index, steps) =>
             new QuestionaryUIStep(
               step.topic.topic_title,
               step.isCompleted,
@@ -113,6 +118,11 @@ export default function ProposalContainer(props: {
                   topicId={step.topic.topic_id}
                   data={proposalInfo}
                   setIsDirty={setIsDirty}
+                  editable={
+                    index === 0 ||
+                    step.isCompleted ||
+                    steps[index - 1].isCompleted === true
+                  }
                   key={step.topic.topic_id}
                 />
               )
@@ -179,7 +189,6 @@ export default function ProposalContainer(props: {
         onClose={() => {
           setNotification({ ...notification, isOpen: false });
         }}
-        // @ts-ignore
         variant={notification.variant}
         message={notification.message}
       />
@@ -189,22 +198,23 @@ export default function ProposalContainer(props: {
             {false ? "Update Proposal" : "New Proposal"}
           </Typography>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map((proposalStep, index, steps) => (
-              <Step key={proposalStep.title}>
+            {proposalSteps.map((step, index, steps) => (
+              <Step key={step.title}>
                 <QuestionaryStepButton
                   onClick={async () => {
                     if (!isDirty || (await handleReset())) {
                       setStepIndex(index);
                     }
                   }}
-                  completed={proposalStep.completed}
-                  isClickable={
+                  completed={step.completed}
+                  editable={
                     index === 0 ||
-                    proposalStep.completed ||
+                    step.completed ||
                     steps[index - 1].completed === true
                   }
+                  clickable={true}
                 >
-                  {proposalStep.title}
+                  <span>{step.title}</span>
                 </QuestionaryStepButton>
               </Step>
             ))}
@@ -255,31 +265,43 @@ export const FormApi = createContext<{
   }
 });
 
-function QuestionaryStepButton(props: any) {
+function QuestionaryStepButton(
+  props: PropsWithChildren<any> & {
+    active?: boolean;
+    completed?: boolean;
+    clickable: boolean;
+    editable: boolean;
+  }
+) {
   const classes = makeStyles(theme => ({
     active: {
       "& SVG": {
         color: theme.palette.secondary.main + "!important"
       }
     },
-    clickable: {
+    editable: {
       "& SVG": {
         color: theme.palette.primary.main + "!important"
       }
     }
   }))();
 
-  const { active, isClickable } = props;
+  const { active, clickable, editable } = props;
 
-  var buttonClasses = null;
+  var buttonClasses = [];
+
   if (active) {
-    buttonClasses = classes.active;
-  } else if (isClickable) {
-    buttonClasses = classes.clickable;
+    buttonClasses.push(classes.active);
+  } else if (editable) {
+    buttonClasses.push(classes.editable);
   }
 
   return (
-    <StepButton {...props} disabled={!isClickable} className={buttonClasses}>
+    <StepButton
+      {...props}
+      disabled={!clickable}
+      className={buttonClasses.join(" ")}
+    >
       {props.children}
     </StepButton>
   );

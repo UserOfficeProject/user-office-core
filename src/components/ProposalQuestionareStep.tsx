@@ -32,6 +32,7 @@ export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
   topicId: number;
   setIsDirty: (isDirty: boolean) => void;
+  editable: boolean;
 }) {
   const { data, topicId } = props;
   const api = useContext(FormApi);
@@ -45,10 +46,11 @@ export default function ProposalQuestionareStep(props: {
       margin: "10px 0"
     }
   })();
+
   useEffect(() => {
     setIsDirty(false);
-    console.log("mount");
-  }, []);
+    forceUpdate();
+  }, [props.data, forceUpdate]);
 
   if (data == null) {
     return <div>loading...</div>;
@@ -102,9 +104,9 @@ export default function ProposalQuestionareStep(props: {
         variant: "error",
         message: result.updateProposal.error
       });
-      setIsDirty(false);
     } else {
       api.reportStatus({ variant: "success", message: "Saved" });
+      setIsDirty(false);
     }
   };
 
@@ -137,6 +139,7 @@ export default function ProposalQuestionareStep(props: {
             );
           })}
           <ProposalNavigationFragment
+            disabled={!props.editable}
             back={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
