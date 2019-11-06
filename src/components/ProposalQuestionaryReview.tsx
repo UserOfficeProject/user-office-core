@@ -32,11 +32,10 @@ export default function ProposaQuestionaryReview(props: {
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
-
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
-        Questionary review
+        Proposal Review
       </Typography>
       <Paper>
         <Table>
@@ -47,6 +46,22 @@ export default function ProposaQuestionaryReview(props: {
             </TableRow>
           </TableHead>
           <TableBody>
+          <TableRow key="title">
+                <TableCell>Title</TableCell>
+                <TableCell>{props.data.title}</TableCell>
+              </TableRow>
+              <TableRow key="abstract">
+                <TableCell>Abstract</TableCell>
+                <TableCell>{props.data.abstract}</TableCell>
+              </TableRow>
+              <TableRow key="principalinvestigator">
+                <TableCell>Principal Investigator</TableCell>
+                <TableCell>{props.data.proposer}</TableCell>
+              </TableRow>
+              <TableRow key="coproposers">
+                <TableCell>Co-Proposers</TableCell>
+                <TableCell>{props.data.users.map((user:any) => ` ${user.name} ${user.surname}`).toString()}</TableCell>
+              </TableRow>
             {completedFields.map((row: QuestionaryField) => (
               <TableRow key={row.proposal_question_id}>
                 <TableCell>{row.question}</TableCell>
