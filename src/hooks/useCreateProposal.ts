@@ -11,6 +11,7 @@ export function useCreateProposal() {
         createProposal{
          proposal{
           id
+          status
         }
           error
         }
@@ -20,7 +21,7 @@ export function useCreateProposal() {
     const result = await sendRequest(query);
     const proposal = result.createProposal.proposal;
     setLoading(false);
-    return proposal.id;
+    return proposal;
   }, [sendRequest]);
 
   return { loading, createProposal };
