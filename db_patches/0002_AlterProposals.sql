@@ -1,4 +1,11 @@
 /*
+author: 
+    jekabskarklins
+purpose: 
+    Implementing proposal shortcode
+*/
+
+/*
 -- Using AirLine sytax e.g. GQX349
 
 CREATE OR REPLACE FUNCTION consistent_shuffle(alphabet TEXT, salt TEXT) RETURNS TEXT AS $$
