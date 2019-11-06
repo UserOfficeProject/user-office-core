@@ -16,6 +16,15 @@ export class ProposalInformation {
   ) {}
 }
 
+export enum DataType {
+  BOOLEAN = "BOOLEAN",
+  DATE = "DATE",
+  EMBELLISHMENT = "EMBELLISHMENT",
+  FILE_UPLOAD = "FILE_UPLOAD",
+  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
+  TEXT_INPUT = "TEXT_INPUT"
+}
+
 export class ProposalTemplate {
   constructor(public steps: TemplateStep[] = []) {}
 
@@ -163,15 +172,6 @@ export class FieldCondition {
   static fromObject(obj: any) {
     return new FieldCondition(obj.condition, obj.params);
   }
-}
-
-export enum DataType {
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
-  EMBELLISHMENT = "EMBELLISHMENT",
-  FILE_UPLOAD = "FILE_UPLOAD",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT"
 }
 
 export enum ProposalStatus {

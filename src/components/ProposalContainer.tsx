@@ -19,6 +19,17 @@ import { useLoadProposal } from "../hooks/useLoadProposal";
 import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
 
+export interface INotification {
+  variant: "error" | "success";
+  message: string;
+}
+
+enum StepType {
+  GENERAL,
+  QUESTIONARY,
+  REVIEW
+}
+
 export default function ProposalContainer(props: {
   data: ProposalInformation;
 }) {
@@ -321,15 +332,4 @@ function QuestionaryStepButton(
       {props.children}
     </StepButton>
   );
-}
-
-export interface INotification {
-  variant: "error" | "success";
-  message: string;
-}
-
-enum StepType {
-  GENERAL,
-  QUESTIONARY,
-  REVIEW
 }
