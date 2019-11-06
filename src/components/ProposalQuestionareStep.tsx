@@ -78,13 +78,10 @@ export default function ProposalQuestionareStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    if (!isDirty) {
-      return;
-    }
     const id: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields
-      .filter(field => field.value !== undefined)
+      .filter(field => field.value !== "")
       .map(field => {
         return (({ proposal_question_id, data_type, value }) => ({
           proposal_question_id,

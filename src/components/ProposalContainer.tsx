@@ -121,9 +121,10 @@ export default function ProposalContainer(props: {
                   data={proposalInfo}
                   setIsDirty={setIsDirty}
                   editable={
-                    index === 0 ||
+                    (index === 0 &&
+                      proposalInfo.status !== ProposalStatus.BLANK) ||
                     step.isCompleted ||
-                    steps[index - 1].isCompleted === true
+                    (index > 0 && steps[index - 1].isCompleted === true)
                   }
                   key={step.topic.topic_id}
                 />
@@ -205,7 +206,11 @@ export default function ProposalContainer(props: {
               <Step key={step.title}>
                 <QuestionaryStepButton
                   onClick={async () => {
-                    if (!isDirty || (await handleReset())) {
+                    if (
+                      !isDirty ||
+                      proposalInfo.status === ProposalStatus.BLANK ||
+                      (await handleReset())
+                    ) {
                       setStepIndex(index);
                     }
                   }}

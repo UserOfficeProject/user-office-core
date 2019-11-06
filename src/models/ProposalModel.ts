@@ -112,7 +112,11 @@ export class QuestionaryField extends ProposalTemplateField {
     const templateField = ProposalTemplateField.fromObject(obj);
     return new QuestionaryField(
       templateField,
-      obj.value ? JSON.parse(obj.value).value : undefined
+      obj.value
+        ? JSON.parse(obj.value).value
+        : templateField.data_type === DataType.BOOLEAN
+        ? false
+        : ""
     );
   }
 }

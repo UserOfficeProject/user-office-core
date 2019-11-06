@@ -102,7 +102,6 @@ export default function ProposalInformationView(props) {
           />
           <ProposalNavigationFragment
             disabled={props.disabled}
-            reset={api.reset}
             next={submitForm}
             isLoading={creatingProposal || updatingProposal}
           />
