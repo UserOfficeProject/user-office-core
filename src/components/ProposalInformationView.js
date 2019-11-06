@@ -8,10 +8,12 @@ import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
+import { useCreateProposal } from "../hooks/useCreateProposal";
 
 export default function ProposalInformationView(props) {
   const api = useContext(FormApi);
-  const { loading, updateProposal } = useUpdateProposal();
+  const { loading: updatingProposal, updateProposal } = useUpdateProposal();
+  const { loading: creatingProposal, createProposal } = useCreateProposal();
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
 
@@ -26,13 +28,15 @@ export default function ProposalInformationView(props) {
         if (users.length < 1) {
           setUserError(true);
         } else {
+          const proposalId = props.data.id || await createProposal();
+
           await updateProposal({
-            id: props.data.id,
+            id: proposalId,
             title: values.title,
             abstract: values.abstract,
             users: userIds
           });
-          api.next({ ...values, users });
+          api.next({ ...values, id: proposalId, users });
         }
       }}
       validationSchema={Yup.object().shape({
@@ -95,7 +99,7 @@ export default function ProposalInformationView(props) {
             disabled={props.disabled}
             reset={api.reset}
             next={submitForm}
-            isLoading={loading}
+            isLoading={creatingProposal || updatingProposal}
           />
         </Form>
       )}
