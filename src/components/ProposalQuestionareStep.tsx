@@ -49,8 +49,7 @@ export default function ProposalQuestionareStep(props: {
 
   useEffect(() => {
     setIsDirty(false);
-    forceUpdate();
-  }, [props.data, forceUpdate]);
+  }, [props.data]);
 
   if (data == null) {
     return <div>loading...</div>;

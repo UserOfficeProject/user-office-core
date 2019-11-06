@@ -277,7 +277,7 @@ export const FormApi = createContext<{
     console.warn("Using default implementation for reset");
   },
   reportStatus: () => {
-    console.warn("Using default implementation for reportError");
+    console.warn("Using default implementation for reportStatus");
   }
 });
 
