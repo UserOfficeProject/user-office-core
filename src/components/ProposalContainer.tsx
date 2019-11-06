@@ -1,4 +1,9 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  PropsWithChildren
+} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
@@ -10,9 +15,20 @@ import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import { ProposalStatus, Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalInformationView from "./ProposalInformationView";
-import ErrorIcon from "@material-ui/icons/Error";
-import { Zoom, StepButton } from "@material-ui/core";
 import { useLoadProposal } from "../hooks/useLoadProposal";
+import Notification from "./Notification";
+import { StepButton } from "@material-ui/core";
+
+export interface INotification {
+  variant: "error" | "success";
+  message: string;
+}
+
+enum StepType {
+  GENERAL,
+  QUESTIONARY,
+  REVIEW
+}
 
 export default function ProposalContainer(props: {
   data: ProposalInformation;
@@ -23,9 +39,13 @@ export default function ProposalContainer(props: {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isDirty, setIsDirty] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
+  const [notification, setNotification] = useState<
+    INotification & { isOpen: boolean }
+  >({
+    isOpen: false,
+    variant: "success",
+    message: ""
+  });
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -80,10 +100,6 @@ export default function ProposalContainer(props: {
     return false;
   };
 
-  const handleError = (msg: string) => {
-    setErrorMessage(msg);
-  };
-
   useEffect(() => {
     const createProposalSteps = (
       questionary: Questionary
@@ -92,8 +108,9 @@ export default function ProposalContainer(props: {
 
       allProposalSteps.push(
         new QuestionaryUIStep(
+          StepType.GENERAL,
           "New Proposal",
-          false,
+          proposalInfo.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
               data={proposalInfo}
@@ -104,8 +121,9 @@ export default function ProposalContainer(props: {
       );
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map(
-          step =>
+          (step, index, steps) =>
             new QuestionaryUIStep(
+              StepType.QUESTIONARY,
               step.topic.topic_title,
               step.isCompleted,
               (
@@ -113,6 +131,13 @@ export default function ProposalContainer(props: {
                   topicId={step.topic.topic_id}
                   data={proposalInfo}
                   setIsDirty={setIsDirty}
+                  editable={
+                    (index === 0 &&
+                      proposalInfo.status !== ProposalStatus.BLANK) ||
+                    step.isCompleted ||
+                    (index > 0 && steps[index - 1].isCompleted === true)
+                  }
+                  key={step.topic.topic_id}
                 />
               )
             )
@@ -120,6 +145,7 @@ export default function ProposalContainer(props: {
       );
       allProposalSteps.push(
         new QuestionaryUIStep(
+          StepType.REVIEW,
           "Review",
           proposalInfo.status === ProposalStatus.SUBMITTED,
           <ProposalReview data={proposalInfo} />
@@ -166,42 +192,61 @@ export default function ProposalContainer(props: {
         setStepIndex(stepBeforeReset);
       }
     },
-    error: handleError
+    reportStatus: (notification: INotification) => {
+      setNotification({ ...notification, isOpen: true });
+    }
   };
 
   return (
     <Container maxWidth="lg">
+      <Notification
+        open={notification.isOpen}
+        onClose={() => {
+          setNotification({ ...notification, isOpen: false });
+        }}
+        variant={notification.variant}
+        message={notification.message}
+      />
       <FormApi.Provider value={api}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
             {false ? "Update Proposal" : "New Proposal"}
           </Typography>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map((proposalStep, index, steps) => (
-              <Step key={proposalStep.title}>
+            {proposalSteps.map((step, index, steps) => (
+              <Step key={step.title}>
                 <QuestionaryStepButton
                   onClick={async () => {
-                    if (!isDirty || (await handleReset())) {
+                    if (
+                      !isDirty ||
+                      proposalInfo.status === ProposalStatus.BLANK ||
+                      (await handleReset())
+                    ) {
                       setStepIndex(index);
                     }
                   }}
-                  completed={proposalStep.completed}
-                  isClickable={
+                  completed={step.completed}
+                  editable={
                     index === 0 ||
-                    proposalStep.completed ||
+                    step.completed ||
                     steps[index - 1].completed === true
                   }
+                  clickable={
+                    step.stepType !== StepType.REVIEW ||
+                    steps.every(step => {
+                      return (
+                        step.stepType === StepType.REVIEW || step.completed
+                      );
+                    })
+                  }
                 >
-                  {proposalStep.title}
+                  <span>{step.title}</span>
                 </QuestionaryStepButton>
               </Step>
             ))}
           </Stepper>
-          {proposalInfo.status === ProposalStatus.DRAFT ? (
-            <React.Fragment>
-              {getStepContent(stepIndex)}
-              <ErrorMessageBox message={errorMessage} />
-            </React.Fragment>
+          {proposalInfo.status !== ProposalStatus.SUBMITTED ? (
+            <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
           ) : (
             <React.Fragment>
               <Typography variant="h5" gutterBottom>
@@ -217,33 +262,12 @@ export default function ProposalContainer(props: {
 
 class QuestionaryUIStep {
   constructor(
+    public stepType: StepType,
     public title: string,
     public completed: boolean,
     public element: JSX.Element
   ) {}
 }
-
-const ErrorMessageBox = (props: { message?: string | undefined }) => {
-  const classes = makeStyles(() => ({
-    error: {
-      color: "#ff0000",
-      padding: "10px 0",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "flex-end"
-    },
-    icon: {
-      margin: "5px"
-    }
-  }))();
-  return (
-    <Zoom in={props.message !== undefined} mountOnEnter unmountOnExit>
-      <div className={classes.error}>
-        <ErrorIcon className={classes.icon} /> {props.message}
-      </div>
-    </Zoom>
-  );
-};
 
 type CallbackSignature = (data: ProposalInformation) => void;
 type VoidCallbackSignature = () => void;
@@ -252,7 +276,7 @@ export const FormApi = createContext<{
   next: CallbackSignature;
   back: CallbackSignature;
   reset: VoidCallbackSignature;
-  error: (msg: string) => void;
+  reportStatus: (notification: INotification) => void;
 }>({
   next: () => {
     console.warn("Using default implementation for next");
@@ -263,36 +287,48 @@ export const FormApi = createContext<{
   reset: () => {
     console.warn("Using default implementation for reset");
   },
-  error: () => {
-    console.warn("Using default implementation for error");
+  reportStatus: () => {
+    console.warn("Using default implementation for reportStatus");
   }
 });
 
-function QuestionaryStepButton(props: any) {
+function QuestionaryStepButton(
+  props: PropsWithChildren<any> & {
+    active?: boolean;
+    completed?: boolean;
+    clickable: boolean;
+    editable: boolean;
+  }
+) {
   const classes = makeStyles(theme => ({
     active: {
       "& SVG": {
         color: theme.palette.secondary.main + "!important"
       }
     },
-    clickable: {
+    editable: {
       "& SVG": {
         color: theme.palette.primary.main + "!important"
       }
     }
   }))();
 
-  const { active, isClickable } = props;
+  const { active, clickable, editable } = props;
 
-  var buttonClasses = null;
+  var buttonClasses = [];
+
   if (active) {
-    buttonClasses = classes.active;
-  } else if (isClickable) {
-    buttonClasses = classes.clickable;
+    buttonClasses.push(classes.active);
+  } else if (editable) {
+    buttonClasses.push(classes.editable);
   }
 
   return (
-    <StepButton {...props} disabled={!isClickable} className={buttonClasses}>
+    <StepButton
+      {...props}
+      disabled={!clickable}
+      className={buttonClasses.join(" ")}
+    >
       {props.children}
     </StepButton>
   );
