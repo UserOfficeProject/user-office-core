@@ -7,10 +7,12 @@ import {
 } from "@material-ui/pickers";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { Field } from "formik";
+import { getIn } from "formik";
 export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
-  const { templateField, onComplete, errors } = props;
+  let { templateField, onComplete, touched, errors } = props;
   const { proposal_question_id, config, question } = templateField;
-  const isError = errors[proposal_question_id] ? true : false;
+  const fieldError = getIn(errors, proposal_question_id);
+  const isError = getIn(touched, proposal_question_id) && !!fieldError;
 
   return (
     <FormControl error={isError}>
@@ -27,7 +29,7 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
                 name={field.name}
                 value={field.value || ""}
                 format="dd/MMM/yyyy"
-                helperText={currentError}
+                helperText={isError && errors[proposal_question_id]}
                 label={question}
                 onChange={date => {
                   templateField.value = date;
