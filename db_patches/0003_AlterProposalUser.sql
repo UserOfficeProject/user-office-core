@@ -1,3 +1,10 @@
+/*
+author: 
+    jekabskarklins
+purpose: 
+    Implementing deleting proposal
+*/
+
 alter table proposal_user
 drop constraint IF EXISTS proposal_user_proposal_id_fkey,
 add constraint proposal_user_proposal_id_fkey
