@@ -10,6 +10,7 @@ function ParticipantModal(props) {
       name: rowData.name,
       surname: rowData.surname,
       username: rowData.username,
+      organisation: rowData.organisation,
       id: rowData.id
     });
   };
@@ -26,6 +27,8 @@ function ParticipantModal(props) {
           actionText="Select user"
           actionIcon={<AddBox />}
           action={addUser}
+          selectedUsers={props.selectedUsers}
+          usersOnly={true}
         />
       </DialogContent>
     </Dialog>

@@ -36,16 +36,16 @@ export default function ProposalParticipants(props) {
   const openModal = rowData => {
     setOpen(true);
   };
-
   return (
     <form>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
         addParticipant={addUser}
+        selectedUsers={props.users}
       />
       <PeopleTable
-        title="Users"
+        title="Co-Proposers"
         actionIcon={<Add />}
         action={openModal}
         isFreeAction={true}
