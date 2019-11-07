@@ -21,7 +21,6 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
           name={proposal_question_id}
           label={question}
           component={({ field, form, ...other }: { field: any; form: any }) => {
-            const currentError = form.errors[field.name];
             return (
               <KeyboardDatePicker
                 clearable={true}
