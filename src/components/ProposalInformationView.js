@@ -9,6 +9,9 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
 import { useCreateProposal } from "../hooks/useCreateProposal";
+import { makeStyles } from "@material-ui/core"
+
+
 
 export default function ProposalInformationView(props) {
   const api = useContext(FormApi);
@@ -16,6 +19,13 @@ export default function ProposalInformationView(props) {
   const { loading: creatingProposal, createProposal } = useCreateProposal();
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
+
+  const classes = makeStyles({
+    disabled: {
+      pointerEvents: "none",
+      opacity: 0.7
+    }
+  })();
 
   return (
     <Formik
@@ -32,8 +42,6 @@ export default function ProposalInformationView(props) {
           if (!id) {
             ({ id, status } = await createProposal());
           }
-
-
           await updateProposal({
             id: id,
             status: status,
@@ -56,7 +64,7 @@ export default function ProposalInformationView(props) {
       })}
     >
       {({ values, errors, touched, handleChange, submitForm }) => (
-        <Form>
+        <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
             General Information
           </Typography>
@@ -101,7 +109,7 @@ export default function ProposalInformationView(props) {
             users={users}
           />
           <ProposalNavigationFragment
-            disabled={props.disabled}
+            disabled={props.readonly}
             next={submitForm}
             isLoading={creatingProposal || updatingProposal}
           />
