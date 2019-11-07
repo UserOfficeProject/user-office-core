@@ -179,6 +179,11 @@ async function resolveProposal(
     return users;
   }
 
+  const proposer = await context.queries.user.get(agent, proposal.proposer);
+  if (!proposer) {
+    return null;
+  }
+
   const reviews = await context.queries.review.reviewsForProposal(agent, id);
   if (isRejection(reviews)) {
     return reviews;
@@ -193,7 +198,7 @@ async function resolveProposal(
     id,
     title,
     abstract,
-    agent.id,
+    proposer!,
     status,
     created,
     updated,
