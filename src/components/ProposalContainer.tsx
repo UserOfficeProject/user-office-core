@@ -59,10 +59,6 @@ export default function ProposalContainer(props: {
         padding: theme.spacing(3)
       }
     },
-    disabled: {
-      pointerEvents: "none",
-      opacity: 0.7
-    },
     stepper: {
       padding: theme.spacing(3, 0, 5)
     },
@@ -98,7 +94,6 @@ export default function ProposalContainer(props: {
   const clampStep = (step: number) => {
     return _.clamp(step, 0, proposalSteps.length - 1);
   };
-
   /**
    * Returns true if reset was peformed, false otherwise
    */
@@ -282,7 +277,7 @@ class QuestionaryUIStep {
     public stepType: StepType,
     public title: string,
     public completed: boolean,
-    public element: React.ReactElement<{ bla: number }>
+    public element: JSX.Element
   ) {}
 }
 

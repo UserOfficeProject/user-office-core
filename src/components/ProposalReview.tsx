@@ -15,7 +15,8 @@ const useStyles = makeStyles({
     justifyContent: "flex-end"
   },
   disabled: {
-    pointerEvents: "none"
+    pointerEvents: "none",
+    opacity: 0.7
   },
   button: {
     marginTop: "30px",
