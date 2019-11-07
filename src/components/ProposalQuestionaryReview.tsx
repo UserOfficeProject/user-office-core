@@ -3,9 +3,7 @@ import { QuestionaryField } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import { getAllFields } from "../models/ProposalModelFunctions";
 import {
-  Paper,
   Table,
-  TableHead,
   TableRow,
   TableCell,
   TableBody,
@@ -32,19 +30,13 @@ export default function ProposaQuestionaryReview(props: {
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
+
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
         Proposal Review
       </Typography>
-      <Paper>
         <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Question</TableCell>
-              <TableCell>Answer</TableCell>
-            </TableRow>
-          </TableHead>
           <TableBody>
           <TableRow key="title">
                 <TableCell>Title</TableCell>
@@ -56,7 +48,7 @@ export default function ProposaQuestionaryReview(props: {
               </TableRow>
               <TableRow key="principalinvestigator">
                 <TableCell>Principal Investigator</TableCell>
-                <TableCell>{props.data.proposer}</TableCell>
+                <TableCell>{`${props.data.proposer.firstname} ${props.data.proposer.surname}`}</TableCell>
               </TableRow>
               <TableRow key="coproposers">
                 <TableCell>Co-Proposers</TableCell>
@@ -70,7 +62,6 @@ export default function ProposaQuestionaryReview(props: {
             ))}
           </TableBody>
         </Table>
-      </Paper>
     </Fragment>
   );
 }

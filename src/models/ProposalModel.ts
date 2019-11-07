@@ -3,10 +3,10 @@ import { EvaluatorOperator } from "./ConditionEvaluator";
 export class ProposalInformation {
   constructor(
     public id: number,
-    public title?: string,
-    public abstract?: string,
-    public proposer?: number,
-    public status?: ProposalStatus,
+    public title: string,
+    public abstract: string,
+    public proposer: { id: number; firstname: string; surname: string },
+    public status: ProposalStatus,
     public created?: string,
     public updated?: string,
     public users?: any,
