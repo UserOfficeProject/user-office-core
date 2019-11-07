@@ -126,6 +126,8 @@ interface UsersArgs {
   first?: number;
   offset?: number;
   filter?: string;
+  usersOnly?: boolean;
+  subtractUsers?: [number];
 }
 
 interface RolesArgs {}
@@ -177,6 +179,11 @@ async function resolveProposal(
     return users;
   }
 
+  const proposer = await context.queries.user.get(agent, proposal.proposer);
+  if (!proposer) {
+    rejection("NO_PROPOSER_ON_THE_PROPOSAL");
+  }
+
   const reviews = await context.queries.review.reviewsForProposal(agent, id);
   if (isRejection(reviews)) {
     return reviews;
@@ -191,7 +198,7 @@ async function resolveProposal(
     id,
     title,
     abstract,
-    agent.id,
+    proposer!,
     status,
     created,
     updated,
@@ -516,7 +523,9 @@ export default {
       context.user,
       args.filter,
       args.first,
-      args.offset
+      args.offset,
+      args.usersOnly,
+      args.subtractUsers
     );
   },
 

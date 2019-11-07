@@ -11,7 +11,9 @@ export interface UserDataSource {
   getUsers(
     filter?: string,
     first?: number,
-    offset?: number
+    offset?: number,
+    usersOnly?: boolean,
+    subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: User[] }>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<User[]>;

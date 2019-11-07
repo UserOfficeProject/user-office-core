@@ -7,7 +7,7 @@ export class ProposalInformation {
     public id?: number,
     public title?: string,
     public abstract?: string,
-    public proposer?: number,
+    public proposer?: User,
     public status?: ProposalStatus,
     public created?: string,
     public updated?: string,

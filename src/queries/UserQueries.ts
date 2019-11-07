@@ -91,12 +91,20 @@ export default class UserQueries {
     agent: User | null,
     filter?: string,
     first?: number,
-    offset?: number
+    offset?: number,
+    usersOnly?: boolean,
+    subtractUsers?: [number]
   ) {
     if (agent == null) {
       return null;
     }
-    return this.dataSource.getUsers(filter, first, offset);
+    return this.dataSource.getUsers(
+      filter,
+      first,
+      offset,
+      usersOnly,
+      subtractUsers
+    );
   }
 
   async getRoles(agent: User | null) {
