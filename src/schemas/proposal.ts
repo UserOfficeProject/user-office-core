@@ -72,7 +72,7 @@ export const typeDefs = `
         abstract: String
         status: Int
         users: [User!]
-        proposer: Int
+        proposer: User
         questionary: Questionary
         created: String
         updated: String
