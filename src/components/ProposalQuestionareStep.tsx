@@ -140,8 +140,8 @@ export default function ProposalQuestionareStep(props: {
             back={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
+                  saveStepData(isValid);
                   if (isValid) {
-                    saveStepData(isValid);
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
                       topicId
