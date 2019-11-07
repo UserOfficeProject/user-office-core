@@ -13,6 +13,7 @@ export function useUsersData(filter) {
         firstname
         lastname
         username
+        organisation
         id
         }
         totalCount
@@ -30,6 +31,7 @@ export function useUsersData(filter) {
             name: user.firstname,
             surname: user.lastname,
             username: user.username,
+            organisation: user.organisation,
             id: user.id
           };
         })

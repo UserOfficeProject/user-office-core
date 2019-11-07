@@ -15,10 +15,16 @@ export function useLoadProposal() {
               title
               abstract
               status
+              proposer{
+                id
+                firstname
+                lastname
+              }
               users{
                 firstname
                 lastname
                 username
+                organisation
                 id
               }
               questionary {
@@ -68,11 +74,17 @@ export function useLoadProposal() {
         abstract: data.proposal.abstract,
         id: data.proposal.id,
         status: data.proposal.status,
+        proposer: {
+          id: data.proposal.proposer.id,
+          firstname: data.proposal.proposer.firstname,
+          surname: data.proposal.proposer.lastname
+        },
         users: data.proposal.users.map((user: any) => {
           return {
             name: user.firstname,
             surname: user.lastname,
             username: user.username,
+            organisation: user.organisation,
             id: user.id
           };
         }),
