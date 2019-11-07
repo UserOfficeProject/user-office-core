@@ -32,7 +32,7 @@ export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
   topicId: number;
   setIsDirty: (isDirty: boolean) => void;
-  editable: boolean;
+  readonly: boolean;
 }) {
   const { data, topicId } = props;
   const api = useContext(FormApi);
@@ -44,6 +44,10 @@ export default function ProposalQuestionareStep(props: {
   const classes = makeStyles({
     componentWrapper: {
       margin: "10px 0"
+    },
+    disabled: {
+      pointerEvents: "none",
+      opacity: 0.7
     }
   })();
 
@@ -115,7 +119,7 @@ export default function ProposalQuestionareStep(props: {
       enableReinitialize={true}
     >
       {({ errors, touched, handleChange, submitForm, validateForm }) => (
-        <form>
+        <form className={props.readonly ? classes.disabled : undefined}>
           {activeFields.map(field => {
             return (
               <div
@@ -136,12 +140,12 @@ export default function ProposalQuestionareStep(props: {
             );
           })}
           <ProposalNavigationFragment
-            disabled={!props.editable}
+            disabled={props.readonly}
             back={() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
+                  saveStepData(isValid);
                   if (isValid) {
-                    saveStepData(isValid);
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
                       topicId

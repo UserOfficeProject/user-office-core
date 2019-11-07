@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, HTMLAttributes } from "react";
 import { QuestionaryField } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import { getAllFields } from "../models/ProposalModelFunctions";
@@ -11,9 +11,11 @@ import {
   makeStyles
 } from "@material-ui/core";
 
-export default function ProposaQuestionaryReview(props: {
-  data: ProposalInformation;
-}) {
+export default function ProposaQuestionaryReview(
+  props: HTMLAttributes<any> & {
+    data: ProposalInformation;
+  }
+) {
   const questionary = props.data.questionary!;
 
   if (!props.data) {

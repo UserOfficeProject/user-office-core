@@ -18,6 +18,7 @@ import ProposalInformationView from "./ProposalInformationView";
 import { useLoadProposal } from "../hooks/useLoadProposal";
 import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
+import _ from "lodash";
 
 export interface INotification {
   variant: "error" | "success";
@@ -46,6 +47,7 @@ export default function ProposalContainer(props: {
     variant: "success",
     message: ""
   });
+  const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -59,6 +61,15 @@ export default function ProposalContainer(props: {
     },
     stepper: {
       padding: theme.spacing(3, 0, 5)
+    },
+    heading: {
+      textOverflow: "ellipsis",
+      width: "80%",
+      margin: "0 auto",
+      textAlign: "center",
+      minWidth: "450px",
+      whiteSpace: "nowrap",
+      overflow: "hidden"
     }
   }))();
 
@@ -67,7 +78,7 @@ export default function ProposalContainer(props: {
       ...proposalInfo,
       ...data
     });
-    setStepIndex(stepIndex + 1);
+    setStepIndex(clampStep(stepIndex + 1));
     setIsDirty(false);
   };
 
@@ -76,10 +87,13 @@ export default function ProposalContainer(props: {
       ...proposalInfo,
       ...data
     });
-    setStepIndex(stepIndex - 1);
+    setStepIndex(clampStep(stepIndex - 1));
     setIsDirty(false);
   };
 
+  const clampStep = (step: number) => {
+    return _.clamp(step, 0, proposalSteps.length - 1);
+  };
   /**
    * Returns true if reset was peformed, false otherwise
    */
@@ -115,40 +129,40 @@ export default function ProposalContainer(props: {
             <ProposalInformationView
               data={proposalInfo}
               setIsDirty={setIsDirty}
+              readonly={isSubmitted}
             />
           )
         )
       );
       allProposalSteps = allProposalSteps.concat(
-        questionary.steps.map(
-          (step, index, steps) =>
-            new QuestionaryUIStep(
-              StepType.QUESTIONARY,
-              step.topic.topic_title,
-              step.isCompleted,
-              (
-                <ProposalQuestionareStep
-                  topicId={step.topic.topic_id}
-                  data={proposalInfo}
-                  setIsDirty={setIsDirty}
-                  editable={
-                    (index === 0 &&
-                      proposalInfo.status !== ProposalStatus.BLANK) ||
-                    step.isCompleted ||
-                    (index > 0 && steps[index - 1].isCompleted === true)
-                  }
-                  key={step.topic.topic_id}
-                />
-              )
+        questionary.steps.map((step, index, steps) => {
+          let editable =
+            (index === 0 && proposalInfo.status !== ProposalStatus.BLANK) ||
+            step.isCompleted ||
+            (steps[index - 1] && steps[index - 1].isCompleted === true);
+
+          return new QuestionaryUIStep(
+            StepType.QUESTIONARY,
+            step.topic.topic_title,
+            step.isCompleted,
+            (
+              <ProposalQuestionareStep
+                topicId={step.topic.topic_id}
+                data={proposalInfo}
+                setIsDirty={setIsDirty}
+                readonly={!editable || isSubmitted}
+                key={step.topic.topic_id}
+              />
             )
-        )
+          );
+        })
       );
       allProposalSteps.push(
         new QuestionaryUIStep(
           StepType.REVIEW,
           "Review",
           proposalInfo.status === ProposalStatus.SUBMITTED,
-          <ProposalReview data={proposalInfo} />
+          <ProposalReview data={proposalInfo} readonly={isSubmitted} />
         )
       );
       return allProposalSteps;
@@ -163,12 +177,13 @@ export default function ProposalContainer(props: {
       .find(step => step.completed === true);
 
     setStepIndex(
-      Math.max(
+      _.clamp(
+        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
         0,
-        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0
+        proposalSteps.length - 1
       )
     );
-  }, [proposalInfo]);
+  }, [proposalInfo, isSubmitted]);
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
@@ -209,8 +224,13 @@ export default function ProposalContainer(props: {
       />
       <FormApi.Provider value={api}>
         <Paper className={classes.paper}>
-          <Typography component="h1" variant="h4" align="center">
-            {false ? "Update Proposal" : "New Proposal"}
+          <Typography
+            component="h1"
+            variant="h4"
+            align="center"
+            className={classes.heading}
+          >
+            {proposalInfo.title || "New Proposal"}
           </Typography>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
             {proposalSteps.map((step, index, steps) => (
@@ -245,15 +265,7 @@ export default function ProposalContainer(props: {
               </Step>
             ))}
           </Stepper>
-          {proposalInfo.status !== ProposalStatus.SUBMITTED ? (
-            <React.Fragment>{getStepContent(stepIndex)}</React.Fragment>
-          ) : (
-            <React.Fragment>
-              <Typography variant="h5" gutterBottom>
-                {false ? "Update Proposal" : "Sent Proposal"}
-              </Typography>
-            </React.Fragment>
-          )}
+          {getStepContent(stepIndex)}
         </Paper>
       </FormApi.Provider>
     </Container>

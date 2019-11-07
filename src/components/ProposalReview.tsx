@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/styles";
-import ProposalInformationView from "./ProposalInformationView";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
 import { ProposalStatus } from "../models/ProposalModel";
@@ -15,21 +14,27 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "flex-end"
   },
+  disabled: {
+    pointerEvents: "none",
+    opacity: 0.7
+  },
   button: {
     marginTop: "30px",
     marginLeft: "10px",
     backgroundColor: "#00C851",
-    color: "#ffff" ,
+    color: "#ffff",
     "&:hover": {
-      backgroundColor: "#007E33",
-    },
+      backgroundColor: "#007E33"
+    }
   }
 });
 
 export default function ProposalReview({
-  data
+  data,
+  readonly
 }: {
   data: ProposalInformation;
+  readonly: boolean;
 }) {
   const api = useContext(FormApi);
   const classes = useStyles();
@@ -38,24 +43,35 @@ export default function ProposalReview({
 
   return (
     <>
-      <ProposaQuestionaryReview data={data} />
+      <ProposaQuestionaryReview
+        data={data}
+        className={readonly ? classes.disabled : undefined}
+      />
       <div className={classes.buttons}>
         <ProposalNavigationFragment
-          back={() => api.back(data)}
-          backLabel="Back"
-          next={() => {
-            submitProposal(data.id).then(isSubmitted => {
-              data.status = ProposalStatus.SUBMITTED;
-              api.next(data);
-            });
-          }}
+          back={undefined}
+          next={
+            readonly
+              ? undefined
+              : () => {
+                  submitProposal(data.id).then(isSubmitted => {
+                    data.status = ProposalStatus.SUBMITTED;
+                    api.next(data);
+                  });
+                }
+          }
           reset={undefined}
           nextLabel={"Submit"}
           isLoading={isLoading}
           disabled={false}
         />
-        <Button className={classes.button} onClick={() => downloadPDFProposal(data.id)}>Download PDF</Button>
-
+        <Button
+          className={classes.button}
+          onClick={() => downloadPDFProposal(data.id)}
+          variant="contained"
+        >
+          Download PDF
+        </Button>
       </div>
     </>
   );
