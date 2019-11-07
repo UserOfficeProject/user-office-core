@@ -3,14 +3,20 @@ import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { useDataAPI } from "../hooks/useDataAPI";
 
-function sendUserRequest(searchQuery, apiCall, setLoading) {
+function sendUserRequest(
+  searchQuery,
+  apiCall,
+  setLoading,
+  selectedUsers,
+  usersOnly
+) {
   const query = `
-  query($filter: String!, $first: Int!, $offset: Int!) {
-    users(filter: $filter, first: $first, offset: $offset){
+  query($filter: String!, $first: Int!, $offset: Int!, $usersOnly: Boolean!, $subtractUsers: [Int!]) {
+    users(filter: $filter, first: $first, offset: $offset, usersOnly: $usersOnly, subtractUsers: $subtractUsers){
       users{
       firstname
       lastname
-      username
+      organisation
       id
       }
       totalCount
@@ -20,7 +26,9 @@ function sendUserRequest(searchQuery, apiCall, setLoading) {
   const variables = {
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
-    first: searchQuery.pageSize
+    first: searchQuery.pageSize,
+    usersOnly,
+    subtractUsers: selectedUsers ? selectedUsers.map(user => user.id) : []
   };
   setLoading(true);
   return apiCall(query, variables).then(data => {
@@ -32,7 +40,7 @@ function sendUserRequest(searchQuery, apiCall, setLoading) {
         return {
           name: user.firstname,
           surname: user.lastname,
-          username: user.username,
+          organisation: user.organisation,
           id: user.id
         };
       })
@@ -47,7 +55,7 @@ function PeopleTable(props) {
   const columns = [
     { title: "Name", field: "name" },
     { title: "Surname", field: "surname" },
-    { title: "Username", field: "username" }
+    { title: "Organisation", field: "organisation" }
   ];
   return (
     <MaterialTable
@@ -57,7 +65,14 @@ function PeopleTable(props) {
       data={
         props.data
           ? props.data
-          : query => sendUserRequest(query, sendRequest, setLoading)
+          : query =>
+              sendUserRequest(
+                query,
+                sendRequest,
+                setLoading,
+                props.selectedUsers,
+                props.usersOnly
+              )
       }
       isLoading={loading}
       options={{

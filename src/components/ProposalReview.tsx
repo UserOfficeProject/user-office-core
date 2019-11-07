@@ -38,7 +38,6 @@ export default function ProposalReview({
 
   return (
     <>
-      <ProposalInformationView data={data} disabled={true} />
       <ProposaQuestionaryReview data={data} />
       <div className={classes.buttons}>
         <ProposalNavigationFragment
