@@ -181,7 +181,7 @@ async function resolveProposal(
 
   const proposer = await context.queries.user.get(agent, proposal.proposer);
   if (!proposer) {
-    return null;
+    rejection("NO_PROPOSER_ON_THE_PROPOSAL");
   }
 
   const reviews = await context.queries.review.reviewsForProposal(agent, id);
