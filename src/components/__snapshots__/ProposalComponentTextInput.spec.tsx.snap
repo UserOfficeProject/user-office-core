@@ -3,7 +3,7 @@
 exports[`Textfield rendered without crashing 1`] = `
 <div>
   <div
-    className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
+    className="MuiFormControl-root MuiTextField-root makeStyles-textField-1  MuiFormControl-fullWidth"
   >
     <label
       className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
