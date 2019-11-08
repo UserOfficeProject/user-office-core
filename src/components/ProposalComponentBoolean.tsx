@@ -1,12 +1,23 @@
 import React, { ChangeEvent } from "react";
-import { FormControl, FormControlLabel, Checkbox } from "@material-ui/core";
+import {
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  makeStyles
+} from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
+import "../styles/ProposalComponentStyles.css";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
   let { templateField, onComplete, errors, handleChange } = props;
   let { proposal_question_id, config, question } = templateField;
   let isError = errors[proposal_question_id] ? true : false;
+  const classes = makeStyles({
+    label: {
+      marginRight: "5px"
+    }
+  })();
 
   return (
     <FormControl error={isError}>
@@ -28,6 +39,10 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
           />
         }
         label={question}
+        className={[
+          templateField.config.required ? "requiredInput" : undefined,
+          classes.label
+        ].join(" ")}
       />
 
       <span>{config.small_label}</span>

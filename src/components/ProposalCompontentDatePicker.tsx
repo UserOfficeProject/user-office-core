@@ -8,6 +8,8 @@ import {
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { Field } from "formik";
 import { getIn } from "formik";
+import "../styles/ProposalComponentStyles.css";
+
 export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
   let { templateField, onComplete, touched, errors } = props;
   const { proposal_question_id, config, question } = templateField;
@@ -36,6 +38,9 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
                     form.setFieldValue(field.name, date, false);
                     onComplete();
                   }}
+                  className={
+                    templateField.config.required ? "requiredInput" : undefined
+                  }
                   {...other}
                 />
               </Tooltip>

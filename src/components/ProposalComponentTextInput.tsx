@@ -2,6 +2,8 @@ import React, { ChangeEvent } from "react";
 import { TextField, makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
+import "../styles/ProposalComponentStyles.css";
+
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
     textField: {
@@ -31,7 +33,10 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         multiline={config.multiline}
         rows={config.multiline ? 4 : 1}
         rowsMax={config.multiline ? 16 : undefined}
-        className={classes.textField}
+        className={[
+          classes.textField,
+          templateField.config.required ? "requiredInput" : undefined
+        ].join(" ")}
         InputLabelProps={{
           shrink: true
         }}
