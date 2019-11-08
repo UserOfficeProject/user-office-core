@@ -18,7 +18,7 @@ import ProposalInformationView from "./ProposalInformationView";
 import { useLoadProposal } from "../hooks/useLoadProposal";
 import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
-import _ from "lodash";
+import { clamp } from "../utils/Math";
 
 export interface INotification {
   variant: "error" | "success";
@@ -92,7 +92,7 @@ export default function ProposalContainer(props: {
   };
 
   const clampStep = (step: number) => {
-    return _.clamp(step, 0, proposalSteps.length - 1);
+    return clamp(step, 0, proposalSteps.length - 1);
   };
   /**
    * Returns true if reset was peformed, false otherwise
@@ -177,7 +177,7 @@ export default function ProposalContainer(props: {
       .find(step => step.completed === true);
 
     setStepIndex(
-      _.clamp(
+      clamp(
         lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
         0,
         proposalSteps.length - 1
