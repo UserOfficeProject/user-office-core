@@ -10,8 +10,7 @@ import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { makeStyles } from "@material-ui/core"
-
-
+import { UserContext } from "../context/UserContextProvider";
 
 export default function ProposalInformationView(props) {
   const api = useContext(FormApi);
@@ -19,6 +18,7 @@ export default function ProposalInformationView(props) {
   const { loading: creatingProposal, createProposal } = useCreateProposal();
   const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
+  const { user } = useContext(UserContext);
 
   const classes = makeStyles({
     disabled: {
@@ -49,7 +49,17 @@ export default function ProposalInformationView(props) {
             abstract: values.abstract,
             users: userIds
           });
-          api.next({ ...values, id, status, users });
+          api.next({
+            ...values,
+            id,
+            status,
+            users,
+            proposer: {
+              id: user.id,
+              firstname: user.firstname,
+              surname: user.lastname
+            }
+          });
         }
       }}
       validationSchema={Yup.object().shape({
@@ -78,7 +88,10 @@ export default function ProposalInformationView(props) {
                 label="Title"
                 defaultValue={values.title}
                 fullWidth
-                onChange={(e) => { props.setIsDirty(true); handleChange(e) }}
+                onChange={e => {
+                  props.setIsDirty(true);
+                  handleChange(e);
+                }}
                 error={touched.title && errors.title}
                 helperText={touched.title && errors.title && errors.title}
               />
@@ -95,7 +108,10 @@ export default function ProposalInformationView(props) {
                 rows="4"
                 defaultValue={values.abstract}
                 fullWidth
-                onChange={(e) => { props.setIsDirty(true); handleChange(e) }}
+                onChange={e => {
+                  props.setIsDirty(true);
+                  handleChange(e);
+                }}
                 error={touched.abstract && errors.abstract}
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
@@ -105,7 +121,10 @@ export default function ProposalInformationView(props) {
           </Grid>
           <ProposalParticipants
             error={userError}
-            setUsers={(users) => { props.setIsDirty(true); setUsers(users) }}
+            setUsers={users => {
+              props.setIsDirty(true);
+              setUsers(users);
+            }}
             users={users}
           />
           <ProposalNavigationFragment
