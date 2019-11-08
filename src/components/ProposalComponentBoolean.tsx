@@ -7,7 +7,6 @@ import {
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
-import "../styles/ProposalComponentStyles.css";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
   let { templateField, onComplete, errors, handleChange } = props;
@@ -38,11 +37,8 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             }}
           />
         }
-        label={question}
-        className={[
-          templateField.config.required ? "requiredInput" : undefined,
-          classes.label
-        ].join(" ")}
+        label={question + (config.required ? " *" : "")}
+        className={classes.label}
       />
 
       <span>{config.small_label}</span>
