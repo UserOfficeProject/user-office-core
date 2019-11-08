@@ -39,6 +39,15 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               fullWidth
               data-cy="question"
             />
+            <Field
+              name="config.tooltip"
+              label="Tooltip"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="tooltip"
+            />
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"
