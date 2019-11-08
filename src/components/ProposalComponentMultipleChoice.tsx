@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
+import "../styles/ProposalComponentStyles.css";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -22,7 +23,11 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
     },
     wrapper: {
       margin: "18px 0 0 0",
-      display: "flex"
+      display: "inline-flex"
+    },
+    label: {
+      marginTop: "10px",
+      marginRight: "5px"
     }
   })();
 
@@ -49,6 +54,9 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             SelectProps={{
               MenuProps: {}
             }}
+            className={
+              templateField.config.required ? "requiredInput" : undefined
+            }
             helperText={templateField.config.small_label}
             margin="normal"
           >
@@ -65,8 +73,16 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
 
     default:
       return (
-        <FormControl className={classes.wrapper} error={isError}>
-          <FormLabel>{templateField.question}</FormLabel>
+        <FormControl
+          className={[
+            templateField.config.required ? "requiredInput" : undefined,
+            classes.wrapper
+          ].join(" ")}
+          error={isError}
+        >
+          <FormLabel className={classes.label}>
+            {templateField.question}
+          </FormLabel>
           <span>{templateField.config.small_label}</span>
           <RadioGroup
             id={templateField.proposal_question_id}
@@ -77,11 +93,11 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               onComplete();
             }}
             value={templateField.value}
-            className={
+            className={[
               config.options!.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
-            }
+            ].join(" ")}
           >
             {(config.options as string[]).map(option => {
               return (

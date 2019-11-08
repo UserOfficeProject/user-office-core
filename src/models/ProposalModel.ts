@@ -203,4 +203,5 @@ export interface FieldConfig {
   placeholder?: string;
   html?: string;
   plain?: string;
+  tooltip?: string;
 }

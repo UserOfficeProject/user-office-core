@@ -31,6 +31,7 @@ export function FileUploadComponent(props: {
   fileType?: string;
   value: string;
   onChange: Function;
+  className?: string;
 }) {
   const { getFileMetadata, filesMetadata } = useGetFileMetadata();
   const [files, setFiles] = useState<FileMetaData[]>([]);
