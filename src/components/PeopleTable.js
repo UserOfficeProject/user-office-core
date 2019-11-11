@@ -11,7 +11,7 @@ function sendUserRequest(
   usersOnly
 ) {
   const query = `
-  query($filter: String!, $first: Int!, $offset: Int!, $usersOnly: Boolean!, $subtractUsers: [Int!]) {
+  query($filter: String!, $first: Int!, $offset: Int!, $usersOnly: Boolean, $subtractUsers: [Int!]) {
     users(filter: $filter, first: $first, offset: $offset, usersOnly: $usersOnly, subtractUsers: $subtractUsers){
       users{
       firstname
