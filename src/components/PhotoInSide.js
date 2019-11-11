@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
   },
   image: {
     backgroundImage:
-      "url(https://lh3.googleusercontent.com/W9_mgCQO_-4zO4p1RY4sXa13iHERfHucZf6IJNYrb_0OqeySCYI7oUJ8c4-YCpjlWRUfaMMM3RNasQ=w1572-h1233-rw)",
+      "url(https://lh3.googleusercontent.com/n4PhGyTc1Ov9X1PA6G2zBmXtJGBpRKLDnHMlaBUujxzdgf5e4ZMtS0ClXszkbMXbHgXDvXsccPGzyhdK7iPZRvo58aYFIrdoqkmEOR4fDXxN1o2kn_OEi0hhnSpatLUigyyGgi68f7qy_B96-cbv0kFMMEEVten-S967xxSvndXdWx-zP9SBODEJEXs0UDF8kvPWILuyVDaa8qZyUfO7sS6XQ2D9sfzMMFn3t5MXNMkChg-YduoHAccl7uoYO8sCFgyjEvcGISyQoiGr8ehFHl2o4KDT7aI5Gvo3HB4cTIDoAgFDghVytBVgSZBE4v-Ha-HeCrWBXvdDaY9hZKAO-DHIhGSE434HlCqYhJTB35F7PZBvh4CASWphuMWUWEE61TaFXmTN_RHQegIoiqqGepsBNu7InWGsQarghL_wx5Sa6tOjLktqUOiLx89NdhptlaPTzfnNDit6XO8ofMwZxtoI66QlccTV7ZZDGBdqUqC00ATnBqtA5f0khFsz-aA56hgRIL5k-sxogbkLqeXwbJRX4G32KXiIJPnR93sIl3-3VirEblPdl6yGcWHj4qFdb__M0BgtD4KV9lf4cYkUGSVKTrwlusQMfiGpqHziAUmxUgLl97uG=w1492-h1186)",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundPosition: "center"
