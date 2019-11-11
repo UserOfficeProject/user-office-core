@@ -179,7 +179,7 @@ async function resolveProposal(
     return users;
   }
 
-  const proposer = await context.queries.user.get(agent, proposal.proposer);
+  const proposer = await context.queries.user.getUser(proposal.proposer);
   if (!proposer) {
     rejection("NO_PROPOSER_ON_THE_PROPOSAL");
   }
@@ -576,6 +576,10 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  checkEmail(args: { email: string }, context: ResolverContext) {
+    return context.queries.user.checkEmail(args.email);
   },
 
   updatePassword(
