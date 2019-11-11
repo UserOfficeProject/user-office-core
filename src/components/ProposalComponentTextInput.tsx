@@ -15,6 +15,10 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   return (
     <div>
+      { 
+        props.templateField.config.htmlQuestion && 
+        <div dangerouslySetInnerHTML={{__html:props.templateField.config.htmlQuestion!}}></div> 
+      }
       <TextField
         id={proposal_question_id}
         name={proposal_question_id}

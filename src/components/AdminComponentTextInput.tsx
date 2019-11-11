@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 import TitledContainer from "./TitledContainer";
+import FormikUICustomEditor from "./FormikUICustomEditor";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
@@ -46,6 +47,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               fullWidth
               data-cy="question"
             />
+
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"
@@ -99,7 +101,22 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
                 data-cy="multiline"
               />
             </TitledContainer>
-
+            <Field
+              name="config.htmlQuestion"
+              type="text"
+              component={FormikUICustomEditor}
+              margin="normal"
+              label="Optional rich text question"
+              fullWidth
+              init={{
+                skin: false,
+                content_css: false,
+                plugins: ["link", "preview", "image", "code"],
+                toolbar: "bold italic",
+                branding: false
+              }}
+              data-cy="htmlQuestion"
+            />
             <TitledContainer label="Dependencies">
               <Field
                 name="dependencies"
