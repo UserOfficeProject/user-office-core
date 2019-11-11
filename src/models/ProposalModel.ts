@@ -188,7 +188,7 @@ export enum ProposalStatus {
 
 export interface ProposalAnswer {
   proposal_question_id: string;
-  value: boolean | number | string;
+  value: string;
   data_type: DataType;
 }
 
