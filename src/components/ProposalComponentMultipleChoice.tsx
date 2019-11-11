@@ -11,7 +11,6 @@ import {
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
-import "../styles/ProposalComponentStyles.css";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -54,11 +53,9 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             SelectProps={{
               MenuProps: {}
             }}
-            className={
-              templateField.config.required ? "requiredInput" : undefined
-            }
             helperText={templateField.config.small_label}
             margin="normal"
+            required={config.required ? true : false}
           >
             {(config.options as string[]).map(option => {
               return (
@@ -74,10 +71,8 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
     default:
       return (
         <FormControl
-          className={[
-            templateField.config.required ? "requiredInput" : undefined,
-            classes.wrapper
-          ].join(" ")}
+          className={classes.wrapper}
+          required={config.required ? true : false}
           error={isError}
         >
           <FormLabel className={classes.label}>
@@ -93,11 +88,11 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               onComplete();
             }}
             value={templateField.value}
-            className={[
+            className={
               config.options!.length < 3
                 ? classes.horizontalLayout
                 : classes.verticalLayout
-            ].join(" ")}
+            }
           >
             {(config.options as string[]).map(option => {
               return (
