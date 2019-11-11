@@ -4,7 +4,8 @@ import { isRejection } from "../rejection";
 import {
   DataType,
   Questionary,
-  QuestionaryField
+  QuestionaryField,
+  FieldConfig
 } from "../models/ProposalModel";
 import { createToC } from "./pdfTableofContents/index";
 import {
@@ -162,7 +163,10 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          writeBold(JSON.parse(field.config).plain!);
+          let conf = JSON.parse(field.config) as FieldConfig;
+          if (!conf.omitFromPdf) {
+            writeBold(conf.plain!);
+          }
         } else if (field.data_type === DataType.FILE_UPLOAD) {
           writeBold(field.question);
           if (field.value) {
