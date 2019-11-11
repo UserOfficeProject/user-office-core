@@ -35,12 +35,12 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             inputProps={{
               "aria-label": "primary checkbox"
             }}
+            required={config.required ? true : false}
           />
         }
-        label={question + (config.required ? " *" : "")}
+        label={question}
         className={classes.label}
       />
-
       <span>{config.small_label}</span>
       {isError && (
         <ProposalErrorLabel>{errors[proposal_question_id]}</ProposalErrorLabel>
