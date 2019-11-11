@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 import TitledContainer from "./TitledContainer";
+import FormikUICustomCheckbox from "./FormikUICustomCheckbox";
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
   const field = props.field;
@@ -58,6 +59,17 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               fullWidth
               data-cy="plain"
             />
+
+            <Field
+              name="config.omitFromPdf"
+              checked={formikProps.values.config.omitFromPdf}
+              component={FormikUICustomCheckbox}
+              label="Omit from PDF"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+
             <TitledContainer label="Dependencies">
               <Field
                 name="dependencies"
