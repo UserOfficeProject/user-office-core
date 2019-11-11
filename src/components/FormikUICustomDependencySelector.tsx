@@ -5,7 +5,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  makeStyles
+  makeStyles,
+  IconButton
 } from "@material-ui/core";
 import { FormikActions } from "formik";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../models/ProposalModel";
 import { getFieldById, getAllFields } from "../models/ProposalModelFunctions";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
+import ClearIcon from "@material-ui/icons/Clear";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -60,12 +62,17 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = () => {
-    var dep = new FieldDependency(
-      templateField.proposal_question_id,
-      dependencyId,
-      new FieldCondition(operator, dependencyValue)
-    );
-    form.setFieldValue(field.name, [dep]);
+    let depArr = [];
+    if (dependencyId && dependencyValue && operator) {
+      depArr.push(
+        new FieldDependency(
+          templateField.proposal_question_id,
+          dependencyId,
+          new FieldCondition(operator, dependencyValue)
+        )
+      );
+    }
+    form.setFieldValue(field.name, depArr);
   };
 
   useEffect(() => {
@@ -96,9 +103,7 @@ const FormikUICustomDependencySelector = ({
   ]);
 
   useEffect(() => {
-    if (dependencyId !== "" && dependencyValue !== "") {
-      updateFormikMemoized();
-    }
+    updateFormikMemoized();
   }, [dependencyId, operator, dependencyValue, updateFormikMemoized]);
 
   return (
@@ -138,7 +143,7 @@ const FormikUICustomDependencySelector = ({
         </FormControl>
       </Grid>
 
-      <Grid item xs={3}>
+      <Grid item xs={2}>
         <FormControl fullWidth>
           <InputLabel shrink htmlFor="operator">
             Compare
@@ -180,6 +185,16 @@ const FormikUICustomDependencySelector = ({
             })}
           </Select>
         </FormControl>
+      </Grid>
+      <Grid item xs={1}>
+        <IconButton
+          onClick={() => {
+            setDependencyId("");
+            setDependencyValue("");
+          }}
+        >
+          <ClearIcon />
+        </IconButton>
       </Grid>
     </Grid>
   );
