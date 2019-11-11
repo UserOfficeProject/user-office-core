@@ -67,7 +67,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               label="Omit from PDF"
               margin="normal"
               fullWidth
-              data-cy="required"
+              data-cy="omit"
             />
 
             <TitledContainer label="Dependencies">
