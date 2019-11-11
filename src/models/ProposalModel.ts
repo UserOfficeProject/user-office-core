@@ -18,6 +18,15 @@ export class ProposalInformation {
   ) {}
 }
 
+export enum DataType {
+  BOOLEAN = "BOOLEAN",
+  DATE = "DATE",
+  EMBELLISHMENT = "EMBELLISHMENT",
+  FILE_UPLOAD = "FILE_UPLOAD",
+  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
+  TEXT_INPUT = "TEXT_INPUT"
+}
+
 export class ProposalTemplate {
   constructor(public steps: TemplateStep[] = []) {}
 
@@ -115,7 +124,11 @@ export class QuestionaryField extends ProposalTemplateField {
     const templateField = ProposalTemplateField.fromObject(obj);
     return new QuestionaryField(
       templateField,
-      obj.value ? JSON.parse(obj.value).value : undefined
+      obj.value
+        ? JSON.parse(obj.value).value
+        : templateField.data_type === DataType.BOOLEAN
+        ? false
+        : ""
     );
   }
 }
@@ -167,15 +180,6 @@ export class FieldCondition {
   }
 }
 
-export enum DataType {
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
-  EMBELLISHMENT = "EMBELLISHMENT",
-  FILE_UPLOAD = "FILE_UPLOAD",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT"
-}
-
 export enum ProposalStatus {
   BLANK = -1,
   DRAFT = 0,
@@ -184,8 +188,8 @@ export enum ProposalStatus {
 
 export interface ProposalAnswer {
   proposal_question_id: string;
+  value: boolean | number | string;
   data_type: DataType;
-  value: string;
 }
 
 export interface DataTypeSpec {
@@ -205,4 +209,6 @@ export interface FieldConfig {
   placeholder?: string;
   html?: string;
   plain?: string;
+  tooltip?: string;
+  omitFromPdf?: boolean;
 }
