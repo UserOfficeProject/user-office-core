@@ -53,8 +53,6 @@ export default function QuestionaryFieldEditor(props: {
   }
   return (
     <Modal
-      aria-labelledby="transition-modal-title"
-      aria-describedby="transition-modal-description"
       className={classes.modal}
       open={props.field != null}
       onClose={() => {
@@ -68,7 +66,7 @@ export default function QuestionaryFieldEditor(props: {
     >
       <Fade in={props.field != null}>
         <Grid container className={classes.container}>
-          {componentMap.get(props.field.data_type)!({
+          {React.createElement(componentMap.get(props.field.data_type)!, {
             field: props.field,
             dispatch: props.dispatch,
             closeMe: props.closeMe,

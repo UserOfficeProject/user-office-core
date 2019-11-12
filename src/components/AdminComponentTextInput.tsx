@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
 import { EventType } from "../models/QuestionaryEditorModel";
@@ -9,13 +9,22 @@ import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "./FormikUICustomDependencySelector";
 import TitledContainer from "./TitledContainer";
 import FormikUICustomEditor from "./FormikUICustomEditor";
+import { FormControlLabel, Collapse } from "@material-ui/core";
+import Checkbox from "@material-ui/core/Checkbox";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
+  const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
+    field.config.htmlQuestion != undefined
+  );
+
   return (
     <Formik
       initialValues={field}
       onSubmit={async vals => {
+        if (!isRichQuestion) {
+          vals.config.htmlQuestion = undefined;
+        }
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
@@ -47,7 +56,35 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               fullWidth
               data-cy="question"
             />
-
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setIsRichQuestion(event.target.checked);
+                  }}
+                  checked={isRichQuestion}
+                />
+              }
+              label="Enable rich text question"
+            />
+            <Collapse in={isRichQuestion}>
+              <Field
+                visible={isRichQuestion}
+                name="config.htmlQuestion"
+                type="text"
+                component={FormikUICustomEditor}
+                margin="normal"
+                fullWidth
+                init={{
+                  skin: false,
+                  content_css: false,
+                  plugins: ["link", "preview", "image", "code"],
+                  toolbar: "bold italic",
+                  branding: false
+                }}
+                data-cy="htmlQuestion"
+              />
+            </Collapse>
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"
@@ -101,22 +138,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
                 data-cy="multiline"
               />
             </TitledContainer>
-            <Field
-              name="config.htmlQuestion"
-              type="text"
-              component={FormikUICustomEditor}
-              margin="normal"
-              label="Optional rich text question"
-              fullWidth
-              init={{
-                skin: false,
-                content_css: false,
-                plugins: ["link", "preview", "image", "code"],
-                toolbar: "bold italic",
-                branding: false
-              }}
-              data-cy="htmlQuestion"
-            />
+
             <TitledContainer label="Dependencies">
               <Field
                 name="dependencies"
