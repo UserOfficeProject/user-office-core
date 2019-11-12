@@ -44,7 +44,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="question"
+              inputProps= { {"data-cy" : "question" }}
             />
 
             <TitledContainer label="Constraints">
@@ -55,7 +55,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 component={FormikUICustomCheckbox}
                 margin="normal"
                 fullWidth
-                data-cy="required"
+                inputProps= { {"data-cy" : "required" }}
               />
             </TitledContainer>
 
@@ -101,7 +101,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                data-cy="dependencies"
+                inputProps= { {"data-cy" : "dependencies" }}
               />
             </TitledContainer>
           </AdminComponentShell>

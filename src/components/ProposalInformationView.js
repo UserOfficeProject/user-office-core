@@ -94,6 +94,7 @@ export default function ProposalInformationView(props) {
                 }}
                 error={touched.title && errors.title}
                 helperText={touched.title && errors.title && errors.title}
+                data-cy="title"
               />
             </Grid>
             <Grid item xs={12}>
@@ -116,6 +117,7 @@ export default function ProposalInformationView(props) {
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
                 }
+                data-cy="abstract"
               />
             </Grid>
           </Grid>

@@ -41,7 +41,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="question"
+              inputProps= { {"data-cy" : "question" }}
             />
 
             <TitledContainer label="Constraints">

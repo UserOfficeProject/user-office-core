@@ -58,14 +58,16 @@ function PeopleTable(props) {
     { title: "Organisation", field: "organisation" }
   ];
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={props.title}
-      columns={columns}
-      data={
-        props.data
-          ? props.data
-          : query =>
+    <div data-cy='co-proposers'>
+      <MaterialTable
+        icons={tableIcons}
+        title={props.title}
+        columns={columns}
+
+        data={
+          props.data
+            ? props.data
+            : query =>
               sendUserRequest(
                 query,
                 sendRequest,
@@ -73,15 +75,15 @@ function PeopleTable(props) {
                 props.selectedUsers,
                 props.usersOnly
               )
-      }
-      isLoading={loading}
-      options={{
-        search: props.search,
-        debounceInterval: 400
-      }}
-      actions={
-        props.action
-          ? [
+        }
+        isLoading={loading}
+        options={{
+          search: props.search,
+          debounceInterval: 400
+        }}
+        actions={
+          props.action
+            ? [
               {
                 icon: () => props.actionIcon,
                 isFreeAction: props.isFreeAction,
@@ -89,20 +91,21 @@ function PeopleTable(props) {
                 onClick: (event, rowData) => props.action(rowData)
               }
             ]
-          : null
-      }
-      editable={
-        props.onRemove
-          ? {
+            : null
+        }
+        editable={
+          props.onRemove
+            ? {
               onRowDelete: oldData =>
                 new Promise(resolve => {
                   resolve();
                   props.onRemove(oldData);
                 })
             }
-          : null
-      }
-    />
+            : null
+        }
+      />
+    </div>
   );
 }
 

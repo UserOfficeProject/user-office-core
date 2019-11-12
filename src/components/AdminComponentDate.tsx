@@ -37,7 +37,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="question"
+              inputProps= { {"data-cy" : "question" }}
             />
             <Field
               name="config.tooltip"

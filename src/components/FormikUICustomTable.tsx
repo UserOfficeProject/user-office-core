@@ -101,6 +101,8 @@ export const FormikUICustomTable = ({
           })
       }}
       {...props}
+
+      data-cy="options"
     />
   );
 };
