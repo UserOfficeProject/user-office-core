@@ -205,4 +205,5 @@ export interface FieldConfig {
   plain?: string;
   tooltip?: string;
   htmlQuestion?: string;
+  omitFromPdf?: boolean;
 }
