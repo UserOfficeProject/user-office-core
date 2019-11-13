@@ -30,7 +30,6 @@ export default class UserMutations {
     firstname: string,
     middlename: string,
     lastname: string,
-    username: string,
     password: string,
     preferredname: string,
     orcid: string,
@@ -68,7 +67,7 @@ export default class UserMutations {
           firstname,
           middlename,
           lastname,
-          username,
+          `${firstname}.${lastname}.${orcid}`, // This is just for now, while we decide on the final format
           hash,
           preferredname,
           orcid,

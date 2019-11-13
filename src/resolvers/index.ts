@@ -539,7 +539,6 @@ export default {
       args.firstname,
       args.middlename,
       args.lastname,
-      args.username,
       args.password,
       args.preferredname,
       args.orcid,
@@ -578,8 +577,8 @@ export default {
     return context.mutations.user.resetPassword(args.token, args.password);
   },
 
-  checkEmail(args: { email: string }, context: ResolverContext) {
-    return context.queries.user.checkEmail(args.email);
+  checkEmailExist(args: { email: string }, context: ResolverContext) {
+    return context.queries.user.checkEmailExist(context.user, args.email);
   },
 
   updatePassword(

@@ -32,6 +32,17 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.updated_at.toISOString()
     );
   }
+
+  checkEmailExist(email: string): Promise<Boolean | null> {
+    return database
+      .select()
+      .from("users")
+      .where("email", email)
+      .first()
+      .then((user: any) => (user ? true : false))
+      .catch(() => null);
+  }
+
   getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select("password")

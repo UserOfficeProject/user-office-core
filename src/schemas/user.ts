@@ -4,6 +4,7 @@ export const typeDefs = `
         roles: [Roles]
         users(filter: String, first: Int, offset: Int, usersOnly: Boolean, subtractUsers: [Int]): UserQueryResult
         getOrcIDInformation(authorizationCode: String): OrcIDInformation
+        checkEmailExist(email:String): Boolean
     }
 
     extend type Mutation {
@@ -39,7 +40,6 @@ export const typeDefs = `
             firstname: String!, 
             middlename:String, 
             lastname: String!, 
-            username: String!, 
             password: String!,
             preferredname: String,
             orcid: String!,

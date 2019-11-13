@@ -25,6 +25,15 @@ export default class UserQueries {
     }
   }
 
+  async checkEmailExist(agent: User | null, email: string) {
+    // A user can change to the same email they already have
+    console.log(agent);
+    if (agent !== null && agent.email === email) {
+      return false;
+    }
+    return this.dataSource.checkEmailExist(email);
+  }
+
   async getOrcIDAccessToken(authorizationCode: string) {
     var options = {
       method: "POST",
@@ -113,6 +122,10 @@ export default class UserQueries {
     } else {
       return null;
     }
+  }
+
+  async getUser(id: number) {
+    return this.dataSource.get(id);
   }
 
   async getProposers(agent: User | null, proposalId: number) {
