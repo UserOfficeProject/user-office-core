@@ -31,7 +31,7 @@ export const typeDefs = `
           telephone_alt: String, 
           roles: [Int]): UserMutationResult
         updatePassword(id: Int!,  password: String!): Boolean
-        login(username: String!, password: String!): LoginMutationResult
+        login(email: String!, password: String!): LoginMutationResult
         resetPasswordEmail(email: String!): Boolean
         resetPassword(token: String!, password: String!): Boolean
         emailVerification(token: String!): Boolean

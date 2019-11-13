@@ -7,7 +7,8 @@ export interface UserDataSource {
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
-  getByEmail(email: String): Promise<User | null>;
+  getByEmail(email: string): Promise<User | null>;
+  getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     filter?: string,

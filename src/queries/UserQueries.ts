@@ -26,11 +26,6 @@ export default class UserQueries {
   }
 
   async checkEmailExist(agent: User | null, email: string) {
-    // A user can change to the same email they already have
-    console.log(agent);
-    if (agent !== null && agent.email === email) {
-      return false;
-    }
     return this.dataSource.checkEmailExist(email);
   }
 
@@ -61,10 +56,22 @@ export default class UserQueries {
   }
 
   async getOrcIDInformation(user: User | null, authorizationCode: string) {
+    // If in development fake response
+    if (process.env.NODE_ENV === "development") {
+      return {
+        orcid: "0000-0000-0000-0000",
+        orcidHash: "asdadgiuerervnaofhioa",
+        refreshToken: "asdadgiuerervnaofhioa",
+        firstname: "Kalle",
+        lastname: "Kallesson"
+      };
+    }
+
     const orcData = await this.getOrcIDAccessToken(authorizationCode);
     if (!orcData) {
       return null;
     }
+
     var options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {

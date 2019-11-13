@@ -43,6 +43,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .catch(() => null);
   }
 
+  getPasswordByEmail(email: string): Promise<string | null> {
+    return database
+      .select("password")
+      .from("users")
+      .where("email", email)
+      .first()
+      .then((user: any) => user.password);
+  }
+
   getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select("password")

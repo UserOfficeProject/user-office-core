@@ -113,7 +113,7 @@ interface UserArgs {
 }
 
 interface LoginArgs {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -496,7 +496,7 @@ export default {
 
   login(args: LoginArgs, context: ResolverContext) {
     return wrapLoginMutation(
-      context.mutations.user.login(args.username, args.password)
+      context.mutations.user.login(args.email, args.password)
     );
   },
 

@@ -56,7 +56,10 @@ export default class UserMutations {
           return rejection("INVALID_LAST_NAME");
         }
 
-        if (this.createHash(orcid) !== orcidHash) {
+        if (
+          this.createHash(orcid) !== orcidHash &&
+          !(process.env.NODE_ENV === "development")
+        ) {
           return rejection("ORCID_HASH_MISMATCH");
         }
 
@@ -153,23 +156,23 @@ export default class UserMutations {
 
     return result || rejection("INTERNAL_ERROR");
   }
-  async login(username: string, password: string): Promise<string | Rejection> {
-    const user = await this.dataSource.getByUsername(username);
+  async login(email: string, password: string): Promise<string | Rejection> {
+    const user = await this.dataSource.getByEmail(email);
 
     if (!user) {
-      return rejection("WRONG_USERNAME_OR_PASSWORD");
+      return rejection("WRONG_EMAIL_OR_PASSWORD");
     }
     const roles = await this.dataSource.getUserRoles(user.id);
-    const result = await this.dataSource.getPasswordByUsername(username);
+    const result = await this.dataSource.getPasswordByEmail(email);
 
     if (!result) {
-      return rejection("WRONG_USERNAME_OR_PASSWORD");
+      return rejection("WRONG_EMAIL_OR_PASSWORD");
     }
 
     const valid = bcrypt.compareSync(password, result);
 
     if (!valid) {
-      return rejection("WRONG_USERNAME_OR_PASSWORD");
+      return rejection("WRONG_EMAIL_OR_PASSWORD");
     }
 
     if (!user.emailVerified) {
