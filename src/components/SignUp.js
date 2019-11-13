@@ -108,7 +108,6 @@ export default function SignUp(props) {
                             $firstname: String!, 
                             $middlename: String, 
                             $lastname: String!, 
-                            $username: String!, 
                             $password: String!,
                             $preferredname: String,
                             $orcid: String!,
@@ -131,7 +130,6 @@ export default function SignUp(props) {
                               firstname: $firstname, 
                               middlename: $middlename, 
                               lastname: $lastname, 
-                              username: $username, 
                               password: $password,
                               preferredname: $preferredname
                               orcid: $orcid
@@ -172,7 +170,6 @@ export default function SignUp(props) {
           firstname: orcData ? orcData.firstname : "",
           middlename: "",
           lastname: orcData ? orcData.lastname : "",
-          username: "",
           password: "",
           preferredname: "",
           gender: "",
@@ -270,14 +267,13 @@ export default function SignUp(props) {
                 </Typography>
                 <CardContent>
                   <Field
-                    name="username"
-                    label="Username"
-                    type="text"
+                    name="email"
+                    label="E-mail"
+                    type="email"
                     component={TextField}
                     margin="normal"
                     fullWidth
-                    autoComplete="off"
-                    data-cy="username"
+                    data-cy="email"
                   />
                   <Field
                     name="password"
@@ -436,15 +432,6 @@ export default function SignUp(props) {
                 </Typography>
                 <CardContent>
                   <Grid container spacing={1}>
-                    <Field
-                      name="email"
-                      label="E-mail"
-                      type="email"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="email"
-                    />
                     <Field
                       name="telephone"
                       label="Telephone"

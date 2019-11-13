@@ -216,6 +216,7 @@ export default function ProfilePage({ match, history }) {
                   department: userData.department,
                   organisation_address: userData.organisation_address,
                   position: userData.position,
+                  oldEmail: userData.email,
                   email: userData.email,
                   telephone: userData.telephone,
                   telephone_alt: userData.telephone_alt,
@@ -223,6 +224,7 @@ export default function ProfilePage({ match, history }) {
                 }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
+                  actions.setFieldValue("oldEmail", values.email);
                   actions.setSubmitting(false);
                 }}
                 validationSchema={userFieldSchema}
