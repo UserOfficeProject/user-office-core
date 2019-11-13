@@ -56,7 +56,7 @@ CREATE TABLE users (
 , username     varchar(100) UNIQUE
 , password     varchar(100) NOT NULL
 , preferredname varchar(100) DEFAULT NULL
-, orcid       varchar(100) NOT NULL
+, orcid       varchar(100) UNIQUE
 , orcid_refreshToken  varchar(100) NOT NULL
 , gender      varchar(12) NOT NULL
 , nationality varchar(100) NOT NULL
