@@ -200,6 +200,8 @@ export default function ProfilePage({ match, history }) {
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Formik
+                validateOnChange={false}
+                validateOnBlur={false}
                 initialValues={{
                   username: userData.username,
                   firstname: userData.firstname,

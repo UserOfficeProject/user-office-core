@@ -32,11 +32,11 @@ export const userFieldSchema = Yup.object().shape({
     .min(2, "position must be at least 2 characters")
     .max(50, "position must be at most 50 characters")
     .required("position must be at least 2 characters"),
-
-  email: Yup.string().test(
-    "checkDuplEmail",
-    "Email has been registered before",
-    function(value) {
+  email: Yup.string()
+    .email("Please specify a valid email")
+    .test("checkDuplEmail", "Email has been registered before", function(
+      value
+    ) {
       //Check if user is using same email as before
       if (this.parent.oldEmail && this.parent.oldEmail === value) {
         return true;
@@ -44,11 +44,8 @@ export const userFieldSchema = Yup.object().shape({
 
       if (!value) {
         return this.createError({ message: "Please specify email" });
-      } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
-        return this.createError({
-          message: "Please specify a valid email address"
-        });
       }
+
       return new Promise((resolve, reject) => {
         const query = `query($email: String!)
       {
@@ -60,8 +57,7 @@ export const userFieldSchema = Yup.object().shape({
           .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
           .catch(() => resolve(false));
       });
-    }
-  ),
+    }),
   telephone: Yup.string()
     .min(2, "telephone must be at least 2 characters")
     .max(20, "telephone must be at most 20 characters")

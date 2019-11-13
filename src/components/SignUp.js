@@ -53,6 +53,9 @@ const useStyles = makeStyles(theme => ({
   errorBox: {
     border: "2px solid red"
   },
+  errorText: {
+    color: "red"
+  },
   orcButton: {
     "&:hover": {
       border: "1px solid #338caf",
@@ -165,6 +168,8 @@ export default function SignUp(props) {
   return (
     <Container component="main" maxWidth="xs">
       <Formik
+        validateOnChange={false}
+        validateOnBlur={false}
         initialValues={{
           user_title: "",
           firstname: orcData ? orcData.firstname : "",
@@ -187,7 +192,7 @@ export default function SignUp(props) {
           telephone_alt: ""
         }}
         onSubmit={async (values, actions) => {
-          if (orcData && orcData.orcid) {
+          if (orcData && orcData.orcid && !orcData.registered) {
             await sendSignUpRequest(values);
           } else {
             setOrcidError(true);
@@ -222,11 +227,10 @@ export default function SignUp(props) {
                   {orcData ? "Found OrcID" : "Register OrcID"}
                 </Typography>
                 <CardContent>
-                  {orcData ? (
+                  {orcData && !orcData.registered ? (
                     <p>{orcData.orcid}</p>
                   ) : (
                     <React.Fragment>
-                      {orcidError ? "OrcID is require" : ""}
                       <p>
                         ESS is collecting your ORCID iD so we can verify and
                         update your record. When you click the “Register”
@@ -261,6 +265,14 @@ export default function SignUp(props) {
                   )}
                 </CardContent>
               </Card>
+              {orcidError && (
+                <p className={classes.errorText}>OrcID is require</p>
+              )}
+              {orcData && orcData.registered && (
+                <p className={classes.errorText}>
+                  OrcID has been registered before
+                </p>
+              )}
               <Card className={classes.card}>
                 <Typography className={classes.cardHeader}>
                   Login details
