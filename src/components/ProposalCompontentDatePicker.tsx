@@ -8,7 +8,6 @@ import {
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { Field } from "formik";
 import { getIn } from "formik";
-import "../styles/ProposalComponentStyles.css";
 
 export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
   let { templateField, onComplete, touched, errors } = props;
@@ -26,11 +25,11 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
             return (
               <Tooltip title={config.tooltip}>
                 <KeyboardDatePicker
+                  required={config.required ? true : false}
                   clearable={true}
                   error={isError}
                   name={field.name}
                   value={field.value || ""}
-                  format="dd/MMM/yyyy"
                   helperText={isError && errors[proposal_question_id]}
                   label={question}
                   onChange={date => {
@@ -38,9 +37,6 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
                     form.setFieldValue(field.name, date, false);
                     onComplete();
                   }}
-                  className={
-                    templateField.config.required ? "requiredInput" : undefined
-                  }
                   {...other}
                 />
               </Tooltip>

@@ -19,6 +19,7 @@ import { useLoadProposal } from "../hooks/useLoadProposal";
 import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
 import { clamp } from "../utils/Math";
+import "../styles/ProposalComponentStyles.css";
 
 export interface INotification {
   variant: "error" | "success";

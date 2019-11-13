@@ -3,7 +3,6 @@ import { FormControl, FormLabel } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 import { FileUploadComponent } from "./FileUploadComponent";
-import "../styles/ProposalComponentStyles.css";
 
 export class ProposalCompontentFileUpload extends React.Component<
   IBasicComponentProps,
@@ -15,7 +14,7 @@ export class ProposalCompontentFileUpload extends React.Component<
     const isError = errors[proposal_question_id] ? true : false;
 
     return (
-      <FormControl error={isError}>
+      <FormControl error={isError} required={config.required ? true : false}>
         <FormLabel error={isError}>{templateField.question}</FormLabel>
         <span>{templateField.config.small_label}</span>
         <FileUploadComponent
@@ -28,9 +27,6 @@ export class ProposalCompontentFileUpload extends React.Component<
             onComplete();
           }}
           value={templateField.value}
-          className={
-            templateField.config.required ? "requiredInput" : undefined
-          }
         />
         {isError && (
           <ProposalErrorLabel>
