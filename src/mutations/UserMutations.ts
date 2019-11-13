@@ -202,7 +202,7 @@ export default class UserMutations {
   }
 
   async resetPasswordEmail(
-    email: String
+    email: string
   ): Promise<{ user: User; link: string } | Rejection> {
     return this.eventBus.wrap(
       async () => {

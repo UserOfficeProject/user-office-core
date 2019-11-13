@@ -74,13 +74,22 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
-  setUserEmailVerified(id: number): Promise<Boolean> {
-    throw new Error("Method not implemented.");
+  async checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+    return false;
+  }
+  async checkEmailExist(email: string): Promise<Boolean | null> {
+    return false;
+  }
+  async getPasswordByEmail(email: string): Promise<string | null> {
+    return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
+  }
+  async setUserEmailVerified(id: number): Promise<Boolean> {
+    return true;
   }
   async setUserPassword(id: number, password: string): Promise<Boolean> {
     return true;
   }
-  async getByEmail(email: String): Promise<User | null> {
+  async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {
       return dummyUser;
     } else {

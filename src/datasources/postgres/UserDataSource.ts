@@ -43,6 +43,16 @@ export default class PostgresUserDataSource implements UserDataSource {
       .catch(() => null);
   }
 
+  checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+    return database
+      .select()
+      .from("users")
+      .where("orcid", orcID)
+      .first()
+      .then((user: any) => (user ? true : false))
+      .catch(() => null);
+  }
+
   getPasswordByEmail(email: string): Promise<string | null> {
     return database
       .select("password")

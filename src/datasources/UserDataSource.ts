@@ -4,6 +4,7 @@ import { Review } from "../models/Review";
 
 export interface UserDataSource {
   checkEmailExist(email: string): Promise<Boolean | null>;
+  checkOrcIDExist(orcID: string): Promise<Boolean | null>;
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;

@@ -63,7 +63,8 @@ export default class UserQueries {
         orcidHash: "asdadgiuerervnaofhioa",
         refreshToken: "asdadgiuerervnaofhioa",
         firstname: "Kalle",
-        lastname: "Kallesson"
+        lastname: "Kallesson",
+        registered: false
       };
     }
 
@@ -72,6 +73,7 @@ export default class UserQueries {
       return null;
     }
 
+    const orcIDExist = await this.dataSource.checkOrcIDExist(orcData.orcid);
     var options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
@@ -95,7 +97,8 @@ export default class UserQueries {
             : null,
           lastname: resp.name["family-name"]
             ? resp.name["family-name"].value
-            : null
+            : null,
+          registered: orcIDExist
         };
       })
       .catch(function(err: any) {

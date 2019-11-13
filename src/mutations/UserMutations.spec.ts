@@ -106,16 +106,14 @@ test("A userofficer can update users roles", () => {
 
 test("A user should be able to login with credentials and get a token", () => {
   return expect(
-    userMutations
-      .login(dummyUser.username, "Test1234!")
-      .then(data => typeof data)
+    userMutations.login(dummyUser.email, "Test1234!").then(data => typeof data)
   ).resolves.toBe("string");
 });
 
 test("A user should not be able to login with unvalid credentials", () => {
   return expect(
     userMutations.login(dummyUser.username, "Wrong_Password!")
-  ).resolves.toHaveProperty("reason", "WRONG_USERNAME_OR_PASSWORD");
+  ).resolves.toHaveProperty("reason", "WRONG_EMAIL_OR_PASSWORD");
 });
 
 test("A user should not be able to update a token if it is unvalid", () => {

@@ -69,6 +69,7 @@ export const typeDefs = `
         orcid: String
         orcidHash: String
         refreshToken: String
+        registered: Boolean
       }
 
     type UserQueryResult {
