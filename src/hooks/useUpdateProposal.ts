@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
-import { ProposalAnswer } from "../models/ProposalModel";
+import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 
 export function useUpdateProposal() {
@@ -14,11 +14,12 @@ export function useUpdateProposal() {
       abstract?: string;
       answers?: ProposalAnswer[];
       topicsCompleted?: number[];
+      status: ProposalStatus;
       users?: number[];
     }) => {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $users:[Int]) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users){
+      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $status:Int, $users:[Int]) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, status:$status, users:$users){
          proposal{
           id
         }

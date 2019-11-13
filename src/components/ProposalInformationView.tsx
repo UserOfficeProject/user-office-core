@@ -9,10 +9,23 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { makeStyles } from "@material-ui/core"
+import { makeStyles } from "@material-ui/core";
 import { UserContext } from "../context/UserContextProvider";
+import { User } from "../models/User";
+import { ProposalStatus } from "../models/ProposalModel";
 
-export default function ProposalInformationView(props) {
+export default function ProposalInformationView(props: {
+  data: {
+    users: User[];
+    title: string;
+    abstract: string;
+    id: number;
+    status: ProposalStatus;
+  };
+  readonly: boolean;
+  disabled: boolean;
+  setIsDirty: (val: boolean) => void;
+}) {
   const api = useContext(FormApi);
   const { loading: updatingProposal, updateProposal } = useUpdateProposal();
   const { loading: creatingProposal, createProposal } = useCreateProposal();
@@ -92,7 +105,7 @@ export default function ProposalInformationView(props) {
                   props.setIsDirty(true);
                   handleChange(e);
                 }}
-                error={touched.title && errors.title}
+                error={touched.title && errors !== undefined}
                 helperText={touched.title && errors.title && errors.title}
               />
             </Grid>
@@ -112,7 +125,7 @@ export default function ProposalInformationView(props) {
                   props.setIsDirty(true);
                   handleChange(e);
                 }}
-                error={touched.abstract && errors.abstract}
+                error={touched.abstract && errors.abstract !== undefined}
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
                 }
@@ -121,7 +134,7 @@ export default function ProposalInformationView(props) {
           </Grid>
           <ProposalParticipants
             error={userError}
-            setUsers={users => {
+            setUsers={(users: Users[]) => {
               props.setIsDirty(true);
               setUsers(users);
             }}

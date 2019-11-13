@@ -1,4 +1,6 @@
 import { EvaluatorOperator } from "./ConditionEvaluator";
+import { User } from "./User";
+import { Review } from "./Review";
 
 export class ProposalInformation {
   constructor(
@@ -9,8 +11,8 @@ export class ProposalInformation {
     public status: ProposalStatus,
     public created?: string,
     public updated?: string,
-    public users?: any,
-    public reviews?: any,
+    public users?: User[],
+    public reviews?: Review[],
     public questionary?: Questionary,
     public shortCode?: string
   ) {}
