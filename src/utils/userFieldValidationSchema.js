@@ -13,10 +13,6 @@ export const userFieldSchema = Yup.object().shape({
   gender: Yup.string().required("please specify your gender"),
   nationality: Yup.string().required("please specify your nationality"),
   user_title: Yup.string().required("User title is required"),
-  username: Yup.string()
-    .min(2, "Username must be at least 2 characters")
-    .max(20, "Username must be at most 20 characters")
-    .required("Username must be at least 2 characters"),
   birthdate: Yup.date()
     .max(new Date())
     .required("Please specify your birth date"),
@@ -42,7 +38,6 @@ export const userFieldSchema = Yup.object().shape({
     "Email has been registered before",
     function(value) {
       //Check if user is using same email as before
-
       if (this.parent.oldEmail && this.parent.oldEmail === value) {
         return true;
       }

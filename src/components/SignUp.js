@@ -469,7 +469,7 @@ export default function SignUp(props) {
           <Grid container>
             <Grid item>
               <Link to="/SignIn/">
-                {userID ? "Click here for sign in" : "Have an account? Sign I"}
+                {userID ? "Click here for sign in" : "Have an account? Sign In"}
               </Link>
             </Grid>
           </Grid>
