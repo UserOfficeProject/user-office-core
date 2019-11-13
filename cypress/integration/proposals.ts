@@ -10,7 +10,7 @@ context("Proposaltests", () => {
   var dateId;
   const textQuestion = faker.random.words(5);
   const booleanQuestion = faker.random.words(4);
-  const dateQuestion = faker.random.words(2);
+  const dateQuestion = faker.random.words(1);
 
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
@@ -129,11 +129,11 @@ context("Proposaltests", () => {
     cy.get("[title='Add Participants']").click();
 
     cy.contains("Save and continue").click();
-
     cy.get(`#${textId}`).type(textAnswer);
     cy.get(`#${boolId}`).click();
-
     cy.get(`[data-cy='${dateId}_field'] button`).click();
+    cy.wait(300);
+    cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometime
     cy.contains("15").click();
     cy.contains("OK").click();
 
