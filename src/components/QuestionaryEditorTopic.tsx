@@ -102,6 +102,7 @@ export default function QuestionaryEditorTopic(props: {
     <input
       type="text"
       value={title}
+      data-cy='topic-title-input'
       className={classes.inputHeading}
       onChange={event => setTitle(event.target.value)}
       onBlur={() => {
@@ -122,6 +123,7 @@ export default function QuestionaryEditorTopic(props: {
       onClick={() => {
         setIsEditMode(true);
       }}
+      data-cy='topic-title'
     >
       {index + 2}. {props.data.topic.topic_title}
     </span>
@@ -174,6 +176,7 @@ export default function QuestionaryEditorTopic(props: {
                 setAnchorEl(event.currentTarget)
               }
               className={classes.showMoreButton}
+              data-cy="show-more-button"
             />
             <Menu
               anchorEl={anchorEl}

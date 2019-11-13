@@ -15,7 +15,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    field.config.htmlQuestion != undefined
+    field.config.htmlQuestion !== undefined
   );
 
   return (
@@ -54,7 +54,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="question"
+              inputProps= { {"data-cy" : "question" }}
             />
             <FormControlLabel
               control={
