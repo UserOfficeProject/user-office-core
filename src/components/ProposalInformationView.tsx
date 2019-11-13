@@ -16,15 +16,15 @@ import { ProposalStatus } from "../models/ProposalModel";
 
 export default function ProposalInformationView(props: {
   data: {
-    users: User[];
+    users?: User[];
     title: string;
     abstract: string;
     id: number;
     status: ProposalStatus;
   };
-  readonly: boolean;
-  disabled: boolean;
-  setIsDirty: (val: boolean) => void;
+  readonly?: boolean;
+  disabled?: boolean;
+  setIsDirty?: (val: boolean) => void;
 }) {
   const api = useContext(FormApi);
   const { loading: updatingProposal, updateProposal } = useUpdateProposal();
@@ -39,6 +39,10 @@ export default function ProposalInformationView(props: {
       opacity: 0.7
     }
   })();
+
+  const informDirty = (isDirty: boolean) => {
+    props.setIsDirty && props.setIsDirty(true);
+  };
 
   return (
     <Formik
@@ -102,7 +106,7 @@ export default function ProposalInformationView(props: {
                 defaultValue={values.title}
                 fullWidth
                 onChange={e => {
-                  props.setIsDirty(true);
+                  informDirty(true);
                   handleChange(e);
                 }}
                 error={touched.title && errors !== undefined}
@@ -123,7 +127,7 @@ export default function ProposalInformationView(props: {
                 defaultValue={values.abstract}
                 fullWidth
                 onChange={e => {
-                  props.setIsDirty(true);
+                  informDirty(true);
                   handleChange(e);
                 }}
                 error={touched.abstract && errors.abstract !== undefined}
@@ -136,8 +140,8 @@ export default function ProposalInformationView(props: {
           </Grid>
           <ProposalParticipants
             error={userError}
-            setUsers={(users: Users[]) => {
-              props.setIsDirty(true);
+            setUsers={(users: User[]) => {
+              informDirty(true);
               setUsers(users);
             }}
             users={users}

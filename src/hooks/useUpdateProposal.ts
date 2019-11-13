@@ -14,7 +14,7 @@ export function useUpdateProposal() {
       abstract?: string;
       answers?: ProposalAnswer[];
       topicsCompleted?: number[];
-      status: ProposalStatus;
+      status?: ProposalStatus;
       users?: number[];
     }) => {
       const query = `

@@ -46,7 +46,7 @@ export default function ProposalReview({ match }: { match: any }) {
   useEffect(() => {
     if (proposalData) {
       setReviewers(
-        proposalData.reviews.map((review: any) => {
+        proposalData.reviews!.map((review: any) => {
           const { firstname, lastname, id, username } = review.reviewer;
           return {
             name: firstname,

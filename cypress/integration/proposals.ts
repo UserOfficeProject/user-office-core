@@ -144,5 +144,9 @@ context("Proposaltests", () => {
     cy.contains(title);
     cy.contains(abstract);
     cy.contains(textAnswer);
+
+    cy.contains("Dashboard").click();
+    cy.contains(title);
+    cy.contains("Submitted");
   });
 });
