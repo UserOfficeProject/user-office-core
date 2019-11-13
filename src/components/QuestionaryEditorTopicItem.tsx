@@ -115,7 +115,7 @@ export default function QuestionaryEditorTopicItem(props: {
             props.onClick(props.data);
           }}
         >
-          <Grid item xs={10} className={classes.questionId}>
+          <Grid item xs={10} className={classes.questionId} data-cy="proposal-question-id">
             {props.data.proposal_question_id}
           </Grid>
           <Grid item xs={2} className={classes.icon}>
