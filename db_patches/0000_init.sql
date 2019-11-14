@@ -67,8 +67,8 @@ CREATE TABLE users (
 , position  varchar(30) NOT NULL
 , email     varchar(30) UNIQUE
 , email_verified boolean DEFAULT False
-, telephone varchar(100) NOT NULL
-, telephone_alt varchar(100) DEFAULT NULL
+, telephone varchar(20) NOT NULL
+, telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
