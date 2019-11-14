@@ -1,6 +1,7 @@
 export const typeDefs = `
     extend type Query {
         user(id: ID!): User
+        basicUserDetails(id: ID!): BasicUserDetails
         roles: [Roles]
         users(filter: String, first: Int, offset: Int, usersOnly: Boolean, subtractUsers: [Int]): UserQueryResult
         getOrcIDInformation(authorizationCode: String): OrcIDInformation
@@ -105,6 +106,12 @@ export const typeDefs = `
         created: String
         updated: String
         reviews: [Review]
+    }
+    type BasicUserDetails {
+      id: Int,
+      firstname: String, 
+      lastname: String, 
+      organisation: String
     }
     type Roles {
         id: Int

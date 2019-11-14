@@ -38,6 +38,15 @@ export class User {
   }
 }
 
+export class BasicUserDetails {
+  constructor(
+    public id: number,
+    public firstname: string,
+    public lastname: string,
+    public organisation: string
+  ) {}
+}
+
 export interface UpdateUserArgs {
   id: number;
   user_title?: string;
