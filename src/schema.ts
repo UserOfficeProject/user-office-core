@@ -73,6 +73,8 @@ type Review {
 enum PageName {
   HOMEPAGE
   HELPPAGE
+  PRIVACYPAGE
+  COOKIEPAGE
 }
 
 type FileMetadata {
