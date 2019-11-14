@@ -10,12 +10,14 @@ import Container from "@material-ui/core/Container";
 import { request } from "graphql-request";
 import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
-import { TextField } from "formik-material-ui";
+import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import FormikDropdown from "./FormikDropdown";
 import nationalities from "../models/nationalities";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
+import InformationModal from "./InformationModal";
+import { useGetPageContent } from "../hooks/useGetPageContent";
 import orcid from "../images/orcid.png";
 import clsx from "clsx";
 import {
@@ -52,6 +54,9 @@ const useStyles = makeStyles(theme => ({
   },
   errorBox: {
     border: "2px solid red"
+  },
+  agreeBox: {
+    "font-size": ".7em"
   },
   errorText: {
     color: "red"
@@ -99,6 +104,12 @@ export default function SignUp(props) {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
   const [orcidError, setOrcidError] = useState(false);
+  const [loadingPrivacyContent, privacyPageContent] = useGetPageContent(
+    "PRIVACYPAGE"
+  );
+  const [loadingCookieContent, cookiePageContent] = useGetPageContent(
+    "COOKIEPAGE"
+  );
   let authCodeOrcID = queryString.parse(props.location.search).code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
   const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
@@ -158,7 +169,10 @@ export default function SignUp(props) {
       ...values,
       orcid: orcData.orcid,
       orcidHash: orcData.orcidHash,
-      refreshToken: orcData.refreshToken
+      refreshToken: orcData.refreshToken,
+      preferredname: values.preferredname
+        ? values.preferredname
+        : values.firstname
     }).then(data => setUserID(data.createUser.user.id));
   };
 
@@ -189,7 +203,9 @@ export default function SignUp(props) {
           position: "",
           email: "",
           telephone: "",
-          telephone_alt: ""
+          telephone_alt: "",
+          privacy_agreement: false,
+          cookie_policy: false
         }}
         onSubmit={async (values, actions) => {
           if (orcData && orcData.orcid && !orcData.registered) {
@@ -201,291 +217,355 @@ export default function SignUp(props) {
         }}
         validationSchema={userFieldSchema.concat(userPasswordFieldSchema)}
       >
-        <Form>
-          <CssBaseline />
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
+        {({ values }) => (
+          <Form>
+            <CssBaseline />
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
 
-          <Typography component="h1" variant="h5" className={classes.heading}>
-            Sign Up
-          </Typography>
-          {userID ? (
-            <p>
-              A activation mail has been sent to the specified email, please
-              verify before login.
-            </p>
-          ) : (
-            <React.Fragment>
-              <Card
-                className={clsx({
-                  [classes.card]: true,
-                  [classes.errorBox]: orcidError
-                })}
-              >
-                <Typography className={classes.cardHeader}>
-                  {orcData ? "Found OrcID" : "Register OrcID"}
-                </Typography>
-                <CardContent>
-                  {orcData && !orcData.registered ? (
-                    <p>{orcData.orcid}</p>
-                  ) : (
-                    <React.Fragment>
-                      <p>
-                        ESS is collecting your ORCID iD so we can verify and
-                        update your record. When you click the “Register”
-                        button, we will ask you to share your iD using an
-                        authenticated process: either by registering for an
-                        ORCID iD or, if you already have one, by signing into
-                        your ORCID account, then granting us permission to get
-                        your ORCID iD. We do this to ensure that you are
-                        correctly identified and securely connecting your ORCID
-                        iD.
-                      </p>
-                      <Button
+            <Typography component="h1" variant="h5" className={classes.heading}>
+              Sign Up
+            </Typography>
+            {userID ? (
+              <p>
+                A activation mail has been sent to the specified email, please
+                verify before login.
+              </p>
+            ) : (
+              <React.Fragment>
+                <Card
+                  className={clsx({
+                    [classes.card]: true,
+                    [classes.errorBox]: orcidError
+                  })}
+                >
+                  <Typography className={classes.cardHeader}>
+                    {orcData ? "Found OrcID" : "Register OrcID"}
+                  </Typography>
+                  <CardContent>
+                    {orcData && !orcData.registered ? (
+                      <p>{orcData.orcid}</p>
+                    ) : (
+                      <React.Fragment>
+                        <p>
+                          ESS is collecting your ORCID iD so we can verify and
+                          update your record. When you click the “Register”
+                          button, we will ask you to share your iD using an
+                          authenticated process: either by registering for an
+                          ORCID iD or, if you already have one, by signing into
+                          your ORCID account, then granting us permission to get
+                          your ORCID iD. We do this to ensure that you are
+                          correctly identified and securely connecting your
+                          ORCID iD.
+                        </p>
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          color="primary"
+                          className={classes.orcButton}
+                          onClick={() =>
+                            (window.location.href =
+                              process.env.REACT_APP_ORCID_REDIRECT)
+                          }
+                        >
+                          <img
+                            className={classes.orcidIcon}
+                            src={orcid}
+                            width="24"
+                            height="24"
+                            alt="ORCID iD icon"
+                          />
+                          Register your ORCID iD
+                        </Button>
+                      </React.Fragment>
+                    )}
+                  </CardContent>
+                </Card>
+                {orcidError && (
+                  <p className={classes.errorText}>OrcID is require</p>
+                )}
+                {orcData && orcData.registered && (
+                  <p className={classes.errorText}>
+                    OrcID has been registered before
+                  </p>
+                )}
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Login details
+                  </Typography>
+                  <CardContent>
+                    <Field
+                      name="email"
+                      label="E-mail"
+                      type="email"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="email"
+                      required
+                    />
+                    <Field
+                      name="password"
+                      label="Password"
+                      type="password"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      autoComplete="off"
+                      data-cy="password"
+                      helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+                      required
+                    />
+                    <Field
+                      name="confirmPassword"
+                      label="Confirm Password"
+                      type="password"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      autoComplete="off"
+                      data-cy="confirmPassword"
+                      required
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Personal details
+                  </Typography>
+
+                  <CardContent>
+                    <FormikDropdown
+                      name="user_title"
+                      label="Title"
+                      items={[
+                        { text: "Ms.", value: "Ms." },
+                        { text: "Mr.", value: "Mr." },
+                        { text: "Dr.", value: "Dr." },
+                        { text: "Prof.", value: "Prof." },
+                        { text: "Rather not say", value: "unspecified" }
+                      ]}
+                      data-cy="title"
+                      required
+                    />
+                    <Field
+                      name="firstname"
+                      label="First name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="firstname"
+                      required
+                    />
+                    <Field
+                      name="middlename"
+                      label="Middle name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="middlename"
+                    />
+                    <Field
+                      name="lastname"
+                      label="Last name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="lastname"
+                      required
+                    />
+                    <Field
+                      name="preferredname"
+                      label="Preferred name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="preferredname"
+                    />
+                    <FormikDropdown
+                      name="gender"
+                      label="Gender"
+                      items={[
+                        { text: "Female", value: "female" },
+                        { text: "Male", value: "male" },
+                        { text: "Other", value: "other" }
+                      ]}
+                      data-cy="gender"
+                      required
+                    />
+                    <FormikDropdown
+                      name="nationality"
+                      label="Nationality"
+                      items={nationalitiesList}
+                      data-cy="nationality"
+                      required
+                    />
+                    <Field
+                      name="birthdate"
+                      label="Birthdate"
+                      type="date"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="birthdate"
+                      required
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Organization details
+                  </Typography>
+                  <CardContent>
+                    <Grid container spacing={1}>
+                      <Field
+                        name="organisation"
+                        label="Organization"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
                         fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.orcButton}
-                        onClick={() =>
-                          (window.location.href =
-                            process.env.REACT_APP_ORCID_REDIRECT)
-                        }
-                      >
-                        <img
-                          className={classes.orcidIcon}
-                          src={orcid}
-                          width="24"
-                          height="24"
-                          alt="ORCID iD icon"
-                        />
-                        Register your ORCID iD
-                      </Button>
-                    </React.Fragment>
-                  )}
-                </CardContent>
-              </Card>
-              {orcidError && (
-                <p className={classes.errorText}>OrcID is require</p>
-              )}
-              {orcData && orcData.registered && (
-                <p className={classes.errorText}>
-                  OrcID has been registered before
-                </p>
-              )}
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Login details
-                </Typography>
-                <CardContent>
-                  <Field
-                    name="email"
-                    label="E-mail"
-                    type="email"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="email"
-                  />
-                  <Field
-                    name="password"
-                    label="Password"
-                    type="password"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    autoComplete="off"
-                    data-cy="password"
-                  />
-                  <Field
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    type="password"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    autoComplete="off"
-                    data-cy="confirmPassword"
-                  />
-                </CardContent>
-              </Card>
+                        data-cy="organisation"
+                        required
+                      />
+                      <Field
+                        name="department"
+                        label="Department"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="department"
+                        required
+                      />
+                      <Field
+                        name="organisation_address"
+                        label="Organization address"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="organisation-address"
+                        required
+                      />
+                      <Field
+                        name="position"
+                        label="Position"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="position"
+                        required
+                      />
+                    </Grid>
+                  </CardContent>
+                </Card>
 
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Personal details
-                </Typography>
-
-                <CardContent>
-                  <FormikDropdown
-                    name="user_title"
-                    label="Title"
-                    items={[
-                      { text: "Ms.", value: "Ms." },
-                      { text: "Mr.", value: "Mr." },
-                      { text: "Dr.", value: "Dr." },
-                      { text: "Prof.", value: "Prof." },
-                      { text: "Rather not say", value: "unspecified" }
-                    ]}
-                    data-cy="title"
-                  />
+                <Card className={classes.card}>
+                  <Typography className={classes.cardHeader}>
+                    Contact details
+                  </Typography>
+                  <CardContent>
+                    <Grid container spacing={1}>
+                      <Field
+                        name="telephone"
+                        label="Telephone"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="telephone"
+                        required
+                      />
+                      <Field
+                        name="telephone_alt"
+                        label="Telephone Alt."
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="telephone-alt"
+                      />
+                    </Grid>
+                  </CardContent>
+                </Card>
+                {loadingPrivacyContent ? null : (
                   <Field
-                    name="firstname"
-                    label="Firstname"
-                    type="text"
-                    component={TextField}
+                    name="privacy_agreement"
+                    className={classes.agreeBox}
+                    component={CheckboxWithLabel}
+                    Label={{
+                      classes: { label: classes.agreeBox },
+                      label: (
+                        <>
+                          I confirm that I have read, consent and agree to the
+                          DEMAX
+                          <InformationModal
+                            text={privacyPageContent}
+                            linkText={"Privacy Statement"}
+                          />
+                        </>
+                      )
+                    }}
                     margin="normal"
                     fullWidth
-                    data-cy="firstname"
+                    data-cy="privacy-agreement"
                   />
+                )}
+                {loadingCookieContent ? null : (
                   <Field
-                    name="middlename"
-                    label="Middle name"
-                    type="text"
-                    component={TextField}
+                    name="cookie_policy"
+                    className={classes.agreeBox}
+                    component={CheckboxWithLabel}
+                    Label={{
+                      classes: { label: classes.agreeBox },
+                      label: (
+                        <>
+                          I consent to the DEMAX
+                          <InformationModal
+                            text={cookiePageContent}
+                            linkText={"Cookie policy"}
+                          />
+                        </>
+                      )
+                    }}
                     margin="normal"
                     fullWidth
-                    data-cy="middlename"
+                    data-cy="cookie-policy"
                   />
-                  <Field
-                    name="lastname"
-                    label="Lastname"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="lastname"
-                  />
-                  <Field
-                    name="preferredname"
-                    label="Preferred name"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="preferredname"
-                  />
-                  <FormikDropdown
-                    name="gender"
-                    label="Gender"
-                    items={[
-                      { text: "Female", value: "female" },
-                      { text: "Male", value: "male" },
-                      { text: "Other", value: "other" }
-                    ]}
-                    data-cy="gender"
-                  />
-                  <FormikDropdown
-                    name="nationality"
-                    label="Nationality"
-                    items={nationalitiesList}
-                    data-cy="nationality"
-                  />
-                  <Field
-                    name="birthdate"
-                    label="Birthdate"
-                    type="date"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="birthdate"
-                  />
-                </CardContent>
-              </Card>
-
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Organization details
-                </Typography>
-                <CardContent>
-                  <Grid container spacing={1}>
-                    <Field
-                      name="organisation"
-                      label="Organisation"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="organisation"
-                    />
-                    <Field
-                      name="department"
-                      label="Department"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="department"
-                    />
-                    <Field
-                      name="organisation_address"
-                      label="Organization address"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="organisation-address"
-                    />
-                    <Field
-                      name="position"
-                      label="Position"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="position"
-                    />
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              <Card className={classes.card}>
-                <Typography className={classes.cardHeader}>
-                  Contact details
-                </Typography>
-                <CardContent>
-                  <Grid container spacing={1}>
-                    <Field
-                      name="telephone"
-                      label="Telephone"
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="telephone"
-                    />
-                    <Field
-                      name="telephone_alt"
-                      label="Telephone Alt."
-                      type="text"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="telephone-alt"
-                    />
-                  </Grid>
-                </CardContent>
-              </Card>
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                data-cy="submit"
-              >
-                Sign Up
-              </Button>
-            </React.Fragment>
-          )}
-          <Grid container>
-            <Grid item>
-              <Link to="/SignIn/">
-                {userID ? "Click here for sign in" : "Have an account? Sign In"}
-              </Link>
+                )}
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  data-cy="submit"
+                  disabled={!values.privacy_agreement || !values.cookie_policy}
+                >
+                  Sign Up
+                </Button>
+              </React.Fragment>
+            )}
+            <Grid container>
+              <Grid item>
+                <Link to="/SignIn/">
+                  {userID
+                    ? "Click here for sign in"
+                    : "Have an account? Sign In"}
+                </Link>
+              </Grid>
             </Grid>
-          </Grid>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </Container>
   );

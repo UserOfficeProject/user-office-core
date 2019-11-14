@@ -17,6 +17,7 @@ class FormikDropdown extends React.Component<TProps> {
           shrink: true
         }}
         fullWidth
+        required={this.props.required}
       >
         {this.props.children}
         {this.props.items.map(option => {
@@ -35,6 +36,7 @@ interface TProps {
   items: Option[];
   name: string;
   label: string;
+  required?: boolean;
 }
 
 interface Option {
