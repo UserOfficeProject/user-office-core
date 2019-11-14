@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { request } from "graphql-request";
 
 export function useGetPageContent(pageName) {
-  const sendRequest = useDataAPI();
   const [pageContent, setPageContent] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -15,11 +14,11 @@ export function useGetPageContent(pageName) {
       id: pageName
     };
     setLoading(true);
-    sendRequest(query, variables).then(data => {
+    request("/graphql", query, variables).then(data => {
       setPageContent(data.getPageContent);
       setLoading(false);
     });
-  }, [pageName, sendRequest]);
+  }, [pageName]);
 
   return [loading, pageContent];
 }

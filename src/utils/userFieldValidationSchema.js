@@ -60,18 +60,22 @@ export const userFieldSchema = Yup.object().shape({
     }),
   telephone: Yup.string()
     .min(2, "telephone must be at least 2 characters")
-    .max(20, "telephone must be at most 20 characters")
+    .max(30, "telephone must be at most 20 characters")
     .required("telephone must be at least 2 characters"),
   telephone_alt: Yup.string()
     .min(2, "telephone must be at least 2 characters")
-    .max(20, "telephone must be at most 20 characters")
+    .max(30, "telephone must be at most 20 characters")
 });
 
 export const userPasswordFieldSchema = Yup.object().shape({
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .max(25, "Password must be at most 25 characters")
-    .required("Password must be at least 8 characters"),
+    .required(
+      "Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+    )
+    .matches(
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{12,}$/,
+      "Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+    ),
   confirmPassword: Yup.string()
     .required()
     .label("Confirm password")

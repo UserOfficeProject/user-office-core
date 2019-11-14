@@ -47,14 +47,24 @@ export default function PageEditor() {
   const classes = useStyles();
   const [homeContent, setHomeContent] = useState("");
   const [helpContent, setHelpContent] = useState("");
+  const [privacyContent, setPrivacyContent] = useState("");
+  const [cookieContent, setCookieContent] = useState("");
   const [loadingHelpContent, helpPageContent] = useGetPageContent("HELPPAGE");
   const [loadingHomeContent, homePageContent] = useGetPageContent("HOMEPAGE");
+  const [loadingPrivacyContent, privacyPageContent] = useGetPageContent(
+    "PRIVACYPAGE"
+  );
+  const [loadingCookieContent, cookiePageContent] = useGetPageContent(
+    "COOKIEPAGE"
+  );
   const sendPageContent = useSetPageContent();
 
   useEffect(() => {
     setHelpContent(helpPageContent);
     setHomeContent(homePageContent);
-  }, [helpPageContent, homePageContent]);
+    setPrivacyContent(privacyPageContent);
+    setCookieContent(cookiePageContent);
+  }, [helpPageContent, homePageContent, privacyPageContent, cookiePageContent]);
 
   const [state, setState] = useState({
     open: false,
@@ -145,6 +155,64 @@ export default function PageEditor() {
             color="primary"
             className={classes.button}
             onClick={() => handleClick("HELPPAGE", helpContent)}
+          >
+            Update
+          </Button>
+        </div>
+      </Paper>
+      <Paper className={classes.paper}>
+        <Typography variant="h6" gutterBottom>
+          Set privacy agreement
+        </Typography>
+        <Divider />
+        {loadingPrivacyContent ? null : (
+          <Editor
+            initialValue={privacyContent}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ["link", "preview", "image", "code"],
+              toolbar: "bold italic",
+              branding: false
+            }}
+            onEditorChange={content => setPrivacyContent(content)}
+          />
+        )}
+        <div className={classes.buttons}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => handleClick("PRIVACYPAGE", privacyContent)}
+          >
+            Update
+          </Button>
+        </div>
+      </Paper>
+      <Paper className={classes.paper}>
+        <Typography variant="h6" gutterBottom>
+          Set cookie policy
+        </Typography>
+        <Divider />
+        {loadingCookieContent ? null : (
+          <Editor
+            initialValue={cookieContent}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ["link", "preview", "image", "code"],
+              toolbar: "bold italic",
+              branding: false
+            }}
+            onEditorChange={content => setCookieContent(content)}
+          />
+        )}
+        <div className={classes.buttons}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={() => handleClick("COOKIEPAGE", cookieContent)}
           >
             Update
           </Button>
