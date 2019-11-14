@@ -1,5 +1,5 @@
 import { EvaluatorOperator } from "./ConditionEvaluator";
-import { User } from "./User";
+import { User, BasicUserDetails } from "./User";
 import { Review } from "./Review";
 
 export class ProposalInformation {
@@ -7,7 +7,7 @@ export class ProposalInformation {
     public id: number,
     public title: string,
     public abstract: string,
-    public proposer: { id: number; firstname: string; surname: string },
+    public proposer: BasicUserDetails,
     public status: ProposalStatus,
     public created?: string,
     public updated?: string,

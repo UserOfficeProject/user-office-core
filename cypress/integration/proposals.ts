@@ -3,6 +3,11 @@ var faker = require("faker");
 context("Proposaltests", () => {
   beforeEach(() => {
     cy.visit("localhost:3000");
+    // slowExecutionMode();
+  });
+
+  afterEach(() => {
+    //cy.wait(2000);
   });
 
   var textId;
@@ -105,7 +110,7 @@ context("Proposaltests", () => {
   });
 
   it("User should be able to create proposal", () => {
-    cy.viewport(1100, 800);
+    cy.viewport(1100, 1000);
 
     cy.get("[data-cy=input-username] input")
       .type("testuser")
@@ -126,7 +131,9 @@ context("Proposaltests", () => {
     cy.get("[data-cy=co-proposers] button")
       .first()
       .click();
-    cy.get("[title='Add Participants']").click();
+    cy.get("[title='Add Participants']")
+      .first()
+      .click();
 
     cy.contains("Save and continue").click();
     cy.get(`#${textId}`).type(textAnswer);
@@ -149,4 +156,79 @@ context("Proposaltests", () => {
     cy.contains(title);
     cy.contains("Submitted");
   });
+
+  it("Office should be able to delete proposal", () => {
+    cy.viewport(1100, 1000);
+
+    cy.get("[data-cy=input-username] input")
+      .type("testofficer")
+      .should("have.value", "testofficer");
+
+    cy.get("[data-cy=input-password] input")
+      .type("Test1234!")
+      .should("have.value", "Test1234!");
+
+    cy.get("[data-cy=submit]").click();
+
+    cy.contains("View Proposals").click();
+
+    cy.get("[title=Delete] button")
+      .first()
+      .click();
+    cy.get("[title=Save] button")
+      .first()
+      .click();
+  });
+
+  it("Office should be able to delete proposal questions", () => {
+    cy.viewport(1100, 1000);
+
+    cy.get("[data-cy=input-username] input")
+      .type("testofficer")
+      .should("have.value", "testofficer");
+
+    cy.get("[data-cy=input-password] input")
+      .type("Test1234!")
+      .should("have.value", "Test1234!");
+
+    cy.get("[data-cy=submit]").click();
+
+    cy.contains("Edit Questionary").click();
+
+    cy.contains(textQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.contains(booleanQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.contains(dateQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.get("[data-cy=show-more-button]").click();
+    cy.contains("Delete topic").click();
+  });
 });
+
+function slowExecutionMode() {
+  const COMMAND_DELAY = 300;
+
+  for (const command of [
+    "visit",
+    "click",
+    "trigger",
+    "type",
+    "clear",
+    "reload",
+    "contains"
+  ]) {
+    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
+      const origVal = originalFn(...args);
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(origVal);
+        }, COMMAND_DELAY);
+      });
+    });
+  }
+}

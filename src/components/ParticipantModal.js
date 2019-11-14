@@ -7,8 +7,8 @@ import { AddBox } from "@material-ui/icons";
 function ParticipantModal(props) {
   const addUser = rowData => {
     props.addParticipant({
-      name: rowData.name,
-      surname: rowData.surname,
+      firstname: rowData.firstname,
+      lastname: rowData.lastname,
       username: rowData.username,
       organisation: rowData.organisation,
       id: rowData.id

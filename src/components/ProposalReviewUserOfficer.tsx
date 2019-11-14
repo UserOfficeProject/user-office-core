@@ -49,8 +49,8 @@ export default function ProposalReview({ match }: { match: any }) {
         proposalData.reviews!.map((review: any) => {
           const { firstname, lastname, id, username } = review.reviewer;
           return {
-            name: firstname,
-            surname: lastname,
+            firstname,
+            lastname,
             username,
             id,
             reviewID: review.id

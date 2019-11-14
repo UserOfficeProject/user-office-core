@@ -1,9 +1,8 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
 import { Questionary } from "../models/ProposalModel";
 
 export function useLoadProposal() {
-  const [loading] = useState(true);
   const sendRequest = useDataAPI();
 
   const loadProposal = useCallback(
@@ -19,6 +18,7 @@ export function useLoadProposal() {
                 id
                 firstname
                 lastname
+                organisation
               }
               users{
                 firstname
@@ -77,12 +77,13 @@ export function useLoadProposal() {
         proposer: {
           id: data.proposal.proposer.id,
           firstname: data.proposal.proposer.firstname,
-          surname: data.proposal.proposer.lastname
+          lastname: data.proposal.proposer.lastname,
+          organisation: data.proposal.proposer.organisation
         },
         users: data.proposal.users.map((user: any) => {
           return {
-            name: user.firstname,
-            surname: user.lastname,
+            firstname: user.firstname,
+            lastname: user.lastname,
             username: user.username,
             organisation: user.organisation,
             id: user.id
@@ -103,5 +104,5 @@ export function useLoadProposal() {
     [sendRequest]
   );
 
-  return { loading, loadProposal };
+  return { loadProposal };
 }

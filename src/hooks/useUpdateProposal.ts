@@ -16,10 +16,11 @@ export function useUpdateProposal() {
       topicsCompleted?: number[];
       status?: ProposalStatus;
       users?: number[];
+      proposerId?: number;
     }) => {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $status:Int, $users:[Int]) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, status:$status, users:$users){
+      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $status:Int, $users:[Int], $proposerId:Int) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, status:$status, users:$users, proposerId:$proposerId){
          proposal{
           id
         }

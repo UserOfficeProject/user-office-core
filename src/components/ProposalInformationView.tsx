@@ -11,17 +11,12 @@ import ProposalParticipants from "./ProposalParticipants";
 import { useCreateProposal } from "../hooks/useCreateProposal";
 import { makeStyles } from "@material-ui/core";
 import { UserContext } from "../context/UserContextProvider";
-import { User } from "../models/User";
-import { ProposalStatus } from "../models/ProposalModel";
+import { User, BasicUserDetails } from "../models/User";
+import { ProposalInformation } from "../models/ProposalModel";
+import ProposalParticipant from "./ProposalParticipant";
 
 export default function ProposalInformationView(props: {
-  data: {
-    users?: User[];
-    title: string;
-    abstract: string;
-    id: number;
-    status: ProposalStatus;
-  };
+  data: ProposalInformation;
   readonly?: boolean;
   disabled?: boolean;
   setIsDirty?: (val: boolean) => void;
@@ -37,6 +32,10 @@ export default function ProposalInformationView(props: {
     disabled: {
       pointerEvents: "none",
       opacity: 0.7
+    },
+    pi: {
+      marginTop: "30px",
+      marginBottom: "30px"
     }
   })();
 
@@ -48,11 +47,15 @@ export default function ProposalInformationView(props: {
     <Formik
       initialValues={{
         title: props.data.title,
-        abstract: props.data.abstract
+        abstract: props.data.abstract,
+        proposer: props.data.proposer
       }}
       onSubmit={async values => {
         const userIds = users.map(user => user.id);
-        if (users.length < 1) {
+        if (
+          values.proposer.id !== user.id &&
+          !users.some((curUser: BasicUserDetails) => curUser.id === user.id)
+        ) {
           setUserError(true);
         } else {
           var { id, status } = props.data;
@@ -64,7 +67,8 @@ export default function ProposalInformationView(props: {
             status: status,
             title: values.title,
             abstract: values.abstract,
-            users: userIds
+            users: userIds,
+            proposerId: values.proposer.id
           });
           api.next({
             ...values,
@@ -74,7 +78,8 @@ export default function ProposalInformationView(props: {
             proposer: {
               id: user.id,
               firstname: user.firstname,
-              surname: user.lastname
+              lastname: user.lastname,
+              organisation: user.organisation
             }
           });
         }
@@ -90,7 +95,14 @@ export default function ProposalInformationView(props: {
           .required("Abstract must be at least 20 characters")
       })}
     >
-      {({ values, errors, touched, handleChange, submitForm }) => (
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        submitForm,
+        setFieldValue
+      }) => (
         <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
             General Information
@@ -106,8 +118,8 @@ export default function ProposalInformationView(props: {
                 defaultValue={values.title}
                 fullWidth
                 onChange={e => {
-                  informDirty(true);
                   handleChange(e);
+                  informDirty(true);
                 }}
                 error={touched.title && errors !== undefined}
                 helperText={touched.title && errors.title && errors.title}
@@ -127,8 +139,8 @@ export default function ProposalInformationView(props: {
                 defaultValue={values.abstract}
                 fullWidth
                 onChange={e => {
-                  informDirty(true);
                   handleChange(e);
+                  informDirty(true);
                 }}
                 error={touched.abstract && errors.abstract !== undefined}
                 helperText={
@@ -138,11 +150,20 @@ export default function ProposalInformationView(props: {
               />
             </Grid>
           </Grid>
+          <ProposalParticipant
+            userChanged={(user: User) => {
+              setFieldValue("proposer", user);
+              informDirty(true);
+            }}
+            title="Principal investigator"
+            className={classes.pi}
+            userId={values.proposer.id}
+          />
           <ProposalParticipants
             error={userError}
             setUsers={(users: User[]) => {
-              informDirty(true);
               setUsers(users);
+              informDirty(true);
             }}
             users={users}
           />

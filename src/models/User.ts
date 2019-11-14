@@ -23,3 +23,12 @@ export class User {
     public updated: string
   ) {}
 }
+
+export class BasicUserDetails {
+  constructor(
+    public id: number,
+    public firstname: string,
+    public lastname: string,
+    public organisation: string
+  ) {}
+}

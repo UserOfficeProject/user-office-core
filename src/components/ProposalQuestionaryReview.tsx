@@ -51,13 +51,13 @@ export default function ProposaQuestionaryReview(
           </TableRow>
           <TableRow key="principalinvestigator">
             <TableCell>Principal Investigator</TableCell>
-            <TableCell>{`${props.data.proposer.firstname} ${props.data.proposer.surname}`}</TableCell>
+            <TableCell>{`${props.data.proposer.firstname} ${props.data.proposer.lastname}`}</TableCell>
           </TableRow>
           <TableRow key="coproposers">
             <TableCell>Co-Proposers</TableCell>
             <TableCell>
               {props.data
-                .users!.map((user: any) => ` ${user.name} ${user.surname}`)
+                .users!.map((user: any) => ` ${user.name} ${user.lastname}`)
                 .toString()}
             </TableCell>
           </TableRow>

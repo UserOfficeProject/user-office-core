@@ -14,6 +14,12 @@ export function useBlankProposal() {
           id
           status
           shortCode
+          proposer {
+            id
+            firstname
+            lastname
+            organisation
+          }
           questionary {
             steps {
               topic {
