@@ -3,17 +3,16 @@ const faker = require("faker");
 
 context("User tests", () => {
   beforeEach(() => {
-    cy.visit("localhost:3000");
+    cy.visit("localhost:3000/SignUp?code=WRMVXa");
   });
 
   // Login details
-  const userName = faker.internet.userName();
   const password = faker.internet.password();
 
   // Personal details
-  const title = "Mr.";
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
+
   const middleName = faker.name.firstName();
   const birthDate = faker.date
     .past()
@@ -32,34 +31,34 @@ context("User tests", () => {
   const telephoneAlt = faker.phone.phoneNumber();
 
   it("A user should be able to create a new account", () => {
-    cy.get("[data-cy=create-account]").click();
-
-    // Login details
-    cy.get("[data-cy=username] input")
-      .type(userName)
-      .should("have.value", userName);
+    cy.get("[data-cy=email] input")
+      .type(email)
+      .should("have.value", email);
 
     cy.get("[data-cy=password] input")
       .type(password)
       .should("have.value", password);
 
+    cy.get("[data-cy=confirmPassword] input")
+      .type(password)
+      .should("have.value", password);
+
     // Personal details
     cy.get("#select-user_title").click();
-
-    cy.contains("Mr.").click();
-
     cy.get("[data-cy=firstname] input")
+      .clear()
       .type(firstName)
       .should("have.value", firstName);
+
+    cy.contains("Mr.").click();
 
     cy.get("[data-cy=middlename] input")
       .type(middleName)
       .should("have.value", middleName);
-
     cy.get("[data-cy=lastname] input")
+      .clear()
       .type(lastName)
       .should("have.value", lastName);
-
     cy.get("[data-cy=preferredname] input")
       .type(firstName)
       .should("have.value", firstName);
@@ -77,9 +76,6 @@ context("User tests", () => {
       .should("have.value", birthDate);
 
     //Organization details
-    cy.get("[data-cy=orcid] input")
-      .type("0000-0000-0000-0000")
-      .should("have.value", "0000-0000-0000-0000");
 
     cy.get("[data-cy=organisation] input")
       .type(organisation)
@@ -98,9 +94,6 @@ context("User tests", () => {
       .should("have.value", position);
 
     //Contact details
-    cy.get("[data-cy=email] input")
-      .type(email)
-      .should("have.value", email);
 
     cy.get("[data-cy=telephone] input")
       .type(telephone)
@@ -119,9 +112,11 @@ context("User tests", () => {
   });
 
   it("A user should be able to login and out", () => {
-    cy.get("[data-cy=input-username] input")
-      .type(userName)
-      .should("have.value", userName);
+    cy.contains("Have an account? Sign In").click();
+
+    cy.get("[data-cy=input-email] input")
+      .type(email)
+      .should("have.value", email);
 
     cy.get("[data-cy=input-password] input")
       .type(password)

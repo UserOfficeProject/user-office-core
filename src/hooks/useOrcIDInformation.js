@@ -18,6 +18,7 @@ export function useOrcIDInformation(authorizationCode) {
       orcid
       orcidHash
       refreshToken
+      registered
      }
   }`;
     if (authorizationCode === undefined) {
