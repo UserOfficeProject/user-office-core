@@ -184,7 +184,7 @@ async function resolveProposal(
     agent,
     proposal.proposer
   );
-  if (isRejection(proposer)) {
+  if (proposer === null) {
     return rejection("NO_PROPOSER_ON_THE_PROPOSAL");
   }
 
