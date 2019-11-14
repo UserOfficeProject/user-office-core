@@ -200,6 +200,8 @@ export default function ProfilePage({ match, history }) {
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Formik
+                validateOnChange={false}
+                validateOnBlur={false}
                 initialValues={{
                   username: userData.username,
                   firstname: userData.firstname,
@@ -216,6 +218,7 @@ export default function ProfilePage({ match, history }) {
                   department: userData.department,
                   organisation_address: userData.organisation_address,
                   position: userData.position,
+                  oldEmail: userData.email,
                   email: userData.email,
                   telephone: userData.telephone,
                   telephone_alt: userData.telephone_alt,
@@ -223,6 +226,7 @@ export default function ProfilePage({ match, history }) {
                 }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
+                  actions.setFieldValue("oldEmail", values.email);
                   actions.setSubmitting(false);
                 }}
                 validationSchema={userFieldSchema}

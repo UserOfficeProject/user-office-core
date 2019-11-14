@@ -53,6 +53,9 @@ const useStyles = makeStyles(theme => ({
   errorBox: {
     border: "2px solid red"
   },
+  errorText: {
+    color: "red"
+  },
   orcButton: {
     "&:hover": {
       border: "1px solid #338caf",
@@ -108,7 +111,6 @@ export default function SignUp(props) {
                             $firstname: String!, 
                             $middlename: String, 
                             $lastname: String!, 
-                            $username: String!, 
                             $password: String!,
                             $preferredname: String,
                             $orcid: String!,
@@ -131,7 +133,6 @@ export default function SignUp(props) {
                               firstname: $firstname, 
                               middlename: $middlename, 
                               lastname: $lastname, 
-                              username: $username, 
                               password: $password,
                               preferredname: $preferredname
                               orcid: $orcid
@@ -167,12 +168,13 @@ export default function SignUp(props) {
   return (
     <Container component="main" maxWidth="xs">
       <Formik
+        validateOnChange={false}
+        validateOnBlur={false}
         initialValues={{
           user_title: "",
           firstname: orcData ? orcData.firstname : "",
           middlename: "",
           lastname: orcData ? orcData.lastname : "",
-          username: "",
           password: "",
           preferredname: "",
           gender: "",
@@ -190,7 +192,7 @@ export default function SignUp(props) {
           telephone_alt: ""
         }}
         onSubmit={async (values, actions) => {
-          if (orcData && orcData.orcid) {
+          if (orcData && orcData.orcid && !orcData.registered) {
             await sendSignUpRequest(values);
           } else {
             setOrcidError(true);
@@ -225,11 +227,10 @@ export default function SignUp(props) {
                   {orcData ? "Found OrcID" : "Register OrcID"}
                 </Typography>
                 <CardContent>
-                  {orcData ? (
+                  {orcData && !orcData.registered ? (
                     <p>{orcData.orcid}</p>
                   ) : (
                     <React.Fragment>
-                      {orcidError ? "OrcID is require" : ""}
                       <p>
                         ESS is collecting your ORCID iD so we can verify and
                         update your record. When you click the “Register”
@@ -264,20 +265,27 @@ export default function SignUp(props) {
                   )}
                 </CardContent>
               </Card>
+              {orcidError && (
+                <p className={classes.errorText}>OrcID is require</p>
+              )}
+              {orcData && orcData.registered && (
+                <p className={classes.errorText}>
+                  OrcID has been registered before
+                </p>
+              )}
               <Card className={classes.card}>
                 <Typography className={classes.cardHeader}>
                   Login details
                 </Typography>
                 <CardContent>
                   <Field
-                    name="username"
-                    label="Username"
-                    type="text"
+                    name="email"
+                    label="E-mail"
+                    type="email"
                     component={TextField}
                     margin="normal"
                     fullWidth
-                    autoComplete="off"
-                    data-cy="username"
+                    data-cy="email"
                   />
                   <Field
                     name="password"
@@ -437,15 +445,6 @@ export default function SignUp(props) {
                 <CardContent>
                   <Grid container spacing={1}>
                     <Field
-                      name="email"
-                      label="E-mail"
-                      type="email"
-                      component={TextField}
-                      margin="normal"
-                      fullWidth
-                      data-cy="email"
-                    />
-                    <Field
                       name="telephone"
                       label="Telephone"
                       type="text"
@@ -482,7 +481,7 @@ export default function SignUp(props) {
           <Grid container>
             <Grid item>
               <Link to="/SignIn/">
-                {userID ? "Click here for sign in" : "Have an account? Sign I"}
+                {userID ? "Click here for sign in" : "Have an account? Sign In"}
               </Link>
             </Grid>
           </Grid>

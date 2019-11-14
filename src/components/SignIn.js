@@ -45,10 +45,10 @@ export default function SignInSide() {
   const { handleLogin, token } = useContext(UserContext);
 
   const requestToken = values => {
-    const { username, password } = values;
+    const { email, password } = values;
     const query = `
-    mutation($username: String!, $password: String!){
-      login(username: $username, password: $password){
+    mutation($email: String!, $password: String!){
+      login(email: $email, password: $password){
         token
         error
       }
@@ -56,7 +56,7 @@ export default function SignInSide() {
     `;
 
     const variables = {
-      username,
+      email,
       password
     };
 
@@ -65,8 +65,8 @@ export default function SignInSide() {
         if (!data.login.error) {
           handleLogin(data.login.token);
         } else {
-          if (data.login.error === "WRONG_USERNAME_OR_PASSWORD") {
-            setErrorMessage("Wrong password or username");
+          if (data.login.error === "WRONG_EMAIL_OR_PASSWORD") {
+            setErrorMessage("Wrong password or email");
           } else if (data.login.error === "EMAIL_NOT_VERIFIED") {
             setErrorMessage("Verify email before login");
           }
@@ -89,10 +89,7 @@ export default function SignInSide() {
           actions.setSubmitting(false);
         }}
         validationSchema={Yup.object().shape({
-          username: Yup.string()
-            .min(2, "Username must be at least 2 characters")
-            .max(20, "Username must be at most 20 characters")
-            .required("Username must be at least 2 characters"),
+          email: Yup.string().email(),
           password: Yup.string()
             .min(8, "Password must be at least 8 characters")
             .max(25, "Password must be at most 25 characters")
@@ -109,13 +106,13 @@ export default function SignInSide() {
               Sign in
             </Typography>
             <Field
-              name="username"
-              label="Username"
+              name="email"
+              label="Email"
               type="text"
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="input-username"
+              data-cy="input-email"
             />
             <Field
               name="password"
