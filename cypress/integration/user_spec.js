@@ -7,7 +7,7 @@ context("User tests", () => {
   });
 
   // Login details
-  const password = faker.internet.password();
+  const password = "aslaksjdajsl9#ASdADSlk!";
 
   // Personal details
   const firstName = faker.name.firstName();
@@ -102,6 +102,10 @@ context("User tests", () => {
     cy.get("[data-cy=telephone-alt] input")
       .type(telephoneAlt)
       .should("have.value", telephoneAlt);
+
+    cy.get("[data-cy=privacy-agreement] input").click();
+
+    cy.get("[data-cy=cookie-policy] input").click();
 
     //Submit
     cy.get("[data-cy=submit]").click();
