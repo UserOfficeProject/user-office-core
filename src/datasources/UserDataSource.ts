@@ -3,10 +3,13 @@ import { Role } from "../models/Role";
 import { Review } from "../models/Review";
 
 export interface UserDataSource {
+  checkEmailExist(email: string): Promise<Boolean | null>;
+  checkOrcIDExist(orcID: string): Promise<Boolean | null>;
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
-  getByEmail(email: String): Promise<User | null>;
+  getByEmail(email: string): Promise<User | null>;
+  getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
   getUsers(
     filter?: string,
