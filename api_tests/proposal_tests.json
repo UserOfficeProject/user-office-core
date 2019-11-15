@@ -79,8 +79,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($username: String!, $password: String!) {\n  login(username: $username, password: $password) {\n    token\n    error\n  }\n}\n",
-						"variables": "{\n    \"username\": \"testuser\",\n    \"password\": \"Test1234!\"\n  }"
+						"query": "mutation ($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    token\n    error\n  }\n}\n",
+						"variables": "{\n    \"email\": \"Javon4@hotmail.com\",\n    \"password\": \"Test1234!\"\n  }"
 					},
 					"options": {
 						"raw": {
