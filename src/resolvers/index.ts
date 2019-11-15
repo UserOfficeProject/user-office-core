@@ -158,7 +158,9 @@ interface CreateUserArgs {
 
 enum PageName {
   HOMEPAGE = 1,
-  HELPPAGE = 2
+  HELPPAGE = 2,
+  PRIVACYPAGE = 3,
+  COOKIEPAGE = 4
 }
 
 async function resolveProposal(
@@ -639,9 +641,6 @@ export default {
     );
   },
   getPageContent(args: { id: PageName }, context: ResolverContext) {
-    return context.queries.admin.getPageText(
-      context.user,
-      parseInt(PageName[args.id])
-    );
+    return context.queries.admin.getPageText(parseInt(PageName[args.id]));
   }
 };

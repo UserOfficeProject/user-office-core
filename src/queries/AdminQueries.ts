@@ -8,10 +8,7 @@ export default class AdminQueries {
     private userAuth: UserAuthorization
   ) {}
 
-  async getPageText(agent: User | null, id: number): Promise<String | null> {
-    if (agent == null) {
-      return null;
-    }
+  async getPageText(id: number): Promise<String | null> {
     return await this.dataSource.get(id);
   }
 }
