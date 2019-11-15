@@ -14,6 +14,7 @@ export function useLoadProposal() {
               title
               abstract
               status
+              shortCode
               proposer{
                 id
                 firstname
@@ -74,6 +75,7 @@ export function useLoadProposal() {
         abstract: data.proposal.abstract,
         id: data.proposal.id,
         status: data.proposal.status,
+        shortCode: data.proposal.shortCode,
         proposer: {
           id: data.proposal.proposer.id,
           firstname: data.proposal.proposer.firstname,

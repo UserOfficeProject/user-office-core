@@ -77,6 +77,7 @@ export function useProposalData(id: number) {
           abstract: data.proposal.abstract,
           id: data.proposal.id,
           status: data.proposal.status,
+          shortCode: data.proposal.shortCode,
           proposer: {
             id: data.proposal.proposer.id,
             firstname: data.proposal.proposer.firstname,
