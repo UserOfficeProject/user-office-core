@@ -25,6 +25,10 @@ export default class UserQueries {
     }
   }
 
+  async checkEmailExist(agent: User | null, email: string) {
+    return this.dataSource.checkEmailExist(email);
+  }
+
   async getOrcIDAccessToken(authorizationCode: string) {
     var options = {
       method: "POST",
@@ -52,10 +56,24 @@ export default class UserQueries {
   }
 
   async getOrcIDInformation(user: User | null, authorizationCode: string) {
+    // If in development fake response
+    if (process.env.NODE_ENV === "development") {
+      return {
+        orcid: "0000-0000-0000-0000",
+        orcidHash: "asdadgiuerervnaofhioa",
+        refreshToken: "asdadgiuerervnaofhioa",
+        firstname: "Kalle",
+        lastname: "Kallesson",
+        registered: false
+      };
+    }
+
     const orcData = await this.getOrcIDAccessToken(authorizationCode);
     if (!orcData) {
       return null;
     }
+
+    const orcIDExist = await this.dataSource.checkOrcIDExist(orcData.orcid);
     var options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
@@ -79,7 +97,8 @@ export default class UserQueries {
             : null,
           lastname: resp.name["family-name"]
             ? resp.name["family-name"].value
-            : null
+            : null,
+          registered: orcIDExist
         };
       })
       .catch(function(err: any) {
@@ -113,6 +132,10 @@ export default class UserQueries {
     } else {
       return null;
     }
+  }
+
+  async getUser(id: number) {
+    return this.dataSource.get(id);
   }
 
   async getProposers(agent: User | null, proposalId: number) {

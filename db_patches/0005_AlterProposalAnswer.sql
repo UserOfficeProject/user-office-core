@@ -6,4 +6,4 @@ purpose:
 date:
     06.nov.2019
 */
-ALTER TABLE proposal_answers ALTER COLUMN config TYPE TEXT;
+ALTER TABLE proposal_answers ALTER COLUMN answer TYPE TEXT;

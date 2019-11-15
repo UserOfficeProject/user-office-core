@@ -113,7 +113,7 @@ interface UserArgs {
 }
 
 interface LoginArgs {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -179,7 +179,7 @@ async function resolveProposal(
     return users;
   }
 
-  const proposer = await context.queries.user.get(agent, proposal.proposer);
+  const proposer = await context.queries.user.getUser(proposal.proposer);
   if (!proposer) {
     rejection("NO_PROPOSER_ON_THE_PROPOSAL");
   }
@@ -496,7 +496,7 @@ export default {
 
   login(args: LoginArgs, context: ResolverContext) {
     return wrapLoginMutation(
-      context.mutations.user.login(args.username, args.password)
+      context.mutations.user.login(args.email, args.password)
     );
   },
 
@@ -539,7 +539,6 @@ export default {
       args.firstname,
       args.middlename,
       args.lastname,
-      args.username,
       args.password,
       args.preferredname,
       args.orcid,
@@ -576,6 +575,10 @@ export default {
     context: ResolverContext
   ) {
     return context.mutations.user.resetPassword(args.token, args.password);
+  },
+
+  checkEmailExist(args: { email: string }, context: ResolverContext) {
+    return context.queries.user.checkEmailExist(context.user, args.email);
   },
 
   updatePassword(

@@ -32,6 +32,36 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.updated_at.toISOString()
     );
   }
+
+  checkEmailExist(email: string): Promise<Boolean | null> {
+    return database
+      .select()
+      .from("users")
+      .where("email", email)
+      .first()
+      .then((user: any) => (user ? true : false))
+      .catch(() => null);
+  }
+
+  checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+    return database
+      .select()
+      .from("users")
+      .where("orcid", orcID)
+      .first()
+      .then((user: any) => (user ? true : false))
+      .catch(() => null);
+  }
+
+  getPasswordByEmail(email: string): Promise<string | null> {
+    return database
+      .select("password")
+      .from("users")
+      .where("email", email)
+      .first()
+      .then((user: any) => user.password);
+  }
+
   getPasswordByUsername(username: string): Promise<string | null> {
     return database
       .select("password")
