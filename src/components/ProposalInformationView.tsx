@@ -105,7 +105,7 @@ export default function ProposalInformationView(props: {
       }) => (
         <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
-            General Information
+            Proposal information
           </Typography>
           <Grid container spacing={3}>
             <Grid item xs={12}>
