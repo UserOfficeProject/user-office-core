@@ -246,7 +246,16 @@ export default function SignUp(props) {
                   })}
                 >
                   <Typography className={classes.cardHeader}>
-                    {orcData ? "Found OrcID" : "Register OrcID"}
+                    {orcData ? (
+                      "Found OrcID"
+                    ) : (
+                      <>
+                        Register OrcID
+                        <span class="MuiFormLabel-asterisk MuiInputLabel-asterisk">
+                          &thinsp;*
+                        </span>
+                      </>
+                    )}
                   </Typography>
                   <CardContent>
                     {orcData && !orcData.registered ? (
@@ -309,6 +318,7 @@ export default function SignUp(props) {
                       fullWidth
                       data-cy="email"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="password"
@@ -321,6 +331,7 @@ export default function SignUp(props) {
                       data-cy="password"
                       helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="confirmPassword"
@@ -332,6 +343,7 @@ export default function SignUp(props) {
                       autoComplete="off"
                       data-cy="confirmPassword"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                   </CardContent>
                 </Card>
@@ -354,6 +366,7 @@ export default function SignUp(props) {
                       ]}
                       data-cy="title"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="firstname"
@@ -364,6 +377,7 @@ export default function SignUp(props) {
                       fullWidth
                       data-cy="firstname"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="middlename"
@@ -373,6 +387,7 @@ export default function SignUp(props) {
                       margin="normal"
                       fullWidth
                       data-cy="middlename"
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="lastname"
@@ -383,6 +398,7 @@ export default function SignUp(props) {
                       fullWidth
                       data-cy="lastname"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="preferredname"
@@ -392,6 +408,7 @@ export default function SignUp(props) {
                       margin="normal"
                       fullWidth
                       data-cy="preferredname"
+                      disabled={!orcData || orcData.registered}
                     />
                     <FormikDropdown
                       name="gender"
@@ -403,6 +420,7 @@ export default function SignUp(props) {
                       ]}
                       data-cy="gender"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     {values.gender === "other" && (
                       <Field
@@ -414,6 +432,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="othergender"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                     )}
                     <FormikDropdown
@@ -422,6 +441,7 @@ export default function SignUp(props) {
                       items={nationalitiesList}
                       data-cy="nationality"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                     <Field
                       name="birthdate"
@@ -432,6 +452,7 @@ export default function SignUp(props) {
                       fullWidth
                       data-cy="birthdate"
                       required
+                      disabled={!orcData || orcData.registered}
                     />
                   </CardContent>
                 </Card>
@@ -451,6 +472,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="organisation"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                       <Field
                         name="department"
@@ -461,6 +483,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="department"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                       <Field
                         name="organisation_address"
@@ -471,6 +494,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="organisation-address"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                       <Field
                         name="position"
@@ -481,6 +505,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="position"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                     </Grid>
                   </CardContent>
@@ -501,6 +526,7 @@ export default function SignUp(props) {
                         fullWidth
                         data-cy="telephone"
                         required
+                        disabled={!orcData || orcData.registered}
                       />
                       <Field
                         name="telephone_alt"
@@ -510,6 +536,7 @@ export default function SignUp(props) {
                         margin="normal"
                         fullWidth
                         data-cy="telephone-alt"
+                        disabled={!orcData || orcData.registered}
                       />
                     </Grid>
                   </CardContent>
@@ -534,6 +561,7 @@ export default function SignUp(props) {
                   margin="normal"
                   fullWidth
                   data-cy="privacy-agreement"
+                  disabled={!orcData || orcData.registered}
                 />
                 <Field
                   name="cookie_policy"
@@ -554,6 +582,7 @@ export default function SignUp(props) {
                   margin="normal"
                   fullWidth
                   data-cy="cookie-policy"
+                  disabled={!orcData || orcData.registered}
                 />
                 <Button
                   type="submit"
