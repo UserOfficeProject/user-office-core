@@ -24,9 +24,9 @@ context("Proposaltests", () => {
   it("Should be able to modify proposal", () => {
     cy.viewport(1100, 800);
 
-    cy.get("[data-cy=input-username] input")
-      .type("testofficer")
-      .should("have.value", "testofficer");
+    cy.get("[data-cy=input-email] input")
+      .type("Aaron_Harris49@gmail.com")
+      .should("have.value", "Aaron_Harris49@gmail.com");
 
     cy.get("[data-cy=input-password] input")
       .type("Test1234!")
@@ -112,9 +112,9 @@ context("Proposaltests", () => {
   it("User should be able to create proposal", () => {
     cy.viewport(1100, 1000);
 
-    cy.get("[data-cy=input-username] input")
-      .type("testuser")
-      .should("have.value", "testuser");
+    cy.get("[data-cy=input-email] input")
+      .type("Javon4@hotmail.com")
+      .should("have.value", "Javon4@hotmail.com");
 
     cy.get("[data-cy=input-password] input")
       .type("Test1234!")
@@ -160,9 +160,9 @@ context("Proposaltests", () => {
   it("Office should be able to delete proposal", () => {
     cy.viewport(1100, 1000);
 
-    cy.get("[data-cy=input-username] input")
-      .type("testofficer")
-      .should("have.value", "testofficer");
+    cy.get("[data-cy=input-email] input")
+      .type("Aaron_Harris49@gmail.com")
+      .should("have.value", "Aaron_Harris49@gmail.com");
 
     cy.get("[data-cy=input-password] input")
       .type("Test1234!")
@@ -183,9 +183,9 @@ context("Proposaltests", () => {
   it("Office should be able to delete proposal questions", () => {
     cy.viewport(1100, 1000);
 
-    cy.get("[data-cy=input-username] input")
-      .type("testofficer")
-      .should("have.value", "testofficer");
+    cy.get("[data-cy=input-email] input")
+      .type("Aaron_Harris49@gmail.com")
+      .should("have.value", "Aaron_Harris49@gmail.com");
 
     cy.get("[data-cy=input-password] input")
       .type("Test1234!")
