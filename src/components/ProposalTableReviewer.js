@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { useUserData } from "../hooks/useUserData";
+import { useUserWithReviewsData } from "../hooks/useUserData";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
-  const { loading, userData } = useUserData(user.id);
+  const { loading, userData } = useUserWithReviewsData(user.id);
 
   const classes = useStyles();
 

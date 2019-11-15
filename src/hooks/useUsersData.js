@@ -28,8 +28,8 @@ export function useUsersData(filter) {
       setUsersData(
         data.users.users.map(user => {
           return {
-            name: user.firstname,
-            surname: user.lastname,
+            firstname: user.firstname,
+            lastname: user.lastname,
             username: user.username,
             organisation: user.organisation,
             id: user.id

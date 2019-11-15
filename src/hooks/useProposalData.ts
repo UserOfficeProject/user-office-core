@@ -80,12 +80,13 @@ export function useProposalData(id: number) {
           proposer: {
             id: data.proposal.proposer.id,
             firstname: data.proposal.proposer.firstname,
-            surname: data.proposal.proposer.lastname
+            lastname: data.proposal.proposer.lastname,
+            organisation: data.proposal.proposer.organisation
           },
           users: data.proposal.users.map((user: any) => {
             return {
-              name: user.firstname,
-              surname: user.lastname,
+              firstname: user.firstname,
+              lastname: user.lastname,
               username: user.username,
               organisation: user.organisation,
               id: user.id

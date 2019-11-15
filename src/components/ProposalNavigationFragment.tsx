@@ -3,9 +3,9 @@ import { Fragment } from "react";
 import React from "react";
 
 const ProposalNavigationFragment = (props: {
-  back: (() => void) | undefined;
-  reset: (() => void) | undefined;
-  next: (() => void) | undefined;
+  back?: () => void;
+  reset?: () => void;
+  next?: () => void;
   isLoading: boolean;
   backLabel?: string;
   nextLabel?: string;
