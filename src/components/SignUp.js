@@ -18,6 +18,7 @@ import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
 import InformationModal from "./InformationModal";
 import { useGetPageContent } from "../hooks/useGetPageContent";
+import FormLabel from "@material-ui/core/FormLabel";
 import orcid from "../images/orcid.png";
 import clsx from "clsx";
 import {
@@ -247,14 +248,9 @@ export default function SignUp(props) {
                 >
                   <Typography className={classes.cardHeader}>
                     {orcData ? (
-                      "Found OrcID"
+                      <FormLabel>Found OrcID</FormLabel>
                     ) : (
-                      <>
-                        Register OrcID
-                        <span class="MuiFormLabel-asterisk MuiInputLabel-asterisk">
-                          &thinsp;*
-                        </span>
-                      </>
+                      <FormLabel required> Register OrcID</FormLabel>
                     )}
                   </Typography>
                   <CardContent>
