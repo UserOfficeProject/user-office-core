@@ -9,10 +9,18 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalParticipants from "./ProposalParticipants";
 import { useCreateProposal } from "../hooks/useCreateProposal";
-import { makeStyles } from "@material-ui/core"
+import { makeStyles } from "@material-ui/core";
 import { UserContext } from "../context/UserContextProvider";
+import { User, BasicUserDetails } from "../models/User";
+import { ProposalInformation } from "../models/ProposalModel";
+import ProposalParticipant from "./ProposalParticipant";
 
-export default function ProposalInformationView(props) {
+export default function ProposalInformationView(props: {
+  data: ProposalInformation;
+  readonly?: boolean;
+  disabled?: boolean;
+  setIsDirty?: (val: boolean) => void;
+}) {
   const api = useContext(FormApi);
   const { loading: updatingProposal, updateProposal } = useUpdateProposal();
   const { loading: creatingProposal, createProposal } = useCreateProposal();
@@ -24,18 +32,30 @@ export default function ProposalInformationView(props) {
     disabled: {
       pointerEvents: "none",
       opacity: 0.7
+    },
+    pi: {
+      marginTop: "30px",
+      marginBottom: "30px"
     }
   })();
+
+  const informDirty = (isDirty: boolean) => {
+    props.setIsDirty && props.setIsDirty(true);
+  };
 
   return (
     <Formik
       initialValues={{
         title: props.data.title,
-        abstract: props.data.abstract
+        abstract: props.data.abstract,
+        proposer: props.data.proposer
       }}
       onSubmit={async values => {
         const userIds = users.map(user => user.id);
-        if (users.length < 1) {
+        if (
+          values.proposer.id !== user.id &&
+          !users.some((curUser: BasicUserDetails) => curUser.id === user.id)
+        ) {
           setUserError(true);
         } else {
           var { id, status } = props.data;
@@ -47,7 +67,8 @@ export default function ProposalInformationView(props) {
             status: status,
             title: values.title,
             abstract: values.abstract,
-            users: userIds
+            users: userIds,
+            proposerId: values.proposer.id
           });
           api.next({
             ...values,
@@ -57,7 +78,8 @@ export default function ProposalInformationView(props) {
             proposer: {
               id: user.id,
               firstname: user.firstname,
-              surname: user.lastname
+              lastname: user.lastname,
+              organisation: user.organisation
             }
           });
         }
@@ -73,7 +95,14 @@ export default function ProposalInformationView(props) {
           .required("Abstract must be at least 20 characters")
       })}
     >
-      {({ values, errors, touched, handleChange, submitForm }) => (
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        submitForm,
+        setFieldValue
+      }) => (
         <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
             General Information
@@ -89,11 +118,12 @@ export default function ProposalInformationView(props) {
                 defaultValue={values.title}
                 fullWidth
                 onChange={e => {
-                  props.setIsDirty(true);
                   handleChange(e);
+                  informDirty(true);
                 }}
-                error={touched.title && errors.title}
+                error={touched.title && errors !== undefined}
                 helperText={touched.title && errors.title && errors.title}
+                data-cy="title"
               />
             </Grid>
             <Grid item xs={12}>
@@ -109,21 +139,31 @@ export default function ProposalInformationView(props) {
                 defaultValue={values.abstract}
                 fullWidth
                 onChange={e => {
-                  props.setIsDirty(true);
                   handleChange(e);
+                  informDirty(true);
                 }}
-                error={touched.abstract && errors.abstract}
+                error={touched.abstract && errors.abstract !== undefined}
                 helperText={
                   touched.abstract && errors.abstract && errors.abstract
                 }
+                data-cy="abstract"
               />
             </Grid>
           </Grid>
+          <ProposalParticipant
+            userChanged={(user: User) => {
+              setFieldValue("proposer", user);
+              informDirty(true);
+            }}
+            title="Principal investigator"
+            className={classes.pi}
+            userId={values.proposer.id}
+          />
           <ProposalParticipants
             error={userError}
-            setUsers={users => {
-              props.setIsDirty(true);
+            setUsers={(users: User[]) => {
               setUsers(users);
+              informDirty(true);
             }}
             users={users}
           />

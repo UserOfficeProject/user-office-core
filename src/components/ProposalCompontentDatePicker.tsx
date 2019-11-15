@@ -19,6 +19,7 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
     <FormControl error={isError}>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Field
+          data-cy={proposal_question_id + "_field"}
           name={proposal_question_id}
           label={question}
           component={({ field, form, ...other }: { field: any; form: any }) => {

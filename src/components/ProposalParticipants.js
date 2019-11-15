@@ -55,7 +55,7 @@ export default function ProposalParticipants(props) {
       />
       {props.error && (
         <p className={classes.errorText}>
-          You need to add at least one Co-Proposer
+          You must be part of the proposal. Either add youself as Principal Investigator or a Co-Proposer!
         </p>
       )}
     </form>

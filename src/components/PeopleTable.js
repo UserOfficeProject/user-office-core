@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { makeStyles } from "@material-ui/styles";
 
 function sendUserRequest(
   searchQuery,
@@ -38,8 +39,8 @@ function sendUserRequest(
       totalCount: data.users.totalCount,
       data: data.users.users.map(user => {
         return {
-          name: user.firstname,
-          surname: user.lastname,
+          firstname: user.firstname,
+          lastname: user.lastname,
           organisation: user.organisation,
           id: user.id
         };
@@ -53,19 +54,31 @@ function PeopleTable(props) {
   const [loading, setLoading] = useState(false);
 
   const columns = [
-    { title: "Name", field: "name" },
-    { title: "Surname", field: "surname" },
+    { title: "Name", field: "firstname" },
+    { title: "Surname", field: "lastname" },
     { title: "Organisation", field: "organisation" }
   ];
+
+  const classes = makeStyles({
+    tableWrapper: {
+      "& .MuiToolbar-gutters": {
+        paddingLeft: "0"
+      }
+    },
+
+  })();
+
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={props.title}
-      columns={columns}
-      data={
-        props.data
-          ? props.data
-          : query =>
+    <div data-cy='co-proposers' className={classes.tableWrapper}>
+      <MaterialTable
+        icons={tableIcons}
+        title={props.title}
+        columns={columns}
+
+        data={
+          props.data
+            ? props.data
+            : query =>
               sendUserRequest(
                 query,
                 sendRequest,
@@ -73,15 +86,15 @@ function PeopleTable(props) {
                 props.selectedUsers,
                 props.usersOnly
               )
-      }
-      isLoading={loading}
-      options={{
-        search: props.search,
-        debounceInterval: 400
-      }}
-      actions={
-        props.action
-          ? [
+        }
+        isLoading={loading}
+        options={{
+          search: props.search,
+          debounceInterval: 400
+        }}
+        actions={
+          props.action
+            ? [
               {
                 icon: () => props.actionIcon,
                 isFreeAction: props.isFreeAction,
@@ -89,20 +102,21 @@ function PeopleTable(props) {
                 onClick: (event, rowData) => props.action(rowData)
               }
             ]
-          : null
-      }
-      editable={
-        props.onRemove
-          ? {
+            : null
+        }
+        editable={
+          props.onRemove
+            ? {
               onRowDelete: oldData =>
                 new Promise(resolve => {
                   resolve();
                   props.onRemove(oldData);
                 })
             }
-          : null
-      }
-    />
+            : null
+        }
+      />
+    </div>
   );
 }
 
