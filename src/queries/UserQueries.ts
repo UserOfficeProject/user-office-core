@@ -1,5 +1,5 @@
 import { UserDataSource } from "../datasources/UserDataSource";
-import { User } from "../models/User";
+import { User, BasicUserDetails } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
 var rp = require("request-promise");
 import * as bcrypt from "bcryptjs";
@@ -23,6 +23,22 @@ export default class UserQueries {
     } else {
       return null;
     }
+  }
+
+  async getBasic(agent: User | null, id: number) {
+    if (!agent) {
+      return null;
+    }
+    const user = await this.dataSource.get(id);
+    if (!user) {
+      return null;
+    }
+    return new BasicUserDetails(
+      user.id,
+      user.firstname,
+      user.lastname,
+      user.organisation
+    );
   }
 
   async checkEmailExist(agent: User | null, email: string) {

@@ -7,7 +7,7 @@ import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
 export default class PostgresUserDataSource implements UserDataSource {
-  private createProposalObject(user: UserRecord) {
+  private createUserObject(user: UserRecord) {
     return new User(
       user.user_id,
       user.user_title,
@@ -184,7 +184,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("user_id", id)
       .first()
-      .then((user: UserRecord) => this.createProposalObject(user));
+      .then((user: UserRecord) => this.createUserObject(user));
   }
 
   async getByUsername(username: string) {
@@ -193,7 +193,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("username", username)
       .first()
-      .then((user: UserRecord) => this.createProposalObject(user))
+      .then((user: UserRecord) => this.createUserObject(user))
       .catch((error: any) => {
         return null;
       });
@@ -205,7 +205,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("email", email)
       .first()
-      .then((user: UserRecord) => this.createProposalObject(user))
+      .then((user: UserRecord) => this.createUserObject(user))
       .catch((error: any) => {
         return null;
       });
@@ -256,7 +256,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .returning(["*"])
       .into("users")
-      .then((user: UserRecord[]) => this.createProposalObject(user[0]))
+      .then((user: UserRecord[]) => this.createUserObject(user[0]))
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
         return user;
@@ -299,7 +299,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map(user => this.createProposalObject(user));
+        const users = usersRecord.map(user => this.createUserObject(user));
         return {
           totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
           users
@@ -326,7 +326,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
       .then((users: UserRecord[]) =>
-        users.map(user => this.createProposalObject(user))
+        users.map(user => this.createUserObject(user))
       );
   }
 }

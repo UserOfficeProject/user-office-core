@@ -50,6 +50,7 @@ interface UpdateProposalArgs {
   status: number;
   topicsCompleted: number[];
   users: number[];
+  proposerId: number;
 }
 
 interface UpdateProposalFilesArgs {
@@ -179,9 +180,12 @@ async function resolveProposal(
     return users;
   }
 
-  const proposer = await context.queries.user.getUser(proposal.proposer);
-  if (!proposer) {
-    rejection("NO_PROPOSER_ON_THE_PROPOSAL");
+  const proposer = await context.queries.user.getBasic(
+    agent,
+    proposal.proposer
+  );
+  if (proposer === null) {
+    return rejection("NO_PROPOSER_ON_THE_PROPOSAL");
   }
 
   const reviews = await context.queries.review.reviewsForProposal(agent, id);
@@ -198,7 +202,7 @@ async function resolveProposal(
     id,
     title,
     abstract,
-    proposer!,
+    proposer,
     status,
     created,
     updated,
@@ -398,7 +402,8 @@ export default {
       answers,
       topicsCompleted,
       status,
-      users
+      users,
+      proposerId
     } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
@@ -409,7 +414,8 @@ export default {
         answers,
         topicsCompleted,
         status,
-        users
+        users,
+        proposerId
       )
     );
   },
@@ -506,6 +512,10 @@ export default {
 
   user(args: UserArgs, context: ResolverContext) {
     return context.queries.user.get(context.user, parseInt(args.id));
+  },
+
+  basicUserDetails(args: UserArgs, context: ResolverContext) {
+    return context.queries.user.getBasic(context.user, parseInt(args.id));
   },
 
   getOrcIDInformation(
