@@ -58,9 +58,9 @@ export default function ProposalInformationView(props: {
         ) {
           setUserError(true);
         } else {
-          var { id, status } = props.data;
+          var { id, status, shortCode } = props.data;
           if (!id) {
-            ({ id, status } = await createProposal());
+            ({ id, status, shortCode } = await createProposal());
           }
           await updateProposal({
             id: id,
@@ -75,6 +75,7 @@ export default function ProposalInformationView(props: {
             id,
             status,
             users,
+            shortCode,
             proposer: {
               id: user.id,
               firstname: user.firstname,

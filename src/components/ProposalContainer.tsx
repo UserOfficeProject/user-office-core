@@ -48,7 +48,7 @@ export default function ProposalContainer(props: {
     variant: "success",
     message: ""
   });
-  const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
+  const isSubmitted = proposalInfo.status === ProposalStatus.Submitted;
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -71,6 +71,10 @@ export default function ProposalContainer(props: {
       minWidth: "450px",
       whiteSpace: "nowrap",
       overflow: "hidden"
+    },
+    infoline: {
+      color: theme.palette.grey[600],
+      textAlign: "right"
     }
   }))();
 
@@ -125,7 +129,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.GENERAL,
           "New Proposal",
-          proposalInfo.status !== ProposalStatus.BLANK,
+          proposalInfo.status !== ProposalStatus.Blank,
           (
             <ProposalInformationView
               data={proposalInfo}
@@ -138,7 +142,7 @@ export default function ProposalContainer(props: {
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
           let editable =
-            (index === 0 && proposalInfo.status !== ProposalStatus.BLANK) ||
+            (index === 0 && proposalInfo.status !== ProposalStatus.Blank) ||
             step.isCompleted ||
             (steps[index - 1] && steps[index - 1].isCompleted === true);
 
@@ -162,7 +166,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.REVIEW,
           "Review",
-          proposalInfo.status === ProposalStatus.SUBMITTED,
+          proposalInfo.status === ProposalStatus.Submitted,
           <ProposalReview data={proposalInfo} readonly={isSubmitted} />
         )
       );
@@ -233,6 +237,12 @@ export default function ProposalContainer(props: {
           >
             {proposalInfo.title || "New Proposal"}
           </Typography>
+          <div className={classes.infoline}>
+            {proposalInfo.shortCode ? `#${proposalInfo.shortCode}` : null}
+          </div>
+          <div className={classes.infoline}>
+            {ProposalStatus[proposalInfo.status]}
+          </div>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
             {proposalSteps.map((step, index, steps) => (
               <Step key={step.title}>
@@ -240,7 +250,7 @@ export default function ProposalContainer(props: {
                   onClick={async () => {
                     if (
                       !isDirty ||
-                      proposalInfo.status === ProposalStatus.BLANK ||
+                      proposalInfo.status === ProposalStatus.Blank ||
                       (await handleReset())
                     ) {
                       setStepIndex(index);
@@ -266,6 +276,7 @@ export default function ProposalContainer(props: {
               </Step>
             ))}
           </Stepper>
+
           {getStepContent(stepIndex)}
         </Paper>
       </FormApi.Provider>
