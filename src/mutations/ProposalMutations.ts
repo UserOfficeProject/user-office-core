@@ -53,7 +53,8 @@ export default class ProposalMutations {
     answers?: ProposalAnswer[],
     topicsCompleted?: number[],
     status?: number,
-    users?: number[]
+    users?: number[],
+    proposerId?: number
   ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
@@ -118,6 +119,10 @@ export default class ProposalMutations {
           if (!resultUpdateUsers) {
             return rejection("INTERNAL_ERROR");
           }
+        }
+
+        if (proposerId !== undefined) {
+          proposal.proposer = proposerId;
         }
 
         if (answers !== undefined) {

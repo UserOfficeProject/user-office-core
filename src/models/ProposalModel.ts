@@ -1,4 +1,4 @@
-import { User } from "./User";
+import { User, BasicUserDetails } from "./User";
 import { Review } from "./Review";
 import { EvaluatorOperator } from "./ConditionEvaluator";
 
@@ -7,7 +7,7 @@ export class ProposalInformation {
     public id?: number,
     public title?: string,
     public abstract?: string,
-    public proposer?: User,
+    public proposer?: BasicUserDetails,
     public status?: ProposalStatus,
     public created?: string,
     public updated?: string,

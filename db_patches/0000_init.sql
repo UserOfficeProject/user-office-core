@@ -50,25 +50,25 @@ $$ LANGUAGE plpgsql strict immutable;
 CREATE TABLE users (
   user_id  serial PRIMARY KEY
 , user_title       varchar(5) DEFAULT NULL
-, middlename    varchar(100) DEFAULT NULL
-, firstname     varchar(100) NOT NULL
-, lastname     varchar(100) NOT NULL
-, username     varchar(100) UNIQUE
+, middlename    varchar(20) DEFAULT NULL
+, firstname     varchar(20) NOT NULL
+, lastname     varchar(20) NOT NULL
+, username     varchar(20) UNIQUE
 , password     varchar(100) NOT NULL
-, preferredname varchar(100) DEFAULT NULL
-, orcid       varchar(100) UNIQUE
+, preferredname varchar(20) DEFAULT NULL
+, orcid       varchar(100) NOT NULL
 , orcid_refreshToken  varchar(100) NOT NULL
 , gender      varchar(12) NOT NULL
-, nationality varchar(100) NOT NULL
+, nationality varchar(30) NOT NULL
 , birthdate   DATE NOT NULL
-, organisation varchar(100) NOT NULL
-, department varchar(100) NOT NULL
+, organisation varchar(50) NOT NULL
+, department varchar(60) NOT NULL
 , organisation_address varchar(100) NOT NULL
-, position  varchar(100) NOT NULL
-, email     varchar(100) UNIQUE
+, position  varchar(30) NOT NULL
+, email     varchar(30) UNIQUE
 , email_verified boolean DEFAULT False
-, telephone varchar(100) NOT NULL
-, telephone_alt varchar(100) DEFAULT NULL
+, telephone varchar(20) NOT NULL
+, telephone_alt varchar(20) DEFAULT NULL
 , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 , updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
