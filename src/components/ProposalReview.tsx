@@ -55,7 +55,7 @@ export default function ProposalReview({
               ? undefined
               : () => {
                   submitProposal(data.id).then(isSubmitted => {
-                    data.status = ProposalStatus.SUBMITTED;
+                    data.status = ProposalStatus.Submitted;
                     api.next(data);
                   });
                 }
