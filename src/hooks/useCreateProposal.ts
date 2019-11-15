@@ -12,6 +12,7 @@ export function useCreateProposal() {
          proposal{
           id
           status
+          shortCode
         }
           error
         }
