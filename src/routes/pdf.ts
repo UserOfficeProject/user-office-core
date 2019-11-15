@@ -28,7 +28,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
   try {
     const decoded = jsonwebtoken.verify(req.cookies.token, process.env.secret);
     const proposalId = parseInt(req.params.proposal_id);
-    const notAnswered = "This question is not mandatory and was not answered.";
+    const notAnswered = "Left blank";
 
     // Authenticate user and fecth user, co-proposer and proposal with questionary
     let user = null;
