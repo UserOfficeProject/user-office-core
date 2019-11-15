@@ -42,6 +42,10 @@ export default function InformationDialog(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  if (!props.text) {
+    return null;
+  }
   return (
     <div>
       <Button className={classes.buttonLink} onClick={handleClickOpen}>

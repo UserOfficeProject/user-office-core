@@ -61,6 +61,10 @@ const useStyles = makeStyles(theme => ({
   errorText: {
     color: "red"
   },
+  requiredStar: {
+    color: "red",
+    content: " *"
+  },
   orcButton: {
     "&:hover": {
       border: "1px solid #338caf",
@@ -172,7 +176,8 @@ export default function SignUp(props) {
       refreshToken: orcData.refreshToken,
       preferredname: values.preferredname
         ? values.preferredname
-        : values.firstname
+        : values.firstname,
+      gender: values.gender === "other" ? values.othergender : values.gender
     }).then(data => setUserID(data.createUser.user.id));
   };
 
@@ -399,6 +404,18 @@ export default function SignUp(props) {
                       data-cy="gender"
                       required
                     />
+                    {values.gender === "other" && (
+                      <Field
+                        name="othergender"
+                        label="Please specify gender"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="othergender"
+                        required
+                      />
+                    )}
                     <FormikDropdown
                       name="nationality"
                       label="Nationality"
@@ -497,51 +514,47 @@ export default function SignUp(props) {
                     </Grid>
                   </CardContent>
                 </Card>
-                {loadingPrivacyContent ? null : (
-                  <Field
-                    name="privacy_agreement"
-                    className={classes.agreeBox}
-                    component={CheckboxWithLabel}
-                    Label={{
-                      classes: { label: classes.agreeBox },
-                      label: (
-                        <>
-                          I confirm that I have read, consent and agree to the
-                          DEMAX
-                          <InformationModal
-                            text={privacyPageContent}
-                            linkText={"Privacy Statement"}
-                          />
-                        </>
-                      )
-                    }}
-                    margin="normal"
-                    fullWidth
-                    data-cy="privacy-agreement"
-                  />
-                )}
-                {loadingCookieContent ? null : (
-                  <Field
-                    name="cookie_policy"
-                    className={classes.agreeBox}
-                    component={CheckboxWithLabel}
-                    Label={{
-                      classes: { label: classes.agreeBox },
-                      label: (
-                        <>
-                          I consent to the DEMAX
-                          <InformationModal
-                            text={cookiePageContent}
-                            linkText={"Cookie policy"}
-                          />
-                        </>
-                      )
-                    }}
-                    margin="normal"
-                    fullWidth
-                    data-cy="cookie-policy"
-                  />
-                )}
+                <Field
+                  name="privacy_agreement"
+                  className={classes.agreeBox}
+                  component={CheckboxWithLabel}
+                  Label={{
+                    classes: { label: classes.agreeBox },
+                    label: (
+                      <>
+                        I confirm that I have read, consent and agree to the
+                        DEMAX
+                        <InformationModal
+                          text={privacyPageContent}
+                          linkText={"Privacy Statement"}
+                        />
+                      </>
+                    )
+                  }}
+                  margin="normal"
+                  fullWidth
+                  data-cy="privacy-agreement"
+                />
+                <Field
+                  name="cookie_policy"
+                  className={classes.agreeBox}
+                  component={CheckboxWithLabel}
+                  Label={{
+                    classes: { label: classes.agreeBox },
+                    label: (
+                      <>
+                        I consent to the DEMAX
+                        <InformationModal
+                          text={cookiePageContent}
+                          linkText={"Cookie policy"}
+                        />
+                      </>
+                    )
+                  }}
+                  margin="normal"
+                  fullWidth
+                  data-cy="cookie-policy"
+                />
                 <Button
                   type="submit"
                   fullWidth
