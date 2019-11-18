@@ -15,11 +15,11 @@ import {
   DataType,
   TemplateStep
 } from "../../models/ProposalModel";
-import { ILogger } from "../../utils/Logger";
+import { Logger } from "../../utils/Logger";
 import to from "await-to-js";
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
-  constructor(private logger: ILogger) {}
+  logger = new Logger();
 
   async getProposalTemplate(): Promise<ProposalTemplate> {
     const dependencies: FieldDependency[] = await database
@@ -237,13 +237,16 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
-    const [error] = await to(
+    const [, rowsAffected] = await to(
       database("proposal_questions")
         .where({ proposal_question_id: fieldId })
         .del()
     );
-    if (error) {
-      this.logger.logException("Could not delete field", error, { fieldId });
+    if (rowsAffected !== 1) {
+      this.logger.logError("Unexpected number of affected rows", {
+        fieldId,
+        rowsAffected
+      });
       return null;
     }
     return await this.getProposalTemplate();
@@ -259,12 +262,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
         return createTopicObject(result[0]);
-      })
-      .catch((e: Error) => {
-        this.logger.logException("Could not delete topic ", e, {
-          id
-        });
-        return false;
       });
   }
 

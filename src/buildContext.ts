@@ -25,19 +25,20 @@ import FileQueries from "./queries/FileQueries";
 import FileMutations from "./mutations/FileMutations";
 import AdminQueries from "./queries/AdminQueries";
 import AdminMutations from "./mutations/AdminMutations";
-import { Logger } from "./utils/Logger";
+
 import TemplateMutations from "./mutations/TemplateMutations";
 import TemplateQueries from "./queries/TemplateQueries";
+import { Logger } from "./utils/Logger";
 
 // Site specific data sources and event handlers (only ESS atm)
 const logger = new Logger();
 const userDataSource = new PostgresUserDataSource();
-const proposalDataSource = new PostgresProposalDataSource(logger);
+const proposalDataSource = new PostgresProposalDataSource();
 const reviewDataSource = new PostgresReviewDataSource();
 const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
-const templateDataSource = new TemplateDataSource(logger);
+const templateDataSource = new TemplateDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,

@@ -586,7 +586,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation ($topicId: Int!, $fieldIds: [String]) {\n  updateFieldTopicRel(topic_id: $topicId, field_ids: $fieldIds) {\n    error\n  }\n}",
-						"variables": "{\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"fieldIds\": [\n            \"ttl_delivery_date\",\n            \"is_towards_degree\",\n            \"has_links_with_industry\",\n            \"final_delivery_date\",\n            \"ttl_general\",\n            \"final_delivery_date_motivation\",\n            \"pdb_id\"\n        ]\n    }"
+						"variables": "{\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"fieldIds\": [\n            \"{{NEW_FIELD_ID}}\"\n        ]\n    }"
 					},
 					"options": {
 						"raw": {
@@ -1059,7 +1059,7 @@
 					"script": {
 						"id": "a213c77c-316a-48cc-a311-6ec12816927c",
 						"exec": [
-							"pm.test(\"Should update topic\", function () {",
+							"pm.test(\"Should delete topic\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.deleteTopic.error).to.be.eql(null)",
 							"});",

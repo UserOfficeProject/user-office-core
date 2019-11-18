@@ -13,12 +13,13 @@ import {
 import { ProposalDataSource } from "../ProposalDataSource";
 import { QuestionaryStep, Questionary } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
-import { ILogger } from "../../utils/Logger";
+import { Transaction } from "knex";
+import { Logger } from "../../utils/Logger";
 
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  constructor(private logger: ILogger) {}
+  logger = new Logger();
 
   async checkActiveCall(): Promise<Boolean> {
     const currentDate = new Date().toISOString();
@@ -74,14 +75,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           return null;
         }
         return createProposalObject(proposal[0]);
-      })
-      .catch((e: Error) => {
-        this.logger.logException("Exception while deleting proposal", e);
       });
   }
 
   async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
-    return database.transaction(function(trx: { commit: any; rollback: any }) {
+    return database.transaction(function(trx: Transaction) {
       return database
         .from("proposal_user")
         .where("proposal_id", id)
@@ -231,9 +229,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from("proposals")
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
-      })
-      .catch((error: any) => {
-        this.logger.logException("Failed to create proposal", error);
       });
   }
 

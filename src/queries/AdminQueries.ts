@@ -1,6 +1,5 @@
 import { AdminDataSource } from "../datasources/AdminDataSource";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { User } from "../models/User";
 
 export default class AdminQueries {
   constructor(

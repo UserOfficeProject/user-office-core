@@ -5,6 +5,7 @@ const BluePromise = require("bluebird");
 import { User } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
+import { Transaction } from "knex";
 
 export default class PostgresUserDataSource implements UserDataSource {
   private createUserObject(user: UserRecord) {
@@ -140,7 +141,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
-    return database.transaction(function(trx: { commit: any; rollback: any }) {
+    return database.transaction(function(trx: Transaction) {
       return database
         .from("role_user")
         .where("user_id", id)
@@ -199,7 +200,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
-  async getByEmail(email: String): Promise<User | null> {
+  async getByEmail(email: string): Promise<User | null> {
     return database
       .select()
       .from("users")
