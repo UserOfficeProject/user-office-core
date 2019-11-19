@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
-import { Edit } from "@material-ui/icons";
+import { Edit, Visibility } from "@material-ui/icons";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 
@@ -31,10 +31,19 @@ export default function ProposalTable(props) {
         debounceInterval: 400
       }}
       actions={[
-        {
-          icon: () => <Edit />,
-          tooltip: "Edit proposal",
-          onClick: (event, rowData) => setEditProposalID(rowData.id)
+        rowData => {
+          console.log(rowData);
+          return {
+            icon:
+              rowData.status === "Submitted"
+                ? () => <Visibility />
+                : () => <Edit />,
+            tooltip:
+              rowData.status === "Submitted"
+                ? "View proposal"
+                : "Edit proposal",
+            onClick: (event, rowData) => setEditProposalID(rowData.id)
+          };
         },
         {
           icon: () => <GetAppIcon />,
