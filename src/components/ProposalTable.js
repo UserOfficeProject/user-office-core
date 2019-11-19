@@ -32,7 +32,6 @@ export default function ProposalTable(props) {
       }}
       actions={[
         rowData => {
-          console.log(rowData);
           return {
             icon:
               rowData.status === "Submitted"
