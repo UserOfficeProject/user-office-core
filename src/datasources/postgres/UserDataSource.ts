@@ -345,6 +345,17 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .catch(() => false);
   }
+  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+    return database
+      .select()
+      .from("users as u")
+      .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
+      .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
+      .where("p.proposal_id", proposalId)
+      .then((users: UserRecord[]) =>
+        users.map(user => this.createUserObject(user))
+      );
+  }
   async getProposalUsers(id: number) {
     return database
       .select()

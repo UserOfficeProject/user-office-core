@@ -20,6 +20,7 @@ export interface UserDataSource {
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
   getProposalUsers(proposalId: number): Promise<BasicUserDetails[]>;
+  getProposalUsersFull(proposalId: number): Promise<User[]>;
   // Write
   create(
     user_title: string,

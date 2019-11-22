@@ -87,6 +87,9 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+    throw new Error("Method not implemented.");
+  }
   async getBasicUserInfo(
     id: number
   ): Promise<import("../../models/User").BasicUserDetails | null> {
