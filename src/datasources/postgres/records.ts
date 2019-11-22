@@ -62,9 +62,9 @@ export interface UserRecord {
   readonly preferredname: string;
   readonly orcid: string;
   readonly gender: string;
-  readonly nationality: string;
+  readonly nationality: number;
   readonly birthdate: string;
-  readonly organisation: string;
+  readonly organisation: number;
   readonly department: string;
   readonly organisation_address: string;
   readonly position: string;
@@ -75,6 +75,7 @@ export interface UserRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
+  readonly institution: string;
 }
 
 export interface RoleRecord {

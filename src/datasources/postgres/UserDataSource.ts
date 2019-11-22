@@ -2,7 +2,7 @@ import database from "./database";
 import { UserRecord } from "./records";
 const BluePromise = require("bluebird");
 
-import { User } from "../../models/User";
+import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
@@ -22,7 +22,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.birthdate,
       user.organisation,
       user.department,
-      user.organisation_address,
       user.position,
       user.email,
       user.email_verified,
@@ -30,6 +29,16 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.telephone_alt,
       user.created_at.toISOString(),
       user.updated_at.toISOString()
+    );
+  }
+
+  private createBasicUserObject(user: UserRecord) {
+    return new BasicUserDetails(
+      user.user_id,
+      user.firstname,
+      user.lastname,
+      user.institution,
+      user.position
     );
   }
 
@@ -83,7 +92,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       birthdate,
       organisation,
       department,
-      organisation_address,
       position,
       email,
       telephone,
@@ -101,7 +109,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         birthdate,
         organisation,
         department,
-        organisation_address,
         position,
         email,
         telephone,
@@ -187,6 +194,19 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => this.createUserObject(user));
   }
 
+  getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    return database
+      .select()
+      .from("users as u")
+      .join("institutions as i", { "u.organisation": "i.institution_id" })
+      .where("user_id", id)
+      .first()
+      .then((user: UserRecord) => this.createBasicUserObject(user))
+      .catch((error: any) => {
+        return null;
+      });
+  }
+
   async getByUsername(username: string) {
     return database
       .select()
@@ -222,11 +242,10 @@ export default class PostgresUserDataSource implements UserDataSource {
     orcid: string,
     orcid_refreshtoken: string,
     gender: string,
-    nationality: string,
+    nationality: number,
     birthdate: string,
-    organisation: string,
+    organisation: number,
     department: string,
-    organisation_address: string,
     position: string,
     email: string,
     telephone: string,
@@ -248,7 +267,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         birthdate,
         organisation,
         department,
-        organisation_address,
         position,
         email,
         telephone,
@@ -260,6 +278,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
         return user;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        return null;
       });
   }
 
@@ -273,11 +295,12 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("users")
+      .join("institutions as i", { organisation: "i.institution_id" })
       .orderBy("user_id", "desc")
       .modify((query: any) => {
         if (filter) {
           query
-            .where("organisation", "ilike", `%${filter}%`)
+            .where("institution", "ilike", `%${filter}%`)
             .orWhere("firstname", "ilike", `%${filter}%`)
             .orWhere("lastname", "ilike", `%${filter}%`);
         }
@@ -299,11 +322,15 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map(user => this.createUserObject(user));
+        const users = usersRecord.map(user => this.createBasicUserObject(user));
         return {
           totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
           users
         };
+      })
+      .catch((error: any) => {
+        console.log(error);
+        return null;
       });
   }
   async setUserEmailVerified(id: number): Promise<Boolean> {
@@ -318,15 +345,27 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .catch(() => false);
   }
-  async getProposalUsers(id: number) {
+  async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
       .select()
       .from("users as u")
       .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
-      .where("p.proposal_id", id)
+      .where("p.proposal_id", proposalId)
       .then((users: UserRecord[]) =>
         users.map(user => this.createUserObject(user))
+      );
+  }
+  async getProposalUsers(id: number) {
+    return database
+      .select()
+      .from("users as u")
+      .join("institutions as i", { organisation: "i.institution_id" })
+      .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
+      .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
+      .where("p.proposal_id", id)
+      .then((users: UserRecord[]) =>
+        users.map(user => this.createBasicUserObject(user))
       );
   }
 }

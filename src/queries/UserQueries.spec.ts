@@ -2,7 +2,9 @@ import UserQueries from "./UserQueries";
 import {
   userDataSource,
   dummyUser,
-  dummyUserOfficer
+  dummyUserOfficer,
+  basicDummyUser,
+  basicDummyUserNotOnProposal
 } from "../datasources/mockups/UserDataSource";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -36,14 +38,14 @@ test("A user officer is allowed to fetch all accounts", () => {
     userQueries.getAll(dummyUserOfficer, "")
   ).resolves.toStrictEqual({
     totalCount: 2,
-    users: [dummyUser, dummyUserOfficer]
+    users: [basicDummyUser, basicDummyUserNotOnProposal]
   });
 });
 
 test("A user is allowed to fetch all accounts", () => {
   return expect(userQueries.getAll(dummyUser, "")).resolves.toStrictEqual({
     totalCount: 2,
-    users: [dummyUser, dummyUserOfficer]
+    users: [basicDummyUser, basicDummyUserNotOnProposal]
   });
 });
 

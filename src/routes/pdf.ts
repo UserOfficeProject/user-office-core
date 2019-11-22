@@ -55,7 +55,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     }
 
     const questionary = Questionary.fromObject(questionaryObj);
-    const principalInvestigator = await baseContext.queries.user.get(
+    const principalInvestigator = await baseContext.queries.user.getBasic(
       user,
       proposal.proposer
     );
@@ -127,6 +127,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     write(
       `${principalInvestigator.firstname} ${principalInvestigator.lastname}`
     );
+
     write(principalInvestigator.organisation);
     write(principalInvestigator.position);
 

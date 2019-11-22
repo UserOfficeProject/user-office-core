@@ -6,6 +6,7 @@ export const typeDefs = `
         users(filter: String, first: Int, offset: Int, usersOnly: Boolean, subtractUsers: [Int]): UserQueryResult
         getOrcIDInformation(authorizationCode: String): OrcIDInformation
         checkEmailExist(email:String): Boolean
+        getFields: Fields
     }
 
     extend type Mutation {
@@ -21,11 +22,10 @@ export const typeDefs = `
           lastname: String, 
           preferredname: String,
           gender: String,
-          nationality: String,
+          nationality: Int,
           birthdate: String,
-          organisation: String,
+          organisation: Int,
           department: String,
-          organisation_address: String,
           position: String,
           email: String,
           telephone: String,
@@ -47,17 +47,22 @@ export const typeDefs = `
             orcidHash: String!,
             refreshToken: String!,
             gender: String!,
-            nationality: String!,
+            nationality: Int!,
             birthdate: String!,
-            organisation: String!,
+            organisation: Int!,
             department: String!,
-            organisation_address: String!,
             position: String!,
             email: String!,
             telephone: String!,
             telephone_alt: String
             ): UserMutationResult
     }
+
+  type Fields {
+    nationalities: [Entry]
+    countries: [Entry]
+    institutions: [Entry]
+  }
 
   type LoginMutationResult {
     token: String
@@ -72,9 +77,12 @@ export const typeDefs = `
         refreshToken: String
         registered: Boolean
       }
-
+    type Entry{
+      id: Int
+      value: String
+    }
     type UserQueryResult {
-        users: [User]
+        users: [BasicUserDetails]
         totalCount: Int
     }
     type UserMutationResult {
@@ -93,11 +101,10 @@ export const typeDefs = `
         orcidHash: String,
         refreshToken: String,
         gender: String,
-        nationality: String,
+        nationality: Int,
         birthdate: String,
-        organisation: String,
+        organisation: Int,
         department: String,
-        organisation_address: String,
         position: String,
         email: String,
         telephone: String,
