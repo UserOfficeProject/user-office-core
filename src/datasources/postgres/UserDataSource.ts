@@ -2,7 +2,7 @@ import database from "./database";
 import { UserRecord } from "./records";
 const BluePromise = require("bluebird");
 
-import { User } from "../../models/User";
+import { User, CreateUserArgs } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 
@@ -22,7 +22,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.birthdate,
       user.organisation,
       user.department,
-      user.organisation_address,
       user.position,
       user.email,
       user.email_verified,
@@ -83,7 +82,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       birthdate,
       organisation,
       department,
-      organisation_address,
       position,
       email,
       telephone,
@@ -101,7 +99,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         birthdate,
         organisation,
         department,
-        organisation_address,
         position,
         email,
         telephone,
@@ -222,11 +219,10 @@ export default class PostgresUserDataSource implements UserDataSource {
     orcid: string,
     orcid_refreshtoken: string,
     gender: string,
-    nationality: string,
+    nationality: number,
     birthdate: string,
-    organisation: string,
+    organisation: number,
     department: string,
-    organisation_address: string,
     position: string,
     email: string,
     telephone: string,
@@ -248,7 +244,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         birthdate,
         organisation,
         department,
-        organisation_address,
         position,
         email,
         telephone,
@@ -260,6 +255,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
         return user;
+      })
+      .catch((error: any) => {
+        console.log(error);
+        return null;
       });
   }
 

@@ -10,7 +10,12 @@ import {
   ProposalTemplate
 } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
-import { User, UpdateUserArgs } from "../models/User";
+import {
+  User,
+  UpdateUserArgs,
+  CreateUserArgs,
+  UsersArgs
+} from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 
@@ -118,43 +123,7 @@ interface LoginArgs {
   password: string;
 }
 
-interface AddUserRoleArgs {
-  userID: number;
-  roleID: number;
-}
-
-interface UsersArgs {
-  first?: number;
-  offset?: number;
-  filter?: string;
-  usersOnly?: boolean;
-  subtractUsers?: [number];
-}
-
 interface RolesArgs {}
-
-interface CreateUserArgs {
-  user_title: string;
-  firstname: string;
-  middlename: string;
-  lastname: string;
-  username: string;
-  password: string;
-  preferredname: string;
-  orcid: string;
-  orcidHash: string;
-  refreshToken: string;
-  gender: string;
-  nationality: string;
-  birthdate: string;
-  organisation: string;
-  department: string;
-  organisation_address: string;
-  position: string;
-  email: string;
-  telephone: string;
-  telephone_alt: string;
-}
 
 enum PageName {
   HOMEPAGE = 1,
@@ -546,6 +515,7 @@ export default {
   },
 
   async createUser(args: CreateUserArgs, context: ResolverContext) {
+    console.log(args);
     const res = await context.mutations.user.create(
       args.user_title,
       args.firstname,
@@ -561,7 +531,6 @@ export default {
       args.birthdate,
       args.organisation,
       args.department,
-      args.organisation_address,
       args.position,
       args.email,
       args.telephone,
@@ -642,5 +611,12 @@ export default {
   },
   getPageContent(args: { id: PageName }, context: ResolverContext) {
     return context.queries.admin.getPageText(parseInt(PageName[args.id]));
+  },
+  getFields(args: {}, context: ResolverContext) {
+    return {
+      nationalities: () => context.queries.admin.getNationalities(),
+      countries: () => context.queries.admin.getCountries(),
+      institutions: () => context.queries.admin.getInstitutions()
+    };
   }
 };

@@ -1,4 +1,9 @@
-import { User, UpdateUserArgs, checkUserArgs } from "../models/User";
+import {
+  User,
+  UpdateUserArgs,
+  checkUserArgs,
+  CreateUserArgs
+} from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { isRejection, rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
@@ -36,11 +41,10 @@ export default class UserMutations {
     orcidHash: string,
     refreshToken: string,
     gender: string,
-    nationality: string,
+    nationality: number,
     birthdate: string,
-    organisation: string,
+    organisation: number,
     department: string,
-    organisation_address: string,
     position: string,
     email: string,
     telephone: string,
@@ -80,7 +84,6 @@ export default class UserMutations {
           birthdate,
           organisation,
           department,
-          organisation_address,
           position,
           email,
           telephone,

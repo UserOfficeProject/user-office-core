@@ -11,11 +11,10 @@ export class User {
     public preferredname: string | null,
     public orcid: string,
     public gender: string,
-    public nationality: string,
+    public nationality: number,
     public birthdate: string,
-    public organisation: string,
+    public organisation: number,
     public department: string,
-    public organisation_address: string,
     public position: string,
     public email: string,
     public emailVerified: boolean,
@@ -43,8 +42,38 @@ export class BasicUserDetails {
     public id: number,
     public firstname: string,
     public lastname: string,
-    public organisation: string
+    public organisation: number
   ) {}
+}
+
+export interface UsersArgs {
+  first?: number;
+  offset?: number;
+  filter?: string;
+  usersOnly?: boolean;
+  subtractUsers?: [number];
+}
+
+export interface CreateUserArgs {
+  user_title: string;
+  firstname: string;
+  middlename: string;
+  lastname: string;
+  username: string;
+  password: string;
+  preferredname: string;
+  orcid: string;
+  orcidHash: string;
+  refreshToken: string;
+  gender: string;
+  nationality: number;
+  birthdate: string;
+  organisation: number;
+  department: string;
+  position: string;
+  email: string;
+  telephone: string;
+  telephone_alt: string;
 }
 
 export interface UpdateUserArgs {
@@ -56,11 +85,10 @@ export interface UpdateUserArgs {
   username?: string;
   preferredname?: string;
   gender?: string;
-  nationality?: string;
+  nationality?: number;
   birthdate?: string;
-  organisation?: string;
+  organisation?: number;
   department?: string;
-  organisation_address?: string;
   position?: string;
   email?: string;
   telephone?: string;
