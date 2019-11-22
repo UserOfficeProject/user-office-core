@@ -20,9 +20,7 @@ context("User tests", () => {
     .slice(0, 10);
 
   //Organization detail
-  const organisation = faker.company.companyName();
   const department = faker.commerce.department();
-  const orgAddress = faker.address.streetAddress();
   const position = faker.name.jobTitle();
 
   //Contact details
@@ -76,18 +74,13 @@ context("User tests", () => {
       .should("have.value", birthDate);
 
     //Organization details
+    cy.get("#select-organisation").click();
 
-    cy.get("[data-cy=organisation] input")
-      .type(organisation)
-      .should("have.value", organisation);
+    cy.contains("Lund University").click();
 
     cy.get("[data-cy=department] input")
       .type(department)
       .should("have.value", department);
-
-    cy.get("[data-cy=organisation-address] input")
-      .type(orgAddress)
-      .should("have.value", orgAddress);
 
     cy.get("[data-cy=position] input")
       .type(position)
