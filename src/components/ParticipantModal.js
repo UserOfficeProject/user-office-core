@@ -9,7 +9,6 @@ function ParticipantModal(props) {
     props.addParticipant({
       firstname: rowData.firstname,
       lastname: rowData.lastname,
-      username: rowData.username,
       organisation: rowData.organisation,
       id: rowData.id
     });

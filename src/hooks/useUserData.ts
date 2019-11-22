@@ -4,7 +4,7 @@ import { useDataAPI } from "./useDataAPI";
 export function useUserWithReviewsData(id: number) {
   const sendRequest = useDataAPI();
   const [userData, setUserData] = useState<
-    IBasicUserData & { reviews: [] } | null
+    (IBasicUserData & { reviews: [] }) | null
   >(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -14,7 +14,6 @@ export function useUserWithReviewsData(id: number) {
         id
         firstname
         lastname
-        username
         organisation
         reviews{
           id

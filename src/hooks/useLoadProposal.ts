@@ -24,7 +24,6 @@ export function useLoadProposal() {
               users{
                 firstname
                 lastname
-                username
                 organisation
                 id
               }
@@ -86,7 +85,6 @@ export function useLoadProposal() {
           return {
             firstname: user.firstname,
             lastname: user.lastname,
-            username: user.username,
             organisation: user.organisation,
             id: user.id
           };

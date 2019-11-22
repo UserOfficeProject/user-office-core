@@ -12,7 +12,6 @@ export function useUsersData(filter) {
         users{
         firstname
         lastname
-        username
         organisation
         id
         }
@@ -30,7 +29,6 @@ export function useUsersData(filter) {
           return {
             firstname: user.firstname,
             lastname: user.lastname,
-            username: user.username,
             organisation: user.organisation,
             id: user.id
           };
