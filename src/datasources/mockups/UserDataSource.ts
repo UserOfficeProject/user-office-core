@@ -1,6 +1,22 @@
 import { UserDataSource } from "../UserDataSource";
-import { User } from "../../models/User";
+import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
+
+export const basicDummyUser = new BasicUserDetails(
+  2,
+  "john",
+  "doe",
+  "org",
+  "boss"
+);
+
+export const basicDummyUserNotOnProposal = new BasicUserDetails(
+  3,
+  "john",
+  "doe",
+  "org",
+  "boss"
+);
 
 export const dummyUserOfficer = new User(
   4,
@@ -71,6 +87,11 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async getBasicUserInfo(
+    id: number
+  ): Promise<import("../../models/User").BasicUserDetails | null> {
+    throw new Error("Method not implemented.");
+  }
   async checkOrcIDExist(orcID: string): Promise<Boolean | null> {
     return false;
   }
@@ -133,12 +154,15 @@ export class userDataSource implements UserDataSource {
     filter?: string,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; users: User[] }> {
-    return { totalCount: 2, users: [dummyUser, dummyUserOfficer] };
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    return {
+      totalCount: 2,
+      users: [basicDummyUser, basicDummyUserNotOnProposal]
+    };
   }
 
   async getProposalUsers(id: number) {
-    return [dummyUser];
+    return [basicDummyUser];
   }
 
   async create(firstname: string, lastname: string) {

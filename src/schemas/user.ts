@@ -82,7 +82,7 @@ export const typeDefs = `
       value: String
     }
     type UserQueryResult {
-        users: [User]
+        users: [BasicUserDetails]
         totalCount: Int
     }
     type UserMutationResult {

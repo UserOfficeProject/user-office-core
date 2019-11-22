@@ -42,7 +42,8 @@ export class BasicUserDetails {
     public id: number,
     public firstname: string,
     public lastname: string,
-    public organisation: number
+    public organisation: string,
+    public position: string
   ) {}
 }
 

@@ -1,4 +1,5 @@
 export interface AdminDataSource {
+  getInstitution(id: number) : Promise<string | null>;
   getInstitutions(): Promise<Entry[]>;
   getCountries(): Promise<Entry[]>;
   getNationalities(): Promise<Entry[]>;

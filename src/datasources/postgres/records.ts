@@ -75,6 +75,7 @@ export interface UserRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
+  readonly institution: string;
 }
 
 export interface RoleRecord {

@@ -515,7 +515,6 @@ export default {
   },
 
   async createUser(args: CreateUserArgs, context: ResolverContext) {
-    console.log(args);
     const res = await context.mutations.user.create(
       args.user_title,
       args.firstname,

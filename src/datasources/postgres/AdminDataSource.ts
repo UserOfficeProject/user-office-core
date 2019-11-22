@@ -46,6 +46,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
         })
       );
   }
+
+  async getInstitution(id: number): Promise<string | null> {
+    return database
+      .select("institution")
+      .from("institutions")
+      .where("institution_id", id)
+      .first()
+      .then((res: { institution: string }) => res.institution);
+  }
   async getCountries(): Promise<Entry[]> {
     return database
       .select()

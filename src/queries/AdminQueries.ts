@@ -1,6 +1,5 @@
 import { AdminDataSource } from "../datasources/AdminDataSource";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { User } from "../models/User";
 
 export default class AdminQueries {
   constructor(
@@ -20,5 +19,9 @@ export default class AdminQueries {
   }
   async getInstitutions() {
     return await this.dataSource.getInstitutions();
+  }
+
+  async getInstitution(id: number) {
+    return await this.dataSource.getInstitution(id);
   }
 }

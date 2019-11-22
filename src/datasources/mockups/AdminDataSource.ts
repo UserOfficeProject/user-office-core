@@ -1,6 +1,9 @@
 import { AdminDataSource } from "../AdminDataSource";
 
 export class adminDataSource implements AdminDataSource {
+  getInstitution(id: number): Promise<string | null> {
+    throw new Error("Method not implemented.");
+  }
   async getInstitutions(): Promise<import("../AdminDataSource").Entry[]> {
     throw new Error("Method not implemented.");
   }
