@@ -67,7 +67,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         const principalInvestigator = await userDataSource.get(
           event.proposal.proposer
         );
-        const participants = await userDataSource.getProposalUsers(
+        const participants = await userDataSource.getProposalUsersFull(
           event.proposal.id
         );
         if (!principalInvestigator) {
