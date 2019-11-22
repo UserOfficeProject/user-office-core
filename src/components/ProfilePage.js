@@ -9,7 +9,7 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { useDataAPI } from "../hooks/useDataAPI";
 import FormikDropdown from "./FormikDropdown";
-import nationalities from "../models/nationalities";
+import { useGetFields } from "../hooks/useGetFields";
 import {
   userFieldSchema,
   userPasswordFieldSchema
@@ -47,10 +47,22 @@ export default function ProfilePage({ match, history }) {
     message: "",
     variant: "success"
   });
-  const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
-    return { text: nationality, value: nationality };
-  });
+  const [, fieldsContent] = useGetFields();
+  const [nationalitiesList, setNationalitiesList] = useState([]);
+  const [institutionsList, setInstitutionsList] = useState([]);
 
+  if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
+    setInstitutionsList(
+      fieldsContent.institutions.map(institution => {
+        return { text: institution.value, value: institution.id };
+      })
+    );
+    setNationalitiesList(
+      fieldsContent.nationalities.map(nationality => {
+        return { text: nationality.value, value: nationality.id };
+      })
+    );
+  }
   const sendPasswordUpdate = password => {
     const query = `mutation(
       $id: Int!,
@@ -92,11 +104,10 @@ export default function ProfilePage({ match, history }) {
       $lastname: String!, 
       $preferredname: String,
       $gender: String!,
-      $nationality: String!,
+      $nationality: Int!,
       $birthdate: String!,
-      $organisation: String!,
+      $organisation: Int!,
       $department: String!,
-      $organisation_address: String!,
       $position: String!,
       $email: String!,
       $telephone: String!,
@@ -115,7 +126,6 @@ export default function ProfilePage({ match, history }) {
         birthdate: $birthdate
         organisation: $organisation
         department: $department
-        organisation_address: $organisation_address
         position: $position
         email: $email
         telephone: $telephone
@@ -163,7 +173,6 @@ export default function ProfilePage({ match, history }) {
           birthdate,
           organisation,
           department,
-          organisation_address,
           position,
           email,
           telephone,
@@ -324,13 +333,10 @@ export default function ProfilePage({ match, history }) {
                           data-cy="username"
                           disabled={true}
                         />
-                        <Field
+                        <FormikDropdown
                           name="organisation"
                           label="Organisation"
-                          type="text"
-                          component={TextField}
-                          margin="normal"
-                          fullWidth
+                          items={institutionsList}
                           data-cy="organisation"
                         />
                         <Field
@@ -341,15 +347,6 @@ export default function ProfilePage({ match, history }) {
                           margin="normal"
                           fullWidth
                           data-cy="department"
-                        />
-                        <Field
-                          name="organisation_address"
-                          label="Organization address"
-                          type="text"
-                          component={TextField}
-                          margin="normal"
-                          fullWidth
-                          data-cy="organisation-address"
                         />
                         <Field
                           name="position"

@@ -12,12 +12,12 @@ import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import FormikDropdown from "./FormikDropdown";
-import nationalities from "../models/nationalities";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
 import InformationModal from "./InformationModal";
 import { useGetPageContent } from "../hooks/useGetPageContent";
+import { useGetFields } from "../hooks/useGetFields";
 import FormLabel from "@material-ui/core/FormLabel";
 import orcid from "../images/orcid.png";
 import clsx from "clsx";
@@ -108,18 +108,30 @@ const useStyles = makeStyles(theme => ({
 export default function SignUp(props) {
   const classes = useStyles();
   const [userID, setUserID] = useState(null);
+
+  const [nationalitiesList, setNationalitiesList] = useState([]);
+  const [institutionsList, setInstitutionsList] = useState([]);
+
   const [orcidError, setOrcidError] = useState(false);
-  const [loadingPrivacyContent, privacyPageContent] = useGetPageContent(
-    "PRIVACYPAGE"
-  );
-  const [loadingCookieContent, cookiePageContent] = useGetPageContent(
-    "COOKIEPAGE"
-  );
+  const [, privacyPageContent] = useGetPageContent("PRIVACYPAGE");
+  const [, cookiePageContent] = useGetPageContent("COOKIEPAGE");
+
+  const [, fieldsContent] = useGetFields();
   let authCodeOrcID = queryString.parse(props.location.search).code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
-  const nationalitiesList = nationalities.NATIONALITIES.map(nationality => {
-    return { text: nationality, value: nationality };
-  });
+
+  if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
+    setInstitutionsList(
+      fieldsContent.institutions.map(institution => {
+        return { text: institution.value, value: institution.id };
+      })
+    );
+    setNationalitiesList(
+      fieldsContent.nationalities.map(nationality => {
+        return { text: nationality.value, value: nationality.id };
+      })
+    );
+  }
 
   const sendSignUpRequest = values => {
     const query = `mutation(
@@ -133,11 +145,10 @@ export default function SignUp(props) {
                             $orcidHash: String!,
                             $refreshToken: String!,
                             $gender: String!,
-                            $nationality: String!,
+                            $nationality: Int!,
                             $birthdate: String!,
-                            $organisation: String!,
+                            $organisation: Int!,
                             $department: String!,
-                            $organisation_address: String!,
                             $position: String!,
                             $email: String!,
                             $telephone: String!,
@@ -159,7 +170,6 @@ export default function SignUp(props) {
                               birthdate: $birthdate
                               organisation: $organisation
                               department: $department
-                              organisation_address: $organisation_address
                               position: $position
                               email: $email
                               telephone: $telephone
@@ -460,13 +470,13 @@ export default function SignUp(props) {
                   <CardContent>
                     <Grid container spacing={1}>
                       <Field
-                        name="organisation"
-                        label="Organization"
+                        name="position"
+                        label="Position"
                         type="text"
                         component={TextField}
                         margin="normal"
                         fullWidth
-                        data-cy="organisation"
+                        data-cy="position"
                         required
                         disabled={!orcData || orcData.registered}
                       />
@@ -481,28 +491,27 @@ export default function SignUp(props) {
                         required
                         disabled={!orcData || orcData.registered}
                       />
-                      <Field
-                        name="organisation_address"
-                        label="Organization address"
-                        type="text"
-                        component={TextField}
-                        margin="normal"
-                        fullWidth
-                        data-cy="organisation-address"
+                      <FormikDropdown
+                        name="organisation"
+                        label="Organisation"
+                        items={institutionsList}
+                        data-cy="organisation"
                         required
                         disabled={!orcData || orcData.registered}
                       />
-                      <Field
-                        name="position"
-                        label="Position"
-                        type="text"
-                        component={TextField}
-                        margin="normal"
-                        fullWidth
-                        data-cy="position"
-                        required
-                        disabled={!orcData || orcData.registered}
-                      />
+                      {values.organisation === 1 && (
+                        <Field
+                          name="otherorganisation"
+                          label="Please specify organisation"
+                          type="text"
+                          component={TextField}
+                          margin="normal"
+                          fullWidth
+                          data-cy="otherorganisation"
+                          required
+                          disabled={!orcData || orcData.registered}
+                        />
+                      )}
                     </Grid>
                   </CardContent>
                 </Card>
@@ -555,7 +564,6 @@ export default function SignUp(props) {
                     )
                   }}
                   margin="normal"
-                  fullWidth
                   data-cy="privacy-agreement"
                   disabled={!orcData || orcData.registered}
                 />
@@ -576,7 +584,6 @@ export default function SignUp(props) {
                     )
                   }}
                   margin="normal"
-                  fullWidth
                   data-cy="cookie-policy"
                   disabled={!orcData || orcData.registered}
                 />

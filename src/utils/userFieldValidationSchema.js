@@ -11,23 +11,18 @@ export const userFieldSchema = Yup.object().shape({
     .max(15, "lastname must be at most 15 characters")
     .required("lastname must be at least 2 characters"),
   gender: Yup.string().required("please specify your gender"),
-  nationality: Yup.string().required("please specify your nationality"),
+  nationality: Yup.number().required("please specify your nationality"),
   user_title: Yup.string().required("User title is required"),
   birthdate: Yup.date()
     .max(new Date())
     .required("Please specify your birth date"),
-  organisation: Yup.string()
-    .min(2, "organisation must be at least 2 characters")
-    .max(50, "organisation must be at most 50 characters")
-    .required("organisation must be at least 2 characters"),
+  organisation: Yup.number().required(
+    "organisation must be at least 2 characters"
+  ),
   department: Yup.string()
     .min(2, "department must be at least 2 characters")
     .max(50, "department must be at most 50 characters")
     .required("department must be at least 2 characters"),
-  organisation_address: Yup.string()
-    .min(2, "organisation address must be at least 2 characters")
-    .max(100, "organisation must be at most 100 characters")
-    .required("organisation must be at least 2 characters"),
   position: Yup.string()
     .min(2, "position must be at least 2 characters")
     .max(50, "position must be at most 50 characters")

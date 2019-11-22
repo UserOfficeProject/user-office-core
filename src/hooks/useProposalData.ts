@@ -27,7 +27,6 @@ export function useProposalData(id: number) {
               users{
                 firstname
                 lastname
-                username
                 organisation
                 id
               }
@@ -88,7 +87,6 @@ export function useProposalData(id: number) {
             return {
               firstname: user.firstname,
               lastname: user.lastname,
-              username: user.username,
               organisation: user.organisation,
               id: user.id
             };

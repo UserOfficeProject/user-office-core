@@ -32,7 +32,6 @@ export default function ProposaQuestionaryReview(
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
-  console.log(props);
 
   return (
     <Fragment>
