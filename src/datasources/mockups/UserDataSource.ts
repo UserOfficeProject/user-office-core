@@ -1,6 +1,22 @@
 import { UserDataSource } from "../UserDataSource";
-import { User } from "../../models/User";
+import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
+
+export const basicDummyUser = new BasicUserDetails(
+  2,
+  "john",
+  "doe",
+  "org",
+  "boss"
+);
+
+export const basicDummyUserNotOnProposal = new BasicUserDetails(
+  3,
+  "john",
+  "doe",
+  "org",
+  "boss"
+);
 
 export const dummyUserOfficer = new User(
   4,
@@ -12,11 +28,10 @@ export const dummyUserOfficer = new User(
   "Hailey",
   "683142616",
   "male",
-  "United Kingdom",
+  12,
   "1990-01-25",
-  "Johnston, Hammes and Keeling",
+  3,
   "IT department",
-  "Vietnam, Consueloburgh, 4788 Frederik Parkways",
   "Producer",
   "Dorris83@gmail.com",
   true,
@@ -35,11 +50,10 @@ export const dummyUser = new User(
   "Meta",
   "568567353",
   "male",
-  "Pitcairn Islands",
+  2,
   "1981-05-04",
-  "Anderson LLC",
+  3,
   "IT department",
-  "Sudan, North Catalina, 7486 Schimmel Pine",
   "Architect",
   "Cleve30@yahoo.com",
   true,
@@ -59,11 +73,10 @@ export const dummyUserNotOnProposal = new User(
   "Damion",
   "182082741",
   "female",
-  "Zambia",
+  3,
   "1991-11-08",
-  "Ritchie - Balistreri",
+  5,
   "IT department",
-  "Andorra, Strackeview, 81436 Summer Mill",
   "Facilitator",
   "Tyrique41@hotmail.com",
   true,
@@ -74,6 +87,14 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async getProposalUsersFull(proposalId: number): Promise<User[]> {
+    throw new Error("Method not implemented.");
+  }
+  async getBasicUserInfo(
+    id: number
+  ): Promise<import("../../models/User").BasicUserDetails | null> {
+    throw new Error("Method not implemented.");
+  }
   async checkOrcIDExist(orcID: string): Promise<Boolean | null> {
     return false;
   }
@@ -136,12 +157,15 @@ export class userDataSource implements UserDataSource {
     filter?: string,
     first?: number,
     offset?: number
-  ): Promise<{ totalCount: number; users: User[] }> {
-    return { totalCount: 2, users: [dummyUser, dummyUserOfficer] };
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
+    return {
+      totalCount: 2,
+      users: [basicDummyUser, basicDummyUserNotOnProposal]
+    };
   }
 
   async getProposalUsers(id: number) {
-    return [dummyUser];
+    return [basicDummyUser];
   }
 
   async create(firstname: string, lastname: string) {

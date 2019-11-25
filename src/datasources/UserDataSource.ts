@@ -1,8 +1,8 @@
-import { User } from "../models/User";
+import { User, BasicUserDetails } from "../models/User";
 import { Role } from "../models/Role";
-import { Review } from "../models/Review";
 
 export interface UserDataSource {
+  getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<Boolean | null>;
   checkOrcIDExist(orcID: string): Promise<Boolean | null>;
   // Read
@@ -17,9 +17,10 @@ export interface UserDataSource {
     offset?: number,
     usersOnly?: boolean,
     subtractUsers?: [number]
-  ): Promise<{ totalCount: number; users: User[] }>;
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;
-  getProposalUsers(proposalId: number): Promise<User[]>;
+  getProposalUsers(proposalId: number): Promise<BasicUserDetails[]>;
+  getProposalUsersFull(proposalId: number): Promise<User[]>;
   // Write
   create(
     user_title: string,
@@ -32,11 +33,10 @@ export interface UserDataSource {
     orcid: string,
     orcidRefreshToken: string,
     gender: string,
-    nationality: string,
+    nationality: number,
     birthdate: string,
-    organisation: string,
+    organisation: number,
     department: string,
-    organisation_address: string,
     position: string,
     email: string,
     telephone: string,

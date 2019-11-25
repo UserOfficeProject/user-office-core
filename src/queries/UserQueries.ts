@@ -29,7 +29,7 @@ export default class UserQueries {
     if (!agent) {
       return null;
     }
-    const user = await this.dataSource.get(id);
+    const user = await this.dataSource.getBasicUserInfo(id);
     if (!user) {
       return null;
     }
@@ -37,7 +37,8 @@ export default class UserQueries {
       user.id,
       user.firstname,
       user.lastname,
-      user.organisation
+      user.organisation,
+      user.position
     );
   }
 

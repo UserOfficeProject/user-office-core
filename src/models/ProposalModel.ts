@@ -11,7 +11,7 @@ export class ProposalInformation {
     public status?: ProposalStatus,
     public created?: string,
     public updated?: string,
-    public users?: User[],
+    public users?: BasicUserDetails[],
     public reviews?: Review[],
     public questionary?: Questionary,
     public shortCode?: string

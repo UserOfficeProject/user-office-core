@@ -1,8 +1,8 @@
-import { AdminDataSource } from "../AdminDataSource";
+import { AdminDataSource, Entry } from "../AdminDataSource";
 import database from "./database";
 
 export default class PostgresAdminDataSource implements AdminDataSource {
-  get(id: number): Promise<string | null> {
+  async get(id: number): Promise<string | null> {
     return database
       .select("content")
       .from("pagetext")
@@ -10,7 +10,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then((res: { content: string }) => res.content);
   }
-  setPageText(id: number, content: string): Promise<Boolean> {
+  async setPageText(id: number, content: string): Promise<Boolean> {
     return database
       .update({
         content
@@ -23,5 +23,46 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .catch(() => {
         return false;
       });
+  }
+
+  async getNationalities(): Promise<Entry[]> {
+    return database
+      .select()
+      .from("nationalities")
+      .then((natDB: any[]) =>
+        natDB.map(nat => {
+          return { id: nat.nationality_id, value: nat.nationality };
+        })
+      );
+  }
+
+  async getInstitutions(): Promise<Entry[]> {
+    return database
+      .select()
+      .from("institutions")
+      .then((intDB: any[]) =>
+        intDB.map(int => {
+          return { id: int.institution_id, value: int.institution };
+        })
+      );
+  }
+
+  async getInstitution(id: number): Promise<string | null> {
+    return database
+      .select("institution")
+      .from("institutions")
+      .where("institution_id", id)
+      .first()
+      .then((res: { institution: string }) => res.institution);
+  }
+  async getCountries(): Promise<Entry[]> {
+    return database
+      .select()
+      .from("countries")
+      .then((countDB: any[]) =>
+        countDB.map(count => {
+          return { id: count.country_id, value: count.country };
+        })
+      );
   }
 }
