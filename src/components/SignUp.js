@@ -152,7 +152,8 @@ export default function SignUp(props) {
                             $position: String!,
                             $email: String!,
                             $telephone: String!,
-                            $telephone_alt: String
+                            $telephone_alt: String,
+                            $otherOrganisation: String
                             )
                   {
                     createUser(
@@ -173,7 +174,8 @@ export default function SignUp(props) {
                               position: $position
                               email: $email
                               telephone: $telephone
-                              telephone_alt: $telephone_alt
+                              telephone_alt: $telephone_alt,
+                              otherOrganisation: $otherOrganisation
                               )
                      {
                         user { id }
@@ -501,13 +503,13 @@ export default function SignUp(props) {
                       />
                       {values.organisation === 1 && (
                         <Field
-                          name="otherorganisation"
+                          name="otherOrganisation"
                           label="Please specify organisation"
                           type="text"
                           component={TextField}
                           margin="normal"
                           fullWidth
-                          data-cy="otherorganisation"
+                          data-cy="otherOrganisation"
                           required
                           disabled={!orcData || orcData.registered}
                         />
