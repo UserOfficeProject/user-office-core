@@ -55,6 +55,7 @@ export const typeDefs = `
             email: String!,
             telephone: String!,
             telephone_alt: String
+            otherOrganisation: String
             ): UserMutationResult
     }
 

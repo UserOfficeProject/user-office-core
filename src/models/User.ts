@@ -75,6 +75,7 @@ export interface CreateUserArgs {
   email: string;
   telephone: string;
   telephone_alt: string;
+  otherOrganisation?: string;
 }
 
 export interface UpdateUserArgs {

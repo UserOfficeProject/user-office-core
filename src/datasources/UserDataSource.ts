@@ -42,6 +42,7 @@ export interface UserDataSource {
     telephone: string,
     telephone_alt: string
   ): Promise<User | null>;
+  createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User | null>;
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
   setUserPassword(id: number, password: string): Promise<Boolean>;

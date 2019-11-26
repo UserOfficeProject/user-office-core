@@ -368,4 +368,14 @@ export default class PostgresUserDataSource implements UserDataSource {
         users.map(user => this.createBasicUserObject(user))
       );
   }
+  async createOrganisation(name: string, verified: boolean): Promise<number> {
+    return database
+      .insert({
+        institution: name,
+        verified
+      })
+      .into("institutions")
+      .returning("institution_id")
+      .then((id: number[]) => id[0]);
+  }
 }

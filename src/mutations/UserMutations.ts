@@ -48,7 +48,8 @@ export default class UserMutations {
     position: string,
     email: string,
     telephone: string,
-    telephone_alt: string
+    telephone_alt: string,
+    otherOrganisation?: string
   ): Promise<{ user: User; link: string } | Rejection> {
     return this.eventBus.wrap(
       async () => {
@@ -68,6 +69,14 @@ export default class UserMutations {
         }
 
         const hash = this.createHash(password);
+        let organisationId = organisation;
+        // Check if user has other org and if so create it
+        if (otherOrganisation) {
+          organisationId = await this.dataSource.createOrganisation(
+            otherOrganisation,
+            false
+          );
+        }
 
         const user = await this.dataSource.create(
           user_title,
@@ -82,7 +91,7 @@ export default class UserMutations {
           gender,
           nationality,
           birthdate,
-          organisation,
+          organisationId,
           department,
           position,
           email,

@@ -533,7 +533,8 @@ export default {
       args.position,
       args.email,
       args.telephone,
-      args.telephone_alt
+      args.telephone_alt,
+      args.otherOrganisation
     );
 
     return wrapUserMutation(

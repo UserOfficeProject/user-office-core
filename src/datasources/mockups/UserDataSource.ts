@@ -87,6 +87,9 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  async createOrganisation(name: string, verified: boolean): Promise<number> {
+    return 1;
+  }
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     throw new Error("Method not implemented.");
   }
