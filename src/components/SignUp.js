@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     border: "2px solid red"
   },
   agreeBox: {
-    "font-size": ".7em"
+    "font-size": ".8em"
   },
   errorText: {
     color: "red"
@@ -467,7 +467,7 @@ export default function SignUp(props) {
 
                 <Card className={classes.card}>
                   <Typography className={classes.cardHeader}>
-                    Organization details
+                    Organisation details
                   </Typography>
                   <CardContent>
                     <Grid container spacing={1}>
