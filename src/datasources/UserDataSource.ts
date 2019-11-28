@@ -2,6 +2,11 @@ import { User, BasicUserDetails } from "../models/User";
 import { Role } from "../models/Role";
 
 export interface UserDataSource {
+  createInviteUser(
+    firstname: string,
+    lastname: string,
+    email: string
+  ): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<Boolean | null>;
   checkOrcIDExist(orcID: string): Promise<Boolean | null>;

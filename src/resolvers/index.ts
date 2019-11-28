@@ -514,28 +514,24 @@ export default {
     return context.queries.user.getRoles(context.user);
   },
 
-  async createUser(args: CreateUserArgs, context: ResolverContext) {
-    const res = await context.mutations.user.create(
-      args.user_title,
+  async createUserByEmailInvite(
+    args: { firstname: string; lastname: string; email: string },
+    context: ResolverContext
+  ) {
+    const res = await context.mutations.user.createUserByEmailInvite(
+      context.user,
       args.firstname,
-      args.middlename,
       args.lastname,
-      args.password,
-      args.preferredname,
-      args.orcid,
-      args.orcidHash,
-      args.refreshToken,
-      args.gender,
-      args.nationality,
-      args.birthdate,
-      args.organisation,
-      args.department,
-      args.position,
-      args.email,
-      args.telephone,
-      args.telephone_alt,
-      args.otherOrganisation
+      args.email
     );
+    if (isRejection(res)) {
+      return null;
+    }
+    return res.userId;
+  },
+
+  async createUser(args: CreateUserArgs, context: ResolverContext) {
+    const res = await context.mutations.user.create(args);
 
     return wrapUserMutation(
       isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user)

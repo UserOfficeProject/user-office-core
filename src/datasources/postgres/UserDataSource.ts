@@ -17,6 +17,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.username,
       user.preferredname,
       user.orcid,
+      user.orcid_refreshtoken,
       user.gender,
       user.nationality,
       user.birthdate,
@@ -27,6 +28,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       user.email_verified,
       user.telephone,
       user.telephone_alt,
+      user.placeholder,
       user.created_at.toISOString(),
       user.updated_at.toISOString()
     );
@@ -47,6 +49,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from("users")
       .where("email", email)
+      .andWhere("placeholder", false)
       .first()
       .then((user: any) => (user ? true : false))
       .catch(() => null);
@@ -95,7 +98,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       position,
       email,
       telephone,
-      telephone_alt
+      telephone_alt,
+      placeholder,
+      orcid,
+      refreshToken
     } = user;
     return database
       .update({
@@ -112,7 +118,9 @@ export default class PostgresUserDataSource implements UserDataSource {
         position,
         email,
         telephone,
-        telephone_alt
+        telephone_alt,
+        placeholder,
+        orcid
       })
       .from("users")
       .where("user_id", user.id)
@@ -123,6 +131,37 @@ export default class PostgresUserDataSource implements UserDataSource {
         console.log(e);
         return null;
       });
+  }
+  async createInviteUser(
+    firstname: string,
+    lastname: string,
+    email: string
+  ): Promise<number> {
+    return database
+      .insert({
+        user_title: "",
+        firstname,
+        middlename: "",
+        lastname,
+        username: email,
+        password: "",
+        preferredname: firstname,
+        orcid: "",
+        orcid_refreshtoken: "",
+        gender: "",
+        nationality: null,
+        birthdate: "1111-11-11",
+        organisation: 1,
+        department: "",
+        position: "",
+        email,
+        telephone: "",
+        telephone_alt: "",
+        placeholder: true
+      })
+      .returning(["user_id"])
+      .into("users")
+      .then((user: any[]) => user[0].user_id);
   }
 
   async getRoles() {

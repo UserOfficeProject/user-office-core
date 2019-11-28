@@ -36,6 +36,7 @@ export const typeDefs = `
         resetPasswordEmail(email: String!): Boolean
         resetPassword(token: String!, password: String!): Boolean
         emailVerification(token: String!): Boolean
+        createUserByEmailInvite(firstname: String!, lastname: String!, email: String!): Int
         createUser(
             user_title: String, 
             firstname: String!, 

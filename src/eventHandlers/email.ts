@@ -63,6 +63,39 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
+      case "EMAIL_INVITE": {
+        const user = await userDataSource.get(event.userId);
+        const inviter = await userDataSource.get(event.inviterId);
+
+        if (!user || !inviter) {
+          console.log("Failed");
+          return;
+        }
+
+        client.transmissions
+          .send({
+            content: {
+              template_id: "user-office-registration-invitation"
+            },
+            substitution_data: {
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              inviterName: inviter.preferredname,
+              inviterLastname: inviter.lastname,
+              inviterOrg: inviter.organisation
+            },
+            recipients: [{ address: user.email }]
+          })
+          .then((res: string) => {
+            console.log(res);
+          })
+          .catch((err: string) => {
+            console.log(err);
+          });
+        return;
+      }
+
       case "PROPOSAL_SUBMITTED": {
         const principalInvestigator = await userDataSource.get(
           event.proposal.proposer
