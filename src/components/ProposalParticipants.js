@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ParticipantModal from "./ParticipantModal";
 import { makeStyles } from "@material-ui/styles";
 import PeopleTable from "./PeopleTable";
-import { Add } from "@material-ui/icons";
+import { People } from "@material-ui/icons";
 
 const useStyles = makeStyles({
   errorText: {
@@ -46,7 +46,7 @@ export default function ProposalParticipants(props) {
       />
       <PeopleTable
         title="Co-Proposers"
-        actionIcon={<Add />}
+        actionIcon={<People />}
         action={openModal}
         isFreeAction={true}
         data={props.users}
@@ -55,7 +55,8 @@ export default function ProposalParticipants(props) {
       />
       {props.error && (
         <p className={classes.errorText}>
-          You must be part of the proposal. Either add youself as Principal Investigator or a Co-Proposer!
+          You must be part of the proposal. Either add youself as Principal
+          Investigator or a Co-Proposer!
         </p>
       )}
     </form>

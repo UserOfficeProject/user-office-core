@@ -3,6 +3,12 @@ import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { useDataAPI } from "../hooks/useDataAPI";
 import { makeStyles } from "@material-ui/styles";
+import { Email } from "@material-ui/icons";
+import { Formik, Form, Field } from "formik";
+import { TextField } from "formik-material-ui";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import { useCreateUserInvite } from "../hooks/useCreateUserInvite";
 
 function sendUserRequest(
   searchQuery,
@@ -52,6 +58,8 @@ function sendUserRequest(
 function PeopleTable(props) {
   const sendRequest = useDataAPI();
   const [loading, setLoading] = useState(false);
+  const [sendUserEmail, setSendUserEmail] = useState(false);
+  const { createUserInvite } = useCreateUserInvite();
 
   const columns = [
     { title: "Name", field: "firstname" },
@@ -63,29 +71,99 @@ function PeopleTable(props) {
     tableWrapper: {
       "& .MuiToolbar-gutters": {
         paddingLeft: "0"
+      },
+      buttons: {
+        display: "flex",
+        justifyContent: "flex-end"
+      },
+      button: {
+        marginTop: "25px",
+        marginLeft: "10px"
       }
-    },
-
+    }
   })();
+  if (sendUserEmail) {
+    return (
+      <Formik
+        onSubmit={async (values, actions) => {
+          const id = await createUserInvite(
+            values.name,
+            values.lastname,
+            values.email
+          );
+          props.action({
+            firstname: values.name,
+            lastname: values.lastname,
+            organisation: "",
+            id
+          });
+        }}
+      >
+        {subformik => (
+          <Form>
+            <Typography component="h1" variant="h5">
+              Invite by Email
+            </Typography>
+            <Field
+              name="name"
+              label="Name"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+            />
+            <Field
+              name="lastname"
+              label="Lastname"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="lastname"
+            />
+            <Field
+              name="email"
+              label="E-mail"
+              type="email"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="email"
+            />
+
+            <div className={classes.buttons}>
+              <Button
+                onClick={() => subformik.submitForm()}
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                Invite User
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    );
+  }
 
   return (
-    <div data-cy='co-proposers' className={classes.tableWrapper}>
+    <div data-cy="co-proposers" className={classes.tableWrapper}>
       <MaterialTable
         icons={tableIcons}
         title={props.title}
         columns={columns}
-
         data={
           props.data
             ? props.data
             : query =>
-              sendUserRequest(
-                query,
-                sendRequest,
-                setLoading,
-                props.selectedUsers,
-                props.usersOnly
-              )
+                sendUserRequest(
+                  query,
+                  sendRequest,
+                  setLoading,
+                  props.selectedUsers,
+                  props.usersOnly
+                )
         }
         isLoading={loading}
         options={{
@@ -95,24 +173,30 @@ function PeopleTable(props) {
         actions={
           props.action
             ? [
-              {
-                icon: () => props.actionIcon,
-                isFreeAction: props.isFreeAction,
-                tooltip: props.title,
-                onClick: (event, rowData) => props.action(rowData)
-              }
-            ]
+                {
+                  icon: () => props.actionIcon,
+                  isFreeAction: props.isFreeAction,
+                  tooltip: props.title,
+                  onClick: (event, rowData) => props.action(rowData)
+                },
+                {
+                  icon: () => <Email />,
+                  isFreeAction: true,
+                  tooltip: "Add user by email",
+                  onClick: () => setSendUserEmail(true)
+                }
+              ]
             : null
         }
         editable={
           props.onRemove
             ? {
-              onRowDelete: oldData =>
-                new Promise(resolve => {
-                  resolve();
-                  props.onRemove(oldData);
-                })
-            }
+                onRowDelete: oldData =>
+                  new Promise(resolve => {
+                    resolve();
+                    props.onRemove(oldData);
+                  })
+              }
             : null
         }
       />
