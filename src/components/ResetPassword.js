@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { request } from "graphql-request";
 import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
-import * as Yup from "yup";
+import { userPasswordFieldSchema } from "../utils/userFieldValidationSchema";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -68,13 +68,7 @@ export default function ResetPassword({ match }) {
           await requestResetPassword(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={Yup.object().shape({
-          password: Yup.string().required("Password is required"),
-          passwordConfirmation: Yup.string().oneOf(
-            [Yup.ref("password"), null],
-            "Passwords must match"
-          )
-        })}
+        validationSchema={userPasswordFieldSchema}
       >
         <Form className={classes.form}>
           <CssBaseline />
@@ -91,6 +85,7 @@ export default function ResetPassword({ match }) {
               type="password"
               component={TextField}
               margin="normal"
+              helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
               fullWidth
             />
             <Field
