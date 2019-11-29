@@ -99,7 +99,7 @@ export interface UpdateUserArgs {
   telephone_alt?: string;
   placeholder?: boolean;
   roles?: number[];
-  orcid: string;
+  orcid?: string;
   refreshToken?: string;
 }
 

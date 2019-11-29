@@ -41,6 +41,16 @@ export default class UserMutations {
         if (!agent) {
           return rejection("MUST_LOGIN");
         }
+        //Check if email exist in database and if user has been invited before
+        const user = await this.dataSource.getByEmail(email);
+        if (user && user.placeholder) {
+          return {
+            userId: user.id,
+            inviterId: agent.id
+          };
+        } else if (user) {
+          return rejection("ACCOUNT_EXIST");
+        }
         return {
           userId: await this.dataSource.createInviteUser(
             firstname,
