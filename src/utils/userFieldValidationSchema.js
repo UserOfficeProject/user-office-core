@@ -78,3 +78,27 @@ export const userPasswordFieldSchema = Yup.object().shape({
       return this.parent.password === value;
     })
 });
+
+export const emailFieldSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Please specify a valid email")
+    .test("checkDuplEmail", "Email has been registered before", function(
+      value
+    ) {
+      if (!value) {
+        return this.createError({ message: "Please specify email" });
+      }
+
+      return new Promise((resolve, reject) => {
+        const query = `query($email: String!)
+      {
+          checkEmailExist(email: $email)
+      }`;
+        request("/graphql", query, {
+          email: value
+        })
+          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
+          .catch(() => resolve(false));
+      });
+    })
+});
