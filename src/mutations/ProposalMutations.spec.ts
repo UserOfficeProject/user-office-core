@@ -20,10 +20,10 @@ import {
 } from "../datasources/mockups/UserDataSource";
 import { DataType } from "../models/ProposalModel";
 import { User } from "../models/User";
-import { DummyLogger } from "../utils/Logger";
+import { MutedLogger } from "../utils/Logger";
 import { Proposal } from "../models/Proposal";
 
-const dummyLogger = new DummyLogger();
+const dummyLogger = new MutedLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyProposalDataSource = new proposalDataSource();
 const dummyTemplateDataSource = new templateDataSource();

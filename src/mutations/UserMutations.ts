@@ -1,9 +1,4 @@
-import {
-  User,
-  UpdateUserArgs,
-  checkUserArgs,
-  CreateUserArgs
-} from "../models/User";
+import { User, UpdateUserArgs, checkUserArgs } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { isRejection, rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
@@ -12,6 +7,8 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
+import { to } from "await-to-js";
+import { logger } from "../utils/Logger";
 
 export default class UserMutations {
   constructor(
@@ -147,11 +144,9 @@ export default class UserMutations {
       if (!(await this.userAuth.isUserOfficer(agent))) {
         return rejection("WRONG_PERMISSIONS");
       }
-      const resultUpdateRoles = await this.dataSource.setUserRoles(
-        args.id,
-        args.roles
-      );
-      if (!resultUpdateRoles) {
+      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
+      if (err) {
+        logger.logError("Could not set user roles", { err });
         return rejection("INTERNAL_ERROR");
       }
     }
@@ -279,7 +274,10 @@ export default class UserMutations {
       return false;
     }
   }
-  async resetPassword(token: string, password: string): Promise<Boolean> {
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<void | Rejection> {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
@@ -292,12 +290,14 @@ export default class UserMutations {
         user.updated === decoded.updated &&
         decoded.type === "passwordReset"
       ) {
-        return this.dataSource.setUserPassword(user.id, hash);
-      } else {
-        return false;
+        this.dataSource.setUserPassword(user.id, hash).catch(err => {
+          logger.logError("Could not reset password", { err });
+          return rejection("INTERNAL_ERROR");
+        });
       }
     } catch (error) {
-      return false;
+      logger.logError("Could not reset password", { error, token });
+      return rejection("INTERNAL_ERROR");
     }
   }
 }

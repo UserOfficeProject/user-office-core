@@ -1,4 +1,73 @@
-export class Logger implements ILogger {
+class GrayLogLogger implements ILogger {
+  log = require("gelf-pro");
+
+  constructor(server: string, port: number, private environment: string) {
+    this.log.setConfig({
+      fields: {
+        facility: "DMSC",
+        service: "UserOfficeBackend"
+      },
+      adapterName: "tcp",
+      adapterOptions: {
+        host: server,
+        port: port
+      }
+    });
+  }
+
+  private getCommonFields(level: LEVEL, message: string) {
+    return {
+      level_str: LEVEL[level],
+      title: message,
+      environment: this.environment
+    };
+  }
+
+  logInfo(message: string, context: object) {
+    this.log.info(message, {
+      ...this.getCommonFields(LEVEL.INFO, message),
+      ...context
+    });
+  }
+
+  logWarn(message: string, context: object) {
+    this.log.warning(message, {
+      ...this.getCommonFields(LEVEL.WARN, message),
+      ...context
+    });
+  }
+
+  logDebug(message: string, context: object) {
+    this.log.debug(message, {
+      ...this.getCommonFields(LEVEL.DEBUG, message),
+      ...context
+    });
+  }
+
+  logError(message: string, context: object) {
+    this.log.error(message, {
+      ...this.getCommonFields(LEVEL.ERROR, message),
+      ...context
+    });
+  }
+
+  logException(message: string, exception: Error, context?: object): void {
+    this.log.error(
+      message,
+      (() => {
+        const { name, message, stack } = exception;
+        return {
+          exception: { name, message, stack },
+          level_str: LEVEL[LEVEL.ERROR],
+          ...this.getCommonFields(LEVEL.ERROR, message),
+          ...context
+        };
+      })()
+    );
+  }
+}
+
+class ConsoleLogger implements ILogger {
   logInfo(message: string, context: object) {
     this.log(LEVEL.INFO, message, context);
   }
@@ -31,13 +100,12 @@ export class Logger implements ILogger {
   }
 }
 
-export class DummyLogger implements ILogger {
+export class MutedLogger implements ILogger {
   logInfo(message: string, context: object): void {}
   logWarn(message: string, context: object): void {}
   logDebug(message: string, context: object): void {}
   logError(message: string, context: object): void {}
   logException(message: string, exception: Error, context?: object): void {}
-  log(level: LEVEL, message: string, context: object): void {}
 }
 
 export enum LEVEL {
@@ -55,5 +123,38 @@ export interface ILogger {
   logDebug(message: string, context: object): void;
   logError(message: string, context: object): void;
   logException(message: string, exception: Error, context?: object): void;
-  log(level: LEVEL, message: string, context: object): void;
 }
+
+class LoggerFactory {
+  static logger: ILogger;
+  static getLogger(): ILogger {
+    console.log(process.env.NODE_ENV);
+    console.log(process.env.GRAYLOG_SERVER);
+    console.log(process.env.GRAYLOG_PORT);
+    if (this.logger) {
+      return this.logger;
+    }
+    if (process.env.NODE_ENV === "development") {
+      this.logger = new ConsoleLogger();
+      this.logger = new GrayLogLogger(
+        process.env.GRAYLOG_SERVER!,
+        parseInt(process.env.GRAYLOG_PORT!),
+        process.env.NODE_ENV
+      );
+    } else {
+      const server = process.env.GRAYLOG_SERVER;
+      const port = parseInt(process.env.GRAYLOG_PORT || "0");
+      if (server && port) {
+        this.logger = new GrayLogLogger(server, port);
+      } else {
+        this.logger = new MutedLogger();
+      }
+    }
+
+    return this.logger;
+  }
+}
+
+const logger = LoggerFactory.getLogger();
+
+export { logger };

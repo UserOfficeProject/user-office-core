@@ -28,10 +28,9 @@ import AdminMutations from "./mutations/AdminMutations";
 
 import TemplateMutations from "./mutations/TemplateMutations";
 import TemplateQueries from "./queries/TemplateQueries";
-import { Logger } from "./utils/Logger";
+import { logger } from "./utils/Logger";
 
 // Site specific data sources and event handlers (only ESS atm)
-const logger = new Logger();
 const userDataSource = new PostgresUserDataSource();
 const proposalDataSource = new PostgresProposalDataSource();
 const reviewDataSource = new PostgresReviewDataSource();

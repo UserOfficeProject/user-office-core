@@ -8,7 +8,7 @@ import {
   ProposalTemplateField
 } from "../models/ProposalModel";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { DummyLogger } from "../utils/Logger";
+import { MutedLogger } from "../utils/Logger";
 import {
   dummyUserOfficer,
   dummyUser,
@@ -20,7 +20,7 @@ import TemplateMutations from "./TemplateMutations";
 
 // TODO: it is here much of the logic reside
 
-const dummyLogger = new DummyLogger();
+const dummyLogger = new MutedLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyTemplateDataSource = new templateDataSource();
 const userAuthorization = new UserAuthorization(

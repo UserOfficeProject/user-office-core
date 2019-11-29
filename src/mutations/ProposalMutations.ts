@@ -9,6 +9,7 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 import { isMatchingConstraints } from "../models/ProposalModelFunctions";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import { logger } from "../utils/Logger";
 
 // TODO: it is here much of the logic reside
 
@@ -112,11 +113,11 @@ export default class ProposalMutations {
         }
 
         if (users !== undefined) {
-          const resultUpdateUsers = await this.dataSource.setProposalUsers(
-            parseInt(id),
-            users
+          const [err] = await to(
+            this.dataSource.setProposalUsers(parseInt(id), users)
           );
-          if (!resultUpdateUsers) {
+          if (err) {
+            logger.logError(`Could not update users`, { err, id, agent });
             return rejection("INTERNAL_ERROR");
           }
         }

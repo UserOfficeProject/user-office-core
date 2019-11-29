@@ -1,5 +1,7 @@
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserDataSource } from "../datasources/UserDataSource";
+import {logger} from '../utils/Logger';
+
 const SparkPost = require("sparkpost");
 const options = {
   endpoint: "https://api.eu.sparkpost.com:443"
@@ -55,10 +57,10 @@ export default function createHandler(userDataSource: UserDataSource) {
             recipients: [{ address: event.user.email }]
           })
           .then((res: string) => {
-            console.log(res);
+            logger.logInfo("PASSWORD_RESET_EMAIL success:", {result:res});
           })
           .catch((err: string) => {
-            console.log(err);
+            logger.logError("PASSWORD_RESET_EMAIL fail:", {error:err});
           });
         return;
       }
@@ -99,10 +101,10 @@ export default function createHandler(userDataSource: UserDataSource) {
             ]
           })
           .then((res: string) => {
-            console.log(res);
+            logger.logInfo("PROPOSAL_SUBMITTED success:", {result:res});
           })
           .catch((err: string) => {
-            console.log(err);
+            logger.logError("PROPOSAL_SUBMITTED fail:", {error:err});
           });
         return;
       }
@@ -125,10 +127,10 @@ export default function createHandler(userDataSource: UserDataSource) {
               recipients: [{ address: event.user.email }]
             })
             .then((res: string) => {
-              console.log(res);
+              logger.logInfo("ACCOUNT_CREATED success:", {result:res});
             })
             .catch((err: string) => {
-              console.log(err);
+              logger.logError("ACCOUNT_CREATED fail:", {error:err});
             });
         }
         return;
