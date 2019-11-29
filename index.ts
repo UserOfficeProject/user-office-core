@@ -65,4 +65,13 @@ app.use(proposalDownload);
 
 app.listen(process.env.PORT || 4000);
 
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+  logger.logException("Unhandled EXPRESS JS exception", err, {req, res})
+  res.status(500).send('SERVER EXCEPTION');
+})
+
+process.on('uncaughtException', (err) => {
+  logger.logException("Unhandled NODE exception", err)
+});
+
 console.log("Running a GraphQL API server at localhost:4000/graphql");
