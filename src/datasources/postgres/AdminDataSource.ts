@@ -1,5 +1,7 @@
 import { AdminDataSource, Entry } from "../AdminDataSource";
 import database from "./database";
+import { PagetextRecord, createPageObject } from "./records";
+import { Page } from "../../models/Admin";
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async get(id: number): Promise<string | null> {
@@ -10,18 +12,20 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then((res: { content: string }) => res.content);
   }
-  async setPageText(id: number, content: string): Promise<Boolean> {
+
+  async setPageText(id: number, content: string): Promise<Page> {
     return database
       .update({
         content
       })
       .from("pagetext")
       .where("pagetext_id", id)
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
+      .returning("*")
+      .then((updatedRows: Array<PagetextRecord>) => {
+        if (updatedRows.length === 0) {
+          throw new Error(`Could not update page with id:${id}`);
+        }
+        return createPageObject(updatedRows[0]);
       });
   }
 
@@ -55,6 +59,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .first()
       .then((res: { institution: string }) => res.institution);
   }
+
   async getCountries(): Promise<Entry[]> {
     return database
       .select()

@@ -18,6 +18,7 @@ import {
 } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
+import { Page } from "../models/Admin";
 
 interface ProposalArgs {
   id: string;
@@ -229,6 +230,7 @@ const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
+const wrapPageTextMutation = createResponseWrapper<Page>("page");
 const wrapProposalTemplateFieldMutation = createResponseWrapper<
   ProposalTemplateField
 >("field");
@@ -598,16 +600,20 @@ export default {
   calls(args: {}, context: ResolverContext) {
     return context.queries.call.getAll(context.user);
   },
+
   setPageContent(
     args: { id: PageName; text: string },
     context: ResolverContext
   ) {
-    return context.mutations.admin.setPageText(
-      context.user,
-      parseInt(PageName[args.id]),
-      args.text
+    return wrapPageTextMutation(
+      context.mutations.admin.setPageText(
+        context.user,
+        parseInt(PageName[args.id]),
+        args.text
+      )
     );
   },
+
   getPageContent(args: { id: PageName }, context: ResolverContext) {
     return context.queries.admin.getPageText(parseInt(PageName[args.id]));
   },

@@ -27,7 +27,7 @@ test("A user can not set page text", () => {
   );
 });
 
-test("A userofficer can set page text", () => {
+test("A user officer can set page text", () => {
   return expect(
     adminMutations.setPageText(dummyUserOfficer, 1, "")
   ).resolves.toBe(true);
