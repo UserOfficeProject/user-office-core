@@ -65,7 +65,7 @@ export default function createHandler(userDataSource: UserDataSource) {
 
       case "EMAIL_INVITE": {
         const user = await userDataSource.get(event.userId);
-        const inviter = await userDataSource.get(event.inviterId);
+        const inviter = await userDataSource.getBasicUserInfo(event.inviterId);
 
         if (!user || !inviter) {
           console.log("Failed");
@@ -81,7 +81,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               firstname: user.firstname,
               lastname: user.lastname,
               email: user.email,
-              inviterName: inviter.preferredname,
+              inviterName: inviter.firstname,
               inviterLastname: inviter.lastname,
               inviterOrg: inviter.organisation
             },

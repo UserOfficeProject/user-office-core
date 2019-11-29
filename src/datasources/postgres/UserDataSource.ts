@@ -37,7 +37,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   private createBasicUserObject(user: UserRecord) {
     return new BasicUserDetails(
       user.user_id,
-      user.firstname,
+      user.preferredname,
       user.lastname,
       user.institution,
       user.position
