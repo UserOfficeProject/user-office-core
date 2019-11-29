@@ -96,6 +96,11 @@ export default class UserMutations {
         let user = await this.dataSource.getByEmail(args.email);
 
         if (user && user.placeholder) {
+          const changePassword = await this.updatePassword(
+            user,
+            user.id,
+            args.password
+          );
           const updatedUser = await this.update(user, {
             id: user.id,
             placeholder: false,
@@ -103,11 +108,6 @@ export default class UserMutations {
             ...args
           });
 
-          const changePassword = await this.updatePassword(
-            user,
-            user.id,
-            args.password
-          );
           const roles = await this.dataSource.setUserRoles(user.id, [1]);
           if (isRejection(updatedUser) || !changePassword || !roles) {
             return rejection("INTERNAL_ERROR");
@@ -287,7 +287,6 @@ export default class UserMutations {
     try {
       const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
-
       //Check that user exist and that it has not been updated since token creation
       if (
         user &&

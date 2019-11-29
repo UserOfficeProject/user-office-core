@@ -120,13 +120,13 @@ export default class PostgresUserDataSource implements UserDataSource {
         telephone,
         telephone_alt,
         placeholder,
-        orcid
+        orcid,
+        orcid_refreshtoken: refreshToken
       })
       .from("users")
       .where("user_id", user.id)
-      .then(() => {
-        return user;
-      })
+      .returning(["*"])
+      .then((user: UserRecord[]) => this.createUserObject(user[0]))
       .catch((e: string) => {
         console.log(e);
         return null;
