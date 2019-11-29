@@ -31,10 +31,7 @@ export interface ProposalDataSource {
     question_id: string,
     files: string[]
   ): Promise<string[] | null>;
-  deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<Boolean | null>;
+  deleteFiles(proposal_id: number, question_id: string): Promise<string[]>;
   updateTopicCompletenesses(
     id: number,
     topicsCompleted: number[]

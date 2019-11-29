@@ -159,17 +159,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async deleteFiles(
     proposal_id: number,
     question_id: string
-  ): Promise<Boolean | null> {
+  ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
-      return null;
+      throw new Error(
+        `Could not delete files because answer does not exist. AnswerID ${answerId}`
+      );
     }
 
-    await database("proposal_answers_files")
+    return await database("proposal_answers_files")
       .where({ answer_id: answerId })
+      .returning("file_id")
       .del();
-
-    return true;
   }
 
   private async getAnswerId(

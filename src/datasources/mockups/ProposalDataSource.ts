@@ -76,8 +76,8 @@ export class proposalDataSource implements ProposalDataSource {
   async deleteFiles(
     proposal_id: number,
     question_id: string
-  ): Promise<Boolean> {
-    return true;
+  ): Promise<string[]> {
+    return ["file_id_012345"];
   }
 
   async updateAnswer(
