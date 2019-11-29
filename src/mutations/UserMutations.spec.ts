@@ -7,7 +7,8 @@ import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
-  dummyUserOfficer
+  dummyUserOfficer,
+  dummyPlaceHolderUser
 } from "../datasources/mockups/UserDataSource";
 
 const jsonwebtoken = require("jsonwebtoken");
@@ -41,6 +42,53 @@ const userMutations = new UserMutations(
   userAuthorization,
   dummyEventBus
 );
+
+test("A user can invite another user by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUser,
+      "firstname",
+      "lastname",
+      "email@google.com"
+    )
+  ).resolves.toStrictEqual({ inviterId: dummyUser.id, userId: 5 });
+});
+
+test("A user must be logged in to invite another user by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      null,
+      "firstname",
+      "lastname",
+      "email@google.com"
+    )
+  ).resolves.toHaveProperty("reason", "MUST_LOGIN");
+});
+
+test("A user cannot invite another user by email if the user already has an account", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUserNotOnProposal,
+      "firstname",
+      "lastname",
+      dummyUser.email
+    )
+  ).resolves.toHaveProperty("reason", "ACCOUNT_EXIST");
+});
+
+test("A user can reinvite another user by email if the user has not created an account", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUser,
+      "firstname",
+      "lastname",
+      dummyPlaceHolderUser.email
+    )
+  ).resolves.toStrictEqual({
+    inviterId: dummyUser.id,
+    userId: dummyPlaceHolderUser.id
+  });
+});
 
 test("A user can update it's own name", () => {
   return expect(

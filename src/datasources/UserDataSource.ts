@@ -2,6 +2,11 @@ import { User, BasicUserDetails } from "../models/User";
 import { Role } from "../models/Role";
 
 export interface UserDataSource {
+  createInviteUser(
+    firstname: string,
+    lastname: string,
+    email: string
+  ): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<Boolean | null>;
   checkOrcIDExist(orcID: string): Promise<Boolean | null>;
@@ -42,6 +47,7 @@ export interface UserDataSource {
     telephone: string,
     telephone_alt: string
   ): Promise<User | null>;
+  createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User | null>;
   setUserRoles(id: number, roles: number[]): Promise<Boolean | null>;
   setUserPassword(id: number, password: string): Promise<Boolean>;
