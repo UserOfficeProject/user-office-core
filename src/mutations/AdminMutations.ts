@@ -3,9 +3,9 @@ import { User } from "../models/User";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { logger } from "../../build/src/utils/Logger";
 import { Rejection, rejection } from "../rejection";
 import { Page } from "../models/Admin";
+import { logger } from "../utils/Logger";
 
 export default class AdminMutations {
   constructor(
@@ -28,7 +28,7 @@ export default class AdminMutations {
         return page;
       })
       .catch(error => {
-        logger.logger.logException("Could not set page text", error, {
+        logger.logException("Could not set page text", error, {
           agent,
           id
         });

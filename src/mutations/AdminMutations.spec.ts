@@ -9,6 +9,8 @@ import {
   dummyUser,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
+import { rejection } from "../rejection";
+import { Page } from "../models/Admin";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -22,13 +24,13 @@ const adminMutations = new AdminMutations(
 );
 
 test("A user can not set page text", () => {
-  return expect(adminMutations.setPageText(dummyUser, 1, "")).resolves.toBe(
-    false
-  );
+  return expect(
+    adminMutations.setPageText(null, 1, "New page contents")
+  ).resolves.not.toBeInstanceOf(Page);
 });
 
 test("A user officer can set page text", () => {
   return expect(
     adminMutations.setPageText(dummyUserOfficer, 1, "")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(Page);
 });

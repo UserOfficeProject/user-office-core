@@ -1,6 +1,12 @@
 import { AdminDataSource, Entry } from "../AdminDataSource";
 import database from "./database";
-import { PagetextRecord, createPageObject } from "./records";
+import {
+  PagetextRecord,
+  createPageObject,
+  NationalityRecord,
+  InstitutionRecord,
+  CountryRecord
+} from "./records";
 import { Page } from "../../models/Admin";
 
 export default class PostgresAdminDataSource implements AdminDataSource {
@@ -10,7 +16,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .from("pagetext")
       .where("pagetext_id", id)
       .first()
-      .then((res: { content: string }) => res.content);
+      .then(res => (res ? res.content : null));
   }
 
   async setPageText(id: number, content: string): Promise<Page> {
@@ -33,7 +39,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return database
       .select()
       .from("nationalities")
-      .then((natDB: any[]) =>
+      .then((natDB: NationalityRecord[]) =>
         natDB.map(nat => {
           return { id: nat.nationality_id, value: nat.nationality };
         })
@@ -44,7 +50,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return database
       .select()
       .from("institutions")
-      .then((intDB: any[]) =>
+      .then((intDB: InstitutionRecord[]) =>
         intDB.map(int => {
           return { id: int.institution_id, value: int.institution };
         })
@@ -53,18 +59,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async getInstitution(id: number): Promise<string | null> {
     return database
-      .select("institution")
+      .select()
       .from("institutions")
       .where("institution_id", id)
       .first()
-      .then((res: { institution: string }) => res.institution);
+      .then((res: InstitutionRecord) => res.institution);
   }
 
   async getCountries(): Promise<Entry[]> {
     return database
       .select()
       .from("countries")
-      .then((countDB: any[]) =>
+      .then((countDB: CountryRecord[]) =>
         countDB.map(count => {
           return { id: count.country_id, value: count.country };
         })

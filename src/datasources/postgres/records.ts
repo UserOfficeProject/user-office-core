@@ -106,6 +106,20 @@ export interface CallRecord {
   readonly survey_comment: string;
 }
 
+export interface NationalityRecord {
+  readonly nationality_id: number;
+  readonly nationality: string;
+}
+
+export interface InstitutionRecord {
+  readonly institution_id: number;
+  readonly institution: string;
+  readonly verified: boolean;
+}
+
+export interface CountryRecord {
+  readonly country_id: number;
+  readonly country: string;
 export const createTopicObject = (proposal: TopicRecord) => {
   return new Topic(
     proposal.topic_id,

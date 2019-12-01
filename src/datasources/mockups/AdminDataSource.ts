@@ -14,7 +14,7 @@ export class adminDataSource implements AdminDataSource {
   async getNationalities(): Promise<Entry[]> {
     throw new Error("Method not implemented.");
   }
-  async get(id: number): Promise<string | null> {
+  async get(id: number) {
     return "HELLO WORLD";
   }
   async setPageText(id: number, text: string) {
