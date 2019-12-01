@@ -1,12 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import schema from "./src/schema";
 import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import { NextFunction } from "connect";
 import { logger } from "./src/utils/Logger";
+import graphqlHTTP, { RequestInfo } from "express-graphql";
 
-const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");
 const proposalDownload = require("./src/routes/pdf");
@@ -29,16 +28,13 @@ const authMiddleware = jwt({
   secret: process.env.secret
 });
 
-// GQL extensions. Required for logging
-const extensions = async ({
-  operationName,
-  result,
-}:{
-  operationName:any,
-  result:any,
-}) => {
-  if(result.errors) {
-    logger.logError("Failed GRAPHQL execution", {result, operationName})
+const extensions = async (info: RequestInfo) => {
+  if (info.result.errors) {
+    logger.logError("Failed GRAPHQL execution", {
+      result: info.result,
+      operationName: info.operationName,
+      user: info.context.user
+    });
   }
 };
 
@@ -76,21 +72,19 @@ app.use(
   })
 );
 
-
-
 app.use(files);
 
 app.use(proposalDownload);
 
 app.listen(process.env.PORT || 4000);
 
-app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
-  logger.logException("Unhandled EXPRESS JS exception", err, {req, res})
-  res.status(500).send('SERVER EXCEPTION');
-})
+app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
+  logger.logException("Unhandled EXPRESS JS exception", err, { req, res });
+  res.status(500).send("SERVER EXCEPTION");
+});
 
-process.on('uncaughtException', (err) => {
-  logger.logException("Unhandled NODE exception", err)
+process.on("uncaughtException", err => {
+  logger.logException("Unhandled NODE exception", err);
 });
 
 console.log("Running a GraphQL API server at localhost:4000/graphql");

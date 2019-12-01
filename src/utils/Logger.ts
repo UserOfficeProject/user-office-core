@@ -162,9 +162,6 @@ export interface ILogger {
 class LoggerFactory {
   static logger: ILogger;
   static getLogger(): ILogger {
-    console.log(process.env.NODE_ENV);
-    console.log(process.env.GRAYLOG_SERVER);
-    console.log(process.env.GRAYLOG_PORT);
     if (this.logger) {
       return this.logger;
     }
