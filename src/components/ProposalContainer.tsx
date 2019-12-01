@@ -346,7 +346,6 @@ function QuestionaryStepButton(
   } else if (editable) {
     buttonClasses.push(classes.editable);
   }
-
   return (
     <StepButton
       {...props}

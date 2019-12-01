@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     border: "2px solid red"
   },
   agreeBox: {
-    "font-size": ".7em"
+    "font-size": ".8em"
   },
   errorText: {
     color: "red"
@@ -102,6 +102,9 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     margin: "30px 0"
+  },
+  cardTitle: {
+    color: "black"
   }
 }));
 
@@ -152,7 +155,8 @@ export default function SignUp(props) {
                             $position: String!,
                             $email: String!,
                             $telephone: String!,
-                            $telephone_alt: String
+                            $telephone_alt: String,
+                            $otherOrganisation: String
                             )
                   {
                     createUser(
@@ -173,7 +177,8 @@ export default function SignUp(props) {
                               position: $position
                               email: $email
                               telephone: $telephone
-                              telephone_alt: $telephone_alt
+                              telephone_alt: $telephone_alt,
+                              otherOrganisation: $otherOrganisation
                               )
                      {
                         user { id }
@@ -258,9 +263,23 @@ export default function SignUp(props) {
                 >
                   <Typography className={classes.cardHeader}>
                     {orcData ? (
-                      <FormLabel>Found OrcID</FormLabel>
+                      <FormLabel
+                        classes={{
+                          root: classes.cardTitle
+                        }}
+                      >
+                        1. Found ORCID iD
+                      </FormLabel>
                     ) : (
-                      <FormLabel required> Register OrcID</FormLabel>
+                      <FormLabel
+                        required
+                        classes={{
+                          root: classes.cardTitle
+                        }}
+                      >
+                        {" "}
+                        1. Register ORCID iD
+                      </FormLabel>
                     )}
                   </Typography>
                   <CardContent>
@@ -269,15 +288,20 @@ export default function SignUp(props) {
                     ) : (
                       <React.Fragment>
                         <p>
-                          ESS is collecting your ORCID iD so we can verify and
-                          update your record. When you click the “Register”
-                          button, we will ask you to share your iD using an
-                          authenticated process: either by registering for an
-                          ORCID iD or, if you already have one, by signing into
-                          your ORCID account, then granting us permission to get
-                          your ORCID iD. We do this to ensure that you are
-                          correctly identified and securely connecting your
-                          ORCID iD.
+                          Please add you ORCID iD <b>first</b>: ESS will collect
+                          any information we can from ORCID before you complete
+                          the rest of the sign up.
+                        </p>
+
+                        <p>
+                          ESS collects your ORCID iD so we can verify your
+                          record. When you click the “Register” button, we will
+                          ask you to share your iD using an authenticated
+                          process: either by registering for an ORCID iD or, if
+                          you already have one, by signing into your ORCID
+                          account, then granting us permission to get your ORCID
+                          iD. We do this to ensure that you are correctly
+                          identified and securely connecting your ORCID iD.
                         </p>
                         <Button
                           fullWidth
@@ -312,7 +336,7 @@ export default function SignUp(props) {
                 )}
                 <Card className={classes.card}>
                   <Typography className={classes.cardHeader}>
-                    Login details
+                    2. Login details
                   </Typography>
                   <CardContent>
                     <Field
@@ -356,7 +380,7 @@ export default function SignUp(props) {
 
                 <Card className={classes.card}>
                   <Typography className={classes.cardHeader}>
-                    Personal details
+                    3. Personal details
                   </Typography>
 
                   <CardContent>
@@ -465,7 +489,7 @@ export default function SignUp(props) {
 
                 <Card className={classes.card}>
                   <Typography className={classes.cardHeader}>
-                    Organization details
+                    4. Organisation details
                   </Typography>
                   <CardContent>
                     <Grid container spacing={1}>
@@ -501,13 +525,13 @@ export default function SignUp(props) {
                       />
                       {values.organisation === 1 && (
                         <Field
-                          name="otherorganisation"
+                          name="otherOrganisation"
                           label="Please specify organisation"
                           type="text"
                           component={TextField}
                           margin="normal"
                           fullWidth
-                          data-cy="otherorganisation"
+                          data-cy="otherOrganisation"
                           required
                           disabled={!orcData || orcData.registered}
                         />
@@ -518,7 +542,7 @@ export default function SignUp(props) {
 
                 <Card className={classes.card}>
                   <Typography className={classes.cardHeader}>
-                    Contact details
+                    5. Contact details
                   </Typography>
                   <CardContent>
                     <Grid container spacing={1}>

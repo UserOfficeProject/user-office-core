@@ -28,6 +28,7 @@ function ParticipantModal(props) {
           action={addUser}
           selectedUsers={props.selectedUsers}
           usersOnly={true}
+          emailInvite={true}
         />
       </DialogContent>
     </Dialog>

@@ -138,7 +138,8 @@ export default function ProfilePage({ match, history }) {
 }`;
     const variables = {
       id: parseInt(match.params.id),
-      ...values
+      ...values,
+      gender: values.gender === "other" ? values.othergender : values.gender
     };
     sendRequest(query, variables).then(data => {
       if (!data.user) {
@@ -217,7 +218,11 @@ export default function ProfilePage({ match, history }) {
                   middlename: userData.middlename,
                   lastname: userData.lastname,
                   preferredname: userData.preferredname,
-                  gender: userData.gender,
+                  gender:
+                    userData.gender !== "male" && userData.gender !== "female"
+                      ? "other"
+                      : userData.gender,
+                  othergender: userData.gender,
                   nationality: userData.nationality,
                   birthdate: dateformat(
                     new Date(parseInt(userData.birthdate)),
@@ -240,7 +245,7 @@ export default function ProfilePage({ match, history }) {
                 }}
                 validationSchema={userFieldSchema}
               >
-                {({ isSubmitting }) => (
+                {({ isSubmitting, values }) => (
                   <Form>
                     <Typography variant="h6" gutterBottom>
                       User Information
@@ -305,6 +310,18 @@ export default function ProfilePage({ match, history }) {
                           ]}
                           data-cy="gender"
                         />
+                        {values.gender === "other" && (
+                          <Field
+                            name="othergender"
+                            label="Please specify gender"
+                            type="text"
+                            component={TextField}
+                            margin="normal"
+                            fullWidth
+                            data-cy="othergender"
+                            required
+                          />
+                        )}
                         <FormikDropdown
                           name="nationality"
                           label="Nationality"
@@ -429,6 +446,7 @@ export default function ProfilePage({ match, history }) {
                           fullWidth
                           autoComplete="off"
                           data-cy="password"
+                          helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
                         />
                       </Grid>
                       <Grid item xs={6}>
