@@ -26,10 +26,10 @@ export class templateDataSource implements TemplateDataSource {
     dummyTemplate = createDummyTemplate();
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
-    return true;
+  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
+    return topicOrder;
   }
-  async deleteTopic(id: number): Promise<Topic | null> {
+  async deleteTopic(id: number): Promise<Topic> {
     return createDummyTopic(id, {});
   }
   async createTemplateField(
@@ -38,7 +38,7 @@ export class templateDataSource implements TemplateDataSource {
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField | null> {
+  ): Promise<ProposalTemplateField> {
     return createDummyField({
       proposal_question_id: fieldId,
       topic_id: topicId,
@@ -54,7 +54,7 @@ export class templateDataSource implements TemplateDataSource {
     return createDummyField({ proposal_question_id: fieldId });
   }
 
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
+  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
     return this.getProposalTemplate();
   }
   async updateTemplateField(
@@ -66,7 +66,7 @@ export class templateDataSource implements TemplateDataSource {
       config?: string | undefined;
       sort_order: number;
     }
-  ): Promise<ProposalTemplate | null> {
+  ): Promise<ProposalTemplate> {
     var template = await this.getProposalTemplate();
     template.steps.forEach(topic => {
       topic.fields!.forEach(field => {
