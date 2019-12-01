@@ -78,6 +78,8 @@ export interface UserRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly institution: string;
+  readonly placeholder: boolean;
+  readonly orcid_refreshtoken: string;
 }
 
 export interface RoleRecord {

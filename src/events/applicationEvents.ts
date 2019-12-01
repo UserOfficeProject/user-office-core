@@ -39,6 +39,12 @@ interface AccountCreation {
   link: string;
 }
 
+interface EmailInvite {
+  type: "EMAIL_INVITE";
+  userId: number;
+  inviterId: number;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -46,4 +52,5 @@ export type ApplicationEvent =
   | ProposalRejectedEvent
   | ProposalCreatedEvent
   | AccountCreation
+  | EmailInvite
   | UserResetPasswordEmailEvent;
