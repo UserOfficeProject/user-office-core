@@ -7,6 +7,7 @@ import {
   QuestionaryField
 } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
+import { Page } from "../../models/Admin";
 import { FileMetadata } from "../../models/Blob";
 
 // Interfaces corresponding exactly to database tables
@@ -107,6 +108,11 @@ export interface CallRecord {
   readonly survey_comment: string;
 }
 
+export interface PagetextRecord {
+  readonly pagetext_id: number;
+  readonly content: string;
+}
+
 export interface NationalityRecord {
   readonly nationality_id: number;
   readonly nationality: string;
@@ -131,6 +137,11 @@ export interface FileRecord {
   readonly oid: number;
   readonly created_at: Date;
 }
+
+export const createPageObject = (record: PagetextRecord) => {
+  return new Page(record.pagetext_id, record.content);
+};
+
 export const createTopicObject = (proposal: TopicRecord) => {
   return new Topic(
     proposal.topic_id,
