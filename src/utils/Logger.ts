@@ -19,7 +19,8 @@ class GrayLogLogger implements ILogger {
     return {
       level_str: LEVEL[level],
       title: message,
-      environment: this.environment
+      environment: this.environment,
+      stackTrace: new Error().stack
     };
   }
 
@@ -51,19 +52,30 @@ class GrayLogLogger implements ILogger {
     });
   }
 
-  logException(message: string, exception: Error, context?: object): void {
-    this.log.error(
-      message,
-      (() => {
-        const { name, message, stack } = exception;
-        return {
-          exception: { name, message, stack },
-          level_str: LEVEL[LEVEL.ERROR],
-          ...this.getCommonFields(LEVEL.ERROR, message),
-          ...context
-        };
-      })()
-    );
+  logException(
+    message: string,
+    exception: Error | string,
+    context?: object
+  ): void {
+    if (exception instanceof Error) {
+      this.log.error(
+        message,
+        (() => {
+          const { name, message, stack } = exception;
+          return {
+            exception: { name, message, stack },
+            level_str: LEVEL[LEVEL.ERROR],
+            ...this.getCommonFields(LEVEL.ERROR, message),
+            ...context
+          };
+        })()
+      );
+      if (typeof exception === "string" || exception instanceof String) {
+        this.logError(message, { exception, ...context });
+      } else {
+        this.logError(message, context || {});
+      }
+    }
   }
 }
 
@@ -84,15 +96,29 @@ class ConsoleLogger implements ILogger {
     this.log(LEVEL.ERROR, message, context);
   }
 
-  logException(message: string, exception: Error, context?: object): void {
-    this.log(
-      LEVEL.EXCEPTION,
-      message,
-      (() => {
-        const { name, message, stack } = exception;
-        return { exception: { name, message, stack }, ...context };
-      })()
-    );
+  logException(
+    message: string,
+    exception: Error | string,
+    context?: object
+  ): void {
+    if (exception instanceof Error) {
+      this.logError(
+        message,
+        (() => {
+          const { name, message, stack } = exception;
+          return {
+            exception: { name, message, stack },
+            level_str: LEVEL[LEVEL.ERROR],
+            ...context
+          };
+        })()
+      );
+      if (typeof exception === "string" || exception instanceof String) {
+        this.logError(message, { exception, ...context });
+      } else {
+        this.logError(message, context || {});
+      }
+    }
   }
 
   log(level: LEVEL, message: string, context: object) {
@@ -105,7 +131,11 @@ export class MutedLogger implements ILogger {
   logWarn(message: string, context: object): void {}
   logDebug(message: string, context: object): void {}
   logError(message: string, context: object): void {}
-  logException(message: string, exception: Error, context?: object): void {}
+  logException(
+    message: string,
+    exception: Error | string,
+    context?: object
+  ): void {}
 }
 
 export enum LEVEL {
@@ -122,7 +152,11 @@ export interface ILogger {
   logWarn(message: string, context: object): void;
   logDebug(message: string, context: object): void;
   logError(message: string, context: object): void;
-  logException(message: string, exception: Error, context?: object): void;
+  logException(
+    message: string,
+    exception: Error | string,
+    context?: object
+  ): void;
 }
 
 class LoggerFactory {
@@ -144,8 +178,9 @@ class LoggerFactory {
     } else {
       const server = process.env.GRAYLOG_SERVER;
       const port = parseInt(process.env.GRAYLOG_PORT || "0");
-      if (server && port) {
-        this.logger = new GrayLogLogger(server, port);
+      const env = process.env.NODE_ENV;
+      if (server && port && env) {
+        this.logger = new GrayLogLogger(server, port, env);
       } else {
         this.logger = new MutedLogger();
       }
