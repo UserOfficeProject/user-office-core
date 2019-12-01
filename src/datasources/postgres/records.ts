@@ -130,7 +130,7 @@ export interface CountryRecord {
 }
 
 export interface FileRecord {
-  readonly file_id: number;
+  readonly file_id: string;
   readonly file_name: string;
   readonly size_in_bytes: number;
   readonly mime_type: string;
