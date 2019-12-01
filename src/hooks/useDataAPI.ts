@@ -2,7 +2,7 @@ import { useContext, useCallback } from "react";
 import { GraphQLClient } from "graphql-request";
 import { UserContext } from "../context/UserContextProvider";
 
-export function useDataAPI() {
+export function useDataAPI<T>():(query:string, variables?:any) => Promise<T> {
   const { token, expToken, handleNewToken } = useContext(UserContext);
   const endpoint = "/graphql";
 

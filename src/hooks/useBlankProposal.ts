@@ -4,7 +4,7 @@ import { Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 
 export function useBlankProposal() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [proposal, setProposal] = useState<ProposalInformation | null>(null);
 
   useEffect(() => {

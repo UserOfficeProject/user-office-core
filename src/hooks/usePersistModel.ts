@@ -9,7 +9,7 @@ import {
 } from "../models/ProposalModel";
 
 export function usePersistModel() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {

@@ -84,7 +84,7 @@ export function useFileUpload() {
 }
 
 export function useGetFileMetadata() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [filesMetadata, setFilesMetadata] = useState<FileMetaData[]>([]);
   const getFileMetadata = (fileIds: string[]) => {
     const query = `

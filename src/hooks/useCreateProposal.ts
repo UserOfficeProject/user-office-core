@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useCreateProposal() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [loading, setLoading] = useState(false);
 
   const createProposal = useCallback(async () => {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useSubmitProposal() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const submitProposal = async (id: number) => {

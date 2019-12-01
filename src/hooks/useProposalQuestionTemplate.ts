@@ -3,7 +3,7 @@ import { useDataAPI } from "./useDataAPI";
 import { ProposalTemplate } from "../models/ProposalModel";
 
 export function useProposalQuestionTemplate() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
 
   const getProposalTemplateRequest = useCallback(async () => {
     const query = `

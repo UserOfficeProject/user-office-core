@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useDeleteProposal() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
 
   const deleteProposal = useCallback(
     async (id: number) => {
