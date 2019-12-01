@@ -7,6 +7,7 @@ import {
   QuestionaryField
 } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
+import { FileMetadata } from "../../models/Blob";
 
 // Interfaces corresponding exactly to database tables
 
@@ -120,6 +121,16 @@ export interface InstitutionRecord {
 export interface CountryRecord {
   readonly country_id: number;
   readonly country: string;
+}
+
+export interface FileRecord {
+  readonly file_id: number;
+  readonly file_name: string;
+  readonly size_in_bytes: number;
+  readonly mime_type: string;
+  readonly oid: number;
+  readonly created_at: Date;
+}
 export const createTopicObject = (proposal: TopicRecord) => {
   return new Topic(
     proposal.topic_id,
@@ -186,5 +197,16 @@ export const createQuestionaryFieldObject = (
       null
     ),
     question.value || ""
+  );
+};
+
+export const createFileMetadata = (record: FileRecord) => {
+  return new FileMetadata(
+    record.file_id,
+    record.oid,
+    record.file_name,
+    record.mime_type,
+    record.size_in_bytes,
+    record.created_at
   );
 };

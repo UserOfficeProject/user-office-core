@@ -5,21 +5,39 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { IFileDataSource } from "../datasources/IFileDataSource";
 import { FileMetadata } from "../models/Blob";
+import { Rejection, rejection } from "../rejection";
+import { logger } from "../utils/Logger";
 
 export default class FileMutations {
-    constructor(
-      private dataSource: IFileDataSource,
-      private userAuth: UserAuthorization,
-      private eventBus: EventBus<ApplicationEvent>
-    ) {}
-    
-    async put(fileName:string, mimeType:string, sizeImBytes:number, path: string):Promise<FileMetadata | null> {
-        return await this.dataSource.put(fileName, mimeType, sizeImBytes, path);
-    }
+  constructor(
+    private dataSource: IFileDataSource,
+    private userAuth: UserAuthorization,
+    private eventBus: EventBus<ApplicationEvent>
+  ) {}
 
-    async prepare(fileId:string):Promise<string | null> {
-      const filePath = `downloads/${fileId}`;
-      await this.dataSource.prepare(fileId, filePath);
-      return filePath;
-    }
+  async put(
+    fileName: string,
+    mimeType: string,
+    sizeImBytes: number,
+    path: string
+  ): Promise<FileMetadata | Rejection> {
+    return this.dataSource
+      .put(fileName, mimeType, sizeImBytes, path)
+      .then(metadata => metadata)
+      .catch(err => {
+        logger.logException("Could not save file", err, { fileName, path });
+        return rejection("INTERNAL_ERROR");
+      });
+  }
+
+  async prepare(fileId: string): Promise<string | Rejection> {
+    const filePath = `downloads/${fileId}`;
+    return this.dataSource
+      .prepare(fileId, filePath)
+      .then(fid => fid)
+      .catch(err => {
+        logger.logException("Could not prepare file", err, { fileId });
+        return rejection("INTERNAL_ERROR");
+      });
+  }
 }
