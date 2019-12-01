@@ -114,7 +114,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     const hasEntry = results && results.count !== "0";
     if (hasEntry) {
-      database("proposal_answers")
+      return database("proposal_answers")
         .update({
           answer: answer
         })
@@ -124,7 +124,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         .then(() => question_id);
     } else {
-      database("proposal_answers")
+      return database("proposal_answers")
         .insert({
           proposal_id: proposal_id,
           proposal_question_id: question_id,
