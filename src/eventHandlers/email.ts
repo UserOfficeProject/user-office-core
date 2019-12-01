@@ -1,6 +1,6 @@
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserDataSource } from "../datasources/UserDataSource";
-import {logger} from '../utils/Logger';
+import { logger } from "../utils/Logger";
 
 const SparkPost = require("sparkpost");
 const options = {
@@ -57,10 +57,16 @@ export default function createHandler(userDataSource: UserDataSource) {
             recipients: [{ address: event.user.email }]
           })
           .then((res: string) => {
-            logger.logInfo("PASSWORD_RESET_EMAIL success:", {result:res});
+            logger.logInfo("Emai send on for password reset:", {
+              result: res,
+              event
+            });
           })
           .catch((err: string) => {
-            logger.logError("PASSWORD_RESET_EMAIL fail:", {error:err});
+            logger.logError("Could not send email for password reset", {
+              error: err,
+              event
+            });
           });
         return;
       }
@@ -101,10 +107,16 @@ export default function createHandler(userDataSource: UserDataSource) {
             ]
           })
           .then((res: string) => {
-            logger.logInfo("PROPOSAL_SUBMITTED success:", {result:res});
+            logger.logInfo("Email sent on proposal submission:", {
+              result: res,
+              event
+            });
           })
           .catch((err: string) => {
-            logger.logError("PROPOSAL_SUBMITTED fail:", {error:err});
+            logger.logError("Could not send email on proposal submission:", {
+              error: err,
+              event
+            });
           });
         return;
       }
@@ -127,10 +139,16 @@ export default function createHandler(userDataSource: UserDataSource) {
               recipients: [{ address: event.user.email }]
             })
             .then((res: string) => {
-              logger.logInfo("ACCOUNT_CREATED success:", {result:res});
+              logger.logInfo("Email sent on user creation:", {
+                result: res,
+                event
+              });
             })
             .catch((err: string) => {
-              logger.logError("ACCOUNT_CREATED fail:", {error:err});
+              logger.logError("Could not send email on user creation:", {
+                error: err,
+                event
+              });
             });
         }
         return;
