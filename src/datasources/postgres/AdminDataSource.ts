@@ -50,6 +50,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     return database
       .select()
       .from("institutions")
+      .where("verified", true)
       .then((intDB: InstitutionRecord[]) =>
         intDB.map(int => {
           return { id: int.institution_id, value: int.institution };
@@ -59,7 +60,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async getInstitution(id: number): Promise<string | null> {
     return database
-      .select()
+      .select("*")
       .from("institutions")
       .where("institution_id", id)
       .first()

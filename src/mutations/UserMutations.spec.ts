@@ -7,8 +7,11 @@ import {
   userDataSource,
   dummyUser,
   dummyUserNotOnProposal,
-  dummyUserOfficer
+  dummyUserOfficer,
+  dummyPlaceHolderUser
 } from "../datasources/mockups/UserDataSource";
+import { rejection } from "../rejection";
+import { BasicUserDetails } from "../models/User";
 
 const jsonwebtoken = require("jsonwebtoken");
 
@@ -41,6 +44,53 @@ const userMutations = new UserMutations(
   userAuthorization,
   dummyEventBus
 );
+
+test("A user can invite another user by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUser,
+      "firstname",
+      "lastname",
+      "email@google.com"
+    )
+  ).resolves.toStrictEqual({ inviterId: dummyUser.id, userId: 5 });
+});
+
+test("A user must be logged in to invite another user by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      null,
+      "firstname",
+      "lastname",
+      "email@google.com"
+    )
+  ).resolves.toHaveProperty("reason", "MUST_LOGIN");
+});
+
+test("A user cannot invite another user by email if the user already has an account", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUserNotOnProposal,
+      "firstname",
+      "lastname",
+      dummyUser.email
+    )
+  ).resolves.toHaveProperty("reason", "ACCOUNT_EXIST");
+});
+
+test("A user can reinvite another user by email if the user has not created an account", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(
+      dummyUser,
+      "firstname",
+      "lastname",
+      dummyPlaceHolderUser.email
+    )
+  ).resolves.toStrictEqual({
+    inviterId: dummyUser.id,
+    userId: dummyPlaceHolderUser.id
+  });
+});
 
 test("A user can update it's own name", () => {
   return expect(
@@ -150,19 +200,19 @@ test("A user get's a error if providing a email not attached to a account", () =
 test("A user can update it's password if it has a valid token", () => {
   return expect(
     userMutations.resetPassword(goodToken, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test("A user can not update it's password if it has a bad token", () => {
   return expect(
     userMutations.resetPassword(badToken, "Test1234!")
-  ).resolves.toBe(false);
+  ).resolves.toHaveProperty("reason");
 });
 
-test("A user can it's password ", () => {
+test("A user can update it's password ", () => {
   return expect(
     userMutations.updatePassword(dummyUser, dummyUser.id, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test("A user can not update another users password ", () => {
@@ -184,5 +234,5 @@ test("A not logged in users can not update passwords ", () => {
 test("A user officer can update any password ", () => {
   return expect(
     userMutations.updatePassword(dummyUserOfficer, dummyUser.id, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });

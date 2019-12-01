@@ -54,15 +54,13 @@ export class proposalDataSource implements ProposalDataSource {
       }
     ];
   }
-  async deleteProposal(id: number): Promise<Proposal | null> {
+  async deleteProposal(id: number): Promise<Proposal> {
     return dummyProposal;
   }
   async updateTopicCompletenesses(
     id: number,
     topicsCompleted: number[]
-  ): Promise<Boolean | null> {
-    return true;
-  }
+  ): Promise<void> {}
   async getQuestionary(proposalId: number): Promise<Questionary> {
     return dummyQuestionary;
   }
@@ -84,20 +82,20 @@ export class proposalDataSource implements ProposalDataSource {
     proposal_id: number,
     question_id: string,
     answer: string
-  ): Promise<Boolean> {
-    return true;
+  ): Promise<string> {
+    return question_id;
   }
   async checkActiveCall(): Promise<Boolean> {
     return true;
   }
 
-  async rejectProposal(id: number): Promise<Proposal | null> {
+  async rejectProposal(id: number): Promise<Proposal> {
     if (id && id > 0) {
       return dummyProposal;
     }
-    return null;
+    throw new Error("Wrong ID");
   }
-  async update(proposal: Proposal): Promise<Proposal | null> {
+  async update(proposal: Proposal): Promise<Proposal> {
     if (proposal.id && proposal.id > 0) {
       if (proposal.id == dummyProposalSubmitted.id) {
         return dummyProposalSubmitted;
@@ -105,23 +103,21 @@ export class proposalDataSource implements ProposalDataSource {
         return dummyProposal;
       }
     }
-    return null;
+    throw new Error("Error");
   }
-  async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
-    return true;
-  }
-  async acceptProposal(id: number): Promise<Proposal | null> {
+  async setProposalUsers(id: number, users: number[]): Promise<void> {}
+  async acceptProposal(id: number): Promise<Proposal> {
     if (id && id > 0) {
       return dummyProposal;
     }
-    return null;
+    throw new Error("Wrong ID");
   }
 
-  async submitProposal(id: number): Promise<Proposal | null> {
+  async submitProposal(id: number): Promise<Proposal> {
     if (id && id > 0) {
       return dummyProposal;
     }
-    return null;
+    throw new Error("Wrong ID");
   }
 
   async get(id: number) {

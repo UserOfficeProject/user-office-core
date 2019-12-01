@@ -1,4 +1,10 @@
-import { User, UpdateUserArgs, checkUserArgs } from "../models/User";
+import {
+  User,
+  UpdateUserArgs,
+  checkUserArgs,
+  BasicUserDetails,
+  CreateUserArgs
+} from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { isRejection, rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
@@ -27,66 +33,121 @@ export default class UserMutations {
     return hash;
   }
 
-  async create(
-    user_title: string,
+  async createUserByEmailInvite(
+    agent: User | null,
     firstname: string,
-    middlename: string,
     lastname: string,
-    password: string,
-    preferredname: string,
-    orcid: string,
-    orcidHash: string,
-    refreshToken: string,
-    gender: string,
-    nationality: number,
-    birthdate: string,
-    organisation: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string,
-    telephone_alt: string
+    email: string
+  ): Promise<{ userId: number; inviterId: number } | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        if (!agent) {
+          return rejection("MUST_LOGIN");
+        }
+        //Check if email exist in database and if user has been invited before
+        const user = await this.dataSource.getByEmail(email);
+        if (user && user.placeholder) {
+          return {
+            userId: user.id,
+            inviterId: agent.id
+          };
+        } else if (user) {
+          return rejection("ACCOUNT_EXIST");
+        }
+        return {
+          userId: await this.dataSource.createInviteUser(
+            firstname,
+            lastname,
+            email
+          ),
+          inviterId: agent.id
+        };
+      },
+      res => {
+        return {
+          type: "EMAIL_INVITE",
+          userId: res.userId,
+          inviterId: res.inviterId
+        };
+      }
+    );
+  }
+
+  async create(
+    args: CreateUserArgs
   ): Promise<{ user: User; link: string } | Rejection> {
     return this.eventBus.wrap(
       async () => {
-        if (firstname === "") {
-          return rejection("INVALID_FIRST_NAME");
-        }
-
-        if (lastname === "") {
-          return rejection("INVALID_LAST_NAME");
-        }
-
         if (
-          this.createHash(orcid) !== orcidHash &&
+          this.createHash(args.orcid) !== args.orcidHash &&
           !(process.env.NODE_ENV === "development")
         ) {
+          logger.logError("ORCID hash mismatch", { args });
           return rejection("ORCID_HASH_MISMATCH");
         }
 
-        const hash = this.createHash(password);
+        const hash = this.createHash(args.password);
+        let organisationId = args.organisation;
+        // Check if user has other org and if so create it
+        if (args.otherOrganisation) {
+          organisationId = await this.dataSource.createOrganisation(
+            args.otherOrganisation,
+            false
+          );
+        }
 
-        const user = await this.dataSource.create(
-          user_title,
-          firstname,
-          middlename,
-          lastname,
-          `${firstname}.${lastname}.${orcid}`, // This is just for now, while we decide on the final format
-          hash,
-          preferredname,
-          orcid,
-          refreshToken,
-          gender,
-          nationality,
-          birthdate,
-          organisation,
-          department,
-          position,
-          email,
-          telephone,
-          telephone_alt
-        );
+        //Check if email exist in database and if user has been invited
+        let user = await this.dataSource.getByEmail(args.email);
+
+        if (user && user.placeholder) {
+          const changePassword = await this.updatePassword(
+            user,
+            user.id,
+            args.password
+          );
+          const updatedUser = await this.update(user, {
+            id: user.id,
+            placeholder: false,
+            password: hash,
+            ...args
+          });
+
+          const [updateRolesErr] = await to(
+            this.dataSource.setUserRoles(user.id, [1])
+          );
+          if (isRejection(updatedUser) || !changePassword || !updateRolesErr) {
+            logger.logError("Could not create user", {
+              updatedUser,
+              changePassword,
+              updateRolesErr
+            });
+            return rejection("INTERNAL_ERROR");
+          }
+          user = updatedUser;
+        } else {
+          user = await this.dataSource.create(
+            args.user_title,
+            args.firstname,
+            args.middlename,
+            args.lastname,
+            `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+            hash,
+            args.preferredname,
+            args.orcid,
+            args.refreshToken,
+            args.gender,
+            args.nationality,
+            args.birthdate,
+            organisationId,
+            args.department,
+            args.position,
+            args.email,
+            args.telephone,
+            args.telephone_alt
+          );
+        }
         if (!user) {
+          logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
 
@@ -150,10 +211,15 @@ export default class UserMutations {
         return rejection("INTERNAL_ERROR");
       }
     }
-    const result = await this.dataSource.update(user);
-
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .update(user)
+      .then(user => user)
+      .catch(err => {
+        logger.logException("Could not create user", err, { user });
+        return rejection("INTERNAL_ERROR");
+      });
   }
+
   async login(email: string, password: string): Promise<string | Rejection> {
     const user = await this.dataSource.getByEmail(email);
 
@@ -195,6 +261,7 @@ export default class UserMutations {
       );
       return freshToken;
     } catch (error) {
+      logger.logError("Bad token", { token });
       return rejection("BAD_TOKEN");
     }
   }
@@ -207,6 +274,7 @@ export default class UserMutations {
         const user = await this.dataSource.getByEmail(email);
 
         if (!user) {
+          logger.logInfo("Could not find user by email", { email });
           return rejection("COULD_NOT_FIND_USER_BY_EMAIL");
         }
 
@@ -236,7 +304,6 @@ export default class UserMutations {
     try {
       const decoded = jsonwebtoken.verify(token, process.env.secret);
       const user = await this.dataSource.get(decoded.id);
-
       //Check that user exist and that it has not been updated since token creation
       if (
         user &&
@@ -248,6 +315,7 @@ export default class UserMutations {
         return false;
       }
     } catch (error) {
+      logger.logException("Could not verify email", error, { token });
       return false;
     }
   }
@@ -258,26 +326,27 @@ export default class UserMutations {
     ) {
       return false;
     }
-    // Check that token is valid
     try {
       const hash = this.createHash(password);
-
       let user = await this.dataSource.get(id);
-
-      //Check that user exist and that it has not been updated since token creation
       if (user) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
+        logger.logError("Could not update password. Used does not exist", {
+          agent,
+          id
+        });
         return false;
       }
     } catch (error) {
+      logger.logException("Could not update password", error, { agent, id });
       return false;
     }
   }
   async resetPassword(
     token: string,
     password: string
-  ): Promise<void | Rejection> {
+  ): Promise<BasicUserDetails | Rejection> {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
@@ -290,11 +359,19 @@ export default class UserMutations {
         user.updated === decoded.updated &&
         decoded.type === "passwordReset"
       ) {
-        this.dataSource.setUserPassword(user.id, hash).catch(err => {
-          logger.logError("Could not reset password", { err });
-          return rejection("INTERNAL_ERROR");
-        });
+        return this.dataSource
+          .setUserPassword(user.id, hash)
+          .then(user => user)
+          .catch(err => {
+            logger.logError("Could not reset password", { err });
+            return rejection("INTERNAL_ERROR");
+          });
       }
+      logger.logError("Could not reset password incomplete data", {
+        user,
+        decoded
+      });
+      return rejection("INTERNAL_ERROR");
     } catch (error) {
       logger.logError("Could not reset password", { error, token });
       return rejection("INTERNAL_ERROR");

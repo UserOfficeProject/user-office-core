@@ -5,9 +5,5 @@ import createLoggingHandler from "./logging";
 import createSDMHandler from "./sdm";
 
 export default function createEventHandlers(userDataSource: UserDataSource) {
-  return [
-    createEmailHandler(userDataSource),
-    createLoggingHandler(),
-    createSDMHandler()
-  ];
+  return [createEmailHandler(userDataSource), createLoggingHandler()];
 }

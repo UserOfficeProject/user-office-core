@@ -26,6 +26,7 @@ export const dummyUserOfficer = new User(
   "Doe",
   "JoDo",
   "Hailey",
+  "324235",
   "683142616",
   "male",
   12,
@@ -37,6 +38,7 @@ export const dummyUserOfficer = new User(
   true,
   "(012) 325-1151",
   "1-316-182-3694",
+  false,
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
@@ -48,6 +50,7 @@ export const dummyUser = new User(
   "Doe",
   "JaDa",
   "Meta",
+  "12312414",
   "568567353",
   "male",
   2,
@@ -59,6 +62,32 @@ export const dummyUser = new User(
   true,
   "045-272-7984 x34539",
   "028-065-8228 x08367",
+  false,
+  "2019-07-17 08:25:12.23043+00",
+  "2019-07-17 08:25:12.23043+00"
+);
+
+export const dummyPlaceHolderUser = new User(
+  2,
+  "",
+  "Jane",
+  null,
+  "Doe",
+  "JaDa",
+  "Meta",
+  "12312414",
+  "568567353",
+  "male",
+  2,
+  "1981-05-04",
+  3,
+  "IT department",
+  "Architect",
+  "placeholder@ess.se",
+  true,
+  "045-272-7984 x34539",
+  "028-065-8228 x08367",
+  true,
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
@@ -72,6 +101,7 @@ export const dummyUserNotOnProposal = new User(
   "NoDO",
   "Damion",
   "182082741",
+  "adaasd",
   "female",
   3,
   "1991-11-08",
@@ -82,11 +112,22 @@ export const dummyUserNotOnProposal = new User(
   true,
   "1-272-760-1466 x03877",
   "174-603-1024",
+  false,
   "2019-07-17 08:25:12.23043+00",
   "2019-07-17 08:25:12.23043+00"
 );
 
 export class userDataSource implements UserDataSource {
+  async createInviteUser(
+    firstname: string,
+    lastname: string,
+    email: string
+  ): Promise<number> {
+    return 5;
+  }
+  async createOrganisation(name: string, verified: boolean): Promise<number> {
+    return 1;
+  }
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     throw new Error("Method not implemented.");
   }
@@ -95,24 +136,27 @@ export class userDataSource implements UserDataSource {
   ): Promise<import("../../models/User").BasicUserDetails | null> {
     throw new Error("Method not implemented.");
   }
-  async checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+  async checkOrcIDExist(orcID: string): Promise<Boolean> {
     return false;
   }
-  async checkEmailExist(email: string): Promise<Boolean | null> {
+  async checkEmailExist(email: string): Promise<Boolean> {
     return false;
   }
-  async getPasswordByEmail(email: string): Promise<string | null> {
+  async getPasswordByEmail(email: string): Promise<string> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserEmailVerified(id: number): Promise<Boolean> {
-    return true;
-  }
-  async setUserPassword(id: number, password: string): Promise<Boolean> {
-    return true;
+  async setUserEmailVerified(id: number): Promise<void> {}
+  async setUserPassword(
+    id: number,
+    password: string
+  ): Promise<BasicUserDetails> {
+    return new BasicUserDetails(id, "John", "Smith", "ESS", "Manager");
   }
   async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {
       return dummyUser;
+    } else if (dummyPlaceHolderUser.email === email) {
+      return dummyPlaceHolderUser;
     } else {
       return null;
     }
@@ -129,9 +173,7 @@ export class userDataSource implements UserDataSource {
   async getPasswordByUsername(username: string): Promise<string | null> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
-    return true;
-  }
+  async setUserRoles(id: number, roles: number[]): Promise<void> {}
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: "user_officer", title: "User Officer" }];
@@ -145,7 +187,7 @@ export class userDataSource implements UserDataSource {
       { id: 2, shortCode: "user", title: "User" }
     ];
   }
-  async update(user: User): Promise<User | null> {
+  async update(user: User): Promise<User> {
     return dummyUser;
   }
 

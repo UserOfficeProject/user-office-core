@@ -10,6 +10,7 @@ export class User {
     public username: string,
     public preferredname: string | null,
     public orcid: string,
+    public refreshToken: string,
     public gender: string,
     public nationality: number,
     public birthdate: string,
@@ -20,6 +21,7 @@ export class User {
     public emailVerified: boolean,
     public telephone: string,
     public telephone_alt: string | null,
+    public placeholder: boolean,
     public created: string,
     public updated: string
   ) {}
@@ -75,6 +77,7 @@ export interface CreateUserArgs {
   email: string;
   telephone: string;
   telephone_alt: string;
+  otherOrganisation?: string;
 }
 
 export interface UpdateUserArgs {
@@ -94,7 +97,10 @@ export interface UpdateUserArgs {
   email?: string;
   telephone?: string;
   telephone_alt?: string;
+  placeholder?: boolean;
   roles?: number[];
+  orcid?: string;
+  refreshToken?: string;
 }
 
 export function checkUserArgs(args: UpdateUserArgs) {
