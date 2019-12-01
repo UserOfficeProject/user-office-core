@@ -307,7 +307,7 @@ export default {
   },
 
   updateFieldTopicRel(args: UpdateFieldTopicRelArgs, context: ResolverContext) {
-    return createResponseWrapper<void>("result")(
+    return createResponseWrapper<string[]>("result")(
       context.mutations.template.updateFieldTopicRel(
         context.user,
         args.topic_id,
@@ -323,7 +323,7 @@ export default {
   },
 
   updateTopicOrder(args: UpdateTopicOrderArgs, context: ResolverContext) {
-    return createResponseWrapper<Boolean>("result")(
+    return createResponseWrapper<number[]>("result")(
       context.mutations.template.updateTopicOrder(context.user, args.topicOrder)
     );
   },

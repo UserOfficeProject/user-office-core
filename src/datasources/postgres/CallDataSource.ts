@@ -34,7 +34,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   async getCalls(): Promise<Call[]> {
     return database
       .select(["*"])
-      .from("call")
+      .from("callz")
       .then((callDB: CallRecord[]) =>
         callDB.map(call => this.createCallObject(call))
       );

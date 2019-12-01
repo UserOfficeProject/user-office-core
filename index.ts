@@ -4,6 +4,8 @@ import root from "./src/resolvers";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
 import { NextFunction } from "connect";
+import { logger } from "./src/utils/Logger";
+
 const graphqlHTTP = require("express-graphql");
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");
@@ -27,6 +29,19 @@ const authMiddleware = jwt({
   secret: process.env.secret
 });
 
+// GQL extensions. Required for logging
+const extensions = async ({
+  operationName,
+  result,
+}:{
+  operationName:any,
+  result:any,
+}) => {
+  if(result.errors) {
+    logger.logError("Failed GRAPHQL execution", {result, operationName})
+  }
+};
+
 app.use(
   authMiddleware,
   (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -38,6 +53,7 @@ app.use(
 );
 
 app.use(cookieParser());
+
 app.use(
   "/graphql",
   graphqlHTTP(async (req: Req) => {
@@ -54,10 +70,13 @@ app.use(
       schema: schema,
       rootValue: root,
       graphiql: true,
-      context
+      context,
+      extensions
     };
   })
 );
+
+
 
 app.use(files);
 
