@@ -170,11 +170,11 @@ class LoggerFactory {
     }
     if (process.env.NODE_ENV === "development") {
       this.logger = new ConsoleLogger();
-      this.logger = new GrayLogLogger(
+      /*this.logger = new GrayLogLogger(
         process.env.GRAYLOG_SERVER!,
         parseInt(process.env.GRAYLOG_PORT!),
         process.env.NODE_ENV
-      );
+      );*/
     } else {
       const server = process.env.GRAYLOG_SERVER;
       const port = parseInt(process.env.GRAYLOG_PORT || "0");
