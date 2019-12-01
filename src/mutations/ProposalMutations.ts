@@ -168,7 +168,8 @@ export default class ProposalMutations {
           .then(proposal => proposal)
           .catch(err => {
             logger.logException("Could not update proposal", err, {
-              agent
+              agent,
+              id
             });
             return rejection("INTERNAL_ERROR");
           });
@@ -207,7 +208,10 @@ export default class ProposalMutations {
       })
       .catch(err => {
         logger.logException("Could not update proposal files", err, {
-          agent
+          agent,
+          proposalId,
+          questionId,
+          files
         });
         return rejection("INTERNAL_ERROR");
       });

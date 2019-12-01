@@ -1,0 +1,16 @@
+{
+    "cSpell.words": [
+        "Completenesses",
+        "GRAYLOG",
+        "admin",
+        "data",
+        "pagetext",
+        "postgres",
+        "source"
+    ],
+
+    "editor.formatOnSave": false,
+    "[typescript]": {
+        "editor.formatOnSave": true
+    }
+}
