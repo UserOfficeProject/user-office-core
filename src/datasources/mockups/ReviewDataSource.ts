@@ -6,14 +6,11 @@ export const dummyReview = new Review(4, 10, 1, "Good proposal", 9, 0);
 export const dummyReviewbad = new Review(1, 9, 1, "bad proposal", 1, 0);
 
 export class reviewDataSource implements ReviewDataSource {
-  async addUserForReview(
-    userID: number,
-    proposalID: number
-  ): Promise<Boolean | null> {
-    return true;
+  async addUserForReview(userID: number, proposalID: number): Promise<Review> {
+    return new Review(1, proposalID, userID, " ", 1, 1);
   }
-  async removeUserForReview(id: number): Promise<Boolean | null> {
-    return true;
+  async removeUserForReview(id: number): Promise<Review> {
+    return new Review(1, 1, 1, " ", 1, 1);
   }
   async get(id: number): Promise<Review | null> {
     if (id == 1) {
@@ -25,7 +22,7 @@ export class reviewDataSource implements ReviewDataSource {
     reviewID: number,
     comment: string,
     grade: number
-  ): Promise<Review | null> {
+  ): Promise<Review> {
     return dummyReview;
   }
   async getProposalReviews(id: number): Promise<Review[]> {

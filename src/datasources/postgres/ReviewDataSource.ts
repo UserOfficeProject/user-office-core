@@ -3,6 +3,7 @@ import { Review } from "../../models/Review";
 import { ReviewRecord } from "./records";
 
 import database from "./database";
+import { User } from "../../models/User";
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
@@ -25,19 +26,20 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord) => this.createReviewObject(review));
   }
 
-  async removeUserForReview(id: number): Promise<Boolean | null> {
+  async removeUserForReview(id: number): Promise<Review> {
     return database
       .from("reviews")
       .where("review_id", id)
+      .returning("*")
       .del()
-      .then(() => true);
+      .then(record => this.createReviewObject(record));
   }
 
   async submitReview(
     reviewID: number,
     comment: string,
     grade: number
-  ): Promise<Review | null> {
+  ): Promise<Review> {
     return database
       .update(
         {
@@ -77,28 +79,18 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               review.status
             )
         );
-      })
-      .catch(() => {
-        return [];
       });
   }
 
-  async addUserForReview(
-    userID: number,
-    proposalID: number
-  ): Promise<Boolean | null> {
+  async addUserForReview(userID: number, proposalID: number): Promise<Review> {
     return database
       .insert({
         user_id: userID,
         proposal_id: proposalID
       })
+      .returning("*")
       .into("reviews")
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+      .then(record => this.createReviewObject(record));
   }
 
   async getUserReviews(id: number): Promise<Review[]> {
@@ -118,9 +110,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               review.status
             )
         );
-      })
-      .catch(() => {
-        return [];
       });
   }
 }
