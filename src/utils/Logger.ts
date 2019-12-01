@@ -7,7 +7,7 @@ class GrayLogLogger implements ILogger {
         facility: "DMSC",
         service: "UserOfficeBackend"
       },
-      adapterName: "tcp",
+      adapterName: "udp",
       adapterOptions: {
         host: server,
         port: port
