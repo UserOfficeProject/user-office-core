@@ -276,7 +276,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         if (!user || user.length !== 0) {
           throw new Error("Could not create user");
         }
-        return this.createUserObject(user[0]);
+        return createUserObject(user[0]);
       })
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
