@@ -9,6 +9,7 @@ import {
 import { Proposal } from "../../models/Proposal";
 import { Page } from "../../models/Admin";
 import { FileMetadata } from "../../models/Blob";
+import { User, BasicUserDetails } from "../../models/User";
 
 // Interfaces corresponding exactly to database tables
 
@@ -72,6 +73,7 @@ export interface UserRecord {
   readonly position: string;
   readonly email: string;
   readonly email_verified: boolean;
+  readonly password: string;
   readonly telephone: string;
   readonly telephone_alt: string;
   readonly created_at: Date;
@@ -221,5 +223,42 @@ export const createFileMetadata = (record: FileRecord) => {
     record.mime_type,
     record.size_in_bytes,
     record.created_at
+  );
+};
+
+export const createUserObject = (user: UserRecord) => {
+  return new User(
+    user.user_id,
+    user.user_title,
+    user.firstname,
+    user.middlename,
+    user.lastname,
+    user.username,
+    user.preferredname,
+    user.orcid,
+    user.orcid_refreshtoken,
+    user.gender,
+    user.nationality,
+    user.birthdate,
+    user.organisation,
+    user.department,
+    user.position,
+    user.email,
+    user.email_verified,
+    user.telephone,
+    user.telephone_alt,
+    user.placeholder,
+    user.created_at.toISOString(),
+    user.updated_at.toISOString()
+  );
+};
+
+export const createBasicUserObject = (user: UserRecord) => {
+  return new BasicUserDetails(
+    user.user_id,
+    user.preferredname,
+    user.lastname,
+    user.institution,
+    user.position
   );
 };

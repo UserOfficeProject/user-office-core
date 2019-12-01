@@ -2,7 +2,8 @@ import {
   User,
   UpdateUserArgs,
   checkUserArgs,
-  BasicUserDetails
+  BasicUserDetails,
+  CreateUserArgs
 } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { isRejection, rejection, Rejection } from "../rejection";
@@ -81,7 +82,7 @@ export default class UserMutations {
           this.createHash(args.orcid) !== args.orcidHash &&
           !(process.env.NODE_ENV === "development")
         ) {
-          logger.logError("ORCID hash mismatch", { orcid, orcidHash });
+          logger.logError("ORCID hash mismatch", { args });
           return rejection("ORCID_HASH_MISMATCH");
         }
 
@@ -111,8 +112,15 @@ export default class UserMutations {
             ...args
           });
 
-          const roles = await this.dataSource.setUserRoles(user.id, [1]);
-          if (isRejection(updatedUser) || !changePassword || !roles) {
+          const [updateRolesErr] = await to(
+            this.dataSource.setUserRoles(user.id, [1])
+          );
+          if (isRejection(updatedUser) || !changePassword || !updateRolesErr) {
+            logger.logError("Could not create user", {
+              updatedUser,
+              changePassword,
+              updateRolesErr
+            });
             return rejection("INTERNAL_ERROR");
           }
           user = updatedUser;
@@ -139,7 +147,7 @@ export default class UserMutations {
           );
         }
         if (!user) {
-          logger.logError("Could not create user", { email, orcid });
+          logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
 

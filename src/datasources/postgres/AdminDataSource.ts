@@ -60,7 +60,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async getInstitution(id: number): Promise<string | null> {
     return database
-      .select()
+      .select("*")
       .from("institutions")
       .where("institution_id", id)
       .first()
