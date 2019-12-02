@@ -38,7 +38,7 @@ export default class TemplateMutations {
           agent,
           sortOrder
         });
-        return rejection("INTERNAL_SERVER_ERROR");
+        return rejection("INTERNAL_ERROR");
       });
   }
 
@@ -63,7 +63,7 @@ export default class TemplateMutations {
           id,
           title
         });
-        return rejection("INTERNAL_SERVER_ERROR");
+        return rejection("INTERNAL_ERROR");
       });
   }
 
@@ -109,7 +109,7 @@ export default class TemplateMutations {
           topicId,
           dataType
         });
-        return rejection("INTERNAL_SERVER_ERROR");
+        return rejection("INTERNAL_ERROR");
       });
   }
 
@@ -141,7 +141,7 @@ export default class TemplateMutations {
           agent,
           id
         });
-        return rejection("INTERNAL_SERVER_ERROR");
+        return rejection("INTERNAL_ERROR");
       });
   }
 
@@ -160,7 +160,7 @@ export default class TemplateMutations {
           agent,
           id
         });
-        return rejection("INTERNAL_SERVER_ERROR");
+        return rejection("INTERNAL_ERROR");
       });
   }
 

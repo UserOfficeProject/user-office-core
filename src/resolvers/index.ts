@@ -138,13 +138,13 @@ async function resolveProposal(
   context: ResolverContext
 ) {
   if (proposal == null) {
-    return rejection("Proposal is null");
+    return rejection("PROPOSAL_DOES_NOT_EXIST");
   }
   const { id, title, abstract, status, created, updated, shortCode } = proposal;
   const agent = context.user;
 
   if (!agent) {
-    return rejection("Not aututhorized");
+    return rejection("NOT_AUTHORIZED");
   }
 
   const users = await context.queries.user.getProposers(agent, id);

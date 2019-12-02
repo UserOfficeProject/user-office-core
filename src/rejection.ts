@@ -1,11 +1,13 @@
+import { ResourceId } from "../submodules/duo-localisation/StringResources";
+
 const REJECTION = Symbol("REJECTION");
 
 export interface Rejection {
-  [REJECTION]: true,
+  [REJECTION]: true;
   reason: string;
 }
 
-export function rejection(reason: string): Rejection {
+export function rejection(reason: ResourceId): Rejection {
   return { [REJECTION]: true, reason };
 }
 

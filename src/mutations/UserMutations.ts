@@ -42,7 +42,7 @@ export default class UserMutations {
     return this.eventBus.wrap(
       async () => {
         if (!agent) {
-          return rejection("MUST_LOGIN");
+          return rejection("NOT_LOGGED");
         }
         //Check if email exist in database and if user has been invited before
         const user = await this.dataSource.getByEmail(email);
@@ -180,7 +180,7 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, args.id))
     ) {
-      return rejection("WRONG_PERMISSIONS");
+      return rejection("INSUFFICIENT_PERMISSIONS");
     }
 
     const checkArgs = checkUserArgs(args);
@@ -203,7 +203,7 @@ export default class UserMutations {
 
     if (args.roles !== undefined) {
       if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("WRONG_PERMISSIONS");
+        return rejection("INSUFFICIENT_PERMISSIONS");
       }
       const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
       if (err) {
