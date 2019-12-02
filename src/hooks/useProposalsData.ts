@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useProposalsData(filter: string) {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [proposalsData, setProposalsData] = useState<ProposalData | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {

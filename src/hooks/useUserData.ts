@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useUserWithReviewsData(id: number) {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [userData, setUserData] = useState<
     (IBasicUserData & { reviews: [] }) | null
   >(null);
@@ -48,7 +48,7 @@ export function useUserWithReviewsData(id: number) {
 }
 
 export function useBasicUserData() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
 
   const loadBasicUserData = useCallback(
     async (id: number) => {

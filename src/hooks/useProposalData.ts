@@ -4,7 +4,7 @@ import { Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 
 export function useProposalData(id: number) {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [proposalData, setProposalData] = useState<ProposalInformation | null>(
     null
   );

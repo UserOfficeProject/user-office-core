@@ -3,7 +3,7 @@ import { useDataAPI } from "./useDataAPI";
 
 export function useUpdateProposalFiles() 
 {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [loading, setLoading] = useState(false);
 
   const updateProposalFiles = useCallback(

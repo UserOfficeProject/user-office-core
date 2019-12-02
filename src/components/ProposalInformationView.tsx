@@ -62,7 +62,7 @@ export default function ProposalInformationView(props: {
           if (!id) {
             ({ id, status, shortCode } = await createProposal());
           }
-          await updateProposal({
+          const result = await updateProposal({
             id: id,
             status: status,
             title: values.title,
@@ -70,6 +70,12 @@ export default function ProposalInformationView(props: {
             users: userIds,
             proposerId: values.proposer.id
           });
+          if (result && result.updateProposal && result.updateProposal.error) {
+            api.reportStatus({
+              variant: "error",
+              message: result.updateProposal.error
+            });
+          } else {
           api.next({
             ...values,
             id,
@@ -83,6 +89,7 @@ export default function ProposalInformationView(props: {
               organisation: user.organisation
             }
           });
+        }
         }
       }}
       validationSchema={Yup.object().shape({

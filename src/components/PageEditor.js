@@ -74,17 +74,17 @@ export default function PageEditor() {
 
   const handleClick = async (pageName, text) => {
     const resp = await sendPageContent(pageName, text);
-    if (resp) {
-      setState({
-        open: true,
-        variant: "success",
-        message: "Text Updated"
-      });
-    } else {
+    if (resp.error) {
       setState({
         open: true,
         variant: "error",
         message: "Update Failed"
+      });
+    } else {
+      setState({
+        open: true,
+        variant: "success",
+        message: "Text Updated"
       });
     }
   };

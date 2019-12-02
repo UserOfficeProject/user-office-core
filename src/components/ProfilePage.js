@@ -68,12 +68,12 @@ export default function ProfilePage({ match, history }) {
       $id: Int!,
       $password: String!, 
       )
-{
-  updatePassword(
-        id: $id, 
-        password: $password, 
-        )
-}`;
+      {
+        updatePassword(
+              id: $id, 
+              password: $password, 
+              )
+      }`;
     const variables = {
       id: parseInt(match.params.id),
       password

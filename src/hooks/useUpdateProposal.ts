@@ -4,7 +4,7 @@ import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 
 export function useUpdateProposal() {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataAPI<any>();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(
