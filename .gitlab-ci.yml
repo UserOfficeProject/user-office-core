@@ -1,7 +1,7 @@
 image: node:7
 
 variables:
-  GIT_SUBMODULE_STRATEGY: normal
+  GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
   - test
