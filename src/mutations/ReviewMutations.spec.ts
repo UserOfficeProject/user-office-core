@@ -13,6 +13,7 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
+import { Review } from "../models/Review";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
@@ -42,7 +43,7 @@ test("A user can't submit a review on a proposal", () => {
 test("A userofficer can add a reviewer for a proposal", () => {
   return expect(
     reviewMutations.addUserForReview(dummyUserOfficer, 1, 1)
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(Review);
 });
 
 test("A user can't add a reviewer for a proposal", () => {
@@ -54,7 +55,7 @@ test("A user can't add a reviewer for a proposal", () => {
 test("A userofficer can remove a reviewer for a proposal", () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUserOfficer, 1)
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(Review);
 });
 
 test("A user can't remove a reviewer for a proposal", () => {

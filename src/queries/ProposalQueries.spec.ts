@@ -11,7 +11,7 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
-import { DummyLogger } from "../utils/Logger";
+import { MutedLogger } from "../utils/Logger";
 
 const dummyProposalDataSource = new proposalDataSource();
 const userAuthorization = new UserAuthorization(
@@ -21,7 +21,7 @@ const userAuthorization = new UserAuthorization(
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,
   userAuthorization,
-  new DummyLogger()
+  new MutedLogger()
 );
 beforeEach(() => {
   dummyProposalDataSource.init();

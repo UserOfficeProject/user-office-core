@@ -15,12 +15,10 @@ import {
   DataType,
   TemplateStep
 } from "../../models/ProposalModel";
-import { ILogger } from "../../utils/Logger";
+
 import to from "await-to-js";
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
-  constructor(private logger: ILogger) {}
-
   async getProposalTemplate(): Promise<ProposalTemplate> {
     const dependencies: FieldDependency[] = await database
       .select("*")
@@ -82,35 +80,21 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       isEnabled?: boolean;
       sortOrder?: number;
     }
-  ): Promise<Topic | null> {
-    const [error, resultSet] = await to<TopicRecord[]>(
-      database
-        .update(
-          {
-            topic_title: values.title,
-            is_enabled: values.isEnabled,
-            sortOrder: values.sortOrder
-          },
-          ["*"]
-        )
-        .from("proposal_topics")
-        .where({ topic_id: id })
-    );
-
-    if (error) {
-      this.logger.logError("Error occurred while updating topic", {
-        values,
-        id
-      });
-      return null;
-    }
+  ): Promise<Topic> {
+    const resultSet: TopicRecord[] = await database
+      .update(
+        {
+          topic_title: values.title,
+          is_enabled: values.isEnabled,
+          sortOrder: values.sortOrder
+        },
+        ["*"]
+      )
+      .from("proposal_topics")
+      .where({ topic_id: id });
 
     if (!resultSet || resultSet.length != 1) {
-      this.logger.logError(
-        "INSERT Topic resultSet must contain exactly 1 row",
-        { values, id, resultSet }
-      );
-      return null;
+      throw new Error("INSERT Topic resultSet must contain exactly 1 row");
     }
     return createTopicObject(resultSet[0]);
   }
@@ -125,7 +109,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplate | null> {
+  ): Promise<ProposalTemplate> {
     const rows = {
       data_type: values.dataType,
       question: values.question,
@@ -148,13 +132,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       }
     }
 
-    return new Promise(async (resolve, reject) => {
-      await database
-        .update(rows, ["*"])
-        .from("proposal_questions")
-        .where("proposal_question_id", proposal_question_id);
-      resolve(await this.getProposalTemplate());
-    });
+    return database
+      .update(rows, ["*"])
+      .from("proposal_questions")
+      .where("proposal_question_id", proposal_question_id)
+      .then(async () => await this.getProposalTemplate());
   }
 
   async createTemplateField(
@@ -163,120 +145,71 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField | null> {
-    const [error, resultSet] = await to<ProposalQuestionRecord[]>(
-      database
-        .insert(
-          {
-            proposal_question_id: fieldId,
-            topic_id: topicId,
-            data_type: dataType,
-            question: question,
-            config: config
-          },
-          ["*"]
-        )
-        .from("proposal_questions")
-    );
-
-    if (error) {
-      this.logger.logException(
-        "Exception occurred while inserting field",
-        error,
+  ): Promise<ProposalTemplateField> {
+    const resultSet: ProposalQuestionRecord[] = await database
+      .insert(
         {
-          topicId,
-          dataType
-        }
-      );
-      return null;
-    }
+          proposal_question_id: fieldId,
+          topic_id: topicId,
+          data_type: dataType,
+          question: question,
+          config: config
+        },
+        ["*"]
+      )
+      .from("proposal_questions");
 
     if (!resultSet || resultSet.length != 1) {
-      this.logger.logError(
-        "INSERT field resultSet must contain exactly 1 row",
-        {
-          resultSet,
-          topicId,
-          dataType
-        }
-      );
-      return null;
+      throw new Error("INSERT field resultSet must contain exactly 1 row");
     }
 
     return createProposalTemplateFieldObject(resultSet[0]);
   }
 
-  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null> {
+  async getTemplateField(
+    fieldId: string
+  ): Promise<ProposalTemplateField | null> {
     return database("proposal_questions")
       .where({ proposal_question_id: fieldId })
       .select("*")
       .then((resultSet: ProposalQuestionRecord[]) => {
-        if (!resultSet || resultSet.length == 0) {
-          this.logger.logWarn(
-            "SELECT from proposal_question yielded no results",
-            { fieldId }
-          );
-          return null;
-        }
-        if (resultSet.length > 1) {
-          this.logger.logError(
-            "Select from proposal_question yelded in more than one row",
-            { fieldId }
-          );
+        if (!resultSet || resultSet.length === 0) {
           return null;
         }
         return createProposalTemplateFieldObject(resultSet[0]);
-      })
-      .catch((e: Error) =>
-        this.logger.logException(
-          "Exception occurred while fetching template field",
-          e,
-          { fieldId }
-        )
-      );
+      });
   }
 
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null> {
-    const [error] = await to(
+  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
+    const [, rowsAffected] = await to(
       database("proposal_questions")
         .where({ proposal_question_id: fieldId })
         .del()
     );
-    if (error) {
-      this.logger.logException("Could not delete field", error, { fieldId });
-      return null;
+    if (rowsAffected !== 1) {
+      throw new Error(`Could not delete template field ${fieldId}`);
     }
     return await this.getProposalTemplate();
   }
 
-  async deleteTopic(id: number): Promise<Topic | null> {
+  async deleteTopic(id: number): Promise<Topic> {
     return database("proposal_topics")
       .where({ topic_id: id })
       .del(["*"])
       .then((result: TopicRecord[]) => {
         if (!result || result.length !== 1) {
-          this.logger.logError("Could not delete topic", { id });
-          return null;
+          throw new Error(`Could not delete topic ${id}`);
         }
         return createTopicObject(result[0]);
-      })
-      .catch((e: Error) => {
-        this.logger.logException("Could not delete topic ", e, {
-          id
-        });
-        return false;
       });
   }
 
-  async updateTopicOrder(topicOrder: number[]): Promise<Boolean | null> {
+  async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
     topicOrder.forEach(async (topicId, index) => {
       database("proposal_topics")
         .update({ sort_order: index })
-        .where({ topic_id: topicId })
-        .catch((e: Error) => {
-          this.logger.logError("Could not updateTopicOrder", e);
-        });
+        .where({ topic_id: topicId });
     });
-    return true;
+    return topicOrder;
   }
 }

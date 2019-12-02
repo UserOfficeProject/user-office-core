@@ -5,7 +5,7 @@ import {
   dummyUserOfficer
 } from "../datasources/mockups/UserDataSource";
 import { ProposalTemplate } from "../models/ProposalModel";
-import { DummyLogger } from "../utils/Logger";
+import { MutedLogger } from "../utils/Logger";
 import TemplateQueries from "../queries/TemplateQueries";
 import { templateDataSource } from "../datasources/mockups/TemplateDataSource";
 
@@ -17,7 +17,7 @@ const userAuthorization = new UserAuthorization(
 const templateQueries = new TemplateQueries(
   dummyTemplateDataSource,
   userAuthorization,
-  new DummyLogger()
+  new MutedLogger()
 );
 beforeEach(() => {
   dummyTemplateDataSource.init();

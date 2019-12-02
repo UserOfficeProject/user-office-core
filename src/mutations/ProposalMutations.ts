@@ -9,13 +9,13 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 import { ILogger } from "../utils/Logger";
 import { isMatchingConstraints } from "../models/ProposalModelFunctions";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
-
-// TODO: it is here much of the logic reside
+import { to } from "await-to-js";
+import { logger } from "../utils/Logger";
 
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
-    private templataDataSource: TemplateDataSource,
+    private templateDataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>,
     private logger: ILogger
@@ -36,8 +36,13 @@ export default class ProposalMutations {
           return rejection("NO_ACTIVE_CALL_FOUND");
         }
 
-        const result = await this.dataSource.create(agent.id);
-        return result || rejection("INTERNAL_ERROR");
+        return this.dataSource
+          .create(agent.id)
+          .then(proposal => proposal)
+          .catch(err => {
+            logger.logException("Could not create proposal", err, { agent });
+            return rejection("INTERNAL_ERROR");
+          });
       },
       proposal => {
         return { type: "PROPOSAL_CREATED", proposal };
@@ -56,7 +61,7 @@ export default class ProposalMutations {
     users?: number[],
     proposerId?: number
   ): Promise<Proposal | Rejection> {
-    return this.eventBus.wrap(
+    return this.eventBus.wrap<Proposal>(
       async () => {
         if (agent == null) {
           return rejection("NOT_LOGGED_IN");
@@ -84,6 +89,7 @@ export default class ProposalMutations {
         ) {
           return rejection("NOT_ALLOWED");
         }
+
         if (
           (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
           proposal.status !== ProposalStatus.DRAFT
@@ -112,11 +118,11 @@ export default class ProposalMutations {
         }
 
         if (users !== undefined) {
-          const resultUpdateUsers = await this.dataSource.setProposalUsers(
-            parseInt(id),
-            users
+          const [err] = await to(
+            this.dataSource.setProposalUsers(parseInt(id), users)
           );
-          if (!resultUpdateUsers) {
+          if (err) {
+            logger.logError(`Could not update users`, { err, id, agent });
             return rejection("INTERNAL_ERROR");
           }
         }
@@ -128,7 +134,7 @@ export default class ProposalMutations {
         if (answers !== undefined) {
           for (const answer of answers) {
             if (answer.value !== undefined) {
-              const templateField = await this.templataDataSource.getTemplateField(
+              const templateField = await this.templateDataSource.getTemplateField(
                 answer.proposal_question_id
               );
               if (!templateField) {
@@ -157,9 +163,16 @@ export default class ProposalMutations {
           );
         }
 
-        const result = await this.dataSource.update(proposal);
-
-        return result || rejection("INTERNAL_ERROR");
+        return this.dataSource
+          .update(proposal)
+          .then(proposal => proposal)
+          .catch(err => {
+            logger.logException("Could not update proposal", err, {
+              agent,
+              id
+            });
+            return rejection("INTERNAL_ERROR");
+          });
       },
       proposal => {
         return { type: "PROPOSAL_UPDATED", proposal };
@@ -188,13 +201,20 @@ export default class ProposalMutations {
 
     await this.dataSource.deleteFiles(proposalId, questionId);
 
-    const result = await this.dataSource.insertFiles(
-      proposalId,
-      questionId,
-      files
-    );
-
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .insertFiles(proposalId, questionId, files)
+      .then(result => {
+        return result;
+      })
+      .catch(err => {
+        logger.logException("Could not update proposal files", err, {
+          agent,
+          proposalId,
+          questionId,
+          files
+        });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 
   async accept(
@@ -207,8 +227,16 @@ export default class ProposalMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
-    const result = await this.dataSource.acceptProposal(proposalId);
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .acceptProposal(proposalId)
+      .then(proposal => proposal)
+      .catch(err => {
+        logger.logException("Could not accept proposal", err, {
+          agent,
+          proposalId
+        });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 
   async reject(
@@ -223,8 +251,16 @@ export default class ProposalMutations {
       return rejection("NOT_USER_OFFICER");
     }
 
-    const result = await this.dataSource.rejectProposal(proposalId);
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .rejectProposal(proposalId)
+      .then(proposal => proposal)
+      .catch(err => {
+        logger.logException("Could not reject proposal", err, {
+          agent,
+          proposalId
+        });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 
   async submit(
@@ -250,8 +286,16 @@ export default class ProposalMutations {
           return rejection("NOT_ALLOWED");
         }
 
-        const result = await this.dataSource.submitProposal(proposalId);
-        return result || rejection("INTERNAL_ERROR");
+        return this.dataSource
+          .submitProposal(proposalId)
+          .then(proposal => proposal)
+          .catch(e => {
+            logger.logException("Could not submit proposal", e, {
+              agent,
+              proposalId
+            });
+            return rejection("INTERNAL_ERROR");
+          });
       },
       proposal => {
         return { type: "PROPOSAL_SUBMITTED", proposal };
@@ -259,7 +303,10 @@ export default class ProposalMutations {
     );
   }
 
-  async delete(agent: User | null, proposalId: number) {
+  async delete(
+    agent: User | null,
+    proposalId: number
+  ): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }

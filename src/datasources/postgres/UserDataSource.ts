@@ -1,68 +1,30 @@
 import database from "./database";
-import { UserRecord } from "./records";
+import { UserRecord, createUserObject, createBasicUserObject } from "./records";
 const BluePromise = require("bluebird");
 
 import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
+import { Transaction } from "knex";
 
 export default class PostgresUserDataSource implements UserDataSource {
-  private createUserObject(user: UserRecord) {
-    return new User(
-      user.user_id,
-      user.user_title,
-      user.firstname,
-      user.middlename,
-      user.lastname,
-      user.username,
-      user.preferredname,
-      user.orcid,
-      user.orcid_refreshtoken,
-      user.gender,
-      user.nationality,
-      user.birthdate,
-      user.organisation,
-      user.department,
-      user.position,
-      user.email,
-      user.email_verified,
-      user.telephone,
-      user.telephone_alt,
-      user.placeholder,
-      user.created_at.toISOString(),
-      user.updated_at.toISOString()
-    );
-  }
-
-  private createBasicUserObject(user: UserRecord) {
-    return new BasicUserDetails(
-      user.user_id,
-      user.preferredname,
-      user.lastname,
-      user.institution,
-      user.position
-    );
-  }
-
-  checkEmailExist(email: string): Promise<Boolean | null> {
+  checkEmailExist(email: string): Promise<Boolean> {
     return database
       .select()
       .from("users")
       .where("email", email)
       .andWhere("placeholder", false)
       .first()
-      .then((user: any) => (user ? true : false))
-      .catch(() => null);
+      .then((user: any) => (user ? true : false));
   }
 
-  checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+  checkOrcIDExist(orcID: string): Promise<Boolean> {
     return database
       .select()
       .from("users")
       .where("orcid", orcID)
       .first()
-      .then((user: any) => (user ? true : false))
-      .catch(() => null);
+      .then((user: any) => (user ? true : false));
   }
 
   getPasswordByEmail(email: string): Promise<string | null> {
@@ -71,7 +33,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("email", email)
       .first()
-      .then((user: any) => user.password);
+      .then((user: any) => (user ? user.password : null));
   }
 
   getPasswordByUsername(username: string): Promise<string | null> {
@@ -80,10 +42,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("username", username)
       .first()
-      .then((user: any) => user.password);
+      .then((user: UserRecord) => (user ? user.password : null));
   }
 
-  update(user: User): Promise<User | null> {
+  update(user: User): Promise<User> {
     const {
       firstname,
       user_title,
@@ -126,11 +88,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .where("user_id", user.id)
       .returning(["*"])
-      .then((user: UserRecord[]) => this.createUserObject(user[0]))
-      .catch((e: string) => {
-        console.log(e);
-        return null;
-      });
+      .then((user: UserRecord[]) => createUserObject(user[0]));
   }
   async createInviteUser(
     firstname: string,
@@ -164,7 +122,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: any[]) => user[0].user_id);
   }
 
-  async getRoles() {
+  async getRoles(): Promise<Role[]> {
     return database
       .select()
       .from("roles")
@@ -185,8 +143,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
-  async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
-    return database.transaction(function(trx: { commit: any; rollback: any }) {
+  async setUserRoles(id: number, roles: number[]): Promise<void> {
+    return database.transaction(function(trx: Transaction) {
       return database
         .from("role_user")
         .where("user_id", id)
@@ -201,36 +159,36 @@ export default class PostgresUserDataSource implements UserDataSource {
           });
         })
         .then(() => {
-          trx.commit;
-          return true;
+          trx.commit; // TODO call commit
         })
-        .catch(() => {
-          trx.rollback;
-          return false;
+        .catch(error => {
+          trx.rollback; // TODO call rollback
+          throw error;
         });
     });
   }
 
-  async setUserPassword(id: number, password: string): Promise<Boolean> {
+  async setUserPassword(
+    id: number,
+    password: string
+  ): Promise<BasicUserDetails> {
     return database
       .update({
         password
       })
       .from("users")
+      .returning("*")
       .where("user_id", id)
-      .then(() => {
-        return true;
-      })
-      .catch(() => false);
+      .then(record => createBasicUserObject(record));
   }
 
-  async get(id: number) {
+  async get(id: number): Promise<User | null> {
     return database
       .select()
       .from("users")
       .where("user_id", id)
       .first()
-      .then((user: UserRecord) => this.createUserObject(user));
+      .then((user: UserRecord) => createUserObject(user));
   }
 
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
@@ -240,33 +198,34 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("institutions as i", { "u.organisation": "i.institution_id" })
       .where("user_id", id)
       .first()
-      .then((user: UserRecord) => this.createBasicUserObject(user))
-      .catch((error: any) => {
-        return null;
-      });
+      .then((user: UserRecord) => createBasicUserObject(user));
   }
 
-  async getByUsername(username: string) {
+  async getByUsername(username: string): Promise<User | null> {
     return database
       .select()
       .from("users")
       .where("username", username)
       .first()
-      .then((user: UserRecord) => this.createUserObject(user))
-      .catch((error: any) => {
-        return null;
+      .then((user: UserRecord) => {
+        if (!user) {
+          return null;
+        }
+        return createUserObject(user);
       });
   }
 
-  async getByEmail(email: String): Promise<User | null> {
+  async getByEmail(email: string): Promise<User | null> {
     return database
       .select()
       .from("users")
       .where("email", email)
       .first()
-      .then((user: UserRecord) => this.createUserObject(user))
-      .catch((error: any) => {
-        return null;
+      .then((user: UserRecord) => {
+        if (!user) {
+          return null;
+        }
+        return createUserObject(user);
       });
   }
 
@@ -289,7 +248,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     email: string,
     telephone: string,
     telephone_alt: string | null
-  ) {
+  ): Promise<User> {
     return database
       .insert({
         user_title,
@@ -313,14 +272,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .returning(["*"])
       .into("users")
-      .then((user: UserRecord[]) => this.createUserObject(user[0]))
+      .then((user: UserRecord[]) => {
+        if (!user || user.length !== 0) {
+          throw new Error("Could not create user");
+        }
+        return createUserObject(user[0]);
+      })
       .then((user: User) => {
         this.setUserRoles(user.id, [1]);
         return user;
-      })
-      .catch((error: any) => {
-        console.log(error);
-        return null;
       });
   }
 
@@ -330,7 +290,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     offset?: number,
     usersOnly?: boolean,
     subtractUsers?: [number]
-  ) {
+  ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
       .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("users")
@@ -361,28 +321,20 @@ export default class PostgresUserDataSource implements UserDataSource {
         }
       })
       .then((usersRecord: UserRecord[]) => {
-        const users = usersRecord.map(user => this.createBasicUserObject(user));
+        const users = usersRecord.map(user => createBasicUserObject(user));
         return {
           totalCount: usersRecord[0] ? usersRecord[0].full_count : 0,
           users
         };
-      })
-      .catch((error: any) => {
-        console.log(error);
-        return null;
       });
   }
-  async setUserEmailVerified(id: number): Promise<Boolean> {
+  async setUserEmailVerified(id: number): Promise<void> {
     return database
       .update({
         email_verified: true
       })
       .from("users")
-      .where("user_id", id)
-      .then(() => {
-        return true;
-      })
-      .catch(() => false);
+      .where("user_id", id);
   }
   async getProposalUsersFull(proposalId: number): Promise<User[]> {
     return database
@@ -391,11 +343,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposal_user as pc", { "u.user_id": "pc.user_id" })
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", proposalId)
-      .then((users: UserRecord[]) =>
-        users.map(user => this.createUserObject(user))
-      );
+      .then((users: UserRecord[]) => users.map(user => createUserObject(user)));
   }
-  async getProposalUsers(id: number) {
+  async getProposalUsers(id: number): Promise<BasicUserDetails[]> {
     return database
       .select()
       .from("users as u")
@@ -404,7 +354,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("proposals as p", { "p.proposal_id": "pc.proposal_id" })
       .where("p.proposal_id", id)
       .then((users: UserRecord[]) =>
-        users.map(user => this.createBasicUserObject(user))
+        users.map(user => createBasicUserObject(user))
       );
   }
   async createOrganisation(name: string, verified: boolean): Promise<number> {

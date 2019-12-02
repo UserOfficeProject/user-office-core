@@ -15,5 +15,5 @@ export interface CallDataSource {
     endNotify: string,
     cycleComment: string,
     surveyComment: string
-  ): Promise<Call | null>;
+  ): Promise<Call>;
 }

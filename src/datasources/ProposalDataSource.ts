@@ -14,29 +14,26 @@ export interface ProposalDataSource {
   getQuestionary(proposalId: number): Promise<Questionary>;
 
   // Write
-  create(id: number): Promise<Proposal | null>;
-  update(proposal: Proposal): Promise<Proposal | null>;
-  setProposalUsers(id: number, users: number[]): Promise<Boolean>;
-  acceptProposal(id: number): Promise<Proposal | null>;
-  rejectProposal(id: number): Promise<Proposal | null>;
-  submitProposal(id: number): Promise<Proposal | null>;
-  deleteProposal(id: number): Promise<Proposal | null>;
+  create(id: number): Promise<Proposal>;
+  update(proposal: Proposal): Promise<Proposal>;
+  setProposalUsers(id: number, users: number[]): Promise<void>;
+  acceptProposal(id: number): Promise<Proposal>;
+  rejectProposal(id: number): Promise<Proposal>;
+  submitProposal(id: number): Promise<Proposal>;
+  deleteProposal(id: number): Promise<Proposal>;
   updateAnswer(
     proposal_id: number,
     question_id: string,
     answer: string
-  ): Promise<Boolean>;
+  ): Promise<string>;
   insertFiles(
     proposal_id: number,
     question_id: string,
     files: string[]
-  ): Promise<string[] | null>;
-  deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<Boolean | null>;
+  ): Promise<string[]>;
+  deleteFiles(proposal_id: number, question_id: string): Promise<string[]>;
   updateTopicCompletenesses(
     id: number,
     topicsCompleted: number[]
-  ): Promise<Boolean | null>;
+  ): Promise<void>;
 }

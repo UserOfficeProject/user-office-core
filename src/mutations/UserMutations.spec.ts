@@ -10,6 +10,8 @@ import {
   dummyUserOfficer,
   dummyPlaceHolderUser
 } from "../datasources/mockups/UserDataSource";
+import { rejection } from "../rejection";
+import { BasicUserDetails } from "../models/User";
 
 const jsonwebtoken = require("jsonwebtoken");
 
@@ -198,19 +200,19 @@ test("A user get's a error if providing a email not attached to a account", () =
 test("A user can update it's password if it has a valid token", () => {
   return expect(
     userMutations.resetPassword(goodToken, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test("A user can not update it's password if it has a bad token", () => {
   return expect(
     userMutations.resetPassword(badToken, "Test1234!")
-  ).resolves.toBe(false);
+  ).resolves.toHaveProperty("reason");
 });
 
-test("A user can it's password ", () => {
+test("A user can update it's password ", () => {
   return expect(
     userMutations.updatePassword(dummyUser, dummyUser.id, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test("A user can not update another users password ", () => {
@@ -232,5 +234,5 @@ test("A not logged in users can not update passwords ", () => {
 test("A user officer can update any password ", () => {
   return expect(
     userMutations.updatePassword(dummyUserOfficer, dummyUser.id, "Test1234!")
-  ).resolves.toBe(true);
+  ).resolves.toBeInstanceOf(BasicUserDetails);
 });

@@ -32,7 +32,7 @@ export class callDataSource implements CallDataSource {
     endNotify: string,
     cycleComment: string,
     surveyComment: string
-  ): Promise<Call | null> {
+  ) {
     return dummyCall;
   }
 }

@@ -1,5 +1,7 @@
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserDataSource } from "../datasources/UserDataSource";
+import { logger } from "../utils/Logger";
+
 const SparkPost = require("sparkpost");
 const options = {
   endpoint: "https://api.eu.sparkpost.com:443"
@@ -55,10 +57,16 @@ export default function createHandler(userDataSource: UserDataSource) {
             recipients: [{ address: event.user.email }]
           })
           .then((res: string) => {
-            console.log(res);
+            logger.logInfo("Emai send on for password reset:", {
+              result: res,
+              event
+            });
           })
           .catch((err: string) => {
-            console.log(err);
+            logger.logError("Could not send email for password reset", {
+              error: err,
+              event
+            });
           });
         return;
       }
@@ -132,10 +140,16 @@ export default function createHandler(userDataSource: UserDataSource) {
             ]
           })
           .then((res: string) => {
-            console.log(res);
+            logger.logInfo("Email sent on proposal submission:", {
+              result: res,
+              event
+            });
           })
           .catch((err: string) => {
-            console.log(err);
+            logger.logError("Could not send email on proposal submission:", {
+              error: err,
+              event
+            });
           });
         return;
       }
@@ -158,10 +172,16 @@ export default function createHandler(userDataSource: UserDataSource) {
               recipients: [{ address: event.user.email }]
             })
             .then((res: string) => {
-              console.log(res);
+              logger.logInfo("Email sent on user creation:", {
+                result: res,
+                event
+              });
             })
             .catch((err: string) => {
-              console.log(err);
+              logger.logError("Could not send email on user creation:", {
+                error: err,
+                event
+              });
             });
         }
         return;

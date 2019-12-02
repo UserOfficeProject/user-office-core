@@ -16,7 +16,7 @@ export interface TemplateDataSource {
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField | null>;
+  ): Promise<ProposalTemplateField>;
   getTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
   updateTemplateField(
     proposal_question_id: string,
@@ -28,16 +28,16 @@ export interface TemplateDataSource {
       sortOrder?: number;
       dependencies?: FieldDependency[];
     }
-  ): Promise<ProposalTemplate | null>;
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplate | null>;
+  ): Promise<ProposalTemplate>;
+  deleteTemplateField(fieldId: string): Promise<ProposalTemplate>;
 
   // Topic
   createTopic(sortOrder: number): Promise<ProposalTemplate>;
   updateTopic(
     id: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
-  ): Promise<Topic | null>;
-  deleteTopic(id: number): Promise<Topic | null>;
+  ): Promise<Topic>;
+  deleteTopic(id: number): Promise<Topic>;
 
-  updateTopicOrder(topicOrder: number[]): Promise<Boolean | null>;
+  updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 }

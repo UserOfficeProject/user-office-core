@@ -12,7 +12,7 @@ import {
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
-import { ILogger } from "../utils/Logger";
+import { ILogger, logger } from "../utils/Logger";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
 
 export default class TemplateMutations {
@@ -30,7 +30,16 @@ export default class TemplateMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return await this.dataSource.createTopic(sortOrder);
+    return this.dataSource
+      .createTopic(sortOrder)
+      .then(template => template)
+      .catch(err => {
+        logger.logException("Could not create topic", err, {
+          agent,
+          sortOrder
+        });
+        return rejection("INTERNAL_SERVER_ERROR");
+      });
   }
 
   async updateTopic(
@@ -42,12 +51,20 @@ export default class TemplateMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return (
-      (await this.dataSource.updateTopic(id, {
+    return this.dataSource
+      .updateTopic(id, {
         title,
         isEnabled
-      })) || rejection("INTERNAL_SERVER_ERROR")
-    );
+      })
+      .then(topic => topic)
+      .catch(err => {
+        logger.logException("Could not update topic", err, {
+          agent,
+          id,
+          title
+        });
+        return rejection("INTERNAL_SERVER_ERROR");
+      });
   }
 
   async deleteTopic(
@@ -58,8 +75,13 @@ export default class TemplateMutations {
       return rejection("NOT_AUTHORIZED");
     }
 
-    var result = await this.dataSource.deleteTopic(topicId);
-    return result ? result : rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .deleteTopic(topicId)
+      .then(topic => topic)
+      .catch(err => {
+        logger.logException("Could not delete topic", err, { agent, topicId });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 
   async createTemplateField(
@@ -72,15 +94,23 @@ export default class TemplateMutations {
     }
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
-    return (
-      (await this.dataSource.createTemplateField(
+    return this.dataSource
+      .createTemplateField(
         newFieldId,
         topicId,
         dataType,
         "New question",
         JSON.stringify(this.createBlankConfig(dataType))
-      )) || rejection("INTERNAL_SERVER_ERROR")
-    );
+      )
+      .then(template => template)
+      .catch(err => {
+        logger.logException("Could not create template field", err, {
+          agent,
+          topicId,
+          dataType
+        });
+        return rejection("INTERNAL_SERVER_ERROR");
+      });
   }
 
   async updateProposalTemplateField(
@@ -96,16 +126,23 @@ export default class TemplateMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return (
-      (await this.dataSource.updateTemplateField(id, {
+    return this.dataSource
+      .updateTemplateField(id, {
         dataType,
         sortOrder,
         question,
         topicId,
         config,
         dependencies
-      })) || rejection("INTERNAL_SERVER_ERROR")
-    );
+      })
+      .then(template => template)
+      .catch(err => {
+        logger.logException("Could not update template field", err, {
+          agent,
+          id
+        });
+        return rejection("INTERNAL_SERVER_ERROR");
+      });
   }
 
   async deleteTemplateField(
@@ -115,30 +152,42 @@ export default class TemplateMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return (
-      (await this.dataSource.deleteTemplateField(id)) ||
-      rejection("INTERNAL_SERVER_ERROR")
-    );
+    return this.dataSource
+      .deleteTemplateField(id)
+      .then(template => template)
+      .catch(err => {
+        logger.logException("Could not delete template field", err, {
+          agent,
+          id
+        });
+        return rejection("INTERNAL_SERVER_ERROR");
+      });
   }
 
   async updateTopicOrder(
     agent: User | null,
     topicOrder: number[]
-  ): Promise<Boolean | Rejection> {
+  ): Promise<number[] | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
-    return (
-      (await this.dataSource.updateTopicOrder(topicOrder)) ||
-      rejection("INTERNAL_SERVER_ERROR")
-    );
+    return this.dataSource
+      .updateTopicOrder(topicOrder)
+      .then(order => order)
+      .catch(err => {
+        logger.logException("Could not update topic order", err, {
+          agent,
+          topicOrder
+        });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 
   async updateFieldTopicRel(
     agent: User | null,
     topicId: number,
     fieldIds: string[]
-  ): Promise<void | Rejection> {
+  ): Promise<string[] | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
@@ -155,6 +204,7 @@ export default class TemplateMutations {
     if (isSuccess === false) {
       return rejection("INTERNAL_ERROR");
     }
+    return fieldIds;
   }
 
   private createBlankConfig(dataType: DataType): FieldConfig {

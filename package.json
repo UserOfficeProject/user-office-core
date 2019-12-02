@@ -7,19 +7,21 @@
     "test": "secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 jest --env=node --colors --coverage",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "tsc": "tsc",
-    "dev": "ORCID_TOKEN_URL=https://sandbox.orcid.org/oauth/token ORCID_API_URL=https://api.sandbox.orcid.org/v2.1/  ORCID_CLIENT_ID=APP-CIF25IJ0S3CDB3C8 ORCID_CLIENT_SECRET=c3ba31f8-7e79-4d0d-bf4c-b6e6c300addd DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere ts-node-dev --respawn --transpileOnly ./index.ts",
-    "prod": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 node ./build/index.js",
+    "dev": "ORCID_TOKEN_URL=https://sandbox.orcid.org/oauth/token ORCID_API_URL=https://api.sandbox.orcid.org/v2.1/  ORCID_CLIENT_ID=APP-CIF25IJ0S3CDB3C8 ORCID_CLIENT_SECRET=c3ba31f8-7e79-4d0d-bf4c-b6e6c300addd DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --respawn --transpileOnly ./index.ts",
+    "prod": "tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 GRAYLOG_SERVER=it-graylog.esss.lu.se GRAYLOG_PORT=12201 node ./build/index.js",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "start": "tsc && node ./build/index.js",
     "apitest": "newman run api_tests/proposal_tests.json --environment api_tests/environment.json",
-    "debug": "rm -R ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere node --inspect ./build/index.js"
+    "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --inspect --respawn --transpileOnly ./index.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/express-graphql": "^0.8.0",
+    "@types/graphql": "^14.5.0",
     "@types/multer": "^1.3.9",
+    "@types/node": "^12.12.14",
     "@types/pdfkit": "^0.10.2",
     "@types/pg": "^7.11.0",
     "@types/pg-large-object": "^2.0.1",
@@ -34,6 +36,7 @@
     "express": "^4.16.4",
     "express-graphql": "^0.8.0",
     "express-jwt": "^5.3.1",
+    "gelf-pro": "^1.3.3",
     "graphql": "^14.2.1",
     "graphql-tools": "^4.0.5",
     "hummus": "^1.0.107",
@@ -46,7 +49,6 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "sparkpost": "^2.1.3",
-    "ts-node-dev": "^1.0.0-pre.35",
     "typescript": "^3.4.5"
   },
   "devDependencies": {
@@ -59,6 +61,7 @@
     "newman": "^4.5.5",
     "nodemon": "^1.19.1",
     "prettier": "^1.17.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "ts-node-dev": "^1.0.0-pre.44"
   }
 }

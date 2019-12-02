@@ -2,11 +2,13 @@ var { buildSchema } = require("graphql");
 import { makeExecutableSchema } from "graphql-tools";
 import { typeDefs as proposal } from "./schemas/proposal";
 import { typeDefs as user } from "./schemas/user";
+import { typeDefs as admin } from "./schemas/admin";
 
 export default makeExecutableSchema({
   typeDefs: [
     proposal,
     user,
+    admin,
     `
 type Query {
     review(id: ID!): Review
@@ -41,7 +43,6 @@ type Query {
   }
 
   type Mutation {
-    setPageContent(id: PageName!, text: String): Boolean
     createCall(shortCode: String!, startCall: String!, endCall: String!, startReview: String!, endReview: String!, startNotify: String!, endNotify: String!, cycleComment: String!, surveyComment: String!): CallMutationResult
     addReview(reviewID: Int!, comment: String!, grade: Int!): Review
   }

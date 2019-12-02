@@ -13,14 +13,12 @@ import {
 import { ProposalDataSource } from "../ProposalDataSource";
 import { QuestionaryStep, Questionary } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
-import { ILogger } from "../../utils/Logger";
+import { Transaction } from "knex";
 
 const BluePromise = require("bluebird");
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  constructor(private logger: ILogger) {}
-
-  async checkActiveCall(): Promise<Boolean> {
+  public async checkActiveCall(): Promise<Boolean> {
     const currentDate = new Date().toISOString();
     return database
       .select()
@@ -31,10 +29,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((call: any) => (call ? true : false));
   }
 
-  async setStatusProposal(
-    id: number,
-    status: number
-  ): Promise<Proposal | null> {
+  async setStatusProposal(id: number, status: number): Promise<Proposal> {
     return database
       .update(
         {
@@ -45,43 +40,41 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from("proposals")
       .where("proposal_id", id)
       .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || !proposal.length) {
-          return null;
+        if (proposal === undefined || proposal.length !== 1) {
+          throw new Error(
+            `Failed to set status '${status}' for proposal with id '${id}'`
+          );
         }
         return createProposalObject(proposal[0]);
       });
   }
 
-  async submitProposal(id: number): Promise<Proposal | null> {
+  async submitProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, 1);
   }
-  async acceptProposal(id: number): Promise<Proposal | null> {
+  async acceptProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, 2);
   }
-  async rejectProposal(id: number): Promise<Proposal | null> {
+  async rejectProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, 3);
   }
 
-  async deleteProposal(id: number): Promise<Proposal | null> {
+  async deleteProposal(id: number): Promise<Proposal> {
     return database("proposals")
       .where("proposals.proposal_id", id)
       .del()
       .from("proposals")
       .returning("*")
       .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || !proposal.length) {
-          this.logger.logError("Could not delete proposal", { id });
-          return null;
+        if (proposal === undefined || proposal.length !== 1) {
+          throw new Error(`Could not delete proposal with id:${id}`);
         }
         return createProposalObject(proposal[0]);
-      })
-      .catch((e: Error) => {
-        this.logger.logException("Exception while deleting proposal", e);
       });
   }
 
-  async setProposalUsers(id: number, users: number[]): Promise<Boolean> {
-    return database.transaction(function(trx: { commit: any; rollback: any }) {
+  async setProposalUsers(id: number, users: number[]): Promise<void> {
+    return database.transaction(function(trx: Transaction) {
       return database
         .from("proposal_user")
         .where("proposal_id", id)
@@ -97,11 +90,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         })
         .then(() => {
           trx.commit;
-          return true;
         })
-        .catch(() => {
+        .catch(error => {
           trx.rollback;
-          return false;
+          throw error; // re-throw
         });
     });
   }
@@ -110,7 +102,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposal_id: number,
     question_id: string,
     answer: string
-  ): Promise<Boolean> {
+  ): Promise<string> {
     const results: { count: string } = await database
       .count()
       .from("proposal_answers")
@@ -129,15 +121,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         .where({
           proposal_id: proposal_id,
           proposal_question_id: question_id
-        });
+        })
+        .then(() => question_id);
     } else {
-      return database
+      return database("proposal_answers")
         .insert({
           proposal_id: proposal_id,
           proposal_question_id: question_id,
           answer: answer
         })
-        .into("proposal_answers");
+        .then(() => question_id);
     }
   }
 
@@ -145,10 +138,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposal_id: number,
     question_id: string,
     files: string[]
-  ): Promise<string[] | null> {
+  ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
-      return null;
+      throw new Error(
+        `Could not insert files because answer does not exist. AnswerID ${answerId}`
+      );
     }
 
     await database("proposal_answers_files").insert(
@@ -161,17 +156,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async deleteFiles(
     proposal_id: number,
     question_id: string
-  ): Promise<Boolean | null> {
+  ): Promise<string[]> {
     const answerId = await this.getAnswerId(proposal_id, question_id);
     if (!answerId) {
-      return null;
+      throw new Error(
+        `Could not delete files because answer does not exist. AnswerID ${answerId}`
+      );
     }
 
-    await database("proposal_answers_files")
+    return await database("proposal_answers_files")
       .where({ answer_id: answerId })
+      .returning("file_id")
       .del();
-
-    return true;
   }
 
   private async getAnswerId(
@@ -193,7 +189,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return selectResult[0].answer_id;
   }
 
-  async update(proposal: Proposal): Promise<Proposal | null> {
+  async update(proposal: Proposal): Promise<Proposal> {
     return database
       .update(
         {
@@ -206,15 +202,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       )
       .from("proposals")
       .where("proposal_id", proposal.id)
-      .then((proposal: ProposalRecord[]) => {
-        if (proposal === undefined || !proposal.length) {
-          return null;
+      .then((records: ProposalRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new Error(`Proposal not found ${proposal.id}`);
         }
-        return createProposalObject(proposal[0]);
+        return createProposalObject(records[0]);
       });
   }
 
-  async get(id: number) {
+  async get(id: number): Promise<Proposal | null> {
     return database
       .select()
       .from("proposals")
@@ -225,19 +221,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async create(proposerID: number) {
+  async create(proposerID: number): Promise<Proposal> {
     return database
       .insert({ proposer_id: proposerID }, ["*"])
       .from("proposals")
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
-      })
-      .catch((error: any) => {
-        this.logger.logException("Failed to create proposal", error);
       });
   }
 
-  async getProposals(filter?: string, first?: number, offset?: number) {
+  async getProposals(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
       .select(["*", database.raw("count(*) OVER() AS full_count")])
       .from("proposals")
@@ -264,7 +261,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async getUserProposals(id: number) {
+  async getUserProposals(id: number): Promise<Proposal[]> {
     return database
       .select("p.*")
       .from("proposals as p")
@@ -351,24 +348,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async updateTopicCompletenesses(
     proposalId: number,
     topicsCompleted: number[]
-  ): Promise<Boolean | null> {
-    return database
-      .transaction(async (tr: any) => {
-        for (const topic_id of topicsCompleted) {
-          await database
-            .raw(
-              `INSERT into proposal_topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true`,
-              [proposalId, topic_id, true]
-            )
-            .transacting(tr);
-        }
-      })
-      .then(() => {
-        return true;
-      })
-      .catch((error: Error) => {
-        this.logger.logException("Could not update topic completeness", error);
-        return null;
-      });
+  ): Promise<void> {
+    return database.transaction(async (tr: any) => {
+      for (const topic_id of topicsCompleted) {
+        await database
+          .raw(
+            `INSERT into proposal_topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true`,
+            [proposalId, topic_id, true]
+          )
+          .transacting(tr);
+      }
+    });
   }
 }

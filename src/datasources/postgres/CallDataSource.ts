@@ -20,16 +20,18 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async get(id: number) {
+  async get(id: number): Promise<Call | null> {
     return database
       .select()
       .from("call")
       .where("call_id", id)
       .first()
-      .then((call: CallRecord) => this.createCallObject(call));
+      .then((call: CallRecord | null) =>
+        call ? this.createCallObject(call) : null
+      );
   }
 
-  async getCalls() {
+  async getCalls(): Promise<Call[]> {
     return database
       .select(["*"])
       .from("call")
@@ -48,7 +50,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     endNotify: string,
     cycleComment: string,
     surveyComment: string
-  ): Promise<Call | null> {
+  ): Promise<Call> {
     return database
       .insert({
         call_short_code: shortCode,
@@ -64,10 +66,10 @@ export default class PostgresCallDataSource implements CallDataSource {
       .into("call")
       .returning(["*"])
       .then((call: CallRecord[]) => {
+        if (call.length !== 1) {
+          throw new Error("Could not create call");
+        }
         return this.createCallObject(call[0]);
-      })
-      .catch(() => {
-        return null;
       });
   }
 }

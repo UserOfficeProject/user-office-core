@@ -4,6 +4,7 @@ import { Call } from "../models/Call";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
+import { logger } from "../utils/Logger";
 
 export default class CallMutations {
   constructor(
@@ -30,17 +31,25 @@ export default class CallMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
-    const result = await this.dataSource.create(
-      shortCode,
-      startCall,
-      endCall,
-      startReview,
-      endReview,
-      startNotify,
-      endNotify,
-      cycleComment,
-      surveyComment
-    );
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .create(
+        shortCode,
+        startCall,
+        endCall,
+        startReview,
+        endReview,
+        startNotify,
+        endNotify,
+        cycleComment,
+        surveyComment
+      )
+      .then(result => result)
+      .catch(error => {
+        logger.logException("Could not create call", error, {
+          agent,
+          shortCode
+        });
+        return rejection("INTERNAL_ERROR");
+      });
   }
 }

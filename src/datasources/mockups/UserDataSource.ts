@@ -136,20 +136,21 @@ export class userDataSource implements UserDataSource {
   ): Promise<import("../../models/User").BasicUserDetails | null> {
     throw new Error("Method not implemented.");
   }
-  async checkOrcIDExist(orcID: string): Promise<Boolean | null> {
+  async checkOrcIDExist(orcID: string): Promise<Boolean> {
     return false;
   }
-  async checkEmailExist(email: string): Promise<Boolean | null> {
+  async checkEmailExist(email: string): Promise<Boolean> {
     return false;
   }
-  async getPasswordByEmail(email: string): Promise<string | null> {
+  async getPasswordByEmail(email: string): Promise<string> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserEmailVerified(id: number): Promise<Boolean> {
-    return true;
-  }
-  async setUserPassword(id: number, password: string): Promise<Boolean> {
-    return true;
+  async setUserEmailVerified(id: number): Promise<void> {}
+  async setUserPassword(
+    id: number,
+    password: string
+  ): Promise<BasicUserDetails> {
+    return new BasicUserDetails(id, "John", "Smith", "ESS", "Manager");
   }
   async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {
@@ -172,9 +173,7 @@ export class userDataSource implements UserDataSource {
   async getPasswordByUsername(username: string): Promise<string | null> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserRoles(id: number, roles: number[]): Promise<Boolean | null> {
-    return true;
-  }
+  async setUserRoles(id: number, roles: number[]): Promise<void> {}
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: "user_officer", title: "User Officer" }];
@@ -188,7 +187,7 @@ export class userDataSource implements UserDataSource {
       { id: 2, shortCode: "user", title: "User" }
     ];
   }
-  async update(user: User): Promise<User | null> {
+  async update(user: User): Promise<User> {
     return dummyUser;
   }
 

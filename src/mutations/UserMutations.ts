@@ -2,6 +2,7 @@ import {
   User,
   UpdateUserArgs,
   checkUserArgs,
+  BasicUserDetails,
   CreateUserArgs
 } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
@@ -12,6 +13,8 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
+import { to } from "await-to-js";
+import { logger } from "../utils/Logger";
 
 export default class UserMutations {
   constructor(
@@ -79,6 +82,7 @@ export default class UserMutations {
           this.createHash(args.orcid) !== args.orcidHash &&
           !(process.env.NODE_ENV === "development")
         ) {
+          logger.logError("ORCID hash mismatch", { args });
           return rejection("ORCID_HASH_MISMATCH");
         }
 
@@ -108,8 +112,15 @@ export default class UserMutations {
             ...args
           });
 
-          const roles = await this.dataSource.setUserRoles(user.id, [1]);
-          if (isRejection(updatedUser) || !changePassword || !roles) {
+          const [updateRolesErr] = await to(
+            this.dataSource.setUserRoles(user.id, [1])
+          );
+          if (isRejection(updatedUser) || !changePassword || !updateRolesErr) {
+            logger.logError("Could not create user", {
+              updatedUser,
+              changePassword,
+              updateRolesErr
+            });
             return rejection("INTERNAL_ERROR");
           }
           user = updatedUser;
@@ -136,6 +147,7 @@ export default class UserMutations {
           );
         }
         if (!user) {
+          logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
 
@@ -193,18 +205,21 @@ export default class UserMutations {
       if (!(await this.userAuth.isUserOfficer(agent))) {
         return rejection("WRONG_PERMISSIONS");
       }
-      const resultUpdateRoles = await this.dataSource.setUserRoles(
-        args.id,
-        args.roles
-      );
-      if (!resultUpdateRoles) {
+      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
+      if (err) {
+        logger.logError("Could not set user roles", { err });
         return rejection("INTERNAL_ERROR");
       }
     }
-    const result = await this.dataSource.update(user);
-
-    return result || rejection("INTERNAL_ERROR");
+    return this.dataSource
+      .update(user)
+      .then(user => user)
+      .catch(err => {
+        logger.logException("Could not create user", err, { user });
+        return rejection("INTERNAL_ERROR");
+      });
   }
+
   async login(email: string, password: string): Promise<string | Rejection> {
     const user = await this.dataSource.getByEmail(email);
 
@@ -246,6 +261,7 @@ export default class UserMutations {
       );
       return freshToken;
     } catch (error) {
+      logger.logError("Bad token", { token });
       return rejection("BAD_TOKEN");
     }
   }
@@ -258,6 +274,7 @@ export default class UserMutations {
         const user = await this.dataSource.getByEmail(email);
 
         if (!user) {
+          logger.logInfo("Could not find user by email", { email });
           return rejection("COULD_NOT_FIND_USER_BY_EMAIL");
         }
 
@@ -298,6 +315,7 @@ export default class UserMutations {
         return false;
       }
     } catch (error) {
+      logger.logException("Could not verify email", error, { token });
       return false;
     }
   }
@@ -314,13 +332,21 @@ export default class UserMutations {
       if (user) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
+        logger.logError("Could not update password. Used does not exist", {
+          agent,
+          id
+        });
         return false;
       }
     } catch (error) {
+      logger.logException("Could not update password", error, { agent, id });
       return false;
     }
   }
-  async resetPassword(token: string, password: string): Promise<Boolean> {
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<BasicUserDetails | Rejection> {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
@@ -333,12 +359,22 @@ export default class UserMutations {
         user.updated === decoded.updated &&
         decoded.type === "passwordReset"
       ) {
-        return this.dataSource.setUserPassword(user.id, hash);
-      } else {
-        return false;
+        return this.dataSource
+          .setUserPassword(user.id, hash)
+          .then(user => user)
+          .catch(err => {
+            logger.logError("Could not reset password", { err });
+            return rejection("INTERNAL_ERROR");
+          });
       }
+      logger.logError("Could not reset password incomplete data", {
+        user,
+        decoded
+      });
+      return rejection("INTERNAL_ERROR");
     } catch (error) {
-      return false;
+      logger.logError("Could not reset password", { error, token });
+      return rejection("INTERNAL_ERROR");
     }
   }
 }
