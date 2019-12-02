@@ -81,8 +81,8 @@ export default class ProposalQueries {
       "",
       agent.id,
       ProposalStatus.BLANK,
-      new Date().toTimeString(),
-      new Date().toTimeString(),
+      new Date(),
+      new Date(),
       ""
     );
     return blankProposal;

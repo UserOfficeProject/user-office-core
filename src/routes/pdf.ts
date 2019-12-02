@@ -253,9 +253,12 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
         () => {}
       ); // delete file once done
 
+      const year = proposal.created.getUTCFullYear();
+      const pi = principalInvestigator.lastname;
+      const shortcode = proposal.shortCode;
       res.download(
         `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
-        `${proposal.shortCode}-${proposal.title}.pdf`,
+        `${year}_${pi}_${shortcode}.pdf`,
         () => {
           fs.unlink(
             `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
