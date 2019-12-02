@@ -14,6 +14,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
+import { getTranslation } from "../../submodules/duo-localisation/StringResources";
 
 export default function ProposalInformationView(props: {
   data: ProposalInformation;
@@ -73,7 +74,7 @@ export default function ProposalInformationView(props: {
           if (result && result.updateProposal && result.updateProposal.error) {
             api.reportStatus({
               variant: "error",
-              message: result.updateProposal.error
+              message: getTranslation(result.updateProposal.error)
             });
           } else {
           api.next({

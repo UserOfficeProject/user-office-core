@@ -2,9 +2,10 @@ import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
+import { ResourceId } from "../../submodules/duo-localisation/StringResources"
 
 export function useUpdateProposal() {
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataAPI<{updateProposal:{proposal?:{id:number}, error:ResourceId}}>();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(

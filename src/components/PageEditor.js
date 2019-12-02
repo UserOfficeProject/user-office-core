@@ -21,6 +21,7 @@ import Divider from "@material-ui/core/Divider";
 import Notification from "./Notification";
 import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
+import { getTranslation } from "../../submodules/duo-localisation/StringResources";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -78,7 +79,7 @@ export default function PageEditor() {
       setState({
         open: true,
         variant: "error",
-        message: "Update Failed"
+        message: `Update Failed. ${getTranslation(resp.error)}`
       });
     } else {
       setState({
