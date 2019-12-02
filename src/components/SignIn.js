@@ -14,7 +14,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
-import { getTranslation } from "../../submodules/duo-localisation/StringResources";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 const useStyles = makeStyles(theme => ({
   avatar: {

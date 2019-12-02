@@ -14,7 +14,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
-import { getTranslation } from "../../submodules/duo-localisation/StringResources";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 export default function ProposalInformationView(props: {
   data: ProposalInformation;

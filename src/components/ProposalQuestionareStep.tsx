@@ -27,7 +27,7 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
-import { getTranslation } from "../../submodules/duo-localisation/StringResources";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
