@@ -1,5 +1,8 @@
 image: node:7
 
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
+
 stages:
   - test
   - build-test
