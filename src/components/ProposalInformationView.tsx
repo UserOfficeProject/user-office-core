@@ -15,6 +15,7 @@ import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
 
+
 export default function ProposalInformationView(props: {
   data: ProposalInformation;
   readonly?: boolean;

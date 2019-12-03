@@ -48,7 +48,7 @@ export default function InformationDialog(props) {
   }
   return (
     <div>
-      <Button className={classes.buttonLink} onClick={handleClickOpen}>
+      <Button className={classes.buttonLink} onClick={handleClickOpen} style={props.linkStyle}>
         {props.linkText}
       </Button>
       <Dialog
