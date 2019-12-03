@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { unlink } from "fs";
+import { unlink, existsSync } from "fs";
 import baseContext from "../buildContext";
 import { logger } from "../utils/Logger";
 import { isRejection } from "../rejection";
@@ -34,8 +34,13 @@ router.get("/files/download/:file_id", async (req, res) => {
     const path = await baseContext.mutations.file.prepare(fileId);
     const metaData = await baseContext.queries.file.getFileMetadata([fileId]);
     if (!isRejection(path) && metaData) {
-      res.download(path, metaData[0].originalFileName, () => {
-        unlink(path, () => {}); // delete file once done
+      res.download(path, metaData[0].originalFileName, err => {
+        if (err) {
+          throw err;
+        }
+        if (existsSync(path)) {
+          unlink(path, () => {}); // delete file once done
+        }
       });
     } else {
       throw new Error("Could not prepare file");

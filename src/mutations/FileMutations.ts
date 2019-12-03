@@ -34,7 +34,7 @@ export default class FileMutations {
     const filePath = `downloads/${fileId}`;
     return this.dataSource
       .prepare(fileId, filePath)
-      .then(fid => fid)
+      .then(fid => filePath)
       .catch(err => {
         logger.logException("Could not prepare file", err, { fileId });
         return rejection("INTERNAL_ERROR");
