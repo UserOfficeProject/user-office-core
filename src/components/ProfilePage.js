@@ -177,7 +177,8 @@ export default function ProfilePage({ match, history }) {
           position,
           email,
           telephone,
-          telephone_alt, 
+          telephone_alt,
+          orcid
         }
       }`;
 
@@ -236,7 +237,8 @@ export default function ProfilePage({ match, history }) {
                   email: userData.email,
                   telephone: userData.telephone,
                   telephone_alt: userData.telephone_alt,
-                  user_title: userData.user_title
+                  user_title: userData.user_title,
+                  orcid: userData.orcid
                 }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
@@ -339,6 +341,17 @@ export default function ProfilePage({ match, history }) {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <Field
+                          name="orcid"
+                          label="OrcID"
+                          type="text"
+                          component={TextField}
+                          margin="normal"
+                          fullWidth
+                          autoComplete="off"
+                          data-cy="orcid"
+                          disabled={true}
+                        />
                         <Field
                           name="username"
                           label="Username"
