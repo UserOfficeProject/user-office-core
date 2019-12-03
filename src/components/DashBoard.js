@@ -111,11 +111,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection:"row",
     alignItems:"center",
     justifyContent:"center"
-  },
-  linkStyle: {
-    fontSize:"10px",
-    minWidth:"auto",
-    padding:"0 5px"
   }
 }));
 
