@@ -165,7 +165,8 @@ class LoggerFactory {
     if (this.logger) {
       return this.logger;
     }
-    if (process.env.NODE_ENV === "development") {
+    const env = process.env.NODE_ENV || "unset";
+    if (env === "development") {
       this.logger = new ConsoleLogger();
       /*this.logger = new GrayLogLogger(
         process.env.GRAYLOG_SERVER!,
@@ -175,8 +176,7 @@ class LoggerFactory {
     } else {
       const server = process.env.GRAYLOG_SERVER;
       const port = parseInt(process.env.GRAYLOG_PORT || "0");
-      const env = process.env.NODE_ENV;
-      if (server && port && env) {
+      if (server && port) {
         this.logger = new GrayLogLogger(server, port, env);
       } else {
         this.logger = new MutedLogger();
