@@ -40,7 +40,7 @@ export default function ProposalInformationView(props: {
   })();
 
   const informDirty = (isDirty: boolean) => {
-    props.setIsDirty && props.setIsDirty(true);
+    props.setIsDirty && props.setIsDirty(isDirty);
   };
 
   return (
@@ -129,7 +129,7 @@ export default function ProposalInformationView(props: {
                   handleChange(e);
                   informDirty(true);
                 }}
-                error={touched.title && errors !== undefined}
+                error={touched.title && errors.title !== undefined}
                 helperText={touched.title && errors.title && errors.title}
                 data-cy="title"
               />
