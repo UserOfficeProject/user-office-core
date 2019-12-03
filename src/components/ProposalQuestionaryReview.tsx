@@ -32,7 +32,6 @@ export default function ProposaQuestionaryReview(
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
-
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
@@ -56,7 +55,7 @@ export default function ProposaQuestionaryReview(
             <TableCell>Co-Proposers</TableCell>
             <TableCell>
               {props.data
-                .users!.map((user: any) => ` ${user.name} ${user.lastname}`)
+                .users!.map((user: any) => ` ${user.firstname} ${user.lastname}`)
                 .toString()}
             </TableCell>
           </TableRow>
