@@ -74,8 +74,8 @@ export const typeDefs = `
         users: [BasicUserDetails!]
         proposer: BasicUserDetails
         questionary: Questionary
-        created: String
-        updated: String
+        created: Date
+        updated: Date
         reviews: [Review]
         shortCode:String
     }
@@ -132,10 +132,6 @@ export const typeDefs = `
         data_type:String,
         value: String
     }
-
-    
-
-
 
     input FieldDependencyInput {
         proposal_question_dependency: String,
