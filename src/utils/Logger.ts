@@ -15,7 +15,7 @@ class GrayLogLogger implements ILogger {
     });
   }
 
-  private getCommonFields(level: LEVEL, message: string, context: object) {
+  private createPayload(level: LEVEL, message: string, context: object) {
     return {
       level_str: LEVEL[level],
       title: message,
@@ -26,26 +26,19 @@ class GrayLogLogger implements ILogger {
   }
 
   logInfo(message: string, context: object) {
-    this.log.info(message, this.getCommonFields(LEVEL.INFO, message, context));
+    this.log.info(message, this.createPayload(LEVEL.INFO, message, context));
   }
 
   logWarn(message: string, context: object) {
-    this.log.warning(
-      message,
-      this.getCommonFields(LEVEL.WARN, message, context)
-    );
+    this.log.warning(message, this.createPayload(LEVEL.WARN, message, context));
   }
 
   logDebug(message: string, context: object) {
-    this.log.debug(
-      message,
-      this.getCommonFields(LEVEL.DEBUG, message, context)
-    );
+    this.log.debug(message, this.createPayload(LEVEL.DEBUG, message, context));
   }
 
   logError(message: string, context: object) {
-    const payload = this.getCommonFields(LEVEL.ERROR, message, context);
-    this.log.error(message, payload);
+    this.log.error(message, this.createPayload(LEVEL.ERROR, message, context));
   }
 
   logException(
