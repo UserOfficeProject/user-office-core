@@ -12,6 +12,8 @@ import {
   getQuestionaryStepByTopicId,
   areDependenciesSatisfied
 } from "../models/ProposalModelFunctions";
+import { unlink, existsSync } from "fs";
+import { logger } from "../utils/Logger";
 const jsonwebtoken = require("jsonwebtoken");
 const PDFDocument = require("pdfkit");
 const router = express.Router();
@@ -205,7 +207,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       const attachmentsMetadata = await Promise.all(
         attachmentIds.map(getAttachments)
       ).catch(e => {
-        console.log(e);
+        logger.logException("Failed to write PDF", e);
         res.status(500).send();
         return [];
       });
@@ -256,19 +258,18 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       const year = proposal.created.getUTCFullYear();
       const pi = principalInvestigator.lastname;
       const shortcode = proposal.shortCode;
-      res.download(
-        `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
-        `${year}_${pi}_${shortcode}.pdf`,
-        () => {
-          fs.unlink(
-            `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`,
-            () => {}
-          ); // delete file once done
+      const path = `downloads/proposalWithAttachmentsAndToC-${proposalId}.pdf`;
+      res.download(path, `${year}_${pi}_${shortcode}.pdf`, err => {
+        if (err) {
+          throw err;
         }
-      );
+        if (existsSync(path)) {
+          unlink(path, () => {}); // delete file once done
+        }
+      });
     });
   } catch (e) {
-    console.log(e);
+    logger.logException("Could not dowload generated PDF", e, { req });
     res.status(500).send(e);
   }
 });
