@@ -2,6 +2,7 @@ import { UserDataSource } from "../datasources/UserDataSource";
 import { User, BasicUserDetails } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
 var rp = require("request-promise");
+const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 
 export default class UserQueries {
@@ -72,7 +73,7 @@ export default class UserQueries {
       });
   }
 
-  async getOrcIDInformation(user: User | null, authorizationCode: string) {
+  async getOrcIDInformation(authorizationCode: string) {
     // If in development fake response
     if (process.env.NODE_ENV === "development") {
       return {
@@ -80,8 +81,7 @@ export default class UserQueries {
         orcidHash: "asdadgiuerervnaofhioa",
         refreshToken: "asdadgiuerervnaofhioa",
         firstname: "Kalle",
-        lastname: "Kallesson",
-        registered: false
+        lastname: "Kallesson"
       };
     }
 
@@ -90,7 +90,14 @@ export default class UserQueries {
       return null;
     }
 
-    const orcIDExist = await this.dataSource.checkOrcIDExist(orcData.orcid);
+    const user = await this.dataSource.getByOrcID(orcData.orcid);
+    if (user) {
+      const roles = await this.dataSource.getUserRoles(user.id);
+      const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+        expiresIn: process.env.tokenLife
+      });
+      return { token };
+    }
     var options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
@@ -114,8 +121,7 @@ export default class UserQueries {
             : null,
           lastname: resp.name["family-name"]
             ? resp.name["family-name"].value
-            : null,
-          registered: orcIDExist
+            : null
         };
       })
       .catch(function(err: any) {

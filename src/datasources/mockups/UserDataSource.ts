@@ -118,6 +118,9 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
+  getByOrcID(orcID: string): Promise<User | null> {
+    throw new Error("Method not implemented.");
+  }
   async createInviteUser(
     firstname: string,
     lastname: string,
