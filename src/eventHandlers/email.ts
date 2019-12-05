@@ -76,7 +76,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         const inviter = await userDataSource.getBasicUserInfo(event.inviterId);
 
         if (!user || !inviter) {
-          console.log("Failed");
+          logger.logError("Failed email invite", { user, inviter, event });
           return;
         }
 
@@ -96,10 +96,10 @@ export default function createHandler(userDataSource: UserDataSource) {
             recipients: [{ address: user.email }]
           })
           .then((res: string) => {
-            console.log(res);
+            logger.logInfo("Successful email transmission", { res });
           })
           .catch((err: string) => {
-            console.log(err);
+            logger.logException("Failed email transmission", err);
           });
         return;
       }

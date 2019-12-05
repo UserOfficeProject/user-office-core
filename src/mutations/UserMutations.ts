@@ -112,14 +112,10 @@ export default class UserMutations {
             ...args
           });
 
-          const [updateRolesErr] = await to(
-            this.dataSource.setUserRoles(user.id, [1])
-          );
-          if (isRejection(updatedUser) || !changePassword || !updateRolesErr) {
+          if (isRejection(updatedUser) || !changePassword) {
             logger.logError("Could not create user", {
               updatedUser,
-              changePassword,
-              updateRolesErr
+              changePassword
             });
             return rejection("INTERNAL_ERROR");
           }
@@ -146,7 +142,12 @@ export default class UserMutations {
             args.telephone_alt
           );
         }
-        if (!user) {
+
+        const [updateRolesErr] = await to(
+          this.dataSource.setUserRoles(user.id, [1])
+        );
+
+        if (!user || !updateRolesErr) {
           logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
