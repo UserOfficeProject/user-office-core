@@ -31,8 +31,12 @@ import HelpPage from "./HelpPage";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
 import QuestionaryEditor from "./QuestionaryEditor"
+import { BottomNavigation } from '@material-ui/core';
+import InformationModal from "./InformationModal";
+import { useGetPageContent } from "../hooks/useGetPageContent";
 
 const drawerWidth = 240;
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -96,7 +100,17 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
     height: "100vh",
-    overflow: "auto"
+    overflow: "auto",
+    display:"flex",
+    flexDirection:"column",
+  },
+  bottomNavigation: {
+    display:"flex",
+    marginTop:"auto",
+    marginBottom: theme.spacing(2),
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"center"
   }
 }));
 
@@ -111,6 +125,8 @@ export default function Dashboard({ match }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  const [, privacyPageContent] = useGetPageContent("PRIVACYPAGE");
+  const [, faqPageContent] = useGetPageContent("HELPPAGE");
 
   return (
     <div className={classes.root}>
@@ -201,7 +217,32 @@ export default function Dashboard({ match }) {
             <Route component={ProposalTableReviewer} />
           )}
         </Switch>
+        <BottomNavigation class={classes.bottomNavigation}>
+        <BottomNavItem
+          text={privacyPageContent}
+          linkText={"Privacy Statement"}
+        />
+        <BottomNavItem
+          text={faqPageContent}
+          linkText={"FAQ"}
+        />
+        <BottomNavItem />
+        </BottomNavigation>
       </main>
     </div>
+  );
+}
+
+
+const BottomNavItem = (props) => {
+  return (
+      <InformationModal
+      text={props.text}
+      linkText={props.linkText}
+      linkStyle={{
+        fontSize:"10px",
+        minWidth:"auto",
+        padding:"10px"
+      }}/>
   );
 }
