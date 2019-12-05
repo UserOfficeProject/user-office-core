@@ -1,6 +1,7 @@
 import React from "react";
 import ProposalTable from "./ProposalTable";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { timeAgo } from "./../utils/Time";
 
 export default function ProposalTableUser(props) {
   const sendRequest = useDataAPI();
@@ -14,6 +15,7 @@ export default function ProposalTableUser(props) {
           shortCode
           title
           status
+          updated
         }
       }
     }`;
@@ -31,6 +33,7 @@ export default function ProposalTableUser(props) {
             title: proposal.title,
             status: proposal.status === 0 ? "Open" : "Submitted",
             shortCode: proposal.shortCode,
+            updated: timeAgo(proposal.updated)
           };
         })
       };

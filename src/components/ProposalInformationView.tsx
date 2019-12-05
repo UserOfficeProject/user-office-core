@@ -15,7 +15,6 @@ import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
 
-
 export default function ProposalInformationView(props: {
   data: ProposalInformation;
   readonly?: boolean;
@@ -77,20 +76,20 @@ export default function ProposalInformationView(props: {
               message: result.updateProposal.error
             });
           } else {
-          api.next({
-            ...values,
-            id,
-            status,
-            users,
-            shortCode,
-            proposer: {
-              id: user.id,
-              firstname: user.firstname,
-              lastname: user.lastname,
-              organisation: user.organisation
-            }
-          });
-        }
+            api.next({
+              ...values,
+              id,
+              status,
+              users,
+              shortCode,
+              proposer: {
+                id: user.id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                organisation: user.organisation
+              }
+            });
+          }
         }
       }}
       validationSchema={Yup.object().shape({
@@ -178,7 +177,7 @@ export default function ProposalInformationView(props: {
           />
           <ProposalNavigationFragment
             disabled={props.readonly}
-            saveAndNext={{callback:submitForm}}
+            saveAndNext={{ callback: submitForm }}
             isLoading={creatingProposal || updatingProposal}
           />
         </Form>
