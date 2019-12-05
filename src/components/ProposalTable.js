@@ -12,7 +12,7 @@ export default function ProposalTable(props) {
     { title: "Shortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Status", field: "status" },
-    { title: "Last updated", field: "updated" },
+    { title: "Created", field: "created" }
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);

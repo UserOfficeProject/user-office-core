@@ -15,7 +15,7 @@ export default function ProposalTableUser(props) {
           shortCode
           title
           status
-          updated
+          created
         }
       }
     }`;
@@ -27,15 +27,21 @@ export default function ProposalTableUser(props) {
       return {
         page: 0,
         totalCount: data.user.proposals.length,
-        data: data.user.proposals.map(proposal => {
-          return {
-            id: proposal.id,
-            title: proposal.title,
-            status: proposal.status === 0 ? "Open" : "Submitted",
-            shortCode: proposal.shortCode,
-            updated: timeAgo(proposal.updated)
-          };
-        })
+        data: data.user.proposals
+          .sort((a, b) => {
+            return (
+              new Date(b.created).getTime() - new Date(a.created).getTime()
+            );
+          })
+          .map(proposal => {
+            return {
+              id: proposal.id,
+              title: proposal.title,
+              status: proposal.status === 0 ? "Open" : "Submitted",
+              shortCode: proposal.shortCode,
+              created: timeAgo(proposal.created)
+            };
+          })
       };
     });
   };
