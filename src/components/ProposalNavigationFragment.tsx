@@ -3,12 +3,11 @@ import { Fragment } from "react";
 import React from "react";
 
 const ProposalNavigationFragment = (props: {
-  back?: () => void;
-  reset?: () => void;
-  next?: () => void;
+  back?: IButtonConfig;
+  reset?: IButtonConfig;
+  save?: IButtonConfig;
+  saveAndNext?: IButtonConfig;
   isLoading: boolean;
-  backLabel?: string;
-  nextLabel?: string;
   disabled?: boolean;
 }) => {
   if (props.disabled === true) {
@@ -18,41 +17,65 @@ const ProposalNavigationFragment = (props: {
     buttons: {
       marginTop: "15px",
       display: "flex",
-      justifyContent: "flex-end"
+      justifyContent: "flex-end",
+      
     },
     button: {
-      marginTop: "25px",
-      marginLeft: "10px"
+      margin: "25px 10px 0 10px",
+      '&:first-child': {
+        marginLeft: '0',
+      },
+      '&:last-child': {
+        marginRight: '0',
+      }
+    },
+     lastLeftButton: {
+      marginRight:"auto"
     }
   })();
 
   const backbutton = props.back ? (
     <Button
-      onClick={() => props.back!()}
-      className={classes.buttons}
+      onClick={() => props.back!.callback()}
+      className={`${classes.button} ${classes.lastLeftButton}`}
       type="button"
+      disabled={props.back.disabled}
     >
-      {props.backLabel || "Save and back"}
+      {props.back.label || "Back"}
     </Button>
   ) : null;
   const resetButton = props.reset ? (
     <Button
-      onClick={() => props.reset!()}
-      className={classes.buttons}
+      onClick={() => props.reset!.callback()}
+      className={classes.button}
       type="button"
+      disabled={props.reset.disabled}
     >
-      Reset
+      {props.reset.label || "Reset"}
     </Button>
   ) : null;
-  const nextButton = props.next ? (
+  const saveButton = props.save ? (
     <Button
-      onClick={() => props.next!()}
-      className={classes.buttons}
+      onClick={() => props.save!.callback()}
+      className={classes.button}
       type="button"
       variant="contained"
       color="primary"
+      disabled={props.save.disabled}
     >
-      {props.nextLabel || "Save and continue"}
+      {props.save.label || "Save"}
+    </Button>
+    ) : null;
+  const saveAndNextButton = props.saveAndNext ? (
+    <Button
+      onClick={() => props.saveAndNext!.callback()}
+      className={classes.button}
+      type="button"
+      variant="contained"
+      color="primary"
+      disabled={props.saveAndNext.disabled}
+    >
+      {props.saveAndNext.label || "Save and continue"}
     </Button>
   ) : null;
   const buttonArea = props.isLoading ? (
@@ -61,7 +84,8 @@ const ProposalNavigationFragment = (props: {
     <Fragment>
       {backbutton}
       {resetButton}
-      {nextButton}
+      {saveButton}
+      {saveAndNextButton}
     </Fragment>
   );
 
@@ -69,3 +93,9 @@ const ProposalNavigationFragment = (props: {
 };
 
 export default ProposalNavigationFragment;
+
+interface IButtonConfig {
+  callback:() => void,
+  label?:string,
+  disabled?:boolean
+}
