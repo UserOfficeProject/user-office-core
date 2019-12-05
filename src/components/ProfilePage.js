@@ -10,6 +10,9 @@ import Paper from "@material-ui/core/Paper";
 import { useDataAPI } from "../hooks/useDataAPI";
 import FormikDropdown from "./FormikDropdown";
 import { useGetFields } from "../hooks/useGetFields";
+import orcid from "../images/orcid.png";
+import InputLabel from "@material-ui/core/InputLabel";
+
 import {
   userFieldSchema,
   userPasswordFieldSchema
@@ -36,6 +39,17 @@ const useStyles = makeStyles({
   container: {
     paddingTop: "25px",
     paddingBottom: "25px"
+  },
+  orcidIconSmall: {
+    "vertical-align": "middle",
+    "margin-right": "4px",
+    width: "16px",
+    height: "16px",
+    border: "0px"
+  },
+  orcIdContainer: {
+    "margin-top": "16px",
+    "margin-bottom": "19px"
   }
 });
 
@@ -177,7 +191,8 @@ export default function ProfilePage({ match, history }) {
           position,
           email,
           telephone,
-          telephone_alt, 
+          telephone_alt,
+          orcid
         }
       }`;
 
@@ -236,7 +251,8 @@ export default function ProfilePage({ match, history }) {
                   email: userData.email,
                   telephone: userData.telephone,
                   telephone_alt: userData.telephone_alt,
-                  user_title: userData.user_title
+                  user_title: userData.user_title,
+                  orcid: userData.orcid
                 }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
@@ -339,6 +355,17 @@ export default function ProfilePage({ match, history }) {
                         />
                       </Grid>
                       <Grid item xs={6}>
+                        <div className={classes.orcIdContainer}>
+                          <InputLabel shrink>ORCID iD</InputLabel>
+                          <a href={"https://orcid.org/" + values.orcid}>
+                            <img
+                              className={classes.orcidIconSmall}
+                              src={orcid}
+                              alt="ORCID iD icon"
+                            />
+                            https://orcid.org/{values.orcid}
+                          </a>
+                        </div>
                         <Field
                           name="username"
                           label="Username"
