@@ -147,7 +147,7 @@ export default class UserMutations {
           this.dataSource.setUserRoles(user.id, [1])
         );
 
-        if (!user || !updateRolesErr) {
+        if (!user || updateRolesErr) {
           logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
