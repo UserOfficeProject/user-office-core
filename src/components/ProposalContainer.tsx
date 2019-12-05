@@ -88,13 +88,16 @@ export default function ProposalContainer(props: {
     setIsDirty(false);
   };
 
-  const handleBack = async (data: ProposalInformation) => {
-    setProposalInfo({
-      ...proposalInfo,
-      ...data
-    });
-    setStepIndex(clampStep(stepIndex - 1));
-    setIsDirty(false);
+  const handleBack = async () => {
+    if(isDirty) {
+      if(await handleReset())
+      {
+        setStepIndex(clampStep(stepIndex - 1));
+      }
+    }
+    else{
+      setStepIndex(clampStep(stepIndex - 1));
+    }
   };
 
   const clampStep = (step: number) => {
@@ -306,7 +309,7 @@ type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{
   next: CallbackSignature;
-  back: CallbackSignature;
+  back: VoidCallbackSignature;
   reset: VoidCallbackSignature;
   reportStatus: (notification: INotification) => void;
 }>({

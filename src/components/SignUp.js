@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -21,6 +21,8 @@ import { useGetFields } from "../hooks/useGetFields";
 import FormLabel from "@material-ui/core/FormLabel";
 import orcid from "../images/orcid.png";
 import clsx from "clsx";
+import { UserContext } from "../context/UserContextProvider";
+import { Redirect } from "react-router-dom";
 import {
   userFieldSchema,
   userPasswordFieldSchema
@@ -66,6 +68,13 @@ const useStyles = makeStyles(theme => ({
     color: "red",
     content: " *"
   },
+  orcidIconSmall: {
+    "vertical-align": "middle",
+    "margin-right": "4px",
+    width: "16px",
+    height: "16px",
+    border: "0px"
+  },
   orcButton: {
     "&:hover": {
       border: "1px solid #338caf",
@@ -87,11 +96,13 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2)
   },
-  orcidIcon: {
+  orcidIconMedium: {
     display: "block",
     margin: "0 .5em 0 0",
     padding: 0,
-    float: "left"
+    float: "left",
+    width: "24px",
+    height: "24px"
   },
   gridRoot: {
     flexGrow: 1
@@ -114,6 +125,7 @@ export default function SignUp(props) {
 
   const [nationalitiesList, setNationalitiesList] = useState([]);
   const [institutionsList, setInstitutionsList] = useState([]);
+  const { handleLogin, token } = useContext(UserContext);
 
   const [orcidError, setOrcidError] = useState(false);
   const [, privacyPageContent] = useGetPageContent("PRIVACYPAGE");
@@ -122,6 +134,14 @@ export default function SignUp(props) {
   const [, fieldsContent] = useGetFields();
   let authCodeOrcID = queryString.parse(props.location.search).code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
+
+  if (orcData && orcData.token) {
+    handleLogin(orcData.token);
+  }
+
+  if (token) {
+    return <Redirect to="/" />;
+  }
 
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
     setInstitutionsList(
@@ -268,7 +288,7 @@ export default function SignUp(props) {
                           root: classes.cardTitle
                         }}
                       >
-                        1. Found ORCID iD
+                        1. ORCID iD
                       </FormLabel>
                     ) : (
                       <FormLabel
@@ -278,15 +298,28 @@ export default function SignUp(props) {
                         }}
                       >
                         {" "}
-                        1. Register ORCID iD
+                        1. Create or connect your ORCID iD
                       </FormLabel>
                     )}
                   </Typography>
                   <CardContent>
                     {orcData && !orcData.registered ? (
-                      <p>{orcData.orcid}</p>
+                      <a href={"https://orcid.org/" + orcData.orcid}>
+                        <img
+                          className={classes.orcidIconSmall}
+                          src={orcid}
+                          alt="ORCID iD icon"
+                        />
+                        https://orcid.org/{orcData.orcid}
+                      </a>
                     ) : (
                       <React.Fragment>
+                        <p>
+                          ORCID provides a persistent identifier – an ORCID iD –
+                          that distinguishes you from other researchers and a
+                          mechanism for linking your research outputs and
+                          activities to your iD. Learn more at orcid.org
+                        </p>
                         <p>
                           Please add you ORCID iD <b>first</b>: ESS will collect
                           any information we can from ORCID before you complete
@@ -314,13 +347,11 @@ export default function SignUp(props) {
                           }
                         >
                           <img
-                            className={classes.orcidIcon}
+                            className={classes.orcidIconMedium}
                             src={orcid}
-                            width="24"
-                            height="24"
                             alt="ORCID iD icon"
                           />
-                          Register your ORCID iD
+                          Create or connect your ORCID iD
                         </Button>
                       </React.Fragment>
                     )}

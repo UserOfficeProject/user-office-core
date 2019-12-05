@@ -81,8 +81,8 @@ export default function ProposalQuestionareStep(props: {
     activeFields
   );
 
-  const saveStepData = async (markAsComplete: boolean) => {
-    const id: number = props.data.id;
+  const saveStepData = async (markAsComplete: boolean, partialSave:boolean) => {
+    const proposalId: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields
       .filter(field => field.value !== "")
@@ -95,9 +95,10 @@ export default function ProposalQuestionareStep(props: {
       });
 
     const result = await updateProposal({
-      id,
+      id: proposalId,
       answers,
-      topicsCompleted: markAsComplete ? [topicId] : []
+      topicsCompleted: markAsComplete ? [topicId] : [],
+      partialSave
     });
 
     if (result && result.updateProposal && result.updateProposal.error) {
@@ -142,26 +143,20 @@ export default function ProposalQuestionareStep(props: {
           })}
           <ProposalNavigationFragment
             disabled={props.readonly}
-            back={() => {
-              submitFormAsync(submitForm, validateForm).then(
-                (isValid: boolean) => {
-                  saveStepData(isValid);
-                  if (isValid) {
-                    (getQuestionaryStepByTopicId(
-                      props.data.questionary!,
-                      topicId
-                    ) as QuestionaryStep).isCompleted = true;
-                    api.back({ ...props.data });
-                  }
-                }
-              );
+            back={{callback:() => {
+              api.back();
+            }}}
+            reset={{callback:api.reset, disabled:!isDirty}}
+            save={questionaryStep.isCompleted ? undefined:{callback: () => {
+              saveStepData(false, true);
+            },
+            disabled:!isDirty
             }}
-            reset={isDirty ? () => api.reset() : undefined}
-            next={() => {
+            saveAndNext={{callback:() => {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
-                  saveStepData(isValid);
                   if (isValid) {
+                    saveStepData(true, false);
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
                       topicId
@@ -170,7 +165,7 @@ export default function ProposalQuestionareStep(props: {
                   }
                 }
               );
-            }}
+            }}}
             isLoading={formSaving}
           />
         </form>

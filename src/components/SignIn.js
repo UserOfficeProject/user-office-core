@@ -14,6 +14,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
+import orcid from "../images/orcid.png";
 import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 const useStyles = makeStyles(theme => ({
@@ -36,6 +37,41 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center"
+  },
+  loginAlternative: {
+    "border-top": "1px solid #e1e5ed",
+    position: "relative",
+    "text-align": "center",
+    "margin-top": "1.5em",
+    "padding-top": "2em",
+    "padding-bottom": "2em",
+    width: "100%"
+  },
+  loginAlternativeOr: {
+    position: "absolute",
+    left: "50%",
+    top: "-11px",
+    "margin-left": "-16px",
+    display: "inline-block",
+    height: "22px",
+    "font-size": ".8rem",
+    width: "32px",
+    "text-align": "center",
+    background: "#fff",
+    color: "#c5c5c5",
+    "margin-bottom": "10px"
+  },
+  orcButton: {
+    background: "#a6ce39",
+    color: "white",
+    "&:hover": {
+      background: "#a6ce39"
+    }
+  },
+  orcidIconMedium: {
+    "border-right": "1px solid white",
+    "margin-right": "4px",
+    "padding-right": "6px"
   }
 }));
 
@@ -88,9 +124,9 @@ export default function SignInSide() {
         validationSchema={Yup.object().shape({
           email: Yup.string().email(),
           password: Yup.string()
-            .min(8, "Password must be at least 8 characters")
+            .min(8, "Password must be at least 12 characters")
             .max(25, "Password must be at most 25 characters")
-            .required("Password must be at least 8 characters")
+            .required("Password must be at least 12 characters")
         })}
       >
         <Form className={classes.form}>
@@ -141,6 +177,27 @@ export default function SignInSide() {
                 <Link to="/SignUp/" data-cy="create-account">
                   Don't have an account? Sign Up
                 </Link>
+              </Grid>
+              <Grid item xs={12}>
+                <div className={classes.loginAlternative}>
+                  <span className={classes.loginAlternativeOr}>or</span>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.orcButton}
+                    onClick={() =>
+                      (window.location.href =
+                        process.env.REACT_APP_ORCID_REDIRECT)
+                    }
+                  >
+                    <img
+                      className={classes.orcidIconMedium}
+                      src={orcid}
+                      alt="ORCID iD icon"
+                    />
+                    Sign in with <b>&nbsp;ORCID</b>
+                  </Button>
+                </div>
               </Grid>
             </Grid>
           </div>

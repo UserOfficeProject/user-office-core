@@ -179,7 +179,7 @@ export default function ProposalInformationView(props: {
           />
           <ProposalNavigationFragment
             disabled={props.readonly}
-            next={submitForm}
+            saveAndNext={{callback:submitForm}}
             isLoading={creatingProposal || updatingProposal}
           />
         </Form>

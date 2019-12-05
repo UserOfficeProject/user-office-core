@@ -50,18 +50,17 @@ export default function ProposalReview({
       <div className={classes.buttons}>
         <ProposalNavigationFragment
           back={undefined}
-          next={
+          saveAndNext={
             readonly
               ? undefined
-              : () => {
+              : {callback:() => {
                   submitProposal(data.id).then(isSubmitted => {
                     data.status = ProposalStatus.Submitted;
                     api.next(data);
                   });
-                }
+                }, label:"Submit"}
           }
           reset={undefined}
-          nextLabel={"Submit"}
           isLoading={isLoading}
           disabled={false}
         />
