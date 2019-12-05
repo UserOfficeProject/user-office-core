@@ -498,10 +498,7 @@ export default {
     args: { authorizationCode: string },
     context: ResolverContext
   ) {
-    return context.queries.user.getOrcIDInformation(
-      context.user,
-      args.authorizationCode
-    );
+    return context.queries.user.getOrcIDInformation(args.authorizationCode);
   },
 
   users(args: UsersArgs, context: ResolverContext) {

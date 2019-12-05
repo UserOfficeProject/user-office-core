@@ -215,6 +215,20 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
+  async getByOrcID(orcID: string): Promise<User | null> {
+    return database
+      .select()
+      .from("users")
+      .where("orcid", orcID)
+      .first()
+      .then((user: UserRecord) => {
+        if (!user) {
+          return null;
+        }
+        return createUserObject(user);
+      });
+  }
+
   async getByEmail(email: string): Promise<User | null> {
     return database
       .select()
@@ -273,7 +287,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning(["*"])
       .into("users")
       .then((user: UserRecord[]) => {
-        if (!user || user.length !== 0) {
+        if (!user || user.length == 0) {
           throw new Error("Could not create user");
         }
         return createUserObject(user[0]);
