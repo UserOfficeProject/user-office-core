@@ -57,6 +57,7 @@ interface UpdateProposalArgs {
   topicsCompleted: number[];
   users: number[];
   proposerId: number;
+  partialSave: boolean;
 }
 
 interface UpdateProposalFilesArgs {
@@ -376,7 +377,8 @@ export default {
       topicsCompleted,
       status,
       users,
-      proposerId
+      proposerId,
+      partialSave
     } = args;
     return wrapProposalMutation(
       context.mutations.proposal.update(
@@ -388,7 +390,8 @@ export default {
         topicsCompleted,
         status,
         users,
-        proposerId
+        proposerId,
+        partialSave
       )
     );
   },

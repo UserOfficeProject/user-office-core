@@ -293,7 +293,6 @@ export default class PostgresUserDataSource implements UserDataSource {
         return createUserObject(user[0]);
       })
       .then((user: User) => {
-        this.setUserRoles(user.id, [1]);
         return user;
       });
   }
