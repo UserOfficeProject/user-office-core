@@ -64,7 +64,7 @@ test("A user must be logged in to invite another user by email", () => {
       "lastname",
       "email@google.com"
     )
-  ).resolves.toHaveProperty("reason", "MUST_LOGIN");
+  ).resolves.toHaveProperty("reason", "NOT_LOGGED");
 });
 
 test("A user cannot invite another user by email if the user already has an account", () => {
@@ -109,7 +109,7 @@ test("A user cannot update another users name", () => {
       firstname: "klara",
       lastname: "undefined"
     })
-  ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
+  ).resolves.toHaveProperty("reason", "INSUFFICIENT_PERMISSIONS");
 });
 
 test("A not logged in user cannot update another users name", () => {
@@ -119,7 +119,7 @@ test("A not logged in user cannot update another users name", () => {
       firstname: "klara",
       lastname: "undefined"
     })
-  ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
+  ).resolves.toHaveProperty("reason", "INSUFFICIENT_PERMISSIONS");
 });
 
 test("A userofficer can update another users name", () => {
@@ -140,7 +140,7 @@ test("A user cannot update it's roles", () => {
       lastname: "undefined",
       roles: [1, 2]
     })
-  ).resolves.toHaveProperty("reason", "WRONG_PERMISSIONS");
+  ).resolves.toHaveProperty("reason", "INSUFFICIENT_PERMISSIONS");
 });
 
 test("A userofficer can update users roles", () => {
