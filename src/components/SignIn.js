@@ -127,9 +127,9 @@ export default function SignInSide() {
         validationSchema={Yup.object().shape({
           email: Yup.string().email(),
           password: Yup.string()
-            .min(8, "Password must be at least 12 characters")
+            .min(8, "Password must be at least 8 characters")
             .max(25, "Password must be at most 25 characters")
-            .required("Password must be at least 12 characters")
+            .required("Password must be at least 8 characters")
         })}
       >
         <Form className={classes.form}>
