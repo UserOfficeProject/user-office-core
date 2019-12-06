@@ -20,6 +20,7 @@ import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
 import { clamp } from "../utils/Math";
 import "../styles/ProposalComponentStyles.css";
+import { Prompt } from "react-router";
 
 export interface INotification {
   variant: "error" | "success";
@@ -87,13 +88,16 @@ export default function ProposalContainer(props: {
     setIsDirty(false);
   };
 
-  const handleBack = async (data: ProposalInformation) => {
-    setProposalInfo({
-      ...proposalInfo,
-      ...data
-    });
-    setStepIndex(clampStep(stepIndex - 1));
-    setIsDirty(false);
+  const handleBack = async () => {
+    if(isDirty) {
+      if(await handleReset())
+      {
+        setStepIndex(clampStep(stepIndex - 1));
+      }
+    }
+    else{
+      setStepIndex(clampStep(stepIndex - 1));
+    }
   };
 
   const clampStep = (step: number) => {
@@ -105,7 +109,7 @@ export default function ProposalContainer(props: {
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
       const confirmed = window.confirm(
-        "Changes you recently made in this step will not be saved! Are you sure?"
+        getConfirmNavigMsg()
       );
       if (confirmed) {
         const proposalData = await loadProposal(proposalInfo.id);
@@ -118,6 +122,10 @@ export default function ProposalContainer(props: {
     }
     return false;
   };
+
+  const getConfirmNavigMsg = () => {
+    return "Changes you recently made in this step will not be saved! Are you sure?";
+  }
 
   useEffect(() => {
     const createProposalSteps = (
@@ -219,6 +227,10 @@ export default function ProposalContainer(props: {
 
   return (
     <Container maxWidth="lg">
+      <Prompt
+            when={isDirty}
+            message={location => getConfirmNavigMsg()}
+          />
       <Notification
         open={notification.isOpen}
         onClose={() => {
@@ -250,7 +262,6 @@ export default function ProposalContainer(props: {
                   onClick={async () => {
                     if (
                       !isDirty ||
-                      proposalInfo.status === ProposalStatus.Blank ||
                       (await handleReset())
                     ) {
                       setStepIndex(index);
@@ -298,7 +309,7 @@ type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{
   next: CallbackSignature;
-  back: CallbackSignature;
+  back: VoidCallbackSignature;
   reset: VoidCallbackSignature;
   reportStatus: (notification: INotification) => void;
 }>({

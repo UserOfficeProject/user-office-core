@@ -15,6 +15,7 @@ import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
 
+
 export default function ProposalInformationView(props: {
   data: ProposalInformation;
   readonly?: boolean;
@@ -40,7 +41,7 @@ export default function ProposalInformationView(props: {
   })();
 
   const informDirty = (isDirty: boolean) => {
-    props.setIsDirty && props.setIsDirty(true);
+    props.setIsDirty && props.setIsDirty(isDirty);
   };
 
   return (
@@ -129,7 +130,7 @@ export default function ProposalInformationView(props: {
                   handleChange(e);
                   informDirty(true);
                 }}
-                error={touched.title && errors !== undefined}
+                error={touched.title && errors.title !== undefined}
                 helperText={touched.title && errors.title && errors.title}
                 data-cy="title"
               />
@@ -177,7 +178,7 @@ export default function ProposalInformationView(props: {
           />
           <ProposalNavigationFragment
             disabled={props.readonly}
-            next={submitForm}
+            saveAndNext={{callback:submitForm}}
             isLoading={creatingProposal || updatingProposal}
           />
         </Form>
