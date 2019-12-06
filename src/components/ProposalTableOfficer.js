@@ -11,7 +11,7 @@ export default function ProposalTableOfficer() {
   const deleteProposal = useDeleteProposal();
 
   const columns = [
-    { title: "Sortcode", field: "shortCode" },
+    { title: "Shortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Status", field: "status" }
   ];
@@ -45,17 +45,15 @@ export default function ProposalTableOfficer() {
           onClick: (event, rowData) => setEditProposalID(rowData.id)
         }
       ]}
-      editable={
-        {
-          onRowDelete: oldData =>
-            new Promise(async resolve => {
-              await deleteProposal(oldData.id)
-              proposalsData.splice(proposalsData.indexOf(oldData), 1)
-              setProposalsData(proposalsData.slice(0))
-              resolve();
-            })
-        }
-      }
+      editable={{
+        onRowDelete: oldData =>
+          new Promise(async resolve => {
+            await deleteProposal(oldData.id);
+            proposalsData.splice(proposalsData.indexOf(oldData), 1);
+            setProposalsData(proposalsData.slice(0));
+            resolve();
+          })
+      }}
     />
   );
 }

@@ -11,7 +11,8 @@ export default function ProposalTable(props) {
   const columns = [
     { title: "Shortcode", field: "shortCode" },
     { title: "Title", field: "title" },
-    { title: "Status", field: "status" }
+    { title: "Status", field: "status" },
+    { title: "Created", field: "created" }
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);

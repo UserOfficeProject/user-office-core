@@ -46,10 +46,11 @@ const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
       return dateSchema;
     case DataType.BOOLEAN:
       let booleanSchema = Yup.bool();
+
       field.config.required &&
-        (booleanSchema = booleanSchema.required(
-          "The checkbox must be selected"
-        ));
+        (booleanSchema = booleanSchema
+          .oneOf([true], "This field is required")
+          .required("This field is required"));
       return booleanSchema;
     default:
       return Yup.string();

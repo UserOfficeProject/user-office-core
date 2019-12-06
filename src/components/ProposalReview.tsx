@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     opacity: 0.7
   },
   button: {
-    marginTop: "30px",
+    marginTop: "auto",
     marginLeft: "10px",
     backgroundColor: "#00C851",
     color: "#ffff",
@@ -53,12 +53,15 @@ export default function ProposalReview({
           saveAndNext={
             readonly
               ? undefined
-              : {callback:() => {
-                  submitProposal(data.id).then(isSubmitted => {
-                    data.status = ProposalStatus.Submitted;
-                    api.next(data);
-                  });
-                }, label:"Submit"}
+              : {
+                  callback: () => {
+                    submitProposal(data.id).then(isSubmitted => {
+                      data.status = ProposalStatus.Submitted;
+                      api.next(data);
+                    });
+                  },
+                  label: "Submit"
+                }
           }
           reset={undefined}
           isLoading={isLoading}

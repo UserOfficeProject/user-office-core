@@ -24,7 +24,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         name={proposal_question_id}
         fullWidth
         required={config.required ? true : false}
-        label={question}
+        label={config.htmlQuestion ? "" : question }
         value={templateField.value}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           templateField.value = evt.target.value;

@@ -57,11 +57,6 @@ export function FileUploadComponent(props: {
     if (previousFiles.length === files.length) {
       return; // no files added or removed
     }
-
-    const inputElement: HTMLInputElement = inputRef.current!;
-    let event: any = {};
-    event.target = inputElement;
-    props.onChange(event);
   }, [files, previousFiles]); // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
 
   useEffect(() => {
@@ -76,11 +71,20 @@ export function FileUploadComponent(props: {
 
   const onUploadComplete = (newFile: FileMetaData) => {
     setFiles(files.concat(newFile));
+    dispatchChange();
   };
 
   const onDeleteClicked = (deleteFile: FileMetaData) => {
     setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
+    dispatchChange();
   };
+
+  const dispatchChange = () => {
+    const inputElement: HTMLInputElement = inputRef.current!;
+    let event: any = {};
+    event.target = inputElement;
+    props.onChange(event);
+  }
 
   const { fileType, id } = props;
   const maxFiles = props.maxFiles || 1;
