@@ -59,7 +59,8 @@ export default class ProposalMutations {
     topicsCompleted?: number[],
     status?: number,
     users?: number[],
-    proposerId?: number
+    proposerId?: number,
+    partialSave?: boolean
   ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap<Proposal>(
       async () => {
@@ -140,7 +141,10 @@ export default class ProposalMutations {
               if (!templateField) {
                 return rejection("INTERNAL_ERROR");
               }
-              if (!isMatchingConstraints(answer.value, templateField)) {
+              if (
+                !partialSave &&
+                !isMatchingConstraints(answer.value, templateField)
+              ) {
                 this.logger.logError(
                   "User provided value not matching constraint",
                   { answer, templateField }

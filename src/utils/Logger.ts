@@ -15,41 +15,30 @@ class GrayLogLogger implements ILogger {
     });
   }
 
-  private getCommonFields(level: LEVEL, message: string) {
+  private createPayload(level: LEVEL, message: string, context: object) {
     return {
       level_str: LEVEL[level],
       title: message,
       environment: this.environment,
-      stackTrace: new Error().stack
+      stackTrace: new Error().stack,
+      context: JSON.stringify(context)
     };
   }
 
   logInfo(message: string, context: object) {
-    this.log.info(message, {
-      ...this.getCommonFields(LEVEL.INFO, message),
-      ...context
-    });
+    this.log.info(message, this.createPayload(LEVEL.INFO, message, context));
   }
 
   logWarn(message: string, context: object) {
-    this.log.warning(message, {
-      ...this.getCommonFields(LEVEL.WARN, message),
-      ...context
-    });
+    this.log.warning(message, this.createPayload(LEVEL.WARN, message, context));
   }
 
   logDebug(message: string, context: object) {
-    this.log.debug(message, {
-      ...this.getCommonFields(LEVEL.DEBUG, message),
-      ...context
-    });
+    this.log.debug(message, this.createPayload(LEVEL.DEBUG, message, context));
   }
 
   logError(message: string, context: object) {
-    this.log.error(message, {
-      ...this.getCommonFields(LEVEL.ERROR, message),
-      ...context
-    });
+    this.log.error(message, this.createPayload(LEVEL.ERROR, message, context));
   }
 
   logException(
@@ -57,24 +46,10 @@ class GrayLogLogger implements ILogger {
     exception: Error | string,
     context?: object
   ): void {
-    if (exception instanceof Error) {
-      this.log.error(
-        message,
-        (() => {
-          const { name, message, stack } = exception;
-          return {
-            exception: { name, message, stack },
-            level_str: LEVEL[LEVEL.ERROR],
-            ...this.getCommonFields(LEVEL.ERROR, message),
-            ...context
-          };
-        })()
-      );
-      if (typeof exception === "string" || exception instanceof String) {
-        this.logError(message, { exception, ...context });
-      } else {
-        this.logError(message, context || {});
-      }
+    if (exception !== null) {
+      this.logError(message, { exception, ...context });
+    } else {
+      this.logError(message, context || {});
     }
   }
 }
