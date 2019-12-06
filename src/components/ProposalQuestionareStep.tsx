@@ -27,6 +27,7 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
@@ -102,7 +103,7 @@ export default function ProposalQuestionareStep(props: {
     if (result && result.updateProposal && result.updateProposal.error) {
       api.reportStatus({
         variant: "error",
-        message: result.updateProposal.error
+        message: getTranslation(result.updateProposal.error)
       });
     } else {
       api.reportStatus({ variant: "success", message: "Saved" });
