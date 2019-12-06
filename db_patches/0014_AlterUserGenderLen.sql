@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN gender TYPE varchar(30);
