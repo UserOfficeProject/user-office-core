@@ -1,0 +1,3 @@
+[submodule "src/submodules/duo-localisation"]
+	path = src/submodules/duo-localisation
+	url = https://gitlab.esss.lu.se/swap/duo-localisation

@@ -15,6 +15,7 @@ import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
 import orcid from "../images/orcid.png";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -101,11 +102,7 @@ export default function SignInSide() {
         if (!data.login.error) {
           handleLogin(data.login.token);
         } else {
-          if (data.login.error === "WRONG_EMAIL_OR_PASSWORD") {
-            setErrorMessage("Wrong password or email");
-          } else if (data.login.error === "EMAIL_NOT_VERIFIED") {
-            setErrorMessage("Verify email before login");
-          }
+          setErrorMessage(getTranslation(data.login.error));
           setFailed(true);
         }
       })
