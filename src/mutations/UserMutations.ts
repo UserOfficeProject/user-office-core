@@ -320,12 +320,16 @@ export default class UserMutations {
       return false;
     }
   }
-  async updatePassword(agent: User | null, id: number, password: string) {
+  async updatePassword(
+    agent: User | null,
+    id: number,
+    password: string
+  ): Promise<BasicUserDetails | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, id))
     ) {
-      return false;
+      return rejection("NOT_ALLOWED");
     }
     try {
       const hash = this.createHash(password);
@@ -337,11 +341,11 @@ export default class UserMutations {
           agent,
           id
         });
-        return false;
+        return rejection("USER_DOES_NOT_EXIST");
       }
     } catch (error) {
       logger.logException("Could not update password", error, { agent, id });
-      return false;
+      return rejection("INTERNAL_ERROR");
     }
   }
   async resetPassword(
