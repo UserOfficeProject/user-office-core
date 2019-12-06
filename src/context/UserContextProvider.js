@@ -83,7 +83,9 @@ export const UserContextProvider = props => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
   checkLocalStorage(dispatch, state);
+  console.log("in usercontextprovider");
   useEffect(() => {
+    console.log("in useeffect token");
     setCookie("token", state.token, { secure: false });
   }, [setCookie, state.token]);
 

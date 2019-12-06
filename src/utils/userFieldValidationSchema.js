@@ -65,11 +65,11 @@ export const userFieldSchema = Yup.object().shape({
 export const userPasswordFieldSchema = Yup.object().shape({
   password: Yup.string()
     .required(
-      "Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+      "Password must contain at least 8 characters (including upper case, lower case and numbers)"
     )
     .matches(
-      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{12,}$/,
-      "Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/,
+      "Password must contain at least 8 characters (including upper case, lower case and numbers)"
     ),
   confirmPassword: Yup.string()
     .required()
