@@ -1,6 +1,7 @@
 import React from "react";
 import ProposalTable from "./ProposalTable";
 import { useDataAPI } from "../hooks/useDataAPI";
+import { timeAgo } from "./../utils/Time";
 
 export default function ProposalTableUser(props) {
   const sendRequest = useDataAPI();
@@ -14,6 +15,7 @@ export default function ProposalTableUser(props) {
           shortCode
           title
           status
+          created
         }
       }
     }`;
@@ -25,14 +27,21 @@ export default function ProposalTableUser(props) {
       return {
         page: 0,
         totalCount: data.user.proposals.length,
-        data: data.user.proposals.map(proposal => {
-          return {
-            id: proposal.id,
-            title: proposal.title,
-            status: proposal.status === 0 ? "Open" : "Submitted",
-            shortCode: proposal.shortCode,
-          };
-        })
+        data: data.user.proposals
+          .sort((a, b) => {
+            return (
+              new Date(b.created).getTime() - new Date(a.created).getTime()
+            );
+          })
+          .map(proposal => {
+            return {
+              id: proposal.id,
+              title: proposal.title,
+              status: proposal.status === 0 ? "Open" : "Submitted",
+              shortCode: proposal.shortCode,
+              created: timeAgo(proposal.created)
+            };
+          })
       };
     });
   };

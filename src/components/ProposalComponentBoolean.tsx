@@ -7,11 +7,14 @@ import {
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
+import { getIn } from "formik";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, onComplete, errors, handleChange } = props;
+  let { templateField, onComplete, errors, handleChange, touched } = props;
   let { proposal_question_id, config, question } = templateField;
-  let isError = errors[proposal_question_id] ? true : false;
+  const fieldError = getIn(errors, proposal_question_id);
+  const isError = getIn(touched, proposal_question_id) && !!fieldError;
+
   const classes = makeStyles({
     label: {
       marginRight: "5px"
