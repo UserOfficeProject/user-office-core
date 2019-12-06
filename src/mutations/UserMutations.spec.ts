@@ -222,13 +222,13 @@ test("A user can not update another users password ", () => {
       dummyUser.id,
       "Test1234!"
     )
-  ).resolves.toBe(false);
+  ).resolves.toHaveProperty("reason", "NOT_ALLOWED");
 });
 
 test("A not logged in users can not update passwords ", () => {
   return expect(
     userMutations.updatePassword(null, dummyUser.id, "Test1234!")
-  ).resolves.toBe(false);
+  ).resolves.toHaveProperty("reason", "NOT_ALLOWED");
 });
 
 test("A user officer can update any password ", () => {
