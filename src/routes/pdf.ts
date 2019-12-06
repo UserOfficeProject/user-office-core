@@ -181,6 +181,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
           }
           // Default case, a ordinary question type
         } else if (field.data_type === DataType.DATE) {
+          writeBold(field.question);
           write(
             field.value
               ? new Date(field.value).toISOString().split("T")[0]
