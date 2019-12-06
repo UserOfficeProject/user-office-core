@@ -83,7 +83,9 @@ export const UserContextProvider = props => {
   const [state, dispatch] = React.useReducer(reducer, initUserData);
   const [, setCookie] = useCookies();
   checkLocalStorage(dispatch, state);
-  setCookie("token", state.token, { secure: false });
+  useEffect(() => {
+    setCookie("token", state.token, { path: "/", secure: false });
+  }, [setCookie, state]);
 
   return (
     <UserContext.Provider
