@@ -122,7 +122,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
               piLastname: principalInvestigator.lastname,
-              proposalNumber: event.proposal.id,
+              proposalNumber: event.proposal.shortCode,
               proposalTitle: event.proposal.title,
               coProposers: participants.map(
                 partipant => `${partipant.preferredname} ${partipant.lastname} `
