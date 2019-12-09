@@ -5,7 +5,8 @@ const BluePromise = require("bluebird");
 import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
-import { Transaction } from "knex";
+import { Transaction, QueryBuilder } from "knex";
+import Knex = require("knex");
 
 export default class PostgresUserDataSource implements UserDataSource {
   checkEmailExist(email: string): Promise<Boolean> {
@@ -309,10 +310,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .join("institutions as i", { organisation: "i.institution_id" })
       .orderBy("user_id", "desc")
-      .modify((query: any) => {
+      .modify(query => {
         if (filter) {
-          query.andWhere(qB => {
-            qB.where("institution", "ilike", `%${filter}%`)
+          query.andWhere((qb: QueryBuilder) => {
+            qb.where("institution", "ilike", `%${filter}%`)
               .orWhere("firstname", "ilike", `%${filter}%`)
               .orWhere("lastname", "ilike", `%${filter}%`);
           });
