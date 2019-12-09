@@ -89,13 +89,11 @@ export default function ProposalContainer(props: {
   };
 
   const handleBack = async () => {
-    if(isDirty) {
-      if(await handleReset())
-      {
+    if (isDirty) {
+      if (await handleReset()) {
         setStepIndex(clampStep(stepIndex - 1));
       }
-    }
-    else{
+    } else {
       setStepIndex(clampStep(stepIndex - 1));
     }
   };
@@ -108,9 +106,7 @@ export default function ProposalContainer(props: {
    */
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
-      const confirmed = window.confirm(
-        getConfirmNavigMsg()
-      );
+      const confirmed = window.confirm(getConfirmNavigMsg());
       if (confirmed) {
         const proposalData = await loadProposal(proposalInfo.id);
         setProposalInfo(proposalData);
@@ -125,7 +121,7 @@ export default function ProposalContainer(props: {
 
   const getConfirmNavigMsg = () => {
     return "Changes you recently made in this step will not be saved! Are you sure?";
-  }
+  };
 
   useEffect(() => {
     const createProposalSteps = (
@@ -175,7 +171,7 @@ export default function ProposalContainer(props: {
           StepType.REVIEW,
           "Review",
           proposalInfo.status === ProposalStatus.Submitted,
-          <ProposalReview data={proposalInfo} readonly={isSubmitted} />
+          (<ProposalReview data={proposalInfo} readonly={isSubmitted} />)
         )
       );
       return allProposalSteps;
@@ -227,10 +223,7 @@ export default function ProposalContainer(props: {
 
   return (
     <Container maxWidth="lg">
-      <Prompt
-            when={isDirty}
-            message={location => getConfirmNavigMsg()}
-          />
+      <Prompt when={isDirty} message={location => getConfirmNavigMsg()} />
       <Notification
         open={notification.isOpen}
         onClose={() => {
@@ -260,10 +253,7 @@ export default function ProposalContainer(props: {
               <Step key={step.title}>
                 <QuestionaryStepButton
                   onClick={async () => {
-                    if (
-                      !isDirty ||
-                      (await handleReset())
-                    ) {
+                    if (!isDirty || (await handleReset())) {
                       setStepIndex(index);
                     }
                   }}

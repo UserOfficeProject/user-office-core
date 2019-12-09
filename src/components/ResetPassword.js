@@ -85,7 +85,7 @@ export default function ResetPassword({ match }) {
               type="password"
               component={TextField}
               margin="normal"
-              helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+              helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
               fullWidth
             />
             <Field

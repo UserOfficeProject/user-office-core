@@ -38,7 +38,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   switch (templateField.config.variant) {
     case "dropdown":
       return (
-        <FormControl error={isError} fullWidth>
+        <FormControl fullWidth>
           <TextField
             id={proposal_question_id}
             name={proposal_question_id}
@@ -53,6 +53,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             SelectProps={{
               MenuProps: {}
             }}
+            error={isError}
             helperText={templateField.config.small_label}
             margin="normal"
             required={config.required ? true : false}

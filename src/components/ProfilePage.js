@@ -19,6 +19,7 @@ import {
 } from "../utils/userFieldValidationSchema";
 import Notification from "./Notification";
 import dateformat from "dateformat";
+import { getTranslation } from "../submodules/duo-localisation/StringResources";
 
 const useStyles = makeStyles({
   buttons: {
@@ -78,32 +79,36 @@ export default function ProfilePage({ match, history }) {
     );
   }
   const sendPasswordUpdate = password => {
-    const query = `mutation(
-      $id: Int!,
-      $password: String!, 
-      )
+    const query = `
+      mutation(
+        $id: Int!,
+        $password: String!, 
+        )
       {
         updatePassword(
-              id: $id, 
-              password: $password, 
-              )
+          id: $id, 
+          password: $password, 
+        )
+        {
+          error
+        }
       }`;
     const variables = {
       id: parseInt(match.params.id),
       password
     };
     sendRequest(query, variables).then(data => {
-      if (data.updatePassword) {
+      if (data.error) {
         setState({
           open: true,
-          variant: "success",
-          message: "Password Updated"
+          variant: "error",
+          message: getTranslation(data.error)
         });
       } else {
         setState({
           open: true,
-          variant: "error",
-          message: "Password Update Failed"
+          variant: "success",
+          message: "Password Updated"
         });
       }
     });

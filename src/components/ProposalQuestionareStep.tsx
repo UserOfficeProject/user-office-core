@@ -81,11 +81,10 @@ export default function ProposalQuestionareStep(props: {
     activeFields
   );
 
-  const saveStepData = async (markAsComplete: boolean, partialSave:boolean) => {
+  const saveStepData = async (markAsComplete: boolean) => {
     const proposalId: number = props.data.id;
 
     const answers: ProposalAnswer[] = activeFields
-      .filter(field => field.value !== "")
       .map(field => {
         return (({ proposal_question_id, data_type, value }) => ({
           proposal_question_id,
@@ -98,7 +97,7 @@ export default function ProposalQuestionareStep(props: {
       id: proposalId,
       answers,
       topicsCompleted: markAsComplete ? [topicId] : [],
-      partialSave
+      partialSave:!markAsComplete
     });
 
     if (result && result.updateProposal && result.updateProposal.error) {
@@ -148,7 +147,7 @@ export default function ProposalQuestionareStep(props: {
             }}}
             reset={{callback:api.reset, disabled:!isDirty}}
             save={questionaryStep.isCompleted ? undefined:{callback: () => {
-              saveStepData(false, true);
+              saveStepData(false);
             },
             disabled:!isDirty
             }}
@@ -156,7 +155,7 @@ export default function ProposalQuestionareStep(props: {
               submitFormAsync(submitForm, validateForm).then(
                 (isValid: boolean) => {
                   if (isValid) {
-                    saveStepData(true, false);
+                    saveStepData(true);
                     (getQuestionaryStepByTopicId(
                       props.data.questionary!,
                       topicId

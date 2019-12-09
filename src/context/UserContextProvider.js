@@ -84,8 +84,8 @@ export const UserContextProvider = props => {
   const [, setCookie] = useCookies();
   checkLocalStorage(dispatch, state);
   useEffect(() => {
-    setCookie("token", state.token, { secure: false });
-  }, [setCookie, state.token]);
+    setCookie("token", state.token, { path: "/", secure: false });
+  }, [setCookie, state]);
 
   return (
     <UserContext.Provider

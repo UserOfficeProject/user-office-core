@@ -37,7 +37,7 @@ export default function ProposalTableReviewer() {
   const classes = useStyles();
 
   const columns = [
-    { title: "ID", field: "id" },
+    { title: "Shortcode", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Comment", field: "comment" },
     { title: "Grade", field: "grade" }
