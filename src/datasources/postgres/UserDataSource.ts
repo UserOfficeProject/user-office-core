@@ -6,7 +6,6 @@ import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
-import Knex = require("knex");
 
 export default class PostgresUserDataSource implements UserDataSource {
   checkEmailExist(email: string): Promise<Boolean> {
