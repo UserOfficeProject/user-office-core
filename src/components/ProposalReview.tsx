@@ -5,9 +5,10 @@ import { useSubmitProposal } from "../hooks/useSubmitProposal";
 import { ProposalStatus } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
+import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 import { Button } from "@material-ui/core";
+import withConfirm from "../utils/withConfirm";
 
 const useStyles = makeStyles({
   buttons: {
@@ -29,12 +30,14 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProposalReview({
+function ProposalReview({
   data,
-  readonly
+  readonly,
+  confirm
 }: {
   data: ProposalInformation;
   readonly: boolean;
+  confirm: Function;
 }) {
   const api = useContext(FormApi);
   const classes = useStyles();
@@ -43,7 +46,7 @@ export default function ProposalReview({
 
   return (
     <>
-      <ProposaQuestionaryReview
+      <ProposalQuestionaryReview
         data={data}
         className={readonly ? classes.disabled : undefined}
       />
@@ -52,16 +55,26 @@ export default function ProposalReview({
           back={undefined}
           saveAndNext={{
             callback: () => {
-              submitProposal(data.id).then(isSubmitted => {
-                data.status = ProposalStatus.Submitted;
-                api.next(data);
-              });
+              confirm(
+                () => {
+                  submitProposal(data.id).then(isSubmitted => {
+                    data.status = ProposalStatus.Submitted;
+                    api.next(data);
+                  });
+                },
+                {
+                  title: "Please confirm",
+                  description:
+                    "I am aware that no further edits can be done after proposal submission."
+                }
+              )();
             },
             label:
               data.status === ProposalStatus.Submitted
                 ? "✔ Submitted"
                 : "Submit",
-            disabled: readonly
+            disabled: readonly,
+            isBusy: isLoading
           }}
           reset={undefined}
           isLoading={false}
@@ -78,3 +91,5 @@ export default function ProposalReview({
     </>
   );
 }
+
+export default withConfirm(ProposalReview);
