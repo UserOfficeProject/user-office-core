@@ -311,10 +311,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       .orderBy("user_id", "desc")
       .modify((query: any) => {
         if (filter) {
-          query
-            .where("institution", "ilike", `%${filter}%`)
-            .orWhere("firstname", "ilike", `%${filter}%`)
-            .orWhere("lastname", "ilike", `%${filter}%`);
+          query.andWhere(qB => {
+            qB.where("institution", "ilike", `%${filter}%`)
+              .orWhere("firstname", "ilike", `%${filter}%`)
+              .orWhere("lastname", "ilike", `%${filter}%`);
+          });
         }
         if (first) {
           query.limit(first);
