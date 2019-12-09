@@ -5,7 +5,7 @@ const BluePromise = require("bluebird");
 import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
-import { Transaction, QueryBuilder } from "knex";
+import { Transaction } from "knex";
 import Knex = require("knex");
 
 export default class PostgresUserDataSource implements UserDataSource {
