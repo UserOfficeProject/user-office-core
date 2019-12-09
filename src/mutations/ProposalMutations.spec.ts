@@ -76,8 +76,8 @@ function tryUpdateProposal(user: User, proposalId: string) {
   return proposalMutations.update(
     user,
     proposalId,
-    "New project title",
-    "Project abstract description",
+    "Cras nulla nibh, dictum nec rhoncus eget, lobortis vel augue.",
+    "Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.",
     [
       {
         proposal_question_id: "fasta_seq",
