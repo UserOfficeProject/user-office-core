@@ -33,6 +33,7 @@ export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
                   value={field.value || ""}
                   helperText={isError && errors[proposal_question_id]}
                   label={question}
+                  format="yyyy-MM-dd"
                   onChange={date => {
                     templateField.value = date;
                     form.setFieldValue(field.name, date, false);
