@@ -130,11 +130,13 @@ export default function createHandler(userDataSource: UserDataSource) {
               call: ""
             },
             recipients: [
-              { address: principalInvestigator.email },
+              { address: { email: principalInvestigator.email } },
               ...participants.map(partipant => {
                 return {
-                  address: partipant.email,
-                  header_to: principalInvestigator.email
+                  address: {
+                    email: partipant.email,
+                    header_to: principalInvestigator.email
+                  }
                 };
               })
             ]
