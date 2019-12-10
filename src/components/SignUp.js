@@ -508,6 +508,9 @@ export default function SignUp(props) {
                       data-cy="birthdate"
                       required
                       disabled={!orcData}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
                     />
                   </CardContent>
                 </Card>
