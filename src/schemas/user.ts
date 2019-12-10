@@ -31,7 +31,7 @@ export const typeDefs = `
           telephone: String,
           telephone_alt: String, 
           roles: [Int]): UserMutationResult
-        updatePassword(id: Int!,  password: String!): Boolean
+        updatePassword(id: Int!,  password: String!): BasicUserDetailsMutationResult
         login(email: String!, password: String!): LoginMutationResult
         resetPasswordEmail(email: String!): Boolean
         resetPassword(token: String!, password: String!): Boolean
@@ -88,8 +88,12 @@ export const typeDefs = `
         totalCount: Int
     }
     type UserMutationResult {
-        user: User
-        error: String
+      user: User
+      error: String
+    }
+    type BasicUserDetailsMutationResult {
+      user: BasicUserDetails
+      error: String
     }
     type User {
         id: Int

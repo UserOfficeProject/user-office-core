@@ -14,7 +14,8 @@ import {
   User,
   UpdateUserArgs,
   CreateUserArgs,
-  UsersArgs
+  UsersArgs,
+  BasicUserDetails
 } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
@@ -227,7 +228,7 @@ const wrapProposalInformationMutation = createResponseWrapper<
 >("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapLoginMutation = createResponseWrapper<String>("token");
-const wrapProposalTemplate = createResponseWrapper<ProposalTemplate>(
+const wrapBasicUserDetailsMutation = createResponseWrapper<BasicUserDetails>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
@@ -564,10 +565,12 @@ export default {
     args: { id: number; password: string },
     context: ResolverContext
   ) {
-    return context.mutations.user.updatePassword(
-      context.user,
-      args.id,
-      args.password
+    return wrapBasicUserDetailsMutation(
+      context.mutations.user.updatePassword(
+        context.user,
+        args.id,
+        args.password
+      )
     );
   },
 

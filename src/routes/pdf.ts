@@ -37,14 +37,14 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     user = await baseContext.queries.user.getAgent(decoded.user.id);
 
     if (user == null) {
-      return res.status(500).send();
+      throw new Error("Could not find user");
     }
 
     const UserAuthorization = baseContext.userAuthorization;
     const proposal = await baseContext.queries.proposal.get(user, proposalId);
 
     if (!proposal || !UserAuthorization.hasAccessRights(user, proposal)) {
-      return res.status(500).send();
+      throw new Error("User was not allowed to download PDF");
     }
 
     const questionaryObj = await baseContext.queries.proposal.getQuestionary(
@@ -53,7 +53,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     );
 
     if (isRejection(questionaryObj) || questionaryObj == null) {
-      return res.status(500).send();
+      throw new Error("Could not fetch questionary");
     }
 
     const questionary = Questionary.fromObject(questionaryObj);
@@ -67,7 +67,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     );
 
     if (!principalInvestigator || !coProposers) {
-      return res.status(500).send();
+      throw new Error("User was not PI or co-proposer");
     }
 
     // Create a PDF document
@@ -181,6 +181,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
           }
           // Default case, a ordinary question type
         } else if (field.data_type === DataType.DATE) {
+          writeBold(field.question);
           write(
             field.value
               ? new Date(field.value).toISOString().split("T")[0]
