@@ -51,6 +51,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .select()
       .from("institutions")
       .where("verified", true)
+      .orderByRaw("institution_id=1 desc")
       .orderBy("institution", "asc")
       .then((intDB: InstitutionRecord[]) =>
         intDB.map(int => {
