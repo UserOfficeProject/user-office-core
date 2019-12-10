@@ -86,7 +86,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               template_id: "user-office-registration-invitation"
             },
             substitution_data: {
-              firstname: user.firstname,
+              firstname: user.preferredname,
               lastname: user.lastname,
               email: user.email,
               inviterName: inviter.firstname,
