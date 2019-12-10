@@ -15,10 +15,13 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   return (
     <div>
-      { 
-        props.templateField.config.htmlQuestion && 
-        <div dangerouslySetInnerHTML={{__html:props.templateField.config.htmlQuestion!}}></div> 
-      }
+      {props.templateField.config.htmlQuestion && (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: props.templateField.config.htmlQuestion!
+          }}
+        ></div>
+      )}
       <TextField
         id={proposal_question_id}
         name={proposal_question_id}
@@ -35,7 +38,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         error={isError}
         helperText={isError && errors[proposal_question_id]}
         multiline={config.multiline}
-        rows={config.multiline ? 4 : 1}
+        rows={config.multiline ? 2 : 1}
         rowsMax={config.multiline ? 16 : undefined}
         className={classes.textField}
         InputLabelProps={{
