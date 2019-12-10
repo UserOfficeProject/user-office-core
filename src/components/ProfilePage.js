@@ -478,7 +478,7 @@ export default function ProfilePage({ match, history }) {
                           fullWidth
                           autoComplete="off"
                           data-cy="password"
-                          helperText="Password must contain at least 12 characters (including upper case, lower case, numbers and special characters)"
+                          helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
                         />
                       </Grid>
                       <Grid item xs={6}>

@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import FormikDropdown from "./FormikDropdown";
+import { ErrorFocus } from "./ErrorFocus";
 import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
@@ -23,6 +24,7 @@ import orcid from "../images/orcid.png";
 import clsx from "clsx";
 import { UserContext } from "../context/UserContextProvider";
 import { Redirect } from "react-router-dom";
+
 import {
   userFieldSchema,
   userPasswordFieldSchema
@@ -660,6 +662,7 @@ export default function SignUp(props) {
                 </Link>
               </Grid>
             </Grid>
+            <ErrorFocus />
           </Form>
         )}
       </Formik>
