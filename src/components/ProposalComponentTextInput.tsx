@@ -2,7 +2,7 @@ import React, { ChangeEvent } from "react";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
-import TextInputWithCounter from "./TextInputWithCounter";
+import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -23,7 +23,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
           }}
         ></div>
       )}
-      <TextInputWithCounter
+      <TextFieldWithCounter
         variant="standard"
         id={proposal_question_id}
         name={proposal_question_id}

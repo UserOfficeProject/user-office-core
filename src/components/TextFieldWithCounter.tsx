@@ -2,17 +2,13 @@ import TextField, { TextFieldProps } from "@material-ui/core/TextField";
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 
-const TextInputWithCounter = (props: TextFieldProps) => {
+const TextFieldWithCounter = (props: TextFieldProps) => {
   const classes = makeStyles({
     counter: {
-      color: "gray",
-      position: "absolute",
-      bottom: "-15px",
-      right: "5px",
-      backgroundColor: "rgba(255,255,255,.8)"
+      color: "gray"
     },
     wrapper: {
-      position: "relative"
+      textAlign: "right"
     }
   })();
   var [textLen, setTextLen] = useState(0);
@@ -28,4 +24,4 @@ const TextInputWithCounter = (props: TextFieldProps) => {
   );
 };
 
-export default TextInputWithCounter;
+export default TextFieldWithCounter;

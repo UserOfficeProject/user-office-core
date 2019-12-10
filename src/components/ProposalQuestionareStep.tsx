@@ -28,6 +28,7 @@ import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
 import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { ErrorFocus } from "./ErrorFocus";
 
 export default function ProposalQuestionareStep(props: {
   data: ProposalInformation;
@@ -84,20 +85,19 @@ export default function ProposalQuestionareStep(props: {
   const saveStepData = async (markAsComplete: boolean) => {
     const proposalId: number = props.data.id;
 
-    const answers: ProposalAnswer[] = activeFields
-      .map(field => {
-        return (({ proposal_question_id, data_type, value }) => ({
-          proposal_question_id,
-          data_type,
-          value
-        }))(field); // convert field to answer object
-      });
+    const answers: ProposalAnswer[] = activeFields.map(field => {
+      return (({ proposal_question_id, data_type, value }) => ({
+        proposal_question_id,
+        data_type,
+        value
+      }))(field); // convert field to answer object
+    });
 
     const result = await updateProposal({
       id: proposalId,
       answers,
       topicsCompleted: markAsComplete ? [topicId] : [],
-      partialSave:!markAsComplete
+      partialSave: !markAsComplete
     });
 
     if (result && result.updateProposal && result.updateProposal.error) {
@@ -142,31 +142,41 @@ export default function ProposalQuestionareStep(props: {
           })}
           <ProposalNavigationFragment
             disabled={props.readonly}
-            back={{callback:() => {
-              api.back();
-            }}}
-            reset={{callback:api.reset, disabled:!isDirty}}
-            save={questionaryStep.isCompleted ? undefined:{callback: () => {
-              saveStepData(false);
-            },
-            disabled:!isDirty
+            back={{
+              callback: () => {
+                api.back();
+              }
             }}
-            saveAndNext={{callback:() => {
-              submitFormAsync(submitForm, validateForm).then(
-                (isValid: boolean) => {
-                  if (isValid) {
-                    saveStepData(true);
-                    (getQuestionaryStepByTopicId(
-                      props.data.questionary!,
-                      topicId
-                    ) as QuestionaryStep).isCompleted = true;
-                    api.next({ ...props.data });
+            reset={{ callback: api.reset, disabled: !isDirty }}
+            save={
+              questionaryStep.isCompleted
+                ? undefined
+                : {
+                    callback: () => {
+                      saveStepData(false);
+                    },
+                    disabled: !isDirty
                   }
-                }
-              );
-            }}}
+            }
+            saveAndNext={{
+              callback: () => {
+                submitFormAsync(submitForm, validateForm).then(
+                  (isValid: boolean) => {
+                    if (isValid) {
+                      saveStepData(true);
+                      (getQuestionaryStepByTopicId(
+                        props.data.questionary!,
+                        topicId
+                      ) as QuestionaryStep).isCompleted = true;
+                      api.next({ ...props.data });
+                    }
+                  }
+                );
+              }
+            }}
             isLoading={formSaving}
           />
+          <ErrorFocus />
         </form>
       )}
     </Formik>

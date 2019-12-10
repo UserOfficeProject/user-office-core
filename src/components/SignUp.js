@@ -13,7 +13,6 @@ import { Formik, Field, Form } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import FormikDropdown from "./FormikDropdown";
 import { ErrorFocus } from "./ErrorFocus";
-import dateformat from "dateformat";
 import { Card, CardContent } from "@material-ui/core";
 import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
 import InformationModal from "./InformationModal";
