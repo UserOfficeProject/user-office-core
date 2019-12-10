@@ -2,7 +2,7 @@ import TextField, { TextFieldProps } from "@material-ui/core/TextField";
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 
-const TextInputWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
+const TextInputWithCounter = (props: TextFieldProps) => {
   const classes = makeStyles({
     counter: {
       color: "gray",
@@ -16,14 +16,13 @@ const TextInputWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
     }
   })();
   var [textLen, setTextLen] = useState(0);
-  const { maxLen, ...other } = props;
   const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
     props.onChange && props.onChange(evt);
     setTextLen(evt.target.value.length);
   };
   return (
     <div className={classes.wrapper}>
-      <TextField {...other} onChange={handleChange} />
+      <TextField {...props} onChange={handleChange} />
       <span className={classes.counter}>{textLen}</span>
     </div>
   );
