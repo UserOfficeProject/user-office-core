@@ -23,7 +23,7 @@ const TextInputWithCounter = (props: TextFieldProps) => {
   return (
     <div className={classes.wrapper}>
       <TextField {...props} onChange={handleChange} />
-      <span className={classes.counter}>{textLen}</span>
+      <span className={classes.counter}>{textLen || ""}</span>
     </div>
   );
 };
