@@ -646,8 +646,8 @@
 							"pm.test(\"Should update proposal\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.updateProposal.proposal.id).to.be.eql(pm.environment.get(\"NEW_PROPOSAL_ID\"))",
-							"    pm.expect(jsonData.data.updateProposal.proposal.title).to.be.eql(\"Postman Title\")",
-							"    pm.expect(jsonData.data.updateProposal.proposal.abstract).to.be.eql(\"Postman Proposal Abstract Text\")",
+							"    pm.expect(jsonData.data.updateProposal.proposal.title).to.be.eql(\"Postman Sample Title\")",
+							"    pm.expect(jsonData.data.updateProposal.proposal.abstract).to.be.eql(\"This proposal was created by automated API test and should not be visible. If you see this there must have been a problem with our API, or API tests.\")",
 							"});"
 						],
 						"type": "text/javascript"
@@ -712,7 +712,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation ($id: ID!, $title: String, $abstract: String, $answers: [ProposalAnswerInput], $users: [Int]) {\n  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"Postman Title\",\n        \"abstract\": \"Postman Proposal Abstract Text\",\n        \"answers\": []\n    }"
+						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"Postman Sample Title\",\n        \"abstract\": \"This proposal was created by automated API test and should not be visible. If you see this there must have been a problem with our API, or API tests.\",\n        \"answers\": []\n    }"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
