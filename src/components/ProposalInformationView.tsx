@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { FormApi } from "./ProposalContainer";
@@ -15,6 +14,7 @@ import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
 import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export default function ProposalInformationView(props: {
   data: ProposalInformation;
@@ -118,7 +118,7 @@ export default function ProposalInformationView(props: {
           </Typography>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField
+              <TextFieldWithCounter
                 disabled={props.disabled}
                 required
                 id="title"
@@ -136,7 +136,7 @@ export default function ProposalInformationView(props: {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+              <TextFieldWithCounter
                 disabled={props.disabled}
                 required
                 id="abstract"
