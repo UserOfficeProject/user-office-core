@@ -89,7 +89,7 @@ export default function ResetPassword({ match }) {
               fullWidth
             />
             <Field
-              name="passwordConfirmation"
+              name="confirmPassword"
               label="Confirm Password"
               type="password"
               component={TextField}
