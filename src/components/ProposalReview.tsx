@@ -44,6 +44,9 @@ function ProposalReview({
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
 
+  const allStepsComplete =
+    data.questionary && data.questionary.steps.every(step => step.isCompleted);
+
   return (
     <>
       <ProposalQuestionaryReview
@@ -73,7 +76,8 @@ function ProposalReview({
               data.status === ProposalStatus.Submitted
                 ? "✔ Submitted"
                 : "Submit",
-            disabled: readonly,
+            disabled:
+              !allStepsComplete || data.status === ProposalStatus.Submitted,
             isBusy: isLoading
           }}
           reset={undefined}
@@ -84,6 +88,7 @@ function ProposalReview({
           className={classes.button}
           onClick={() => downloadPDFProposal(data.id)}
           variant="contained"
+          disabled={!allStepsComplete}
         >
           Download PDF
         </Button>

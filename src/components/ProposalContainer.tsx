@@ -263,14 +263,7 @@ export default function ProposalContainer(props: {
                     step.completed ||
                     steps[index - 1].completed === true
                   }
-                  clickable={
-                    step.stepType !== StepType.REVIEW ||
-                    steps.every(step => {
-                      return (
-                        step.stepType === StepType.REVIEW || step.completed
-                      );
-                    })
-                  }
+                  clickable={true}
                 >
                   <span>{step.title}</span>
                 </QuestionaryStepButton>
