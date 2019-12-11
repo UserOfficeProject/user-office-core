@@ -102,7 +102,7 @@ export function useGetFileMetadata() {
       fileIds
     };
     sendRequest(query, variables).then(data => {
-      setFilesMetadata(data.fileMetadata);
+      setFilesMetadata(data ? data.fileMetadata : []);
     });
   };
 
