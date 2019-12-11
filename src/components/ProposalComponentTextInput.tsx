@@ -1,7 +1,8 @@
 import React, { ChangeEvent } from "react";
-import { TextField, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
+import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -22,12 +23,13 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
           }}
         ></div>
       )}
-      <TextField
+      <TextFieldWithCounter
+        variant="standard"
         id={proposal_question_id}
         name={proposal_question_id}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? "" : question }
+        label={config.htmlQuestion ? "" : question}
         value={templateField.value}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           templateField.value = evt.target.value;

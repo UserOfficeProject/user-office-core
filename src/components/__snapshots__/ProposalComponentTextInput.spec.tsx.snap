@@ -3,35 +3,44 @@
 exports[`Textfield rendered without crashing 1`] = `
 <div>
   <div
-    className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
+    className="makeStyles-wrapper-3"
   >
-    <label
-      className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
-      data-shrink={true}
-      htmlFor="links_with_industry"
-    >
-      If yes, please describe:
-    </label>
     <div
-      className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-fullWidth MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
-      onClick={[Function]}
+      className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
     >
-      <input
-        aria-invalid={false}
-        className="MuiInputBase-input MuiInput-input"
-        disabled={false}
-        id="links_with_industry"
-        name="links_with_industry"
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        placeholder="Please specify links with industry"
-        required={false}
-        rows={1}
-        type="text"
-        value=""
-      />
+      <label
+        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
+        data-shrink={true}
+        htmlFor="links_with_industry"
+      >
+        If yes, please describe:
+      </label>
+      <div
+        className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-fullWidth MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
+        onClick={[Function]}
+      >
+        <input
+          aria-invalid={false}
+          className="MuiInputBase-input MuiInput-input"
+          disabled={false}
+          id="links_with_industry"
+          name="links_with_industry"
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Please specify links with industry"
+          required={false}
+          rows={1}
+          type="text"
+          value=""
+        />
+      </div>
     </div>
+    <span
+      className="makeStyles-counter-2"
+    >
+      
+    </span>
   </div>
 </div>
 `;
