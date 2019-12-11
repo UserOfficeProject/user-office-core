@@ -30,8 +30,8 @@ export function useFileUpload() {
 
   const uploadFile = (file: File, completeHandler: Function) => {
     setState(UPLOAD_STATE.UPLOADING);
-    var formdata = new FormData();
-    formdata.append("file", file);
+    var formData = new FormData();
+    formData.append("file", file);
     xhr = new XMLHttpRequest();
 
     xhr.upload.addEventListener(
@@ -77,7 +77,7 @@ export function useFileUpload() {
     );
 
     xhr.open("POST", "/files/upload");
-    xhr.send(formdata);
+    xhr.send(formData);
   };
 
   return { uploadFile, progress, state, abort };
