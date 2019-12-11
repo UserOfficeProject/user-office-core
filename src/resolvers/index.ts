@@ -554,7 +554,9 @@ export default {
     args: { token: string; password: string },
     context: ResolverContext
   ) {
-    return context.mutations.user.resetPassword(args.token, args.password);
+    return wrapBasicUserDetailsMutation(
+      context.mutations.user.resetPassword(args.token, args.password)
+    );
   },
 
   checkEmailExist(args: { email: string }, context: ResolverContext) {
