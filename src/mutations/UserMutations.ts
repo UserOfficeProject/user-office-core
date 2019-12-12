@@ -250,7 +250,7 @@ export default class UserMutations {
     return token;
   }
 
-  async token(token: string): Promise<{ token: string } | Rejection> {
+  async token(token: string): Promise<string | Rejection> {
     try {
       const decoded = jsonwebtoken.verify(token, process.env.secret);
       const freshToken = jsonwebtoken.sign(

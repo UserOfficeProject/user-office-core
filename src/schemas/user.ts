@@ -10,7 +10,7 @@ export const typeDefs = `
     }
 
     extend type Mutation {
-        token(token: String!): String
+        token(token: String!): LoginMutationResult
         addUserForReview(userID: Int!, proposalID: Int!): Boolean
         removeUserForReview(reviewID: Int!): Boolean
         addUserRole(userID: Int!, roleID: Int!): Boolean
