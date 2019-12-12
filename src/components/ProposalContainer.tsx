@@ -243,7 +243,9 @@ export default function ProposalContainer(props: {
             {proposalInfo.title || "New Proposal"}
           </Typography>
           <div className={classes.infoline}>
-            {proposalInfo.shortCode ? `#${proposalInfo.shortCode}` : null}
+            {proposalInfo.shortCode
+              ? `Proposal ID: ${proposalInfo.shortCode}`
+              : null}
           </div>
           <div className={classes.infoline}>
             {ProposalStatus[proposalInfo.status]}
