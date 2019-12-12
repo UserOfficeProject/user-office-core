@@ -12,7 +12,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from("users")
-      .where("email", email)
+      .where("email", "ilike", email)
       .andWhere("placeholder", false)
       .first()
       .then((user: any) => (user ? true : false));
@@ -31,7 +31,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select("password")
       .from("users")
-      .where("email", email)
+      .where("email", "ilike", email)
       .first()
       .then((user: any) => (user ? user.password : null));
   }
@@ -233,7 +233,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from("users")
-      .where("email", email)
+      .where("email", "ilike", email)
       .first()
       .then((user: UserRecord) => {
         if (!user) {

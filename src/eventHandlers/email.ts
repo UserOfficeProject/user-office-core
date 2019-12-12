@@ -86,7 +86,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               template_id: "user-office-registration-invitation"
             },
             substitution_data: {
-              firstname: user.firstname,
+              firstname: user.preferredname,
               lastname: user.lastname,
               email: user.email,
               inviterName: inviter.firstname,
@@ -122,7 +122,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
               piLastname: principalInvestigator.lastname,
-              proposalNumber: event.proposal.id,
+              proposalNumber: event.proposal.shortCode,
               proposalTitle: event.proposal.title,
               coProposers: participants.map(
                 partipant => `${partipant.preferredname} ${partipant.lastname} `
@@ -130,11 +130,13 @@ export default function createHandler(userDataSource: UserDataSource) {
               call: ""
             },
             recipients: [
-              { address: principalInvestigator.email },
+              { address: { email: principalInvestigator.email } },
               ...participants.map(partipant => {
                 return {
-                  address: partipant.email,
-                  header_to: principalInvestigator.email
+                  address: {
+                    email: partipant.email,
+                    header_to: principalInvestigator.email
+                  }
                 };
               })
             ]
