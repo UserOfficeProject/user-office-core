@@ -47,7 +47,9 @@ export default function ResetPassword({ match }) {
     const { password } = values;
     const query = `
     mutation($token: String!, $password: String!){
-      resetPassword(token: $token, password: $password)
+      resetPassword(token: $token, password: $password){
+        error
+      }
     }
     `;
     const variables = {
@@ -56,7 +58,7 @@ export default function ResetPassword({ match }) {
     };
 
     request("/graphql", query, variables).then(data =>
-      data.resetPassword ? setPasswordReset(true) : setErrorMessage(true)
+      data.resetPassword.error ? setErrorMessage(true) : setPasswordReset(true)
     );
   };
 
@@ -89,7 +91,7 @@ export default function ResetPassword({ match }) {
               fullWidth
             />
             <Field
-              name="passwordConfirmation"
+              name="confirmPassword"
               label="Confirm Password"
               type="password"
               component={TextField}
