@@ -99,10 +99,10 @@ export default function ProposalInformationView(props: {
       validationSchema={Yup.object().shape({
         title: Yup.string()
           .max(MAX_TITLE_LEN, "Title must be at most 175 characters")
-          .required("Title must be at least 20 characters"),
+          .required("Title is required"),
         abstract: Yup.string()
           .max(MAX_ABSTRACT_LEN, "Abstract must be at most 1500 characters")
-          .required("Abstract must be at least 100 characters")
+          .required("Abstract is required")
       })}
     >
       {({
