@@ -34,7 +34,7 @@ export const typeDefs = `
         updatePassword(id: Int!,  password: String!): BasicUserDetailsMutationResult
         login(email: String!, password: String!): LoginMutationResult
         resetPasswordEmail(email: String!): Boolean
-        resetPassword(token: String!, password: String!): Boolean
+        resetPassword(token: String!, password: String!): BasicUserDetailsMutationResult
         emailVerification(token: String!): Boolean
         createUserByEmailInvite(firstname: String!, lastname: String!, email: String!): Int
         createUser(
