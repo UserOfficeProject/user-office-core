@@ -11,7 +11,7 @@ const initUserData = {
 const checkLocalStorage = (dispatch, state) => {
   if (localStorage.token && !state.token) {
     const decoded = decode(localStorage.token);
-    if (decoded.exp > Date.now() / 1000) {
+    if (decoded && decoded.exp > Date.now() / 1000) {
       dispatch({
         type: "setUserFromLocalStorage",
         payload: {
@@ -21,6 +21,8 @@ const checkLocalStorage = (dispatch, state) => {
           expToken: decoded.exp
         }
       });
+    } else {
+      localStorage.removeItem("token");
     }
   }
 };
@@ -47,6 +49,7 @@ const reducer = (state, action) => {
       return {
         token: action.payload,
         user: decoded.user,
+        expToken: decoded.exp,
         currentRole:
           decoded.roles.length === 1 ? decoded.roles[0].shortCode : null
       };
