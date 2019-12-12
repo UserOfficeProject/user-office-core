@@ -100,18 +100,10 @@ export default class ProposalMutations {
 
         if (title !== undefined) {
           proposal.title = title;
-
-          if (title.length < 20) {
-            return rejection("TOO_SHORT_TITLE");
-          }
         }
 
         if (abstract !== undefined) {
           proposal.abstract = abstract;
-
-          if (abstract.length < 100) {
-            return rejection("TOO_SHORT_ABSTRACT");
-          }
         }
 
         if (status !== undefined) {
