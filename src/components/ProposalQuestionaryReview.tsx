@@ -32,6 +32,8 @@ export default function ProposaQuestionaryReview(
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
+
+  const users = props.data.users || [];
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
@@ -54,8 +56,8 @@ export default function ProposaQuestionaryReview(
           <TableRow key="coproposers">
             <TableCell>Co-Proposers</TableCell>
             <TableCell>
-              {props.data
-                .users!.map((user: any) => ` ${user.firstname} ${user.lastname}`)
+              {users
+                .map((user: any) => ` ${user.firstname} ${user.lastname}`)
                 .toString()}
             </TableCell>
           </TableRow>
