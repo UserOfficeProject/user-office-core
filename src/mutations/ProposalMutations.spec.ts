@@ -234,9 +234,3 @@ test("Can create a proposal", () => {
     Proposal
   );
 });
-
-test("Proposal title should not be short", () => {
-  return expect(
-    proposalMutations.update(dummyUser, "1", "a")
-  ).resolves.not.toBeInstanceOf(Proposal);
-});
