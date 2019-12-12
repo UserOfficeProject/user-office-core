@@ -23,7 +23,6 @@ import orcid from "../images/orcid.png";
 import clsx from "clsx";
 import { UserContext } from "../context/UserContextProvider";
 import { Redirect } from "react-router-dom";
-
 import {
   userFieldSchema,
   userPasswordFieldSchema
@@ -133,12 +132,30 @@ export default function SignUp(props) {
   const [, cookiePageContent] = useGetPageContent("COOKIEPAGE");
 
   const [, fieldsContent] = useGetFields();
-  let authCodeOrcID = queryString.parse(props.location.search).code;
+  const searchParams = queryString.parse(props.location.search);
+  let authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
 
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
   }
+
+  //grab information either from URL or ORCID, with preference for orcid information
+  const firstname = orcData ? orcData.firstname : searchParams.firstname;
+  const lastname = orcData ? orcData.lastname : searchParams.lastname;
+  const email = searchParams.email;
+
+  //Function for redirecting user to orcid page, this adds information abouth the user in URL
+  const reDirectOrcID = () => {
+    window.location.href =
+      process.env.REACT_APP_ORCID_REDIRECT +
+      "?" +
+      queryString.stringify({
+        email,
+        given_names: firstname,
+        family_names: lastname
+      });
+  };
 
   if (token) {
     return <Redirect to="/" />;
@@ -228,9 +245,9 @@ export default function SignUp(props) {
         validateOnBlur={false}
         initialValues={{
           user_title: "",
-          firstname: orcData ? orcData.firstname : "",
+          firstname,
           middlename: "",
-          lastname: orcData ? orcData.lastname : "",
+          lastname,
           password: "",
           preferredname: "",
           gender: "",
@@ -240,7 +257,7 @@ export default function SignUp(props) {
           department: "",
           organisation_address: "",
           position: "",
-          email: "",
+          email,
           telephone: "",
           telephone_alt: "",
           privacy_agreement: false,
@@ -339,10 +356,7 @@ export default function SignUp(props) {
                           variant="contained"
                           color="primary"
                           className={classes.orcButton}
-                          onClick={() =>
-                            (window.location.href =
-                              process.env.REACT_APP_ORCID_REDIRECT)
-                          }
+                          onClick={() => reDirectOrcID()}
                         >
                           <img
                             className={classes.orcidIconMedium}
