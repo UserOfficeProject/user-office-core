@@ -47,6 +47,7 @@ const reducer = (state, action) => {
       return {
         token: action.payload,
         user: decoded.user,
+        expToken: decoded.exp,
         currentRole:
           decoded.roles.length === 1 ? decoded.roles[0].shortCode : null
       };

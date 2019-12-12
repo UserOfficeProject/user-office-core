@@ -2,14 +2,22 @@ import { useContext, useCallback } from "react";
 import { GraphQLClient } from "graphql-request";
 import { UserContext } from "../context/UserContextProvider";
 
-export function useDataAPI<T>():(query:string, variables?:any) => Promise<T> {
-  const { token, expToken, handleNewToken } = useContext(UserContext);
+export function useDataAPI<T>(): (
+  query: string,
+  variables?: any
+) => Promise<T> {
+  const { token, expToken, handleNewToken, handleLogout } = useContext(
+    UserContext
+  );
   const endpoint = "/graphql";
 
   const sendRequestForToken = useCallback(async () => {
     const query = `
     mutation($token: String!) {
-      token(token: $token)
+      token(token: $token){
+        token
+        error
+      }
     }
     `;
     const variables = {
@@ -17,7 +25,9 @@ export function useDataAPI<T>():(query:string, variables?:any) => Promise<T> {
     };
     return await new GraphQLClient(endpoint)
       .request(query, variables)
-      .then(data => handleNewToken(data.token));
+      .then(data =>
+        data.token.error ? handleLogout() : handleNewToken(data.token.token)
+      );
   }, [token, handleNewToken]);
 
   const sendRequest = useCallback(
