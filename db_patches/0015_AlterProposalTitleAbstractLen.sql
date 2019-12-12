@@ -1,0 +1,1 @@
+ALTER TABLE proposals ALTER COLUMN title TYPE varchar(350);
