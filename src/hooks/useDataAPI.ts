@@ -28,7 +28,7 @@ export function useDataAPI<T>(): (
       .then(data =>
         data.token.error ? handleLogout() : handleNewToken(data.token.token)
       );
-  }, [token, handleNewToken]);
+  }, [token, handleNewToken, handleLogout]);
 
   const sendRequest = useCallback(
     async function sendRequest(query, variables) {
