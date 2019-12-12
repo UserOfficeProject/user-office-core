@@ -29,6 +29,9 @@ export default function ProposalInformationView(props: {
   const [userError, setUserError] = useState(false);
   const { user } = useContext(UserContext);
 
+  const MAX_TITLE_LEN = 175;
+  const MAX_ABSTRACT_LEN = 1500;
+
   const classes = makeStyles({
     disabled: {
       pointerEvents: "none",
@@ -95,12 +98,10 @@ export default function ProposalInformationView(props: {
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
-          .min(20, "Title must be at least 20 characters")
-          .max(175, "Title must be at most 175 characters")
+          .max(MAX_TITLE_LEN, "Title must be at most 175 characters")
           .required("Title must be at least 20 characters"),
         abstract: Yup.string()
-          .min(100, "Abstract must be at least 100 characters")
-          .max(1500, "Abstract must be at most 1500 characters")
+          .max(MAX_ABSTRACT_LEN, "Abstract must be at most 1500 characters")
           .required("Abstract must be at least 100 characters")
       })}
     >
@@ -133,6 +134,7 @@ export default function ProposalInformationView(props: {
                 error={touched.title && errors.title !== undefined}
                 helperText={touched.title && errors.title && errors.title}
                 data-cy="title"
+                maxLen={MAX_TITLE_LEN}
               />
             </Grid>
             <Grid item xs={12}>
@@ -156,6 +158,7 @@ export default function ProposalInformationView(props: {
                   touched.abstract && errors.abstract && errors.abstract
                 }
                 data-cy="abstract"
+                maxLen={MAX_ABSTRACT_LEN}
               />
             </Grid>
           </Grid>

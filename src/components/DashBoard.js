@@ -30,13 +30,12 @@ import OverviewPage from "./OverviewPage";
 import HelpPage from "./HelpPage";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
-import QuestionaryEditor from "./QuestionaryEditor"
-import { BottomNavigation } from '@material-ui/core';
+import QuestionaryEditor from "./QuestionaryEditor";
+import { BottomNavigation } from "@material-ui/core";
 import InformationModal from "./InformationModal";
 import { useGetPageContent } from "../hooks/useGetPageContent";
 
 const drawerWidth = 240;
-
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -101,16 +100,17 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     height: "100vh",
     overflow: "auto",
-    display:"flex",
-    flexDirection:"column",
+    display: "flex",
+    flexDirection: "column"
   },
   bottomNavigation: {
-    display:"flex",
-    marginTop:"auto",
+    display: "flex",
+    marginTop: "auto",
     marginBottom: theme.spacing(2),
-    flexDirection:"row",
-    alignItems:"center",
-    justifyContent:"center"
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "transparent"
   }
 }));
 
@@ -217,32 +217,29 @@ export default function Dashboard({ match }) {
             <Route component={ProposalTableReviewer} />
           )}
         </Switch>
-        <BottomNavigation class={classes.bottomNavigation}>
-        <BottomNavItem
-          text={privacyPageContent}
-          linkText={"Privacy Statement"}
-        />
-        <BottomNavItem
-          text={faqPageContent}
-          linkText={"FAQ"}
-        />
-        <BottomNavItem />
+        <BottomNavigation className={classes.bottomNavigation}>
+          <BottomNavItem
+            text={privacyPageContent}
+            linkText={"Privacy Statement"}
+          />
+          <BottomNavItem text={faqPageContent} linkText={"FAQ"} />
+          <BottomNavItem />
         </BottomNavigation>
       </main>
     </div>
   );
 }
 
-
-const BottomNavItem = (props) => {
+const BottomNavItem = props => {
   return (
-      <InformationModal
+    <InformationModal
       text={props.text}
       linkText={props.linkText}
       linkStyle={{
-        fontSize:"10px",
-        minWidth:"auto",
-        padding:"10px"
-      }}/>
+        fontSize: "10px",
+        minWidth: "auto",
+        padding: "10px"
+      }}
+    />
   );
-}
+};
