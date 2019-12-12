@@ -64,24 +64,22 @@ export default class PostgresFileDataSource implements IFileDataSource {
   }
 
   private async storeBlob(filePath: string): Promise<number> {
-    return new Promise(async (resolve, reject) => {
-      let err: any,
-        oid: number,
-        stream: WriteStream,
-        connection: Client | undefined;
+    let [err, connection] = await to<Client, Error>(
+      database.client.acquireConnection()
+    );
+    if (err) {
+      throw new Error(`Could not establish connection with database \n ${err}`);
+    }
 
-      [err, connection] = await to(database.client.acquireConnection());
+    if (!connection) {
+      throw new Error(`Could not obtain connection`);
+    }
+
+    return new Promise<number>(async (resolve, reject) => {
+      let err: any, oid: number, stream: WriteStream;
+
+      [err] = await to(connection!.query("BEGIN")); // start the transaction
       if (err) {
-        return reject(`Could not establish connection with database \n ${err}`);
-      }
-
-      if (!connection) {
-        return reject(`Could not obtain connection`);
-      }
-
-      [err] = await to(connection.query("BEGIN")); // start the transaction
-      if (err) {
-        database.client.releaseConnection(connection);
         return reject(`Could not begin transaction \n${err}`);
       }
 
@@ -91,20 +89,23 @@ export default class PostgresFileDataSource implements IFileDataSource {
         blobManager.createAndWritableStreamAsync()
       );
       if (err) {
-        connection.emit("error", err);
-        database.client.releaseConnection(connection);
+        connection!.emit("error", err);
         return reject(`Could not create writeable stream \n${err}`);
       }
 
-      stream.on("finish", function() {
-        // @ts-ignore Already checked
-        connection.query("COMMIT", () => resolve(oid));
-        database.client.releaseConnection(connection);
+      stream.on("finish", () => {
+        connection!.query("COMMIT", () => resolve(oid));
       });
 
       var fileStream = fs.createReadStream(filePath);
       fileStream.pipe(stream);
-    });
+    })
+      .then(newOid => {
+        return newOid;
+      })
+      .finally(() => {
+        database.client.releaseConnection(connection);
+      });
   }
 
   private async retrieveBlob(oid: number, output: string): Promise<void> {
