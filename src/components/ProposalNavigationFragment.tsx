@@ -45,7 +45,7 @@ const ProposalNavigationFragment = (props: {
       className={`${classes.button} ${classes.lastLeftButton}`}
       type="button"
       disabled={props.back.disabled}
-      isBusy={props.back.isBusy}
+      isbusy={props.back.isBusy}
     >
       {props.back.label || "Back"}
     </NavigButton>
@@ -56,7 +56,7 @@ const ProposalNavigationFragment = (props: {
       className={classes.button}
       type="button"
       disabled={props.reset.disabled}
-      isBusy={props.reset.isBusy}
+      isbusy={props.reset.isBusy}
     >
       {props.reset.label || "Reset"}
     </NavigButton>
@@ -69,7 +69,7 @@ const ProposalNavigationFragment = (props: {
       variant="contained"
       color="primary"
       disabled={props.save.disabled}
-      isBusy={props.save.isBusy}
+      isbusy={props.save.isBusy}
     >
       {props.save.label || "Save"}
     </NavigButton>
@@ -82,7 +82,7 @@ const ProposalNavigationFragment = (props: {
       variant="contained"
       color="primary"
       disabled={props.saveAndNext.disabled}
-      isBusy={props.saveAndNext.isBusy}
+      isbusy={props.saveAndNext.isBusy}
     >
       {props.saveAndNext.label || "Save and continue"}
     </NavigButton>
@@ -111,14 +111,14 @@ interface IButtonConfig {
 }
 
 class NavigButton extends Component<
-  StandardProps<ButtonProps & { isBusy?: boolean }, ButtonClassKey>
+  StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>
 > {
   render() {
     var { className, ...other } = this.props;
     return (
       <div className={className} style={{ position: "relative" }}>
         <Button {...other} />
-        {this.props.isBusy && (
+        {this.props.isbusy && (
           <CircularProgress
             size={24}
             style={{
