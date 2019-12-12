@@ -484,7 +484,7 @@ export default {
   },
 
   token(args: { token: string }, context: ResolverContext) {
-    return context.mutations.user.token(args.token);
+    return wrapLoginMutation(context.mutations.user.token(args.token));
   },
 
   user(args: UserArgs, context: ResolverContext) {
