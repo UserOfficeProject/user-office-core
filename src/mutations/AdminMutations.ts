@@ -35,4 +35,11 @@ export default class AdminMutations {
         return rejection("INTERNAL_ERROR");
       });
   }
+
+  async logClientError(error: string) {
+    logger.logException("Error recieved from client", error, {
+      error
+    });
+    return true;
+  }
 }
