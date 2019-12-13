@@ -3,8 +3,9 @@ import { decode } from "jsonwebtoken";
 import { useCookies } from "react-cookie";
 
 const initUserData = {
-  user: { roles: [] },
+  user: null,
   token: null,
+  roles: null,
   currentRole: null
 };
 
@@ -16,6 +17,7 @@ const checkLocalStorage = (dispatch, state) => {
         type: "setUserFromLocalStorage",
         payload: {
           user: decoded.user,
+          roles: decoded.roles,
           currentRole: localStorage.currentRole,
           token: localStorage.token,
           expToken: decoded.exp
@@ -35,6 +37,7 @@ const reducer = (state, action) => {
       return {
         currentRole: action.payload.currentRole,
         user: action.payload.user,
+        roles: action.payload.roles,
         token: action.payload.token,
         expToken: action.payload.expToken
       };
@@ -50,6 +53,7 @@ const reducer = (state, action) => {
         token: action.payload,
         user: decoded.user,
         expToken: decoded.exp,
+        roles: decoded.roles,
         currentRole:
           decoded.roles.length === 1 ? decoded.roles[0].shortCode : null
       };
