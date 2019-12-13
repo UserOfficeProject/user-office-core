@@ -12,6 +12,7 @@ exports[`Textfield rendered without crashing 1`] = `
         className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
         data-shrink={true}
         htmlFor="links_with_industry"
+        id="links_with_industry-label"
       >
         If yes, please describe:
       </label>
@@ -21,10 +22,12 @@ exports[`Textfield rendered without crashing 1`] = `
       >
         <input
           aria-invalid={false}
+          autoFocus={false}
           className="MuiInputBase-input MuiInput-input"
           disabled={false}
           id="links_with_industry"
           name="links_with_industry"
+          onAnimationStart={[Function]}
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
