@@ -1,4 +1,6 @@
-import { rejection, Rejection } from "../rejection";
+import "reflect-metadata";
+import { rejection } from "../rejection";
+import { Field, Int, ObjectType } from "type-graphql";
 
 export class User {
   constructor(
@@ -24,7 +26,7 @@ export class User {
     public placeholder: boolean,
     public created: string,
     public updated: string
-  ) {}
+  ) { }
 
   roles(args: any, context: any) {
     return context.queries.user.dataSource.getUserRoles(this.id);
@@ -39,14 +41,26 @@ export class User {
   }
 }
 
+@ObjectType()
 export class BasicUserDetails {
-  constructor(
-    public id: number,
-    public firstname: string,
-    public lastname: string,
-    public organisation: string,
-    public position: string
-  ) {}
+  @Field(type => Int)
+  public id: number;
+  @Field()
+  public firstname: string;
+  @Field()
+  public lastname: string;
+  @Field()
+  public organisation: string;
+  @Field()
+  public position: string;
+
+  constructor(id: number, firstname: string, lastname: string, organisation: string, position: string) {
+    this.id = id;
+    this.firstname = firstname;
+    this.lastname = lastname;
+    this.organisation = organisation;
+    this.position = position;
+  }
 }
 
 export interface UsersArgs {
