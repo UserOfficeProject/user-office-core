@@ -51,6 +51,7 @@
     "request-promise": "^4.2.5",
     "sparkpost": "^2.1.4",
     "type-graphql": "^0.17.5",
+    "typedi": "^0.8.0",
     "typescript": "^3.7.3"
   },
   "devDependencies": {
