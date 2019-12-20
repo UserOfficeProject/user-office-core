@@ -1,14 +1,54 @@
 {
-	"id": "bb57984e-4686-47dd-b9de-eb2dd63020f7",
+	"id": "6af95db0-6941-4489-bca4-e739ec9ba5de",
 	"name": "LOCAL",
 	"values": [
 		{
 			"key": "Authorization",
 			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQW5kZXJzIiwibWlkZGxlbmFtZSI6IkFkYW0iLCJsYXN0bmFtZSI6IkFuZGVyc3NvbiIsInVzZXJuYW1lIjoidGVzdG9mZmljZXIiLCJwcmVmZXJyZWRuYW1lIjoiUmhpYW5ub24iLCJvcmNpZCI6Ijg3ODMyMTg5NyIsImdlbmRlciI6Im1hbGUiLCJuYXRpb25hbGl0eSI6IkZyZW5jaCIsImJpcnRoZGF0ZSI6IjE5ODEtMDgtMDRUMjI6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6IlBmYW5uZXJzdGlsbCBhbmQgU29ucyIsImRlcGFydG1lbnQiOiJJVCBkZXBhcnRtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJDb25nbywgQWxsZW5ldmlsbGUsIDM1ODIzIE11ZWxsZXIgR2xlbnMiLCJwb3NpdGlvbiI6IkxpYWlzb24iLCJlbWFpbCI6IkFhcm9uX0hhcnJpczQ5QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IjcxMS0zMTYtNTcyOCIsInRlbGVwaG9uZV9hbHQiOiIxLTM1OS04NjQtMzQ4OSB4NzM5MCIsImNyZWF0ZWQiOiIyMDE5LTEwLTE3VDEwOjU4OjM4LjczNVoiLCJ1cGRhdGVkIjoiMjAxOS0xMC0xN1QxMDo1ODozOC43MzVaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU3MTMyNzQ2Mn0.NinmUuwuu0D6syqwd2z5J1BaqhwRPlFaxtML8sA2Ang",
 			"enabled": true
+		},
+		{
+			"key": "NEW_CALL_ID",
+			"value": 54,
+			"enabled": true
+		},
+		{
+			"key": "NEW_USER_ID",
+			"value": 15,
+			"enabled": true
+		},
+		{
+			"key": "NEW_PROPOSAL_ID",
+			"value": 2,
+			"enabled": true
+		},
+		{
+			"key": "NEW_USER_TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjo1LCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQXBpIiwibWlkZGxlbmFtZSI6bnVsbCwibGFzdG5hbWUiOiJUZXN0IiwidXNlcm5hbWUiOiJBcGkuVGVzdC4yMGMyY2ZjMC0yOTRiLTRiYTYtYWY5My1jYjZjZWNiNzA2YzgiLCJwcmVmZXJyZWRuYW1lIjoiQXBpIiwib3JjaWQiOiIyMGMyY2ZjMC0yOTRiLTRiYTYtYWY5My1jYjZjZWNiNzA2YzgiLCJyZWZyZXNoVG9rZW4iOiIiLCJnZW5kZXIiOiJtYWxlIiwibmF0aW9uYWxpdHkiOjksImJpcnRoZGF0ZSI6IjE5OTktMTItMzFUMjM6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6NywiZGVwYXJ0bWVudCI6IlFBIiwicG9zaXRpb24iOiJNYW51YWwgdGVzdGVyIGJvdCIsImVtYWlsIjoiV2lsbGlhbTc0QHlhaG9vLmNvbSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IjU1NS0xMjQ4LTc3NyIsInRlbGVwaG9uZV9hbHQiOm51bGwsInBsYWNlaG9sZGVyIjpmYWxzZSwiY3JlYXRlZCI6IjIwMTktMTItMjBUMTQ6MjI6MDQuMDc3WiIsInVwZGF0ZWQiOiIyMDE5LTEyLTIwVDE0OjIyOjA0LjA4OFoifSwicm9sZXMiOlt7ImlkIjoxLCJzaG9ydENvZGUiOiJ1c2VyIiwidGl0bGUiOiJVc2VyIn1dLCJpYXQiOjE1NzY4NTE3MzIsImV4cCI6MTU3NzQ1NjUzMn0.Y_NX_X8l1VOKpwF9zRchKRN-KI9ZrnngA_hvsyyLXa8",
+			"enabled": true
+		},
+		{
+			"key": "NEW_USER_EMAIL",
+			"value": "Teresa68@hotmail.com",
+			"enabled": true
+		},
+		{
+			"key": "NEW_USER_POSITION",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "PAGE_CONTENT",
+			"value": null,
+			"enabled": true
+		},
+		{
+			"key": "NEW_REVIEW_ID",
+			"value": 65,
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2019-10-17T15:29:50.173Z",
-	"_postman_exported_using": "Postman/7.9.0"
+	"_postman_exported_at": "2019-12-20T15:00:16.722Z",
+	"_postman_exported_using": "Postman/7.14.0"
 }
