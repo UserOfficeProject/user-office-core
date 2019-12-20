@@ -232,6 +232,7 @@ const wrapBasicUserDetailsMutation = createResponseWrapper<BasicUserDetails>(
   "template"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
+const wrapReviewMutation = createResponseWrapper<Review>("review");
 const wrapPageTextMutation = createResponseWrapper<Page>("page");
 const wrapProposalTemplateFieldMutation = createResponseWrapper<
   ProposalTemplateField
@@ -463,18 +464,18 @@ export default {
     args: { userID: number; proposalID: number },
     context: ResolverContext
   ) {
-    return context.mutations.review.addUserForReview(
+    return wrapReviewMutation(context.mutations.review.addUserForReview(
       context.user,
       args.userID,
       args.proposalID
-    );
+    ));
   },
 
   removeUserForReview(args: { reviewID: number }, context: ResolverContext) {
-    return context.mutations.review.removeUserForReview(
+    return wrapReviewMutation(context.mutations.review.removeUserForReview(
       context.user,
       args.reviewID
-    );
+    ));
   },
 
   login(args: LoginArgs, context: ResolverContext) {

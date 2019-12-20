@@ -90,7 +90,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       })
       .returning("*")
       .into("reviews")
-      .then(record => this.createReviewObject(record));
+      .then((records: ReviewRecord[]) => this.createReviewObject(records[0]));
   }
 
   async getUserReviews(id: number): Promise<Review[]> {
