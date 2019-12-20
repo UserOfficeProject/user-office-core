@@ -191,7 +191,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .returning("*")
       .where("user_id", id)
-      .then(record => createBasicUserObject(record));
+      .then((record: UserRecord[]) => createBasicUserObject(record[0]));
   }
 
   async get(id: number): Promise<User | null> {
