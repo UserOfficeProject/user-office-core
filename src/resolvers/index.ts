@@ -229,7 +229,7 @@ const wrapProposalInformationMutation = createResponseWrapper<
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapBasicUserDetailsMutation = createResponseWrapper<BasicUserDetails>(
-  "template"
+  "user"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
 const wrapReviewMutation = createResponseWrapper<Review>("review");
