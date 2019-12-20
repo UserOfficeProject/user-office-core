@@ -8,6 +8,18 @@ import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
 
 export default class PostgresUserDataSource implements UserDataSource {
+
+  addUserRole(userID: number, roleID: number): Promise<Boolean> {
+    return database
+      .insert({
+        user_id: userID,
+        role_id: roleID
+      })
+      .into("role_user")
+      .then(() => {
+        return true;
+      });
+  }
   checkEmailExist(email: string): Promise<Boolean> {
     return database
       .select()

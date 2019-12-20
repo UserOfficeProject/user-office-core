@@ -20,6 +20,7 @@ import {
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 import { Page } from "../models/Admin";
+import { Review } from "../models/Review";
 
 interface ProposalArgs {
   id: string;
@@ -457,6 +458,17 @@ export default {
       args.reviewID,
       args.comment,
       args.grade
+    );
+  },
+
+  addUserRole(
+    args: { userID: number; roleID: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.addUserRole(
+      context.user,
+      args.userID,
+      args.roleID
     );
   },
 

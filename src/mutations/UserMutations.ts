@@ -320,6 +320,20 @@ export default class UserMutations {
       return false;
     }
   }
+
+  async addUserRole(agent: User | null, userID: number, roleID: number) {
+    if (
+      !(await this.userAuth.isUserOfficer(agent))
+    ) {
+      return rejection("INSUFFICIENT_PERMISSIONS");
+    }
+    return this.dataSource.addUserRole(userID, roleID)
+      .then(() => true)
+      .catch(err => {
+        logger.logException("Could not add user role", err, { agent });
+        return rejection("INTERNAL_ERROR");
+      });
+  }
   async updatePassword(
     agent: User | null,
     id: number,
