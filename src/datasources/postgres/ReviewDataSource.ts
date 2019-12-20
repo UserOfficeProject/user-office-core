@@ -32,7 +32,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .where("review_id", id)
       .returning("*")
       .del()
-      .then(record => this.createReviewObject(record));
+      .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
   }
 
   async submitReview(
