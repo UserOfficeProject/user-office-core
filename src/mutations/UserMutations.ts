@@ -21,7 +21,7 @@ export default class UserMutations {
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) {}
+  ) { }
 
   createHash(password: string): string {
     //Check that password follows rules

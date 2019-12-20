@@ -12,7 +12,7 @@ export default class ReviewMutations {
     private dataSource: ReviewDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) {}
+  ) { }
 
   async submitReview(
     agent: User | null,

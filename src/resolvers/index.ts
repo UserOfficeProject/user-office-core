@@ -35,7 +35,7 @@ interface FileMetadataArgs {
   fileIds: string[];
 }
 
-interface CreateProposalArgs {}
+interface CreateProposalArgs { }
 
 interface CreateCallArgs {
   shortCode: string;
@@ -126,7 +126,7 @@ interface LoginArgs {
   password: string;
 }
 
-interface RolesArgs {}
+interface RolesArgs { }
 
 enum PageName {
   HOMEPAGE = 1,
@@ -204,7 +204,7 @@ function resolveProposals(
 }
 
 function createResponseWrapper<T>(key: string) {
-  return async function(promise: Promise<T | Rejection>) {
+  return async function (promise: Promise<T | Rejection>) {
     const result = await promise;
     if (isRejection(result)) {
       return {

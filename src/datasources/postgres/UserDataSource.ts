@@ -144,7 +144,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    return database.transaction(function(trx: Transaction) {
+    return database.transaction(function (trx: Transaction) {
       return database
         .from("role_user")
         .where("user_id", id)
@@ -324,7 +324,7 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.offset(offset);
         }
         if (usersOnly) {
-          query.whereIn("user_id", function(this: any) {
+          query.whereIn("user_id", function (this: any) {
             this.select("user_id")
               .from("role_user")
               .where("role_id", 1);
