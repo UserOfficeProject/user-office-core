@@ -8,7 +8,9 @@ export function useAddUserForReview() {
     async (userID, proposalID) => {
       const query = `
     mutation($userID: Int!, $proposalID: Int!) {
-      addUserForReview(userID: $userID, proposalID: $proposalID)
+      addUserForReview(userID: $userID, proposalID: $proposalID) {
+        error
+      }
     }
     `;
       const variables = {
