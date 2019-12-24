@@ -8,7 +8,9 @@ export function useRemoveUserForReview() {
     async reviewID => {
       const query = `
         mutation($reviewID: Int!) {
-          removeUserForReview(reviewID: $reviewID)
+          removeUserForReview(reviewID: $reviewID) {
+            error
+          }
         }
     `;
       const variables = {
