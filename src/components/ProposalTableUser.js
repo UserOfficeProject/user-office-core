@@ -8,7 +8,7 @@ export default function ProposalTableUser(props) {
 
   const sendUserProposalRequest = searchQuery => {
     const query = `
-    query($id: ID!) {
+    query($id: Int!) {
       user(id: $id){
         proposals {
           id

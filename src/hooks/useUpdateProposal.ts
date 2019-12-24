@@ -5,7 +5,7 @@ import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 import { ResourceId } from "../submodules/duo-localisation/StringResources"
 
 export function useUpdateProposal() {
-  const sendRequest = useDataAPI<{updateProposal:{proposal?:{id:number}, error:ResourceId}}>();
+  const sendRequest = useDataAPI<{ updateProposal: { proposal?: { id: number }, error: ResourceId } }>();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(
@@ -18,10 +18,10 @@ export function useUpdateProposal() {
       status?: ProposalStatus;
       users?: number[];
       proposerId?: number;
-      partialSave?:boolean;
+      partialSave?: boolean;
     }) => {
       const query = `
-      mutation($id: ID!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $status:Int, $users:[Int], $proposerId:Int, $partialSave:Boolean) {
+      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput], $topicsCompleted:[Int], $status:Int, $users:[Int], $proposerId:Int, $partialSave:Boolean) {
         updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, status:$status, users:$users, proposerId:$proposerId, partialSave:$partialSave){
          proposal{
           id

@@ -180,7 +180,7 @@ export default function ProfilePage({ match, history }) {
   useEffect(() => {
     const getUserInformation = id => {
       const query = `
-      query($id: ID!) {
+      query($id: Int!) {
         user(id: $id){
           user_title, 
           username,
@@ -208,7 +208,7 @@ export default function ProfilePage({ match, history }) {
         setUserData({ ...data.user });
       });
     };
-    getUserInformation(match.params.id);
+    getUserInformation(parseInt(match.params.id));
   }, [match.params.id, sendRequest]);
 
   const classes = useStyles();

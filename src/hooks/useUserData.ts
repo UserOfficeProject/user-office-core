@@ -9,7 +9,7 @@ export function useUserWithReviewsData(id: number) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const query = `
-    query($id: ID!) {
+    query($id: Int!) {
       user(id: $id){
         id
         firstname
@@ -53,7 +53,7 @@ export function useBasicUserData() {
   const loadBasicUserData = useCallback(
     async (id: number) => {
       const query = `
-        query($id: ID!) {
+        query($id: Int!) {
           basicUserDetails(id: $id){
             id
             firstname

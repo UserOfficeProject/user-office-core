@@ -12,7 +12,7 @@ export function useProposalData(id: number) {
   useEffect(() => {
     const getProposalInformation = (id: number) => {
       const query = `
-          query($id: ID!) {
+          query($id: Int!) {
             proposal(id: $id) {
               id
               title
