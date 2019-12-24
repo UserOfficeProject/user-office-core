@@ -2,6 +2,7 @@ import { User, BasicUserDetails } from "../models/User";
 import { Role } from "../models/Role";
 
 export interface UserDataSource {
+  addUserRole(userID: number, roleID: number): Promise<Boolean>;
   createInviteUser(
     firstname: string,
     lastname: string,

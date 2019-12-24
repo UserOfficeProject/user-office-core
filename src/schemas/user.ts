@@ -11,8 +11,8 @@ export const typeDefs = `
 
     extend type Mutation {
         token(token: String!): LoginMutationResult
-        addUserForReview(userID: Int!, proposalID: Int!): Boolean
-        removeUserForReview(reviewID: Int!): Boolean
+        addUserForReview(userID: Int!, proposalID: Int!): ReviewMutationResult
+        removeUserForReview(reviewID: Int!): ReviewMutationResult
         addUserRole(userID: Int!, roleID: Int!): Boolean
         updateUser(
           id: Int!, 
@@ -93,6 +93,10 @@ export const typeDefs = `
     }
     type BasicUserDetailsMutationResult {
       user: BasicUserDetails
+      error: String
+    }
+    type ReviewMutationResult {
+      review: Review
       error: String
     }
     type User {
