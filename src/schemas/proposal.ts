@@ -1,6 +1,6 @@
 export const typeDefs = `
     extend type Query {
-        proposal(id: ID!): Proposal
+        proposal(id: Int!): Proposal
         proposals(filter: String, first: Int, offset: Int): ProposalQueryResult
         proposalTemplate: ProposalTemplate
         blankProposal: Proposal
@@ -8,8 +8,8 @@ export const typeDefs = `
 
     extend type Mutation {
         createProposal: ProposalMutationResult
-        updateProposal(id:ID!, title: String, abstract: String, answers:[ProposalAnswerInput], topicsCompleted:[Int], status: Int, users: [Int], proposerId:Int, partialSave:Boolean): ProposalMutationResult
-        updateProposalFiles(proposal_id:ID!, question_id:ID!, files:[String]): FilesMutationResult
+        updateProposal(id:Int!, title: String, abstract: String, answers:[ProposalAnswerInput], topicsCompleted:[Int], status: Int, users: [Int], proposerId:Int, partialSave:Boolean): ProposalMutationResult
+        updateProposalFiles(proposal_id:Int!, question_id:String!, files:[String]): FilesMutationResult
         
         approveProposal(id: Int!): ProposalMutationResult
         submitProposal(id: Int!): ProposalMutationResult
@@ -128,7 +128,7 @@ export const typeDefs = `
     }
 
     input ProposalAnswerInput {
-        proposal_question_id: ID!,
+        proposal_question_id: String!,
         data_type:String,
         value: String
     }
@@ -145,7 +145,7 @@ export const typeDefs = `
     }
 
     type ProposalAnswer {
-        proposal_question_id: ID!,
+        proposal_question_id: String!,
         answer: String
     }
 `;

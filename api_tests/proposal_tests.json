@@ -2110,8 +2110,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id:ID!) {\n  basicUserDetails(id:$id)\n    {\n      id\n      lastname\n      firstname\n    }\n}\n",
-						"variables": "{\n\t\"id\":{{NEW_USER_ID}}\n}"
+						"query": "query ($id:String!) {\n  basicUserDetails(id:$id)\n    {\n      id\n      lastname\n      firstname\n    }\n}\n",
+						"variables": "{\n\t\"id\":\"{{NEW_USER_ID}}\"\n}"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
