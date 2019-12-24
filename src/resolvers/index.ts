@@ -616,6 +616,10 @@ export default {
     );
   },
 
+  logError(args: { error: string }, context: ResolverContext) {
+    return context.mutations.admin.logClientError(args.error);
+  },
+
   getPageContent(args: { id: PageName }, context: ResolverContext) {
     return context.queries.admin.getPageText(parseInt(PageName[args.id]));
   },
