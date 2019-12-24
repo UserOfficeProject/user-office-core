@@ -8,6 +8,18 @@ import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
 
 export default class PostgresUserDataSource implements UserDataSource {
+
+  addUserRole(userID: number, roleID: number): Promise<Boolean> {
+    return database
+      .insert({
+        user_id: userID,
+        role_id: roleID
+      })
+      .into("role_user")
+      .then(() => {
+        return true;
+      });
+  }
   checkEmailExist(email: string): Promise<Boolean> {
     return database
       .select()
@@ -144,7 +156,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    return database.transaction(function(trx: Transaction) {
+    return database.transaction(function (trx: Transaction) {
       return database
         .from("role_user")
         .where("user_id", id)
@@ -179,7 +191,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from("users")
       .returning("*")
       .where("user_id", id)
-      .then(record => createBasicUserObject(record));
+      .then((record: UserRecord[]) => createBasicUserObject(record[0]));
   }
 
   async get(id: number): Promise<User | null> {
@@ -324,7 +336,7 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.offset(offset);
         }
         if (usersOnly) {
-          query.whereIn("user_id", function(this: any) {
+          query.whereIn("user_id", function (this: any) {
             this.select("user_id")
               .from("role_user")
               .where("role_id", 1);

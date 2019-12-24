@@ -12,7 +12,7 @@ export default class ReviewMutations {
     private dataSource: ReviewDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) {}
+  ) { }
 
   async submitReview(
     agent: User | null,
@@ -25,6 +25,7 @@ export default class ReviewMutations {
       review &&
       !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
     ) {
+      logger.logWarn("Blocked submitting review", { agent, reviewID })
       return rejection("NOT_REVIEWER_OF_PROPOSAL");
     }
     return this.dataSource

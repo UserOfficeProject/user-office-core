@@ -1,8 +1,8 @@
 export const typeDefs = `
     extend type Mutation {
         setPageContent(id: PageName!, text: String): PageMutationsResult
+        logError(error: String!): Boolean
     }
-
 
     type PageMutationsResult {
         page: Page

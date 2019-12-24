@@ -20,6 +20,7 @@ import {
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 import { Page } from "../models/Admin";
+import { Review } from "../models/Review";
 
 interface ProposalArgs {
   id: string;
@@ -35,7 +36,7 @@ interface FileMetadataArgs {
   fileIds: string[];
 }
 
-interface CreateProposalArgs {}
+interface CreateProposalArgs { }
 
 interface CreateCallArgs {
   shortCode: string;
@@ -126,7 +127,7 @@ interface LoginArgs {
   password: string;
 }
 
-interface RolesArgs {}
+interface RolesArgs { }
 
 enum PageName {
   HOMEPAGE = 1,
@@ -204,7 +205,7 @@ function resolveProposals(
 }
 
 function createResponseWrapper<T>(key: string) {
-  return async function(promise: Promise<T | Rejection>) {
+  return async function (promise: Promise<T | Rejection>) {
     const result = await promise;
     if (isRejection(result)) {
       return {
@@ -229,9 +230,10 @@ const wrapProposalInformationMutation = createResponseWrapper<
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapBasicUserDetailsMutation = createResponseWrapper<BasicUserDetails>(
-  "template"
+  "user"
 );
 const wrapCallMutation = createResponseWrapper<Call>("call");
+const wrapReviewMutation = createResponseWrapper<Review>("review");
 const wrapPageTextMutation = createResponseWrapper<Page>("page");
 const wrapProposalTemplateFieldMutation = createResponseWrapper<
   ProposalTemplateField
@@ -459,22 +461,33 @@ export default {
     );
   },
 
+  addUserRole(
+    args: { userID: number; roleID: number },
+    context: ResolverContext
+  ) {
+    return context.mutations.user.addUserRole(
+      context.user,
+      args.userID,
+      args.roleID
+    );
+  },
+
   addUserForReview(
     args: { userID: number; proposalID: number },
     context: ResolverContext
   ) {
-    return context.mutations.review.addUserForReview(
+    return wrapReviewMutation(context.mutations.review.addUserForReview(
       context.user,
       args.userID,
       args.proposalID
-    );
+    ));
   },
 
   removeUserForReview(args: { reviewID: number }, context: ResolverContext) {
-    return context.mutations.review.removeUserForReview(
+    return wrapReviewMutation(context.mutations.review.removeUserForReview(
       context.user,
       args.reviewID
-    );
+    ));
   },
 
   login(args: LoginArgs, context: ResolverContext) {
@@ -614,6 +627,10 @@ export default {
         args.text
       )
     );
+  },
+
+  logError(args: { error: string }, context: ResolverContext) {
+    return context.mutations.admin.logClientError(args.error);
   },
 
   getPageContent(args: { id: PageName }, context: ResolverContext) {

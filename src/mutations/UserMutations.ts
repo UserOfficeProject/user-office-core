@@ -21,7 +21,7 @@ export default class UserMutations {
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) {}
+  ) { }
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -319,6 +319,20 @@ export default class UserMutations {
       logger.logException("Could not verify email", error, { token });
       return false;
     }
+  }
+
+  async addUserRole(agent: User | null, userID: number, roleID: number) {
+    if (
+      !(await this.userAuth.isUserOfficer(agent))
+    ) {
+      return rejection("INSUFFICIENT_PERMISSIONS");
+    }
+    return this.dataSource.addUserRole(userID, roleID)
+      .then(() => true)
+      .catch(err => {
+        logger.logException("Could not add user role", err, { agent });
+        return rejection("INTERNAL_ERROR");
+      });
   }
   async updatePassword(
     agent: User | null,
