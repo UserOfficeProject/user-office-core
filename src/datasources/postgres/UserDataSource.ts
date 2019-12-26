@@ -8,7 +8,6 @@ import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
 
 export default class PostgresUserDataSource implements UserDataSource {
-
   addUserRole(userID: number, roleID: number): Promise<Boolean> {
     return database
       .insert({
@@ -139,7 +138,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from("roles")
       .then((roles: any[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          role =>
+            new Role({
+              id: role.role_id,
+              shortCode: role.short_code,
+              title: role.title
+            })
+        )
       );
   }
 
@@ -151,12 +157,19 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join("users as u", { "u.user_id": "rc.user_id" })
       .where("u.user_id", id)
       .then((roles: any[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          role =>
+            new Role({
+              id: role.role_id,
+              shortCode: role.short_code,
+              title: role.title
+            })
+        )
       );
   }
 
   async setUserRoles(id: number, roles: number[]): Promise<void> {
-    return database.transaction(function (trx: Transaction) {
+    return database.transaction(function(trx: Transaction) {
       return database
         .from("role_user")
         .where("user_id", id)
@@ -256,13 +269,13 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async create(
-    user_title: string,
+    user_title: string | undefined,
     firstname: string,
-    middlename: string,
+    middlename: string | undefined,
     lastname: string,
     username: string,
     password: string,
-    preferredname: string | null,
+    preferredname: string | undefined,
     orcid: string,
     orcid_refreshtoken: string,
     gender: string,
@@ -273,7 +286,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    telephone_alt: string | null
+    telephone_alt: string | undefined
   ): Promise<User> {
     return database
       .insert({
@@ -336,7 +349,7 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.offset(offset);
         }
         if (usersOnly) {
-          query.whereIn("user_id", function (this: any) {
+          query.whereIn("user_id", function(this: any) {
             this.select("user_id")
               .from("role_user")
               .where("role_id", 1);

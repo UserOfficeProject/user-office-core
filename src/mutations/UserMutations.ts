@@ -1,10 +1,4 @@
-import {
-  User,
-  UpdateUserArgs,
-  checkUserArgs,
-  BasicUserDetails,
-  CreateUserArgs
-} from "../models/User";
+import { User, checkUserArgs, BasicUserDetails } from "../models/User";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { isRejection, rejection, Rejection } from "../rejection";
 import { EventBus } from "../events/eventBus";
@@ -15,13 +9,15 @@ const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
+import { UpdateUserArgs } from "../resolvers/UpdateUserMutation";
+import { CreateUserArgs } from "../resolvers/CreateUserMutation";
 
 export default class UserMutations {
   constructor(
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) { }
+  ) {}
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -322,12 +318,11 @@ export default class UserMutations {
   }
 
   async addUserRole(agent: User | null, userID: number, roleID: number) {
-    if (
-      !(await this.userAuth.isUserOfficer(agent))
-    ) {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("INSUFFICIENT_PERMISSIONS");
     }
-    return this.dataSource.addUserRole(userID, roleID)
+    return this.dataSource
+      .addUserRole(userID, roleID)
       .then(() => true)
       .catch(err => {
         logger.logException("Could not add user role", err, { agent });

@@ -13,7 +13,6 @@ import { Proposal } from "../models/Proposal";
 import {
   User,
   UpdateUserArgs,
-  CreateUserArgs,
   UsersArgs,
   BasicUserDetails
 } from "../models/User";
@@ -21,6 +20,7 @@ import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 import { Page } from "../models/Admin";
 import { Review } from "../models/Review";
+import { CreateUserArgs } from "./UserResolver";
 
 interface ProposalArgs {
   id: string;
@@ -36,7 +36,7 @@ interface FileMetadataArgs {
   fileIds: string[];
 }
 
-interface CreateProposalArgs { }
+interface CreateProposalArgs {}
 
 interface CreateCallArgs {
   shortCode: string;
@@ -127,7 +127,7 @@ interface LoginArgs {
   password: string;
 }
 
-interface RolesArgs { }
+interface RolesArgs {}
 
 enum PageName {
   HOMEPAGE = 1,
@@ -205,7 +205,7 @@ function resolveProposals(
 }
 
 function createResponseWrapper<T>(key: string) {
-  return async function (promise: Promise<T | Rejection>) {
+  return async function(promise: Promise<T | Rejection>) {
     const result = await promise;
     if (isRejection(result)) {
       return {
@@ -476,18 +476,19 @@ export default {
     args: { userID: number; proposalID: number },
     context: ResolverContext
   ) {
-    return wrapReviewMutation(context.mutations.review.addUserForReview(
-      context.user,
-      args.userID,
-      args.proposalID
-    ));
+    return wrapReviewMutation(
+      context.mutations.review.addUserForReview(
+        context.user,
+        args.userID,
+        args.proposalID
+      )
+    );
   },
 
   removeUserForReview(args: { reviewID: number }, context: ResolverContext) {
-    return wrapReviewMutation(context.mutations.review.removeUserForReview(
-      context.user,
-      args.reviewID
-    ));
+    return wrapReviewMutation(
+      context.mutations.review.removeUserForReview(context.user, args.reviewID)
+    );
   },
 
   login(args: LoginArgs, context: ResolverContext) {

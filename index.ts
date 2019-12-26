@@ -12,13 +12,11 @@ const proposalDownload = require("./src/routes/pdf");
 
 var cookieParser = require("cookie-parser");
 
-
 interface Req extends Request {
   user?: any;
 }
 
 async function bootstrap() {
-
   var app = express();
 
   // authentication middleware
@@ -50,7 +48,10 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const schema = await buildSchema({
-    resolvers: [__dirname + "/src/resolvers/**/*Resolver.ts"]
+    resolvers: [
+      __dirname + "/src/resolvers/**/*Query.ts",
+      __dirname + "/src/resolvers/**/*Mutation.ts"
+    ]
   });
 
   app.use(
@@ -80,7 +81,7 @@ async function bootstrap() {
 
   app.listen(process.env.PORT || 4000);
 
-  app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+  app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
     logger.logException("Unhandled EXPRESS JS exception", err, { req, res });
     res.status(500).send("SERVER EXCEPTION");
   });
