@@ -145,7 +145,7 @@ export function usePersistModel() {
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
     const mutation = `
-    mutation($topicId:Int!, $dataType:String!) {
+    mutation($topicId:Int!, $dataType:DataType!) {
       createTemplateField(topicId:$topicId, dataType:$dataType) {
         field {
           proposal_question_id
