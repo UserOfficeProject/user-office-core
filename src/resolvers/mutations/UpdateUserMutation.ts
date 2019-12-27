@@ -9,16 +9,20 @@ import {
   Int
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { createResponseWrapper, MutationResultBase } from "../Utils";
+import { wrapResponse, AbstractResponseWrap } from "../Utils";
 import { User } from "../../models/User";
 
-const wrapUserMutation = createResponseWrapper<User>("user");
-
 @ObjectType()
-class UpdateUserMutationResult extends MutationResultBase {
+class UpdateUserResponseWrap extends AbstractResponseWrap<User> {
   @Field(() => User, { nullable: true })
   public user: User;
+  setValue(value: User): void {
+    this.user = value;
+  }
 }
+
+const wrap = wrapResponse<User>(new UpdateUserResponseWrap());
+
 @ArgsType()
 export class UpdateUserArgs {
   @Field(() => Int)
@@ -84,8 +88,8 @@ export class UpdateUserArgs {
 
 @Resolver()
 export class UpdateUserMutation {
-  @Mutation(() => UpdateUserMutationResult, { nullable: true })
+  @Mutation(() => UpdateUserResponseWrap)
   updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
-    return wrapUserMutation(context.mutations.user.update(context.user, args));
+    return wrap(context.mutations.user.update(context.user, args));
   }
 }

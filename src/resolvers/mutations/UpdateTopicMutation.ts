@@ -9,13 +9,17 @@ import {
   Args
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { MutationResultBase, createResponseWrapper } from "../Utils";
+import { AbstractResponseWrap, wrapResponse } from "../Utils";
 import { Topic } from "../../models/ProposalModel";
 
 @ObjectType()
-class UpdateTopicMutationResult extends MutationResultBase {
+class UpdateTopicMutationResult extends AbstractResponseWrap<Topic> {
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
+
+  setValue(value: Topic): void {
+    this.topic = value;
+  }
 }
 
 @ArgsType()
@@ -30,16 +34,16 @@ class UpdateTopicArgs {
   isEnabled: boolean;
 }
 
-const resultWrapper = createResponseWrapper<Topic>("topic");
+const wrap = wrapResponse<Topic>(new UpdateTopicMutationResult());
 
 @Resolver()
 export class UpdateTopicMutation {
-  @Mutation(() => UpdateTopicMutationResult, { nullable: true })
+  @Mutation(() => UpdateTopicMutationResult)
   updateTopic(
     @Args() { id, title, isEnabled }: UpdateTopicArgs,
     @Ctx() context: ResolverContext
   ) {
-    return resultWrapper(
+    return wrap(
       context.mutations.template.updateTopic(context.user, id, title, isEnabled)
     );
   }

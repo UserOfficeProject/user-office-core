@@ -9,16 +9,19 @@ import {
 } from "type-graphql";
 
 import { ResolverContext } from "../../context";
-import { createResponseWrapper, MutationResultBase } from "../Utils";
-import { User } from "../../models/User";
-
-const wrapLoginMutation = createResponseWrapper<String>("token");
+import { wrapResponse, AbstractResponseWrap } from "../Utils";
 
 @ObjectType()
-class LoginMutationResult extends MutationResultBase {
+class LoginResponseWrap extends AbstractResponseWrap<string> {
   @Field(() => String, { nullable: true })
-  public token: String;
+  public token: string;
+
+  setValue(value: string): void {
+    this.token = value;
+  }
 }
+
+const wrap = wrapResponse<String>(new LoginResponseWrap());
 
 @ArgsType()
 class LoginArgs {
@@ -31,11 +34,11 @@ class LoginArgs {
 
 @Resolver()
 export class LoginMutation {
-  @Mutation(() => LoginMutationResult, { nullable: true })
+  @Mutation(() => LoginResponseWrap)
   login(
     @Args() { email, password }: LoginArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrapLoginMutation(context.mutations.user.login(email, password));
+    return wrap(context.mutations.user.login(email, password));
   }
 }

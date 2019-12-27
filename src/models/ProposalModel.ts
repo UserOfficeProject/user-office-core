@@ -1,22 +1,174 @@
 import { BasicUserDetails } from "./User";
 import { Review } from "./Review";
 import { EvaluatorOperator } from "./ConditionEvaluator";
-import { ObjectType, Field, Int } from "type-graphql";
+import { ObjectType, Field, Int, registerEnumType } from "type-graphql";
 
-export class ProposalInformation {
+@ObjectType()
+export class ProposalTemplateField {
+  @Field()
+  public proposal_question_id: string;
+
+  @Field()
+  public data_type: DataType;
+
+  @Field(() => Int)
+  public sort_order: number;
+
+  @Field()
+  public question: string;
+  //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
+
+  @Field()
+  public config: string;
+
+  @Field(() => Int)
+  public topic_id: number;
+
+  @Field(() => [FieldDependency], { nullable: true })
+  public dependencies: FieldDependency[] | null;
+
   constructor(
-    public id?: number,
-    public title?: string,
-    public abstract?: string,
-    public proposer?: BasicUserDetails,
-    public status?: ProposalStatus,
-    public created?: Date,
-    public updated?: Date,
-    public users?: BasicUserDetails[],
-    public reviews?: Review[],
-    public questionary?: Questionary,
-    public shortCode?: string
-  ) {}
+    proposal_question_id: string,
+    data_type: DataType,
+    sort_order: number,
+    question: string,
+    config: string,
+    topic_id: number,
+    dependencies: FieldDependency[] | null
+  ) {
+    this.proposal_question_id = proposal_question_id;
+    this.data_type = data_type;
+    this.sort_order = sort_order;
+    this.question = question;
+    this.config = config;
+    this.topic_id = topic_id;
+    this.dependencies = dependencies;
+  }
+
+  static fromObject(obj: any) {
+    return new ProposalTemplateField(
+      obj.proposal_question_id,
+      obj.data_type,
+      obj.sort_order,
+      obj.question,
+      obj.config,
+      obj.topic_id,
+      obj.dependencies
+        ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
+        : null
+    );
+  }
+}
+
+@ObjectType()
+export class QuestionaryField extends ProposalTemplateField {
+  @Field(() => String)
+  public value: any;
+  constructor(templateField: ProposalTemplateField, value: any) {
+    super(
+      templateField.proposal_question_id,
+      templateField.data_type,
+      templateField.sort_order,
+      templateField.question,
+      templateField.config,
+      templateField.topic_id,
+      templateField.dependencies
+    );
+    this.value = value;
+  }
+  static fromObject(obj: any) {
+    const templateField = ProposalTemplateField.fromObject(obj);
+    return new QuestionaryField(
+      templateField,
+      obj.value
+        ? JSON.parse(obj.value).value
+        : templateField.data_type === DataType.BOOLEAN
+        ? false
+        : ""
+    );
+  }
+}
+
+@ObjectType()
+export class Questionary {
+  @Field()
+  public a: string;
+
+  @Field(() => [QuestionaryStep])
+  public steps: QuestionaryStep[];
+  constructor(steps: QuestionaryStep[]) {
+    this.steps = steps;
+  }
+
+  static fromObject(obj: any): Questionary {
+    return new Questionary(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
+        : []
+    );
+  }
+}
+
+@ObjectType()
+export class ProposalInformation {
+  @Field(() => Int)
+  public id?: number;
+
+  @Field(() => String, { nullable: true })
+  public title?: string;
+
+  @Field(() => String, { nullable: true })
+  public abstract?: string;
+
+  @Field(() => BasicUserDetails, { nullable: true })
+  public proposer?: BasicUserDetails;
+
+  @Field(() => ProposalStatus, { nullable: true })
+  public status?: ProposalStatus;
+
+  @Field(() => Date, { nullable: true })
+  public created?: Date;
+
+  @Field(() => Date, { nullable: true })
+  public updated?: Date;
+
+  @Field(() => [BasicUserDetails], { nullable: true })
+  public users?: BasicUserDetails[];
+
+  @Field(() => [Review], { nullable: true })
+  public reviews?: Review[];
+
+  @Field(() => Questionary, { nullable: true })
+  public questionary?: Questionary;
+
+  @Field(() => String, { nullable: true })
+  public shortCode?: string;
+
+  constructor(
+    id?: number,
+    title?: string,
+    abstract?: string,
+    proposer?: BasicUserDetails,
+    status?: ProposalStatus,
+    created?: Date,
+    updated?: Date,
+    users?: BasicUserDetails[],
+    reviews?: Review[],
+    questionary?: Questionary,
+    shortCode?: string
+  ) {
+    this.id = id;
+    this.title = title;
+    this.abstract = abstract;
+    this.proposer = proposer;
+    this.status = status;
+    this.created = created;
+    this.updated = updated;
+    this.users = users;
+    this.reviews = reviews;
+    this.questionary = questionary;
+    this.shortCode = shortCode;
+  }
 }
 
 export enum DataType {
@@ -27,6 +179,10 @@ export enum DataType {
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
   TEXT_INPUT = "TEXT_INPUT"
 }
+
+registerEnumType(DataType, {
+  name: "DataType"
+});
 
 @ObjectType()
 export class Topic {
@@ -103,80 +259,19 @@ export class TemplateStep {
 }
 
 @ObjectType()
-export class ProposalTemplateField {
-  @Field()
-  public proposal_question_id: string;
-
-  @Field()
-  public data_type: DataType;
-
-  @Field(() => Int)
-  public sort_order: number;
-
-  @Field()
-  public question: string;
-  //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
-
-  @Field()
-  public config: string;
-
-  @Field(() => Int)
-  public topic_id: number;
-
-  @Field(() => [FieldDependency], { nullable: true })
-  public dependencies: FieldDependency[] | null;
-
-  constructor(
-    proposal_question_id: string,
-    data_type: DataType,
-    sort_order: number,
-    question: string,
-    config: string,
-    topic_id: number,
-    dependencies: FieldDependency[] | null
-  ) {
-    this.proposal_question_id = proposal_question_id;
-    this.data_type = data_type;
-    this.sort_order = sort_order;
-    this.question = question;
-    this.config = config;
-    this.topic_id = topic_id;
-    this.dependencies = dependencies;
-  }
-
-  static fromObject(obj: any) {
-    return new ProposalTemplateField(
-      obj.proposal_question_id,
-      obj.data_type,
-      obj.sort_order,
-      obj.question,
-      obj.config,
-      obj.topic_id,
-      obj.dependencies
-        ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
-        : null
-    );
-  }
-}
-
-export class Questionary {
-  constructor(public steps: QuestionaryStep[]) {}
-
-  static fromObject(obj: any): Questionary {
-    return new Questionary(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
-        : []
-    );
-  }
-}
-
 export class QuestionaryStep {
-  constructor(
-    public topic: Topic,
-    public isCompleted: boolean,
-    public fields: QuestionaryField[]
-  ) {}
+  @Field(() => Topic)
+  public topic: Topic;
+  @Field()
+  public isCompleted: boolean;
+  @Field(() => QuestionaryField)
+  public fields: QuestionaryField[];
+
+  constructor(topic: Topic, isCompleted: boolean, fields: QuestionaryField[]) {
+    this.topic = topic;
+    this.isCompleted = isCompleted;
+    this.fields = fields;
+  }
   static fromObject(obj: any): QuestionaryStep | undefined {
     return new QuestionaryStep(
       Topic.fromObject(obj.topic),
@@ -186,31 +281,6 @@ export class QuestionaryStep {
             QuestionaryField.fromObject(fieldObj)
           )
         : []
-    );
-  }
-}
-
-export class QuestionaryField extends ProposalTemplateField {
-  constructor(templateField: ProposalTemplateField, public value: any) {
-    super(
-      templateField.proposal_question_id,
-      templateField.data_type,
-      templateField.sort_order,
-      templateField.question,
-      templateField.config,
-      templateField.topic_id,
-      templateField.dependencies
-    );
-  }
-  static fromObject(obj: any) {
-    const templateField = ProposalTemplateField.fromObject(obj);
-    return new QuestionaryField(
-      templateField,
-      obj.value
-        ? JSON.parse(obj.value).value
-        : templateField.data_type === DataType.BOOLEAN
-        ? false
-        : ""
     );
   }
 }
@@ -263,6 +333,8 @@ export enum ProposalStatus {
   DRAFT = 0,
   SUBMITTED = 1
 }
+
+registerEnumType(ProposalStatus, { name: "ProposalStatus" });
 
 export interface ProposalAnswer {
   proposal_question_id: string;
