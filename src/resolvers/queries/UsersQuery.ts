@@ -22,7 +22,7 @@ class UserQueryResult {
 }
 
 @ArgsType()
-class UsersArgs {
+export class UsersArgs {
   @Field(() => String, { nullable: true })
   filter?: string;
 

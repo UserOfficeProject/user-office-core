@@ -1,6 +1,7 @@
-import { User, BasicUserDetails } from "./User";
+import { BasicUserDetails } from "./User";
 import { Review } from "./Review";
 import { EvaluatorOperator } from "./ConditionEvaluator";
+import { ObjectType, Field, Int } from "type-graphql";
 
 export class ProposalInformation {
   constructor(
@@ -27,8 +28,49 @@ export enum DataType {
   TEXT_INPUT = "TEXT_INPUT"
 }
 
+@ObjectType()
+export class Topic {
+  @Field(type => Int)
+  public topic_id: number; // TODO fix casing. Use CamelCasing
+
+  @Field()
+  public topic_title: string;
+
+  @Field(type => Int)
+  public sort_order: number;
+
+  @Field()
+  public is_enabled: boolean;
+
+  constructor(
+    topic_id: number,
+    topic_title: string,
+    sort_order: number,
+    is_enabled: boolean
+  ) {
+    this.topic_id = topic_id;
+    this.topic_title = topic_title;
+    this.sort_order = sort_order;
+    this.is_enabled = is_enabled;
+  }
+
+  public static fromObject(obj: any) {
+    return new Topic(
+      obj.topic_id,
+      obj.topic_title,
+      obj.sort_order,
+      obj.is_enabled
+    );
+  }
+}
+
+@ObjectType()
 export class ProposalTemplate {
-  constructor(public steps: TemplateStep[] = []) {}
+  @Field(type => TemplateStep)
+  public steps: TemplateStep[] = [];
+  constructor(steps: TemplateStep[]) {
+    this.steps = steps;
+  }
 
   static fromObject(obj: any) {
     return new ProposalTemplate(
@@ -39,8 +81,18 @@ export class ProposalTemplate {
   }
 }
 
+@ObjectType()
 export class TemplateStep {
-  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
+  @Field(type => Topic)
+  public topic: Topic;
+
+  @Field(type => [ProposalTemplateField])
+  public fields: ProposalTemplateField[];
+
+  constructor(topic: Topic, fields: ProposalTemplateField[]) {
+    this.topic = topic;
+    this.fields = fields;
+  }
 
   public static fromObject(obj: any) {
     return new TemplateStep(
@@ -50,17 +102,47 @@ export class TemplateStep {
   }
 }
 
+@ObjectType()
 export class ProposalTemplateField {
+  @Field()
+  public proposal_question_id: string;
+
+  @Field()
+  public data_type: DataType;
+
+  @Field(() => Int)
+  public sort_order: number;
+
+  @Field()
+  public question: string;
+  //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
+
+  @Field()
+  public config: string;
+
+  @Field(() => Int)
+  public topic_id: number;
+
+  @Field(() => [FieldDependency], { nullable: true })
+  public dependencies: FieldDependency[] | null;
+
   constructor(
-    public proposal_question_id: string,
-    public data_type: DataType,
-    public sort_order: number,
-    public question: string,
-    //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
-    public config: string,
-    public topic_id: number,
-    public dependencies: FieldDependency[] | null
-  ) {}
+    proposal_question_id: string,
+    data_type: DataType,
+    sort_order: number,
+    question: string,
+    config: string,
+    topic_id: number,
+    dependencies: FieldDependency[] | null
+  ) {
+    this.proposal_question_id = proposal_question_id;
+    this.data_type = data_type;
+    this.sort_order = sort_order;
+    this.question = question;
+    this.config = config;
+    this.topic_id = topic_id;
+    this.dependencies = dependencies;
+  }
 
   static fromObject(obj: any) {
     return new ProposalTemplateField(
@@ -133,31 +215,27 @@ export class QuestionaryField extends ProposalTemplateField {
   }
 }
 
-export class Topic {
-  constructor(
-    public topic_id: number,
-    public topic_title: string,
-    public sort_order: number,
-    public is_enabled: boolean
-  ) {}
-
-  public static fromObject(obj: any) {
-    return new Topic(
-      obj.topic_id,
-      obj.topic_title,
-      obj.sort_order,
-      obj.is_enabled
-    );
-  }
-}
-
+@ObjectType()
 export class FieldDependency {
+  @Field()
+  public proposal_question_id: string;
+
+  @Field()
+  public proposal_question_dependency: string;
+  //public condition: FieldCondition
+
+  @Field(() => String, { nullable: true })
+  public condition: string; // TODO SWAP-341. strongly type this after making GraphQL able to return more custom objects
+
   constructor(
-    public proposal_question_id: string,
-    public proposal_question_dependency: string,
-    //public condition: FieldCondition
-    public condition: string // TODO SWAP-341. strongly type this after making GraphQL able to return more custom objects
-  ) {}
+    proposal_question_id: string,
+    proposal_question_dependency: string,
+    condition: string
+  ) {
+    this.proposal_question_id = proposal_question_id;
+    this.proposal_question_dependency = proposal_question_dependency;
+    this.condition = condition;
+  }
 
   static fromObject(obj: any) {
     return new FieldDependency(

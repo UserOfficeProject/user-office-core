@@ -10,17 +10,14 @@ import {
   ProposalTemplate
 } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
-import {
-  User,
-  UpdateUserArgs,
-  UsersArgs,
-  BasicUserDetails
-} from "../models/User";
+import { User, BasicUserDetails } from "../models/User";
 import { Call } from "../models/Call";
 import { FileMetadata } from "../models/Blob";
 import { Page } from "../models/Admin";
 import { Review } from "../models/Review";
-import { CreateUserArgs } from "./UserResolver";
+import { UpdateUserArgs } from "./mutations/UpdateUserMutation";
+import { CreateUserArgs } from "./mutations/CreateUserMutation";
+import { UsersArgs } from "./queries/UsersQuery";
 
 interface ProposalArgs {
   id: string;
