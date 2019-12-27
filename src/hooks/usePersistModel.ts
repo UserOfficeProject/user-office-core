@@ -14,7 +14,7 @@ export function usePersistModel() {
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
     const mutation = `
-    mutation($topicId:Int!, $fieldIds:[String]) {
+    mutation($topicId:Int!, $fieldIds:[String!]) {
       updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
         error
       }
