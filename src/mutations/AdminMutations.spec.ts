@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import AdminMutations from "./AdminMutations";
 import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";

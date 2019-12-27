@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import AdminQueries from "./AdminQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
