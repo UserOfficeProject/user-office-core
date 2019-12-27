@@ -1,6 +1,6 @@
 import { Resolver, ObjectType, Arg, Ctx, Mutation, Field } from "type-graphql";
-import { ResolverContext } from "../context";
-import { createResponseWrapper, MutationResultBase } from "./Utils";
+import { ResolverContext } from "../../context";
+import { createResponseWrapper, MutationResultBase } from "../Utils";
 
 const wrapTokenMutation = createResponseWrapper<String>("token");
 
@@ -10,7 +10,7 @@ class TokenMutationResult extends MutationResultBase {
   public token: String;
 }
 @Resolver()
-export class TokenQuery {
+export class TokenMutation {
   @Mutation(() => TokenMutationResult, { nullable: true })
   token(@Arg("token") token: string, @Ctx() context: ResolverContext) {
     return wrapTokenMutation(context.mutations.user.token(token));

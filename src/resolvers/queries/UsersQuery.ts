@@ -9,8 +9,8 @@ import {
   ObjectType,
   ArgsType
 } from "type-graphql";
-import { BasicUserDetails } from "../models/User";
-import { ResolverContext } from "../context";
+import { BasicUserDetails } from "../../models/User";
+import { ResolverContext } from "../../context";
 
 @ObjectType()
 class UserQueryResult {

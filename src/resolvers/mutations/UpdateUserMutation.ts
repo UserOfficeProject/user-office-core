@@ -8,9 +8,9 @@ import {
   ArgsType,
   Int
 } from "type-graphql";
-import { ResolverContext } from "../context";
-import { createResponseWrapper, MutationResultBase } from "./Utils";
-import { User } from "../models/User";
+import { ResolverContext } from "../../context";
+import { createResponseWrapper, MutationResultBase } from "../Utils";
+import { User } from "../../models/User";
 
 const wrapUserMutation = createResponseWrapper<User>("user");
 

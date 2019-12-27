@@ -1,6 +1,6 @@
 import { Resolver, Query, Ctx } from "type-graphql";
-import { ResolverContext } from "../context";
-import { Role } from "../models/Role";
+import { ResolverContext } from "../../context";
+import { Role } from "../../models/Role";
 
 @Resolver()
 export class RolesQuery {

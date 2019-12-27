@@ -9,8 +9,8 @@ const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
 import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
-import { UpdateUserArgs } from "../resolvers/UpdateUserMutation";
-import { CreateUserArgs } from "../resolvers/CreateUserMutation";
+import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
+import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
 
 export default class UserMutations {
   constructor(

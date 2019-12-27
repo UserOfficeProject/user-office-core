@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { rejection } from "../rejection";
 import { Field, Int, ObjectType } from "type-graphql";
-import { UpdateUserArgs } from "../resolvers/UpdateUserMutation";
+import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 @ObjectType()
 export class User {
   @Field(type => Int)

@@ -7,10 +7,10 @@ import {
   Field,
   ArgsType
 } from "type-graphql";
-import { ResolverContext } from "../context";
-import { isRejection } from "../rejection";
-import { MutationResultBase, createResponseWrapper } from "./Utils";
-import { User } from "../models/User";
+import { ResolverContext } from "../../context";
+import { isRejection } from "../../rejection";
+import { MutationResultBase, createResponseWrapper } from "../Utils";
+import { User } from "../../models/User";
 
 @ArgsType()
 export class CreateUserArgs {
