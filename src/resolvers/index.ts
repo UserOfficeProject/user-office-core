@@ -2,7 +2,6 @@ import { ResolverContext } from "../context";
 import { isRejection, Rejection, rejection } from "../rejection";
 import {
   ProposalAnswer,
-  ProposalInformation,
   Topic,
   FieldDependency,
   ProposalTemplateField,
@@ -154,7 +153,7 @@ async function resolveProposal(
 
   const proposer = await context.queries.user.getBasic(
     agent,
-    proposal.proposer
+    proposal.proposerId
   );
   if (proposer === null) {
     return rejection("NO_PROPOSER_ON_THE_PROPOSAL");
@@ -169,8 +168,8 @@ async function resolveProposal(
   if (isRejection(questionary)) {
     return questionary;
   }
-
-  return new ProposalInformation(
+  return null;
+  /*return new ProposalInformation(
     id,
     title,
     abstract,
@@ -182,7 +181,7 @@ async function resolveProposal(
     reviews,
     questionary!,
     shortCode
-  );
+  );*/
 }
 
 function resolveProposals(
@@ -221,9 +220,6 @@ function createResponseWrapper<T>(key: string) {
 const wrapFilesMutation = createResponseWrapper<string[]>("files");
 const wrapProposalMutation = createResponseWrapper<Proposal>("proposal");
 const wrapTopicMutation = createResponseWrapper<Topic>("topic");
-const wrapProposalInformationMutation = createResponseWrapper<
-  ProposalInformation
->("proposal");
 const wrapUserMutation = createResponseWrapper<User>("user");
 const wrapLoginMutation = createResponseWrapper<String>("token");
 const wrapBasicUserDetailsMutation = createResponseWrapper<BasicUserDetails>(
@@ -268,7 +264,7 @@ export default {
   async proposalTemplate(args: CreateProposalArgs, context: ResolverContext) {
     return context.queries.template.getProposalTemplate(context.user);
   },
-
+  /*
   async createProposal(args: CreateProposalArgs, context: ResolverContext) {
     return wrapProposalInformationMutation(
       new Promise(async (resolve, reject) => {
@@ -289,7 +285,7 @@ export default {
       })
     );
   },
-
+*/
   createTopic(args: CreateTopicArgs, context: ResolverContext) {
     return wrapProposalTemplateMutation(
       context.mutations.template.createTopic(context.user, args.sortOrder)
