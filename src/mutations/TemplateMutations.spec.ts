@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { isRejection } from "../rejection";

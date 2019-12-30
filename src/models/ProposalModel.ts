@@ -109,68 +109,6 @@ export class Questionary {
   }
 }
 
-@ObjectType()
-export class ProposalInformation {
-  @Field(() => Int)
-  public id?: number;
-
-  @Field(() => String, { nullable: true })
-  public title?: string;
-
-  @Field(() => String, { nullable: true })
-  public abstract?: string;
-
-  @Field(() => BasicUserDetails, { nullable: true })
-  public proposer?: BasicUserDetails;
-
-  @Field(() => ProposalStatus, { nullable: true })
-  public status?: ProposalStatus;
-
-  @Field(() => Date, { nullable: true })
-  public created?: Date;
-
-  @Field(() => Date, { nullable: true })
-  public updated?: Date;
-
-  @Field(() => [BasicUserDetails], { nullable: true })
-  public users?: BasicUserDetails[];
-
-  @Field(() => [Review], { nullable: true })
-  public reviews?: Review[];
-
-  @Field(() => Questionary, { nullable: true })
-  public questionary?: Questionary;
-
-  @Field(() => String, { nullable: true })
-  public shortCode?: string;
-
-  constructor(
-    id?: number,
-    title?: string,
-    abstract?: string,
-    proposer?: BasicUserDetails,
-    status?: ProposalStatus,
-    created?: Date,
-    updated?: Date,
-    users?: BasicUserDetails[],
-    reviews?: Review[],
-    questionary?: Questionary,
-    shortCode?: string
-  ) {
-    this.id = id;
-    this.title = title;
-    this.abstract = abstract;
-    this.proposer = proposer;
-    this.status = status;
-    this.created = created;
-    this.updated = updated;
-    this.users = users;
-    this.reviews = reviews;
-    this.questionary = questionary;
-    this.shortCode = shortCode;
-  }
-}
-
 export enum DataType {
   BOOLEAN = "BOOLEAN",
   DATE = "DATE",
