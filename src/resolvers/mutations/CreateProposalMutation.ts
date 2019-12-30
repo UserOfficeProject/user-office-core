@@ -17,31 +17,12 @@ class CreateProposalResponseWrap extends AbstractResponseWrap<
   }
 }
 
-const wrap = wrapResponse<ProposalInformation>(
-  new CreateProposalResponseWrap()
-);
+const wrap = wrapResponse<Proposal>(new CreateProposalResponseWrap());
 
 @Resolver()
 export class CreateProposalMutation {
   @Mutation(() => CreateProposalResponseWrap, { nullable: true })
   createProposal(@Ctx() context: ResolverContext) {
-    return wrap(
-      new Promise(async (resolve, reject) => {
-        let newProposal = await context.mutations.proposal.create(context.user);
-        if (isRejection(newProposal)) {
-          return newProposal;
-        }
-
-        let newProposalInformation = await resolveProposal(
-          newProposal,
-          context
-        );
-        if (isRejection(newProposalInformation)) {
-          return newProposalInformation;
-        }
-
-        resolve(newProposalInformation);
-      })
-    );
+    return wrap(context.mutations.proposal.create(context.user));
   }
 }

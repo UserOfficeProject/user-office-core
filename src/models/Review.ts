@@ -1,5 +1,4 @@
 import { ObjectType, Int, Field } from "type-graphql";
-import { ProposalStatus } from "./ProposalModel";
 
 @ObjectType()
 export class Review {
@@ -18,6 +17,9 @@ export class Review {
   @Field(() => Int)
   public grade: number;
 
+  @Field(() => Int)
+  public reviewerID: number;
+
   @Field(() => Int) // TODO use enum here
   public status: number;
 
@@ -35,13 +37,5 @@ export class Review {
     this.comment = comment;
     this.grade = grade;
     this.status = status;
-  }
-
-  reviewer(args: any, context: any) {
-    return context.queries.user.dataSource.get(this.userID);
-  }
-
-  proposal(args: any, context: any) {
-    return context.queries.proposal.dataSource.get(this.proposalID);
   }
 }

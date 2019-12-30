@@ -50,7 +50,8 @@ async function bootstrap() {
   const schema = await buildSchema({
     resolvers: [
       __dirname + "/src/resolvers/**/*Query.ts",
-      __dirname + "/src/resolvers/**/*Mutation.ts"
+      __dirname + "/src/resolvers/**/*Mutation.ts",
+      __dirname + "/src/resolvers/**/*Resolver.ts"
     ]
   });
 

@@ -121,7 +121,7 @@ export default class ProposalMutations {
         }
 
         if (proposerId !== undefined) {
-          proposal.proposer = proposerId;
+          proposal.proposerId = proposerId;
         }
 
         if (answers !== undefined) {

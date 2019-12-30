@@ -42,7 +42,7 @@ export async function resolveProposal(
 
   const proposer = await context.queries.user.getBasic(
     agent,
-    proposal.proposer
+    proposal.proposerId
   );
   if (proposer === null) {
     return rejection("NO_PROPOSER_ON_THE_PROPOSAL");
