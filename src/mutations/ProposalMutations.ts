@@ -52,7 +52,7 @@ export default class ProposalMutations {
 
   async update(
     agent: User | null,
-    id: string,
+    id: number,
     title?: string,
     abstract?: string,
     answers?: ProposalAnswer[],

@@ -7,8 +7,7 @@ export class ProposalQuery {
   async proposal(
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext
-  ) {
-    const proposal = await context.queries.proposal.get(context.user, id);
-    return proposal;
+  ): Promise<Proposal | null> {
+    return await context.queries.proposal.get(context.user, id);
   }
 }

@@ -59,7 +59,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
     const questionary = Questionary.fromObject(questionaryObj);
     const principalInvestigator = await baseContext.queries.user.getBasic(
       user,
-      proposal.proposer
+      proposal.proposerId
     );
     const coProposers = await baseContext.queries.user.getProposers(
       user,

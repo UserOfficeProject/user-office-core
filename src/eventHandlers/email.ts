@@ -106,7 +106,7 @@ export default function createHandler(userDataSource: UserDataSource) {
 
       case "PROPOSAL_SUBMITTED": {
         const principalInvestigator = await userDataSource.get(
-          event.proposal.proposer
+          event.proposal.proposerId
         );
         const participants = await userDataSource.getProposalUsersFull(
           event.proposal.id

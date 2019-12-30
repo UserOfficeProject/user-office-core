@@ -91,9 +91,6 @@ export class QuestionaryField extends ProposalTemplateField {
 
 @ObjectType()
 export class Questionary {
-  @Field()
-  public a: string;
-
   @Field(() => [QuestionaryStep])
   public steps: QuestionaryStep[];
   constructor(steps: QuestionaryStep[]) {
