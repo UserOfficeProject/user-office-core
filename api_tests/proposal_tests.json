@@ -25,6 +25,16 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "77f5be8a-bd02-41c5-b75f-a426f637266b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -363,7 +373,7 @@
 						"exec": [
 							"pm.test(\"Should be able to update user\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateUser.user.position).to.equal(pm.environment.get(\"NEW_USER_POSITION\"));",
+							"    pm.expect(jsonData.data.updateUser.error).to.equal(null);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -751,7 +761,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($topicId: Int!, $dataType: String!) {\n  createTemplateField(topicId: $topicId, dataType: $dataType) {\n    field {\n      proposal_question_id\n      data_type\n      question\n      config\n      topic_id\n    }\n    error\n  }\n}",
+						"query": "mutation ($topicId: Int!, $dataType: DataType!) {\n  createTemplateField(topicId: $topicId, dataType: $dataType) {\n    field {\n      proposal_question_id\n      data_type\n      question\n      config\n      topic_id\n    }\n    error\n  }\n}",
 						"variables": "{\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"dataType\": \"SELECTION_FROM_OPTIONS\"\n    }"
 					}
 				},
@@ -835,7 +845,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($topicId:Int!, $fieldIds:[String]) {\n    updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {\n        error\n    }\n}\n",
+						"query": "mutation($topicId:Int!, $fieldIds:[String!]) {\n    updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {\n        error\n    }\n}\n",
 						"variables": "{\n    \"topicId\": 1,\n    \"fieldIds\": [\n        \"ttl_delivery_date\",\n        \"is_towards_degree\",\n        \"has_links_with_industry\",\n        \"final_delivery_date\",\n        \"ttl_general\",\n        \"final_delivery_date_motivation\",\n        \"pdb_id\"\n    ]\n}\n"
 					}
 				},
@@ -1002,7 +1012,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($id: ID!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  id\n                }\n              }\n            }\n          }",
+						"query": "query($id: Int!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  id\n                }\n              }\n            }\n          }",
 						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
 					}
 				},
@@ -1086,7 +1096,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: ID!, $title: String, $abstract: String, $answers: [ProposalAnswerInput], $users: [Int]) {\n  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput], $users: [Int]) {\n  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"Postman Sample Title\",\n        \"abstract\": \"This proposal was created by automated API test and should not be visible. If you see this there must have been a problem with our API, or API tests.\",\n        \"answers\": []\n    }"
 					}
 				},
@@ -1697,8 +1707,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($reviewID: ID!) {\n  review(id:$reviewID)\n    {\n      id\n    }\n}\n",
-						"variables": "{\n\t\"reviewID\":\"{{NEW_REVIEW_ID}}\"\n}"
+						"query": "query($reviewID: Int!) {\n  review(id:$reviewID)\n    {\n      id\n    }\n}\n",
+						"variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}}\n}"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -1849,7 +1859,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($callID: ID!) {\n  call(id:$callID)\n    {\n      id\n    }\n}\n",
+						"query": "query($callID: Int!) {\n  call(id:$callID)\n    {\n      id\n    }\n}\n",
 						"variables": "{\n\t\"callID\":{{NEW_CALL_ID}}\n}"
 					}
 				},
@@ -2110,8 +2120,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id:String!) {\n  basicUserDetails(id:$id)\n    {\n      id\n      lastname\n      firstname\n    }\n}\n",
-						"variables": "{\n\t\"id\":\"{{NEW_USER_ID}}\"\n}"
+						"query": "query ($id:Int!) {\n  basicUserDetails(id:$id)\n    {\n      id\n      lastname\n      firstname\n    }\n}\n",
+						"variables": "{\n\t\"id\":{{NEW_USER_ID}}\n}"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
