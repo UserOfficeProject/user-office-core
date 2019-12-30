@@ -47,7 +47,7 @@ interface CreateCallArgs {
 }
 
 interface UpdateProposalArgs {
-  id: string;
+  id: number;
   title: string;
   abstract: string;
   answers: ProposalAnswer[];

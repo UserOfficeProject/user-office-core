@@ -69,7 +69,7 @@ export default class ProposalMutations {
         }
 
         // Get proposal information
-        let proposal = await this.dataSource.get(parseInt(id)); //Hacky
+        let proposal = await this.dataSource.get(id); //Hacky
 
         // Check if there is an open call, if not reject
         if (
@@ -111,9 +111,7 @@ export default class ProposalMutations {
         }
 
         if (users !== undefined) {
-          const [err] = await to(
-            this.dataSource.setProposalUsers(parseInt(id), users)
-          );
+          const [err] = await to(this.dataSource.setProposalUsers(id, users));
           if (err) {
             logger.logError(`Could not update users`, { err, id, agent });
             return rejection("INTERNAL_ERROR");
