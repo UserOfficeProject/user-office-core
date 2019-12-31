@@ -7,9 +7,6 @@ export class Review {
   public id: number;
 
   @Field(() => Int)
-  public proposalID: number;
-
-  @Field(() => Int)
   public userID: number;
 
   @Field()
@@ -18,11 +15,11 @@ export class Review {
   @Field(() => Int)
   public grade: number;
 
-  @Field(() => Int)
-  public reviewerID: number;
-
   @Field(() => ProposalStatus)
   public status: ProposalStatus;
+
+  public reviewerID: number;
+  public proposalID: number;
 
   constructor(
     id: number,
