@@ -307,13 +307,14 @@ export default class UserMutations {
         user.updated === decoded.updated &&
         decoded.type === "emailVerification"
       ) {
-        return this.dataSource.setUserEmailVerified(user.id);
+        await this.dataSource.setUserEmailVerified(user.id);
+        return true;
       } else {
-        return false;
+        return rejection("COULD_NOT_VERIFY_USER");
       }
     } catch (error) {
       logger.logException("Could not verify email", error, { token });
-      return false;
+      return rejection("COULD_NOT_VERIFY_USER");
     }
   }
 
