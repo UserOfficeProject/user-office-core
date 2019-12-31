@@ -1,5 +1,4 @@
 import { Review } from "../models/Review";
-import { User } from "../models/User";
 
 export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;

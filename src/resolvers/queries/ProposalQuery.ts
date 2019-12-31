@@ -8,6 +8,6 @@ export class ProposalQuery {
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
-    return await context.queries.proposal.get(context.user, id);
+    return context.queries.proposal.get(context.user, id);
   }
 }

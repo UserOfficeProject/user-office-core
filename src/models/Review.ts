@@ -1,4 +1,5 @@
 import { ObjectType, Int, Field } from "type-graphql";
+import { ProposalStatus } from "./ProposalModel";
 
 @ObjectType()
 export class Review {
@@ -20,8 +21,8 @@ export class Review {
   @Field(() => Int)
   public reviewerID: number;
 
-  @Field(() => Int) // TODO use enum here
-  public status: number;
+  @Field(() => ProposalStatus)
+  public status: ProposalStatus;
 
   constructor(
     id: number,
