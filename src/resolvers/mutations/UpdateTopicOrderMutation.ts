@@ -24,7 +24,7 @@ const wrap = wrapResponse<number[]>(new UpdateTopicOrderResponseWrap());
 @Resolver()
 export class UpdateTopicOrderMutation {
   @Mutation(() => UpdateTopicOrderResponseWrap, { nullable: true })
-  UpdateTopicOrder(
+  updateTopicOrder(
     @Arg("topicOrder", () => [Int]) topicOrder: number[],
     @Ctx() context: ResolverContext
   ) {

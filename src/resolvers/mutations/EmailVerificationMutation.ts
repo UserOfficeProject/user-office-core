@@ -17,7 +17,7 @@ const wrap = wrapResponse<boolean>(new EmailVerificationResponseWrap());
 @Resolver()
 export class EmailVerificationMutation {
   @Mutation(() => EmailVerificationResponseWrap, { nullable: true })
-  EmailVerification(
+  emailVerification(
     @Arg("token") token: string,
     @Ctx() context: ResolverContext
   ) {
