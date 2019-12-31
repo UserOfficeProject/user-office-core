@@ -11,9 +11,6 @@ export class Proposal {
   @Field(() => String, { nullable: true })
   public abstract: string;
 
-  @Field(() => Int, { nullable: true })
-  public proposerId: number;
-
   @Field(() => ProposalStatus)
   public status: ProposalStatus;
 
@@ -25,6 +22,8 @@ export class Proposal {
 
   @Field(() => String, { nullable: true })
   public shortCode: string;
+
+  public proposerId: number;
 
   constructor(
     id: number,

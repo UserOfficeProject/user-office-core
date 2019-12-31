@@ -45,35 +45,35 @@ beforeEach(() => {
 });
 
 test("A user on the proposal can update it's title if it is in edit mode", () => {
-  return expect(tryUpdateProposal(dummyUser, "1")).resolves.toBe(dummyProposal);
+  return expect(tryUpdateProposal(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
 test("A user on the proposal can't update it's title if it is not in edit mode", () => {
-  return expect(tryUpdateProposal(dummyUser, "2")).resolves.toHaveProperty(
+  return expect(tryUpdateProposal(dummyUser, 2)).resolves.toHaveProperty(
     "reason",
     "NOT_ALLOWED_PROPOSAL_SUBMITTED"
   );
 });
 
-test("A userofficer can update a proposal in edit mode", () => {
-  return expect(tryUpdateProposal(dummyUserOfficer, "1")).resolves.toBe(
+test("A user-officer can update a proposal in edit mode", () => {
+  return expect(tryUpdateProposal(dummyUserOfficer, 1)).resolves.toBe(
     dummyProposal
   );
 });
 
-test("A userofficer can update a proposal in submit mode", () => {
-  return expect(tryUpdateProposal(dummyUserOfficer, "2")).resolves.toBe(
+test("A user-officer can update a proposal in submit mode", () => {
+  return expect(tryUpdateProposal(dummyUserOfficer, 2)).resolves.toBe(
     dummyProposalSubmitted
   );
 });
 
 test("A user not on a proposal can not update it", () => {
   return expect(
-    tryUpdateProposal(dummyUserNotOnProposal, "1")
+    tryUpdateProposal(dummyUserNotOnProposal, 1)
   ).resolves.toHaveProperty("reason", "NOT_ALLOWED");
 });
 
-function tryUpdateProposal(user: User, proposalId: string) {
+function tryUpdateProposal(user: User, proposalId: number) {
   return proposalMutations.update(
     user,
     proposalId,
