@@ -5,6 +5,12 @@ import { BasicUserDetails } from "../models/User";
 import { AbstractResponseWrap, wrapResponse } from "./Utils";
 
 @ObjectType()
+export class ResponseWrapBase {
+  @Field(() => String, { nullable: true })
+  public error: string;
+}
+
+@ObjectType()
 export class BasicUserDetailsResponseWrap extends AbstractResponseWrap<
   BasicUserDetails
 > {

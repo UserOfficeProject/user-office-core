@@ -1,16 +1,18 @@
 import {
-  Resolver,
-  ObjectType,
+  Args,
+  ArgsType,
   Ctx,
-  Mutation,
   Field,
   Int,
-  ArgsType,
-  Args
+  Mutation,
+  ObjectType,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { Review } from "../../models/Review";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class AddReviewArgs {
@@ -25,28 +27,24 @@ class AddReviewArgs {
 }
 
 @ObjectType()
-class AddReviewResponseWrap extends AbstractResponseWrap<Review> {
+class AddReviewResponseWrap extends ResponseWrapBase {
+  @Response()
   @Field(() => Review, { nullable: true })
   public review: Review;
-
-  setValue(value: Review): void {
-    this.review = value;
-  }
 }
-
-const wrap = wrapResponse<Review>(new AddReviewResponseWrap());
 
 @Resolver()
 export class AddReviewMutation {
   @Mutation(() => AddReviewResponseWrap, { nullable: true })
   addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
-    return wrap(
+    return wrapResponse<Review>(
       context.mutations.review.submitReview(
         context.user,
         args.reviewID,
         args.comment,
         args.grade
-      )
+      ),
+      AddReviewResponseWrap
     );
   }
 }
