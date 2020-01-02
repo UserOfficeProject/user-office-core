@@ -5,7 +5,7 @@ import { OrcIDInformation } from "../types/OrcIDInformation";
 @Resolver()
 export class GetOrcIDInformationQuery {
   @Query(() => OrcIDInformation, { nullable: true })
-  GetOrcIDInformation(
+  getOrcIDInformation(
     @Arg("authorizationCode") authorizationCode: string,
     @Ctx() context: ResolverContext
   ) {
