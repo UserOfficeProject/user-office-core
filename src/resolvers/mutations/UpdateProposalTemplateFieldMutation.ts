@@ -8,8 +8,7 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { wrapTemplate } from "../wrappers/ProposalTemplateWrapper";
-import { ProposalTemplateResponseWrap } from "./../wrappers/ProposalTemplateWrapper";
+import { ProposalTemplateResponseWrap, wrapTemplate } from "../Wrappers";
 
 @ArgsType()
 class UpdateProposalTemplateFieldArgs {

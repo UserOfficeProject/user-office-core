@@ -3,7 +3,7 @@ import { ResolverContext } from "../../context";
 import {
   BasicUserDetailsResponseWrap,
   wrapBasicUserDetails
-} from "./../wrappers/BasicUserDetailsWrapper";
+} from "../Wrappers";
 
 @ArgsType()
 class ResetPasswordArgs {
