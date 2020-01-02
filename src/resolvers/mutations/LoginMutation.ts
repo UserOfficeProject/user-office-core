@@ -1,27 +1,23 @@
 import {
-  Mutation,
-  Resolver,
-  ObjectType,
-  Field,
-  ArgsType,
   Args,
-  Ctx
+  ArgsType,
+  Ctx,
+  Field,
+  Mutation,
+  ObjectType,
+  Resolver
 } from "type-graphql";
-
 import { ResolverContext } from "../../context";
-import { wrapResponse, AbstractResponseWrap } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ObjectType()
-class LoginResponseWrap extends AbstractResponseWrap<string> {
+class LoginResponseWrap extends ResponseWrapBase<string> {
+  @Response()
   @Field(() => String, { nullable: true })
   public token: string;
-
-  setValue(value: string): void {
-    this.token = value;
-  }
 }
-
-const wrap = wrapResponse<String>(new LoginResponseWrap());
 
 @ArgsType()
 class LoginArgs {
@@ -39,6 +35,9 @@ export class LoginMutation {
     @Args() { email, password }: LoginArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(context.mutations.user.login(email, password));
+    return wrapResponse(
+      context.mutations.user.login(email, password),
+      LoginResponseWrap
+    );
   }
 }

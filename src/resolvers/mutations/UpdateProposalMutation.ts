@@ -1,63 +1,54 @@
 import {
-  Resolver,
-  ObjectType,
-  Ctx,
-  Mutation,
-  Field,
   Args,
   ArgsType,
+  Ctx,
+  Field,
+  InputType,
   Int,
-  InputType
+  Mutation,
+  ObjectType,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalStatus, DataType } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { DataType, ProposalStatus } from "../../models/ProposalModel";
+import { Response } from "../Decorators";
+import { ResponseWrapBase, ProposalResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class UpdateProposalArgs {
-  @Field(type => Int)
+  @Field(() => Int)
   public id: number;
 
-  @Field(type => String, { nullable: true })
+  @Field(() => String, { nullable: true })
   public title?: string;
 
-  @Field(type => String, { nullable: true })
+  @Field(() => String, { nullable: true })
   public abstract?: string;
 
-  @Field(type => [ProposalAnswerInput], { nullable: true })
+  @Field(() => [ProposalAnswerInput], { nullable: true })
   public answers?: ProposalAnswerInput[];
 
-  @Field(type => [Int], { nullable: true })
+  @Field(() => [Int], { nullable: true })
   public topicsCompleted?: number[];
 
-  @Field(type => ProposalStatus, { nullable: true })
+  @Field(() => ProposalStatus, { nullable: true })
   public status?: ProposalStatus;
 
-  @Field(type => [Int], { nullable: true })
+  @Field(() => [Int], { nullable: true })
   public users?: number[];
 
-  @Field(type => Int, { nullable: true })
+  @Field(() => Int, { nullable: true })
   public proposerId?: number;
 
-  @Field(type => Boolean, { nullable: true })
+  @Field(() => Boolean, { nullable: true })
   public partialSave?: boolean;
 }
 
-@ObjectType()
-class UpdateProposalResponseWrap extends AbstractResponseWrap<Proposal> {
-  @Field({ nullable: true })
-  public proposal: Proposal;
-  setValue(value: Proposal): void {
-    this.proposal = value;
-  }
-}
-
-const wrap = wrapResponse<Proposal>(new UpdateProposalResponseWrap());
-
 @Resolver()
 export class UpdateProposalMutation {
-  @Mutation(() => UpdateProposalResponseWrap, { nullable: true })
+  @Mutation(() => ProposalResponseWrap, { nullable: true })
   updateProposal(
     @Args()
     {
@@ -73,7 +64,7 @@ export class UpdateProposalMutation {
     }: UpdateProposalArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
+    return wrapResponse(
       context.mutations.proposal.update(
         context.user,
         id,
@@ -85,7 +76,8 @@ export class UpdateProposalMutation {
         users,
         proposerId,
         partialSave
-      )
+      ),
+      ProposalResponseWrap
     );
   }
 }

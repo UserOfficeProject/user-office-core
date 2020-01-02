@@ -1,19 +1,15 @@
 import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { isRejection } from "../../rejection";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ObjectType()
-class ResetPasswordEmailResponseWrap extends AbstractResponseWrap<any> {
+class ResetPasswordEmailResponseWrap extends ResponseWrapBase<boolean> {
+  @Response()
   @Field(() => Boolean, { nullable: true })
   public success: boolean;
-
-  setValue(value: any): void {
-    this.success = isRejection(value);
-  }
 }
-
-const wrap = wrapResponse<any>(new ResetPasswordEmailResponseWrap());
 
 @Resolver()
 export class ResetPasswordEmailMutation {
@@ -22,6 +18,9 @@ export class ResetPasswordEmailMutation {
     @Arg("email") email: string,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(context.mutations.user.resetPasswordEmail(email));
+    return wrapResponse(
+      context.mutations.user.resetPasswordEmail(email),
+      ResetPasswordEmailResponseWrap
+    );
   }
 }

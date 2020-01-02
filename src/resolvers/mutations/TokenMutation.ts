@@ -1,23 +1,20 @@
 import { Resolver, ObjectType, Arg, Ctx, Mutation, Field } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { wrapResponse, AbstractResponseWrap } from "../Utils";
+import { ResponseWrapBase } from "../Wrappers";
+import { Response } from "../Decorators";
+import { wrapResponse } from "../wrapResponse";
 
 @ObjectType()
-class TokenResponseWrap extends AbstractResponseWrap<string> {
+class TokenResponseWrap extends ResponseWrapBase<string> {
+  @Response()
   @Field()
   public token: String;
-
-  setValue(value: string): void {
-    this.token = value;
-  }
 }
-
-const wrapTokenMutation = wrapResponse<String>(new TokenResponseWrap());
 
 @Resolver()
 export class TokenMutation {
   @Mutation(() => TokenResponseWrap)
   token(@Arg("token") token: string, @Ctx() context: ResolverContext) {
-    return wrapTokenMutation(context.mutations.user.token(token));
+    return wrapResponse(context.mutations.user.token(token), TokenResponseWrap);
   }
 }

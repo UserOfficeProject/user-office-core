@@ -9,7 +9,9 @@ import {
   Args
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
+import { Response } from "../Decorators";
 
 @ArgsType()
 class AddUserRoleArgs {
@@ -21,22 +23,23 @@ class AddUserRoleArgs {
 }
 
 @ObjectType()
-class AddUserRoleResponseWrap extends AbstractResponseWrap<boolean> {
+class AddUserRoleResponseWrap extends ResponseWrapBase<boolean> {
+  @Response()
   @Field({ nullable: true })
   public success: boolean = false;
-  setValue(value: boolean): void {
-    this.success = value;
-  }
 }
-
-const wrap = wrapResponse<boolean>(new AddUserRoleResponseWrap());
 
 @Resolver()
 export class AddUserRoleMutation {
   @Mutation(() => AddUserRoleResponseWrap, { nullable: true })
   addUserRole(@Args() args: AddUserRoleArgs, @Ctx() context: ResolverContext) {
-    return wrap(
-      context.mutations.user.addUserRole(context.user, args.userID, args.roleID)
+    return wrapResponse(
+      context.mutations.user.addUserRole(
+        context.user,
+        args.userID,
+        args.roleID
+      ),
+      AddUserRoleResponseWrap
     );
   }
 }

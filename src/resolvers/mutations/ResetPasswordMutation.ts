@@ -1,9 +1,7 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import {
-  BasicUserDetailsResponseWrap,
-  wrapBasicUserDetails
-} from "../Wrappers";
+import { BasicUserDetailsResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class ResetPasswordArgs {
@@ -21,8 +19,9 @@ export class ResetPasswordMutation {
     @Args() args: ResetPasswordArgs,
     @Ctx() context: ResolverContext
   ) {
-    wrapBasicUserDetails(
-      context.mutations.user.resetPassword(args.token, args.password)
+    wrapResponse(
+      context.mutations.user.resetPassword(args.token, args.password),
+      BasicUserDetailsResponseWrap
     );
   }
 }

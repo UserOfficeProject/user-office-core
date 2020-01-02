@@ -4,8 +4,8 @@ import { getResponseField } from "./Decorators";
 
 export async function wrapResponse<T>(
   executor: Promise<T | Rejection>,
-  ResponseWrapper: new () => ResponseWrapBase
-): Promise<ResponseWrapBase> {
+  ResponseWrapper: new () => ResponseWrapBase<T>
+): Promise<ResponseWrapBase<T>> {
   const result = await executor;
   const wrapper = new ResponseWrapper();
 
@@ -15,7 +15,8 @@ export async function wrapResponse<T>(
       ? (wrapper.error = result.reason)
       : ((wrapper as any)[responseFieldName] = result);
   } else {
-    wrapper.error = "Failed to wrap response";
+    wrapper.error = `No response fields found in '${ResponseWrapper.name}'`;
+    console.error(wrapper.error); // print out for easier debugging, most likely missing @Response() decorator
   }
 
   return wrapper;

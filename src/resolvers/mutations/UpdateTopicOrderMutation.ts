@@ -8,18 +8,16 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ObjectType()
-class UpdateTopicOrderResponseWrap extends AbstractResponseWrap<number[]> {
+class UpdateTopicOrderResponseWrap extends ResponseWrapBase<number[]> {
+  @Response()
   @Field(() => [Int], { nullable: true })
   public topicOrder: number[];
-
-  setValue(value: number[]): void {
-    this.topicOrder = value;
-  }
 }
-const wrap = wrapResponse<number[]>(new UpdateTopicOrderResponseWrap());
 
 @Resolver()
 export class UpdateTopicOrderMutation {
@@ -28,8 +26,9 @@ export class UpdateTopicOrderMutation {
     @Arg("topicOrder", () => [Int]) topicOrder: number[],
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
-      context.mutations.template.updateTopicOrder(context.user, topicOrder)
+    return wrapResponse(
+      context.mutations.template.updateTopicOrder(context.user, topicOrder),
+      UpdateTopicOrderResponseWrap
     );
   }
 }

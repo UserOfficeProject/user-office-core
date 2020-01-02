@@ -1,35 +1,18 @@
-import {
-  Arg,
-  Ctx,
-  Field,
-  Int,
-  Mutation,
-  ObjectType,
-  Resolver
-} from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
-import { Topic } from "./../../models/ProposalModel";
-
-@ObjectType()
-class DeleteTopicResponseWrap extends AbstractResponseWrap<Topic> {
-  @Field(() => Topic)
-  public template: Topic;
-
-  setValue(value: Topic): void {
-    this.template = value;
-  }
-}
-
-const wrap = wrapResponse<Topic>(new DeleteTopicResponseWrap());
+import { ProposalTemplateResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class DeleteTopicMutation {
-  @Mutation(() => DeleteTopicResponseWrap, { nullable: true })
+  @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
   deleteTopic(
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(context.mutations.template.deleteTopic(context.user, id));
+    return wrapResponse(
+      context.mutations.template.deleteTopic(context.user, id),
+      ProposalTemplateResponseWrap
+    );
   }
 }

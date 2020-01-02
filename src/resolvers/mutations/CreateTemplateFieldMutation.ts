@@ -1,32 +1,16 @@
 import {
-  Resolver,
-  ObjectType,
-  Ctx,
-  Mutation,
-  Field,
   Args,
+  ArgsType,
+  Ctx,
+  Field,
   Int,
-  ArgsType
+  Mutation,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
-import { ProposalTemplateField, DataType } from "../../models/ProposalModel";
-
-@ObjectType()
-class CreateTemplateFieldResponseWrap extends AbstractResponseWrap<
-  ProposalTemplateField
-> {
-  @Field({ nullable: true })
-  public field: ProposalTemplateField;
-
-  setValue(value: ProposalTemplateField): void {
-    this.field = value;
-  }
-}
-
-const wrap = wrapResponse<ProposalTemplateField>(
-  new CreateTemplateFieldResponseWrap()
-);
+import { DataType } from "../../models/ProposalModel";
+import { TemplateFieldResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class CreateTemplateFieldArgs {
@@ -39,17 +23,18 @@ class CreateTemplateFieldArgs {
 
 @Resolver()
 export class CreateTemplateFieldMutation {
-  @Mutation(() => CreateTemplateFieldResponseWrap, { nullable: true })
+  @Mutation(() => TemplateFieldResponseWrap, { nullable: true })
   createTemplateField(
     @Args() args: CreateTemplateFieldArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
+    return wrapResponse(
       context.mutations.template.createTemplateField(
         context.user,
         args.topicId,
         args.dataType
-      )
+      ),
+      TemplateFieldResponseWrap
     );
   }
 }

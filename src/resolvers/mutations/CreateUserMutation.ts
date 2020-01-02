@@ -1,16 +1,8 @@
-import {
-  Mutation,
-  Args,
-  Ctx,
-  Resolver,
-  ObjectType,
-  Field,
-  ArgsType
-} from "type-graphql";
+import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { isRejection } from "../../rejection";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
-import { User } from "../../models/User";
+import { UserResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 export class CreateUserArgs {
@@ -72,18 +64,6 @@ export class CreateUserArgs {
   public otherOrganisation?: string;
 }
 
-@ObjectType()
-class UserResponseWrap extends AbstractResponseWrap<User> {
-  @Field(() => User, { nullable: true })
-  public user: User;
-
-  setValue(value: User): void {
-    this.user = value;
-  }
-}
-
-const wrap = wrapResponse<User>(new UserResponseWrap());
-
 @Resolver()
 export class CreateUserMutation {
   @Mutation(() => UserResponseWrap)
@@ -93,8 +73,9 @@ export class CreateUserMutation {
   ) {
     const res = await context.mutations.user.create(args);
 
-    return wrap(
-      isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user)
+    return wrapResponse(
+      isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user),
+      UserResponseWrap
     );
   }
 }

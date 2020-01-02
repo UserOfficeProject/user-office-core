@@ -1,15 +1,17 @@
 import {
-  Resolver,
+  Args,
+  ArgsType,
   Ctx,
-  Mutation,
   Field,
   Int,
-  ArgsType,
-  Args,
-  ObjectType
+  Mutation,
+  ObjectType,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class UpdateFieldTopicRelArgs {
@@ -21,30 +23,26 @@ class UpdateFieldTopicRelArgs {
 }
 
 @ObjectType()
-class UpdateFieldTopicRelResponseWrap extends AbstractResponseWrap<string[]> {
+class UpdateFieldTopicRelResponseWrap extends ResponseWrapBase<string[]> {
+  @Response()
   @Field(() => [String], { nullable: true })
   public result: string[];
-
-  setValue(value: string[]): void {
-    this.result = value;
-  }
 }
-
-const wrap = wrapResponse<string[]>(new UpdateFieldTopicRelResponseWrap());
 
 @Resolver()
 export class UpdateFieldTopicRelMutation {
-  @Mutation(() => AbstractResponseWrap)
+  @Mutation(() => UpdateFieldTopicRelResponseWrap)
   updateFieldTopicRel(
     @Args() args: UpdateFieldTopicRelArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
+    return wrapResponse(
       context.mutations.template.updateFieldTopicRel(
         context.user,
         args.topic_id,
         args.field_ids
-      )
+      ),
+      UpdateFieldTopicRelResponseWrap
     );
   }
 }

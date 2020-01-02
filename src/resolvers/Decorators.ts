@@ -18,15 +18,15 @@ export function Response(): (target: object, propertyKey: string) => void {
 export function getResponseField(origin: any): string | null {
   const responseFields = getResponseFields(origin);
   const keys = Object.keys(responseFields);
-  if (keys.length === 1) {
+  if (keys.length !== 1) {
     // response wrapper must have one and only one key decorated with @Response
-    return keys[0];
+    return null;
   }
-  return null;
+  return keys[0];
 }
 
 function getResponseFields(origin: any): object {
-  const properties: string[] = Reflect.getMetadata(metadataKey, origin);
+  const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
   const result: any = {};
   properties.forEach(key => (result[key] = origin[key]));
   return result;

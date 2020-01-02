@@ -1,27 +1,15 @@
 import {
-  Resolver,
-  Ctx,
-  Mutation,
-  ObjectType,
-  Field,
   Args,
   ArgsType,
-  Int
+  Ctx,
+  Field,
+  Int,
+  Mutation,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { wrapResponse, AbstractResponseWrap } from "../Utils";
-import { User } from "../../models/User";
-
-@ObjectType()
-class UpdateUserResponseWrap extends AbstractResponseWrap<User> {
-  @Field(() => User, { nullable: true })
-  public user: User;
-  setValue(value: User): void {
-    this.user = value;
-  }
-}
-
-const wrap = wrapResponse<User>(new UpdateUserResponseWrap());
+import { UserResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 export class UpdateUserArgs {
@@ -88,8 +76,11 @@ export class UpdateUserArgs {
 
 @Resolver()
 export class UpdateUserMutation {
-  @Mutation(() => UpdateUserResponseWrap)
+  @Mutation(() => UserResponseWrap)
   updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
-    return wrap(context.mutations.user.update(context.user, args));
+    return wrapResponse(
+      context.mutations.user.update(context.user, args),
+      UserResponseWrap
+    );
   }
 }

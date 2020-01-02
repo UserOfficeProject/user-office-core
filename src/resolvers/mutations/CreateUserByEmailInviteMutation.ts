@@ -9,7 +9,9 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { Response } from "../Decorators";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class CreateUserByEmailInviteArgs {
@@ -24,20 +26,14 @@ class CreateUserByEmailInviteArgs {
 }
 
 @ObjectType()
-class CreateUserByEmailInviteResponseWrap extends AbstractResponseWrap<{
+class CreateUserByEmailInviteResponseWrap extends ResponseWrapBase<{
   userId: number;
   inviterId: number;
 }> {
+  @Response()
   @Field(() => Int, { nullable: true })
   public id: number;
-  setValue(value: { userId: number; inviterId: number }): void {
-    this.id = value.userId;
-  }
 }
-
-const wrap = wrapResponse<{ userId: number; inviterId: number }>(
-  new CreateUserByEmailInviteResponseWrap()
-);
 
 @Resolver()
 export class CreateUserByEmailInviteMutation {
@@ -46,13 +42,14 @@ export class CreateUserByEmailInviteMutation {
     @Args() args: CreateUserByEmailInviteArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
+    return wrapResponse(
       context.mutations.user.createUserByEmailInvite(
         context.user,
         args.firstname,
         args.lastname,
         args.email
-      )
+      ),
+      CreateUserByEmailInviteResponseWrap
     );
   }
 }

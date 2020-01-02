@@ -1,24 +1,15 @@
-import { Resolver, ObjectType, Ctx, Mutation, Field } from "type-graphql";
+import { Ctx, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Proposal } from "../../models/Proposal";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
-
-@ObjectType()
-class CreateProposalResponseWrap extends AbstractResponseWrap<Proposal> {
-  @Field(() => Proposal, { nullable: true })
-  public proposal: Proposal;
-
-  setValue(value: Proposal): void {
-    this.proposal = value;
-  }
-}
-
-const wrap = wrapResponse<Proposal>(new CreateProposalResponseWrap());
+import { wrapResponse } from "../wrapResponse";
+import { ProposalResponseWrap } from "../Wrappers";
 
 @Resolver()
 export class CreateProposalMutation {
-  @Mutation(() => CreateProposalResponseWrap, { nullable: true })
+  @Mutation(() => ProposalResponseWrap, { nullable: true })
   createProposal(@Ctx() context: ResolverContext) {
-    return wrap(context.mutations.proposal.create(context.user));
+    return wrapResponse(
+      context.mutations.proposal.create(context.user),
+      ProposalResponseWrap
+    );
   }
 }

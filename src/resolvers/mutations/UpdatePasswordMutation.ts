@@ -1,29 +1,15 @@
 import {
-  Resolver,
-  ObjectType,
-  Ctx,
-  Mutation,
-  Field,
+  Args,
   ArgsType,
+  Ctx,
+  Field,
   Int,
-  Args
+  Mutation,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { wrapResponse, AbstractResponseWrap } from "../Utils";
-import { BasicUserDetails } from "../../models/User";
-
-@ObjectType()
-class UpdatePasswordResponseWrap extends AbstractResponseWrap<
-  BasicUserDetails
-> {
-  @Field({ nullable: true })
-  public user: BasicUserDetails;
-  setValue(value: BasicUserDetails): void {
-    this.user = value;
-  }
-}
-
-const wrap = wrapResponse<BasicUserDetails>(new UpdatePasswordResponseWrap());
+import { BasicUserDetailsResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class UpdatePasswordArguments {
@@ -35,13 +21,14 @@ class UpdatePasswordArguments {
 }
 @Resolver()
 export class UpdatePasswordMutations {
-  @Mutation(() => UpdatePasswordResponseWrap)
+  @Mutation(() => BasicUserDetailsResponseWrap)
   updatePassword(
     @Args() { id, password }: UpdatePasswordArguments,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
-      context.mutations.user.updatePassword(context.user, id, password)
+    return wrapResponse(
+      context.mutations.user.updatePassword(context.user, id, password),
+      BasicUserDetailsResponseWrap
     );
   }
 }

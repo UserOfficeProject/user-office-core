@@ -8,7 +8,8 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalTemplateResponseWrap, wrapTemplate } from "../Wrappers";
+import { ProposalTemplateResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 class UpdateProposalTemplateFieldArgs {
@@ -45,7 +46,7 @@ export class UpdateProposalTemplateFieldMutation {
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext
   ) {
-    wrapTemplate(
+    wrapResponse(
       context.mutations.template.updateProposalTemplateField(
         context.user,
         args.id,
@@ -55,7 +56,8 @@ export class UpdateProposalTemplateFieldMutation {
         undefined,
         args.config,
         args.dependencies
-      )
+      ),
+      ProposalTemplateResponseWrap
     );
   }
 }

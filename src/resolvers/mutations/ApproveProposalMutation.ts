@@ -1,6 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalResponseWrap, proposalWrap } from "../Wrappers";
+import { ProposalResponseWrap } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class ApproveProposalMutation {
@@ -9,6 +10,9 @@ export class ApproveProposalMutation {
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    proposalWrap(context.mutations.proposal.accept(context.user, id));
+    wrapResponse(
+      context.mutations.proposal.accept(context.user, id),
+      ProposalResponseWrap
+    );
   }
 }

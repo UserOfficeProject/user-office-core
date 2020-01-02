@@ -1,18 +1,15 @@
-import { Resolver, ObjectType, Ctx, Mutation, Field, Arg } from "type-graphql";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
+import { Response } from "../Decorators";
 
 @ObjectType()
-class EmailVerificationResponseWrap extends AbstractResponseWrap<boolean> {
+class EmailVerificationResponseWrap extends ResponseWrapBase<boolean> {
+  @Response()
   @Field({ nullable: true })
   public success: boolean;
-
-  setValue(value: boolean): void {
-    this.success = value;
-  }
 }
-
-const wrap = wrapResponse<boolean>(new EmailVerificationResponseWrap());
 
 @Resolver()
 export class EmailVerificationMutation {
@@ -21,6 +18,9 @@ export class EmailVerificationMutation {
     @Arg("token") token: string,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(context.mutations.user.emailVerification(token));
+    return wrapResponse(
+      context.mutations.user.emailVerification(token),
+      EmailVerificationResponseWrap
+    );
   }
 }

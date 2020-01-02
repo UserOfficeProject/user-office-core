@@ -1,15 +1,17 @@
 import {
+  Args,
+  ArgsType,
   Ctx,
   Field,
   Int,
   Mutation,
-  Resolver,
-  ArgsType,
-  Args,
-  ObjectType
+  ObjectType,
+  Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { AbstractResponseWrap, wrapResponse } from "../Utils";
+import { ResponseWrapBase } from "../Wrappers";
+import { wrapResponse } from "../wrapResponse";
+import { Response } from "../Decorators";
 
 @ArgsType()
 class UpdateProposalFilesArgs {
@@ -24,16 +26,11 @@ class UpdateProposalFilesArgs {
 }
 
 @ObjectType()
-class UpdateProposalFilesResponseWrap extends AbstractResponseWrap<string[]> {
+class UpdateProposalFilesResponseWrap extends ResponseWrapBase<string[]> {
+  @Response()
   @Field(() => [String])
   public files: string[];
-
-  setValue(value: string[]): void {
-    this.files = value;
-  }
 }
-
-const wrap = wrapResponse<string[]>(new UpdateProposalFilesResponseWrap());
 
 @Resolver()
 export class UpdateProposalFilesMutation {
@@ -42,13 +39,14 @@ export class UpdateProposalFilesMutation {
     @Args() { proposal_id, question_id, files }: UpdateProposalFilesArgs,
     @Ctx() context: ResolverContext
   ) {
-    return wrap(
+    return wrapResponse(
       context.mutations.proposal.updateFiles(
         context.user,
         proposal_id,
         question_id,
         files
-      )
+      ),
+      UpdateProposalFilesResponseWrap
     );
   }
 }
