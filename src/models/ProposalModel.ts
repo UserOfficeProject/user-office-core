@@ -1,5 +1,4 @@
 import { EvaluatorOperator } from "./ConditionEvaluator";
-import { ObjectType, Field, Int, registerEnumType } from "type-graphql";
 
 export class ProposalTemplateField {
   constructor(
@@ -73,10 +72,6 @@ export enum DataType {
   SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
   TEXT_INPUT = "TEXT_INPUT"
 }
-
-registerEnumType(DataType, {
-  name: "DataType"
-});
 
 export class Topic {
   constructor(
@@ -174,8 +169,6 @@ export enum ProposalStatus {
   ACCEPTED = 2,
   REJECTED = 3
 }
-
-registerEnumType(ProposalStatus, { name: "ProposalStatus" });
 
 export interface ProposalAnswer {
   proposal_question_id: string;

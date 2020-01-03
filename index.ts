@@ -1,10 +1,11 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
+import graphqlHTTP, { RequestInfo } from "express-graphql";
 import "reflect-metadata";
+import { buildSchema, registerEnumType } from "type-graphql";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
 import { logger } from "./src/utils/Logger";
-import graphqlHTTP, { RequestInfo } from "express-graphql";
-import { buildSchema } from "type-graphql";
+import { registerEnums } from "./src/resolvers/registerEnums";
 
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");
@@ -44,6 +45,8 @@ async function bootstrap() {
       return res.sendStatus(400);
     }
   );
+
+  registerEnums();
 
   app.use(cookieParser());
 
