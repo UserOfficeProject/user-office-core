@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
+import { ProposalStatus } from "../models/ProposalModel";
 
 export function useProposalsData(filter: string) {
   const sendRequest = useDataAPI<any>();
@@ -30,7 +31,8 @@ export function useProposalsData(filter: string) {
               id: proposal.id,
               shortCode: proposal.shortCode,
               title: proposal.title,
-              status: proposal.status === 0 ? "Open" : "Submitted",
+              status:
+                proposal.status === ProposalStatus.DRAFT ? "Open" : "Submitted"
             };
           })
         );
