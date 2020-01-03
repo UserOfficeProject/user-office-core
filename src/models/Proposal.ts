@@ -11,7 +11,7 @@ export class Proposal {
   @Field(() => String, { nullable: true })
   public abstract: string;
 
-  @Field(() => ProposalStatus)
+  @Field(() => Int)
   public status: ProposalStatus;
 
   @Field(() => Date, { nullable: true })
