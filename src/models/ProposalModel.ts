@@ -266,7 +266,9 @@ export class FieldCondition {
 export enum ProposalStatus {
   BLANK = -1,
   DRAFT = 0,
-  SUBMITTED = 1
+  SUBMITTED = 1,
+  ACCEPTED = 2,
+  REJECTED = 3
 }
 
 registerEnumType(ProposalStatus, { name: "ProposalStatus" });
