@@ -206,7 +206,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
     topicOrder.forEach(async (topicId, index) => {
-      database("proposal_topics")
+      return database("proposal_topics")
         .update({ sort_order: index })
         .where({ topic_id: topicId });
     });
