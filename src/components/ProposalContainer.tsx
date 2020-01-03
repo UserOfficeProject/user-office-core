@@ -102,7 +102,7 @@ export default function ProposalContainer(props: {
     return clamp(step, 0, proposalSteps.length - 1);
   };
   /**
-   * Returns true if reset was peformed, false otherwise
+   * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
@@ -185,13 +185,12 @@ export default function ProposalContainer(props: {
       .reverse()
       .find(step => step.completed === true);
 
-    setStepIndex(
-      clamp(
-        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
-        0,
-        proposalSteps.length - 1
-      )
+    const wrongValue = clamp(
+      lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
+      0,
+      proposalSteps.length - 1
     );
+    setStepIndex(wrongValue);
   }, [proposalInfo, isSubmitted]);
 
   const getStepContent = (step: number) => {

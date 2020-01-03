@@ -23,8 +23,8 @@ export function useUpdateProposal() {
       partialSave?: boolean;
     }) => {
       const query = `
-      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $status:Int, $users:[Int!], $proposerId:Int, $partialSave:Boolean) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, status:$status, users:$users, proposerId:$proposerId, partialSave:$partialSave){
+      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $users:[Int!], $proposerId:Int, $partialSave:Boolean) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users, proposerId:$proposerId, partialSave:$partialSave){
          proposal{
           id
         }

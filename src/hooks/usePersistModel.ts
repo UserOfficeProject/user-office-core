@@ -70,7 +70,7 @@ export function usePersistModel() {
 
   const updateTopicOrder = async (topicOrder: number[]) => {
     const mutation = `
-    mutation($topicOrder:[Int]!) {
+    mutation($topicOrder:[Int!]!) {
       updateTopicOrder(topicOrder:$topicOrder) {
         error
       }
