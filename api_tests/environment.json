@@ -9,56 +9,66 @@
 		},
 		{
 			"key": "NEW_CALL_ID",
-			"value": 54,
+			"value": 106,
 			"enabled": true
 		},
 		{
 			"key": "NEW_USER_ID",
-			"value": 42,
+			"value": 29,
 			"enabled": true
 		},
 		{
 			"key": "NEW_PROPOSAL_ID",
-			"value": 20,
+			"value": 29,
 			"enabled": true
 		},
 		{
 			"key": "NEW_USER_TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjozMiwidXNlcl90aXRsZSI6Ik1zLiIsImZpcnN0bmFtZSI6IkFndXN0aW4iLCJtaWRkbGVuYW1lIjpudWxsLCJsYXN0bmFtZSI6IlNjaHVtbSIsInVzZXJuYW1lIjoiQWd1c3Rpbi5TY2h1bW0uZmVlNDM2YWYtM2YxZC00ZTJlLThiNjUtNWVhZTUyMjRlNjAzIiwicHJlZmVycmVkbmFtZSI6IkFndXN0aW4iLCJvcmNpZCI6ImZlZTQzNmFmLTNmMWQtNGUyZS04YjY1LTVlYWU1MjI0ZTYwMyIsInJlZnJlc2hUb2tlbiI6IiIsImdlbmRlciI6ImZlbWFsZSIsIm5hdGlvbmFsaXR5Ijo5LCJiaXJ0aGRhdGUiOiIxOTk5LTEyLTMxVDIzOjAwOjAwLjAwMFoiLCJvcmdhbmlzYXRpb24iOjcsImRlcGFydG1lbnQiOiJRQSIsInBvc2l0aW9uIjoiTGVhZCBDb21tdW5pY2F0aW9ucyBTdXBlcnZpc29yIiwiZW1haWwiOiJKdXN0aW5hX1B1cmR5QGhvdG1haWwuY29tIiwiZW1haWxWZXJpZmllZCI6dHJ1ZSwidGVsZXBob25lIjoiMTQ3LTE4OC03ODE2IiwidGVsZXBob25lX2FsdCI6bnVsbCwicGxhY2Vob2xkZXIiOmZhbHNlLCJjcmVhdGVkIjoiMjAxOS0xMi0yN1QxMTozOTo0Ny45NjBaIiwidXBkYXRlZCI6IjIwMTktMTItMjdUMTE6Mzk6NDcuOTg0WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3NzQ0NjgwMCwiZXhwIjoxNTc4MDUxNjAwfQ.xVemev0nWWXs_ikAkpUuxKzPZ6i7e0PDfyiWbbXfGTs",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyOSwidXNlcl90aXRsZSI6Ik1zLiIsImZpcnN0bmFtZSI6Ik1pZ3VlbCIsIm1pZGRsZW5hbWUiOm51bGwsImxhc3RuYW1lIjoiUGFkYmVyZyIsInVzZXJuYW1lIjoiTWlndWVsLlBhZGJlcmcuNTNiYTM2NDAtZDEyNi00OWM5LTliNTItMWYzYmQzYmNiZDY1IiwicHJlZmVycmVkbmFtZSI6Ik1pZ3VlbCIsIm9yY2lkIjoiNTNiYTM2NDAtZDEyNi00OWM5LTliNTItMWYzYmQzYmNiZDY1IiwicmVmcmVzaFRva2VuIjoiIiwiZ2VuZGVyIjoiZmVtYWxlIiwibmF0aW9uYWxpdHkiOjksImJpcnRoZGF0ZSI6IjE5OTktMTItMzFUMjM6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6NywiZGVwYXJ0bWVudCI6IlFBIiwicG9zaXRpb24iOiJDb3Jwb3JhdGUgT3BlcmF0aW9ucyBEZXZlbG9wZXIiLCJlbWFpbCI6IkthaXRseW5fQmVyZ3N0cm9tQGhvdG1haWwuY29tIiwiZW1haWxWZXJpZmllZCI6dHJ1ZSwidGVsZXBob25lIjoiNjU0LTAwNS03Nzg4IiwidGVsZXBob25lX2FsdCI6bnVsbCwicGxhY2Vob2xkZXIiOmZhbHNlLCJjcmVhdGVkIjoiMjAyMC0wMS0wM1QxMjoxNjoxMS40NTRaIiwidXBkYXRlZCI6IjIwMjAtMDEtMDNUMTI6MTY6MTEuNDcyWiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3ODA1Mzc3NSwiZXhwIjoxNTc4NjU4NTc1fQ.V6fGJkfXZ88_QCoT0MwpgyDOwCDf2a0QgIFLiB6rGl0",
 			"enabled": true
 		},
 		{
 			"key": "NEW_USER_EMAIL",
-			"value": "Prudence_Schamberger@hotmail.com",
+			"value": "Kaitlyn_Bergstrom@hotmail.com",
 			"enabled": true
 		},
 		{
 			"key": "NEW_USER_POSITION",
-			"value": "{{$randomJobType}}",
+			"value": "Sales manager",
 			"enabled": true
 		},
 		{
 			"key": "PAGE_CONTENT",
-			"value": null,
+			"value": "Lorem ipsum dolor amet",
 			"enabled": true
 		},
 		{
 			"key": "NEW_REVIEW_ID",
-			"value": 65,
+			"value": 21,
 			"enabled": true
 		},
 		{
 			"key": "NEW_TOPIC_ID",
-			"value": 26,
+			"value": 32,
 			"enabled": true
 		},
 		{
 			"key": "NEW_FIELD_ID",
-			"value": "selection_from_options_1577457253719",
+			"value": "file_upload_1578053789186",
+			"enabled": true
+		},
+		{
+			"key": "NEW_PROPOSAL_TITLE",
+			"value": "This is a test proposal",
+			"enabled": true
+		},
+		{
+			"key": "NEW_PROPOSAL_ABSTRACT",
+			"value": "This is a test abstract",
 			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2019-12-30T08:47:42.589Z",
+	"_postman_exported_at": "2020-01-03T18:19:09.064Z",
 	"_postman_exported_using": "Postman/7.14.0"
 }
