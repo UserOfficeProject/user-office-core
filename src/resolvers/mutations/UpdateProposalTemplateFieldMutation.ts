@@ -42,11 +42,11 @@ class FieldDependencyInput {
 @Resolver()
 export class UpdateProposalTemplateFieldMutation {
   @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
-  UpdateProposalTemplateField(
+  updateProposalTemplateField(
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext
   ) {
-    wrapResponse(
+    return wrapResponse(
       context.mutations.template.updateProposalTemplateField(
         context.user,
         args.id,

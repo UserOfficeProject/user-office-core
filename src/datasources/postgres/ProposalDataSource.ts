@@ -332,7 +332,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       steps.push(
         new QuestionaryStep(
           createTopicObject(topic),
-          topic.is_complete,
+          topic.is_complete || false,
           fields.filter(field => field.topic_id === topic.topic_id)
         )
       );

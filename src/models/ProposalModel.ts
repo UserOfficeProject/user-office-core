@@ -210,7 +210,7 @@ export class QuestionaryStep {
   static fromObject(obj: any): QuestionaryStep | undefined {
     return new QuestionaryStep(
       Topic.fromObject(obj.topic),
-      obj.isCompleted,
+      obj.isCompleted || false,
       obj.fields
         ? obj.fields.map((fieldObj: any) =>
             QuestionaryField.fromObject(fieldObj)
