@@ -1,6 +1,6 @@
 import { Query, Arg, Ctx, Resolver, Int } from "type-graphql";
-import { BasicUserDetails } from "../../models/User";
 import { ResolverContext } from "../../context";
+import { BasicUserDetails } from "../types/BasicUserDetails";
 
 @Resolver()
 export class BasicUserDetailsQuery {

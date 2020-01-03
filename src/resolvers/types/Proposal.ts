@@ -10,11 +10,11 @@ import {
 import { ResolverContext } from "../../context";
 import { Proposal as ProposalOrigin } from "../../models/Proposal";
 
-import { BasicUserDetails } from "../../models/User";
 import { isRejection } from "../../rejection";
 import { ProposalStatus } from "../../models/ProposalModel";
 import { Questionary } from "./Questionary";
 import { Review } from "./Review";
+import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
 export class Proposal implements Partial<ProposalOrigin> {
@@ -40,26 +40,6 @@ export class Proposal implements Partial<ProposalOrigin> {
   public shortCode: string;
 
   public proposerId: number;
-
-  constructor(
-    id: number,
-    title: string,
-    abstract: string,
-    proposerId: number,
-    status: ProposalStatus,
-    created: Date,
-    updated: Date,
-    shortCode: string
-  ) {
-    this.id = id;
-    this.title = title;
-    this.abstract = abstract;
-    this.proposerId = proposerId;
-    this.status = status;
-    this.created = created;
-    this.updated = updated;
-    this.shortCode = shortCode;
-  }
 }
 
 @Resolver(of => Proposal)

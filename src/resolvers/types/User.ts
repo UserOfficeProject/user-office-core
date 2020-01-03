@@ -9,9 +9,9 @@ import {
 } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { User as UserOrigin } from "../../models/User";
-import { Role } from "../../models/Role";
 import { Proposal } from "./Proposal";
 import { Review } from "./Review";
+import { Role } from "./Role";
 
 @ObjectType()
 export class User implements Partial<UserOrigin> {

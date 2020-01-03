@@ -1,6 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
 
-import { BasicUserDetails } from "../../models/User";
 import { Response } from "../Decorators";
 import { User } from "./User";
 import { Page } from "./Admin";
@@ -10,6 +9,7 @@ import { Topic } from "./Topic";
 import { ProposalTemplateField } from "./ProposalTemplateField";
 import { ProposalTemplate } from "./ProposalTemplate";
 import { Review } from "./Review";
+import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
 export class ResponseWrapBase<T> {

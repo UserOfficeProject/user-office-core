@@ -30,34 +30,15 @@ export class User {
   ) {}
 }
 
-@ObjectType()
 export class BasicUserDetails {
-  @Field(type => Int)
-  public id: number;
-  @Field()
-  public firstname: string;
-  @Field()
-  public lastname: string;
-  @Field()
-  public organisation: string;
-  @Field()
-  public position: string;
-
   constructor(
-    id: number,
-    firstname: string,
-    lastname: string,
-    organisation: string,
-    position: string
-  ) {
-    this.id = id;
-    this.firstname = firstname;
-    this.lastname = lastname;
-    this.organisation = organisation;
-    this.position = position;
-  }
+    public id: number,
+    public firstname: string,
+    public lastname: string,
+    public organisation: string,
+    public position: string
+  ) {}
 }
-
 export function checkUserArgs(args: UpdateUserArgs) {
   const { firstname, lastname } = args;
   if (firstname && firstname.length < 2) {
