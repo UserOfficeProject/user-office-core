@@ -28,9 +28,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function RoleSelectionPage() {
   const classes = useStyles();
-  const { user, currentRole, handleRole } = useContext(UserContext);
-  console.log(user);
-  if (!user) {
+  const { roles, currentRole, handleRole } = useContext(UserContext);
+  if (!roles) {
     return <Redirect to="/SignIn" />;
   }
   if (currentRole) {
@@ -44,7 +43,7 @@ export default function RoleSelectionPage() {
           <Grid item xs={12}>
             <Paper className={classes.paper}>Select role: </Paper>
           </Grid>
-          {user.roles.map(role => (
+          {roles.map(role => (
             <Grid item xs={6} onClick={() => handleRole(role.shortCode)}>
               <Paper className={classes.paper}>{role.title}</Paper>
             </Grid>
