@@ -93,7 +93,7 @@ export function usePersistModel() {
 
   const updateItem = async (field: ProposalTemplateField) => {
     const mutation = `
-    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
+    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
         template {
           steps {
