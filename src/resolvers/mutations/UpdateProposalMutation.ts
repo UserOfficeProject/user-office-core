@@ -33,9 +33,6 @@ class UpdateProposalArgs {
   @Field(() => [Int], { nullable: true })
   public topicsCompleted?: number[];
 
-  @Field(() => ProposalStatus, { nullable: true })
-  public status?: ProposalStatus;
-
   @Field(() => [Int], { nullable: true })
   public users?: number[];
 
@@ -57,7 +54,6 @@ export class UpdateProposalMutation {
       abstract,
       answers,
       topicsCompleted,
-      status,
       users,
       proposerId,
       partialSave
@@ -72,7 +68,6 @@ export class UpdateProposalMutation {
         abstract,
         answers,
         topicsCompleted,
-        status,
         users,
         proposerId,
         partialSave

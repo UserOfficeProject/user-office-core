@@ -57,7 +57,6 @@ export default class ProposalMutations {
     abstract?: string,
     answers?: ProposalAnswer[],
     topicsCompleted?: number[],
-    status?: number,
     users?: number[],
     proposerId?: number,
     partialSave?: boolean
@@ -104,10 +103,6 @@ export default class ProposalMutations {
 
         if (abstract !== undefined) {
           proposal.abstract = abstract;
-        }
-
-        if (status !== undefined) {
-          proposal.status = status;
         }
 
         if (users !== undefined) {
