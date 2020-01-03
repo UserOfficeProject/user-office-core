@@ -70,7 +70,7 @@
     "@types/react-router-dom": "^4.3.5",
     "@types/react-test-renderer": "^16.9.1",
     "@types/yup": "^0.26.26",
-    "cypress": "^3.8.0",
+    "cypress": "^3.8.1",
     "faker": "^4.1.0",
     "react-test-renderer": "^16.12.0"
   }
