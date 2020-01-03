@@ -1,7 +1,7 @@
 import { Ctx, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { wrapResponse } from "../wrapResponse";
-import { ProposalResponseWrap } from "../Wrappers";
+import { ProposalResponseWrap } from "../types/CommonWrappers";
 
 @Resolver()
 export class CreateProposalMutation {

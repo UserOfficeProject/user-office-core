@@ -13,7 +13,10 @@ import { ResolverContext } from "../../context";
 import { Proposal } from "../../models/Proposal";
 import { DataType, ProposalStatus } from "../../models/ProposalModel";
 import { Response } from "../Decorators";
-import { ResponseWrapBase, ProposalResponseWrap } from "../Wrappers";
+import {
+  ResponseWrapBase,
+  ProposalResponseWrap
+} from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()

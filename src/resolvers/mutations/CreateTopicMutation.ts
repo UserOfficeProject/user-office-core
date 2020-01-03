@@ -1,7 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { wrapResponse } from "../wrapResponse";
-import { ProposalTemplateResponseWrap } from "../Wrappers";
+import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
 
 @Resolver()
 export class CreateTopicMutation {

@@ -1,5 +1,5 @@
 import { Rejection, isRejection } from "../rejection";
-import { ResponseWrapBase } from "./Wrappers";
+import { ResponseWrapBase } from "./types/CommonWrappers";
 import { getResponseField } from "./Decorators";
 
 export async function wrapResponse<T>(

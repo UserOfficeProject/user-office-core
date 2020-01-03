@@ -8,7 +8,7 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalTemplateResponseWrap } from "../Wrappers";
+import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()

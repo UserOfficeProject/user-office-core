@@ -1,6 +1,6 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { BasicUserDetailsResponseWrap } from "../Wrappers";
+import { BasicUserDetailsResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()

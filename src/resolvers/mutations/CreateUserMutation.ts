@@ -9,7 +9,7 @@ import {
 } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { isRejection } from "../../rejection";
-import { UserResponseWrap } from "../Wrappers";
+import { UserResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
