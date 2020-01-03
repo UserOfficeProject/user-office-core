@@ -1,4 +1,12 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Mutation,
+  Resolver,
+  Int
+} from "type-graphql";
 import { ResolverContext } from "../../context";
 import { isRejection } from "../../rejection";
 import { UserResponseWrap } from "../Wrappers";
@@ -36,13 +44,13 @@ export class CreateUserArgs {
   @Field()
   public gender: string;
 
-  @Field()
+  @Field(() => Int)
   public nationality: number;
 
   @Field()
   public birthdate: string;
 
-  @Field()
+  @Field(() => Int)
   public organisation: number;
 
   @Field()
