@@ -185,12 +185,13 @@ export default function ProposalContainer(props: {
       .reverse()
       .find(step => step.completed === true);
 
-    const wrongValue = clamp(
-      lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
-      0,
-      proposalSteps.length - 1
+    setStepIndex(
+      clamp(
+        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
+        0,
+        proposalSteps.length - 1
+      )
     );
-    setStepIndex(wrongValue);
   }, [proposalInfo, isSubmitted]);
 
   const getStepContent = (step: number) => {
