@@ -11,7 +11,11 @@ import {
 } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { QuestionaryStep, Questionary } from "../../models/ProposalModel";
+import {
+  QuestionaryStep,
+  Questionary,
+  ProposalStatus
+} from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
 import { Transaction } from "knex";
 
@@ -50,13 +54,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 1);
+    return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
   async acceptProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 2);
+    return this.setStatusProposal(id, ProposalStatus.ACCEPTED);
   }
   async rejectProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 3);
+    return this.setStatusProposal(id, ProposalStatus.REJECTED);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
