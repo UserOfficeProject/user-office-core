@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 
 export function useCreateUserInvite() {
-  const sendRequest = useDataAPI<{createUserByEmailInvite:number}>();
+  const sendRequest = useDataAPI<{
+    createUserByEmailInvite: { error: string; id: number };
+  }>();
   const [loading, setLoading] = useState(true);
   const createUserInvite = async (
     firstname: string,
