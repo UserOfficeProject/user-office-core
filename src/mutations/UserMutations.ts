@@ -192,10 +192,7 @@ export default class UserMutations {
     }
     user = {
       ...user,
-      ...args,
-      roles: user.roles,
-      reviews: user.reviews,
-      proposals: user.proposals
+      ...args
     };
 
     if (args.roles !== undefined) {

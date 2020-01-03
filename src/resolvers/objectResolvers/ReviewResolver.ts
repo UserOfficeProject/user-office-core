@@ -1,8 +1,8 @@
-import { Resolver, FieldResolver, Root, Ctx } from "type-graphql";
-import { User } from "../../models/User";
+import { Ctx, FieldResolver, Resolver, Root } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Review } from "../../models/Review";
 import { Proposal } from "../../models/Proposal";
+import { Review } from "../../models/Review";
+import { User } from "../types/User";
 
 @Resolver(() => Review)
 export class ReviewResolver {

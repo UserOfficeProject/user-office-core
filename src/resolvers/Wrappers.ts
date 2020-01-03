@@ -7,9 +7,10 @@ import {
   Topic
 } from "../models/ProposalModel";
 import { Review } from "../models/Review";
-import { BasicUserDetails, User } from "../models/User";
+import { BasicUserDetails } from "../models/User";
 import { Response } from "./Decorators";
 import { Page } from "../models/Admin";
+import { User } from "./types/User";
 
 @ObjectType()
 export class ResponseWrapBase<T> {

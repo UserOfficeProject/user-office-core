@@ -1,11 +1,11 @@
-import { Query, Arg, Ctx, Resolver } from "type-graphql";
-import { User } from "../../models/User";
+import { Query, Arg, Ctx, Resolver, Int } from "type-graphql";
 import { ResolverContext } from "../../context";
+import { User } from "../types/User";
 
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  user(@Arg("id") id: number, @Ctx() context: ResolverContext) {
+  user(@Arg("id", () => Int) id: number, @Ctx() context: ResolverContext) {
     return context.queries.user.get(context.user, id);
   }
 }
