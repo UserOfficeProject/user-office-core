@@ -64,14 +64,14 @@ test("A user can not update topic", async () => {
   expect(topic instanceof Topic).toBe(false);
 });
 
-test("A userofficer can create topic", async () => {
+test("A user-officer can create topic", async () => {
   let template = await templateMutations.createTopic(dummyUserOfficer, 0);
   expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
-  var numbefOfTopics = (template as ProposalTemplate).steps.length;
+  var numberfOfTopics = (template as ProposalTemplate).steps.length;
 
   template = await templateMutations.createTopic(dummyUserOfficer, 1);
   expect((template as ProposalTemplate).steps.length).toEqual(
-    numbefOfTopics + 1
+    numberfOfTopics + 1
   ); // added new one
 });
 
@@ -80,7 +80,7 @@ test("A user can not create topic", async () => {
   expect(topic instanceof ProposalTemplate).toBe(false);
 });
 
-test("A userofficer can update fieltTopicRel", async () => {
+test("A user-officer can update fieltTopicRel", async () => {
   const response = await templateMutations.updateFieldTopicRel(
     dummyUserOfficer,
     1,
