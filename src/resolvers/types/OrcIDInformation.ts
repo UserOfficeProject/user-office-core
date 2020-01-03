@@ -3,17 +3,20 @@ import { Field, ObjectType } from "type-graphql";
 @ObjectType()
 export class OrcIDInformation {
   @Field()
-  firstname: String;
+  firstname: string;
 
   @Field()
-  lastname: String;
+  lastname: string;
 
   @Field()
-  orcid: String;
+  orcid: string;
 
   @Field()
-  orcidHash: String;
+  orcidHash: string;
 
   @Field()
-  refreshToken: String;
+  refreshToken: string;
+
+  @Field(() => String, { nullable: true })
+  token?: string;
 }
