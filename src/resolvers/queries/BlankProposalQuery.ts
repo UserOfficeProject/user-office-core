@@ -1,6 +1,7 @@
 import { Ctx, Query, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Proposal } from "../../models/Proposal";
+import { Proposal } from "../types/Proposal";
+
 @Resolver()
 export class BlankProposalQuery {
   @Query(() => Proposal, { nullable: true })

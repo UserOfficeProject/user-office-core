@@ -1,10 +1,66 @@
-import { Resolver, FieldResolver, Root, Ctx } from "type-graphql";
-import { Proposal } from "../../models/Proposal";
-import { BasicUserDetails } from "../../models/User";
+import {
+  Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root
+} from "type-graphql";
 import { ResolverContext } from "../../context";
+import { Proposal as ProposalOrigin } from "../../models/Proposal";
+
+import { BasicUserDetails } from "../../models/User";
 import { isRejection } from "../../rejection";
-import { Review } from "../../models/Review";
-import { Questionary } from "../../models/ProposalModel";
+import { ProposalStatus } from "../../models/ProposalModel";
+import { Questionary } from "./Questionary";
+import { Review } from "./Review";
+
+@ObjectType()
+export class Proposal implements Partial<ProposalOrigin> {
+  @Field(() => Int, { nullable: true })
+  public id: number;
+
+  @Field(() => String, { nullable: true })
+  public title: string;
+
+  @Field(() => String, { nullable: true })
+  public abstract: string;
+
+  @Field(() => Int)
+  public status: ProposalStatus;
+
+  @Field(() => Date, { nullable: true })
+  public created: Date;
+
+  @Field(() => Date, { nullable: true })
+  public updated: Date;
+
+  @Field(() => String, { nullable: true })
+  public shortCode: string;
+
+  public proposerId: number;
+
+  constructor(
+    id: number,
+    title: string,
+    abstract: string,
+    proposerId: number,
+    status: ProposalStatus,
+    created: Date,
+    updated: Date,
+    shortCode: string
+  ) {
+    this.id = id;
+    this.title = title;
+    this.abstract = abstract;
+    this.proposerId = proposerId;
+    this.status = status;
+    this.created = created;
+    this.updated = updated;
+    this.shortCode = shortCode;
+  }
+}
 
 @Resolver(of => Proposal)
 export class ProposalResolver {

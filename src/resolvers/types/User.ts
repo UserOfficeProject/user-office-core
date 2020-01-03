@@ -8,10 +8,10 @@ import {
   Root
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Proposal } from "../../models/Proposal";
 import { User as UserOrigin } from "../../models/User";
 import { Role } from "../../models/Role";
-import { Review } from "../../models/Review";
+import { Proposal } from "./Proposal";
+import { Review } from "./Review";
 
 @ObjectType()
 export class User implements Partial<UserOrigin> {

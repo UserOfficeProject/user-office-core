@@ -6,17 +6,11 @@ import {
   InputType,
   Int,
   Mutation,
-  ObjectType,
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Proposal } from "../../models/Proposal";
-import { DataType, ProposalStatus } from "../../models/ProposalModel";
-import { Response } from "../Decorators";
-import {
-  ResponseWrapBase,
-  ProposalResponseWrap
-} from "../types/CommonWrappers";
+import { DataType } from "../../models/ProposalModel";
+import { ProposalResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()

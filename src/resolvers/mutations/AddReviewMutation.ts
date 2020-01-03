@@ -8,9 +8,10 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { Review } from "../../models/Review";
+
 import { ReviewResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
+import { Review } from "../types/Review";
 
 @ArgsType()
 class AddReviewArgs {

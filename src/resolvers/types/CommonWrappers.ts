@@ -1,16 +1,15 @@
 import { Field, ObjectType } from "type-graphql";
-import { Call } from "../../models/Call";
-import { Proposal } from "../../models/Proposal";
-import {
-  ProposalTemplate,
-  ProposalTemplateField,
-  Topic
-} from "../../models/ProposalModel";
-import { Review } from "../../models/Review";
+
 import { BasicUserDetails } from "../../models/User";
 import { Response } from "../Decorators";
-import { Page } from "../../models/Admin";
 import { User } from "./User";
+import { Page } from "./Admin";
+import { Call } from "./Call";
+import { Proposal } from "./Proposal";
+import { Topic } from "./Topic";
+import { ProposalTemplateField } from "./ProposalTemplateField";
+import { ProposalTemplate } from "./ProposalTemplate";
+import { Review } from "./Review";
 
 @ObjectType()
 export class ResponseWrapBase<T> {
@@ -69,7 +68,7 @@ export class TemplateFieldResponseWrap extends ResponseWrapBase<
   ProposalTemplateField
 > {
   @Response()
-  @Field({ nullable: true })
+  @Field(() => ProposalTemplateField, { nullable: true })
   public field: ProposalTemplateField;
 }
 

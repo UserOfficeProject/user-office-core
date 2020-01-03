@@ -1,4 +1,3 @@
-import { Proposal } from "./../../models/Proposal";
 import {
   Query,
   Ctx,
@@ -10,6 +9,7 @@ import {
   ObjectType
 } from "type-graphql";
 import { ResolverContext } from "../../context";
+import { Proposal } from "../types/Proposal";
 
 @ArgsType()
 class ProposalsArgs {
