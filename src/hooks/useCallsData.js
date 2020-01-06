@@ -23,8 +23,8 @@ export function useCallsData(show) {
             return {
               id: call.id,
               shortCode: call.shortCode,
-              startDate: new Date(parseInt(call.startCall)).toISOString(),
-              endDate: new Date(parseInt(call.endCall)).toISOString()
+              startDate: call.startCall,
+              endDate: call.endCall
             };
           })
         );

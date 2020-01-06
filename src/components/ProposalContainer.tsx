@@ -49,7 +49,7 @@ export default function ProposalContainer(props: {
     variant: "success",
     message: ""
   });
-  const isSubmitted = proposalInfo.status === ProposalStatus.Submitted;
+  const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
   const classes = makeStyles(theme => ({
     paper: {
       marginTop: theme.spacing(3),
@@ -102,7 +102,7 @@ export default function ProposalContainer(props: {
     return clamp(step, 0, proposalSteps.length - 1);
   };
   /**
-   * Returns true if reset was peformed, false otherwise
+   * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
     if (isDirty) {
@@ -133,7 +133,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.GENERAL,
           "New Proposal",
-          proposalInfo.status !== ProposalStatus.Blank,
+          proposalInfo.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
               data={proposalInfo}
@@ -146,7 +146,7 @@ export default function ProposalContainer(props: {
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
           let editable =
-            (index === 0 && proposalInfo.status !== ProposalStatus.Blank) ||
+            (index === 0 && proposalInfo.status !== ProposalStatus.BLANK) ||
             step.isCompleted ||
             (steps[index - 1] && steps[index - 1].isCompleted === true);
 
@@ -170,7 +170,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.REVIEW,
           "Review",
-          proposalInfo.status === ProposalStatus.Submitted,
+          proposalInfo.status === ProposalStatus.SUBMITTED,
           (<ProposalReview data={proposalInfo} readonly={isSubmitted} />)
         )
       );
@@ -243,7 +243,9 @@ export default function ProposalContainer(props: {
             {proposalInfo.title || "New Proposal"}
           </Typography>
           <div className={classes.infoline}>
-            {proposalInfo.shortCode ? `#${proposalInfo.shortCode}` : null}
+            {proposalInfo.shortCode
+              ? `Proposal ID: ${proposalInfo.shortCode}`
+              : null}
           </div>
           <div className={classes.infoline}>
             {ProposalStatus[proposalInfo.status]}
@@ -263,14 +265,7 @@ export default function ProposalContainer(props: {
                     step.completed ||
                     steps[index - 1].completed === true
                   }
-                  clickable={
-                    step.stepType !== StepType.REVIEW ||
-                    steps.every(step => {
-                      return (
-                        step.stepType === StepType.REVIEW || step.completed
-                      );
-                    })
-                  }
+                  clickable={true}
                 >
                   <span>{step.title}</span>
                 </QuestionaryStepButton>

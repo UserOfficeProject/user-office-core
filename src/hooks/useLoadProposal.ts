@@ -8,7 +8,7 @@ export function useLoadProposal() {
   const loadProposal = useCallback(
     async (id: number) => {
       const query = `
-          query($id: ID!) {
+          query($id: Int!) {
             proposal(id: $id) {
               id
               title

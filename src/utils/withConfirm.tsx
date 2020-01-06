@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core";
 const defaultOptions = {
   title: "",
   description: "",
-  confirmationText: "Ok",
+  confirmationText: "OK",
   cancellationText: "Cancel",
   dialogProps: {},
   onClose: () => {},

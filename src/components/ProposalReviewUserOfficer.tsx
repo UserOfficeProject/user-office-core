@@ -37,7 +37,7 @@ export default function ProposalReview({ match }: { match: any }) {
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
   const [reviewers, setReviewers] = useState<any>([]);
-  const { proposalData } = useProposalData(match.params.id);
+  const { proposalData } = useProposalData(parseInt(match.params.id));
   const sendAddReviewer = useAddUserForReview();
   const sendRemoveReviewer = useRemoveUserForReview();
 

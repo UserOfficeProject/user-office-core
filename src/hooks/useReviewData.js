@@ -7,7 +7,7 @@ export function useReviewData(id) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const query = `
-    query($id: ID!) {
+    query($id: Int!) {
       review(id: $id){
         id
         status

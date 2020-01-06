@@ -148,6 +148,8 @@ context("Proposaltests", () => {
 
     cy.contains("Submit").click();
 
+    cy.contains("OK").click();
+
     cy.contains(title);
     cy.contains(abstract);
     cy.contains(textAnswer);
@@ -172,10 +174,10 @@ context("Proposaltests", () => {
 
     cy.contains("View Proposals").click();
 
-    cy.get("[title=Delete] button")
+    cy.get("[title=Delete]")
       .first()
       .click();
-    cy.get("[title=Save] button")
+    cy.get("[title=Save]")
       .first()
       .click();
   });

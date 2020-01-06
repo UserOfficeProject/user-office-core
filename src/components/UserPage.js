@@ -77,7 +77,7 @@ function UserPage({ match, history }) {
   useEffect(() => {
     const getUserInformation = id => {
       const query = `
-      query($id: ID!) {
+      query($id: Int!) {
         user(id: $id){
           firstname
           lastname
@@ -97,7 +97,7 @@ function UserPage({ match, history }) {
         setRoles(data.user.roles);
       });
     };
-    getUserInformation(match.params.id);
+    getUserInformation(parseInt(match.params.id));
   }, [match.params.id, sendRequest]);
 
   const columns = [{ title: "Name", field: "name" }];

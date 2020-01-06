@@ -6,7 +6,7 @@ export function useOrcIDInformation(authorizationCode) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const query = `query(
-            $authorizationCode: String, 
+            $authorizationCode: String!, 
             )
   {
     getOrcIDInformation(

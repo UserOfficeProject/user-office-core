@@ -42,13 +42,12 @@ context("User tests", () => {
       .should("have.value", password);
 
     // Personal details
-    cy.get("#select-user_title").click();
+    cy.get("#mui-component-select-user_title").click();
+    cy.contains("Prof.").click();
     cy.get("[data-cy=firstname] input")
       .clear()
       .type(firstName)
       .should("have.value", firstName);
-
-    cy.contains("Mr.").click();
 
     cy.get("[data-cy=middlename] input")
       .type(middleName)
@@ -61,11 +60,11 @@ context("User tests", () => {
       .type(firstName)
       .should("have.value", firstName);
 
-    cy.get("#select-gender").click();
+    cy.get("#mui-component-select-gender").click();
 
     cy.contains("Male").click();
 
-    cy.get("#select-nationality").click();
+    cy.get("#mui-component-select-nationality").click();
 
     cy.contains("Swedish").click();
 
@@ -74,7 +73,7 @@ context("User tests", () => {
       .should("have.value", birthDate);
 
     //Organization details
-    cy.get("#select-organisation").click();
+    cy.get("#mui-component-select-organisation").click();
 
     cy.contains("Lund University").click();
 

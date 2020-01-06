@@ -177,9 +177,11 @@ export class FieldCondition {
 }
 
 export enum ProposalStatus {
-  Blank = -1,
-  Draft = 0,
-  Submitted = 1
+  BLANK = -1,
+  DRAFT = 0,
+  SUBMITTED = 1,
+  ACCEPTED = 2,
+  REJECTED = 3
 }
 
 export interface ProposalAnswer {

@@ -10,7 +10,7 @@ const initUserData = {
 };
 
 const checkLocalStorage = (dispatch, state) => {
-  if (localStorage.token && !state.token) {
+  if (!state.token && localStorage.token && localStorage.currentRole) {
     const decoded = decode(localStorage.token);
     if (decoded && decoded.exp > Date.now() / 1000) {
       dispatch({

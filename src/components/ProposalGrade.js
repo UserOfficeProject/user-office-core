@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function ProposalGrade({ match }) {
   const classes = useStyles();
-  const { loading, reviewData } = useReviewData(match.params.id);
+  const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
   const { proposalData } = useProposalData(match.params.id);
 
