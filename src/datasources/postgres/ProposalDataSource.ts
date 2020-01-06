@@ -11,7 +11,11 @@ import {
 } from "./records";
 
 import { ProposalDataSource } from "../ProposalDataSource";
-import { QuestionaryStep, Questionary } from "../../models/ProposalModel";
+import {
+  QuestionaryStep,
+  Questionary,
+  ProposalStatus
+} from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
 import { Transaction } from "knex";
 
@@ -50,13 +54,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 1);
+    return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
   async acceptProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 2);
+    return this.setStatusProposal(id, ProposalStatus.ACCEPTED);
   }
   async rejectProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, 3);
+    return this.setStatusProposal(id, ProposalStatus.REJECTED);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -196,7 +200,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           title: proposal.title,
           abstract: proposal.abstract,
           status: proposal.status,
-          proposer_id: proposal.proposer
+          proposer_id: proposal.proposerId
         },
         ["*"]
       )
@@ -281,9 +285,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select("*")
       .from("proposal_question_dependencies");
 
-    const fieldRecords: Array<
-      ProposalQuestionRecord & { value: any }
-    > = (await database.raw(`
+    const fieldRecords: Array<ProposalQuestionRecord & { value: any }> = (
+      await database.raw(`
           SELECT 
             proposal_questions.*, proposal_answers.answer as value
           FROM 
@@ -296,11 +299,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           AND
             proposal_answers.proposal_id=${proposalId}
           ORDER BY
-            proposal_questions.sort_order`)).rows;
+            proposal_questions.sort_order`)
+    ).rows;
 
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
-    })[] = (await database.raw(`
+    })[] = (
+      await database.raw(`
           SELECT 
             proposal_topics.*, proposal_topic_completenesses.is_complete
           FROM 
@@ -311,7 +316,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             proposal_topics.topic_id = proposal_topic_completenesses.topic_id
             AND proposal_topic_completenesses.proposal_id = ${proposalId}
           ORDER BY
-            proposal_topics.sort_order`)).rows;
+            proposal_topics.sort_order`)
+    ).rows;
 
     const dependencies = dependencyRecords.map(record =>
       createFieldDependencyObject(record)
@@ -326,7 +332,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       steps.push(
         new QuestionaryStep(
           createTopicObject(topic),
-          topic.is_complete,
+          topic.is_complete || false,
           fields.filter(field => field.topic_id === topic.topic_id)
         )
       );

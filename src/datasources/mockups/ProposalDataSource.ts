@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { ProposalDataSource } from "../ProposalDataSource";
 import {
   ProposalTemplate,

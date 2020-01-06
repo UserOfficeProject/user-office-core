@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import ProposalQueries from "./ProposalQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import {

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import ReviewMutations from "./ReviewMutations";
 import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";

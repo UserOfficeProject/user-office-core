@@ -30,15 +30,15 @@ export interface UserDataSource {
   getProposalUsersFull(proposalId: number): Promise<User[]>;
   // Write
   create(
-    user_title: string,
+    user_title: string | undefined,
     firstname: string,
-    middlename: string,
+    middlename: string | undefined,
     lastname: string,
     username: string,
     password: string,
-    preferredname: string,
+    preferredname: string | undefined,
     orcid: string,
-    orcidRefreshToken: string,
+    orcid_refreshtoken: string,
     gender: string,
     nationality: number,
     birthdate: string,
@@ -47,7 +47,7 @@ export interface UserDataSource {
     position: string,
     email: string,
     telephone: string,
-    telephone_alt: string
+    telephone_alt: string | undefined
   ): Promise<User>;
   createOrganisation(name: string, verified: boolean): Promise<number>;
   update(user: User): Promise<User>;

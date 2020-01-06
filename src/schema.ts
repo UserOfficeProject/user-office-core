@@ -11,8 +11,8 @@ export default makeExecutableSchema({
     admin,
     `
     type Query {
-      review(id: ID!): Review
-      call(id: ID!): Call
+      review(id: Int!): Review
+      call(id: Int!): Call
       calls: [Call]
       getPageContent(id: PageName!): String
       fileMetadata(fileIds:[String]): [FileMetadata]

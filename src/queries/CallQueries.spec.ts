@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import CallQueries from "./CallQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";

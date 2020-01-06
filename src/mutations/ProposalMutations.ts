@@ -52,12 +52,11 @@ export default class ProposalMutations {
 
   async update(
     agent: User | null,
-    id: string,
+    id: number,
     title?: string,
     abstract?: string,
     answers?: ProposalAnswer[],
     topicsCompleted?: number[],
-    status?: number,
     users?: number[],
     proposerId?: number,
     partialSave?: boolean
@@ -69,7 +68,7 @@ export default class ProposalMutations {
         }
 
         // Get proposal information
-        let proposal = await this.dataSource.get(parseInt(id)); //Hacky
+        let proposal = await this.dataSource.get(id); //Hacky
 
         // Check if there is an open call, if not reject
         if (
@@ -106,14 +105,8 @@ export default class ProposalMutations {
           proposal.abstract = abstract;
         }
 
-        if (status !== undefined) {
-          proposal.status = status;
-        }
-
         if (users !== undefined) {
-          const [err] = await to(
-            this.dataSource.setProposalUsers(parseInt(id), users)
-          );
+          const [err] = await to(this.dataSource.setProposalUsers(id, users));
           if (err) {
             logger.logError(`Could not update users`, { err, id, agent });
             return rejection("INTERNAL_ERROR");
@@ -121,7 +114,7 @@ export default class ProposalMutations {
         }
 
         if (proposerId !== undefined) {
-          proposal.proposer = proposerId;
+          proposal.proposerId = proposerId;
         }
 
         if (answers !== undefined) {

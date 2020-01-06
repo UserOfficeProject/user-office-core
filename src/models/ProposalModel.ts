@@ -1,54 +1,4 @@
-import { User, BasicUserDetails } from "./User";
-import { Review } from "./Review";
 import { EvaluatorOperator } from "./ConditionEvaluator";
-
-export class ProposalInformation {
-  constructor(
-    public id?: number,
-    public title?: string,
-    public abstract?: string,
-    public proposer?: BasicUserDetails,
-    public status?: ProposalStatus,
-    public created?: Date,
-    public updated?: Date,
-    public users?: BasicUserDetails[],
-    public reviews?: Review[],
-    public questionary?: Questionary,
-    public shortCode?: string
-  ) {}
-}
-
-export enum DataType {
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
-  EMBELLISHMENT = "EMBELLISHMENT",
-  FILE_UPLOAD = "FILE_UPLOAD",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT"
-}
-
-export class ProposalTemplate {
-  constructor(public steps: TemplateStep[] = []) {}
-
-  static fromObject(obj: any) {
-    return new ProposalTemplate(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
-        : []
-    );
-  }
-}
-
-export class TemplateStep {
-  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
-
-  public static fromObject(obj: any) {
-    return new TemplateStep(
-      Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
-    );
-  }
-}
 
 export class ProposalTemplateField {
   constructor(
@@ -56,7 +6,7 @@ export class ProposalTemplateField {
     public data_type: DataType,
     public sort_order: number,
     public question: string,
-    //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
+    //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type config,
     public config: string,
     public topic_id: number,
     public dependencies: FieldDependency[] | null
@@ -73,37 +23,6 @@ export class ProposalTemplateField {
       obj.dependencies
         ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
         : null
-    );
-  }
-}
-
-export class Questionary {
-  constructor(public steps: QuestionaryStep[]) {}
-
-  static fromObject(obj: any): Questionary {
-    return new Questionary(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
-        : []
-    );
-  }
-}
-
-export class QuestionaryStep {
-  constructor(
-    public topic: Topic,
-    public isCompleted: boolean,
-    public fields: QuestionaryField[]
-  ) {}
-  static fromObject(obj: any): QuestionaryStep | undefined {
-    return new QuestionaryStep(
-      Topic.fromObject(obj.topic),
-      obj.isCompleted,
-      obj.fields
-        ? obj.fields.map((fieldObj: any) =>
-            QuestionaryField.fromObject(fieldObj)
-          )
-        : []
     );
   }
 }
@@ -133,6 +52,27 @@ export class QuestionaryField extends ProposalTemplateField {
   }
 }
 
+export class Questionary {
+  constructor(public steps: QuestionaryStep[]) {}
+
+  static fromObject(obj: any): Questionary {
+    return new Questionary(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
+        : []
+    );
+  }
+}
+
+export enum DataType {
+  BOOLEAN = "BOOLEAN",
+  DATE = "DATE",
+  EMBELLISHMENT = "EMBELLISHMENT",
+  FILE_UPLOAD = "FILE_UPLOAD",
+  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
+  TEXT_INPUT = "TEXT_INPUT"
+}
+
 export class Topic {
   constructor(
     public topic_id: number,
@@ -147,6 +87,48 @@ export class Topic {
       obj.topic_title,
       obj.sort_order,
       obj.is_enabled
+    );
+  }
+}
+
+export class ProposalTemplate {
+  constructor(public steps: TemplateStep[] = []) {}
+
+  static fromObject(obj: any) {
+    return new ProposalTemplate(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
+        : []
+    );
+  }
+}
+
+export class TemplateStep {
+  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
+
+  public static fromObject(obj: any) {
+    return new TemplateStep(
+      Topic.fromObject(obj.topic),
+      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
+    );
+  }
+}
+
+export class QuestionaryStep {
+  constructor(
+    public topic: Topic,
+    public isCompleted: boolean,
+    public fields: QuestionaryField[]
+  ) {}
+  static fromObject(obj: any): QuestionaryStep | undefined {
+    return new QuestionaryStep(
+      Topic.fromObject(obj.topic),
+      obj.isCompleted,
+      obj.fields
+        ? obj.fields.map((fieldObj: any) =>
+            QuestionaryField.fromObject(fieldObj)
+          )
+        : []
     );
   }
 }
@@ -183,7 +165,9 @@ export class FieldCondition {
 export enum ProposalStatus {
   BLANK = -1,
   DRAFT = 0,
-  SUBMITTED = 1
+  SUBMITTED = 1,
+  ACCEPTED = 2,
+  REJECTED = 3
 }
 
 export interface ProposalAnswer {

@@ -1,4 +1,7 @@
-import { rejection, Rejection } from "../rejection";
+import "reflect-metadata";
+import { rejection } from "../rejection";
+import { Field, Int, ObjectType } from "type-graphql";
+import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 
 export class User {
   constructor(
@@ -25,18 +28,6 @@ export class User {
     public created: string,
     public updated: string
   ) {}
-
-  roles(args: any, context: any) {
-    return context.queries.user.dataSource.getUserRoles(this.id);
-  }
-
-  reviews(args: any, context: any) {
-    return context.queries.review.dataSource.getUserReviews(this.id);
-  }
-
-  proposals(args: any, context: any) {
-    return context.queries.proposal.dataSource.getUserProposals(this.id);
-  }
 }
 
 export class BasicUserDetails {
@@ -48,61 +39,6 @@ export class BasicUserDetails {
     public position: string
   ) {}
 }
-
-export interface UsersArgs {
-  first?: number;
-  offset?: number;
-  filter?: string;
-  usersOnly?: boolean;
-  subtractUsers?: [number];
-}
-
-export interface CreateUserArgs {
-  user_title: string;
-  firstname: string;
-  middlename: string;
-  lastname: string;
-  username: string;
-  password: string;
-  preferredname: string;
-  orcid: string;
-  orcidHash: string;
-  refreshToken: string;
-  gender: string;
-  nationality: number;
-  birthdate: string;
-  organisation: number;
-  department: string;
-  position: string;
-  email: string;
-  telephone: string;
-  telephone_alt: string;
-  otherOrganisation?: string;
-}
-
-export interface UpdateUserArgs {
-  id: number;
-  user_title?: string;
-  firstname?: string;
-  middlename?: string;
-  lastname?: string;
-  username?: string;
-  preferredname?: string;
-  gender?: string;
-  nationality?: number;
-  birthdate?: string;
-  organisation?: number;
-  department?: string;
-  position?: string;
-  email?: string;
-  telephone?: string;
-  telephone_alt?: string;
-  placeholder?: boolean;
-  roles?: number[];
-  orcid?: string;
-  refreshToken?: string;
-}
-
 export function checkUserArgs(args: UpdateUserArgs) {
   const { firstname, lastname } = args;
   if (firstname && firstname.length < 2) {

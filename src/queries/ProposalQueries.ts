@@ -26,7 +26,7 @@ export default class ProposalQueries {
     }
   }
 
-  async getQuestionary(agent: User, id: number) {
+  async getQuestionary(agent: User | null, id: number) {
     const proposal = await this.dataSource.get(id);
 
     if ((await this.hasAccessRights(agent, proposal)) === false) {

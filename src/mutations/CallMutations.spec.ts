@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import CallMutations from "./CallMutations";
 import { EventBus } from "../events/eventBus";
 import { UserAuthorization } from "../utils/UserAuthorization";
