@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
 import MaterialTable from "material-table";
 import RoleModal from "./RoleModal";
 import { withRouter } from "react-router-dom";
@@ -14,6 +12,8 @@ import { AddBox } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { useDataAPI } from "../hooks/useDataAPI";
+import UpdateUserInformation from "./userInformation/UpdateUserInformation";
+import UpdatePassword from "./userInformation/UpdatePassword";
 
 const useStyles = makeStyles({
   buttons: {
@@ -28,7 +28,8 @@ const useStyles = makeStyles({
     padding: "16px",
     display: "flex",
     overflow: "auto",
-    flexDirection: "column"
+    flexDirection: "column",
+    marginBottom: "25px"
   },
   container: {
     paddingTop: "25px",
@@ -56,8 +57,8 @@ function UserPage({ match, history }) {
 
   const sendUserUpdate = values => {
     const query = `
-    mutation($id: ID!, $firstname: String!, $lastname: String!, $roles: [Int!]) {
-      updateUser(id: $id, firstname: $firstname, lastname: $lastname, roles: $roles){
+    mutation($id: Int!, $roles: [Int!]) {
+      updateUser(id: $id, roles: $roles){
        user{
         id
       }
@@ -67,9 +68,7 @@ function UserPage({ match, history }) {
     `;
 
     const variables = {
-      id: match.params.id,
-      firstname: values.firstname,
-      lastname: values.lastname,
+      id: parseInt(match.params.id),
       roles: roles.map(role => role.id)
     };
     sendRequest(query, variables).then(data => history.push("/PeoplePage"));
@@ -111,7 +110,9 @@ function UserPage({ match, history }) {
   return (
     <React.Fragment>
       <Container maxWidth="lg" className={classes.container}>
-        <Grid container spacing={3}>
+        <UpdateUserInformation id={parseInt(match.params.id)} />
+        <UpdatePassword id={parseInt(match.params.id)} />
+        <Grid maxWidth="lg" className={classes.container}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <RoleModal
@@ -120,64 +121,16 @@ function UserPage({ match, history }) {
                 add={addRole}
               />
               <Formik
-                initialValues={{
-                  firstname: userData.firstname,
-                  lastname: userData.lastname
-                }}
                 onSubmit={(values, actions) => {
                   sendUserUpdate(values);
                   actions.setSubmitting(false);
                 }}
-                validationSchema={Yup.object().shape({
-                  firstname: Yup.string()
-                    .min(2, "Name must be at least 2 characters")
-                    .max(20, "Title must be at most 20 characters")
-                    .required("Name is required"),
-                  lastname: Yup.string()
-                    .min(2, "Lastname must be at least 2 characters")
-                    .max(20, "Lastname must be at most 20 characters")
-                    .required("Lastname is required")
-                })}
               >
                 {({ values, errors, touched, handleChange, isSubmitting }) => (
                   <Form>
                     <Typography variant="h6" gutterBottom>
                       User Information
                     </Typography>
-                    <Grid container spacing={3}>
-                      <Grid item xs={6}>
-                        <TextField
-                          required
-                          id="firstname"
-                          name="firstname"
-                          label="Firstname"
-                          defaultValue={values.firstname}
-                          fullWidth
-                          onChange={handleChange}
-                          error={touched.title && errors.title}
-                          helperText={
-                            touched.title && errors.title && errors.title
-                          }
-                        />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <TextField
-                          required
-                          id="lastname"
-                          name="lastname"
-                          label="Lastname"
-                          defaultValue={values.lastname}
-                          fullWidth
-                          onChange={handleChange}
-                          error={touched.abstract && errors.abstract}
-                          helperText={
-                            touched.abstract &&
-                            errors.abstract &&
-                            errors.abstract
-                          }
-                        />
-                      </Grid>
-                    </Grid>
 
                     <MaterialTable
                       className={classes.table}

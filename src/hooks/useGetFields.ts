@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { request } from "graphql-request";
 
 export function useGetFields() {
-  const [fieldContent, setFieldContent] = useState(null);
+  const [fieldContent, setFieldContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const query = `

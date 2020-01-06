@@ -17,6 +17,9 @@ export function useReviewData(id) {
           id
           title
           abstract
+          proposer{
+            id
+          }
         }
       }
     }`;

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import ProposalInformationView from "./ProposalInformationView";
-import ProposalParticipants from "./ProposalParticipants";
 import ReviewTable from "./ReviewTable";
 import { useProposalData } from "../hooks/useProposalData";
 import { useAddUserForReview } from "../hooks/useAddUserForReview";
@@ -80,9 +78,7 @@ export default function ProposalReview({ match }: { match: any }) {
   return (
     <Container maxWidth="lg">
       <Paper className={classes.paper}>
-        <ProposalInformationView data={proposalData} disabled={true} />
         <ProposaQuestionaryReview data={proposalData} />
-        <ProposalParticipants data={proposalData} disabled={true} />
       </Paper>
       <Paper className={classes.paper}>
         <ReviewTable reviews={proposalData.reviews} />
