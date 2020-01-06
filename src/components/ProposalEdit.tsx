@@ -3,7 +3,7 @@ import ProposalContainer from "./ProposalContainer";
 import { useProposalData } from "../hooks/useProposalData";
 
 export default function ProposalEdit(props: { match: any }): JSX.Element {
-  const { proposalData } = useProposalData(props.match.params.proposalID);
+  const { proposalData } = useProposalData(parseInt(props.match.params.proposalID));
 
   if (!proposalData) {
     return <p>Loading</p>;

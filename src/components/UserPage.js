@@ -56,7 +56,7 @@ function UserPage({ match, history }) {
 
   const sendUserUpdate = values => {
     const query = `
-    mutation($id: ID!, $firstname: String!, $lastname: String!, $roles: [Int!]) {
+    mutation($id: Int!, $firstname: String!, $lastname: String!, $roles: [Int!]) {
       updateUser(id: $id, firstname: $firstname, lastname: $lastname, roles: $roles){
        user{
         id
@@ -67,7 +67,7 @@ function UserPage({ match, history }) {
     `;
 
     const variables = {
-      id: match.params.id,
+      id: parseInt(match.params.id),
       firstname: values.firstname,
       lastname: values.lastname,
       roles: roles.map(role => role.id)
@@ -78,7 +78,7 @@ function UserPage({ match, history }) {
   useEffect(() => {
     const getUserInformation = id => {
       const query = `
-      query($id: ID!) {
+      query($id: Int!) {
         user(id: $id){
           firstname
           lastname
@@ -98,7 +98,7 @@ function UserPage({ match, history }) {
         setRoles(data.user.roles);
       });
     };
-    getUserInformation(match.params.id);
+    getUserInformation(parseInt(match.params.id));
   }, [match.params.id, sendRequest]);
 
   const columns = [{ title: "Name", field: "name" }];

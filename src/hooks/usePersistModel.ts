@@ -14,7 +14,7 @@ export function usePersistModel() {
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
     const mutation = `
-    mutation($topicId:Int!, $fieldIds:[String]) {
+    mutation($topicId:Int!, $fieldIds:[String!]) {
       updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
         error
       }
@@ -70,7 +70,7 @@ export function usePersistModel() {
 
   const updateTopicOrder = async (topicOrder: number[]) => {
     const mutation = `
-    mutation($topicOrder:[Int]!) {
+    mutation($topicOrder:[Int!]!) {
       updateTopicOrder(topicOrder:$topicOrder) {
         error
       }
@@ -93,7 +93,7 @@ export function usePersistModel() {
 
   const updateItem = async (field: ProposalTemplateField) => {
     const mutation = `
-    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput]) {
+    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {
       updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
         template {
           steps {
@@ -145,7 +145,7 @@ export function usePersistModel() {
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
     const mutation = `
-    mutation($topicId:Int!, $dataType:String!) {
+    mutation($topicId:Int!, $dataType:DataType!) {
       createTemplateField(topicId:$topicId, dataType:$dataType) {
         field {
           proposal_question_id

@@ -18,9 +18,9 @@ context("User Officer tests", () => {
     .slice(0, 10);
 
   it("A user-officer should be able to add a call", () => {
-    cy.get("[data-cy=input-username] input")
-      .type("testofficer")
-      .should("have.value", "testofficer");
+    cy.get("[data-cy=input-email] input")
+      .type("Aaron_Harris49@gmail.com")
+      .should("have.value", "Aaron_Harris49@gmail.com");
 
     cy.get("[data-cy=input-password] input")
       .type("Test1234!")

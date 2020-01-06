@@ -61,7 +61,7 @@ function ProposalReview({
               confirm(
                 () => {
                   submitProposal(data.id).then(isSubmitted => {
-                    data.status = ProposalStatus.Submitted;
+                    data.status = ProposalStatus.SUBMITTED;
                     api.next(data);
                   });
                 },
@@ -73,11 +73,11 @@ function ProposalReview({
               )();
             },
             label:
-              data.status === ProposalStatus.Submitted
+              data.status === ProposalStatus.SUBMITTED
                 ? "✔ Submitted"
                 : "Submit",
             disabled:
-              !allStepsComplete || data.status === ProposalStatus.Submitted,
+              !allStepsComplete || data.status === ProposalStatus.SUBMITTED,
             isBusy: isLoading
           }}
           reset={undefined}

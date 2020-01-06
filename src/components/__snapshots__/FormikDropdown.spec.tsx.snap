@@ -16,12 +16,13 @@ exports[`Dropdown populated with given values 1`] = `
   >
     <div
       aria-haspopup="listbox"
-      className="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input MuiInputBase-inputSelect"
-      id="select-name"
+      aria-labelledby=" mui-component-select-name"
+      className="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input"
+      id="mui-component-select-name"
       onBlur={[Function]}
-      onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onMouseDown={[Function]}
       role="button"
       tabIndex={0}
     >
@@ -34,7 +35,9 @@ exports[`Dropdown populated with given values 1`] = `
       />
     </div>
     <input
+      autoFocus={false}
       name="name"
+      onAnimationStart={[Function]}
       type="hidden"
       value="name"
     />
