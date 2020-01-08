@@ -38,7 +38,7 @@ export default function ProposalGrade({ match }) {
   const classes = useStyles();
   const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
-  const { proposalData } = useProposalData(match.params.id);
+  const { proposalData } = useProposalData(parseInt(match.params.id));
 
   const sendAddReview = useAddReview();
 

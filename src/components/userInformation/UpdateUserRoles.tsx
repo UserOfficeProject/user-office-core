@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/styles";
-import { Formik, Form } from "formik";
 import MaterialTable from "material-table";
-import RoleModal from "./RoleModal";
-import { withRouter } from "react-router-dom";
-import { tableIcons } from "../utils/tableIcons";
-import { AddBox } from "@material-ui/icons";
+import RoleModal from "./../RoleModal";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import { useDataAPI } from "../hooks/useDataAPI";
-import UpdateUserInformation from "./userInformation/UpdateUserInformation";
-import UpdatePassword from "./userInformation/UpdatePassword";
+import { useDataAPI } from "../../hooks/useDataAPI";
+import AddBox from "@material-ui/icons/AddBox";
+import { tableIcons } from "../../utils/materialIcons"
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles({
   buttons: {
@@ -37,25 +33,25 @@ const useStyles = makeStyles({
   }
 });
 
-function UserPage({ match, history }) {
+export default function UpdateUserRoles(props:{id: number}) {
   const [userData, setUserData] = useState(null);
   const [modalOpen, setOpen] = useState(false);
   const sendRequest = useDataAPI();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const [roles, setRoles] = useState<any>([]);
 
-  const [roles, setRoles] = useState([]);
-
-  const addRole = role => {
+  const addRole = (role: any) => {
     setRoles([...roles, role]);
     setOpen(false);
   };
 
-  const removeRole = role => {
+  const removeRole = (role: any) => {
     let newRoles = [...roles];
     newRoles.splice(newRoles.findIndex(element => role.id === element.id), 1);
     setRoles(newRoles);
   };
 
-  const sendUserUpdate = values => {
+  const sendUserUpdate = () => {
     const query = `
     mutation($id: Int!, $roles: [Int!]) {
       updateUser(id: $id, roles: $roles){
@@ -68,14 +64,16 @@ function UserPage({ match, history }) {
     `;
 
     const variables = {
-      id: parseInt(match.params.id),
-      roles: roles.map(role => role.id)
+      id: props.id,
+      roles: roles.map((role: any) => role.id)
     };
-    sendRequest(query, variables).then(data => history.push("/PeoplePage"));
+    sendRequest(query, variables).then(data => enqueueSnackbar('Updated Roles', { 
+      variant: 'success',
+  }));
   };
 
   useEffect(() => {
-    const getUserInformation = id => {
+    const getUserInformation = () => {
       const query = `
       query($id: Int!) {
         user(id: $id){
@@ -90,15 +88,15 @@ function UserPage({ match, history }) {
       }`;
 
       const variables = {
-        id
+        id: props.id
       };
-      sendRequest(query, variables).then(data => {
+      sendRequest(query, variables).then((data:any) => {
         setUserData({ ...data.user });
         setRoles(data.user.roles);
       });
     };
-    getUserInformation(parseInt(match.params.id));
-  }, [match.params.id, sendRequest]);
+    getUserInformation();
+  }, [props.id, sendRequest]);
 
   const columns = [{ title: "Name", field: "name" }];
 
@@ -108,36 +106,20 @@ function UserPage({ match, history }) {
     return <p>Loading</p>;
   }
   return (
-    <React.Fragment>
       <Container maxWidth="lg" className={classes.container}>
-        <UpdateUserInformation id={parseInt(match.params.id)} />
-        <UpdatePassword id={parseInt(match.params.id)} />
-        <Grid maxWidth="lg" className={classes.container}>
+        <Grid>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <RoleModal
                 show={modalOpen}
-                close={setOpen.bind(this, false)}
+                close={() => setOpen(false)}
                 add={addRole}
               />
-              <Formik
-                onSubmit={(values, actions) => {
-                  sendUserUpdate(values);
-                  actions.setSubmitting(false);
-                }}
-              >
-                {({ values, errors, touched, handleChange, isSubmitting }) => (
-                  <Form>
-                    <Typography variant="h6" gutterBottom>
-                      User Information
-                    </Typography>
-
                     <MaterialTable
-                      className={classes.table}
                       title="Roles"
                       columns={columns}
                       icons={tableIcons}
-                      data={roles.map(role => {
+                      data={roles.map((role: any) => {
                         return { name: role.title, id: role.id };
                       })}
                       options={{
@@ -162,24 +144,19 @@ function UserPage({ match, history }) {
 
                     <div className={classes.buttons}>
                       <Button
-                        disabled={isSubmitting}
                         type="submit"
                         variant="contained"
                         color="primary"
                         className={classes.button}
+                        onClick={() => sendUserUpdate()}
                       >
-                        Update
+                        Update Roles
                       </Button>
                     </div>
-                  </Form>
-                )}
-              </Formik>
+
             </Paper>
           </Grid>
         </Grid>
       </Container>
-    </React.Fragment>
   );
 }
-
-export default withRouter(UserPage);

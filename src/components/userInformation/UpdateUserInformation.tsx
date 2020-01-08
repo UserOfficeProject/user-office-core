@@ -123,7 +123,6 @@ export default function UpdateUserInformation(props:{id: number}) {
       gender: values.gender === "other" ? values.othergender : values.gender
     };
     sendRequest(query, variables).then((data:any) => {
-      console.log(data)
       if (!data.user) {
         setState({
           open: true,
@@ -143,7 +142,7 @@ export default function UpdateUserInformation(props:{id: number}) {
   useEffect(() => {
     const getUserInformation = (id:number) => {
       const query = `
-      query($id: ID!) {
+      query($id: Int!) {
         user(id: $id){
           user_title, 
           username,
