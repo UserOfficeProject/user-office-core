@@ -1,7 +1,7 @@
 image: node:7
 
 variables:
-  REGISTRY_URL: https://$SWAP_NPM_REGISTRY_HOST/$SWAP_NPM_REGISTRY_PATH
+  REGISTRY_URL: https://artifactory.esss.lu.se/artifactory/api/npm/swap-npm/
 
 stages:
   - test
