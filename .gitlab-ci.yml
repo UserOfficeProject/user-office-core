@@ -2,7 +2,7 @@ image: node:7
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  SWAP_NPM_REGISTRY: http://artifactory.esss.lu.se/artifactory/api/npm/swap-npm/
+  SWAP_NPM_REGISTRY: https://artifactory.esss.lu.se/artifactory/api/npm/swap-npm/
 
 stages:
   - test
