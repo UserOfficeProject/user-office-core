@@ -1,5 +1,8 @@
 image: node:8.10.0-alpine
 
+variables:
+  REGISTRY_URL: https://artifactory.esss.lu.se/artifactory/api/npm/swap-npm/
+
 cache:
   key: "alpine"
   paths:
@@ -12,7 +15,7 @@ stages:
 test:
   stage: test
   script:
-    - npm config set @swap:registry $SWAP_NPM_REGISTRY_URL
+    - npm config set @swap:registry $REGISTRY_URL
     - npm install
     - NODE_ENV=ci npm run test
   tags:
