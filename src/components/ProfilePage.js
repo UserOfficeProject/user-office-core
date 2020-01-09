@@ -19,7 +19,7 @@ import {
 } from "../utils/userFieldValidationSchema";
 import Notification from "./Notification";
 import dateformat from "dateformat";
-import { getTranslation } from "@swap/duo-localisation";
+import { getTranslation } from "@esss-swap/duo-localisation";
 
 const useStyles = makeStyles({
   buttons: {
