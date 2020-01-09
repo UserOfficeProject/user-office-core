@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { request } from "graphql-request";
 
 export function useGetFields() {
-  const [fieldContent, setFieldContent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [fieldContent, setFieldContent] = useState<{
+    institutions: { id: number; value: string }[];
+    nationalities: { id: number; value: string }[];
+  } | null>(null);
   useEffect(() => {
     const query = `
     query {
@@ -19,12 +21,10 @@ export function useGetFields() {
       }
     }`;
 
-    setLoading(true);
     request("/graphql", query).then(data => {
       setFieldContent(data.getFields);
-      setLoading(false);
     });
   }, []);
 
-  return [loading, fieldContent];
+  return fieldContent;
 }
