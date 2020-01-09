@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@swap/duo-localisation": "^1.0.2",
+    "@esss-swap/duo-localisation": "^1.1.6",
     "@types/bcryptjs": "^2.4.2",
     "@types/express-graphql": "^0.8.2",
     "@types/graphql": "^14.5.0",
