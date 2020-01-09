@@ -1,30 +1,14 @@
 import { useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi2 } from "./useDataApi2";
 
 export function useSetPageContent() {
-  const sendRequest = useDataAPI<{setPageContent:{page?:{id:number, content:string}, error?:string}}>();
+  const sendRequest = useDataApi2();
 
   const sendPageContent = useCallback(
     async (pageName, text) => {
-      const query = `
-        mutation($id: PageName!, $text: String!) {
-          setPageContent(id: $id, text: $text) {
-            page {
-              id
-              content
-            }
-            error
-          }
-        }
-    `;
-      const variables = {
-        id: pageName,
-        text
-      };
-
-      return await sendRequest(query, variables).then(
-        resp => resp.setPageContent
-      );
+      return await (await sendRequest())
+        .setPageContent({ id: pageName, text })
+        .then(resp => resp.setPageContent);
     },
     [sendRequest]
   );

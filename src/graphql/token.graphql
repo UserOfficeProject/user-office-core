@@ -1,0 +1,6 @@
+mutation token($token: String!) {
+  token(token: $token) {
+    token
+    error
+  }
+}
