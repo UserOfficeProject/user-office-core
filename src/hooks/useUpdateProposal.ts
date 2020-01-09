@@ -2,7 +2,11 @@ import { useCallback, useState } from "react";
 import { useDataAPI } from "./useDataAPI";
 import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
+<<<<<<< HEAD
 import { ResourceId } from "@swap/duo-localisation";
+=======
+import { ResourceId } from "@esss-swap/duo-localisation";
+>>>>>>> e15d06f589df235a71bac337e4ed09f361ab9ed5
 
 export function useUpdateProposal() {
   const sendRequest = useDataAPI<{

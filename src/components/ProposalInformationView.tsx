@@ -13,7 +13,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
-import { getTranslation } from "@swap/duo-localisation";
+import { getTranslation } from "@esss-swap/duo-localisation";
 import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export default function ProposalInformationView(props: {
