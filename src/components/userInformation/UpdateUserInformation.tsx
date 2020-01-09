@@ -15,8 +15,8 @@ import InputLabel from "@material-ui/core/InputLabel";
 import {
   userFieldSchema,
 } from "../../utils/userFieldValidationSchema";
-import Notification from "../Notification";
 import dateformat from "dateformat";
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles({
   buttons: {
@@ -54,18 +54,14 @@ const useStyles = makeStyles({
 export default function UpdateUserInformation(props:{id: number}) {
   const [userData, setUserData] = useState<any>(null);
   const sendRequest = useDataAPI<any>();
-  const [state, setState] = useState({
-    open: false,
-    message: "",
-    variant: "success"
-  });
-  const [, fieldsContent] = useGetFields();
-  const [nationalitiesList, setNationalitiesList] = useState([]);
-  const [institutionsList, setInstitutionsList] = useState([]);
+  const fieldsContent = useGetFields();
+  const [nationalitiesList, setNationalitiesList] = useState<{text: string, value: string}[]>([]);
+  const [institutionsList, setInstitutionsList] = useState<{text: string, value: string}[]>([]);
+  const { enqueueSnackbar } = useSnackbar();
 
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
     setInstitutionsList(
-      fieldsContent.institutions.map((institution:any) => {
+      fieldsContent.institutions.map((institution: any) => {
         return { text: institution.value, value: institution.id };
       })
     );
@@ -122,23 +118,10 @@ export default function UpdateUserInformation(props:{id: number}) {
       ...values,
       gender: values.gender === "other" ? values.othergender : values.gender
     };
-    sendRequest(query, variables).then((data:any) => {
-      if (!data.user) {
-        setState({
-          open: true,
-          variant: "success",
-          message: "User Updated"
-        });
-      } else {
-        setState({
-          open: true,
-          variant: "error",
-          message: "Update Failed"
-        });
-      }
-    });
-  };
-
+    sendRequest(query, variables).then(() => 
+        enqueueSnackbar('Updated Information', { variant: 'success'})
+    );
+  }
   useEffect(() => {
     const getUserInformation = (id:number) => {
       const query = `
@@ -181,12 +164,6 @@ export default function UpdateUserInformation(props:{id: number}) {
 
   return (
     <React.Fragment>
-      <Notification
-        open={state.open}
-        onClose={() => setState({ ...state, open: false })}
-        variant={state.variant}
-        message={state.message}
-      />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>

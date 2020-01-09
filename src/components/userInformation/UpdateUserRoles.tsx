@@ -37,7 +37,7 @@ export default function UpdateUserRoles(props:{id: number}) {
   const [userData, setUserData] = useState(null);
   const [modalOpen, setOpen] = useState(false);
   const sendRequest = useDataAPI();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<any>([]);
 
   const addRole = (role: any) => {
@@ -67,7 +67,7 @@ export default function UpdateUserRoles(props:{id: number}) {
       id: props.id,
       roles: roles.map((role: any) => role.id)
     };
-    sendRequest(query, variables).then(data => enqueueSnackbar('Updated Roles', { 
+    sendRequest(query, variables).then(() => enqueueSnackbar('Updated Roles', { 
       variant: 'success',
   }));
   };

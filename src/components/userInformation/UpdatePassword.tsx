@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { TextField } from "formik-material-ui";
@@ -11,8 +11,7 @@ import { useDataAPI } from "../../hooks/useDataAPI";
 import {
   userPasswordFieldSchema
 } from "../../utils/userFieldValidationSchema";
-import Notification from "./../Notification";
-import { getTranslation } from "../../submodules/duo-localisation/StringResources";
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles({
   buttons: {
@@ -49,12 +48,7 @@ const useStyles = makeStyles({
 
 export default function UpdatePassword(props:{id: number}) {
   const sendRequest = useDataAPI();
-  const [state, setState] = useState({
-    open: false,
-    message: "",
-    variant: "success"
-  });
-
+  const { enqueueSnackbar } = useSnackbar();
   const sendPasswordUpdate = (password:string) => {
     const query = `
       mutation(
@@ -74,21 +68,9 @@ export default function UpdatePassword(props:{id: number}) {
       id: props.id,
       password
     };
-    sendRequest(query, variables).then((data:any) => {
-      if (data.error) {
-        setState({
-          open: true,
-          variant: "error",
-          message: getTranslation(data.error)
-        });
-      } else {
-        setState({
-          open: true,
-          variant: "success",
-          message: "Password Updated"
-        });
-      }
-    });
+    sendRequest(query, variables).then(() => 
+    enqueueSnackbar('Updated Password', { variant: 'success'})
+    );
   };
 
 
@@ -96,12 +78,6 @@ export default function UpdatePassword(props:{id: number}) {
 
   return (
     <React.Fragment>
-      <Notification
-        open={state.open}
-        onClose={() => setState({ ...state, open: false })}
-        variant={state.variant}
-        message={state.message}
-      />
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>

@@ -18,8 +18,8 @@ import {
 import { usePersistModel } from "../hooks/usePersistModel";
 import { ProposalTemplateField } from "../models/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
-import Notification from "./Notification";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
+import { useSnackbar } from 'notistack';
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
@@ -27,7 +27,7 @@ export default function QuestionaryEditor() {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
-          setErrorState({ ...errorState, open: true, message: action.payload });
+          enqueueSnackbar(action.payload, { variant: 'error'} );
           break;
 
         case EventType.FIELD_CREATED:
@@ -36,17 +36,13 @@ export default function QuestionaryEditor() {
       }
     };
   };
-
+  const { enqueueSnackbar } = useSnackbar();
   var { persistModel, isLoading } = usePersistModel();
   var { state, dispatch } = QuestionaryEditorModel([
     persistModel,
     reducerMiddleware
   ]);
-  const [errorState, setErrorState] = useState({
-    open: false,
-    message: "",
-    variant: "error"
-  });
+
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
@@ -137,14 +133,6 @@ export default function QuestionaryEditor() {
     ) : null;
   return (
     <>
-      <Notification
-        open={errorState.open}
-        onClose={() => {
-          setErrorState({ ...errorState, open: false });
-        }}
-        variant={errorState.variant}
-        message={errorState.message}
-      />
       <Paper className={classes.paper} style={getContainerStyle(isLoading)}>
         {progressJsx}
         <FormGroup row style={{ justifyContent: "flex-end" }}>
