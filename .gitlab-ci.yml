@@ -1,7 +1,7 @@
 image: node:7
 
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
+  REGISTRY_URL: https://artifactory.esss.lu.se/artifactory/api/npm/swap-npm/
 
 stages:
   - test
@@ -11,6 +11,7 @@ stages:
 test:
   stage: test
   script:
+    - npm config set @swap:registry $REGISTRY_URL
     - npm install
     - NODE_ENV=ci npm run test
   tags:
@@ -19,6 +20,7 @@ test:
 build-test:
   stage: build-test
   script:
+    - npm config set @swap:registry $REGISTRY_URL
     - npm install --only=production
     - npm run tsc
   tags:
@@ -30,10 +32,10 @@ docker build:
   image: docker:stable
   stage: build
   script:
-  - docker info
-  - docker build . -t dmsc/duo-backend
-  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
-  - docker push dmsc/duo-backend
+    - docker info
+    - docker build . -t dmsc/duo-backend
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+    - docker push dmsc/duo-backend
   tags:
     - docker
   only:

@@ -1,4 +1,4 @@
-import { ResourceId } from "./submodules/duo-localisation/StringResources"; // import
+import { ResourceId } from "@swap/duo-localisation"; // import
 
 const REJECTION = Symbol("REJECTION");
 
