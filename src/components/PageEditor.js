@@ -21,7 +21,6 @@ import Divider from "@material-ui/core/Divider";
 import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
 import { useSnackbar } from "notistack";
-import { getTranslation } from "@swap/duo-localisation";
 
 const useStyles = makeStyles(theme => ({
   paper: {

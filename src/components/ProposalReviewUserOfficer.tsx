@@ -88,6 +88,7 @@ export default function ProposalReview({ match }: { match: any }) {
           show={modalOpen}
           close={setOpen}
           addParticipant={addUser}
+          title={"Add Reviewer"}
         />
         <PeopleTable
           title="Reviewers"
