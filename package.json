@@ -23,6 +23,7 @@
     "immer": "^4.0.2",
     "jsonwebtoken": "^8.5.1",
     "material-table": "^1.54.2",
+    "notistack": "^0.9.7",
     "path": "^0.12.7",
     "query-string": "^6.9.0",
     "react": "^16.12.0",

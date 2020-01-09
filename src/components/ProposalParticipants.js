@@ -43,6 +43,7 @@ export default function ProposalParticipants(props) {
         close={setOpen.bind(this, false)}
         addParticipant={addUser}
         selectedUsers={props.users}
+        title={"Add Co-Proposer"}
       />
       <PeopleTable
         title="Co-Proposers"

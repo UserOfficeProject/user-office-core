@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-import ProposalInformationView from "./ProposalInformationView";
+import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import { Formik, Field, Form } from "formik";
@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { useAddReview } from "../hooks/useAddReview";
 import { useReviewData } from "../hooks/useReviewData";
 import { Redirect } from "react-router";
+import { useProposalData } from "../hooks/useProposalData";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -37,6 +38,7 @@ export default function ProposalGrade({ match }) {
   const classes = useStyles();
   const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
+  const { proposalData } = useProposalData(parseInt(match.params.id));
 
   const sendAddReview = useAddReview();
 
@@ -48,10 +50,13 @@ export default function ProposalGrade({ match }) {
     return <p>Loading</p>;
   }
 
+  if (!proposalData) {
+    return <p>Loading</p>;
+  }
   return (
     <Container maxWidth="lg" className={classes.container}>
       <Paper className={classes.paper}>
-        <ProposalInformationView data={reviewData.proposal} disabled={true} />
+        <ProposaQuestionaryReview data={proposalData} />
       </Paper>
 
       <Paper className={classes.paper}>
