@@ -116,7 +116,7 @@ export default function SignInSide() {
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "", password: "" }}
         onSubmit={async (values, actions) => {
           await requestToken(values);
           actions.setSubmitting(false);
