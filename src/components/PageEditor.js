@@ -21,7 +21,7 @@ import Divider from "@material-ui/core/Divider";
 import Notification from "./Notification";
 import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
-import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { getTranslation } from "@swap/duo-localisation";
 
 const useStyles = makeStyles(theme => ({
   paper: {

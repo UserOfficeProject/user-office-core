@@ -15,7 +15,7 @@ import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
 import orcid from "../images/orcid.png";
-import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { getTranslation } from "@swap/duo-localisation";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
