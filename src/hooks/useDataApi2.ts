@@ -3,7 +3,7 @@ import { Variables } from "graphql-request/dist/src/types";
 import { decode } from "jsonwebtoken";
 import { useCallback, useContext } from "react";
 import { UserContext } from "../context/UserContextProvider";
-import { getSdk } from "../graphql/sdk";
+import { getSdk } from "../generated/sdk";
 
 export function useDataApi2() {
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
@@ -11,20 +11,19 @@ export function useDataApi2() {
 
   const sendRequest = useCallback(
     function sendRequest() {
-      let tokenForRequest = token;
-      //check if token older than an hour, if so ask for new one
-
-      const graphQLClient = new AuthorizedGraphQLClient(
-        endpoint,
-        tokenForRequest,
-        reason => {
-          console.log(reason);
-          handleLogout();
-        },
-        handleNewToken
+      return getSdk(
+        token
+          ? new AuthorizedGraphQLClient(
+              endpoint,
+              token,
+              reason => {
+                console.log(reason);
+                handleLogout();
+              },
+              handleNewToken
+            )
+          : new GraphQLClient(endpoint)
       );
-
-      return getSdk(graphQLClient);
     },
     [token, handleNewToken, handleLogout]
   );
@@ -32,11 +31,11 @@ export function useDataApi2() {
 }
 
 class AuthorizedGraphQLClient extends GraphQLClient {
-  private renewalDate?: number;
+  private renewalDate: number;
 
   constructor(
     private endpoint: string,
-    private token?: string,
+    private token: string,
     private error?: (reason: string) => void,
     private tokenRenewed?: (newToken: string) => void
   ) {
@@ -49,11 +48,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     query: string,
     variables?: Variables
   ): Promise<T> {
-    if (
-      this.token !== undefined &&
-      this.renewalDate !== undefined &&
-      this.renewalDate < Date.now() / 1000
-    ) {
+    const nowTimestampSeconds = Date.now() / 1000;
+    if (this.renewalDate < nowTimestampSeconds) {
       const data = await getSdk(new GraphQLClient(this.endpoint)).token({
         token: this.token
       });
@@ -68,14 +64,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     return super.request(query, variables);
   }
 
-  private getRenewalDate(token?: string): number | undefined {
-    if (!token) {
-      return undefined;
-    }
-
-    return 0;
-    const oneWeek = 7 * 24 * 3600;
+  private getRenewalDate(token: string): number {
     const oneHour = 3600;
-    // return (decode(token) as any).exp - (oneWeek - oneHour);
+    return (decode(token) as any).iat + oneHour;
   }
 }
