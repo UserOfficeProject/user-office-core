@@ -1,0 +1,5 @@
+mutation addUserForReview($userID: Int!, $proposalID: Int!) {
+  addUserForReview(userID: $userID, proposalID: $proposalID) {
+    error
+  }
+}
