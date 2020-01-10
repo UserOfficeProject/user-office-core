@@ -19,7 +19,7 @@ export function useAddUserForReview() {
         proposalID
       };
 
-      return await sendRequest(query, variables).then(resp => resp);
+      return sendRequest(query, variables).then(resp => resp);
     },
     [sendRequest]
   );
