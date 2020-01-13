@@ -1,25 +1,17 @@
 import { useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi2 } from "./useDataApi2";
 
 export function useDeleteProposal() {
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataApi2();
 
   const deleteProposal = useCallback(
     async (id: number) => {
-      const query = `
-          mutation($id: Int!) {
-            deleteProposal(id: $id) {
-                 proposal{
-                    id
-                }
-            }
-          }
-          `;
-
       const variables = {
         id
       };
-      return await sendRequest(query, variables).then(resp => resp);
+      return await sendRequest()
+        .deleteProposal(variables)
+        .then(resp => resp);
     },
     [sendRequest]
   );
