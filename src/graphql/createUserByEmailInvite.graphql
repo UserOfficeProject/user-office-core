@@ -1,0 +1,14 @@
+mutation createUserByEmailInvite(
+  $firstname: String!
+  $lastname: String!
+  $email: String!
+) {
+  createUserByEmailInvite(
+    firstname: $firstname
+    lastname: $lastname
+    email: $email
+  ) {
+    error
+    id
+  }
+}
