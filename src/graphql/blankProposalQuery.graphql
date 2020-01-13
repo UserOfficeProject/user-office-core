@@ -1,0 +1,6 @@
+query blankProposal {
+  blankProposal {
+    id
+    title
+  }
+}

@@ -15,7 +15,7 @@ import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
 import orcid from "../images/orcid.png";
-import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { getTranslation } from "@esss-swap/duo-localisation";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -116,7 +116,7 @@ export default function SignInSide() {
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "", password: "" }}
         onSubmit={async (values, actions) => {
           await requestToken(values);
           actions.setSubmitting(false);

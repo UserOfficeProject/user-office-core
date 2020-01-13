@@ -18,10 +18,9 @@ import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import Notification from "./Notification";
 import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
-import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -46,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function PageEditor() {
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const [homeContent, setHomeContent] = useState("");
   const [helpContent, setHelpContent] = useState("");
   const [privacyContent, setPrivacyContent] = useState("");
@@ -67,41 +67,14 @@ export default function PageEditor() {
     setCookieContent(cookiePageContent);
   }, [helpPageContent, homePageContent, privacyPageContent, cookiePageContent]);
 
-  const [state, setState] = useState({
-    open: false,
-    message: "",
-    variant: "success"
-  });
-
   const handleClick = async (pageName, text) => {
-    const resp = await sendPageContent(pageName, text);
-    if (resp.error) {
-      setState({
-        open: true,
-        variant: "error",
-        message: `Update Failed. ${getTranslation(resp.error)}`
-      });
-    } else {
-      setState({
-        open: true,
-        variant: "success",
-        message: "Text Updated"
-      });
-    }
+    sendPageContent(pageName, text).then(() =>
+      enqueueSnackbar("Updated Page", { variant: "success" })
+    );
   };
-
-  function handleClose() {
-    setState({ ...state, open: false });
-  }
 
   return (
     <Container maxWidth="lg" className={classes.container}>
-      <Notification
-        open={state.open}
-        onClose={handleClose}
-        variant={state.variant}
-        message={state.message}
-      />
       <Paper className={classes.paper}>
         <Typography variant="h6" gutterBottom>
           Set user homepage

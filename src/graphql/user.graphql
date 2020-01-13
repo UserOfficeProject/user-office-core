@@ -1,0 +1,11 @@
+query user($id: Int!) {
+  user(id: $id) {
+    proposals {
+      id
+      shortCode
+      title
+      status
+      created
+    }
+  }
+}

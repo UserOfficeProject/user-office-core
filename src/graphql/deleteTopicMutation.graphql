@@ -1,0 +1,5 @@
+mutation deleteTopic($id: Int!) {
+  deleteTopic(id: $id) {
+    error
+  }
+}

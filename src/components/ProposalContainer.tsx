@@ -16,11 +16,11 @@ import { ProposalStatus, Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalInformationView from "./ProposalInformationView";
 import { useLoadProposal } from "../hooks/useLoadProposal";
-import Notification from "./Notification";
 import { StepButton } from "@material-ui/core";
 import { clamp } from "../utils/Math";
 import "../styles/ProposalComponentStyles.css";
 import { Prompt } from "react-router";
+import { useSnackbar } from 'notistack';
 
 export interface INotification {
   variant: "error" | "success";
@@ -42,13 +42,7 @@ export default function ProposalContainer(props: {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isDirty, setIsDirty] = useState(false);
-  const [notification, setNotification] = useState<
-    INotification & { isOpen: boolean }
-  >({
-    isOpen: false,
-    variant: "success",
-    message: ""
-  });
+  const { enqueueSnackbar } = useSnackbar();
   const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
   const classes = makeStyles(theme => ({
     paper: {
@@ -217,21 +211,13 @@ export default function ProposalContainer(props: {
       }
     },
     reportStatus: (notification: INotification) => {
-      setNotification({ ...notification, isOpen: true });
+      enqueueSnackbar(notification.message, { variant: notification.variant})
     }
   };
 
   return (
     <Container maxWidth="lg">
       <Prompt when={isDirty} message={location => getConfirmNavigMsg()} />
-      <Notification
-        open={notification.isOpen}
-        onClose={() => {
-          setNotification({ ...notification, isOpen: false });
-        }}
-        variant={notification.variant}
-        message={notification.message}
-      />
       <FormApi.Provider value={api}>
         <Paper className={classes.paper}>
           <Typography

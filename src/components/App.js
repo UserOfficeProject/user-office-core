@@ -11,6 +11,7 @@ import { Redirect } from "react-router-dom";
 import { CookiesProvider } from "react-cookie";
 import { request } from "graphql-request";
 import { ThemeProvider } from "@material-ui/styles";
+import { SnackbarProvider } from "notistack";
 import {
   UserContextProvider,
   UserContext
@@ -55,43 +56,48 @@ class App extends React.Component {
       <ThemeProvider theme={getTheme()}>
         <CookiesProvider>
           <UserContextProvider>
-            <Router>
-              <div className="App">
-                <Switch>
-                  <Route path="/SignUp" component={SignUp} />
-                  <Route path="/SignIn" component={SignIn} />
-                  <Route
-                    path="/ResetPasswordEmail"
-                    component={ResetPasswordEmail}
-                  />
-                  <Route
-                    path="/ResetPassword/:token"
-                    component={ResetPassword}
-                  />
-                  <Route
-                    path="/EmailVerification/:token"
-                    component={EmailVerification}
-                  />
-                  <Route
-                    path="/LogOut"
-                    render={() => (
-                      <UserContext.Consumer>
-                        {({ handleLogout }) => {
-                          handleLogout();
-                          return <Redirect to="/" />;
-                        }}
-                      </UserContext.Consumer>
-                    )}
-                  />
+            <SnackbarProvider
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              maxSnack={1}
+            >
+              <Router>
+                <div className="App">
+                  <Switch>
+                    <Route path="/SignUp" component={SignUp} />
+                    <Route path="/SignIn" component={SignIn} />
+                    <Route
+                      path="/ResetPasswordEmail"
+                      component={ResetPasswordEmail}
+                    />
+                    <Route
+                      path="/ResetPassword/:token"
+                      component={ResetPassword}
+                    />
+                    <Route
+                      path="/EmailVerification/:token"
+                      component={EmailVerification}
+                    />
+                    <Route
+                      path="/LogOut"
+                      render={() => (
+                        <UserContext.Consumer>
+                          {({ handleLogout }) => {
+                            handleLogout();
+                            return <Redirect to="/" />;
+                          }}
+                        </UserContext.Consumer>
+                      )}
+                    />
 
-                  <Route
-                    path="/RoleSelectionPage"
-                    component={RoleSelectionPage}
-                  />
-                  <PrivateRoute path="/" component={DashBoard} />
-                </Switch>
-              </div>
-            </Router>
+                    <Route
+                      path="/RoleSelectionPage"
+                      component={RoleSelectionPage}
+                    />
+                    <PrivateRoute path="/" component={DashBoard} />
+                  </Switch>
+                </div>
+              </Router>
+            </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>
       </ThemeProvider>

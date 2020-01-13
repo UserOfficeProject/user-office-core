@@ -1,8 +1,5 @@
 image: node:8.10.0-alpine
 
-variables:
-  GIT_SUBMODULE_STRATEGY: recursive
-
 cache:
   key: "alpine"
   paths:
@@ -24,10 +21,10 @@ docker build:
   image: docker:stable
   stage: build
   script:
-  - docker info
-  - docker build . -t dmsc/duo-frontend
-  - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
-  - docker push dmsc/duo-frontend
+    - docker info
+    - docker build . -t dmsc/duo-frontend
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+    - docker push dmsc/duo-frontend
   tags:
     - docker
   only:
