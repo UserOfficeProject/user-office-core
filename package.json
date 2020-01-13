@@ -40,6 +40,7 @@
   },
   "proxy": "http://localhost:4000",
   "scripts": {
+    "predev": "npm run generate:local",
     "dev": "react-scripts start",
     "build": "react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
@@ -48,8 +49,8 @@
     "start": "node server.js",
     "cypress:open": "cypress open",
     "cy:run": "cypress run",
-    "generate:local": "sed 's@<SCHEMA>@http://localhost:4000/graphql@g' codegen_template.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && rm ./codegen_tmp.yml",
-    "generate:dev": "sed 's@<SCHEMA>@PLACEHOLDER@g' codegen.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && ./rm codegen_tmp.yml"
+    "generate:local": "sed 's@<SCHEMA_URL>@http://localhost:4000/graphql@g' codegen_template.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && rm ./codegen_tmp.yml",
+    "generate:dev": "sed 's@<SCHEMA_URL>@PLACEHOLDER@g' codegen.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && ./rm codegen_tmp.yml"
   },
   "eslintConfig": {
     "extends": "react-app"

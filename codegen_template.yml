@@ -1,6 +1,6 @@
 overwrite: true
-schema: "<SCHEMA>"
-documents: "src/graphql/*.graphql"
+schema: "<SCHEMA_URL>"
+documents: "src/graphql/*.{graphql,fragment}"
 generates:
   src/generated/sdk.ts:
     plugins:

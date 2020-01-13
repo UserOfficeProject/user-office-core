@@ -13,7 +13,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { User, BasicUserDetails } from "../models/User";
 import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
-import { getTranslation } from "../submodules/duo-localisation/StringResources";
+import { getTranslation } from "@esss-swap/duo-localisation";
 import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export default function ProposalInformationView(props: {
@@ -64,7 +64,8 @@ export default function ProposalInformationView(props: {
         } else {
           var { id, status, shortCode } = props.data;
           if (!id) {
-            ({ id, status, shortCode } = await createProposal());
+            const proposal = (await createProposal())?.proposal;
+            proposal && ({ id, status, shortCode } = proposal); // TODO report error
           }
           const result = await updateProposal({
             id: id,
