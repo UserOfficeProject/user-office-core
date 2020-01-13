@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi2 } from "./useDataApi2";
 
 export function useAddCall() {
-  const sendRequest = useDataAPI();
+  const api = useDataApi2();
 
   const sendAddReview = useCallback(
     async (
@@ -16,16 +16,6 @@ export function useAddCall() {
       cycleComment,
       surveyComment
     ) => {
-      const query = `
-    mutation($shortCode: String!, $startCall: String!, $endCall: String!, $startReview: String!, $endReview: String!, $startNotify: String!, $endNotify: String!, $cycleComment: String!, $surveyComment: String!) {
-      createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview , endReview: $endReview , startNotify: $startNotify , endNotify: $endNotify , cycleComment: $cycleComment , surveyComment: $surveyComment){
-        error
-        call{
-          id
-        }
-      }
-    }
-    `;
       const variables = {
         shortCode,
         startCall,
@@ -38,9 +28,9 @@ export function useAddCall() {
         surveyComment
       };
 
-      return await sendRequest(query, variables).then(resp => resp);
+      return await api.createCall(variables).then(resp => resp);
     },
-    [sendRequest]
+    [api]
   );
 
   return sendAddReview;
