@@ -38,8 +38,8 @@ export default function CallPage() {
 
   const columns = [
     { title: "Short Code", field: "shortCode" },
-    { title: "Start Date", field: "startDate" },
-    { title: "End Date", field: "endDate" }
+    { title: "Start Date", field: "startCall" },
+    { title: "End Date", field: "endCall" }
   ];
 
   if (loading) {
