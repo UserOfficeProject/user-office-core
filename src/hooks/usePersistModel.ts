@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { useDataAPI } from "./useDataAPI";
-import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import {
-  ProposalTemplateField,
-  ProposalTemplate,
   DataType,
+  ProposalTemplate,
+  ProposalTemplateField,
   Topic
 } from "../models/ProposalModel";
+import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi2 } from "./useDataApi2";
 
 export function usePersistModel() {
-  const sendRequest = useDataAPI<any>();
   const api = useDataApi2();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -82,114 +80,34 @@ export function usePersistModel() {
       });
   };
 
-  const deleteField = async (id: number) => {
-    const mutation = `
-    mutation($id:String!) {
-      deleteTemplateField(id:$id) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id
-    };
-
+  const deleteField = async (id: string) => {
     setIsLoading(true);
-    return sendRequest(mutation, variables).then(
-      (result: {
-        deleteTemplateField: { error?: string; template?: object };
-      }) => {
+    return api()
+      .deleteTemplateField({
+        id
+      })
+      .then(data => {
         setIsLoading(false);
-        const { error, template } = result.deleteTemplateField;
+        const { error, template } = data.deleteTemplateField;
         return { error, template: templateFromServerResponse(template) };
-      }
-    );
+      });
   };
 
   const deleteTopic = async (id: number) => {
-    const mutation = `
-    mutation($id:Int!) {
-      deleteTopic(id:$id) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      id
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        deleteTopic: {
-          error?: string;
-        };
-      }) => {
-        return result.deleteTopic;
-      }
-    );
+    return api()
+      .deleteTopic({
+        id
+      })
+      .then(data => data.deleteTopic);
   };
 
   const createTopic = async (sortOrder: number) => {
-    const mutation = `
-    mutation($sortOrder:Int!) {
-      createTopic(sortOrder:$sortOrder) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      sortOrder
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        createTopic: {
-          template?: object;
-          error?: string;
-        };
-      }) => {
-        const { error, template } = result.createTopic;
+    return api()
+      .createTopic({ sortOrder })
+      .then(data => {
+        const { error, template } = data.createTopic;
         return { error, template: templateFromServerResponse(template) };
-      }
-    );
+      });
   };
 
   const templateFromServerResponse = (obj: any) => {
