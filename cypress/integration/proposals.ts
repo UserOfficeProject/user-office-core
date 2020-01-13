@@ -131,7 +131,7 @@ context("Proposaltests", () => {
     cy.get("[data-cy=co-proposers] button")
       .first()
       .click();
-    cy.get("[title='Add Participants']")
+    cy.get("[title='Add Co-Proposer']")
       .first()
       .click();
 
