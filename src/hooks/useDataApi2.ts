@@ -27,7 +27,7 @@ export function useDataApi2() {
     },
     [token, handleNewToken, handleLogout]
   );
-  return sendRequest();
+  return sendRequest;
 }
 
 class AuthorizedGraphQLClient extends GraphQLClient {

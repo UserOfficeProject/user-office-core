@@ -7,7 +7,7 @@ export function useCreateProposal() {
 
   const createProposal = useCallback(async () => {
     setLoading(true);
-    const mutationResult = await api.createProposal();
+    const mutationResult = await api().createProposal();
     setLoading(false);
     return mutationResult.createProposal;
   }, [api]);

@@ -6,7 +6,7 @@ export function useSetPageContent() {
 
   const sendPageContent = useCallback(
     async (pageName, text) => {
-      return api
+      return api()
         .setPageContent({ id: pageName, text })
         .then(resp => resp.setPageContent);
     },

@@ -12,7 +12,9 @@ export function useAddReview() {
         comment
       };
 
-      return await sendRequest.addReview(variables).then(resp => resp);
+      return await sendRequest()
+        .addReview(variables)
+        .then(resp => resp);
     },
     [sendRequest]
   );

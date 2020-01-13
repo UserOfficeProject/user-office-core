@@ -28,7 +28,9 @@ export function useAddCall() {
         surveyComment
       };
 
-      return await api.createCall(variables).then(resp => resp);
+      return await api()
+        .createCall(variables)
+        .then(resp => resp);
     },
     [api]
   );
