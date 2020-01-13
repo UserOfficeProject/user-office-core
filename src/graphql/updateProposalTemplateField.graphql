@@ -1,0 +1,36 @@
+mutation updateProposalTemplateField(
+  $id: String!
+  $question: String
+  $config: String
+  $isEnabled: Boolean
+  $dependencies: [FieldDependencyInput!]
+) {
+  updateProposalTemplateField(
+    id: $id
+    question: $question
+    config: $config
+    isEnabled: $isEnabled
+    dependencies: $dependencies
+  ) {
+    template {
+      steps {
+        topic {
+          topic_title
+          topic_id
+        }
+        fields {
+          proposal_question_id
+          data_type
+          question
+          config
+          dependencies {
+            proposal_question_dependency
+            condition
+            proposal_question_id
+          }
+        }
+      }
+    }
+    error
+  }
+}

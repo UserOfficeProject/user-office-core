@@ -1,0 +1,5 @@
+mutation updateFieldTopicRel($topicId: Int!, $fieldIds: [String!]) {
+  updateFieldTopicRel(topic_id: $topicId, field_ids: $fieldIds) {
+    error
+  }
+}

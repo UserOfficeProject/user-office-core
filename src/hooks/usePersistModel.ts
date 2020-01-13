@@ -7,184 +7,79 @@ import {
   DataType,
   Topic
 } from "../models/ProposalModel";
+import { useDataApi2 } from "./useDataApi2";
 
 export function usePersistModel() {
   const sendRequest = useDataAPI<any>();
+  const api = useDataApi2();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
-    const mutation = `
-    mutation($topicId:Int!, $fieldIds:[String!]) {
-      updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicId,
-      fieldIds
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateFieldTopicRel: {
-          error?: string;
-        };
-      }) => {
-        return result.updateFieldTopicRel;
-      }
-    );
+    return api()
+      .updateFieldTopicRel({
+        topicId,
+        fieldIds
+      })
+      .then(data => data.updateFieldTopicRel);
   };
 
   const updateTopic = async (
     topicId: number,
     values: { title?: string; isEnabled?: boolean }
   ) => {
-    const mutation = `
-    mutation($topicId:Int!, $title:String, $isEnabled:Boolean) {
-      updateTopic(id:$topicId, title:$title, isEnabled:$isEnabled) {
-        topic {
-          topic_id
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      ...values,
-      topicId
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateTopic: {
-          error?: string;
-          topic?: { topic_id: number };
-        };
-      }) => {
-        const { error, topic } = result.updateTopic;
+    return api()
+      .updateTopic({
+        ...values,
+        topicId
+      })
+      .then(data => {
+        const { error, topic } = data.updateTopic;
         return { error, topic: topicFromServerResponse(topic) };
-      }
-    );
+      });
   };
 
   const updateTopicOrder = async (topicOrder: number[]) => {
-    const mutation = `
-    mutation($topicOrder:[Int!]!) {
-      updateTopicOrder(topicOrder:$topicOrder) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicOrder
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateTopicOrder: {
-          error?: string;
-        };
-      }) => {
-        return result.updateTopicOrder;
-      }
-    );
+    return api()
+      .updateTopicOrder({
+        topicOrder
+      })
+      .then(data => data.updateTopicOrder);
   };
 
   const updateItem = async (field: ProposalTemplateField) => {
-    const mutation = `
-    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {
-      updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id: field.proposal_question_id,
-      question: field.question,
-      config: field.config ? JSON.stringify(field.config) : undefined,
-      isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
-      dependencies: field.dependencies
-        ? field.dependencies.map(dep => {
-            return { ...dep, condition: JSON.stringify(dep.condition) };
-          })
-        : []
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateProposalTemplateField: {
-          error?: string;
-          template?: object;
-        };
-      }) => {
-        const { error, template } = result.updateProposalTemplateField;
+    return api()
+      .updateProposalTemplateField({
+        id: field.proposal_question_id,
+        question: field.question,
+        config: field.config ? JSON.stringify(field.config) : undefined,
+        isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
+        dependencies: field.dependencies
+          ? field.dependencies.map(dep => {
+              return { ...dep, condition: JSON.stringify(dep.condition) };
+            })
+          : []
+      })
+      .then(data => {
+        const { error, template } = data.updateProposalTemplateField;
         return { error, template: templateFromServerResponse(template) };
-      }
-    );
+      });
   };
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
-    const mutation = `
-    mutation($topicId:Int!, $dataType:DataType!) {
-      createTemplateField(topicId:$topicId, dataType:$dataType) {
-        field {
-          proposal_question_id
-          data_type,
-          question
-          config,
-          topic_id
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicId: topicId,
-      dataType: dataType
-    };
-
     setIsLoading(true);
-    return sendRequest(mutation, variables).then(
-      (result: {
-        createTemplateField: {
-          error?: string;
-          field?: {
-            proposal_question_id: string;
-            ddata_type: DataType;
-            question: string;
-            config: string;
-            topic_id: number;
-          };
-        };
-      }) => {
+    return api()
+      .createTemplateField({
+        topicId: topicId,
+        dataType: dataType
+      })
+      .then(data => {
         setIsLoading(false);
-        const { error, field } = result.createTemplateField;
+        const { error, field } = data.createTemplateField;
         return {
           error,
           field: templateFieldFromServerResponse(field)
         };
-      }
-    );
+      });
   };
 
   const deleteField = async (id: number) => {
@@ -318,7 +213,9 @@ export function usePersistModel() {
     return obj;
   };
 
-  type MonitorableServiceCall = () => Promise<{ error?: string }>;
+  type MonitorableServiceCall = () => Promise<{
+    error?: string | null;
+  }>;
 
   const persistModel = ({
     getState,
