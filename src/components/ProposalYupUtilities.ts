@@ -17,7 +17,7 @@ export const createFormikCofigObjects = (
 
 const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
   switch (field.data_type) {
-    case DataType.TEXT_INPUT:
+    case DataType.TextInput:
       let txtInputSchema = Yup.string();
       field.config.required &&
         (txtInputSchema = txtInputSchema.required(`This is a required field`));
@@ -32,19 +32,19 @@ const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
           `Value must be at most ${field.config.max} characters`
         ));
       return txtInputSchema;
-    case DataType.SELECTION_FROM_OPTIONS:
+    case DataType.SelectionFromOptions:
       let selectFromOptionsSchema = Yup.string();
       field.config.required &&
         (selectFromOptionsSchema = selectFromOptionsSchema.required(
           `This is a required field`
         ));
       return selectFromOptionsSchema;
-    case DataType.DATE:
+    case DataType.Date:
       let dateSchema = Yup.date();
       field.config.required &&
         (dateSchema = dateSchema.required(`This date is required`));
       return dateSchema;
-    case DataType.BOOLEAN:
+    case DataType.Boolean:
       let booleanSchema = Yup.bool();
 
       field.config.required &&

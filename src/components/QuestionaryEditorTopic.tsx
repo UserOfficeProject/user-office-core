@@ -102,7 +102,7 @@ export default function QuestionaryEditorTopic(props: {
     <input
       type="text"
       value={title}
-      data-cy='topic-title-input'
+      data-cy="topic-title-input"
       className={classes.inputHeading}
       onChange={event => setTitle(event.target.value)}
       onBlur={() => {
@@ -123,7 +123,7 @@ export default function QuestionaryEditorTopic(props: {
       onClick={() => {
         setIsEditMode(true);
       }}
-      data-cy='topic-title'
+      data-cy="topic-title"
     >
       {index + 2}. {props.data.topic.topic_title}
     </span>
@@ -187,40 +187,40 @@ export default function QuestionaryEditorTopic(props: {
             >
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
+                onClick={() => onCreateNewFieldClicked(DataType.TextInput)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+                  {getTemplateFieldIcon(DataType.TextInput)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Text input</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
+                onClick={() => onCreateNewFieldClicked(DataType.Embellishment)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
+                  {getTemplateFieldIcon(DataType.Embellishment)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Embellishment</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.DATE)}
+                onClick={() => onCreateNewFieldClicked(DataType.Date)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.DATE)!}
+                  {getTemplateFieldIcon(DataType.Date)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Date</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.FILE_UPLOAD)}
+                onClick={() => onCreateNewFieldClicked(DataType.FileUpload)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
+                  {getTemplateFieldIcon(DataType.FileUpload)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add File upload</Typography>
               </MenuItem>
@@ -228,21 +228,21 @@ export default function QuestionaryEditorTopic(props: {
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() =>
-                  onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)
+                  onCreateNewFieldClicked(DataType.SelectionFromOptions)
                 }
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
+                  {getTemplateFieldIcon(DataType.SelectionFromOptions)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Multiple choice</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
+                onClick={() => onCreateNewFieldClicked(DataType.Boolean)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.BOOLEAN)!}
+                  {getTemplateFieldIcon(DataType.Boolean)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Boolean</Typography>
               </MenuItem>

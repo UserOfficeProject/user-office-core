@@ -19,12 +19,12 @@ export class ProposalInformation {
 }
 
 export enum DataType {
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
-  EMBELLISHMENT = "EMBELLISHMENT",
-  FILE_UPLOAD = "FILE_UPLOAD",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT"
+  Boolean = "BOOLEAN",
+  Date = "DATE",
+  Embellishment = "EMBELLISHMENT",
+  FileUpload = "FILE_UPLOAD",
+  SelectionFromOptions = "SELECTION_FROM_OPTIONS",
+  TextInput = "TEXT_INPUT"
 }
 
 export class ProposalTemplate {
@@ -125,7 +125,7 @@ export class QuestionaryField extends ProposalTemplateField {
       templateField,
       obj.value
         ? JSON.parse(obj.value).value
-        : templateField.data_type === DataType.BOOLEAN
+        : templateField.data_type === DataType.Boolean
         ? false
         : ""
     );

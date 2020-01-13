@@ -9,17 +9,17 @@ import { DataType } from "../models/ProposalModel";
 
 const getTemplateFieldIcon = (dataType: DataType) => {
   switch (dataType) {
-    case DataType.TEXT_INPUT:
+    case DataType.TextInput:
       return <ShortTextIcon />;
-    case DataType.SELECTION_FROM_OPTIONS:
+    case DataType.SelectionFromOptions:
       return <RadioButtonCheckedIcon />;
-    case DataType.BOOLEAN:
+    case DataType.Boolean:
       return <CheckBoxOutlineBlankIcon />;
-    case DataType.DATE:
+    case DataType.Date:
       return <CalendarTodayIcon />;
-    case DataType.FILE_UPLOAD:
+    case DataType.FileUpload:
       return <AttachFileIcon />;
-    case DataType.EMBELLISHMENT:
+    case DataType.Embellishment:
       return <TextFieldsIcon />;
 
     default:

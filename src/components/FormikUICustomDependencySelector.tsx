@@ -81,12 +81,12 @@ const FormikUICustomDependencySelector = ({
       if (!depField) {
         return;
       }
-      if (depField.data_type === DataType.BOOLEAN) {
+      if (depField.data_type === DataType.Boolean) {
         setAvailableValues([
           { label: "true", value: true },
           { label: "false", value: false }
         ]);
-      } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
+      } else if (depField.data_type === DataType.SelectionFromOptions) {
         setAvailableValues(
           depField.config.options!.map(option => {
             return { value: option, label: option };
@@ -123,7 +123,7 @@ const FormikUICustomDependencySelector = ({
           >
             {getAllFields(template)
               .filter(option =>
-                [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
+                [DataType.Boolean, DataType.SelectionFromOptions].includes(
                   option.data_type
                 )
               )

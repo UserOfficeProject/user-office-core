@@ -19,7 +19,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       new QuestionaryField(
         new ProposalTemplateField(
           "ttl_general",
-          DataType.EMBELLISHMENT,
+          DataType.Embellishment,
           0,
           "",
           { html: "General informaiton", plain: "General information" },
@@ -31,7 +31,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       new QuestionaryField(
         new ProposalTemplateField(
           "has_links_with_industry",
-          DataType.SELECTION_FROM_OPTIONS,
+          DataType.SelectionFromOptions,
           1,
           "Has links with industry",
           { options: ["yes", "no"], variant: "radio" },
@@ -43,7 +43,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       new QuestionaryField(
         new ProposalTemplateField(
           "links_with_industry",
-          DataType.TEXT_INPUT,
+          DataType.TextInput,
           2,
           "If yes, please describe:",
           { placeholder: "Please specify links with industry" },
@@ -79,7 +79,7 @@ export const createDummyField = (values: {
 }): ProposalTemplateField => {
   return new ProposalTemplateField(
     values.proposal_question_id || "random_field_name_" + Math.random(),
-    values.data_type || DataType.TEXT_INPUT,
+    values.data_type || DataType.TextInput,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
     values.config || {},

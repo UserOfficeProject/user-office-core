@@ -35,15 +35,12 @@ export default function QuestionaryFieldEditor(props: {
   }))();
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
-  componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
-  componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
-  componentMap.put(DataType.DATE, AdminComponentDate);
-  componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
-  componentMap.put(
-    DataType.SELECTION_FROM_OPTIONS,
-    AdminComponentMultipleChoice
-  );
-  componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
+  componentMap.put(DataType.Boolean, AdminComponentBoolean);
+  componentMap.put(DataType.Embellishment, AdminComponentEmbellishment);
+  componentMap.put(DataType.Date, AdminComponentDate);
+  componentMap.put(DataType.FileUpload, AdminComponentFileUpload);
+  componentMap.put(DataType.SelectionFromOptions, AdminComponentMultipleChoice);
+  componentMap.put(DataType.TextInput, AdminComponentTextInput);
 
   if (props.field === null) {
     return null;
