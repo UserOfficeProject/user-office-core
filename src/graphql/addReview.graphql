@@ -1,0 +1,11 @@
+mutation addReview($reviewID: Int!, $grade: Int!, $comment: String!) {
+  addReview(reviewID: $reviewID, grade: $grade, comment: $comment) {
+    error
+    review {
+      id
+      status
+      comment
+      grade
+    }
+  }
+}
