@@ -21,10 +21,10 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.EMBELLISHMENT,
           0,
           "",
-          JSON.stringify({
+          {
             html: "General informaiton",
             plain: "General information"
-          }),
+          },
           0,
           []
         ),
@@ -36,7 +36,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.SELECTION_FROM_OPTIONS,
           1,
           "Has links with industry",
-          JSON.stringify({ options: ["yes", "no"], variant: "radio" }),
+          { options: ["yes", "no"], variant: "radio" },
           0,
           []
         ),
@@ -48,7 +48,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.TEXT_INPUT,
           2,
           "If yes, please describe:",
-          JSON.stringify({ placeholder: "Please specify links with industry" }),
+          { placeholder: "Please specify links with industry" },
           0,
           [
             new FieldDependency(
@@ -76,7 +76,7 @@ export const createDummyField = (values: {
   sort_order?: number;
   topic_id?: number;
   question?: string;
-  config?: string;
+  config?: object;
   dependencies?: FieldDependency[];
 }): ProposalTemplateField => {
   return new ProposalTemplateField(
@@ -84,7 +84,7 @@ export const createDummyField = (values: {
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
-    values.config || JSON.stringify({}),
+    values.config || {},
     values.topic_id || Math.round(Math.random() * 10),
     values.dependencies || []
   );

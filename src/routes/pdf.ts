@@ -5,7 +5,8 @@ import {
   DataType,
   Questionary,
   QuestionaryField,
-  FieldConfig
+  FieldConfig,
+  EmbellishmentConfig
 } from "../models/ProposalModel";
 import { createToC } from "./pdfTableofContents/index";
 import {
@@ -166,7 +167,7 @@ router.get("/proposal/download/:proposal_id", async (req: any, res) => {
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          let conf = JSON.parse(field.config) as FieldConfig;
+          let conf = field.config as EmbellishmentConfig;
           if (!conf.omitFromPdf) {
             writeBold(conf.plain!);
           }

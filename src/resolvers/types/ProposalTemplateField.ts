@@ -1,8 +1,18 @@
-import { ObjectType, Field, Int } from "type-graphql";
-
-import { DataType } from "../../models/ProposalModel";
-
-import { ProposalTemplateField as ProposalTemplateFieldOrigin } from "../../models/ProposalModel";
+import { Field, Int, ObjectType } from "type-graphql";
+import {
+  DataType,
+  ProposalTemplateField as ProposalTemplateFieldOrigin,
+  FieldConfig
+} from "../../models/ProposalModel";
+import {
+  BooleanConfig,
+  DateConfig,
+  EmbellishmentConfig,
+  FileUploadConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig,
+  FieldConfigType
+} from "./FieldConfig";
 import { FieldDependency } from "./FieldDependency";
 
 @ObjectType()
@@ -19,10 +29,9 @@ export class ProposalTemplateField
 
   @Field()
   public question: string;
-  //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type configs
 
-  @Field()
-  public config: string;
+  @Field(() => FieldConfigType)
+  public config: FieldConfig;
 
   @Field(() => Int)
   public topic_id: number;

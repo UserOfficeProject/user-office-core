@@ -4,7 +4,8 @@ import {
   DataType,
   FieldDependency,
   FieldCondition,
-  QuestionaryField
+  QuestionaryField,
+  FieldConfig
 } from "../../models/ProposalModel";
 import { Proposal } from "../../models/Proposal";
 import { Page } from "../../models/Admin";
@@ -163,7 +164,7 @@ export const createProposalTemplateFieldObject = (
     question.data_type as DataType,
     question.sort_order,
     question.question,
-    question.config,
+    JSON.parse(question.config) as FieldConfig,
     question.topic_id,
     null
   );
@@ -207,7 +208,7 @@ export const createQuestionaryFieldObject = (
       question.data_type as DataType,
       question.sort_order,
       question.question,
-      question.config,
+      JSON.parse(question.config) as FieldConfig,
       question.topic_id,
       null
     ),

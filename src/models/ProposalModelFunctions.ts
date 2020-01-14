@@ -7,7 +7,9 @@ import {
   DataType,
   DataTypeSpec,
   FieldDependency,
-  FieldConfig
+  FieldConfig,
+  TextInputConfig,
+  SelectionFromOptionsConfig
 } from "./ProposalModel";
 import JSDict from "../utils/Dictionary";
 type AbstractField = ProposalTemplateField | QuestionaryField;
@@ -109,8 +111,7 @@ class BaseValidator implements IConstraintValidator {
     if (this.dataType && field.data_type !== this.dataType) {
       throw new Error("Field validator ");
     }
-    const config = JSON.parse(field.config) as FieldConfig;
-    if (config.required && !value) {
+    if (field.config.required && !value) {
       return false;
     }
     return true;
@@ -122,10 +123,10 @@ class TextInputValidator extends BaseValidator {
     super(DataType.TEXT_INPUT);
   }
   validate(value: any, field: QuestionaryField) {
-    const config = JSON.parse(field.config) as FieldConfig;
     if (!super.validate(value, field)) {
       return false;
     }
+    const config = field.config as TextInputConfig;
     if (config.min && value && value.length < config.min) {
       return false;
     }
@@ -141,7 +142,7 @@ class SelectFromOptionsInputValidator extends BaseValidator {
     super(DataType.SELECTION_FROM_OPTIONS);
   }
   validate(value: any, field: QuestionaryField) {
-    const config = JSON.parse(field.config) as FieldConfig;
+    const config = field.config as SelectionFromOptionsConfig;
     if (!super.validate(value, field)) {
       return false;
     }

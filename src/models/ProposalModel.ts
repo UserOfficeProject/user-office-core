@@ -6,8 +6,7 @@ export class ProposalTemplateField {
     public data_type: DataType,
     public sort_order: number,
     public question: string,
-    //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type config,
-    public config: string,
+    public config: FieldConfig,
     public topic_id: number,
     public dependencies: FieldDependency[] | null
   ) {}
@@ -180,19 +179,43 @@ export interface DataTypeSpec {
   readonly: boolean;
 }
 
-export interface FieldConfig {
-  variant?: string;
+export type FieldConfig =
+  | BooleanConfig
+  | DateConfig
+  | EmbellishmentConfig
+  | FileUploadConfig
+  | SelectionFromOptionsConfig
+  | TextInputConfig;
+
+export class ConfigBase {
   small_label?: string;
   required?: boolean;
-  options?: string[];
-  file_type?: string[];
-  max_files?: number;
-  multiline?: boolean;
-  min?: number;
-  max?: number;
-  placeholder?: string;
-  html?: string;
-  plain?: string;
   tooltip?: string;
   omitFromPdf?: boolean;
+}
+
+export class BooleanConfig extends ConfigBase {}
+
+export class DateConfig extends ConfigBase {}
+
+export class EmbellishmentConfig extends ConfigBase {
+  html?: string;
+  plain?: string;
+}
+
+export class FileUploadConfig extends ConfigBase {
+  file_type?: string[];
+  max_files?: number;
+}
+
+export class SelectionFromOptionsConfig extends ConfigBase {
+  variant?: string;
+  options?: string[];
+}
+
+export class TextInputConfig extends ConfigBase {
+  min?: number;
+  max?: number;
+  multiline?: boolean;
+  placeholder?: string;
 }
