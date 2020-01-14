@@ -9,12 +9,11 @@ export function useGetPageContent(pageName: PageName) {
   >(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const variables = {
-      id: pageName
-    };
     setLoading(true);
     api()
-      .getPageContent(variables)
+      .getPageContent({
+        id: pageName
+      })
       .then(data => {
         setPageContent(data.getPageContent);
         setLoading(false);

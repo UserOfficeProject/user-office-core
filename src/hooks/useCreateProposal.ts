@@ -7,9 +7,12 @@ export function useCreateProposal() {
 
   const createProposal = useCallback(async () => {
     setLoading(true);
-    const mutationResult = await api().createProposal();
-    setLoading(false);
-    return mutationResult.createProposal;
+    return api()
+      .createProposal()
+      .then(data => {
+        setLoading(false);
+        return data.createProposal;
+      });
   }, [api]);
 
   return { loading, createProposal };

@@ -9,9 +9,6 @@ export function useOrcIDInformation(authorizationCode: string) {
   >(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (authorizationCode === undefined) {
-      return;
-    }
     sendRequest()
       .getOrcIDInformation({ authorizationCode })
       .then(data => {

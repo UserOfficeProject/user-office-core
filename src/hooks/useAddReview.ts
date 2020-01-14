@@ -6,14 +6,12 @@ export function useAddReview() {
 
   const sendAddReview = useCallback(
     async (reviewID, grade, comment) => {
-      const variables = {
-        reviewID,
-        grade,
-        comment
-      };
-
       return await sendRequest()
-        .addReview(variables)
+        .addReview({
+          reviewID,
+          grade,
+          comment
+        })
         .then(resp => resp);
     },
     [sendRequest]

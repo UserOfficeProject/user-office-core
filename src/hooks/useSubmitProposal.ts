@@ -7,9 +7,12 @@ export function useSubmitProposal() {
 
   const submitProposal = async (id: number) => {
     setIsLoading(true);
-    await sendRequest().submitProposal({ id });
-    setIsLoading(false);
-    return true;
+    return sendRequest()
+      .submitProposal({ id })
+      .then(data => {
+        setIsLoading(false);
+        return !data.submitProposal.error;
+      });
   };
 
   return { isLoading, submitProposal };

@@ -9,16 +9,17 @@ export function useCreateUserInvite() {
     lastname: string,
     email: string
   ) => {
-    const variables = {
-      firstname,
-      lastname,
-      email
-    };
-
     setLoading(true);
-    const data = await sendRequest().createUserByEmailInvite(variables);
-    setLoading(false);
-    return data.createUserByEmailInvite;
+    return sendRequest()
+      .createUserByEmailInvite({
+        firstname,
+        lastname,
+        email
+      })
+      .then(data => {
+        setLoading(false);
+        return data.createUserByEmailInvite;
+      });
   };
 
   return { loading, createUserInvite };

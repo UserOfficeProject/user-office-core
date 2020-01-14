@@ -16,20 +16,18 @@ export function useAddCall() {
       cycleComment,
       surveyComment
     ) => {
-      const variables = {
-        shortCode,
-        startCall,
-        endCall,
-        startReview,
-        endReview,
-        startNotify,
-        endNotify,
-        cycleComment,
-        surveyComment
-      };
-
       return await api()
-        .createCall(variables)
+        .createCall({
+          shortCode,
+          startCall,
+          endCall,
+          startReview,
+          endReview,
+          startNotify,
+          endNotify,
+          cycleComment,
+          surveyComment
+        })
         .then(resp => resp);
     },
     [api]

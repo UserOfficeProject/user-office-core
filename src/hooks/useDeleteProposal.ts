@@ -6,11 +6,8 @@ export function useDeleteProposal() {
 
   const deleteProposal = useCallback(
     async (id: number) => {
-      const variables = {
-        id
-      };
       return await sendRequest()
-        .deleteProposal(variables)
+        .deleteProposal({ id })
         .then(resp => resp);
     },
     [sendRequest]
