@@ -1,10 +1,6 @@
 query review($id: Int!) {
   review(id: $id) {
-    id
-    userID
-    status
-    comment
-    grade
+    ...coreReview
     proposal {
       id
       title

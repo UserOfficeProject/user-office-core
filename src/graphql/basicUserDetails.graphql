@@ -1,8 +1,5 @@
 query basicUserDetails($id: Int!) {
   basicUserDetails(id: $id) {
-    id
-    firstname
-    lastname
-    organisation
+    ...basicUserDetails
   }
 }

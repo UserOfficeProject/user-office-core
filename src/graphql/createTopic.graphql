@@ -7,15 +7,7 @@ mutation createTopic($sortOrder: Int!) {
           topic_id
         }
         fields {
-          proposal_question_id
-          data_type
-          question
-          config
-          dependencies {
-            proposal_question_dependency
-            condition
-            proposal_question_id
-          }
+          ...proposalTemplateField
         }
       }
     }

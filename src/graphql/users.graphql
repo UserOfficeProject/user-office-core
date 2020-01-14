@@ -1,10 +1,7 @@
 query users($filter: String!) {
   users(filter: $filter) {
     users {
-      firstname
-      lastname
-      organisation
-      id
+      ...basicUserDetails
     }
     totalCount
   }

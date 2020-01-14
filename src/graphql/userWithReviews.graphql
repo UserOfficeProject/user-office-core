@@ -6,8 +6,8 @@ query userWithReviews($id: Int!) {
     organisation
     reviews {
       id
-      grade
       comment
+      grade
       proposal {
         id
         title

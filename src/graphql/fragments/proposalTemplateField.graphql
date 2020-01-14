@@ -1,0 +1,13 @@
+fragment proposalTemplateField on ProposalTemplateField {
+  proposal_question_id
+  data_type
+  sort_order
+  question
+  config
+  topic_id
+  dependencies {
+    proposal_question_dependency
+    condition
+    proposal_question_id
+  }
+}
