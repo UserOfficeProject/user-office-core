@@ -1,0 +1,17 @@
+query review($id: Int!) {
+  review(id: $id) {
+    id
+    userID
+    status
+    comment
+    grade
+    proposal {
+      id
+      title
+      abstract
+      proposer {
+        id
+      }
+    }
+  }
+}
