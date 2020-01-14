@@ -91,7 +91,7 @@ export function useGetFileMetadata() {
       fileIds
     };
     sendRequest()
-      .fileMetadata(variables)
+      .getFileMetadata(variables)
       .then(data => {
         setFilesMetadata(data && data.fileMetadata ? data.fileMetadata : []);
       });

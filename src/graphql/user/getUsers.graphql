@@ -1,4 +1,4 @@
-query users($filter: String!) {
+query getUsers($filter: String!) {
   users(filter: $filter) {
     users {
       ...basicUserDetails

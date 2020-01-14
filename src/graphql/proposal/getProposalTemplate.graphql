@@ -1,4 +1,4 @@
-query proposalTemplate {
+query getProposalTemplate {
   proposalTemplate {
     steps {
       topic {

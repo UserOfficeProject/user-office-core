@@ -50,7 +50,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
-      const data = await getSdk(new GraphQLClient(this.endpoint)).token({
+      const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
         token: this.token
       });
       if (data.token.error) {

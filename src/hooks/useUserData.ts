@@ -29,7 +29,7 @@ export function useBasicUserData() {
   const loadBasicUserData = useCallback(
     async (id: number) => {
       return sendRequest()
-        .basicUserDetails({ id })
+        .getBasicUserDetails({ id })
         .then(data => data.basicUserDetails);
     },
     [sendRequest]

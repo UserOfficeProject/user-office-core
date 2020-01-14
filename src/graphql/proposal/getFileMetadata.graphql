@@ -1,4 +1,4 @@
-query fileMetadata($fileIds: [String!]!) {
+query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
     fileId
     originalFileName

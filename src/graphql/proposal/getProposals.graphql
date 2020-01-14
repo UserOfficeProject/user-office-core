@@ -1,4 +1,4 @@
-query proposals($filter: String!) {
+query getProposals($filter: String!) {
   proposals(filter: $filter) {
     proposals {
       id

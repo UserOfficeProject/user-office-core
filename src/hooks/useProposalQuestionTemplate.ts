@@ -7,7 +7,7 @@ export function useProposalQuestionTemplate() {
 
   const getProposalTemplate = useCallback(async () => {
     return api()
-      .proposalTemplate()
+      .getProposalTemplate()
       .then(data => ProposalTemplate.fromObject(data.proposalTemplate));
   }, [api]);
 

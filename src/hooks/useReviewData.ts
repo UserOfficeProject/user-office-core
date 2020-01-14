@@ -9,7 +9,7 @@ export function useReviewData(id: number) {
   useEffect(() => {
     setLoading(true);
     sendRequest()
-      .review({ id })
+      .getReview({ id })
       .then(data => {
         setReviewData(data.review);
         setLoading(false);

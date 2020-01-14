@@ -1,4 +1,4 @@
-query user($id: Int!) {
+query getUser($id: Int!) {
   user(id: $id) {
     proposals {
       id

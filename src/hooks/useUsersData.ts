@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { UsersQuery } from "../generated/sdk";
 import { useDataApi2 } from "./useDataApi2";
+import { GetUsersQuery } from "../generated/sdk";
 
 export function useUsersData(filter: string) {
   const sendRequest = useDataApi2();
-  const [usersData, setUsersData] = useState<UsersQuery["users"] | null>(null);
+  const [usersData, setUsersData] = useState<GetUsersQuery["users"] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
     sendRequest()
-      .users({ filter })
+      .getUsers({ filter })
       .then(data => {
         setUsersData(data.users);
         setLoading(false);

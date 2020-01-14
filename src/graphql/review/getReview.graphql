@@ -1,4 +1,4 @@
-query review($id: Int!) {
+query getReview($id: Int!) {
   review(id: $id) {
     ...coreReview
     proposal {
