@@ -27,7 +27,7 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
-import { getTranslation } from "@esss-swap/duo-localisation";
+import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
 import { ErrorFocus } from "./ErrorFocus";
 
 export default function ProposalQuestionareStep(props: {
@@ -103,7 +103,7 @@ export default function ProposalQuestionareStep(props: {
     if (result && result.updateProposal && result.updateProposal.error) {
       api.reportStatus({
         variant: "error",
-        message: getTranslation(result.updateProposal.error)
+        message: getTranslation(result.updateProposal.error as ResourceId)
       });
     } else {
       api.reportStatus({ variant: "success", message: "Saved" });

@@ -1,13 +1,10 @@
 import { useCallback, useState } from "react";
-import { useDataAPI } from "./useDataAPI";
 import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
-import { ResourceId } from "@esss-swap/duo-localisation";
+import { useDataApi2 } from "./useDataApi2";
 
 export function useUpdateProposal() {
-  const sendRequest = useDataAPI<{
-    updateProposal: { proposal?: { id: number }; error: ResourceId };
-  }>();
+  const sendRequest = useDataApi2();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(
@@ -22,19 +19,9 @@ export function useUpdateProposal() {
       proposerId?: number;
       partialSave?: boolean;
     }) => {
-      const query = `
-      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $users:[Int!], $proposerId:Int, $partialSave:Boolean) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users, proposerId:$proposerId, partialSave:$partialSave){
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
       setLoading(true);
       parameters.answers = prepareAnswers(parameters.answers);
-      const result = await sendRequest(query, parameters);
+      const result = await sendRequest().updateProposal(parameters);
       setLoading(false);
       return result;
     },

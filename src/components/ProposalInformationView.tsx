@@ -46,7 +46,6 @@ export default function ProposalInformationView(props: {
   const informDirty = (isDirty: boolean) => {
     props.setIsDirty && props.setIsDirty(isDirty);
   };
-  console.log(props)
   return (
     <Formik
       initialValues={{
@@ -78,6 +77,7 @@ export default function ProposalInformationView(props: {
           if (result && result.updateProposal && result.updateProposal.error) {
             api.reportStatus({
               variant: "error",
+              //@ts-ignore-line
               message: getTranslation(result.updateProposal.error)
             });
           } else {
