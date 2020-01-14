@@ -41,7 +41,7 @@ class FieldDependencyInput {
 
 @Resolver()
 export class UpdateProposalTemplateFieldMutation {
-  @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
+  @Mutation(() => ProposalTemplateResponseWrap)
   updateProposalTemplateField(
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext

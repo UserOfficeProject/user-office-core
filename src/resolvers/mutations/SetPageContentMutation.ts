@@ -6,7 +6,7 @@ import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class SetPageContentMutation {
-  @Mutation(() => PageResponseWrap, { nullable: true })
+  @Mutation(() => PageResponseWrap)
   setPageContent(
     @Arg("id", () => PageName) id: PageName,
     @Arg("text", () => String) text: string,

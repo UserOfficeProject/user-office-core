@@ -13,7 +13,7 @@ class EmailVerificationResponseWrap extends ResponseWrapBase<boolean> {
 
 @Resolver()
 export class EmailVerificationMutation {
-  @Mutation(() => EmailVerificationResponseWrap, { nullable: true })
+  @Mutation(() => EmailVerificationResponseWrap)
   emailVerification(
     @Arg("token") token: string,
     @Ctx() context: ResolverContext

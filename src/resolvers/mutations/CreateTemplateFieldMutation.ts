@@ -23,7 +23,7 @@ class CreateTemplateFieldArgs {
 
 @Resolver()
 export class CreateTemplateFieldMutation {
-  @Mutation(() => TemplateFieldResponseWrap, { nullable: true })
+  @Mutation(() => TemplateFieldResponseWrap)
   createTemplateField(
     @Args() args: CreateTemplateFieldArgs,
     @Ctx() context: ResolverContext

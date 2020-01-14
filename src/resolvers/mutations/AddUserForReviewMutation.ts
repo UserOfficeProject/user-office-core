@@ -22,7 +22,7 @@ class AddUserForReviewArgs {
 
 @Resolver()
 export class AddUserForReviewMutation {
-  @Mutation(() => ReviewResponseWrap, { nullable: true })
+  @Mutation(() => ReviewResponseWrap)
   addUserForReview(
     @Args() args: AddUserForReviewArgs,
     @Ctx() context: ResolverContext

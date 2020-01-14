@@ -21,7 +21,7 @@ class UpdateTopicOrderResponseWrap extends ResponseWrapBase<number[]> {
 
 @Resolver()
 export class UpdateTopicOrderMutation {
-  @Mutation(() => UpdateTopicOrderResponseWrap, { nullable: true })
+  @Mutation(() => UpdateTopicOrderResponseWrap)
   updateTopicOrder(
     @Arg("topicOrder", () => [Int]) topicOrder: number[],
     @Ctx() context: ResolverContext

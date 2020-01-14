@@ -5,7 +5,7 @@ import { ProposalResponseWrap } from "../types/CommonWrappers";
 
 @Resolver()
 export class CreateProposalMutation {
-  @Mutation(() => ProposalResponseWrap, { nullable: true })
+  @Mutation(() => ProposalResponseWrap)
   createProposal(@Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.proposal.create(context.user),

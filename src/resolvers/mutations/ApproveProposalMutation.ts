@@ -5,7 +5,7 @@ import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class ApproveProposalMutation {
-  @Mutation(() => ProposalResponseWrap, { nullable: true })
+  @Mutation(() => ProposalResponseWrap)
   approveProposal(
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext

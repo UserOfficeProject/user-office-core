@@ -42,7 +42,7 @@ class UpdateProposalArgs {
 
 @Resolver()
 export class UpdateProposalMutation {
-  @Mutation(() => ProposalResponseWrap, { nullable: true })
+  @Mutation(() => ProposalResponseWrap)
   updateProposal(
     @Args()
     {
