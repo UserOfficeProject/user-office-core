@@ -19,9 +19,11 @@ export function useUserWithReviewsData(id: number) {
           id
           grade
           comment
+          status
           proposal{
             id
             title
+            shortCode
           }
         }
       }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
@@ -38,8 +38,7 @@ export default function ProposalGrade({ match }) {
   const classes = useStyles();
   const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
-  const { proposalData } = useProposalData(parseInt(match.params.id));
-
+  const { proposalData } = useProposalData(reviewData?.proposal?.id);
   const sendAddReview = useAddReview();
 
   if (submitted) {

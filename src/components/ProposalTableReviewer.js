@@ -9,6 +9,8 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { UserContext } from "../context/UserContextProvider";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -33,14 +35,14 @@ const useStyles = makeStyles(theme => ({
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
   const { loading, userData } = useUserWithReviewsData(user.id);
-
+  const downloadPDFProposal = useDownloadPDFProposal();
   const classes = useStyles();
 
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
     { title: "Title", field: "title" },
-    { title: "Comment", field: "comment" },
-    { title: "Grade", field: "grade" }
+    { title: "Grade", field: "grade" },
+    { title: "Status", field: "status" }
   ];
 
   const [editReviewID, setEditReviewID] = useState(0);
@@ -53,11 +55,14 @@ export default function ProposalTableReviewer() {
     return <p>Loading</p>;
   }
   const reviewData = userData.reviews.map(review => {
+    console.log(review);
     return {
-      id: review.id,
+      shortCode: review.proposal.shortCode,
       title: review.proposal.title,
       grade: review.grade,
-      comment: review.comment
+      reviewId: review.id,
+      comment: review.comment,
+      status: review.status
     };
   });
   return (
@@ -70,11 +75,39 @@ export default function ProposalTableReviewer() {
               title={"Proposals to review"}
               columns={columns}
               data={reviewData}
+              options={{
+                search: false,
+                selection: true
+              }}
+              localization={{
+                toolbar: {
+                  nRowsSelected: "{0} proposal(s) selected"
+                }
+              }}
               actions={[
                 {
                   icon: () => <Edit />,
                   tooltip: "Review proposal",
-                  onClick: (event, rowData) => setEditReviewID(rowData.id)
+                  onClick: (event, rowData) =>
+                    setEditReviewID(rowData.reviewId),
+                  position: "row"
+                },
+                {
+                  icon: () => <GetAppIcon />,
+                  tooltip: "Download proposal",
+                  onClick: (event, rowData) =>
+                    downloadPDFProposal(rowData.shortCode),
+                  position: "row"
+                },
+                {
+                  icon: () => <GetAppIcon />,
+                  tooltip: "Download proposals",
+                  onClick: (event, rowData) => {
+                    downloadPDFProposal(
+                      rowData.map(row => row.shortCode).join(",")
+                    );
+                  },
+                  position: "toolbarOnSelect"
                 }
               ]}
             />
