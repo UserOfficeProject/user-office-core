@@ -1,0 +1,17 @@
+query userWithReviews($id: Int!) {
+  user(id: $id) {
+    id
+    firstname
+    lastname
+    organisation
+    reviews {
+      id
+      grade
+      comment
+      proposal {
+        id
+        title
+      }
+    }
+  }
+}
