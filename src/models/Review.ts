@@ -8,3 +8,8 @@ export class Review {
     public status: number
   ) {}
 }
+
+export enum ReviewStatus {
+  DRAFT = 0,
+  SUBMITTED = 1
+}
