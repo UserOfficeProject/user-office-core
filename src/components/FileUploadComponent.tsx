@@ -57,13 +57,13 @@ export function FileUploadComponent(props: {
     if (previousFiles.length === files.length) {
       return; // no files added or removed
     }
-  }, [files, previousFiles]); // eslint-disable-line react-hooks/exhaustive-deps, run only when files change
+  }, [files, previousFiles]);
 
   useEffect(() => {
     if (props.value) {
       getFileMetadata(props.value.split(","));
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps, run only once in the beginning
+  }, []);
 
   useEffect(() => {
     setFiles(filesMetadata);
