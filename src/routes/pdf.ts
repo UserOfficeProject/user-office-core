@@ -32,15 +32,16 @@ const createProposalPDF = async (
   proposalId: number,
   user: User,
   pageNumber: number
-): Promise<{ toc: any; pageNumber: number; metaData: any }> => {
-  let toc: any = [];
-  let metaData: any = {};
-
+): Promise<{
+  toc: any;
+  pageNumber: number;
+  metaData: { year: number; path: string; pi: string; shortCode: string };
+}> => {
   try {
     const notAnswered = "Left blank";
     const UserAuthorization = baseContext.userAuthorization;
     const proposal = await baseContext.queries.proposal.get(user, proposalId);
-
+    let toc: any = [];
     // Authenticate user
     if (!proposal || !UserAuthorization.hasAccessRights(user, proposal)) {
       throw new Error("User was not allowed to download PDF");
@@ -70,10 +71,14 @@ const createProposalPDF = async (
     }
 
     // Set metaData information
-    metaData.year = proposal.created.getUTCFullYear();
-    metaData.pi = principalInvestigator.lastname;
-    metaData.shortCode = proposal.shortCode;
-    metaData.path = `${metaData.year}_${metaData.pi}_${metaData.shortCode}.pdf`;
+    const metaData = {
+      year: proposal.created.getUTCFullYear(),
+      pi: principalInvestigator.lastname,
+      shortCode: proposal.shortCode,
+      path: `${proposal.created.getUTCFullYear()}_${
+        principalInvestigator.lastname
+      }_${proposal.shortCode}.pdf`
+    };
 
     // Create a PDF document
     const doc = new PDFDocument({ bufferPages: true });
