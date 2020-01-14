@@ -31,8 +31,7 @@ const getAttachments = (attachmentId: string) => {
 const createProposalPDF = async (
   proposalId: number,
   user: User,
-  pageNumber: number,
-  res: any
+  pageNumber: number
 ): Promise<{ toc: any; pageNumber: number; metaData: any }> => {
   let toc: any = [];
   let metaData: any = {};
@@ -41,6 +40,8 @@ const createProposalPDF = async (
     const notAnswered = "Left blank";
     const UserAuthorization = baseContext.userAuthorization;
     const proposal = await baseContext.queries.proposal.get(user, proposalId);
+
+    // Authenticate user
     if (!proposal || !UserAuthorization.hasAccessRights(user, proposal)) {
       throw new Error("User was not allowed to download PDF");
     }
@@ -159,7 +160,7 @@ const createProposalPDF = async (
           }) as QuestionaryField[])
         : [];
       if (!step) {
-        return res.status(500).send();
+        throw "Could not dowload generated PDF";
       }
       writeBold(step.topic.topic_title);
       toc.push({
@@ -208,65 +209,51 @@ const createProposalPDF = async (
     doc.end();
     pageNumber++;
 
-    // Stitch togethere PDF proposal with attachments
-    writeStream.on("finish", async function() {
-      const attachmentsMetadata = await Promise.all(
-        attachmentIds.map(getAttachments)
-      ).catch(e => {
-        logger.logException("Failed to write PDF", e);
-        res.status(500).send();
-        return [];
-      });
-      var pdfWriter = hummus.createWriter(`downloads/${metaData.path}`);
-      pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
-      let attachmentToC = {
-        title: "Attachment",
-        page: pageNumber,
-        children: <any>[]
-      };
-
-      attachmentsMetadata.forEach(async attachmentMeta => {
-        pdfWriter.appendPDFPagesFromPDF(
-          `downloads/${attachmentMeta[0].fileId}`
-        );
-        var pdfReader = hummus.createReader(
-          `downloads/${attachmentMeta[0].fileId}`
-        );
-        attachmentToC.children.push({
-          title: `${attachmentMeta[0].originalFileName}`,
-          page: pageNumber,
-          children: []
+    // Stitch together PDF proposal with attachments
+    return new Promise((resolve, reject) => {
+      writeStream.on("finish", async function() {
+        const attachmentsMetadata = await Promise.all(
+          attachmentIds.map(getAttachments)
+        ).catch(() => {
+          throw "Could not dowload generated PDF";
         });
-        pageNumber = pageNumber + pdfReader.getPagesCount();
+        var pdfWriter = hummus.createWriter(`downloads/${metaData.path}`);
+        pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
+        let attachmentToC = {
+          title: "Attachment",
+          page: pageNumber,
+          children: <any>[]
+        };
 
-        fs.unlink(`downloads/${attachmentMeta[0].fileId}`, () => {});
+        attachmentsMetadata.forEach(async attachmentMeta => {
+          pdfWriter.appendPDFPagesFromPDF(
+            `downloads/${attachmentMeta[0].fileId}`
+          );
+          var pdfReader = hummus.createReader(
+            `downloads/${attachmentMeta[0].fileId}`
+          );
+          attachmentToC.children.push({
+            title: `${attachmentMeta[0].originalFileName}`,
+            page: pageNumber,
+            children: []
+          });
+          pageNumber = pageNumber + pdfReader.getPagesCount();
+
+          fs.unlink(`downloads/${attachmentMeta[0].fileId}`, () => {});
+        });
+
+        if (attachmentsMetadata[0]) {
+          toc.push(attachmentToC);
+        }
+        fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {});
+        pdfWriter.end();
+        resolve({ toc, pageNumber, metaData });
       });
-
-      if (attachmentsMetadata[0]) {
-        toc.push(attachmentToC);
-      }
-      fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {});
-      pdfWriter.end();
-
-      // fs.unlink(
-      //   `downloads/proposalWithAttachments-${proposalId}.pdf`,
-      //   () => {}
-      // ); // delete file once done
-
-      // res.download(path, `${year}_${pi}_${shortcode}.pdf`, (err: any) => {
-      //   if (err) {
-      //     throw err;
-      //   }
-      //   if (existsSync(path)) {
-      //     unlink(path, () => {}); // delete file once done
-      //   }
-      // });
     });
   } catch (e) {
     logger.logException("Could not dowload generated PDF", e);
-    res.status(500).send(e);
+    throw "Could not dowload generated PDF";
   }
-  return { toc, pageNumber, metaData };
 };
 
 router.get("/proposal/download/:proposal_ids", async (req: any, res) => {
@@ -276,23 +263,24 @@ router.get("/proposal/download/:proposal_ids", async (req: any, res) => {
     let toc: any = [];
     let pageNumber = 0;
     let filePaths: string[] = [];
-    // Authenticate user and fecth user, co-proposer and proposal with questionary
+    const tmpFileNamePath = `downloads/${(+new Date()).toString(36)}.pdf`;
+    const tmpFileNamePathFinal = `downloads/final${(+new Date()).toString(
+      36
+    )}.pdf`;
     let user = await baseContext.queries.user.getAgent(decoded.user.id);
 
     if (user == null) {
       throw new Error("Could not find user");
     }
 
-    var pdfWriter = hummus.createWriter(`downloads/test-proposals.pdf`);
+    var pdfWriter = hummus.createWriter(tmpFileNamePath);
 
     for (const propId of proposalIds) {
       const result = await createProposalPDF(
         parseInt(propId),
         user as User,
-        pageNumber,
-        res
+        pageNumber
       ).then(result => {
-        console.log(result);
         pdfWriter.appendPDFPagesFromPDF(`downloads/${result.metaData.path}`);
         return result;
       });
@@ -307,26 +295,21 @@ router.get("/proposal/download/:proposal_ids", async (req: any, res) => {
 
     pdfWriter.end();
 
+    createToC(tmpFileNamePath, tmpFileNamePathFinal, toc);
+
     //clean up
-    console.log(filePaths);
     filePaths.forEach(filePath => fs.unlink(`downloads/${filePath}`, () => {}));
+    fs.unlink(tmpFileNamePath, () => {});
 
-    createToC(
-      `downloads/test-proposals.pdf`,
-      `downloads/proposalWithAttachmentsAndToC.pdf`,
-      toc
-    );
-
-    const path = `downloads/proposalWithAttachmentsAndToC.pdf`;
     res.download(
-      path,
+      tmpFileNamePathFinal,
       filePaths.length > 1 ? `proposals.pdf` : filePaths[0],
       (err: any) => {
         if (err) {
           throw err;
         }
-        if (existsSync(path)) {
-          unlink(path, () => {}); // delete file once done
+        if (existsSync(tmpFileNamePathFinal)) {
+          unlink(tmpFileNamePathFinal, () => {}); // delete file once done
         }
       }
     );
