@@ -44,7 +44,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .update(
         {
           comment,
-          grade
+          grade,
+          status: ReviewStatus.SUBMITTED
         },
         ["*"]
       )
