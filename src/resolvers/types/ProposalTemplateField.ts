@@ -1,18 +1,9 @@
 import { Field, Int, ObjectType } from "type-graphql";
 import {
   DataType,
-  ProposalTemplateField as ProposalTemplateFieldOrigin,
-  FieldConfig
+  ProposalTemplateField as ProposalTemplateFieldOrigin
 } from "../../models/ProposalModel";
-import {
-  BooleanConfig,
-  DateConfig,
-  EmbellishmentConfig,
-  FileUploadConfig,
-  SelectionFromOptionsConfig,
-  TextInputConfig,
-  FieldConfigType
-} from "./FieldConfig";
+import { FieldConfigType } from "./FieldConfig";
 import { FieldDependency } from "./FieldDependency";
 
 @ObjectType()
@@ -31,7 +22,7 @@ export class ProposalTemplateField
   public question: string;
 
   @Field(() => FieldConfigType)
-  public config: FieldConfig;
+  public config: typeof FieldConfigType;
 
   @Field(() => Int)
   public topic_id: number;

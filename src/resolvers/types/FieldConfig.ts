@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType, createUnionType } from "type-graphql";
-import { ConfigBase as ConfigBaseOrigin } from "../../models/ProposalModel";
 
-export class ConfigBase implements Partial<ConfigBaseOrigin> {
+@ObjectType()
+export class ConfigBase {
   @Field(() => String, { nullable: true })
   small_label?: string;
 

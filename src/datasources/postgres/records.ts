@@ -2,22 +2,24 @@ import { Page } from "../../models/Admin";
 import { FileMetadata } from "../../models/Blob";
 import { Proposal } from "../../models/Proposal";
 import {
-  BooleanConfig,
   DataType,
-  DateConfig,
-  EmbellishmentConfig,
   FieldCondition,
-  FieldConfig,
   FieldDependency,
-  FileUploadConfig,
   ProposalTemplateField,
   QuestionaryField,
-  SelectionFromOptionsConfig,
-  TextInputConfig,
   Topic
 } from "../../models/ProposalModel";
 import { BasicUserDetails, User } from "../../models/User";
 import JSDict from "../../utils/Dictionary";
+import {
+  FieldConfigType,
+  BooleanConfig,
+  DateConfig,
+  FileUploadConfig,
+  EmbellishmentConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig
+} from "../../resolvers/types/FieldConfig";
 
 // Interfaces corresponding exactly to database tables
 
@@ -171,7 +173,7 @@ export const createProposalTemplateFieldObject = (
     question.data_type as DataType,
     question.sort_order,
     question.question,
-    JSON.parse(question.config) as FieldConfig,
+    JSON.parse(question.config) as typeof FieldConfigType,
     question.topic_id,
     null
   );
@@ -224,7 +226,7 @@ export const createQuestionaryFieldObject = (
 };
 
 // map dataType to one of FieldConfig factories
-const m = JSDict.Create<string, () => FieldConfig>();
+const m = JSDict.Create<string, () => typeof FieldConfigType>();
 m.put(DataType.BOOLEAN, () => new BooleanConfig());
 m.put(DataType.DATE, () => new DateConfig());
 m.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
@@ -232,7 +234,10 @@ m.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 m.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 m.put(DataType.TEXT_INPUT, () => new TextInputConfig());
 
-const createConfig = (dataType: DataType, configStr: string): FieldConfig => {
+const createConfig = (
+  dataType: DataType,
+  configStr: string
+): typeof FieldConfigType => {
   const config = m.get(dataType)!();
   Object.assign(config, JSON.parse(configStr));
   return config;

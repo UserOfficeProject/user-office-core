@@ -6,12 +6,13 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency,
-  FieldConfig,
-  TextInputConfig,
-  SelectionFromOptionsConfig
+  FieldDependency
 } from "./ProposalModel";
 import JSDict from "../utils/Dictionary";
+import {
+  TextInputConfig,
+  SelectionFromOptionsConfig
+} from "../resolvers/types/FieldConfig";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {

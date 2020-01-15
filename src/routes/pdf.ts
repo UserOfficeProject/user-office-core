@@ -1,20 +1,19 @@
 import express from "express";
+import { existsSync, unlink } from "fs";
 import baseContext from "../buildContext";
-import { isRejection } from "../rejection";
 import {
   DataType,
   Questionary,
-  QuestionaryField,
-  FieldConfig,
-  EmbellishmentConfig
+  QuestionaryField
 } from "../models/ProposalModel";
-import { createToC } from "./pdfTableofContents/index";
 import {
-  getQuestionaryStepByTopicId,
-  areDependenciesSatisfied
+  areDependenciesSatisfied,
+  getQuestionaryStepByTopicId
 } from "../models/ProposalModelFunctions";
-import { unlink, existsSync } from "fs";
+import { isRejection } from "../rejection";
 import { logger } from "../utils/Logger";
+import { createToC } from "./pdfTableofContents/index";
+import { EmbellishmentConfig } from "../resolvers/types/FieldConfig";
 const jsonwebtoken = require("jsonwebtoken");
 const PDFDocument = require("pdfkit");
 const router = express.Router();
