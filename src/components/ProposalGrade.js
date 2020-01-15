@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
@@ -94,6 +94,7 @@ export default function ProposalGrade({ match }) {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                disabled={reviewData.status === "SUBMITTED"}
               />
               <Field
                 name="grade"
@@ -102,6 +103,7 @@ export default function ProposalGrade({ match }) {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                disabled={reviewData.status === "SUBMITTED"}
               />
               <Button
                 type="submit"
@@ -109,6 +111,7 @@ export default function ProposalGrade({ match }) {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                disabled={reviewData.status === "SUBMITTED"}
               >
                 Submit
               </Button>
