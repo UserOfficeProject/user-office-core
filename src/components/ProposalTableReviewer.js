@@ -3,7 +3,7 @@ import { useUserWithReviewsData } from "../hooks/useUserData";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
-import { Edit } from "@material-ui/icons";
+import { Edit, Visibility } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -55,9 +55,9 @@ export default function ProposalTableReviewer() {
     return <p>Loading</p>;
   }
   const reviewData = userData.reviews.map(review => {
-    console.log(review);
     return {
       shortCode: review.proposal.shortCode,
+      proposalId: review.proposal.id,
       title: review.proposal.title,
       grade: review.grade,
       reviewId: review.id,
@@ -86,17 +86,28 @@ export default function ProposalTableReviewer() {
               }}
               actions={[
                 {
-                  icon: () => <Edit />,
-                  tooltip: "Review proposal",
-                  onClick: (event, rowData) =>
-                    setEditReviewID(rowData.reviewId),
-                  position: "row"
+                  position: "row",
+                  action: rowData => {
+                    return {
+                      position: "row",
+                      icon:
+                        rowData.status === "SUBMITTED"
+                          ? () => <Visibility />
+                          : () => <Edit />,
+                      tooltip:
+                        rowData.status === "SUBMITTED"
+                          ? "View proposal"
+                          : "Edit proposal",
+                      onClick: (event, rowData) =>
+                        setEditReviewID(rowData.reviewId)
+                    };
+                  }
                 },
                 {
                   icon: () => <GetAppIcon />,
                   tooltip: "Download proposal",
                   onClick: (event, rowData) =>
-                    downloadPDFProposal(rowData.shortCode),
+                    downloadPDFProposal(rowData.proposalId),
                   position: "row"
                 },
                 {
@@ -104,7 +115,7 @@ export default function ProposalTableReviewer() {
                   tooltip: "Download proposals",
                   onClick: (event, rowData) => {
                     downloadPDFProposal(
-                      rowData.map(row => row.shortCode).join(",")
+                      rowData.map(row => row.proposalId).join(",")
                     );
                   },
                   position: "toolbarOnSelect"
