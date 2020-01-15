@@ -56,7 +56,7 @@ export class ProposalResolver {
     return isRejection(users) ? [] : users;
   }
 
-  @FieldResolver(() => BasicUserDetails, { nullable: true })
+  @FieldResolver(() => BasicUserDetails)
   async proposer(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
@@ -79,7 +79,7 @@ export class ProposalResolver {
     return isRejection(reviews) ? [] : reviews;
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
