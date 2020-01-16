@@ -3,7 +3,7 @@ import { Review } from "../../models/Review";
 import { ReviewRecord } from "./records";
 
 import database from "./database";
-import { User } from "../../models/User";
+import { ReviewStatus } from "../../models/Review";
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
@@ -44,7 +44,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .update(
         {
           comment,
-          grade
+          grade,
+          status: ReviewStatus.SUBMITTED
         },
         ["*"]
       )
@@ -86,7 +87,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     return database
       .insert({
         user_id: userID,
-        proposal_id: proposalID
+        proposal_id: proposalID,
+        status: ReviewStatus.DRAFT
       })
       .returning("*")
       .into("reviews")

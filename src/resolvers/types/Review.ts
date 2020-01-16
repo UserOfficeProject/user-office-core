@@ -8,7 +8,7 @@ import {
   Root
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalStatus } from "../../models/ProposalModel";
+import { ReviewStatus } from "../../models/Review";
 import { Review as ReviewOrigin } from "../../models/Review";
 import { Proposal } from "../types/Proposal";
 import { User } from "../types/User";
@@ -21,14 +21,14 @@ export class Review implements Partial<ReviewOrigin> {
   @Field(() => Int)
   public userID: number;
 
-  @Field()
-  public comment: string;
+  @Field({ nullable: true })
+  public comment?: string;
 
-  @Field(() => Int)
-  public grade: number;
+  @Field(() => Int, { nullable: true })
+  public grade?: number;
 
-  @Field(() => ProposalStatus)
-  public status: ProposalStatus;
+  @Field(() => ReviewStatus)
+  public status: ReviewStatus;
 
   public proposalID: number;
 }
