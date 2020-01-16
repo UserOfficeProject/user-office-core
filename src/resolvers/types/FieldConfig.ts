@@ -1,17 +1,16 @@
 import { Field, Int, ObjectType, createUnionType } from "type-graphql";
-import { EmailVerificationMutation } from "../../../build/src/resolvers/mutations/EmailVerificationMutation";
 
 // TODO go over and make sure the nullability is correct
 @ObjectType()
 export class ConfigBase {
-  @Field(() => String, { nullable: true })
-  small_label?: string;
+  @Field(() => String)
+  small_label: string;
 
-  @Field(() => Boolean, { nullable: true })
-  required?: boolean;
+  @Field(() => Boolean)
+  required: boolean;
 
-  @Field(() => String, { nullable: true })
-  tooltip?: string;
+  @Field(() => String)
+  tooltip: string;
 }
 
 @ObjectType()
@@ -22,47 +21,47 @@ export class DateConfig extends ConfigBase {}
 
 @ObjectType()
 export class EmbellishmentConfig extends ConfigBase {
-  @Field(() => Boolean, { nullable: true })
-  omitFromPdf?: boolean;
+  @Field(() => Boolean)
+  omitFromPdf: boolean;
 
-  @Field(() => String, { nullable: true })
-  html?: string;
+  @Field(() => String)
+  html: string;
 
-  @Field(() => String, { nullable: true })
-  plain?: string;
+  @Field(() => String)
+  plain: string;
 }
 
 @ObjectType()
 export class FileUploadConfig extends ConfigBase {
-  @Field(() => [String], { nullable: true })
-  file_type?: string[];
+  @Field(() => [String])
+  file_type: string[];
 
-  @Field(() => Int, { nullable: true })
-  max_files?: number;
+  @Field(() => Int)
+  max_files: number;
 }
 
 @ObjectType()
 export class SelectionFromOptionsConfig extends ConfigBase {
-  @Field(() => String, { nullable: true })
-  variant?: string;
+  @Field(() => String)
+  variant: string;
 
-  @Field(() => [String], { nullable: true })
-  options?: string[];
+  @Field(() => [String])
+  options: string[];
 }
 
 @ObjectType()
 export class TextInputConfig extends ConfigBase {
-  @Field(() => Int, { nullable: true })
-  min?: number;
+  @Field(() => Int)
+  min: number;
 
-  @Field(() => Int, { nullable: true })
-  max?: number;
+  @Field(() => Int)
+  max: number;
 
-  @Field(() => Boolean, { nullable: true })
-  multiline?: boolean;
+  @Field(() => Boolean)
+  multiline: boolean;
 
-  @Field(() => String, { nullable: true })
-  placeholder?: string;
+  @Field(() => String)
+  placeholder: string;
 }
 
 export const FieldConfigType = createUnionType({

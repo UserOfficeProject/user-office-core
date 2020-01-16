@@ -2,6 +2,7 @@ import { Page } from "../../models/Admin";
 import { FileMetadata } from "../../models/Blob";
 import { Proposal } from "../../models/Proposal";
 import {
+  createConfigByType,
   DataType,
   FieldCondition,
   FieldDependency,
@@ -10,16 +11,6 @@ import {
   Topic
 } from "../../models/ProposalModel";
 import { BasicUserDetails, User } from "../../models/User";
-import JSDict from "../../utils/Dictionary";
-import {
-  FieldConfigType,
-  BooleanConfig,
-  DateConfig,
-  FileUploadConfig,
-  EmbellishmentConfig,
-  SelectionFromOptionsConfig,
-  TextInputConfig
-} from "../../resolvers/types/FieldConfig";
 
 // Interfaces corresponding exactly to database tables
 
@@ -173,7 +164,7 @@ export const createProposalTemplateFieldObject = (
     question.data_type as DataType,
     question.sort_order,
     question.question,
-    createConfig(question.data_type as DataType, question.config),
+    createConfigByType(question.data_type as DataType, question.config),
     question.topic_id,
     null
   );
@@ -216,27 +207,6 @@ export const createQuestionaryFieldObject = (
     question.value || ""
   );
 };
-
-// map dataType to one of FieldConfig factories
-const m = JSDict.Create<string, () => typeof FieldConfigType>();
-m.put(DataType.BOOLEAN, () => new BooleanConfig());
-m.put(DataType.DATE, () => new DateConfig());
-m.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
-m.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
-m.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
-m.put(DataType.TEXT_INPUT, () => new TextInputConfig());
-
-export function createConfig<T>(
-  dataType: DataType,
-  configStr: string | T
-): typeof FieldConfigType {
-  const config = m.get(dataType)!();
-  Object.assign(
-    config,
-    typeof configStr === "string" ? JSON.parse(configStr) : configStr
-  );
-  return config;
-}
 
 export const createFileMetadata = (record: FileRecord) => {
   return new FileMetadata(

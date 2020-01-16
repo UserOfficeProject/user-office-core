@@ -9,14 +9,15 @@ import {
   QuestionaryField,
   QuestionaryStep,
   TemplateStep,
-  Topic
+  Topic,
+  createConfig
 } from "../models/ProposalModel";
 import {
   EmbellishmentConfig,
   SelectionFromOptionsConfig,
-  TextInputConfig
+  TextInputConfig,
+  FieldConfigType
 } from "../resolvers/types/FieldConfig";
-import { createConfig } from "../datasources/postgres/records";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -27,10 +28,10 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.EMBELLISHMENT,
           0,
           "",
-          createConfig<EmbellishmentConfig>(DataType.EMBELLISHMENT, {
-            plain:"General information",
+          createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
+            plain: "General information",
             html: "<h1>General information</h1>"
-          })
+          }),
           0,
           []
         ),
@@ -42,10 +43,13 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.SELECTION_FROM_OPTIONS,
           1,
           "Has links with industry",
-          createConfig<SelectionFromOptionsConfig>(DataType.SELECTION_FROM_OPTIONS, {
-            options:["yes", "no"],
-            variant: "radio"
-          })
+          createConfig<SelectionFromOptionsConfig>(
+            new SelectionFromOptionsConfig(),
+            {
+              options: ["yes", "no"],
+              variant: "radio"
+            }
+          ),
           0,
           []
         ),
@@ -57,8 +61,9 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.TEXT_INPUT,
           2,
           "If yes, please describe:",
-          createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
-            placeholder: "Please specify links with industry"
+          createConfig<TextInputConfig>(new TextInputConfig(), {
+            placeholder: "Please specify links with industry",
+            multiline: true
           }),
           0,
           [
@@ -87,7 +92,7 @@ export const createDummyField = (values: {
   sort_order?: number;
   topic_id?: number;
   question?: string;
-  config?: object;
+  config?: typeof FieldConfigType;
   dependencies?: FieldDependency[];
 }): ProposalTemplateField => {
   return new ProposalTemplateField(
@@ -95,7 +100,7 @@ export const createDummyField = (values: {
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
-    values.config || {},
+    values.config || { required: false, tooltip: "", small_label: "" },
     values.topic_id || Math.round(Math.random() * 10),
     values.dependencies || []
   );

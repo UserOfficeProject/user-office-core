@@ -16,9 +16,11 @@ import { TemplateDataSource } from "../datasources/TemplateDataSource";
 import {
   FieldConfigType,
   EmbellishmentConfig,
-  SelectionFromOptionsConfig
+  SelectionFromOptionsConfig,
+  ConfigBase,
+  FileUploadConfig
 } from "../resolvers/types/FieldConfig";
-import { createConfig } from "../datasources/postgres/records";
+import { createConfig } from "../models/ProposalModel";
 
 export default class TemplateMutations {
   constructor(
@@ -215,19 +217,18 @@ export default class TemplateMutations {
   private createBlankConfig(dataType: DataType): typeof FieldConfigType {
     switch (dataType) {
       case DataType.FILE_UPLOAD:
-        return createConfig(DataType.FILE_UPLOAD, { file_type: [] });
+        return createConfig<FileUploadConfig>(new FileUploadConfig());
       case DataType.EMBELLISHMENT:
-        return createConfig<EmbellishmentConfig>(DataType.EMBELLISHMENT, {
+        return createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
           plain: "New embellishment",
           html: "<p>New embellishment</p>"
         });
       case DataType.SELECTION_FROM_OPTIONS:
         return createConfig<SelectionFromOptionsConfig>(
-          DataType.SELECTION_FROM_OPTIONS,
-          { options: [] }
+          new SelectionFromOptionsConfig()
         );
       default:
-        return {};
+        return new ConfigBase();
     }
   }
 }
