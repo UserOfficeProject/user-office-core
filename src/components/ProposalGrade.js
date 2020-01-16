@@ -38,8 +38,7 @@ export default function ProposalGrade({ match }) {
   const classes = useStyles();
   const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
-  const { proposalData } = useProposalData(parseInt(match.params.id));
-
+  const { proposalData } = useProposalData(reviewData?.proposal?.id);
   const sendAddReview = useAddReview();
 
   if (submitted) {
@@ -95,6 +94,7 @@ export default function ProposalGrade({ match }) {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                disabled={reviewData.status === "SUBMITTED"}
               />
               <Field
                 name="grade"
@@ -103,6 +103,7 @@ export default function ProposalGrade({ match }) {
                 component={TextField}
                 margin="normal"
                 fullWidth
+                disabled={reviewData.status === "SUBMITTED"}
               />
               <Button
                 type="submit"
@@ -110,6 +111,7 @@ export default function ProposalGrade({ match }) {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                disabled={reviewData.status === "SUBMITTED"}
               >
                 Submit
               </Button>

@@ -6,11 +6,13 @@ query userWithReviews($id: Int!) {
     organisation
     reviews {
       id
-      comment
       grade
+      comment
+      status
       proposal {
         id
         title
+        shortCode
       }
     }
   }

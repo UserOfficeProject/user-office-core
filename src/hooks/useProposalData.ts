@@ -3,7 +3,7 @@ import { useDataAPI } from "./useDataAPI";
 import { Questionary } from "../models/ProposalModel";
 import { ProposalInformation } from "../models/ProposalModel";
 
-export function useProposalData(id: number) {
+export function useProposalData(id: number | null) {
   const sendRequest = useDataAPI<any>();
   const [proposalData, setProposalData] = useState<ProposalInformation | null>(
     null
@@ -105,7 +105,9 @@ export function useProposalData(id: number) {
         setLoading(false);
       });
     };
-    getProposalInformation(id);
+    if (id) {
+      getProposalInformation(id);
+    }
   }, [id, sendRequest]);
 
   return { loading, proposalData };
