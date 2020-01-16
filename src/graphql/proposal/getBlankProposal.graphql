@@ -1,0 +1,42 @@
+query getBlankProposal {
+  blankProposal {
+    id
+    status
+    shortCode
+    title
+    abstract
+    proposer {
+      id
+      firstname
+      lastname
+      organisation
+    }
+    questionary {
+      steps {
+        topic {
+          topic_title
+          topic_id
+          sort_order
+          is_enabled
+        }
+        isCompleted
+        fields {
+          proposal_question_id
+          data_type
+          question
+          config {
+            ...fieldConfig
+          }
+          value
+          sort_order
+          topic_id
+          dependencies {
+            proposal_question_dependency
+            condition
+            proposal_question_id
+          }
+        }
+      }
+    }
+  }
+}

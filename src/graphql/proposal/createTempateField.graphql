@@ -4,7 +4,9 @@ mutation createTemplateField($topicId: Int!, $dataType: DataType!) {
       proposal_question_id
       data_type
       question
-      config
+      config {
+        ...fieldConfig
+      }
       topic_id
     }
     error

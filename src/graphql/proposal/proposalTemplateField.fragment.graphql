@@ -3,7 +3,9 @@ fragment proposalTemplateField on ProposalTemplateField {
   data_type
   sort_order
   question
-  config
+  config {
+    ...fieldConfig
+  }
   topic_id
   dependencies {
     proposal_question_dependency
