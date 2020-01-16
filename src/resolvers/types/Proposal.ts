@@ -18,25 +18,25 @@ import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
 export class Proposal implements Partial<ProposalOrigin> {
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public id: number;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public title: string;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public abstract: string;
 
   @Field(() => Int)
   public status: ProposalStatus;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Date)
   public created: Date;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Date)
   public updated: Date;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public shortCode: string;
 
   public proposerId: number;

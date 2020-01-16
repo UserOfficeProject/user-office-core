@@ -6,10 +6,13 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency,
-  FieldConfig
+  FieldDependency
 } from "./ProposalModel";
 import JSDict from "../utils/Dictionary";
+import {
+  TextInputConfig,
+  SelectionFromOptionsConfig
+} from "../resolvers/types/FieldConfig";
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -70,8 +73,8 @@ export function isDependencySatisfied(
   return (
     isParentSattisfied &&
     new ConditionEvaluator()
-      .getConfitionEvaluator(condition)
-      .isSattisfied(field, params)
+      .getConditionEvaluator(condition)
+      .isSatisfied(field, params)
   );
 }
 export function areDependenciesSatisfied(
@@ -109,8 +112,7 @@ class BaseValidator implements IConstraintValidator {
     if (this.dataType && field.data_type !== this.dataType) {
       throw new Error("Field validator ");
     }
-    const config = JSON.parse(field.config) as FieldConfig;
-    if (config.required && !value) {
+    if (field.config.required && !value) {
       return false;
     }
     return true;
@@ -122,10 +124,10 @@ class TextInputValidator extends BaseValidator {
     super(DataType.TEXT_INPUT);
   }
   validate(value: any, field: QuestionaryField) {
-    const config = JSON.parse(field.config) as FieldConfig;
     if (!super.validate(value, field)) {
       return false;
     }
+    const config = field.config as TextInputConfig;
     if (config.min && value && value.length < config.min) {
       return false;
     }
@@ -141,7 +143,7 @@ class SelectFromOptionsInputValidator extends BaseValidator {
     super(DataType.SELECTION_FROM_OPTIONS);
   }
   validate(value: any, field: QuestionaryField) {
-    const config = JSON.parse(field.config) as FieldConfig;
+    const config = field.config as SelectionFromOptionsConfig;
     if (!super.validate(value, field)) {
       return false;
     }

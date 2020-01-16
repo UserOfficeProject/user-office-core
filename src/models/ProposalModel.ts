@@ -1,4 +1,14 @@
 import { EvaluatorOperator } from "./ConditionEvaluator";
+import {
+  FieldConfigType,
+  BooleanConfig,
+  DateConfig,
+  EmbellishmentConfig,
+  FileUploadConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig
+} from "../resolvers/types/FieldConfig";
+import JSDict from "../utils/Dictionary";
 
 export class ProposalTemplateField {
   constructor(
@@ -6,8 +16,7 @@ export class ProposalTemplateField {
     public data_type: DataType,
     public sort_order: number,
     public question: string,
-    //public config: FieldConfig, // TODO strongly type this after making GraphQL accept union type config,
-    public config: string,
+    public config: typeof FieldConfigType,
     public topic_id: number,
     public dependencies: FieldDependency[] | null
   ) {}
@@ -180,19 +189,61 @@ export interface DataTypeSpec {
   readonly: boolean;
 }
 
-export interface FieldConfig {
-  variant?: string;
-  small_label?: string;
-  required?: boolean;
-  options?: string[];
-  file_type?: string[];
-  max_files?: number;
-  multiline?: boolean;
-  min?: number;
-  max?: number;
-  placeholder?: string;
-  html?: string;
-  plain?: string;
-  tooltip?: string;
-  omitFromPdf?: boolean;
+const baseDefaultConfig = { required: false, small_label: "", tooltip: "" };
+const defaultConfigs = JSDict.Create<
+  string,
+  | BooleanConfig
+  | DateConfig
+  | EmbellishmentConfig
+  | FileUploadConfig
+  | SelectionFromOptionsConfig
+  | TextInputConfig
+>();
+defaultConfigs.put("BooleanConfig", { ...baseDefaultConfig });
+defaultConfigs.put("DateConfig", { ...baseDefaultConfig });
+defaultConfigs.put("EmbellishmentConfig", {
+  plain: "",
+  html: "",
+  omitFromPdf: false,
+  ...baseDefaultConfig
+});
+defaultConfigs.put("FileUploadConfig", {
+  max_files: 1,
+  file_type: [],
+  ...baseDefaultConfig
+});
+defaultConfigs.put("SelectionFromOptionsConfig", {
+  options: [],
+  variant: "radio",
+  ...baseDefaultConfig
+});
+defaultConfigs.put("TextInputConfig", {
+  min: 0,
+  max: 1000000,
+  multiline: false,
+  placeholder: "",
+  ...baseDefaultConfig
+});
+
+const f = JSDict.Create<string, () => typeof FieldConfigType>();
+f.put(DataType.BOOLEAN, () => new BooleanConfig());
+f.put(DataType.DATE, () => new DateConfig());
+f.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
+f.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
+f.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
+f.put(DataType.TEXT_INPUT, () => new TextInputConfig());
+
+export function createConfig<T extends typeof FieldConfigType>(
+  config: T,
+  init: Partial<T> | string = {}
+): T {
+  const defaults = defaultConfigs.get(config.constructor.name);
+  const initValues = typeof init === "string" ? JSON.parse(init) : init;
+  Object.assign(config, { ...defaults, ...initValues });
+  return config;
+}
+
+export function createConfigByType(dataType: DataType, init: object | string) {
+  const config = f.get(dataType)!;
+  return createConfig(config(), init);
 }

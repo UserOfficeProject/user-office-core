@@ -6,7 +6,6 @@ import {
   ProposalTemplateField,
   DataType,
   FieldDependency,
-  FieldConfig,
   ProposalTemplate
 } from "../models/ProposalModel";
 import { UserAuthorization } from "../utils/UserAuthorization";
@@ -14,6 +13,14 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { ILogger, logger } from "../utils/Logger";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import {
+  FieldConfigType,
+  EmbellishmentConfig,
+  SelectionFromOptionsConfig,
+  ConfigBase,
+  FileUploadConfig
+} from "../resolvers/types/FieldConfig";
+import { createConfig } from "../models/ProposalModel";
 
 export default class TemplateMutations {
   constructor(
@@ -207,19 +214,21 @@ export default class TemplateMutations {
     return fieldIds;
   }
 
-  private createBlankConfig(dataType: DataType): FieldConfig {
+  private createBlankConfig(dataType: DataType): typeof FieldConfigType {
     switch (dataType) {
       case DataType.FILE_UPLOAD:
-        return { file_type: [] };
+        return createConfig<FileUploadConfig>(new FileUploadConfig());
       case DataType.EMBELLISHMENT:
-        return {
+        return createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
           plain: "New embellishment",
           html: "<p>New embellishment</p>"
-        };
+        });
       case DataType.SELECTION_FROM_OPTIONS:
-        return { options: [] };
+        return createConfig<SelectionFromOptionsConfig>(
+          new SelectionFromOptionsConfig()
+        );
       default:
-        return {};
+        return new ConfigBase();
     }
   }
 }
