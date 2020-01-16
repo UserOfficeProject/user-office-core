@@ -73,8 +73,8 @@ export function isDependencySatisfied(
   return (
     isParentSattisfied &&
     new ConditionEvaluator()
-      .getConfitionEvaluator(condition)
-      .isSattisfied(field, params)
+      .getConditionEvaluator(condition)
+      .isSatisfied(field, params)
   );
 }
 export function areDependenciesSatisfied(

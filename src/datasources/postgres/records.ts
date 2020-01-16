@@ -173,7 +173,7 @@ export const createProposalTemplateFieldObject = (
     question.data_type as DataType,
     question.sort_order,
     question.question,
-    JSON.parse(question.config) as typeof FieldConfigType,
+    createConfig(question.data_type as DataType, question.config),
     question.topic_id,
     null
   );
@@ -182,8 +182,8 @@ export const createProposalTemplateFieldObject = (
 export const createProposalObject = (proposal: ProposalRecord) => {
   return new Proposal(
     proposal.proposal_id,
-    proposal.title,
-    proposal.abstract,
+    proposal.title || "",
+    proposal.abstract || "",
     proposal.proposer_id,
     proposal.status,
     proposal.created_at,
@@ -212,15 +212,7 @@ export const createQuestionaryFieldObject = (
   question: ProposalQuestionRecord & { value: any }
 ) => {
   return new QuestionaryField(
-    new ProposalTemplateField(
-      question.proposal_question_id,
-      question.data_type as DataType,
-      question.sort_order,
-      question.question,
-      createConfig(question.data_type as DataType, question.config),
-      question.topic_id,
-      null
-    ),
+    createProposalTemplateFieldObject(question),
     question.value || ""
   );
 };
@@ -234,14 +226,17 @@ m.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 m.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 m.put(DataType.TEXT_INPUT, () => new TextInputConfig());
 
-const createConfig = (
+export function createConfig<T>(
   dataType: DataType,
-  configStr: string
-): typeof FieldConfigType => {
+  configStr: string | T
+): typeof FieldConfigType {
   const config = m.get(dataType)!();
-  Object.assign(config, JSON.parse(configStr));
+  Object.assign(
+    config,
+    typeof configStr === "string" ? JSON.parse(configStr) : configStr
+  );
   return config;
-};
+}
 
 export const createFileMetadata = (record: FileRecord) => {
   return new FileMetadata(

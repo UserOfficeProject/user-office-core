@@ -1,5 +1,7 @@
 import { Field, Int, ObjectType, createUnionType } from "type-graphql";
+import { EmailVerificationMutation } from "../../../build/src/resolvers/mutations/EmailVerificationMutation";
 
+// TODO go over and make sure the nullability is correct
 @ObjectType()
 export class ConfigBase {
   @Field(() => String, { nullable: true })
@@ -10,25 +12,19 @@ export class ConfigBase {
 
   @Field(() => String, { nullable: true })
   tooltip?: string;
-
-  @Field(() => Boolean, { nullable: true })
-  omitFromPdf?: boolean;
 }
 
 @ObjectType()
-export class BooleanConfig extends ConfigBase {
-  @Field(() => Boolean, { nullable: true })
-  val?: boolean;
-}
+export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
-export class DateConfig extends ConfigBase {
-  @Field(() => Boolean, { nullable: true })
-  minim?: boolean;
-}
+export class DateConfig extends ConfigBase {}
 
 @ObjectType()
 export class EmbellishmentConfig extends ConfigBase {
+  @Field(() => Boolean, { nullable: true })
+  omitFromPdf?: boolean;
+
   @Field(() => String, { nullable: true })
   html?: string;
 

@@ -1,16 +1,22 @@
-import {
-  ProposalTemplate,
-  DataType,
-  FieldDependency,
-  Topic,
-  ProposalTemplateField,
-  FieldCondition,
-  TemplateStep,
-  Questionary,
-  QuestionaryStep,
-  QuestionaryField
-} from "../models/ProposalModel";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
+import {
+  DataType,
+  FieldCondition,
+  FieldDependency,
+  ProposalTemplate,
+  ProposalTemplateField,
+  Questionary,
+  QuestionaryField,
+  QuestionaryStep,
+  TemplateStep,
+  Topic
+} from "../models/ProposalModel";
+import {
+  EmbellishmentConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig
+} from "../resolvers/types/FieldConfig";
+import { createConfig } from "../datasources/postgres/records";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -21,10 +27,10 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.EMBELLISHMENT,
           0,
           "",
-          {
-            html: "General informaiton",
-            plain: "General information"
-          },
+          createConfig<EmbellishmentConfig>(DataType.EMBELLISHMENT, {
+            plain:"General information",
+            html: "<h1>General information</h1>"
+          })
           0,
           []
         ),
@@ -36,7 +42,10 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.SELECTION_FROM_OPTIONS,
           1,
           "Has links with industry",
-          { options: ["yes", "no"], variant: "radio" },
+          createConfig<SelectionFromOptionsConfig>(DataType.SELECTION_FROM_OPTIONS, {
+            options:["yes", "no"],
+            variant: "radio"
+          })
           0,
           []
         ),
@@ -48,7 +57,9 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.TEXT_INPUT,
           2,
           "If yes, please describe:",
-          { placeholder: "Please specify links with industry" },
+          createConfig<TextInputConfig>(DataType.TEXT_INPUT, {
+            placeholder: "Please specify links with industry"
+          }),
           0,
           [
             new FieldDependency(
