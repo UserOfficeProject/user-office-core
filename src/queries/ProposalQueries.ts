@@ -18,7 +18,6 @@ export default class ProposalQueries {
     if (!proposal) {
       return null;
     }
-
     if ((await this.hasAccessRights(agent, proposal)) === true) {
       return proposal;
     } else {
