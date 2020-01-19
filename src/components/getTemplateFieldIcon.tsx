@@ -5,21 +5,21 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import TextFieldsIcon from "@material-ui/icons/TextFields";
-import { DataType } from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 
 const getTemplateFieldIcon = (dataType: DataType) => {
   switch (dataType) {
-    case DataType.TextInput:
+    case DataType.TEXT_INPUT:
       return <ShortTextIcon />;
-    case DataType.SelectionFromOptions:
+    case DataType.SELECTION_FROM_OPTIONS:
       return <RadioButtonCheckedIcon />;
-    case DataType.Boolean:
+    case DataType.BOOLEAN:
       return <CheckBoxOutlineBlankIcon />;
-    case DataType.Date:
+    case DataType.DATE:
       return <CalendarTodayIcon />;
-    case DataType.FileUpload:
+    case DataType.FILE_UPLOAD:
       return <AttachFileIcon />;
-    case DataType.Embellishment:
+    case DataType.EMBELLISHMENT:
       return <TextFieldsIcon />;
 
     default:

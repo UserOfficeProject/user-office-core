@@ -1,10 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
-import {
-  ProposalTemplateField,
-  DataType,
-  ProposalTemplate
-} from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 import JSDict from "../utils/Dictionary";
 import { IEvent } from "../models/QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +10,7 @@ import { AdminComponentMultipleChoice } from "./AdminComponentMultipleChoice";
 import { AdminComponentBoolean } from "./AdminComponentBoolean";
 import { AdminComponentFileUpload } from "./AdminComponentFileUpload";
 import { AdminComponentDate } from "./AdminComponentDate";
+import { ProposalTemplateField, ProposalTemplate } from "../generated/sdk";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
@@ -35,12 +32,15 @@ export default function QuestionaryFieldEditor(props: {
   }))();
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
-  componentMap.put(DataType.Boolean, AdminComponentBoolean);
-  componentMap.put(DataType.Embellishment, AdminComponentEmbellishment);
-  componentMap.put(DataType.Date, AdminComponentDate);
-  componentMap.put(DataType.FileUpload, AdminComponentFileUpload);
-  componentMap.put(DataType.SelectionFromOptions, AdminComponentMultipleChoice);
-  componentMap.put(DataType.TextInput, AdminComponentTextInput);
+  componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
+  componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
+  componentMap.put(DataType.DATE, AdminComponentDate);
+  componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
+  componentMap.put(
+    DataType.SELECTION_FROM_OPTIONS,
+    AdminComponentMultipleChoice
+  );
+  componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
 
   if (props.field === null) {
     return null;

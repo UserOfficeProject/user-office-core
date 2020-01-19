@@ -187,16 +187,16 @@ class ComponentFactory {
   private componentMap = JSDict.Create<string, any>();
 
   constructor() {
-    this.componentMap.put(DataType.TextInput, ProposalComponentTextInput);
-    this.componentMap.put(DataType.Boolean, ProposalComponentBoolean);
-    this.componentMap.put(DataType.Date, ProposalCompontentDatePicker);
-    this.componentMap.put(DataType.FileUpload, ProposalCompontentFileUpload);
+    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
+    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
+    this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
     this.componentMap.put(
-      DataType.SelectionFromOptions,
+      DataType.SELECTION_FROM_OPTIONS,
       ProposalComponentMultipleChoice
     );
     this.componentMap.put(
-      DataType.Embellishment,
+      DataType.EMBELLISHMENT,
       ProposalComponentEmbellishment
     );
   }

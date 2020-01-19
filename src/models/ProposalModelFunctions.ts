@@ -12,7 +12,7 @@ type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
-    case DataType.Embellishment:
+    case DataType.EMBELLISHMENT:
       return { readonly: true };
     default:
       return { readonly: false };

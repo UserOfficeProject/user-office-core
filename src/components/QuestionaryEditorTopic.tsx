@@ -2,11 +2,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import {
-  ProposalTemplateField,
-  DataType,
-  TemplateStep
-} from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 import {
   makeStyles,
   Grid,
@@ -23,6 +19,7 @@ import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
+import { TemplateStep, ProposalTemplateField } from "../generated/sdk";
 
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
@@ -187,40 +184,40 @@ export default function QuestionaryEditorTopic(props: {
             >
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.TextInput)}
+                onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.TextInput)!}
+                  {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Text input</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.Embellishment)}
+                onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.Embellishment)!}
+                  {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Embellishment</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.Date)}
+                onClick={() => onCreateNewFieldClicked(DataType.DATE)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.Date)!}
+                  {getTemplateFieldIcon(DataType.DATE)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Date</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.FileUpload)}
+                onClick={() => onCreateNewFieldClicked(DataType.FILE_UPLOAD)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.FileUpload)!}
+                  {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add File upload</Typography>
               </MenuItem>
@@ -228,21 +225,21 @@ export default function QuestionaryEditorTopic(props: {
               <MenuItem
                 className={classes.addQuestionMenuItem}
                 onClick={() =>
-                  onCreateNewFieldClicked(DataType.SelectionFromOptions)
+                  onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)
                 }
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.SelectionFromOptions)!}
+                  {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Multiple choice</Typography>
               </MenuItem>
 
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.Boolean)}
+                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.Boolean)!}
+                  {getTemplateFieldIcon(DataType.BOOLEAN)!}
                 </ListItemIcon>
                 <Typography variant="inherit">Add Boolean</Typography>
               </MenuItem>

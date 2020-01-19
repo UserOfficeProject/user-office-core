@@ -1,5 +1,11 @@
-import { DataType, QuestionaryField } from "../models/ProposalModel";
 import * as Yup from "yup";
+import {
+  FieldConfig,
+  QuestionaryField,
+  SelectionFromOptionsConfig,
+  TextInputConfig
+} from "../generated/sdk";
+import { DataType } from "../generated/sdk";
 
 export const createFormikCofigObjects = (
   fields: QuestionaryField[]
@@ -18,7 +24,7 @@ export const createFormikCofigObjects = (
 const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
   let config: FieldConfig;
   switch (field.data_type) {
-    case DataType.TextInput:
+    case DataType.TEXT_INPUT:
       let txtInputSchema = Yup.string();
       config = field.config as TextInputConfig;
       field.config.required &&
@@ -34,7 +40,7 @@ const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
           `Value must be at most ${config.max} characters`
         ));
       return txtInputSchema;
-    case DataType.SelectionFromOptions:
+    case DataType.SELECTION_FROM_OPTIONS:
       let selectFromOptionsSchema = Yup.string();
       config = field.config as SelectionFromOptionsConfig;
       field.config.required &&
@@ -42,12 +48,12 @@ const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
           `This is a required field`
         ));
       return selectFromOptionsSchema;
-    case DataType.Date:
+    case DataType.DATE:
       let dateSchema = Yup.date();
       field.config.required &&
         (dateSchema = dateSchema.required(`This date is required`));
       return dateSchema;
-    case DataType.Boolean:
+    case DataType.BOOLEAN:
       let booleanSchema = Yup.bool();
 
       field.config.required &&

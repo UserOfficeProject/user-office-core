@@ -81,12 +81,12 @@ const FormikUICustomDependencySelector = ({
       if (!depField) {
         return;
       }
-      if (depField.data_type === DataType.Boolean) {
+      if (depField.data_type === DataType.BOOLEAN) {
         setAvailableValues([
           { label: "true", value: true },
           { label: "false", value: false }
         ]);
-      } else if (depField.data_type === DataType.SelectionFromOptions) {
+      } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
         setAvailableValues(
           (depField.config as SelectionFromOptionsConfig).options!.map(
             option => {
