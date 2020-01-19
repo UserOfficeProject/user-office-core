@@ -3,9 +3,10 @@ import { Draggable } from "react-beautiful-dnd";
 import { makeStyles, Grid, useTheme } from "@material-ui/core";
 
 import LockIcon from "@material-ui/icons/Lock";
-import { ProposalTemplateField, DataType } from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 import { IEvent } from "../models/QuestionaryEditorModel";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
+import { ProposalTemplateField, EmbellishmentConfig } from "../generated/sdk";
 
 export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
@@ -128,8 +129,8 @@ export default function QuestionaryEditorTopicItem(props: {
           </Grid>
 
           <Grid item xs={10} className={classes.question}>
-            {props.data.data_type === DataType.Embellishment
-              ? props.data.config.plain
+            {props.data.data_type === DataType.EMBELLISHMENT
+              ? (props.data.config as EmbellishmentConfig).plain
               : props.data.question}
           </Grid>
 

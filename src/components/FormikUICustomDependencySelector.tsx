@@ -88,9 +88,11 @@ const FormikUICustomDependencySelector = ({
         ]);
       } else if (depField.data_type === DataType.SelectionFromOptions) {
         setAvailableValues(
-          depField.config.options!.map(option => {
+          (depField.config as SelectionFromOptionsConfig).options!.map(
+            option => {
             return { value: option, label: option };
-          })
+            }
+          )
         ); // use options
       }
     }
