@@ -70,7 +70,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
             new FieldDependency(
               "links_with_industry",
               "has_links_with_industry",
-              JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes"))
+              new FieldCondition(EvaluatorOperator.EQ, "yes")
             )
           ]
         ),
@@ -118,7 +118,7 @@ export const createDummyTemplate = () => {
       new FieldDependency(
         "linksToField",
         "hasLinksToField",
-        JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes")) // TODO SWAP-341. Remove stringifying
+        new FieldCondition(EvaluatorOperator.EQ, "yes")
       )
     ]
   });

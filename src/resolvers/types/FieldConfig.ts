@@ -62,6 +62,9 @@ export class TextInputConfig extends ConfigBase {
 
   @Field(() => String)
   placeholder: string;
+
+  @Field(() => String, { nullable: true })
+  htmlQuestion?: string;
 }
 
 export const FieldConfigType = createUnionType({

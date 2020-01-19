@@ -2,8 +2,8 @@ import JSDict from "../utils/Dictionary";
 import { QuestionaryField } from "./ProposalModel";
 
 export enum EvaluatorOperator {
-  EQ = "eq",
-  NEQ = "neq"
+  EQ = "EQ",
+  NEQ = "NEQ"
 }
 
 export class ConditionEvaluator {

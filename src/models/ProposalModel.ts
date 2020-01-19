@@ -146,19 +146,16 @@ export class FieldDependency {
   constructor(
     public proposal_question_id: string,
     public proposal_question_dependency: string,
-    //public condition: FieldCondition
-    public condition: string // TODO SWAP-341. strongly type this after making GraphQL able to return more custom objects
+    public condition: FieldCondition
   ) {}
 
   static fromObject(obj: any) {
     return new FieldDependency(
       obj.proposal_question_id,
       obj.proposal_question_dependency,
-      /*typeof obj.condition == "string"
+      typeof obj.condition == "string"
         ? JSON.parse(obj.condition)
         : obj.condition
-        */
-      obj.condition // TODO SWAP-341. strongly type this after making GraphQL able to return more custom objects
     );
   }
 }

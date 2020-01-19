@@ -186,16 +186,11 @@ export const createProposalObject = (proposal: ProposalRecord) => {
 export const createFieldDependencyObject = (
   fieldDependency: FieldDependencyRecord
 ) => {
-  if (!fieldDependency) {
-    return null;
-  }
   const conditionJson = JSON.parse(fieldDependency.condition);
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,
-    JSON.stringify(
-      new FieldCondition(conditionJson.condition, conditionJson.params)
-    ) // TODO SWAP-341. Remove stringifying
+    new FieldCondition(conditionJson.condition, conditionJson.params)
   );
 };
 
