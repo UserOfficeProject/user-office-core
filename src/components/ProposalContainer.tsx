@@ -13,17 +13,15 @@ import React, {
   useState
 } from "react";
 import { Prompt } from "react-router";
+import { Proposal, Questionary } from "../generated/sdk";
 import { useLoadProposal } from "../hooks/useLoadProposal";
-import {
-  ProposalInformation,
-  ProposalStatus,
-  Questionary
-} from "../models/ProposalModel";
+
 import "../styles/ProposalComponentStyles.css";
 import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import ProposalReview from "./ProposalReview";
+import { ProposalStatus } from "../models/ProposalModel";
 
 export interface INotification {
   variant: "error" | "success";
@@ -36,9 +34,7 @@ enum StepType {
   REVIEW
 }
 
-export default function ProposalContainer(props: {
-  data: ProposalInformation;
-}) {
+export default function ProposalContainer(props: { data: Proposal }) {
   const { loadProposal } = useLoadProposal();
   const [proposalInfo, setProposalInfo] = useState(props.data);
 
@@ -76,7 +72,7 @@ export default function ProposalContainer(props: {
     }
   }))();
 
-  const handleNext = (data: ProposalInformation) => {
+  const handleNext = (data: Partial<Proposal>) => {
     setProposalInfo({
       ...proposalInfo,
       ...data
@@ -278,7 +274,7 @@ class QuestionaryUIStep {
   ) {}
 }
 
-type CallbackSignature = (data: ProposalInformation) => void;
+type CallbackSignature = (data: Partial<Proposal>) => void;
 type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{

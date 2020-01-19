@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { ProposalTemplate } from "../models/ProposalModel";
 import { useDataApi2 } from "./useDataApi2";
 
 export function useProposalQuestionTemplate() {
@@ -8,7 +7,7 @@ export function useProposalQuestionTemplate() {
   const getProposalTemplate = useCallback(async () => {
     return api()
       .getProposalTemplate()
-      .then(data => ProposalTemplate.fromObject(data.proposalTemplate));
+      .then(data => data.proposalTemplate);
   }, [api]);
 
   return getProposalTemplate;

@@ -11,13 +11,13 @@ import { useCreateProposal } from "../hooks/useCreateProposal";
 import { makeStyles } from "@material-ui/core";
 import { UserContext } from "../context/UserContextProvider";
 import { User, BasicUserDetails } from "../models/User";
-import { ProposalInformation } from "../models/ProposalModel";
 import ProposalParticipant from "./ProposalParticipant";
 import { getTranslation } from "@esss-swap/duo-localisation";
 import TextFieldWithCounter from "./TextFieldWithCounter";
+import { Proposal } from "../generated/sdk";
 
 export default function ProposalInformationView(props: {
-  data: ProposalInformation;
+  data: Proposal;
   readonly?: boolean;
   disabled?: boolean;
   setIsDirty?: (val: boolean) => void;
@@ -91,7 +91,8 @@ export default function ProposalInformationView(props: {
                 id: user.id,
                 firstname: user.firstname,
                 lastname: user.lastname,
-                organisation: user.organisation
+                organisation: user.organisation,
+                position: user.position
               }
             });
           }

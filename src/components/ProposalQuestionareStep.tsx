@@ -2,13 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import {
-  DataType,
-  ProposalAnswer,
-  QuestionaryField,
-  QuestionaryStep
-} from "../models/ProposalModel";
-import { ProposalInformation } from "../models/ProposalModel";
-import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
   getQuestionaryStepByTopicId
@@ -29,9 +22,16 @@ import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
 import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
 import { ErrorFocus } from "./ErrorFocus";
+import {
+  Proposal,
+  QuestionaryStep,
+  DataType,
+  QuestionaryField
+} from "../generated/sdk";
+import { ProposalAnswer } from "../models/ProposalModel";
 
 export default function ProposalQuestionareStep(props: {
-  data: ProposalInformation;
+  data: Proposal;
   topicId: number;
   setIsDirty: (isDirty: boolean) => void;
   readonly: boolean;
