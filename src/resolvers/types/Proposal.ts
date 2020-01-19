@@ -27,7 +27,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public abstract: string;
 
-  @Field(() => Int)
+  @Field(() => ProposalStatus)
   public status: ProposalStatus;
 
   @Field(() => Date)

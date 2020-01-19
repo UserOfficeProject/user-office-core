@@ -3,9 +3,9 @@ import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 
 @ObjectType()
 export class FieldCondition {
-  @Field(() => EvaluatorOperator, { nullable: true })
+  @Field(() => EvaluatorOperator)
   public condition: EvaluatorOperator;
 
-  @Field({ nullable: true })
+  @Field()
   public params: string;
 }
