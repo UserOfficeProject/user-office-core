@@ -43,5 +43,6 @@ fragment fieldConfig on FieldConfig {
     small_label
     required
     tooltip
+    htmlQuestion
   }
 }

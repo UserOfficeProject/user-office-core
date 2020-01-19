@@ -15,8 +15,7 @@ mutation updateProposalTemplateField(
     template {
       steps {
         topic {
-          topic_title
-          topic_id
+          ...topic
         }
         fields {
           ...proposalTemplateField

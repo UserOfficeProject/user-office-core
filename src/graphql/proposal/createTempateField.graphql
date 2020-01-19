@@ -1,13 +1,7 @@
 mutation createTemplateField($topicId: Int!, $dataType: DataType!) {
   createTemplateField(topicId: $topicId, dataType: $dataType) {
     field {
-      proposal_question_id
-      data_type
-      question
-      config {
-        ...fieldConfig
-      }
-      topic_id
+      ...proposalTemplateField
     }
     error
   }

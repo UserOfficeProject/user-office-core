@@ -1,20 +1,20 @@
-query getBlankProposal {
-  blankProposal {
+query getProposal($id: Int!) {
+  proposal(id: $id) {
     id
-    status
-    shortCode
     title
     abstract
+    status
+    shortCode
     created
     updated
     proposer {
       ...basicUserDetails
     }
-    questionary {
-      ...questionary
-    }
     users {
       ...basicUserDetails
+    }
+    questionary {
+      ...questionary
     }
     reviews {
       id
