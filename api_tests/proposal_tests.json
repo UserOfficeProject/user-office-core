@@ -761,8 +761,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($topicId: Int!, $dataType: DataType!) {\n  createTemplateField(topicId: $topicId, dataType: $dataType) {\n    field {\n      proposal_question_id\n      data_type\n      question\n      config\n      topic_id\n    }\n    error\n  }\n}",
-						"variables": "{\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"dataType\": \"FILE_UPLOAD\"\n    }"
+						"query": "mutation ($topicId: Int!, $dataType: DataType!) {\n  createTemplateField(topicId: $topicId, dataType: $dataType) {\n    field {\n      proposal_question_id\n      data_type\n      question\n      config\n      {\n          ... on TextInputConfig {\n            required\n          }\n      }\n      topic_id\n    }\n    error\n  }\n}",
+						"variables": "{\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"dataType\": \"FILE_UPLOAD\",\n        \"fieldConfigFragment\":\"__typename\"\n    }"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -847,7 +847,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {\n  updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          dependencies {\n            proposal_question_dependency\n            condition\n            proposal_question_id\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {\n  updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n          dependencies {\n            proposal_question_dependency\n            condition {\n                  condition\n                  params\n            }\n            proposal_question_id\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"id\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"isEnabled\": true,\n\"dependencies\": []\n}"
 					}
 				},
@@ -949,7 +949,7 @@
 						"exec": [
 							"pm.test(\"Should create proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.blankProposal.status).to.eql(-1)",
+							"    pm.expect(jsonData.data.blankProposal.status).to.eql(\"BLANK\")",
 							"    pm.expect(jsonData.data.blankProposal.id).to.eql(0)",
 							"});",
 							"",
@@ -1018,7 +1018,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\nblankProposal {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        topic_title\n        topic_id\n      }\n      isCompleted\n      fields {\n        proposal_question_id\n        data_type\n        question\n        config\n        value\n        dependencies {\n          proposal_question_dependency\n          condition\n          proposal_question_id\n        }\n      }\n    }\n  }\n}\n}",
+						"query": "query {\nblankProposal {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        topic_title\n        topic_id\n      }\n      isCompleted\n      fields {\n        proposal_question_id\n        data_type\n        question\n        config\n        {\n          ... on BooleanConfig {\n            required\n          }\n        }\n        value\n        dependencies {\n          proposal_question_dependency\n          condition {\n            condition\n            params\n          }\n          proposal_question_id\n        }\n      }\n    }\n  }\n}\n}",
 						"variables": ""
 					}
 				},
@@ -1105,7 +1105,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            value\n            dependencies {\n              proposal_question_dependency\n              condition\n              proposal_question_id\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            {\n              ... on BooleanConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on DateConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on EmbellishmentConfig {\n                html\n                plain\n            \n                small_label\n                required\n                tooltip\n                omitFromPdf\n              }\n              ... on FileUploadConfig {\n                file_type\n                max_files\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on SelectionFromOptionsConfig {\n                variant\n                options\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on TextInputConfig {\n                min\n                max\n                multiline\n                placeholder\n            \n                small_label\n                required\n                tooltip\n              }\n            }\n            value\n            dependencies {\n              proposal_question_dependency\n              condition {\n                 condition\n                 params\n              }\n              proposal_question_id\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": ""
 					}
 				},
@@ -1187,7 +1187,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($id: Int!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  id\n                }\n              }\n            }\n          }",
+						"query": "query($id: Int!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    {\n                        ... on TextInputConfig {\n                            required\n                        }\n                    }\n                    value\n                    dependencies {\n                      proposal_question_dependency\n                      condition {\n                        condition\n                        params\n                      }\n                      proposal_question_id\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  id\n                }\n              }\n            }\n          }",
 						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
 					}
 				},
@@ -2690,7 +2690,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: String!) {\n  deleteTemplateField(id: $id) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          dependencies {\n            proposal_question_dependency\n            condition\n            proposal_question_id\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($id: String!) {\n  deleteTemplateField(id: $id) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n          dependencies {\n            proposal_question_dependency\n            condition\n            {\n                condition\n                params\n            }\n            proposal_question_id\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"id\": \"{{NEW_FIELD_ID}}\"\n}"
 					}
 				},
