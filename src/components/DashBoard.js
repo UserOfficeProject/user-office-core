@@ -161,6 +161,7 @@ export default function Dashboard({ match }) {
             color="inherit"
             component={Link}
             to={`/ProfilePage/${id}`}
+            data-cy="profile-page-btn"
           >
             <Badge badgeContent={0} color="secondary">
               <AccountCircle />
