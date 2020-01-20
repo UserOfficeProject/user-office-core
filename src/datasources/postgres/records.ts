@@ -199,7 +199,7 @@ export const createQuestionaryFieldObject = (
 ) => {
   return new QuestionaryField(
     createProposalTemplateFieldObject(question),
-    JSON.parse(question.value).value || ""
+    question.value ? JSON.parse(question.value).value : ""
   );
 };
 
