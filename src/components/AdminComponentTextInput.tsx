@@ -15,22 +15,28 @@ import { TextInputConfig } from "../generated/sdk";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
-  const config = field.config as TextInputConfig;
+  var config = field.config as TextInputConfig;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    config.htmlQuestion !== undefined
+    config.htmlQuestion !== null
   );
 
   return (
     <Formik
       initialValues={field}
       onSubmit={async vals => {
-        if (!isRichQuestion) {
-          config.htmlQuestion = undefined;
-        }
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
+            field: {
+              ...field,
+              ...vals,
+              config: {
+                ...vals.config,
+                htmlQuestion: isRichQuestion
+                  ? (vals.config as TextInputConfig).htmlQuestion
+                  : null
+              }
+            }
           }
         });
         props.closeMe();
