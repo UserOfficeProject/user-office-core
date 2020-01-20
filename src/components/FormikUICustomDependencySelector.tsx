@@ -159,8 +159,10 @@ const FormikUICustomDependencySelector = ({
               setOperator(event.target.value as EvaluatorOperator);
             }}
           >
-            <MenuItem value="eq">equals</MenuItem>
-            <MenuItem value="neq">not equal</MenuItem>
+            <MenuItem value={EvaluatorOperator.EQ.toString()}>equals</MenuItem>
+            <MenuItem value={EvaluatorOperator.NEQ.toString()}>
+              not equal
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>
