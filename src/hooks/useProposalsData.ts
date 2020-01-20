@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { ProposalStatus } from "../models/ProposalModel";
 import { useDataApi2 } from "./useDataApi2";
+import { ProposalStatus } from "../generated/sdk";
 
 export function useProposalsData(filter: string) {
   const api = useDataApi2();

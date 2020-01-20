@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
-import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 import { useDataApi2 } from "./useDataApi2";
+import { ProposalAnswer } from "../models/ProposalModel";
+import { ProposalStatus } from "../generated/sdk";
 
 export function useUpdateProposal() {
   const sendRequest = useDataApi2();

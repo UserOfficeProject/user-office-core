@@ -1,17 +1,17 @@
+import produce from "immer";
+import { Reducer, useCallback, useEffect } from "react";
 import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import { Reducer, useEffect, useCallback } from "react";
+import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 import {
   ProposalTemplate,
   ProposalTemplateField,
   TemplateStep
-} from "./ProposalModel";
+} from "../generated/sdk";
 import {
-  getTopicById,
   getFieldById,
-  getQuestionaryStepByTopicId
+  getQuestionaryStepByTopicId,
+  getTopicById
 } from "./ProposalModelFunctions";
-import produce from "immer";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 
 export enum EventType {
   READY,
@@ -37,7 +37,7 @@ export interface IEvent {
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
-  const blankInitTemplate = new ProposalTemplate();
+  const blankInitTemplate: ProposalTemplate = { steps: [] };
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);

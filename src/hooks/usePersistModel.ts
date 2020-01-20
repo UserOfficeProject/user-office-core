@@ -1,12 +1,12 @@
 import { useState } from "react";
-import {
-  DataType,
-  ProposalTemplate,
-  ProposalTemplateField,
-  Topic
-} from "../models/ProposalModel";
 import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi2 } from "./useDataApi2";
+import {
+  ProposalTemplateField,
+  ProposalTemplate,
+  Topic,
+  DataType
+} from "../generated/sdk";
 
 export function usePersistModel() {
   const api = useDataApi2();
@@ -51,11 +51,7 @@ export function usePersistModel() {
         question: field.question,
         config: field.config ? JSON.stringify(field.config) : undefined,
         isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
-        dependencies: field.dependencies
-          ? field.dependencies.map(dep => {
-              return { ...dep, condition: JSON.stringify(dep.condition) };
-            })
-          : []
+        dependencies: field.dependencies ? field.dependencies : []
       })
       .then(data => {
         const { error, template } = data.updateProposalTemplateField;
@@ -110,23 +106,28 @@ export function usePersistModel() {
       });
   };
 
-  const templateFromServerResponse = (obj: any) => {
+  // TODO see if this can be deleted and use the response value directly
+  const templateFromServerResponse = (obj: ProposalTemplate | null) => {
     if (obj) {
-      return ProposalTemplate.fromObject(obj);
+      return { ...obj };
     }
     return obj;
   };
 
-  const topicFromServerResponse = (obj: any) => {
+  // TODO see if this can be deleted and use the response value directly
+  const topicFromServerResponse = (obj: Topic | null) => {
     if (obj) {
-      return Topic.fromObject(obj);
+      return { ...obj };
     }
     return obj;
   };
 
-  const templateFieldFromServerResponse = (obj: any) => {
+  // TODO see if this can be deleted and use the response value directly
+  const templateFieldFromServerResponse = (
+    obj: ProposalTemplateField | null
+  ) => {
     if (obj) {
-      return ProposalTemplateField.fromObject(obj);
+      return { ...obj };
     }
     return obj;
   };

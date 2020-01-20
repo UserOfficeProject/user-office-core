@@ -13,7 +13,7 @@ import React, {
   useState
 } from "react";
 import { Prompt } from "react-router";
-import { Proposal, Questionary } from "../generated/sdk";
+import { Proposal, Questionary, ProposalStatus } from "../generated/sdk";
 import { useLoadProposal } from "../hooks/useLoadProposal";
 
 import "../styles/ProposalComponentStyles.css";
@@ -21,7 +21,6 @@ import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
 import ProposalReview from "./ProposalReview";
-import { ProposalStatus } from "../models/ProposalModel";
 
 export interface INotification {
   variant: "error" | "success";

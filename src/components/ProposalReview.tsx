@@ -2,13 +2,12 @@ import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/styles";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
-import { ProposalStatus } from "../models/ProposalModel";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 import { Button } from "@material-ui/core";
 import withConfirm from "../utils/withConfirm";
-import { Proposal } from "../generated/sdk";
+import { Proposal, ProposalStatus } from "../generated/sdk";
 
 const useStyles = makeStyles({
   buttons: {
