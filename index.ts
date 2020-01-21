@@ -1,14 +1,15 @@
 import express, { NextFunction, Request, Response } from "express";
 import graphqlHTTP, { RequestInfo } from "express-graphql";
 import "reflect-metadata";
-import { buildSchema, registerEnumType } from "type-graphql";
+import { buildSchema } from "type-graphql";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import { logger } from "./src/utils/Logger";
 import { registerEnums } from "./src/resolvers/registerEnums";
+import { logger } from "./src/utils/Logger";
 
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");
+const dev = require("./src/routes/dev");
 const proposalDownload = require("./src/routes/pdf");
 
 var cookieParser = require("cookie-parser");
@@ -82,6 +83,10 @@ async function bootstrap() {
   app.use(files);
 
   app.use(proposalDownload);
+
+  if (process.env.NODE_ENV === "development") {
+    app.use(dev);
+  }
 
   app.listen(process.env.PORT || 4000);
 
