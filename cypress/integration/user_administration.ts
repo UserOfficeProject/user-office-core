@@ -24,7 +24,7 @@ context("Personal information tests", () => {
 
   it("Should be able update FAQ", () => {
     //@ts-ignore-line as
-    cy.resetDb();
+    cy.resetDB();
     /*cy.get("[data-cy=input-email] input")
       .type(EMAIL)
       .should("have.value", EMAIL);
