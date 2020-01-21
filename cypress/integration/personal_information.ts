@@ -11,7 +11,6 @@ context("Personal information tests", () => {
     cy.wait(2000);
   });
 
-  const newTitle = faker.name.lastName();
   const newFirstName = faker.name.firstName();
   const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
