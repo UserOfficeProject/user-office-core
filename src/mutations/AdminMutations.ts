@@ -8,6 +8,9 @@ import { Page } from "../models/Admin";
 import { logger } from "../utils/Logger";
 
 export default class AdminMutations {
+  resetDb(password: string): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
   constructor(
     private dataSource: AdminDataSource,
     private userAuth: UserAuthorization,

@@ -84,10 +84,6 @@ async function bootstrap() {
 
   app.use(proposalDownload);
 
-  if (process.env.NODE_ENV === "development") {
-    app.use(dev);
-  }
-
   app.listen(process.env.PORT || 4000);
 
   app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
