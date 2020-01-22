@@ -1,4 +1,3 @@
-
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -25,17 +24,16 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-import { request } from 'graphql-request'
+import { request } from "graphql-request";
 
 Cypress.Commands.add("resetDB", () => {
-
-    const query = `{
-        mutation {
-            resetDB(password: "duopassword") {
-          isSuccess
-        }
-    }s
-      }`
-    request('http://localhost:3000/graphql', query).then(data => console.log(data))
-
-})
+  const query = `mutation {
+    prepareDB(key:"postgres://duouser:duopassword@127.0.0.1:5432/duo") {
+      isSuccess
+      error
+    }
+  }`;
+  request("http://localhost:3000/graphql", query).then(data =>
+    console.log(data)
+  );
+});
