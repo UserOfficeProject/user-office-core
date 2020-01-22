@@ -6,13 +6,7 @@ import { wrapResponse } from "../wrapResponse";
 @Resolver()
 export class PrepareDBMutationMutation {
   @Mutation(() => SuccessResponseWrap)
-  prepareDB(
-    @Arg("key", () => String) key: string,
-    @Ctx() context: ResolverContext
-  ) {
-    return wrapResponse(
-      context.mutations.admin.resetDB(key),
-      SuccessResponseWrap
-    );
+  prepareDB(@Ctx() context: ResolverContext) {
+    return wrapResponse(context.mutations.admin.resetDB(), SuccessResponseWrap);
   }
 }
