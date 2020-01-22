@@ -26,7 +26,7 @@ context("Personal information tests", () => {
     cy.get("[data-cy='profile-page-btn']").click();
 
     cy.get("[name='firstname']")
-      .clear({ force: true })
+      .clear()
       .type(newFirstName, { force: true });
 
     cy.get("[name='middlename']")

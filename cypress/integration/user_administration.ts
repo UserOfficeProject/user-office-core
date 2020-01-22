@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 var faker = require("faker");
 
-context("Personal information tests", () => {
+context("User administration tests", () => {
   before(() => {
     //@ts-ignore
     cy.resetDB();
@@ -20,7 +20,7 @@ context("Personal information tests", () => {
   const newPosition = faker.random.word();
   const newTelephone = faker.phone.phoneNumber();
 
-  it("Should be able update FAQ", () => {
+  it("Should be able administer user information", () => {
     //@ts-ignore
     cy.login("officer");
 
