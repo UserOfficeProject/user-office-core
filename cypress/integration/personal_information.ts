@@ -2,13 +2,13 @@
 var faker = require("faker");
 
 context("Personal information tests", () => {
+  before(() => {
+    //@ts-ignore
+    cy.resetDB();
+  });
   beforeEach(() => {
     cy.visit("localhost:3000");
     cy.viewport(1100, 1100);
-  });
-
-  afterEach(() => {
-    cy.wait(2000);
   });
 
   const newFirstName = faker.name.firstName();
@@ -19,24 +19,14 @@ context("Personal information tests", () => {
   const newPosition = faker.random.word();
   const newTelephone = faker.phone.phoneNumber();
 
-  const EMAIL = "Javon4@hotmail.com";
-  const PASS = "Test1234!";
-
-  it("Should be able update FAQ", () => {
-    cy.get("[data-cy=input-email] input")
-      .type(EMAIL)
-      .should("have.value", EMAIL);
-
-    cy.get("[data-cy=input-password] input")
-      .type(PASS)
-      .should("have.value", PASS);
-
-    cy.get("[data-cy=submit]").click();
+  it("Should be able update personal information", () => {
+    //@ts-ignore
+    cy.login("user");
 
     cy.get("[data-cy='profile-page-btn']").click();
 
     cy.get("[name='firstname']")
-      .clear()
+      .clear({ force: true })
       .type(newFirstName, { force: true });
 
     cy.get("[name='middlename']")

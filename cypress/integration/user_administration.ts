@@ -2,13 +2,14 @@
 var faker = require("faker");
 
 context("Personal information tests", () => {
-  beforeEach(() => {
-    cy.visit("localhost:3000");
-    cy.viewport(1100, 1100);
+  before(() => {
+    //@ts-ignore
+    cy.resetDB();
   });
 
-  afterEach(() => {
-    cy.wait(2000);
+  beforeEach(() => {
+    cy.viewport(1100, 900);
+    cy.visit("localhost:3000");
   });
 
   const newFirstName = faker.name.firstName();
@@ -19,26 +20,18 @@ context("Personal information tests", () => {
   const newPosition = faker.random.word();
   const newTelephone = faker.phone.phoneNumber();
 
-  const EMAIL = "Aaron_Harris49@gmail.com";
-  const PASS = "Test1234!";
-
   it("Should be able update FAQ", () => {
-    //@ts-ignore-line as
-    cy.resetDB();
-    /*cy.get("[data-cy=input-email] input")
-      .type(EMAIL)
-      .should("have.value", EMAIL);
-
-    cy.get("[data-cy=input-password] input")
-      .type(PASS)
-      .should("have.value", PASS);
-
-    cy.get("[data-cy=submit]").click();
+    //@ts-ignore
+    cy.login("officer");
 
     cy.contains("View People").click();
 
+    cy.get("[title='Edit user']")
+      .first()
+      .click();
+
     cy.get("[name='firstname']")
-      .clear()
+      .clear({ force: true })
       .type(newFirstName, { force: true });
 
     cy.get("[name='middlename']")
@@ -95,6 +88,6 @@ context("Personal information tests", () => {
 
     cy.get("[name='telephone']")
       .invoke("val")
-      .should("eq", newTelephone);*/
+      .should("eq", newTelephone);
   });
 });
