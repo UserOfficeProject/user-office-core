@@ -46,7 +46,6 @@ export default function PeoplePage({ match }) {
                 actionText="Edit user"
                 actionIcon={<Edit />}
                 action={setUserData}
-                usersOnly={false}
               />
             </Paper>
           </Grid>

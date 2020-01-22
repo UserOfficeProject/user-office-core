@@ -4,7 +4,7 @@ import Dialog from "@material-ui/core/Dialog";
 import PeopleTable from "./PeopleTable";
 import { AddBox } from "@material-ui/icons";
 
-function ParticipantModal(props: {title: string, addParticipant: any, show: boolean, close: any, selectedUsers?: number[]}) {
+function ParticipantModal(props: {title: string, addParticipant: any, show: boolean, close: any, selectedUsers?: number[], userRole: string}) {
   const addUser = (rowData: any) => {
     props.addParticipant({
       firstname: rowData.firstname,
@@ -27,7 +27,7 @@ function ParticipantModal(props: {title: string, addParticipant: any, show: bool
           actionIcon={<AddBox />}
           action={addUser}
           selectedUsers={props.selectedUsers}
-          usersOnly={true}
+          userRole={props.userRole}
           emailInvite={true}
         />
       </DialogContent>

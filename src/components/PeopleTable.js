@@ -11,11 +11,11 @@ function sendUserRequest(
   apiCall,
   setLoading,
   selectedUsers,
-  usersOnly
+  userRole
 ) {
   const query = `
-  query($filter: String!, $first: Int!, $offset: Int!, $usersOnly: Boolean, $subtractUsers: [Int!]) {
-    users(filter: $filter, first: $first, offset: $offset, usersOnly: $usersOnly, subtractUsers: $subtractUsers){
+  query($filter: String!, $first: Int!, $offset: Int!, $userRole: UserRole, $subtractUsers: [Int!]) {
+    users(filter: $filter, first: $first, offset: $offset, userRole: $userRole, subtractUsers: $subtractUsers){
       users{
       firstname
       lastname
@@ -30,9 +30,11 @@ function sendUserRequest(
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
     first: searchQuery.pageSize,
-    usersOnly,
     subtractUsers: selectedUsers ? selectedUsers.map(user => user.id) : []
   };
+  if (userRole) {
+    variables.userRole = userRole;
+  }
   setLoading(true);
   return apiCall(query, variables).then(data => {
     setLoading(false);
@@ -101,7 +103,7 @@ function PeopleTable(props) {
                   sendRequest,
                   setLoading,
                   props.selectedUsers,
-                  props.usersOnly
+                  props.userRole
                 )
         }
         isLoading={loading}
