@@ -134,7 +134,7 @@ export default class UserQueries {
     filter?: string,
     first?: number,
     offset?: number,
-    usersOnly?: boolean,
+    userRole?: number,
     subtractUsers?: [number]
   ) {
     if (agent == null) {
@@ -144,7 +144,7 @@ export default class UserQueries {
       filter,
       first,
       offset,
-      usersOnly,
+      userRole,
       subtractUsers
     );
   }
