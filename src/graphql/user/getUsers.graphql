@@ -1,5 +1,17 @@
-query getUsers($filter: String!) {
-  users(filter: $filter) {
+query getUsers(
+  $filter: String
+  $first: Int
+  $offset: Int
+  $usersOnly: Boolean
+  $subtractUsers: [Int!]
+) {
+  users(
+    filter: $filter
+    first: $first
+    offset: $offset
+    usersOnly: $usersOnly
+    subtractUsers: $subtractUsers
+  ) {
     users {
       ...basicUserDetails
     }
