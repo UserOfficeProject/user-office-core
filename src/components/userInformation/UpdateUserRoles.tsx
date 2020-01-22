@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import AddBox from "@material-ui/icons/AddBox";
 import { makeStyles } from "@material-ui/styles";
 import MaterialTable from "material-table";
+import { useSnackbar } from "notistack";
+import React, { useEffect, useState } from "react";
+import { GetUserWithRolesQuery, Role } from "../../generated/sdk";
+import { useDataApi2 } from "../../hooks/useDataApi2";
+import { tableIcons } from "../../utils/materialIcons";
 import RoleModal from "./../RoleModal";
-import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
-import { useDataAPI } from "../../hooks/useDataAPI";
-import AddBox from "@material-ui/icons/AddBox";
-import { tableIcons } from "../../utils/materialIcons"
-import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles({
   buttons: {
@@ -33,12 +34,14 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UpdateUserRoles(props:{id: number}) {
-  const [userData, setUserData] = useState(null);
+export default function UpdateUserRoles(props: { id: number }) {
+  const [userData, setUserData] = useState<
+    GetUserWithRolesQuery["user"] | null
+  >(null);
   const [modalOpen, setOpen] = useState(false);
-  const sendRequest = useDataAPI();
+  const api = useDataApi2();
   const { enqueueSnackbar } = useSnackbar();
-  const [roles, setRoles] = useState<any>([]);
+  const [roles, setRoles] = useState<Array<Role>>([]);
 
   const addRole = (role: any) => {
     setRoles([...roles, role]);
@@ -47,56 +50,38 @@ export default function UpdateUserRoles(props:{id: number}) {
 
   const removeRole = (role: any) => {
     let newRoles = [...roles];
-    newRoles.splice(newRoles.findIndex(element => role.id === element.id), 1);
+    newRoles.splice(
+      newRoles.findIndex(element => role.id === element.id),
+      1
+    );
     setRoles(newRoles);
   };
 
   const sendUserUpdate = () => {
-    const query = `
-    mutation($id: Int!, $roles: [Int!]) {
-      updateUser(id: $id, roles: $roles){
-       user{
-        id
-      }
-        error
-      }
-    }
-    `;
-
     const variables = {
       id: props.id,
-      roles: roles.map((role: any) => role.id)
+      roles: roles.map(role => role.id)
     };
-    sendRequest(query, variables).then(() => enqueueSnackbar('Updated Roles', { 
-      variant: 'success',
-  }));
+    api()
+      .updateUser(variables)
+      .then(response =>
+        enqueueSnackbar("Updated Roles", {
+          variant: response.updateUser.error ? "error" : "success"
+        })
+      );
   };
 
   useEffect(() => {
     const getUserInformation = () => {
-      const query = `
-      query($id: Int!) {
-        user(id: $id){
-          firstname
-          lastname
-          roles{
-            id
-            shortCode
-            title
-          }
-        }
-      }`;
-
-      const variables = {
-        id: props.id
-      };
-      sendRequest(query, variables).then((data:any) => {
-        setUserData({ ...data.user });
-        setRoles(data.user.roles);
-      });
+      api()
+        .getUserWithRoles({ id: props.id })
+        .then(data => {
+          setUserData({ ...data.user! });
+          setRoles(data.user!.roles);
+        });
     };
     getUserInformation();
-  }, [props.id, sendRequest]);
+  }, [props.id, api]);
 
   const columns = [{ title: "Name", field: "name" }];
 
@@ -106,57 +91,56 @@ export default function UpdateUserRoles(props:{id: number}) {
     return <p>Loading</p>;
   }
   return (
-      <Container maxWidth="lg" className={classes.container}>
-        <Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <RoleModal
-                show={modalOpen}
-                close={() => setOpen(false)}
-                add={addRole}
-              />
-                    <MaterialTable
-                      title="Roles"
-                      columns={columns}
-                      icons={tableIcons}
-                      data={roles.map((role: any) => {
-                        return { name: role.title, id: role.id };
-                      })}
-                      options={{
-                        search: false
-                      }}
-                      actions={[
-                        {
-                          icon: () => <AddBox />,
-                          tooltip: "Add Role",
-                          isFreeAction: true,
-                          onClick: event => setOpen(true)
-                        }
-                      ]}
-                      editable={{
-                        onRowDelete: oldData =>
-                          new Promise(resolve => {
-                            resolve();
-                            removeRole(oldData);
-                          })
-                      }}
-                    />
+    <Container maxWidth="lg" className={classes.container}>
+      <Grid>
+        <Grid item xs={12}>
+          <Paper className={classes.paper}>
+            <RoleModal
+              show={modalOpen}
+              close={() => setOpen(false)}
+              add={addRole}
+            />
+            <MaterialTable
+              title="Roles"
+              columns={columns}
+              icons={tableIcons}
+              data={roles.map((role: any) => {
+                return { name: role.title, id: role.id };
+              })}
+              options={{
+                search: false
+              }}
+              actions={[
+                {
+                  icon: () => <AddBox />,
+                  tooltip: "Add Role",
+                  isFreeAction: true,
+                  onClick: event => setOpen(true)
+                }
+              ]}
+              editable={{
+                onRowDelete: oldData =>
+                  new Promise(resolve => {
+                    resolve();
+                    removeRole(oldData);
+                  })
+              }}
+            />
 
-                    <div className={classes.buttons}>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                        onClick={() => sendUserUpdate()}
-                      >
-                        Update Roles
-                      </Button>
-                    </div>
-
-            </Paper>
-          </Grid>
+            <div className={classes.buttons}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={() => sendUserUpdate()}
+              >
+                Update Roles
+              </Button>
+            </div>
+          </Paper>
         </Grid>
-      </Container>
+      </Grid>
+    </Container>
   );
 }
