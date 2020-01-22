@@ -63,7 +63,7 @@ export default function UpdateUserRoles(props: { id: number }) {
       roles: roles.map(role => role.id)
     };
     api()
-      .updateUser(variables)
+      .updateUserRoles(variables)
       .then(response =>
         enqueueSnackbar("Updated Roles", {
           variant: response.updateUser.error ? "error" : "success"

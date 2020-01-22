@@ -1,11 +1,20 @@
 query getUser($id: Int!) {
   user(id: $id) {
-    proposals {
-      id
-      shortCode
-      title
-      status
-      created
-    }
+    user_title
+    username
+    firstname
+    middlename
+    lastname
+    preferredname
+    gender
+    nationality
+    birthdate
+    organisation
+    department
+    position
+    email
+    telephone
+    telephone_alt
+    orcid
   }
 }

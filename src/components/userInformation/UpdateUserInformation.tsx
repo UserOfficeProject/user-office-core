@@ -12,11 +12,10 @@ import FormikDropdown from "../FormikDropdown";
 import { useGetFields } from "../../hooks/useGetFields";
 import orcid from "../../images/orcid.png";
 import InputLabel from "@material-ui/core/InputLabel";
-import {
-  userFieldSchema,
-} from "../../utils/userFieldValidationSchema";
+import { userFieldSchema } from "../../utils/userFieldValidationSchema";
 import dateformat from "dateformat";
-import { useSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
+import { useDataApi2 } from "../../hooks/useDataApi2";
 
 const useStyles = makeStyles({
   buttons: {
@@ -51,12 +50,16 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UpdateUserInformation(props:{id: number}) {
+export default function UpdateUserInformation(props: { id: number }) {
   const [userData, setUserData] = useState<any>(null);
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataApi2();
   const fieldsContent = useGetFields();
-  const [nationalitiesList, setNationalitiesList] = useState<{text: string, value: string}[]>([]);
-  const [institutionsList, setInstitutionsList] = useState<{text: string, value: string}[]>([]);
+  const [nationalitiesList, setNationalitiesList] = useState<
+    { text: string; value: string }[]
+  >([]);
+  const [institutionsList, setInstitutionsList] = useState<
+    { text: string; value: string }[]
+  >([]);
   const { enqueueSnackbar } = useSnackbar();
 
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
@@ -66,92 +69,33 @@ export default function UpdateUserInformation(props:{id: number}) {
       })
     );
     setNationalitiesList(
-      fieldsContent.nationalities.map((nationality:any) => {
+      fieldsContent.nationalities.map((nationality: any) => {
         return { text: nationality.value, value: nationality.id };
       })
     );
   }
 
-  const sendUserUpdate = (values:any) => {
-    const query = `mutation(
-      $id: Int!,
-      $user_title: String, 
-      $firstname: String!, 
-      $middlename: String, 
-      $lastname: String!, 
-      $preferredname: String,
-      $gender: String!,
-      $nationality: Int!,
-      $birthdate: String!,
-      $organisation: Int!,
-      $department: String!,
-      $position: String!,
-      $email: String!,
-      $telephone: String!,
-      $telephone_alt: String
-      )
-{
-  updateUser(
-        id: $id, 
-        user_title: $user_title, 
-        firstname: $firstname, 
-        middlename: $middlename, 
-        lastname: $lastname, 
-        preferredname: $preferredname
-        gender: $gender
-        nationality: $nationality
-        birthdate: $birthdate
-        organisation: $organisation
-        department: $department
-        position: $position
-        email: $email
-        telephone: $telephone
-        telephone_alt: $telephone_alt
-        )
-{
-  user { id }
-  error
-}
-}`;
+  const sendUserUpdate = (values: any) => {
     const variables = {
       id: props.id,
       ...values,
       gender: values.gender === "other" ? values.othergender : values.gender
     };
-    sendRequest(query, variables).then(() => 
-        enqueueSnackbar('Updated Information', { variant: 'success'})
-    );
-  }
+    sendRequest()
+      .updateUser(variables)
+      .then(data =>
+        enqueueSnackbar("Updated Information", {
+          variant: data.updateUser.error ? "error" : "success"
+        })
+      );
+  };
   useEffect(() => {
-    const getUserInformation = (id:number) => {
-      const query = `
-      query($id: Int!) {
-        user(id: $id){
-          user_title, 
-          username,
-          firstname, 
-          middlename, 
-          lastname, 
-          preferredname,
-          gender,
-          nationality,
-          birthdate,
-          organisation,
-          department,
-          position,
-          email,
-          telephone,
-          telephone_alt,
-          orcid
-        }
-      }`;
-
-      const variables = {
-        id
-      };
-      sendRequest(query, variables).then((data:any) => {
-        setUserData({ ...data.user });
-      });
+    const getUserInformation = (id: number) => {
+      sendRequest()
+        .getUser({ id })
+        .then(data => {
+          setUserData({ ...data.user });
+        });
     };
     getUserInformation(props.id);
   }, [props.id, sendRequest]);
