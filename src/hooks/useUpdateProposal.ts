@@ -21,10 +21,11 @@ export function useUpdateProposal() {
       users?: number[];
       proposerId?: number;
       partialSave?: boolean;
+      excellenceScore?: number;
     }) => {
       const query = `
-      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $users:[Int!], $proposerId:Int, $partialSave:Boolean) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users, proposerId:$proposerId, partialSave:$partialSave){
+      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $users:[Int!], $proposerId:Int, $partialSave:Boolean, $excellenceScore:Int) {
+        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users, proposerId:$proposerId, partialSave:$partialSave, excellenceScore:$excellenceScore){
          proposal{
           id
         }

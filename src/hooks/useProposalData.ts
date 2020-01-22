@@ -19,6 +19,9 @@ export function useProposalData(id: number | null) {
               abstract
               status
               shortCode
+              excellenceScore
+              safetyScore
+              technicalScore
               proposer{
                 id
                 firstname
@@ -77,6 +80,9 @@ export function useProposalData(id: number | null) {
           id: data.proposal.id,
           status: data.proposal.status,
           shortCode: data.proposal.shortCode,
+          excellenceScore: data.proposal.excellenceScore,
+          safetyScore: data.proposal.safetyScore,
+          technicalScore: data.proposal.technicalScore,
           proposer: {
             id: data.proposal.proposer.id,
             firstname: data.proposal.proposer.firstname,
