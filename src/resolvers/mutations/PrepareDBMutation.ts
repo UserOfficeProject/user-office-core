@@ -4,14 +4,14 @@ import { SuccessResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
-export class ResetDbMutationMutation {
+export class PrepareDBMutationMutation {
   @Mutation(() => SuccessResponseWrap)
-  resetDB(
-    @Arg("password", () => String) password: string,
+  prepareDB(
+    @Arg("key", () => String) key: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.admin.resetDb(password),
+      context.mutations.admin.resetDB(key),
       SuccessResponseWrap
     );
   }

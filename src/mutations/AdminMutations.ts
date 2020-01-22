@@ -8,8 +8,8 @@ import { Page } from "../models/Admin";
 import { logger } from "../utils/Logger";
 
 export default class AdminMutations {
-  resetDb(password: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+  resetDB(connectionString: string): Promise<boolean> {
+    return this.dataSource.resetDB(connectionString);
   }
   constructor(
     private dataSource: AdminDataSource,

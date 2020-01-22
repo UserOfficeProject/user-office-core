@@ -1,22 +1,26 @@
-drop table IF EXISTS proposal_answers_files;
-drop table IF EXISTS proposal_answers;
-drop table IF EXISTS proposal_question_dependencies;
-drop table IF EXISTS proposal_questions;
-drop table IF EXISTS proposal_question_datatypes;
-drop table IF EXISTS proposal_users;
-drop table IF EXISTS role_users;
-drop table IF EXISTS proposal_user;
-drop table IF EXISTS reviews;
-drop table IF EXISTS proposals;
-drop table IF EXISTS role_user;
-drop table IF EXISTS users;
-drop table IF EXISTS roles;
-drop table IF EXISTS proposal_topics;
-drop table IF EXISTS files;
-drop table IF EXISTS call;
-drop table IF EXISTS pagetext;
+/* CLEANUP */
+DROP TABLE IF EXISTS call;
+DROP TABLE IF EXISTS pagetext;
+DROP TABLE IF EXISTS proposal_answers_files;
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS proposal_answers;
+DROP TABLE IF EXISTS proposal_question_dependencies;
+DROP TABLE IF EXISTS proposal_questions;
+DROP TABLE IF EXISTS proposal_topic_completenesses;
+DROP TABLE IF EXISTS proposal_topics;
+DROP TABLE IF EXISTS proposal_user;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS role_user;
+DROP TABLE IF EXISTS proposals;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS role_users;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS proposal_question_datatypes;
+
+DROP SEQUENCE IF EXISTS proposals_short_code_seq;
 
 
+/* INIT */
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN

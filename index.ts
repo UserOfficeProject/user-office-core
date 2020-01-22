@@ -9,7 +9,6 @@ import { logger } from "./src/utils/Logger";
 
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");
-const dev = require("./src/routes/dev");
 const proposalDownload = require("./src/routes/pdf");
 
 var cookieParser = require("cookie-parser");

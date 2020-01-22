@@ -8,6 +8,8 @@ import {
   CountryRecord
 } from "./records";
 import { Page } from "../../models/Admin";
+import Knex = require("knex");
+import * as fs from "fs";
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async get(id: number): Promise<string | null> {
@@ -78,5 +80,26 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           return { id: count.country_id, value: count.country };
         })
       );
+  }
+
+  async resetDB(key: string) {
+    const resetDbCon = Knex({
+      client: "postgresql",
+      connection: key
+    });
+
+    const directoryPath = "./db_patches";
+    fs.readdir(directoryPath, async function(err, files) {
+      if (err) {
+        return console.log("Unable to scan directory: " + err);
+      }
+
+      for await (let file of files) {
+        var contents = fs.readFileSync(`${directoryPath}/${file}`, "utf8");
+        await resetDbCon.raw(contents);
+      }
+    });
+
+    return true;
   }
 }
