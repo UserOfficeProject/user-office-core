@@ -44,6 +44,7 @@ export default function ProposalParticipants(props) {
         addParticipant={addUser}
         selectedUsers={props.users}
         title={"Add Co-Proposer"}
+        userRole={"USER"}
       />
       <PeopleTable
         title="Co-Proposers"

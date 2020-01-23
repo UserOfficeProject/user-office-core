@@ -14,7 +14,10 @@ export class ProposalInformation {
     public users?: User[],
     public reviews?: Review[],
     public questionary?: Questionary,
-    public shortCode?: string
+    public shortCode?: string,
+    public excellenceScore?: number,
+    public safetyScore?: number,
+    public technicalScore?: number
   ) {}
 }
 

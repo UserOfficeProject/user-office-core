@@ -37,7 +37,7 @@ export default function ProposaQuestionaryReview(
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
-        Proposal Review
+        Information
       </Typography>
       <Table>
         <TableBody>

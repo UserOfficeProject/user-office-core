@@ -46,7 +46,7 @@ export default function ProposalInformationView(props: {
   const informDirty = (isDirty: boolean) => {
     props.setIsDirty && props.setIsDirty(isDirty);
   };
-  console.log(props)
+  
   return (
     <Formik
       initialValues={{
