@@ -7,6 +7,7 @@ mutation updateProposal(
   $users: [Int!]
   $proposerId: Int
   $partialSave: Boolean
+  $excellenceScore: Int
 ) {
   updateProposal(
     id: $id
@@ -17,6 +18,7 @@ mutation updateProposal(
     users: $users
     proposerId: $proposerId
     partialSave: $partialSave
+    excellenceScore: $excellenceScore
   ) {
     proposal {
       id

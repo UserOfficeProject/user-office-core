@@ -2,14 +2,14 @@ query getUsers(
   $filter: String
   $first: Int
   $offset: Int
-  $usersOnly: Boolean
+  $userRole: UserRole
   $subtractUsers: [Int!]
 ) {
   users(
     filter: $filter
     first: $first
     offset: $offset
-    usersOnly: $usersOnly
+    userRole: $userRole
     subtractUsers: $subtractUsers
   ) {
     users {
