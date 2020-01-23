@@ -38,6 +38,15 @@ class UpdateProposalArgs {
 
   @Field(() => Boolean, { nullable: true })
   public partialSave?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public excellenceScore?: number;
+
+  @Field(() => Int, { nullable: true })
+  public technicalScore?: number;
+
+  @Field(() => Int, { nullable: true })
+  public safetyScore?: number;
 }
 
 @Resolver()
@@ -53,7 +62,10 @@ export class UpdateProposalMutation {
       topicsCompleted,
       users,
       proposerId,
-      partialSave
+      partialSave,
+      excellenceScore,
+      technicalScore,
+      safetyScore
     }: UpdateProposalArgs,
     @Ctx() context: ResolverContext
   ) {
@@ -67,7 +79,10 @@ export class UpdateProposalMutation {
         topicsCompleted,
         users,
         proposerId,
-        partialSave
+        partialSave,
+        excellenceScore,
+        technicalScore,
+        safetyScore
       ),
       ProposalResponseWrap
     );

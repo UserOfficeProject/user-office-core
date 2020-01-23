@@ -39,6 +39,15 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public shortCode: string;
 
+  @Field(() => Int, { nullable: true })
+  public excellenceScore?: number;
+
+  @Field(() => Int, { nullable: true })
+  public technicalScore?: number;
+
+  @Field(() => Int, { nullable: true })
+  public safetyScore?: number;
+
   public proposerId: number;
 }
 
