@@ -22,7 +22,7 @@ export interface UserDataSource {
     filter?: string,
     first?: number,
     offset?: number,
-    usersOnly?: boolean,
+    userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }>;
   getRoles(): Promise<Role[]>;

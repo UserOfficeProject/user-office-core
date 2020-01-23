@@ -312,7 +312,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     filter?: string,
     first?: number,
     offset?: number,
-    usersOnly?: boolean,
+    userRole?: number,
     subtractUsers?: [number]
   ): Promise<{ totalCount: number; users: BasicUserDetails[] }> {
     return database
@@ -334,11 +334,11 @@ export default class PostgresUserDataSource implements UserDataSource {
         if (offset) {
           query.offset(offset);
         }
-        if (usersOnly) {
+        if (userRole) {
           query.whereIn("user_id", function(this: any) {
             this.select("user_id")
               .from("role_user")
-              .where("role_id", 1);
+              .where("role_id", userRole);
           });
         }
         if (subtractUsers) {
