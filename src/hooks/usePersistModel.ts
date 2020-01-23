@@ -1,12 +1,11 @@
 import { useState } from "react";
+import {
+  DataType,
+  ProposalTemplate,
+  ProposalTemplateField
+} from "../generated/sdk";
 import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi } from "./useDataApi";
-import {
-  ProposalTemplateField,
-  ProposalTemplate,
-  Topic,
-  DataType
-} from "../generated/sdk";
 
 export function usePersistModel() {
   const api = useDataApi();
@@ -31,8 +30,7 @@ export function usePersistModel() {
         topicId
       })
       .then(data => {
-        const { error, topic } = data.updateTopic;
-        return { error, topic: topicFromServerResponse(topic) };
+        return data.updateTopic;
       });
   };
 
@@ -54,8 +52,7 @@ export function usePersistModel() {
         dependencies: field.dependencies ? field.dependencies : []
       })
       .then(data => {
-        const { error, template } = data.updateProposalTemplateField;
-        return { error, template: templateFromServerResponse(template) };
+        return data.updateProposalTemplateField;
       });
   };
 
@@ -68,11 +65,7 @@ export function usePersistModel() {
       })
       .then(data => {
         setIsLoading(false);
-        const { error, field } = data.createTemplateField;
-        return {
-          error,
-          field: templateFieldFromServerResponse(field)
-        };
+        return data.createTemplateField;
       });
   };
 
@@ -84,8 +77,7 @@ export function usePersistModel() {
       })
       .then(data => {
         setIsLoading(false);
-        const { error, template } = data.deleteTemplateField;
-        return { error, template: templateFromServerResponse(template) };
+        return data.deleteTemplateField;
       });
   };
 
@@ -101,35 +93,8 @@ export function usePersistModel() {
     return api()
       .createTopic({ sortOrder })
       .then(data => {
-        const { error, template } = data.createTopic;
-        return { error, template: templateFromServerResponse(template) };
+        return data.createTopic;
       });
-  };
-
-  // TODO see if this can be deleted and use the response value directly
-  const templateFromServerResponse = (obj: ProposalTemplate | null) => {
-    if (obj) {
-      return { ...obj };
-    }
-    return obj;
-  };
-
-  // TODO see if this can be deleted and use the response value directly
-  const topicFromServerResponse = (obj: Topic | null) => {
-    if (obj) {
-      return { ...obj };
-    }
-    return obj;
-  };
-
-  // TODO see if this can be deleted and use the response value directly
-  const templateFieldFromServerResponse = (
-    obj: ProposalTemplateField | null
-  ) => {
-    if (obj) {
-      return { ...obj };
-    }
-    return obj;
   };
 
   type MonitorableServiceCall = () => Promise<{
