@@ -8,7 +8,7 @@ import { QuestionaryField } from "../generated/sdk";
 test("Is dependency checking working", () => {
   let template = create1Topic3FieldWithDependenciesQuestionary();
   expect(areDependenciesSatisfied(template, "has_links_with_industry")).toBe(
-    false
+    true
   );
 
   expect(areDependenciesSatisfied(template, "links_with_industry")).toBe(false);
