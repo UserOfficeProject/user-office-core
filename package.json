@@ -44,6 +44,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
     "tinymce": "^5.1.4",
+    "ts-log": "2.1.4",
     "typescript": "^3.7.4",
     "yup": "^0.27.0"
   },
