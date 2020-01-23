@@ -6,7 +6,7 @@ export function useAddUserForReview() {
 
   const sendAddReviewer = useCallback(
     async (userID, proposalID) => {
-      api()
+      return api()
         .addUserForReview({ userID, proposalID })
         .then(resp => resp.addUserForReview);
     },
