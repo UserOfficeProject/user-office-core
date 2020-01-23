@@ -189,8 +189,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($filter: String!, $first: Int!, $offset: Int!, $subtractUsers:[Int], $usersOnly:Boolean) {\n  users(filter: $filter, first: $first, offset: $offset, subtractUsers:$subtractUsers, usersOnly:$usersOnly) {\n    users {\n      firstname\n      lastname\n      organisation\n      id\n    }\n    totalCount\n  }\n}\n",
-						"variables": "{\n    \"filter\": \"\",\n    \"offset\": 0,\n    \"first\": 5,\n    \"subtractUsers\":[],\n    \"usersOnly\":false\n  }"
+						"query": "query ($filter: String!, $first: Int!, $offset: Int!, $subtractUsers:[Int], $userRole:UserRole) {\n  users(filter: $filter, first: $first, offset: $offset, subtractUsers:$subtractUsers, userRole:$userRole) {\n    users {\n      firstname\n      lastname\n      organisation\n      id\n    }\n    totalCount\n  }\n}\n",
+						"variables": "{\n    \"filter\": \"\",\n    \"offset\": 0,\n    \"first\": 5,\n    \"subtractUsers\":[],\n    \"userRole\":\"USER\"\n  }"
 					}
 				},
 				"url": "http://localhost:4000/graphql"
