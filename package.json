@@ -55,7 +55,7 @@
     "cypress:open": "cypress open",
     "cy:run": "cypress run",
     "generate:local": "sed 's@<SCHEMA_URL>@http://localhost:4000/graphql@g' codegen_template.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && rm ./codegen_tmp.yml",
-    "generate:dev": "sed 's@<SCHEMA_URL>@PLACEHOLDER@g' codegen.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && ./rm codegen_tmp.yml"
+    "generate:dev": "sed 's@<SCHEMA_URL>@https://useroffice-test.esss.lu.se/graphql@g' codegen.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && ./rm codegen_tmp.yml"
   },
   "eslintConfig": {
     "extends": "react-app"
