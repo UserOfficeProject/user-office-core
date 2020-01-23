@@ -11,15 +11,17 @@ function sendUserRequest(
   api,
   setLoading,
   selectedUsers,
-  usersOnly
+  userRole
 ) {
   const variables = {
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
     first: searchQuery.pageSize,
-    usersOnly,
     subtractUsers: selectedUsers ? selectedUsers.map(user => user.id) : []
   };
+  if (userRole) {
+    variables.userRole = userRole;
+  }
   setLoading(true);
   return api()
     .getUsers(variables)
@@ -90,7 +92,7 @@ function PeopleTable(props) {
                   sendRequest,
                   setLoading,
                   props.selectedUsers,
-                  props.usersOnly
+                  props.userRole
                 )
         }
         isLoading={loading}

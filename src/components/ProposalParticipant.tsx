@@ -27,6 +27,7 @@ export default function ProposalParticipant(props: {
     <div className={props.className}>
       <ParticipantModal
         show={isPickerOpen}
+        userRole={"USER"}
         title={"Add Co-Proposer"}
         close={() => {
           setIsPickerOpen(false);

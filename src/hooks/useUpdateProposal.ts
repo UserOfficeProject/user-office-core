@@ -19,6 +19,7 @@ export function useUpdateProposal() {
       users?: number[];
       proposerId?: number;
       partialSave?: boolean;
+      excellenceScore?: number;
     }) => {
       setLoading(true);
       parameters.answers = prepareAnswers(parameters.answers);
