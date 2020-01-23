@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import { TextField } from "formik-material-ui";
 import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/styles";
-import { Formik, Form, Field } from "formik";
 import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import InputLabel from "@material-ui/core/InputLabel";
 import Paper from "@material-ui/core/Paper";
-import { useDataAPI } from "../../hooks/useDataAPI";
-import FormikDropdown from "../FormikDropdown";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/styles";
+import dateformat from "dateformat";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import { useSnackbar } from "notistack";
+import React, { useEffect, useState } from "react";
+import { useDataApi2 } from "../../hooks/useDataApi2";
 import { useGetFields } from "../../hooks/useGetFields";
 import orcid from "../../images/orcid.png";
-import InputLabel from "@material-ui/core/InputLabel";
 import { userFieldSchema } from "../../utils/userFieldValidationSchema";
-import dateformat from "dateformat";
-import { useSnackbar } from "notistack";
-import { useDataApi2 } from "../../hooks/useDataApi2";
+import FormikDropdown from "../FormikDropdown";
 
 const useStyles = makeStyles({
   buttons: {

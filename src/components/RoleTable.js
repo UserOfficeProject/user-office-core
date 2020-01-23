@@ -1,31 +1,25 @@
-import React from "react";
-import MaterialTable from "material-table";
-import { useDataAPI } from "../hooks/useDataAPI";
-import { tableIcons } from "../utils/tableIcons";
 import { AddBox } from "@material-ui/icons";
+import MaterialTable from "material-table";
+import React from "react";
+import { useDataApi2 } from "../hooks/useDataApi2";
+import { tableIcons } from "../utils/tableIcons";
 
-function sendRoleRequest(searchQuery, apiCall) {
-  const query = `{
-        roles{
-          id
-          shortCode
-          title
-        }
-      }`;
-
-  return apiCall(query).then(data => {
-    return {
-      page: 0,
-      totalCount: data.roles.length,
-      data: data.roles.map(role => {
-        return { title: role.title, id: role.id };
-      })
-    };
-  });
+function sendRoleRequest(apiCall) {
+  return apiCall()
+    .getRoles()
+    .then(data => {
+      return {
+        page: 0,
+        totalCount: data.roles.length,
+        data: data.roles.map(role => {
+          return { title: role.title, id: role.id };
+        })
+      };
+    });
 }
 
 function RoleTable(props) {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataApi2();
   const columns = [
     { title: "Title", field: "title" },
     { title: "ID", field: "id" }
@@ -36,7 +30,7 @@ function RoleTable(props) {
       icons={tableIcons}
       title="Add Role"
       columns={columns}
-      data={query => sendRoleRequest(query, sendRequest)}
+      data={() => sendRoleRequest(sendRequest)}
       options={{
         search: true
       }}
