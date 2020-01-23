@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { EventType, IEvent } from "../models/QuestionaryEditorModel";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 import {
   ProposalTemplateField,
   ProposalTemplate,
@@ -9,7 +9,7 @@ import {
 } from "../generated/sdk";
 
 export function usePersistModel() {
-  const api = useDataApi2();
+  const api = useDataApi();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {

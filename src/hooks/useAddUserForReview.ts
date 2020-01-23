@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useAddUserForReview() {
-  const api = useDataApi2();
+  const api = useDataApi();
 
   const sendAddReviewer = useCallback(
     async (userID, proposalID) => {

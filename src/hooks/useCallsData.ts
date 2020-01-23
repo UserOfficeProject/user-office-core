@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 import { GetCallsQuery } from "../generated/sdk";
 
 export function useCallsData(show: boolean) {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [callsData, setCallsData] = useState<GetCallsQuery["calls"] | null>();
   const [loading, setLoading] = useState(true);
   useEffect(() => {

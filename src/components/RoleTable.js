@@ -1,7 +1,7 @@
 import { AddBox } from "@material-ui/icons";
 import MaterialTable from "material-table";
 import React from "react";
-import { useDataApi2 } from "../hooks/useDataApi2";
+import { useDataApi } from "../hooks/useDataApi";
 import { tableIcons } from "../utils/tableIcons";
 
 function sendRoleRequest(apiCall) {
@@ -19,7 +19,7 @@ function sendRoleRequest(apiCall) {
 }
 
 function RoleTable(props) {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const columns = [
     { title: "Title", field: "title" },
     { title: "ID", field: "id" }

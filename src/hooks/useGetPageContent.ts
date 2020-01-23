@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { GetPageContentQuery, PageName } from "../generated/sdk";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useGetPageContent(pageName: PageName) {
-  const api = useDataApi2();
+  const api = useDataApi();
   const [pageContent, setPageContent] = useState<
     GetPageContentQuery["getPageContent"]
   >(null);

@@ -2,7 +2,7 @@ import { Email } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
 import MaterialTable from "material-table";
 import React, { useState } from "react";
-import { useDataApi2 } from "../hooks/useDataApi2";
+import { useDataApi } from "../hooks/useDataApi";
 import { tableIcons } from "../utils/tableIcons";
 import { InviteUserForm } from "./InviteUserForm";
 
@@ -41,7 +41,7 @@ function sendUserRequest(
 }
 
 function PeopleTable(props) {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const columns = [

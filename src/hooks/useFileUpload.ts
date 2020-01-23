@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FileMetaData } from "../models/FileUpload";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export enum UPLOAD_STATE {
   PRISTINE,
@@ -84,7 +84,7 @@ export function useFileUpload() {
 }
 
 export function useGetFileMetadata() {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [filesMetadata, setFilesMetadata] = useState<FileMetaData[]>([]);
   const getFileMetadata = (fileIds: string[]) => {
     const variables = {

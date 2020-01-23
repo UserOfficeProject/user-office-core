@@ -8,7 +8,7 @@ import MaterialTable from "material-table";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
 import { GetUserWithRolesQuery, Role } from "../../generated/sdk";
-import { useDataApi2 } from "../../hooks/useDataApi2";
+import { useDataApi } from "../../hooks/useDataApi";
 import { tableIcons } from "../../utils/materialIcons";
 import RoleModal from "./../RoleModal";
 
@@ -39,7 +39,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     GetUserWithRolesQuery["user"] | null
   >(null);
   const [modalOpen, setOpen] = useState(false);
-  const api = useDataApi2();
+  const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Array<Role>>([]);
 

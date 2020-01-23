@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 import { GetUsersQuery } from "../generated/sdk";
 
 export function useUsersData(filter: string) {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [usersData, setUsersData] = useState<GetUsersQuery["users"] | null>(
     null
   );

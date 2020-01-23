@@ -5,7 +5,7 @@ import { useCallback, useContext } from "react";
 import { UserContext } from "../context/UserContextProvider";
 import { getSdk } from "../generated/sdk";
 
-export function useDataApi2() {
+export function useDataApi() {
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
   const endpoint = "/graphql";
 

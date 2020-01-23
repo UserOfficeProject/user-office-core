@@ -1,10 +1,10 @@
 import React from "react";
-import { useDataApi2 } from "../hooks/useDataApi2";
+import { useDataApi } from "../hooks/useDataApi";
 import { timeAgo } from "./../utils/Time";
 import ProposalTable from "./ProposalTable";
 
 export default function ProposalTableUser(props) {
-  const api = useDataApi2();
+  const api = useDataApi();
 
   const sendUserProposalRequest = searchQuery => {
     return api()

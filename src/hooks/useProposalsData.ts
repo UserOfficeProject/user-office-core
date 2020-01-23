@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 import { ProposalStatus } from "../generated/sdk";
 
 export function useProposalsData(filter: string) {
-  const api = useDataApi2();
+  const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalData[] | null>(
     null
   );

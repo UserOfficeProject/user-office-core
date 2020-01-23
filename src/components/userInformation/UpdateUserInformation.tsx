@@ -10,7 +10,7 @@ import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
 import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
-import { useDataApi2 } from "../../hooks/useDataApi2";
+import { useDataApi } from "../../hooks/useDataApi";
 import { useGetFields } from "../../hooks/useGetFields";
 import orcid from "../../images/orcid.png";
 import { userFieldSchema } from "../../utils/userFieldValidationSchema";
@@ -51,7 +51,7 @@ const useStyles = makeStyles({
 
 export default function UpdateUserInformation(props: { id: number }) {
   const [userData, setUserData] = useState<any>(null);
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
   const [nationalitiesList, setNationalitiesList] = useState<
     { text: string; value: string }[]

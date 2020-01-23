@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useCreateUserInvite() {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(true);
   const createUserInvite = async (
     firstname: string,

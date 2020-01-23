@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useLoadProposal() {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
 
   const loadProposal = useCallback(
     async (id: number) => {

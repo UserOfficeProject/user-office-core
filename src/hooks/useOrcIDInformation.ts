@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 import { GetOrcIdInformationQuery } from "../generated/sdk";
 
 export function useOrcIDInformation(authorizationCode: string) {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [orcData, setOrcData] = useState<
     GetOrcIdInformationQuery["getOrcIDInformation"]
   >(null);

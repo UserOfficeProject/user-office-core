@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useUpdateProposalFiles() {
-  const sendRequest = useDataApi2();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
 
   const updateProposalFiles = useCallback(

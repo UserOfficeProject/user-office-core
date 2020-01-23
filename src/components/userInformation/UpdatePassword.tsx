@@ -8,7 +8,7 @@ import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
 import { useSnackbar } from "notistack";
 import React from "react";
-import { useDataApi2 } from "../../hooks/useDataApi2";
+import { useDataApi } from "../../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../../utils/userFieldValidationSchema";
 
 const useStyles = makeStyles({
@@ -45,7 +45,7 @@ const useStyles = makeStyles({
 });
 
 export default function UpdatePassword(props: { id: number }) {
-  const api = useDataApi2();
+  const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const sendPasswordUpdate = (password: string) => {
     api()

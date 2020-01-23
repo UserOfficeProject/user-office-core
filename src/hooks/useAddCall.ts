@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { useDataApi2 } from "./useDataApi2";
+import { useDataApi } from "./useDataApi";
 
 export function useAddCall() {
-  const api = useDataApi2();
+  const api = useDataApi();
 
   const sendAddReview = useCallback(
     async (
