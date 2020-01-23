@@ -1,4 +1,4 @@
-image: node:8.10.0-alpine
+image: node:10.17.0-alpine
 
 cache:
   key: "alpine"
