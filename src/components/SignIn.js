@@ -16,6 +16,7 @@ import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
 import orcid from "../images/orcid.png";
 import { getTranslation } from "@esss-swap/duo-localisation";
+import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -82,22 +83,11 @@ export default function SignInSide() {
   const { handleLogin, token } = useContext(UserContext);
 
   const requestToken = values => {
+    const api = useDataApi();
     const { email, password } = values;
-    const query = `
-    mutation($email: String!, $password: String!){
-      login(email: $email, password: $password){
-        token
-        error
-      }
-    }
-    `;
 
-    const variables = {
-      email,
-      password
-    };
-
-    request("/graphql", query, variables)
+    api()
+      .login({ email, password })
       .then(data => {
         if (!data.login.error) {
           handleLogin(data.login.token);
