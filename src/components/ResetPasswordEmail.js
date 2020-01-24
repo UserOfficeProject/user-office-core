@@ -1,17 +1,17 @@
-import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { TextField } from "formik-material-ui";
-import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import { request } from "graphql-request";
-import { Formik, Field, Form } from "formik";
-import PhotoInSide from "./PhotoInSide";
+import Typography from "@material-ui/core/Typography";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import * as Yup from "yup";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
+import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -43,19 +43,9 @@ export default function ResetPasswordEmail() {
   const classes = useStyles();
   const [emailSuccess, setSuccess] = useState(null);
   const requestResetEmail = values => {
-    const { email } = values;
-    const query = `
-    mutation($email: String!){
-      resetPasswordEmail(email: $email)
-    }
-    `;
-    const variables = {
-      email
-    };
-
-    request("/graphql", query, variables).then(data =>
-      setSuccess(data.resetPasswordEmail)
-    );
+    getUnauthorizedApi()
+      .resetPasswordEmail({ email: values.email })
+      .then(data => setSuccess(data.resetPasswordEmail));
   };
 
   return (

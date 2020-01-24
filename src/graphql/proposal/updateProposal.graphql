@@ -1,0 +1,28 @@
+mutation updateProposal(
+  $id: Int!
+  $title: String
+  $abstract: String
+  $answers: [ProposalAnswerInput!]
+  $topicsCompleted: [Int!]
+  $users: [Int!]
+  $proposerId: Int
+  $partialSave: Boolean
+  $excellenceScore: Int
+) {
+  updateProposal(
+    id: $id
+    title: $title
+    abstract: $abstract
+    answers: $answers
+    topicsCompleted: $topicsCompleted
+    users: $users
+    proposerId: $proposerId
+    partialSave: $partialSave
+    excellenceScore: $excellenceScore
+  ) {
+    proposal {
+      id
+    }
+    error
+  }
+}

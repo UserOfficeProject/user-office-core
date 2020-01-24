@@ -12,7 +12,7 @@ import CalendarToday from "@material-ui/icons/CalendarToday";
 import SettingsApplications from "@material-ui/icons/SettingsApplications";
 import { Link } from "react-router-dom";
 import { useCallsData } from "../hooks/useCallsData";
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 
 export default function MenuItems({ role }) {
   const { loading, callsData } = useCallsData();
@@ -25,8 +25,8 @@ export default function MenuItems({ role }) {
     proposalDisabled = callsData
       ? callsData.filter(
           call =>
-            new Date(call.startDate).getTime() < currentTime &&
-            currentTime < new Date(call.endDate).getTime()
+            new Date(call.startCall).getTime() < currentTime &&
+            currentTime < new Date(call.endCall).getTime()
         ).length === 0
       : false;
   }

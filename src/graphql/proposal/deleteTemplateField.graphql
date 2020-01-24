@@ -1,0 +1,15 @@
+mutation deleteTemplateField($id: String!) {
+  deleteTemplateField(id: $id) {
+    template {
+      steps {
+        topic {
+          ...topic
+        }
+        fields {
+          ...proposalTemplateField
+        }
+      }
+    }
+    error
+  }
+}

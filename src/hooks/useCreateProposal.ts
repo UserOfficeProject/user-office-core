@@ -1,29 +1,19 @@
-import { useState, useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useCallback, useState } from "react";
+import { useDataApi } from "./useDataApi";
 
 export function useCreateProposal() {
-  const sendRequest = useDataAPI<any>();
+  const api = useDataApi();
   const [loading, setLoading] = useState(false);
 
   const createProposal = useCallback(async () => {
-    const query = `
-      mutation{
-        createProposal{
-         proposal{
-          id
-          status
-          shortCode
-        }
-          error
-        }
-      }
-      `;
     setLoading(true);
-    const result = await sendRequest(query);
-    const proposal = result.createProposal.proposal;
-    setLoading(false);
-    return proposal;
-  }, [sendRequest]);
+    return api()
+      .createProposal()
+      .then(data => {
+        setLoading(false);
+        return data.createProposal;
+      });
+  }, [api]);
 
   return { loading, createProposal };
 }

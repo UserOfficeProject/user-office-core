@@ -1,13 +1,14 @@
-import { ConditionEvaluator } from "./ConditionEvaluator";
 import {
-  ProposalTemplateField,
-  QuestionaryField,
-  ProposalTemplate,
-  Questionary,
   DataType,
-  DataTypeSpec,
-  FieldDependency
-} from "./ProposalModel";
+  FieldDependency,
+  ProposalTemplate,
+  ProposalTemplateField,
+  Questionary,
+  QuestionaryField
+} from "../generated/sdk";
+import { ConditionEvaluator } from "./ConditionEvaluator";
+import { DataTypeSpec } from "./ProposalModel";
+
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -19,6 +20,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
   }
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
+  // @ts-ignore-line
   const step = collection.steps.find(step => step.topic.topic_id === topicId);
   return step ? step.topic : undefined;
 }
@@ -26,6 +28,7 @@ export function getQuestionaryStepByTopicId(
   template: AbstractCollection,
   topicId: number
 ) {
+  // @ts-ignore-line
   return template.steps.find(step => step.topic.topic_id === topicId);
 }
 export function getFieldById(
@@ -33,8 +36,11 @@ export function getFieldById(
   questionId: string
 ) {
   let needle: AbstractField | undefined;
+
+  // @ts-ignore-line
   collection.steps.every(step => {
     needle = step.fields.find(
+      // @ts-ignore-line
       field => field.proposal_question_id === questionId
     );
     return needle === undefined;
@@ -43,6 +49,7 @@ export function getFieldById(
 }
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
+  // @ts-ignore-line
   collection.steps.forEach(step => {
     allFields = allFields.concat(step.fields);
   });

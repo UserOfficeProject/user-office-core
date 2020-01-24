@@ -1,0 +1,36 @@
+query getBlankProposal {
+  blankProposal {
+    id
+    status
+    shortCode
+    excellenceScore
+    safetyScore
+    technicalScore
+    title
+    abstract
+    created
+    updated
+    proposer {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+    }
+    users {
+      ...basicUserDetails
+    }
+    reviews {
+      id
+      grade
+      comment
+      status
+      userID
+      reviewer {
+        firstname
+        lastname
+        username
+        id
+      }
+    }
+  }
+}

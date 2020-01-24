@@ -1,13 +1,11 @@
 import { useCallback, useState } from "react";
-import { useDataAPI } from "./useDataAPI";
-import { ProposalAnswer, ProposalStatus } from "../models/ProposalModel";
 import { getDataTypeSpec } from "../models/ProposalModelFunctions";
-import { ResourceId } from "@esss-swap/duo-localisation";
+import { useDataApi } from "./useDataApi";
+import { ProposalAnswer } from "../models/ProposalModel";
+import { ProposalStatus } from "../generated/sdk";
 
 export function useUpdateProposal() {
-  const sendRequest = useDataAPI<{
-    updateProposal: { proposal?: { id: number }; error: ResourceId };
-  }>();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
 
   const updateProposal = useCallback(
@@ -23,19 +21,9 @@ export function useUpdateProposal() {
       partialSave?: boolean;
       excellenceScore?: number;
     }) => {
-      const query = `
-      mutation($id: Int!, $title:String, $abstract:String, $answers:[ProposalAnswerInput!], $topicsCompleted:[Int!], $users:[Int!], $proposerId:Int, $partialSave:Boolean, $excellenceScore:Int) {
-        updateProposal(id: $id, title:$title, abstract:$abstract, answers: $answers, topicsCompleted:$topicsCompleted, users:$users, proposerId:$proposerId, partialSave:$partialSave, excellenceScore:$excellenceScore){
-         proposal{
-          id
-        }
-          error
-        }
-      }
-      `;
       setLoading(true);
       parameters.answers = prepareAnswers(parameters.answers);
-      const result = await sendRequest(query, parameters);
+      const result = await sendRequest().updateProposal(parameters);
       setLoading(false);
       return result;
     },

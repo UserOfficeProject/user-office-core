@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
+import { SelectionFromOptionsConfig } from "../generated/sdk";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -31,11 +32,12 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   })();
 
   let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id, config } = templateField;
+  let { proposal_question_id } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const config = templateField.config as SelectionFromOptionsConfig;
 
-  switch (templateField.config.variant) {
+  switch (config.variant) {
     case "dropdown":
       return (
         <FormControl fullWidth>
@@ -54,11 +56,11 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               MenuProps: {}
             }}
             error={isError}
-            helperText={templateField.config.small_label}
+            helperText={config.small_label}
             margin="normal"
             required={config.required ? true : false}
           >
-            {(config.options as string[]).map(option => {
+            {config.options.map(option => {
               return (
                 <MenuItem value={option} key={option}>
                   {option}
@@ -95,7 +97,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
                 : classes.verticalLayout
             }
           >
-            {(config.options as string[]).map(option => {
+            {config.options.map(option => {
               return (
                 <FormControlLabel
                   value={option}

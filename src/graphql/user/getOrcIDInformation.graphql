@@ -1,0 +1,10 @@
+query getOrcIDInformation($authorizationCode: String!) {
+  getOrcIDInformation(authorizationCode: $authorizationCode) {
+    firstname
+    lastname
+    orcid
+    orcidHash
+    refreshToken
+    token
+  }
+}

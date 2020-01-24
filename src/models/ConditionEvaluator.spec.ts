@@ -1,9 +1,9 @@
 import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
-import { ProposalTemplate } from "./ProposalModel";
 import {
   areDependenciesSatisfied,
   getFieldById
 } from "./ProposalModelFunctions";
+import { QuestionaryField } from "../generated/sdk";
 
 test("Is dependency checking working", () => {
   let template = create1Topic3FieldWithDependenciesQuestionary();
@@ -19,6 +19,9 @@ test("Updating value changes dependency sattisfaction", () => {
 
   expect(areDependenciesSatisfied(template, "links_with_industry")).toBe(false);
 
-  getFieldById(template, "has_links_with_industry")!.value = "yes";
+  (getFieldById(
+    template,
+    "has_links_with_industry"
+  ) as QuestionaryField)!.value = "yes";
   expect(areDependenciesSatisfied(template, "links_with_industry")).toBe(true);
 });

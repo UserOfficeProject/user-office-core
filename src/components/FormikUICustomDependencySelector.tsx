@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useCallback } from "react";
 import {
-  Grid,
-  Select,
-  MenuItem,
   FormControl,
+  Grid,
+  IconButton,
   InputLabel,
   makeStyles,
-  IconButton
+  MenuItem,
+  Select
 } from "@material-ui/core";
+import ClearIcon from "@material-ui/icons/Clear";
 import { FormikActions } from "formik";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  DataType,
+  EvaluatorOperator,
   FieldDependency,
   ProposalTemplate,
-  DataType,
-  FieldCondition,
-  ProposalTemplateField
-} from "../models/ProposalModel";
-import { getFieldById, getAllFields } from "../models/ProposalModelFunctions";
-import { EvaluatorOperator } from "../models/ConditionEvaluator";
-import ClearIcon from "@material-ui/icons/Clear";
+  ProposalTemplateField,
+  SelectionFromOptionsConfig
+} from "../generated/sdk";
+import { getAllFields, getFieldById } from "../models/ProposalModelFunctions";
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -62,15 +62,16 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = () => {
-    let depArr = [];
+    let depArr = new Array<FieldDependency>();
     if (dependencyId && dependencyValue && operator) {
-      depArr.push(
-        new FieldDependency(
-          templateField.proposal_question_id,
-          dependencyId,
-          new FieldCondition(operator, dependencyValue)
-        )
-      );
+      depArr.push({
+        proposal_question_id: templateField.proposal_question_id,
+        proposal_question_dependency: dependencyId,
+        condition: {
+          condition: operator,
+          params: dependencyValue
+        }
+      });
     }
     form.setFieldValue(field.name, depArr);
   };
@@ -88,9 +89,11 @@ const FormikUICustomDependencySelector = ({
         ]);
       } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
         setAvailableValues(
-          depField.config.options!.map(option => {
-            return { value: option, label: option };
-          })
+          (depField.config as SelectionFromOptionsConfig).options!.map(
+            option => {
+              return { value: option, label: option };
+            }
+          )
         ); // use options
       }
     }
@@ -156,8 +159,10 @@ const FormikUICustomDependencySelector = ({
               setOperator(event.target.value as EvaluatorOperator);
             }}
           >
-            <MenuItem value="eq">equals</MenuItem>
-            <MenuItem value="neq">not equal</MenuItem>
+            <MenuItem value={EvaluatorOperator.EQ.toString()}>equals</MenuItem>
+            <MenuItem value={EvaluatorOperator.NEQ.toString()}>
+              not equal
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>

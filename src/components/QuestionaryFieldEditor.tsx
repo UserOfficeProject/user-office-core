@@ -1,10 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
-import {
-  ProposalTemplateField,
-  DataType,
-  ProposalTemplate
-} from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 import JSDict from "../utils/Dictionary";
 import { IEvent } from "../models/QuestionaryEditorModel";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +10,7 @@ import { AdminComponentMultipleChoice } from "./AdminComponentMultipleChoice";
 import { AdminComponentBoolean } from "./AdminComponentBoolean";
 import { AdminComponentFileUpload } from "./AdminComponentFileUpload";
 import { AdminComponentDate } from "./AdminComponentDate";
+import { ProposalTemplateField, ProposalTemplate } from "../generated/sdk";
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;

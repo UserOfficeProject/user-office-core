@@ -84,7 +84,7 @@ export function FileUploadComponent(props: {
     let event: any = {};
     event.target = inputElement;
     props.onChange(event);
-  }
+  };
 
   const { fileType, id } = props;
   const maxFiles = props.maxFiles || 1;

@@ -1,0 +1,5 @@
+query getBasicUserDetails($id: Int!) {
+  basicUserDetails(id: $id) {
+    ...basicUserDetails
+  }
+}

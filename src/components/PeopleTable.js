@@ -1,31 +1,18 @@
-import React, { useState } from "react";
-import MaterialTable from "material-table";
-import { tableIcons } from "../utils/tableIcons";
-import { useDataAPI } from "../hooks/useDataAPI";
-import { makeStyles } from "@material-ui/styles";
 import { Email } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/styles";
+import MaterialTable from "material-table";
+import React, { useState } from "react";
+import { useDataApi } from "../hooks/useDataApi";
+import { tableIcons } from "../utils/tableIcons";
 import { InviteUserForm } from "./InviteUserForm";
 
 function sendUserRequest(
   searchQuery,
-  apiCall,
+  api,
   setLoading,
   selectedUsers,
   userRole
 ) {
-  const query = `
-  query($filter: String!, $first: Int!, $offset: Int!, $userRole: UserRole, $subtractUsers: [Int!]) {
-    users(filter: $filter, first: $first, offset: $offset, userRole: $userRole, subtractUsers: $subtractUsers){
-      users{
-      firstname
-      lastname
-      organisation
-      id
-      }
-      totalCount
-    }
-  }`;
-
   const variables = {
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
@@ -36,25 +23,27 @@ function sendUserRequest(
     variables.userRole = userRole;
   }
   setLoading(true);
-  return apiCall(query, variables).then(data => {
-    setLoading(false);
-    return {
-      page: searchQuery.page,
-      totalCount: data.users.totalCount,
-      data: data.users.users.map(user => {
-        return {
-          firstname: user.firstname,
-          lastname: user.lastname,
-          organisation: user.organisation,
-          id: user.id
-        };
-      })
-    };
-  });
+  return api()
+    .getUsers(variables)
+    .then(data => {
+      setLoading(false);
+      return {
+        page: searchQuery.page,
+        totalCount: data.users.totalCount,
+        data: data.users.users.map(user => {
+          return {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            organisation: user.organisation,
+            id: user.id
+          };
+        })
+      };
+    });
 }
 
 function PeopleTable(props) {
-  const sendRequest = useDataAPI();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const columns = [
@@ -78,7 +67,7 @@ function PeopleTable(props) {
     actionArray.push({
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
-      tooltip: props.title,
+      tooltip: props.actionText,
       onClick: (event, rowData) => props.action(rowData)
     });
   props.emailInvite &&

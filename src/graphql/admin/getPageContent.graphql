@@ -1,0 +1,3 @@
+query getPageContent($id: PageName!) {
+  getPageContent(id: $id)
+}

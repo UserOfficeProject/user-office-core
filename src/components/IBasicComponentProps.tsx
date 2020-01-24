@@ -1,4 +1,5 @@
-import { QuestionaryField } from "../models/ProposalModel";
+import { QuestionaryField } from "../generated/sdk";
+
 export interface IBasicComponentProps {
   templateField: QuestionaryField;
   onComplete: Function;

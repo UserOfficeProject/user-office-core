@@ -2,13 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import {
-  DataType,
-  ProposalAnswer,
-  QuestionaryField,
-  QuestionaryStep
-} from "../models/ProposalModel";
-import { ProposalInformation } from "../models/ProposalModel";
-import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
   getQuestionaryStepByTopicId
@@ -27,11 +20,18 @@ import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
 import submitFormAsync from "../utils/FormikAsyncFormHandler";
-import { getTranslation } from "@esss-swap/duo-localisation";
+import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
 import { ErrorFocus } from "./ErrorFocus";
+import {
+  Proposal,
+  QuestionaryStep,
+  DataType,
+  QuestionaryField
+} from "../generated/sdk";
+import { ProposalAnswer } from "../models/ProposalModel";
 
 export default function ProposalQuestionareStep(props: {
-  data: ProposalInformation;
+  data: Proposal;
   topicId: number;
   setIsDirty: (isDirty: boolean) => void;
   readonly: boolean;
@@ -103,7 +103,7 @@ export default function ProposalQuestionareStep(props: {
     if (result && result.updateProposal && result.updateProposal.error) {
       api.reportStatus({
         variant: "error",
-        message: getTranslation(result.updateProposal.error)
+        message: getTranslation(result.updateProposal.error as ResourceId)
       });
     } else {
       api.reportStatus({ variant: "success", message: "Saved" });

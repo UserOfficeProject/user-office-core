@@ -1,0 +1,28 @@
+mutation createCall(
+  $shortCode: String!
+  $startCall: String!
+  $endCall: String!
+  $startReview: String!
+  $endReview: String!
+  $startNotify: String!
+  $endNotify: String!
+  $cycleComment: String!
+  $surveyComment: String!
+) {
+  createCall(
+    shortCode: $shortCode
+    startCall: $startCall
+    endCall: $endCall
+    startReview: $startReview
+    endReview: $endReview
+    startNotify: $startNotify
+    endNotify: $endNotify
+    cycleComment: $cycleComment
+    surveyComment: $surveyComment
+  ) {
+    error
+    call {
+      id
+    }
+  }
+}

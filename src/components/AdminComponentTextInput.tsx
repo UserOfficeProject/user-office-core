@@ -11,24 +11,32 @@ import TitledContainer from "./TitledContainer";
 import FormikUICustomEditor from "./FormikUICustomEditor";
 import { FormControlLabel, Collapse } from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox";
+import { TextInputConfig } from "../generated/sdk";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
+  var config = field.config as TextInputConfig;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    field.config.htmlQuestion !== undefined
+    config.htmlQuestion !== null
   );
 
   return (
     <Formik
       initialValues={field}
       onSubmit={async vals => {
-        if (!isRichQuestion) {
-          vals.config.htmlQuestion = undefined;
-        }
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
+            field: {
+              ...field,
+              ...vals,
+              config: {
+                ...vals.config,
+                htmlQuestion: isRichQuestion
+                  ? (vals.config as TextInputConfig).htmlQuestion
+                  : null
+              }
+            }
           }
         });
         props.closeMe();
@@ -54,7 +62,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps= { {"data-cy" : "question" }}
+              inputProps={{ "data-cy": "question" }}
             />
             <FormControlLabel
               control={
@@ -130,7 +138,9 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
 
               <Field
                 name="config.multiline"
-                checked={formikProps.values.config.multiline}
+                checked={
+                  (formikProps.values.config as TextInputConfig).multiline
+                }
                 component={FormikUICustomCheckbox}
                 label="Multiple line"
                 margin="normal"

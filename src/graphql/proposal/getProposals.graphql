@@ -1,0 +1,11 @@
+query getProposals($filter: String!) {
+  proposals(filter: $filter) {
+    proposals {
+      id
+      shortCode
+      title
+      status
+    }
+    totalCount
+  }
+}

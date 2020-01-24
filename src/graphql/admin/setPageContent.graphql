@@ -1,0 +1,9 @@
+mutation setPageContent($id: PageName!, $text: String!) {
+  setPageContent(id: $id, text: $text) {
+    page {
+      id
+      content
+    }
+    error
+  }
+}

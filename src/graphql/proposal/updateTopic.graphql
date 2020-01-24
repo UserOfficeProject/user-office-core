@@ -1,0 +1,8 @@
+mutation updateTopic($topicId: Int!, $title: String, $isEnabled: Boolean) {
+  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {
+    topic {
+      ...topic
+    }
+    error
+  }
+}

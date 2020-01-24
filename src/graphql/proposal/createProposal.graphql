@@ -1,0 +1,10 @@
+mutation createProposal {
+  createProposal {
+    proposal {
+      id
+      status
+      shortCode
+    }
+    error
+  }
+}

@@ -1,29 +1,18 @@
 import { useState } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi } from "./useDataApi";
 
 export function useSubmitProposal() {
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataApi();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const submitProposal = async (id: number) => {
-    const query = `
-    mutation($id: Int!){
-      submitProposal(id: $id){
-       proposal{
-        id
-      }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id
-    };
-
     setIsLoading(true);
-    await sendRequest(query, variables);
-    setIsLoading(false);
-    return true;
+    return sendRequest()
+      .submitProposal({ id })
+      .then(data => {
+        setIsLoading(false);
+        return !data.submitProposal.error;
+      });
   };
 
   return { isLoading, submitProposal };

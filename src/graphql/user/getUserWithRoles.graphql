@@ -1,0 +1,11 @@
+query getUserWithRoles($id: Int!) {
+  user(id: $id) {
+    firstname
+    lastname
+    roles {
+      id
+      shortCode
+      title
+    }
+  }
+}

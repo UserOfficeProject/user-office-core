@@ -1,0 +1,13 @@
+query getReview($id: Int!) {
+  review(id: $id) {
+    ...coreReview
+    proposal {
+      id
+      title
+      abstract
+      proposer {
+        id
+      }
+    }
+  }
+}

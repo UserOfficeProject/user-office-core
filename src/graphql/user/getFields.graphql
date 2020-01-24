@@ -1,0 +1,12 @@
+query getFields {
+  getFields {
+    institutions {
+      id
+      value
+    }
+    nationalities {
+      id
+      value
+    }
+  }
+}

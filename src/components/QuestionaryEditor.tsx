@@ -16,10 +16,10 @@ import {
   LinearProgress
 } from "@material-ui/core";
 import { usePersistModel } from "../hooks/usePersistModel";
-import { ProposalTemplateField } from "../models/ProposalModel";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { useSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
+import { ProposalTemplateField } from "../generated/sdk";
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
@@ -27,7 +27,7 @@ export default function QuestionaryEditor() {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
-          enqueueSnackbar(action.payload, { variant: 'error'} );
+          enqueueSnackbar(action.payload, { variant: "error" });
           break;
 
         case EventType.FIELD_CREATED:
@@ -42,7 +42,6 @@ export default function QuestionaryEditor() {
     persistModel,
     reducerMiddleware
   ]);
-
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 

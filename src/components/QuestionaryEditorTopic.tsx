@@ -2,11 +2,7 @@ import { Droppable, Draggable } from "react-beautiful-dnd";
 import React, { useState } from "react";
 
 import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import {
-  ProposalTemplateField,
-  DataType,
-  TemplateStep
-} from "../models/ProposalModel";
+import { DataType } from "../generated/sdk";
 import {
   makeStyles,
   Grid,
@@ -23,6 +19,7 @@ import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import getTemplateFieldIcon from "./getTemplateFieldIcon";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
+import { TemplateStep, ProposalTemplateField } from "../generated/sdk";
 
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
@@ -102,7 +99,7 @@ export default function QuestionaryEditorTopic(props: {
     <input
       type="text"
       value={title}
-      data-cy='topic-title-input'
+      data-cy="topic-title-input"
       className={classes.inputHeading}
       onChange={event => setTitle(event.target.value)}
       onBlur={() => {
@@ -123,7 +120,7 @@ export default function QuestionaryEditorTopic(props: {
       onClick={() => {
         setIsEditMode(true);
       }}
-      data-cy='topic-title'
+      data-cy="topic-title"
     >
       {index + 2}. {props.data.topic.topic_title}
     </span>

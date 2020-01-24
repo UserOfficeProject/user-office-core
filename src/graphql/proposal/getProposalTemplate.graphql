@@ -1,0 +1,13 @@
+query getProposalTemplate {
+  proposalTemplate {
+    steps {
+      topic {
+        topic_title
+        topic_id
+      }
+      fields {
+        ...proposalTemplateField
+      }
+    }
+  }
+}

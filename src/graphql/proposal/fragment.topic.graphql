@@ -1,0 +1,6 @@
+fragment topic on Topic {
+  topic_title
+  topic_id
+  sort_order
+  is_enabled
+}

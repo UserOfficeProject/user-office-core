@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { request } from "graphql-request";
-import PhotoInSide from "./PhotoInSide";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Email from "@material-ui/icons/Email";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDataApi } from "../hooks/useDataApi";
+import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -31,20 +31,16 @@ export default function EmailVerification({ match }) {
   const classes = useStyles();
   const [emailVerified, setEmailVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
+  const api = useDataApi();
 
   if (!emailVerified) {
-    const query = `
-    mutation($token: String!){
-      emailVerification(token: $token)
-    }
-    `;
-    const variables = {
-      token: match.params.token
-    };
-
-    request("/graphql", query, variables).then(data =>
-      data.emailVerification ? setEmailVerified(true) : setErrorMessage(true)
-    );
+    api()
+      .verifyEmail({ token: match.params.token })
+      .then(data =>
+        data.emailVerification.success
+          ? setEmailVerified(true)
+          : setErrorMessage(true)
+      );
   }
 
   return (

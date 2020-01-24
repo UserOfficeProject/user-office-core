@@ -1,30 +1,19 @@
 import { useEffect, useState } from "react";
-import { request } from "graphql-request";
+import { GetFieldsQuery } from "../generated/sdk";
+import { useDataApi } from "./useDataApi";
 
 export function useGetFields() {
-  const [fieldContent, setFieldContent] = useState<{
-    institutions: { id: number; value: string }[];
-    nationalities: { id: number; value: string }[];
-  } | null>(null);
+  const sendRequest = useDataApi();
+  const [fieldContent, setFieldContent] = useState<
+    GetFieldsQuery["getFields"] | null
+  >(null);
   useEffect(() => {
-    const query = `
-    query {
-      getFields{
-        institutions{
-            id
-            value
-          }
-          nationalities{
-            id
-            value
-          }
-      }
-    }`;
-
-    request("/graphql", query).then(data => {
-      setFieldContent(data.getFields);
-    });
-  }, []);
+    sendRequest()
+      .getFields()
+      .then(data => {
+        setFieldContent(data.getFields);
+      });
+  }, [sendRequest]);
 
   return fieldContent;
 }

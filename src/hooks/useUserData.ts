@@ -1,81 +1,36 @@
-import { useEffect, useState, useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useCallback, useEffect, useState } from "react";
+import { UserWithReviewsQuery } from "../generated/sdk";
+import { useDataApi } from "./useDataApi";
 
 export function useUserWithReviewsData(id: number) {
-  const sendRequest = useDataAPI<any>();
-  const [userData, setUserData] = useState<
-    (IBasicUserData & { reviews: [] }) | null
-  >(null);
+  const sendRequest = useDataApi();
+  const [userData, setUserData] = useState<UserWithReviewsQuery["user"] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const query = `
-    query($id: Int!) {
-      user(id: $id){
-        id
-        firstname
-        lastname
-        organisation
-        reviews{
-          id
-          grade
-          comment
-          status
-          proposal{
-            id
-            title
-            shortCode
-          }
-        }
-      }
-    }`;
-
-    const variables = {
-      id
-    };
     setLoading(true);
-    sendRequest(query, variables).then(data => {
-      setUserData({
-        firstname: data.user.firstname,
-        lastname: data.user.lastname,
-        username: data.user.username,
-        id: data.user.id,
-        organisation: data.user.organisation,
-        reviews: data.user.reviews
+    sendRequest()
+      .userWithReviews({
+        id
+      })
+      .then(data => {
+        setUserData(data.user);
+        setLoading(false);
       });
-      setLoading(false);
-    });
   }, [id, sendRequest]);
 
   return { loading, userData };
 }
 
 export function useBasicUserData() {
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataApi();
 
   const loadBasicUserData = useCallback(
     async (id: number) => {
-      const query = `
-        query($id: Int!) {
-          basicUserDetails(id: $id){
-            id
-            firstname
-            lastname
-            organisation
-          }
-        }`;
-
-      const variables = {
-        id
-      };
-
-      return sendRequest(query, variables).then(data => {
-        return {
-          firstname: data.basicUserDetails.firstname,
-          lastname: data.basicUserDetails.lastname,
-          id: data.basicUserDetails.id,
-          organisation: data.basicUserDetails.organisation
-        } as IBasicUserData;
-      });
+      return sendRequest()
+        .getBasicUserDetails({ id })
+        .then(data => data.basicUserDetails);
     },
     [sendRequest]
   );
@@ -86,7 +41,6 @@ export function useBasicUserData() {
 export interface IBasicUserData {
   firstname: string;
   lastname: string;
-  username: string;
   organisation: string;
   id: number;
 }

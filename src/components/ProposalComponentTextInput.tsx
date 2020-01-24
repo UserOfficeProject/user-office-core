@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
 import TextFieldWithCounter from "./TextFieldWithCounter";
+import { TextInputConfig } from "../generated/sdk";
 
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -11,15 +12,16 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
     }
   })();
   let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id, config, question } = templateField;
+  let { proposal_question_id, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const config = templateField.config as TextInputConfig;
   return (
     <div>
-      {props.templateField.config.htmlQuestion && (
+      {config.htmlQuestion && (
         <div
           dangerouslySetInnerHTML={{
-            __html: props.templateField.config.htmlQuestion!
+            __html: config.htmlQuestion!
           }}
         ></div>
       )}

@@ -37,7 +37,7 @@ export function InviteUserForm(props: { action: Function }) {
           firstname: values.name,
           lastname: values.lastname,
           organisation: "",
-          id: createResult.id
+          id: createResult?.id
         });
       }}
       validationSchema={emailFieldSchema}

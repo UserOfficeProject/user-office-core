@@ -1,0 +1,8 @@
+query getCalls {
+  calls {
+    id
+    shortCode
+    startCall
+    endCall
+  }
+}

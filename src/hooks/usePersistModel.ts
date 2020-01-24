@@ -1,324 +1,105 @@
 import { useState } from "react";
-import { useDataAPI } from "./useDataAPI";
-import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import {
-  ProposalTemplateField,
-  ProposalTemplate,
   DataType,
-  Topic
-} from "../models/ProposalModel";
+  ProposalTemplate,
+  ProposalTemplateField
+} from "../generated/sdk";
+import { EventType, IEvent } from "../models/QuestionaryEditorModel";
+import { useDataApi } from "./useDataApi";
 
 export function usePersistModel() {
-  const sendRequest = useDataAPI<any>();
+  const api = useDataApi();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
-    const mutation = `
-    mutation($topicId:Int!, $fieldIds:[String!]) {
-      updateFieldTopicRel(topic_id:$topicId, field_ids:$fieldIds) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicId,
-      fieldIds
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateFieldTopicRel: {
-          error?: string;
-        };
-      }) => {
-        return result.updateFieldTopicRel;
-      }
-    );
+    return api()
+      .updateFieldTopicRel({
+        topicId,
+        fieldIds
+      })
+      .then(data => data.updateFieldTopicRel);
   };
 
   const updateTopic = async (
     topicId: number,
     values: { title?: string; isEnabled?: boolean }
   ) => {
-    const mutation = `
-    mutation($topicId:Int!, $title:String, $isEnabled:Boolean) {
-      updateTopic(id:$topicId, title:$title, isEnabled:$isEnabled) {
-        topic {
-          topic_id
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      ...values,
-      topicId
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateTopic: {
-          error?: string;
-          topic?: { topic_id: number };
-        };
-      }) => {
-        const { error, topic } = result.updateTopic;
-        return { error, topic: topicFromServerResponse(topic) };
-      }
-    );
+    return api()
+      .updateTopic({
+        ...values,
+        topicId
+      })
+      .then(data => {
+        return data.updateTopic;
+      });
   };
 
   const updateTopicOrder = async (topicOrder: number[]) => {
-    const mutation = `
-    mutation($topicOrder:[Int!]!) {
-      updateTopicOrder(topicOrder:$topicOrder) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicOrder
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateTopicOrder: {
-          error?: string;
-        };
-      }) => {
-        return result.updateTopicOrder;
-      }
-    );
+    return api()
+      .updateTopicOrder({
+        topicOrder
+      })
+      .then(data => data.updateTopicOrder);
   };
 
   const updateItem = async (field: ProposalTemplateField) => {
-    const mutation = `
-    mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]) {
-      updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id: field.proposal_question_id,
-      question: field.question,
-      config: field.config ? JSON.stringify(field.config) : undefined,
-      isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
-      dependencies: field.dependencies
-        ? field.dependencies.map(dep => {
-            return { ...dep, condition: JSON.stringify(dep.condition) };
-          })
-        : []
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        updateProposalTemplateField: {
-          error?: string;
-          template?: object;
-        };
-      }) => {
-        const { error, template } = result.updateProposalTemplateField;
-        return { error, template: templateFromServerResponse(template) };
-      }
-    );
+    return api()
+      .updateProposalTemplateField({
+        id: field.proposal_question_id,
+        question: field.question,
+        config: field.config ? JSON.stringify(field.config) : undefined,
+        isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
+        dependencies: field.dependencies ? field.dependencies : []
+      })
+      .then(data => {
+        return data.updateProposalTemplateField;
+      });
   };
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
-    const mutation = `
-    mutation($topicId:Int!, $dataType:DataType!) {
-      createTemplateField(topicId:$topicId, dataType:$dataType) {
-        field {
-          proposal_question_id
-          data_type,
-          question
-          config,
-          topic_id
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      topicId: topicId,
-      dataType: dataType
-    };
-
     setIsLoading(true);
-    return sendRequest(mutation, variables).then(
-      (result: {
-        createTemplateField: {
-          error?: string;
-          field?: {
-            proposal_question_id: string;
-            ddata_type: DataType;
-            question: string;
-            config: string;
-            topic_id: number;
-          };
-        };
-      }) => {
+    return api()
+      .createTemplateField({
+        topicId: topicId,
+        dataType: dataType
+      })
+      .then(data => {
         setIsLoading(false);
-        const { error, field } = result.createTemplateField;
-        return {
-          error,
-          field: templateFieldFromServerResponse(field)
-        };
-      }
-    );
+        return data.createTemplateField;
+      });
   };
 
-  const deleteField = async (id: number) => {
-    const mutation = `
-    mutation($id:String!) {
-      deleteTemplateField(id:$id) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      id
-    };
-
+  const deleteField = async (id: string) => {
     setIsLoading(true);
-    return sendRequest(mutation, variables).then(
-      (result: {
-        deleteTemplateField: { error?: string; template?: object };
-      }) => {
+    return api()
+      .deleteTemplateField({
+        id
+      })
+      .then(data => {
         setIsLoading(false);
-        const { error, template } = result.deleteTemplateField;
-        return { error, template: templateFromServerResponse(template) };
-      }
-    );
+        return data.deleteTemplateField;
+      });
   };
 
   const deleteTopic = async (id: number) => {
-    const mutation = `
-    mutation($id:Int!) {
-      deleteTopic(id:$id) {
-        error
-      }
-    }
-    `;
-    const variables = {
-      id
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        deleteTopic: {
-          error?: string;
-        };
-      }) => {
-        return result.deleteTopic;
-      }
-    );
+    return api()
+      .deleteTopic({
+        id
+      })
+      .then(data => data.deleteTopic);
   };
 
   const createTopic = async (sortOrder: number) => {
-    const mutation = `
-    mutation($sortOrder:Int!) {
-      createTopic(sortOrder:$sortOrder) {
-        template {
-          steps {
-            topic {
-              topic_title
-              topic_id
-            }
-            fields {
-              proposal_question_id
-              data_type
-              question
-              config
-              dependencies {
-                proposal_question_dependency
-                condition
-                proposal_question_id
-              }
-            }
-          }
-        }
-        error
-      }
-    }
-    `;
-    const variables = {
-      sortOrder
-    };
-
-    return sendRequest(mutation, variables).then(
-      (result: {
-        createTopic: {
-          template?: object;
-          error?: string;
-        };
-      }) => {
-        const { error, template } = result.createTopic;
-        return { error, template: templateFromServerResponse(template) };
-      }
-    );
+    return api()
+      .createTopic({ sortOrder })
+      .then(data => {
+        return data.createTopic;
+      });
   };
 
-  const templateFromServerResponse = (obj: any) => {
-    if (obj) {
-      return ProposalTemplate.fromObject(obj);
-    }
-    return obj;
-  };
-
-  const topicFromServerResponse = (obj: any) => {
-    if (obj) {
-      return Topic.fromObject(obj);
-    }
-    return obj;
-  };
-
-  const templateFieldFromServerResponse = (obj: any) => {
-    if (obj) {
-      return ProposalTemplateField.fromObject(obj);
-    }
-    return obj;
-  };
-
-  type MonitorableServiceCall = () => Promise<{ error?: string }>;
+  type MonitorableServiceCall = () => Promise<{
+    error?: string | null;
+  }>;
 
   const persistModel = ({
     getState,

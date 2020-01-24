@@ -1,0 +1,20 @@
+query getUsers(
+  $filter: String
+  $first: Int
+  $offset: Int
+  $userRole: UserRole
+  $subtractUsers: [Int!]
+) {
+  users(
+    filter: $filter
+    first: $first
+    offset: $offset
+    userRole: $userRole
+    subtractUsers: $subtractUsers
+  ) {
+    users {
+      ...basicUserDetails
+    }
+    totalCount
+  }
+}

@@ -1,17 +1,15 @@
-import React from "react";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import { TextField } from "formik-material-ui";
 import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/styles";
-import { Formik, Form, Field } from "formik";
 import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import { useDataAPI } from "../../hooks/useDataAPI";
-import {
-  userPasswordFieldSchema
-} from "../../utils/userFieldValidationSchema";
-import { useSnackbar } from 'notistack';
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/styles";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import { useSnackbar } from "notistack";
+import React from "react";
+import { useDataApi } from "../../hooks/useDataApi";
+import { userPasswordFieldSchema } from "../../utils/userFieldValidationSchema";
 
 const useStyles = makeStyles({
   buttons: {
@@ -46,33 +44,18 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UpdatePassword(props:{id: number}) {
-  const sendRequest = useDataAPI();
+export default function UpdatePassword(props: { id: number }) {
+  const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const sendPasswordUpdate = (password:string) => {
-    const query = `
-      mutation(
-        $id: Int!,
-        $password: String!, 
-        )
-      {
-        updatePassword(
-          id: $id, 
-          password: $password, 
-        )
-        {
-          error
-        }
-      }`;
-    const variables = {
-      id: props.id,
-      password
-    };
-    sendRequest(query, variables).then(() => 
-    enqueueSnackbar('Updated Password', { variant: 'success'})
-    );
+  const sendPasswordUpdate = (password: string) => {
+    api()
+      .updatePassword({ id: props.id, password })
+      .then(data =>
+        enqueueSnackbar("Updated Password", {
+          variant: data.updatePassword.error ? "error" : "success"
+        })
+      );
   };
-
 
   const classes = useStyles();
 

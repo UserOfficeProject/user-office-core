@@ -1,11 +1,11 @@
-import React from 'react';
-import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import AppBar from "@material-ui/core/AppBar";
+import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import Tab from "@material-ui/core/Tab";
+import Tabs from "@material-ui/core/Tabs";
+import Typography from "@material-ui/core/Typography";
+import React from "react";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -47,24 +47,24 @@ function TabPanel(props: TabPanelProps) {
 function a11yProps(index: any) {
   return {
     id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`
   };
 }
 
-
-export default function FullWidthTabs(props: {children: React.ReactNode[], tabNames: string[]}) {
+export default function FullWidthTabs(props: {
+  children: React.ReactNode[];
+  tabNames: string[];
+}) {
   const classes = useStyles();
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
-
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 
   return (
-            <Paper className={classes.paper}>
-
+    <Paper className={classes.paper}>
       <AppBar position="static" color="default">
         <Tabs
           value={value}
@@ -74,13 +74,17 @@ export default function FullWidthTabs(props: {children: React.ReactNode[], tabNa
           variant="fullWidth"
           aria-label="full width tabs example"
         >
-        {props.tabNames.map((tabName, i) =>  <Tab label={tabName} {...a11yProps(i)} />)}
+          {props.tabNames.map((tabName, i) => (
+            <Tab label={tabName} {...a11yProps(i)} />
+          ))}
         </Tabs>
       </AppBar>
-      
-        {props.children.map((tabContent, i) =>  <TabPanel value={value} index={i} dir={theme.direction}>
+
+      {props.children.map((tabContent, i) => (
+        <TabPanel value={value} index={i} dir={theme.direction}>
           {tabContent}
-        </TabPanel>)}
-        </Paper>
+        </TabPanel>
+      ))}
+    </Paper>
   );
 }

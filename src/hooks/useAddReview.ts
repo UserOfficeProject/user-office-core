@@ -1,32 +1,18 @@
 import { useCallback } from "react";
-import { useDataAPI } from "./useDataAPI";
-import { Review } from "../models/Review";
+import { useDataApi } from "./useDataApi";
 
 export function useAddReview() {
-  const sendRequest = useDataAPI<{ review: Review; error: string }>();
+  const sendRequest = useDataApi();
 
   const sendAddReview = useCallback(
     async (reviewID, grade, comment) => {
-      const query = `
-    mutation($reviewID: Int!, $grade: Int!, $comment: String!) {
-      addReview(reviewID: $reviewID, grade: $grade, comment: $comment){
-        error
-        review {
-          id
-          status
+      return await sendRequest()
+        .addReview({
+          reviewID,
+          grade,
           comment
-          grade
-        }
-      }
-    }
-    `;
-      const variables = {
-        reviewID,
-        grade,
-        comment
-      };
-
-      return await sendRequest(query, variables).then(resp => resp);
+        })
+        .then(resp => resp);
     },
     [sendRequest]
   );

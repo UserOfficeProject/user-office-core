@@ -1,0 +1,5 @@
+mutation updateTopicOrder($topicOrder: [Int!]!) {
+  updateTopicOrder(topicOrder: $topicOrder) {
+    error
+  }
+}

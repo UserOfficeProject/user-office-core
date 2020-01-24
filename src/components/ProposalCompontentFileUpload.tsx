@@ -3,6 +3,7 @@ import { FormControl, FormLabel } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 import { FileUploadComponent } from "./FileUploadComponent";
+import { FileUploadConfig } from "../generated/sdk";
 
 export class ProposalCompontentFileUpload extends React.Component<
   IBasicComponentProps,
@@ -10,9 +11,9 @@ export class ProposalCompontentFileUpload extends React.Component<
 > {
   render() {
     const { templateField, errors, onComplete, handleChange } = this.props;
-    const { proposal_question_id, config } = templateField;
+    const { proposal_question_id } = templateField;
     const isError = errors[proposal_question_id] ? true : false;
-
+    const config = templateField.config as FileUploadConfig;
     return (
       <FormControl error={isError} required={config.required ? true : false}>
         <FormLabel error={isError}>{templateField.question}</FormLabel>

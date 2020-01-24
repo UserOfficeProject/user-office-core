@@ -1,0 +1,36 @@
+query getProposal($id: Int!) {
+  proposal(id: $id) {
+    id
+    title
+    abstract
+    status
+    shortCode
+    excellenceScore
+    safetyScore
+    technicalScore
+    created
+    updated
+    proposer {
+      ...basicUserDetails
+    }
+    users {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+    }
+    reviews {
+      id
+      grade
+      comment
+      status
+      userID
+      reviewer {
+        firstname
+        lastname
+        username
+        id
+      }
+    }
+  }
+}

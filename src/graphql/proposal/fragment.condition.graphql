@@ -1,0 +1,4 @@
+fragment fieldCondition on FieldCondition {
+  condition
+  params
+}

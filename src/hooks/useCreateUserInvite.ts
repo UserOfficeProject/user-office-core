@@ -1,30 +1,25 @@
 import { useState } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi } from "./useDataApi";
 
 export function useCreateUserInvite() {
-  const sendRequest = useDataAPI<{
-    createUserByEmailInvite: { error: string; id: number };
-  }>();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(true);
   const createUserInvite = async (
     firstname: string,
     lastname: string,
     email: string
   ) => {
-    const query = `
-    mutation($firstname: String!, $lastname: String!, $email: String!){
-        createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email)
-    }
-    `;
-    const variables = {
-      firstname,
-      lastname,
-      email
-    };
-
     setLoading(true);
-    const data = await sendRequest(query, variables);
-    return data.createUserByEmailInvite;
+    return sendRequest()
+      .createUserByEmailInvite({
+        firstname,
+        lastname,
+        email
+      })
+      .then(data => {
+        setLoading(false);
+        return data.createUserByEmailInvite;
+      });
   };
 
   return { loading, createUserInvite };

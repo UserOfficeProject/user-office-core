@@ -129,6 +129,7 @@ export default function PageEditor() {
             color="primary"
             className={classes.button}
             onClick={() => handleClick("HELPPAGE", helpContent)}
+            id="help-update-btn"
           >
             Update
           </Button>

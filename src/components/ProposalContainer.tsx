@@ -1,26 +1,26 @@
-import React, {
-  useState,
-  useEffect,
-  createContext,
-  PropsWithChildren
-} from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import Typography from "@material-ui/core/Typography";
-import ProposalReview from "./ProposalReview";
-import Container from "@material-ui/core/Container";
-import ProposalQuestionareStep from "./ProposalQuestionareStep";
-import { ProposalStatus, Questionary } from "../models/ProposalModel";
-import { ProposalInformation } from "../models/ProposalModel";
-import ProposalInformationView from "./ProposalInformationView";
-import { useLoadProposal } from "../hooks/useLoadProposal";
 import { StepButton } from "@material-ui/core";
-import { clamp } from "../utils/Math";
-import "../styles/ProposalComponentStyles.css";
+import Container from "@material-ui/core/Container";
+import Paper from "@material-ui/core/Paper";
+import Step from "@material-ui/core/Step";
+import Stepper from "@material-ui/core/Stepper";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import { useSnackbar } from "notistack";
+import React, {
+  createContext,
+  PropsWithChildren,
+  useEffect,
+  useState
+} from "react";
 import { Prompt } from "react-router";
-import { useSnackbar } from 'notistack';
+import { Proposal, Questionary, ProposalStatus } from "../generated/sdk";
+import { useLoadProposal } from "../hooks/useLoadProposal";
+
+import "../styles/ProposalComponentStyles.css";
+import { clamp } from "../utils/Math";
+import ProposalInformationView from "./ProposalInformationView";
+import ProposalQuestionareStep from "./ProposalQuestionareStep";
+import ProposalReview from "./ProposalReview";
 
 export interface INotification {
   variant: "error" | "success";
@@ -33,9 +33,7 @@ enum StepType {
   REVIEW
 }
 
-export default function ProposalContainer(props: {
-  data: ProposalInformation;
-}) {
+export default function ProposalContainer(props: { data: Proposal }) {
   const { loadProposal } = useLoadProposal();
   const [proposalInfo, setProposalInfo] = useState(props.data);
 
@@ -73,7 +71,7 @@ export default function ProposalContainer(props: {
     }
   }))();
 
-  const handleNext = (data: ProposalInformation) => {
+  const handleNext = (data: Partial<Proposal>) => {
     setProposalInfo({
       ...proposalInfo,
       ...data
@@ -211,7 +209,7 @@ export default function ProposalContainer(props: {
       }
     },
     reportStatus: (notification: INotification) => {
-      enqueueSnackbar(notification.message, { variant: notification.variant})
+      enqueueSnackbar(notification.message, { variant: notification.variant });
     }
   };
 
@@ -275,7 +273,7 @@ class QuestionaryUIStep {
   ) {}
 }
 
-type CallbackSignature = (data: ProposalInformation) => void;
+type CallbackSignature = (data: Partial<Proposal>) => void;
 type VoidCallbackSignature = () => void;
 
 export const FormApi = createContext<{

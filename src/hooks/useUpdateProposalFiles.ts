@@ -1,32 +1,25 @@
 import { useCallback, useState } from "react";
-import { useDataAPI } from "./useDataAPI";
+import { useDataApi } from "./useDataApi";
 
 export function useUpdateProposalFiles() {
-  const sendRequest = useDataAPI<any>();
+  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
 
   const updateProposalFiles = useCallback(
-    async (parameters: { proposal_id: number, question_id?: string, files: string[] }) => {
-      const query = `
-      mutation($proposal_id: Int!, $question_id:String!, $files:[String]) {
-        updateProposalFiles(proposal_id: $proposal_id, question_id:$question_id, files:$files){
-         files
-         error
-        }
-      }
-      `;
-
+    async (parameters: {
+      proposal_id: number;
+      question_id: string;
+      files: string[];
+    }) => {
       setLoading(true);
-      const result = await sendRequest(query, parameters).then(resp => resp);
+      const result = await sendRequest()
+        .updateProposalFiles(parameters)
+        .then(resp => resp);
       setLoading(false);
       return result;
     },
     [sendRequest]
-
   );
 
   return { loading, updateProposalFiles };
-
 }
-
-

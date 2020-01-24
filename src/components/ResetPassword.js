@@ -1,17 +1,17 @@
-import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { TextField } from "formik-material-ui";
-import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import { request } from "graphql-request";
-import { Formik, Field, Form } from "formik";
-import PhotoInSide from "./PhotoInSide";
+import Typography from "@material-ui/core/Typography";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../utils/userFieldValidationSchema";
+import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -45,21 +45,17 @@ export default function ResetPassword({ match }) {
   const [errorMessage, setErrorMessage] = useState(false);
   const requestResetPassword = values => {
     const { password } = values;
-    const query = `
-    mutation($token: String!, $password: String!){
-      resetPassword(token: $token, password: $password){
-        error
-      }
-    }
-    `;
-    const variables = {
-      token: match.params.token,
-      password
-    };
 
-    request("/graphql", query, variables).then(data =>
-      data.resetPassword.error ? setErrorMessage(true) : setPasswordReset(true)
-    );
+    getUnauthorizedApi()
+      .resetPassword({
+        token: match.params.token,
+        password
+      })
+      .then(data =>
+        data.resetPassword.error
+          ? setErrorMessage(true)
+          : setPasswordReset(true)
+      );
   };
 
   return (
