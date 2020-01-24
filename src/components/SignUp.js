@@ -131,7 +131,7 @@ export default function SignUp(props) {
   const [, privacyPageContent] = useGetPageContent("PRIVACYPAGE");
   const [, cookiePageContent] = useGetPageContent("COOKIEPAGE");
 
-  const [, fieldsContent] = useGetFields();
+  const fieldsContent = useGetFields();
   const searchParams = queryString.parse(props.location.search);
   let authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
