@@ -67,7 +67,7 @@ function PeopleTable(props) {
     actionArray.push({
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
-      tooltip: props.title,
+      tooltip: props.actionText,
       onClick: (event, rowData) => props.action(rowData)
     });
   props.emailInvite &&

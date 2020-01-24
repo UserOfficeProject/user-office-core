@@ -15,7 +15,9 @@ export function useGetPageContent(pageName: PageName) {
         id: pageName
       })
       .then(data => {
-        setPageContent(data.getPageContent);
+        if (data.getPageContent) {
+          setPageContent(data.getPageContent);
+        }
         setLoading(false);
       });
   }, [pageName, api]);

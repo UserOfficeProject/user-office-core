@@ -132,7 +132,7 @@ export default function Dashboard({ match }) {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
-        position="absolute"
+        position="fixed"
         className={clsx(classes.appBar, open && classes.appBarShift)}
       >
         <Toolbar className={classes.toolbar}>
@@ -161,6 +161,7 @@ export default function Dashboard({ match }) {
             color="inherit"
             component={Link}
             to={`/ProfilePage/${id}`}
+            data-cy="profile-page-btn"
           >
             <Badge badgeContent={0} color="secondary">
               <AccountCircle />

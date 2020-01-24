@@ -1,13 +1,13 @@
 /// <reference types="Cypress" />
 var faker = require("faker");
 context("Proposaltests", () => {
-  beforeEach(() => {
-    cy.visit("localhost:3000");
-    // slowExecutionMode();
+  before(() => {
+    //@ts-ignore
+    cy.resetDB();
   });
-
-  afterEach(() => {
-    //cy.wait(2000);
+  beforeEach(() => {
+    cy.viewport(1100, 800);
+    cy.visit("localhost:3000");
   });
 
   var textId;
@@ -22,17 +22,8 @@ context("Proposaltests", () => {
   const textAnswer = faker.random.words(5);
 
   it("Should be able to modify proposal", () => {
-    cy.viewport(1100, 800);
-
-    cy.get("[data-cy=input-email] input")
-      .type("Aaron_Harris49@gmail.com")
-      .should("have.value", "Aaron_Harris49@gmail.com");
-
-    cy.get("[data-cy=input-password] input")
-      .type("Test1234!")
-      .should("have.value", "Test1234!");
-
-    cy.get("[data-cy=submit]").click();
+    //@ts-ignore
+    cy.login("officer");
 
     cy.contains("Edit Questionary").click();
 
@@ -110,17 +101,8 @@ context("Proposaltests", () => {
   });
 
   it("User should be able to create proposal", () => {
-    cy.viewport(1100, 1000);
-
-    cy.get("[data-cy=input-email] input")
-      .type("Javon4@hotmail.com")
-      .should("have.value", "Javon4@hotmail.com");
-
-    cy.get("[data-cy=input-password] input")
-      .type("Test1234!")
-      .should("have.value", "Test1234!");
-
-    cy.get("[data-cy=submit]").click();
+    //@ts-ignore
+    cy.login("user");
 
     cy.contains("New Proposal").click();
 
@@ -131,7 +113,7 @@ context("Proposaltests", () => {
     cy.get("[data-cy=co-proposers] button")
       .first()
       .click();
-    cy.get("[title='Add Co-Proposer']")
+    cy.get("[title='Select user']")
       .first()
       .click();
 
@@ -160,17 +142,8 @@ context("Proposaltests", () => {
   });
 
   it("Office should be able to delete proposal", () => {
-    cy.viewport(1100, 1000);
-
-    cy.get("[data-cy=input-email] input")
-      .type("Aaron_Harris49@gmail.com")
-      .should("have.value", "Aaron_Harris49@gmail.com");
-
-    cy.get("[data-cy=input-password] input")
-      .type("Test1234!")
-      .should("have.value", "Test1234!");
-
-    cy.get("[data-cy=submit]").click();
+    //@ts-ignore
+    cy.login("officer");
 
     cy.contains("View Proposals").click();
 
@@ -183,17 +156,8 @@ context("Proposaltests", () => {
   });
 
   it("Office should be able to delete proposal questions", () => {
-    cy.viewport(1100, 1000);
-
-    cy.get("[data-cy=input-email] input")
-      .type("Aaron_Harris49@gmail.com")
-      .should("have.value", "Aaron_Harris49@gmail.com");
-
-    cy.get("[data-cy=input-password] input")
-      .type("Test1234!")
-      .should("have.value", "Test1234!");
-
-    cy.get("[data-cy=submit]").click();
+    //@ts-ignore
+    cy.login("officer");
 
     cy.contains("Edit Questionary").click();
 
@@ -210,27 +174,3 @@ context("Proposaltests", () => {
     cy.contains("Delete topic").click();
   });
 });
-
-function slowExecutionMode() {
-  const COMMAND_DELAY = 300;
-
-  for (const command of [
-    "visit",
-    "click",
-    "trigger",
-    "type",
-    "clear",
-    "reload",
-    "contains"
-  ]) {
-    Cypress.Commands.overwrite(command, (originalFn, ...args) => {
-      const origVal = originalFn(...args);
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(origVal);
-        }, COMMAND_DELAY);
-      });
-    });
-  }
-}
