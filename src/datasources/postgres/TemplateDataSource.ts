@@ -3,7 +3,9 @@ import {
   TopicRecord,
   ProposalQuestionRecord,
   createTopicObject,
-  createProposalTemplateFieldObject
+  createProposalTemplateFieldObject,
+  createFieldDependencyObject,
+  FieldDependencyRecord
 } from "./records";
 
 import { TemplateDataSource } from "../TemplateDataSource";
@@ -20,7 +22,7 @@ import to from "await-to-js";
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const dependencies: FieldDependency[] = await database
+    const dependenciesRecord: FieldDependencyRecord[] = await database
       .select("*")
       .from("proposal_question_dependencies");
 
@@ -38,6 +40,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const topics = topicRecords.map(record => createTopicObject(record));
     const fields = fieldRecords.map(record =>
       createProposalTemplateFieldObject(record)
+    );
+    const dependencies = dependenciesRecord.map(record =>
+      createFieldDependencyObject(record)
     );
 
     let steps = Array<TemplateStep>();

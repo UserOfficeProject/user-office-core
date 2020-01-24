@@ -34,7 +34,7 @@ class UpdateProposalFilesResponseWrap extends ResponseWrapBase<string[]> {
 
 @Resolver()
 export class UpdateProposalFilesMutation {
-  @Mutation(() => UpdateProposalFilesResponseWrap, { nullable: true })
+  @Mutation(() => UpdateProposalFilesResponseWrap)
   updateProposalFiles(
     @Args() { proposal_id, question_id, files }: UpdateProposalFilesArgs,
     @Ctx() context: ResolverContext

@@ -10,6 +10,9 @@ import {
 import { ResolverContext } from "../../context";
 import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
+import { FieldCondition } from "../types/FieldCondition";
+import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
+import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 
 @ArgsType()
 class UpdateProposalTemplateFieldArgs {
@@ -30,18 +33,29 @@ class UpdateProposalTemplateFieldArgs {
 }
 
 @InputType()
-class FieldDependencyInput {
-  @Field(type => String, { nullable: true })
+class FieldConditionInput implements Partial<FieldCondition> {
+  @Field(() => EvaluatorOperator)
+  public condition: EvaluatorOperator;
+
+  @Field()
+  public params: string;
+}
+
+@InputType()
+class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
+  @Field(() => String)
   public proposal_question_dependency: string;
-  @Field(type => String, { nullable: true })
+
+  @Field(() => String)
   public proposal_question_id: string;
-  @Field(type => String, { nullable: true })
-  public condition: string;
+
+  @Field(() => FieldConditionInput)
+  public condition: FieldConditionInput;
 }
 
 @Resolver()
 export class UpdateProposalTemplateFieldMutation {
-  @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
+  @Mutation(() => ProposalTemplateResponseWrap)
   updateProposalTemplateField(
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext

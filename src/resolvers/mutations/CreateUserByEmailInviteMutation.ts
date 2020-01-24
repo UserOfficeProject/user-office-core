@@ -37,7 +37,7 @@ class CreateUserByEmailInviteResponseWrap extends ResponseWrapBase<{
 
 @Resolver()
 export class CreateUserByEmailInviteMutation {
-  @Mutation(() => CreateUserByEmailInviteResponseWrap, { nullable: true })
+  @Mutation(() => CreateUserByEmailInviteResponseWrap)
   createUserByEmailInvite(
     @Args() args: CreateUserByEmailInviteArgs,
     @Ctx() context: ResolverContext

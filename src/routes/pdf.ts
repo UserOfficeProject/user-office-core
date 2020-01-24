@@ -1,19 +1,19 @@
 import express from "express";
+import { existsSync, unlink } from "fs";
 import baseContext from "../buildContext";
-import { isRejection } from "../rejection";
 import {
   DataType,
   Questionary,
-  QuestionaryField,
-  FieldConfig
+  QuestionaryField
 } from "../models/ProposalModel";
-import { createToC } from "./pdfTableofContents/index";
 import {
-  getQuestionaryStepByTopicId,
-  areDependenciesSatisfied
+  areDependenciesSatisfied,
+  getQuestionaryStepByTopicId
 } from "../models/ProposalModelFunctions";
-import { unlink, existsSync } from "fs";
+import { isRejection } from "../rejection";
 import { logger } from "../utils/Logger";
+import { createToC } from "./pdfTableofContents/index";
+import { EmbellishmentConfig } from "../resolvers/types/FieldConfig";
 import { User } from "../models/User";
 
 const jsonwebtoken = require("jsonwebtoken");
@@ -176,7 +176,7 @@ const createProposalPDF = async (
       doc.moveDown();
       activeFields.forEach(field => {
         if (field.data_type === DataType.EMBELLISHMENT) {
-          let conf = JSON.parse(field.config) as FieldConfig;
+          let conf = field.config as EmbellishmentConfig;
           if (!conf.omitFromPdf) {
             writeBold(conf.plain!);
           }

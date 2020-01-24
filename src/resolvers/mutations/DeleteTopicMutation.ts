@@ -5,7 +5,7 @@ import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class DeleteTopicMutation {
-  @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
+  @Mutation(() => ProposalTemplateResponseWrap)
   deleteTopic(
     @Arg("id", () => Int) id: number,
     @Ctx() context: ResolverContext

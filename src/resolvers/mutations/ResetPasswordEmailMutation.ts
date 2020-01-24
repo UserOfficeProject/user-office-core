@@ -13,7 +13,7 @@ class ResetPasswordEmailResponseWrap extends ResponseWrapBase<boolean> {
 
 @Resolver()
 export class ResetPasswordEmailMutation {
-  @Mutation(() => ResetPasswordEmailResponseWrap, { nullable: true })
+  @Mutation(() => ResetPasswordEmailResponseWrap)
   resetPasswordEmail(
     @Arg("email") email: string,
     @Ctx() context: ResolverContext

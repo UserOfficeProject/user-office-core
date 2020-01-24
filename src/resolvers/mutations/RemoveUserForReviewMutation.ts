@@ -5,7 +5,7 @@ import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class RemoveUserForReviewMutation {
-  @Mutation(() => ReviewResponseWrap, { nullable: true })
+  @Mutation(() => ReviewResponseWrap)
   removeUserForReview(
     @Arg("reviewID", () => Int) reviewID: number,
     @Ctx() context: ResolverContext

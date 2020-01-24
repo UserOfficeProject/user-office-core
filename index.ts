@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
 import graphqlHTTP, { RequestInfo } from "express-graphql";
 import "reflect-metadata";
-import { buildSchema, registerEnumType } from "type-graphql";
+import { buildSchema } from "type-graphql";
 import baseContext from "./src/buildContext";
 import { ResolverContext } from "./src/context";
-import { logger } from "./src/utils/Logger";
 import { registerEnums } from "./src/resolvers/registerEnums";
+import { logger } from "./src/utils/Logger";
 
 const jwt = require("express-jwt");
 const files = require("./src/routes/files");

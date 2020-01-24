@@ -2,8 +2,8 @@ import JSDict from "../utils/Dictionary";
 import { QuestionaryField } from "./ProposalModel";
 
 export enum EvaluatorOperator {
-  EQ = "eq",
-  NEQ = "neq"
+  EQ = "EQ",
+  NEQ = "NEQ"
 }
 
 export class ConditionEvaluator {
@@ -22,23 +22,23 @@ export class ConditionEvaluator {
     return this.validatorMap;
   }
 
-  getConfitionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
+  getConditionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
     return this.getMappings().get(id)!;
   }
 }
 
 export interface IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: object): boolean;
+  isSatisfied(field: QuestionaryField, params: object): boolean;
 }
 
 export class EqualityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: object): boolean {
+  isSatisfied(field: QuestionaryField, params: object): boolean {
     return field.value === params;
   }
 }
 
 export class InequalityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: object): boolean {
+  isSatisfied(field: QuestionaryField, params: object): boolean {
     return field.value !== params;
   }
 }

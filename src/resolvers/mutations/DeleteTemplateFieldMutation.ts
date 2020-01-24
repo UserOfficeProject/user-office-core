@@ -5,7 +5,7 @@ import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
 export class DeleteTemplateFieldMutation {
-  @Mutation(() => ProposalTemplateResponseWrap, { nullable: true })
+  @Mutation(() => ProposalTemplateResponseWrap)
   deleteTemplateField(
     @Arg("id", () => String) id: string,
     @Ctx() context: ResolverContext

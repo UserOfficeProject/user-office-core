@@ -1,15 +1,16 @@
-import {
-  Topic,
-  ProposalTemplateField,
-  DataType,
-  FieldDependency,
-  FieldCondition,
-  QuestionaryField
-} from "../../models/ProposalModel";
-import { Proposal } from "../../models/Proposal";
 import { Page } from "../../models/Admin";
 import { FileMetadata } from "../../models/Blob";
-import { User, BasicUserDetails } from "../../models/User";
+import { Proposal } from "../../models/Proposal";
+import {
+  createConfigByType,
+  DataType,
+  FieldCondition,
+  FieldDependency,
+  ProposalTemplateField,
+  QuestionaryField,
+  Topic
+} from "../../models/ProposalModel";
+import { BasicUserDetails, User } from "../../models/User";
 
 // Interfaces corresponding exactly to database tables
 
@@ -166,7 +167,7 @@ export const createProposalTemplateFieldObject = (
     question.data_type as DataType,
     question.sort_order,
     question.question,
-    question.config,
+    createConfigByType(question.data_type as DataType, question.config),
     question.topic_id,
     null
   );
@@ -175,8 +176,8 @@ export const createProposalTemplateFieldObject = (
 export const createProposalObject = (proposal: ProposalRecord) => {
   return new Proposal(
     proposal.proposal_id,
-    proposal.title,
-    proposal.abstract,
+    proposal.title || "",
+    proposal.abstract || "",
     proposal.proposer_id,
     proposal.status,
     proposal.created_at,
@@ -191,16 +192,11 @@ export const createProposalObject = (proposal: ProposalRecord) => {
 export const createFieldDependencyObject = (
   fieldDependency: FieldDependencyRecord
 ) => {
-  if (!fieldDependency) {
-    return null;
-  }
   const conditionJson = JSON.parse(fieldDependency.condition);
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,
-    JSON.stringify(
-      new FieldCondition(conditionJson.condition, conditionJson.params)
-    ) // TODO SWAP-341. Remove stringifying
+    new FieldCondition(conditionJson.condition, conditionJson.params)
   );
 };
 
@@ -208,16 +204,8 @@ export const createQuestionaryFieldObject = (
   question: ProposalQuestionRecord & { value: any }
 ) => {
   return new QuestionaryField(
-    new ProposalTemplateField(
-      question.proposal_question_id,
-      question.data_type as DataType,
-      question.sort_order,
-      question.question,
-      question.config,
-      question.topic_id,
-      null
-    ),
-    question.value || ""
+    createProposalTemplateFieldObject(question),
+    question.value ? JSON.parse(question.value).value : ""
   );
 };
 

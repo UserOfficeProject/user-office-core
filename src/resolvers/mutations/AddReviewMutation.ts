@@ -27,7 +27,7 @@ class AddReviewArgs {
 
 @Resolver()
 export class AddReviewMutation {
-  @Mutation(() => ReviewResponseWrap, { nullable: true })
+  @Mutation(() => ReviewResponseWrap)
   addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
     return wrapResponse<Review>(
       context.mutations.review.submitReview(

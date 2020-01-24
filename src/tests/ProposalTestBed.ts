@@ -1,16 +1,23 @@
-import {
-  ProposalTemplate,
-  DataType,
-  FieldDependency,
-  Topic,
-  ProposalTemplateField,
-  FieldCondition,
-  TemplateStep,
-  Questionary,
-  QuestionaryStep,
-  QuestionaryField
-} from "../models/ProposalModel";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
+import {
+  DataType,
+  FieldCondition,
+  FieldDependency,
+  ProposalTemplate,
+  ProposalTemplateField,
+  Questionary,
+  QuestionaryField,
+  QuestionaryStep,
+  TemplateStep,
+  Topic,
+  createConfig
+} from "../models/ProposalModel";
+import {
+  EmbellishmentConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig,
+  FieldConfigType
+} from "../resolvers/types/FieldConfig";
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -21,9 +28,9 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.EMBELLISHMENT,
           0,
           "",
-          JSON.stringify({
-            html: "General informaiton",
-            plain: "General information"
+          createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
+            plain: "General information",
+            html: "<h1>General information</h1>"
           }),
           0,
           []
@@ -36,7 +43,13 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.SELECTION_FROM_OPTIONS,
           1,
           "Has links with industry",
-          JSON.stringify({ options: ["yes", "no"], variant: "radio" }),
+          createConfig<SelectionFromOptionsConfig>(
+            new SelectionFromOptionsConfig(),
+            {
+              options: ["yes", "no"],
+              variant: "radio"
+            }
+          ),
           0,
           []
         ),
@@ -48,13 +61,16 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           DataType.TEXT_INPUT,
           2,
           "If yes, please describe:",
-          JSON.stringify({ placeholder: "Please specify links with industry" }),
+          createConfig<TextInputConfig>(new TextInputConfig(), {
+            placeholder: "Please specify links with industry",
+            multiline: true
+          }),
           0,
           [
             new FieldDependency(
               "links_with_industry",
               "has_links_with_industry",
-              JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes"))
+              new FieldCondition(EvaluatorOperator.EQ, "yes")
             )
           ]
         ),
@@ -76,7 +92,7 @@ export const createDummyField = (values: {
   sort_order?: number;
   topic_id?: number;
   question?: string;
-  config?: string;
+  config?: typeof FieldConfigType;
   dependencies?: FieldDependency[];
 }): ProposalTemplateField => {
   return new ProposalTemplateField(
@@ -84,7 +100,7 @@ export const createDummyField = (values: {
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
-    values.config || JSON.stringify({}),
+    values.config || { required: false, tooltip: "", small_label: "" },
     values.topic_id || Math.round(Math.random() * 10),
     values.dependencies || []
   );
@@ -102,7 +118,7 @@ export const createDummyTemplate = () => {
       new FieldDependency(
         "linksToField",
         "hasLinksToField",
-        JSON.stringify(new FieldCondition(EvaluatorOperator.EQ, "yes")) // TODO SWAP-341. Remove stringifying
+        new FieldCondition(EvaluatorOperator.EQ, "yes")
       )
     ]
   });

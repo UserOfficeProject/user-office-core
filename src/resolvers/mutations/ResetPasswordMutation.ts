@@ -14,7 +14,7 @@ class ResetPasswordArgs {
 
 @Resolver()
 export class ResetPasswordMutation {
-  @Mutation(() => BasicUserDetailsResponseWrap, { nullable: true })
+  @Mutation(() => BasicUserDetailsResponseWrap)
   resetPassword(
     @Args() args: ResetPasswordArgs,
     @Ctx() context: ResolverContext

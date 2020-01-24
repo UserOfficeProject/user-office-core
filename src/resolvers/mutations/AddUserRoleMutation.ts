@@ -31,7 +31,7 @@ class AddUserRoleResponseWrap extends ResponseWrapBase<boolean> {
 
 @Resolver()
 export class AddUserRoleMutation {
-  @Mutation(() => AddUserRoleResponseWrap, { nullable: true })
+  @Mutation(() => AddUserRoleResponseWrap)
   addUserRole(@Args() args: AddUserRoleArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.user.addUserRole(

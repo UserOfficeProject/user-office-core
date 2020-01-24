@@ -35,7 +35,7 @@ class CreateCallArgs {
 
 @Resolver()
 export class CreateCallMutation {
-  @Mutation(() => CallResponseWrap, { nullable: true })
+  @Mutation(() => CallResponseWrap)
   createCall(@Args() args: CreateCallArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.call.create(

@@ -18,25 +18,25 @@ import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
 export class Proposal implements Partial<ProposalOrigin> {
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public id: number;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public title: string;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public abstract: string;
 
-  @Field(() => Int)
+  @Field(() => ProposalStatus)
   public status: ProposalStatus;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Date)
   public created: Date;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Date)
   public updated: Date;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   public shortCode: string;
 
   @Field(() => Int, { nullable: true })
@@ -65,7 +65,7 @@ export class ProposalResolver {
     return isRejection(users) ? [] : users;
   }
 
-  @FieldResolver(() => BasicUserDetails, { nullable: true })
+  @FieldResolver(() => BasicUserDetails)
   async proposer(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
@@ -88,7 +88,7 @@ export class ProposalResolver {
     return isRejection(reviews) ? [] : reviews;
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
