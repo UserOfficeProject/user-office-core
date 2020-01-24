@@ -27,6 +27,7 @@ import {
   userFieldSchema,
   userPasswordFieldSchema
 } from "../utils/userFieldValidationSchema";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 
 const queryString = require("query-string");
 
@@ -175,64 +176,18 @@ export default function SignUp(props) {
   }
 
   const sendSignUpRequest = values => {
-    const query = `mutation(
-                            $user_title: String, 
-                            $firstname: String!, 
-                            $middlename: String, 
-                            $lastname: String!, 
-                            $password: String!,
-                            $preferredname: String,
-                            $orcid: String!,
-                            $orcidHash: String!,
-                            $refreshToken: String!,
-                            $gender: String!,
-                            $nationality: Int!,
-                            $birthdate: String!,
-                            $organisation: Int!,
-                            $department: String!,
-                            $position: String!,
-                            $email: String!,
-                            $telephone: String!,
-                            $telephone_alt: String,
-                            $otherOrganisation: String
-                            )
-                  {
-                    createUser(
-                              user_title: $user_title, 
-                              firstname: $firstname, 
-                              middlename: $middlename, 
-                              lastname: $lastname, 
-                              password: $password,
-                              preferredname: $preferredname
-                              orcid: $orcid
-                              orcidHash: $orcidHash
-                              refreshToken: $refreshToken
-                              gender: $gender
-                              nationality: $nationality
-                              birthdate: $birthdate
-                              organisation: $organisation
-                              department: $department
-                              position: $position
-                              email: $email
-                              telephone: $telephone
-                              telephone_alt: $telephone_alt,
-                              otherOrganisation: $otherOrganisation
-                              )
-                     {
-                        user { id }
-                        error
-                     }
-                  }`;
-    request("/graphql", query, {
-      ...values,
-      orcid: orcData.orcid,
-      orcidHash: orcData.orcidHash,
-      refreshToken: orcData.refreshToken,
-      preferredname: values.preferredname
-        ? values.preferredname
-        : values.firstname,
-      gender: values.gender === "other" ? values.othergender : values.gender
-    }).then(data => setUserID(data.createUser.user.id));
+    getUnauthorizedApi()
+      .createUser({
+        ...values,
+        orcid: orcData.orcid,
+        orcidHash: orcData.orcidHash,
+        refreshToken: orcData.refreshToken,
+        preferredname: values.preferredname
+          ? values.preferredname
+          : values.firstname,
+        gender: values.gender === "other" ? values.othergender : values.gender
+      })
+      .then(data => setUserID(data.createUser.user.id));
   };
 
   if (authCodeOrcID && loading) {

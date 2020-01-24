@@ -5,9 +5,10 @@ import { useCallback, useContext } from "react";
 import { UserContext } from "../context/UserContextProvider";
 import { getSdk } from "../generated/sdk";
 
+const endpoint = "/graphql";
+
 export function useDataApi() {
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
-  const endpoint = "/graphql";
 
   const sendRequest = useCallback(
     function sendRequest() {
@@ -28,6 +29,10 @@ export function useDataApi() {
     [token, handleNewToken, handleLogout]
   );
   return sendRequest;
+}
+
+export function getUnauthorizedApi() {
+  return getSdk(new GraphQLClient(endpoint));
 }
 
 class AuthorizedGraphQLClient extends GraphQLClient {

@@ -1421,6 +1421,41 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type CreateUserMutationVariables = {
+  user_title?: Maybe<Scalars['String']>,
+  firstname: Scalars['String'],
+  middlename?: Maybe<Scalars['String']>,
+  lastname: Scalars['String'],
+  password: Scalars['String'],
+  preferredname?: Maybe<Scalars['String']>,
+  orcid: Scalars['String'],
+  orcidHash: Scalars['String'],
+  refreshToken: Scalars['String'],
+  gender: Scalars['String'],
+  nationality: Scalars['Int'],
+  birthdate: Scalars['String'],
+  organisation: Scalars['Int'],
+  department: Scalars['String'],
+  position: Scalars['String'],
+  email: Scalars['String'],
+  telephone: Scalars['String'],
+  telephone_alt?: Maybe<Scalars['String']>,
+  otherOrganisation?: Maybe<Scalars['String']>
+};
+
+
+export type CreateUserMutation = (
+  { __typename?: 'Mutation' }
+  & { createUser: (
+    { __typename?: 'UserResponseWrap' }
+    & Pick<UserResponseWrap, 'error'>
+    & { user: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id'>
+    )> }
+  ) }
+);
+
 export type CreateUserByEmailInviteMutationVariables = {
   firstname: Scalars['String'],
   lastname: Scalars['String'],
@@ -2179,6 +2214,16 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CreateUserDocument = gql`
+    mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
+  createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
+    user {
+      id
+    }
+    error
+  }
+}
+    `;
 export const CreateUserByEmailInviteDocument = gql`
     mutation createUserByEmailInvite($firstname: String!, $lastname: String!, $email: String!) {
   createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email) {
@@ -2435,6 +2480,9 @@ export function getSdk(client: GraphQLClient) {
     },
     userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
+    },
+    createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
+      return client.request<CreateUserMutation>(print(CreateUserDocument), variables);
     },
     createUserByEmailInvite(variables: CreateUserByEmailInviteMutationVariables): Promise<CreateUserByEmailInviteMutation> {
       return client.request<CreateUserByEmailInviteMutation>(print(CreateUserByEmailInviteDocument), variables);

@@ -1,22 +1,20 @@
-import React, { useContext, useState } from "react";
+import { getTranslation } from "@esss-swap/duo-localisation";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { TextField } from "formik-material-ui";
-import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import { Redirect } from "react-router-dom";
-import { request } from "graphql-request";
-import { UserContext } from "../context/UserContextProvider";
-import { Formik, Field, Form } from "formik";
-import PhotoInSide from "./PhotoInSide";
+import Typography from "@material-ui/core/Typography";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import React, { useContext, useState } from "react";
+import { Link, Redirect } from "react-router-dom";
 import * as Yup from "yup";
+import { UserContext } from "../context/UserContextProvider";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 import orcid from "../images/orcid.png";
-import { getTranslation } from "@esss-swap/duo-localisation";
-import { useDataApi } from "../hooks/useDataApi";
+import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -83,10 +81,9 @@ export default function SignInSide() {
   const { handleLogin, token } = useContext(UserContext);
 
   const requestToken = values => {
-    const api = useDataApi();
     const { email, password } = values;
 
-    api()
+    getUnauthorizedApi()
       .login({ email, password })
       .then(data => {
         if (!data.login.error) {

@@ -9,7 +9,7 @@ import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useDataApi } from "../hooks/useDataApi";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../utils/userFieldValidationSchema";
 import PhotoInSide from "./PhotoInSide";
 
@@ -45,9 +45,8 @@ export default function ResetPassword({ match }) {
   const [errorMessage, setErrorMessage] = useState(false);
   const requestResetPassword = values => {
     const { password } = values;
-    const api = useDataApi();
 
-    api()
+    getUnauthorizedApi()
       .resetPassword({
         token: match.params.token,
         password
