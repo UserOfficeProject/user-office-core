@@ -1589,6 +1589,19 @@ export type ResetPasswordMutation = (
   ) }
 );
 
+export type ResetPasswordEmailMutationVariables = {
+  email: Scalars['String']
+};
+
+
+export type ResetPasswordEmailMutation = (
+  { __typename?: 'Mutation' }
+  & { resetPasswordEmail: (
+    { __typename?: 'ResetPasswordEmailResponseWrap' }
+    & Pick<ResetPasswordEmailResponseWrap, 'error' | 'success'>
+  ) }
+);
+
 export type UpdatePasswordMutationVariables = {
   id: Scalars['Int'],
   password: Scalars['String']
@@ -2275,6 +2288,14 @@ export const ResetPasswordDocument = gql`
   }
 }
     `;
+export const ResetPasswordEmailDocument = gql`
+    mutation resetPasswordEmail($email: String!) {
+  resetPasswordEmail(email: $email) {
+    error
+    success
+  }
+}
+    `;
 export const UpdatePasswordDocument = gql`
     mutation updatePassword($id: Int!, $password: String!) {
   updatePassword(id: $id, password: $password) {
@@ -2425,6 +2446,9 @@ export function getSdk(client: GraphQLClient) {
     },
     resetPassword(variables: ResetPasswordMutationVariables): Promise<ResetPasswordMutation> {
       return client.request<ResetPasswordMutation>(print(ResetPasswordDocument), variables);
+    },
+    resetPasswordEmail(variables: ResetPasswordEmailMutationVariables): Promise<ResetPasswordEmailMutation> {
+      return client.request<ResetPasswordEmailMutation>(print(ResetPasswordEmailDocument), variables);
     },
     updatePassword(variables: UpdatePasswordMutationVariables): Promise<UpdatePasswordMutation> {
       return client.request<UpdatePasswordMutation>(print(UpdatePasswordDocument), variables);

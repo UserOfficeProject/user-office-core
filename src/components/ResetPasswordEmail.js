@@ -12,6 +12,7 @@ import { request } from "graphql-request";
 import { Formik, Field, Form } from "formik";
 import PhotoInSide from "./PhotoInSide";
 import * as Yup from "yup";
+import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -43,19 +44,10 @@ export default function ResetPasswordEmail() {
   const classes = useStyles();
   const [emailSuccess, setSuccess] = useState(null);
   const requestResetEmail = values => {
-    const { email } = values;
-    const query = `
-    mutation($email: String!){
-      resetPasswordEmail(email: $email)
-    }
-    `;
-    const variables = {
-      email
-    };
-
-    request("/graphql", query, variables).then(data =>
-      setSuccess(data.resetPasswordEmail)
-    );
+    const api = useDataApi();
+    api()
+      .resetPasswordEmail({ email: values.email })
+      .then(data => setSuccess(data.resetPasswordEmail));
   };
 
   return (
