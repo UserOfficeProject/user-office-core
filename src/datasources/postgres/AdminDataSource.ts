@@ -1,13 +1,16 @@
+import * as fs from "fs";
+import { Page } from "../../models/Admin";
 import { AdminDataSource, Entry } from "../AdminDataSource";
 import database from "./database";
 import {
-  PagetextRecord,
+  CountryRecord,
   createPageObject,
-  NationalityRecord,
   InstitutionRecord,
-  CountryRecord
+  NationalityRecord,
+  PagetextRecord
 } from "./records";
-import { Page } from "../../models/Admin";
+import Knex = require("knex");
+import { logger } from "../../utils/Logger";
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async get(id: number): Promise<string | null> {
@@ -78,5 +81,20 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           return { id: count.country_id, value: count.country };
         })
       );
+  }
+
+  async resetDB() {
+    const directoryPath = "./db_patches";
+    fs.readdir(directoryPath, async function(err, files) {
+      if (err) {
+        logger.logError(err.message, err);
+        return false;
+      }
+      for await (let file of files) {
+        var contents = fs.readFileSync(`${directoryPath}/${file}`, "utf8");
+        await database.raw(contents);
+      }
+    });
+    return true;
   }
 }

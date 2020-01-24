@@ -8,6 +8,14 @@ import { Page } from "../models/Admin";
 import { logger } from "../utils/Logger";
 
 export default class AdminMutations {
+  async resetDB(): Promise<boolean | Rejection> {
+    if (process.env.NODE_ENV === "development") {
+      logger.logWarn("Resetting database", {});
+      return this.dataSource.resetDB();
+    } else {
+      return rejection("NOT_ALLOWED");
+    }
+  }
   constructor(
     private dataSource: AdminDataSource,
     private userAuth: UserAuthorization,
