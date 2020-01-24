@@ -1638,6 +1638,19 @@ export type UpdateUserRolesMutation = (
   ) }
 );
 
+export type VerifyEmailMutationVariables = {
+  token: Scalars['String']
+};
+
+
+export type VerifyEmailMutation = (
+  { __typename?: 'Mutation' }
+  & { emailVerification: (
+    { __typename?: 'EmailVerificationResponseWrap' }
+    & Pick<EmailVerificationResponseWrap, 'error' | 'success'>
+  ) }
+);
+
 export const FieldConfigFragmentDoc = gql`
     fragment fieldConfig on FieldConfig {
   ... on BooleanConfig {
@@ -2268,6 +2281,14 @@ export const UpdateUserRolesDocument = gql`
   }
 }
     `;
+export const VerifyEmailDocument = gql`
+    mutation verifyEmail($token: String!) {
+  emailVerification(token: $token) {
+    error
+    success
+  }
+}
+    `;
 export function getSdk(client: GraphQLClient) {
   return {
     getPageContent(variables: GetPageContentQueryVariables): Promise<GetPageContentQuery> {
@@ -2389,6 +2410,9 @@ export function getSdk(client: GraphQLClient) {
     },
     updateUserRoles(variables: UpdateUserRolesMutationVariables): Promise<UpdateUserRolesMutation> {
       return client.request<UpdateUserRolesMutation>(print(UpdateUserRolesDocument), variables);
+    },
+    verifyEmail(variables: VerifyEmailMutationVariables): Promise<VerifyEmailMutation> {
+      return client.request<VerifyEmailMutation>(print(VerifyEmailDocument), variables);
     }
   };
 }
