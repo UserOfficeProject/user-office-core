@@ -13,7 +13,6 @@ test:
   stage: test
   script:
     - npm install
-    - npm run generate:dev
     - NODE_ENV=ci npm run test
   tags:
     - docker
