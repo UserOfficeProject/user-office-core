@@ -85,3 +85,10 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
 }
+
+@ObjectType()
+export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Boolean, { nullable: true })
+  public isSuccess: boolean;
+}
