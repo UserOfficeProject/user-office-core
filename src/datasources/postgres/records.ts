@@ -196,7 +196,10 @@ export const createFieldDependencyObject = (
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,
-    new FieldCondition(conditionJson.condition, conditionJson.params)
+    new FieldCondition(
+      conditionJson.condition.toUpperCase(),
+      conditionJson.params
+    )
   );
 };
 

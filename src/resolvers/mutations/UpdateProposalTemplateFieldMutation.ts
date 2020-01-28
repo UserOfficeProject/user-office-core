@@ -11,7 +11,10 @@ import { ResolverContext } from "../../context";
 import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 import { FieldCondition } from "../types/FieldCondition";
-import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
+import {
+  FieldDependency as FieldDependencyOrigin,
+  FieldDependency
+} from "../../models/ProposalModel";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 
 @ArgsType()
@@ -69,9 +72,23 @@ export class UpdateProposalTemplateFieldMutation {
         args.question,
         undefined,
         args.config,
-        args.dependencies
+        this.unpackDependencies(args.dependencies)
       ),
       ProposalTemplateResponseWrap
     );
+  }
+
+  // Have this until GQL accepts Union types
+  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
+  unpackDependencies(dependencies: FieldDependency[]) {
+    return dependencies.map(dependency => {
+      return {
+        ...dependency,
+        condition: {
+          ...dependency.condition,
+          params: JSON.parse(dependency.condition.params).value
+        }
+      };
+    });
   }
 }
