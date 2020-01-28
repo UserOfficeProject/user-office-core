@@ -21,7 +21,6 @@ test:
 e2etest:
   image: tiangolo/docker-with-compose
   stage: e2etest
-  needs: ["e2ebuild"]
   retry: 2
   script: 
     - docker-compose -f docker-compose.e2e.yaml  --remove-orphans
