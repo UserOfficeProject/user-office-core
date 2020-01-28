@@ -23,7 +23,7 @@ e2etest:
   stage: e2etest
   retry: 2
   script: 
-    - docker-compose -f docker-compose.e2e.yaml  --remove-orphans
+    - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - docker-compose -f docker-compose.e2e.yaml pull
     - docker-compose -f docker-compose.e2e.yaml build
     - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
