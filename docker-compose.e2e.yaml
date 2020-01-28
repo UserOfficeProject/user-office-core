@@ -1,0 +1,47 @@
+# Use postgres/example user/password credentials
+version: "3.1"
+
+services:
+  proxy:
+    image: traefik:1.7 # The official Traefik docker image
+    command: --api --docker # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "80:80" # The HTTP port
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  db:
+    image: postgres:11.2
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: duopassword
+      POSTGRES_USER: duouser
+      POSTGRES_DB: duo
+    volumes:
+      - ./duo-backend/db_patches/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432
+  backend:
+    image: dmsc/duo-backend
+    environment:
+      DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
+      secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      tokenLife: 7d
+      baseURL: localhost:3000
+      SPARKPOST_TOKEN: dummytoken
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
+      - "traefik.port=4000"
+  frontend:
+    environment:
+        DANGEROUSLY_DISABLE_HOST_CHECK: "true"
+    build:
+        context: ./
+        dockerfile: "Dockerfile.cypress"
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/"
+      - "traefik.port=3000"
+    command: npm run dev
+  cypress:
+    build: ./cypress
+    command: ["./wait-for-it.sh", "-t", "300","frontend:80", "--", "npm", "run", "cy:run"]
