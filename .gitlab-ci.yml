@@ -7,6 +7,7 @@ cache:
 
 stages:
   - test
+  - e2etest
   - build
 
 test:
@@ -16,6 +17,22 @@ test:
     - NODE_ENV=ci npm run test
   tags:
     - docker
+
+e2etest:
+  image: tiangolo/docker-with-compose
+  stage: e2etest
+  needs: ["e2ebuild"]
+  retry: 2
+  script: 
+    - docker-compose -f docker-compose.e2e.yaml  --remove-orphans
+    - docker-compose -f docker-compose.e2e.yaml pull
+    - docker-compose -f docker-compose.e2e.yaml build
+    - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
+#    - docker-compose run cypress
+    - docker-compose down
+  tags:
+    - docker
+
 
 docker build:
   image: docker:stable
