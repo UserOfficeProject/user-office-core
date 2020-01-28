@@ -11,6 +11,7 @@ import {
 } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { BasicUserDetails } from "../types/BasicUserDetails";
+import { UserRole } from "../../models/User";
 
 @ObjectType()
 class UserQueryResult {
@@ -32,8 +33,8 @@ export class UsersArgs {
   @Field(() => Int, { nullable: true })
   offset?: number;
 
-  @Field(() => Boolean, { nullable: true })
-  usersOnly?: boolean;
+  @Field(() => UserRole, { nullable: true })
+  userRole?: UserRole;
 
   @Field(() => [Int], { nullable: "itemsAndList" })
   subtractUsers?: [number];
@@ -43,7 +44,7 @@ export class UsersArgs {
 export class UsersQuery {
   @Query(() => UserQueryResult, { nullable: true })
   users(
-    @Args() { filter, first, offset, usersOnly, subtractUsers }: UsersArgs,
+    @Args() { filter, first, offset, userRole, subtractUsers }: UsersArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.user.getAll(
@@ -51,7 +52,7 @@ export class UsersQuery {
       filter,
       first,
       offset,
-      usersOnly,
+      userRole,
       subtractUsers
     );
   }

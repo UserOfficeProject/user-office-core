@@ -67,6 +67,40 @@ test("A user-officer can update a proposal in submit mode", () => {
   );
 });
 
+test("A user-officer can update a proposals score in submit mode", () => {
+  return expect(
+    proposalMutations.update(
+      dummyUserOfficer,
+      dummyProposalSubmitted.id,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      2
+    )
+  ).resolves.toBe(dummyProposalSubmitted);
+});
+
+test("A user can not update a proposals score mode", () => {
+  return expect(
+    proposalMutations.update(
+      dummyUser,
+      dummyProposalSubmitted.id,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      2
+    )
+  ).resolves.toHaveProperty("reason", "NOT_ALLOWED_PROPOSAL_SUBMITTED");
+});
+
 test("A user not on a proposal can not update it", () => {
   return expect(
     tryUpdateProposal(dummyUserNotOnProposal, 1)

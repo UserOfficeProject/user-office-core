@@ -200,7 +200,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           title: proposal.title,
           abstract: proposal.abstract,
           status: proposal.status,
-          proposer_id: proposal.proposerId
+          proposer_id: proposal.proposerId,
+          excellence_score: proposal.excellenceScore,
+          safety_score: proposal.safetyScore,
+          technical_score: proposal.technicalScore
         },
         ["*"]
       )
