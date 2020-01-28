@@ -9,7 +9,7 @@ context("User administration tests", () => {
 
   beforeEach(() => {
     cy.viewport(1100, 900);
-    cy.visit("localhost:3000");
+    cy.visit("/");
   });
 
   const newFirstName = faker.name.firstName();

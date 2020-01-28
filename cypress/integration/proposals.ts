@@ -7,7 +7,7 @@ context("Proposaltests", () => {
   });
   beforeEach(() => {
     cy.viewport(1100, 800);
-    cy.visit("localhost:3000");
+    cy.visit("/");
   });
 
   var textId;

@@ -3,7 +3,7 @@ const faker = require("faker");
 
 context("User Officer tests", () => {
   beforeEach(() => {
-    cy.visit("localhost:3000");
+    cy.visit("/");
   });
 
   const shortCode = faker.random.word();

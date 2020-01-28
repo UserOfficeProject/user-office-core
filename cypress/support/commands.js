@@ -33,9 +33,7 @@ Cypress.Commands.add("resetDB", () => {
       error
     }
   }`;
-  request("http://localhost:3000/graphql", query).then(data =>
-    console.log(data)
-  );
+  request("/graphql", query).then(data => console.log(data));
 });
 
 Cypress.Commands.add("login", role => {
@@ -52,7 +50,7 @@ Cypress.Commands.add("login", role => {
 
   const credentials = testCredentialStore[role];
 
-  cy.visit("localhost:3000");
+  cy.visit("/");
 
   cy.get("[data-cy=input-email] input")
     .type(credentials.email)

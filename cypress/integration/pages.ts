@@ -3,7 +3,7 @@ var faker = require("faker");
 
 context("Page tests", () => {
   beforeEach(() => {
-    cy.visit("localhost:3000");
+    cy.visit("/");
     cy.viewport(1100, 1000);
   });
 
