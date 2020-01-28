@@ -18,6 +18,13 @@ export default class ProposalQueries {
     if (!proposal) {
       return null;
     }
+
+    //If not a user officer remove excellence, tehnical and safety score
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      delete proposal.excellenceScore;
+      delete proposal.technicalScore;
+      delete proposal.safetyScore;
+    }
     if ((await this.hasAccessRights(agent, proposal)) === true) {
       return proposal;
     } else {
@@ -82,7 +89,10 @@ export default class ProposalQueries {
       ProposalStatus.BLANK,
       new Date(),
       new Date(),
-      ""
+      "",
+      0,
+      0,
+      0
     );
     return blankProposal;
   }

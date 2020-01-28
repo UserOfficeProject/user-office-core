@@ -30,6 +30,12 @@ export class User {
   ) {}
 }
 
+export enum UserRole {
+  USER = 1,
+  USEROFFICER = 2,
+  REVIEWER = 3
+}
+
 export class BasicUserDetails {
   constructor(
     public id: number,

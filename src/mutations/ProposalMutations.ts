@@ -59,7 +59,10 @@ export default class ProposalMutations {
     topicsCompleted?: number[],
     users?: number[],
     proposerId?: number,
-    partialSave?: boolean
+    partialSave?: boolean,
+    excellenceScore?: number,
+    technicalScore?: number,
+    safetyScore?: number
   ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap<Proposal>(
       async () => {
@@ -91,8 +94,8 @@ export default class ProposalMutations {
         }
 
         if (
-          (await this.userAuth.isMemberOfProposal(agent, proposal)) &&
-          proposal.status !== ProposalStatus.DRAFT
+          proposal.status !== ProposalStatus.DRAFT &&
+          !(await this.userAuth.isUserOfficer(agent))
         ) {
           return rejection("NOT_ALLOWED_PROPOSAL_SUBMITTED");
         }
@@ -103,6 +106,27 @@ export default class ProposalMutations {
 
         if (abstract !== undefined) {
           proposal.abstract = abstract;
+        }
+
+        if (
+          (await this.userAuth.isUserOfficer(agent)) &&
+          excellenceScore !== undefined
+        ) {
+          proposal.excellenceScore = excellenceScore;
+        }
+
+        if (
+          (await this.userAuth.isUserOfficer(agent)) &&
+          technicalScore !== undefined
+        ) {
+          proposal.technicalScore = technicalScore;
+        }
+
+        if (
+          (await this.userAuth.isUserOfficer(agent)) &&
+          safetyScore !== undefined
+        ) {
+          proposal.safetyScore = safetyScore;
         }
 
         if (users !== undefined) {

@@ -1,0 +1,4 @@
+ALTER TABLE users ADD COLUMN excellence_score INT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN technical_score INT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN safety_score INT DEFAULT NULL;
+

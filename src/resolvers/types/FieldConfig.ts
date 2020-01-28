@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType, createUnionType } from "type-graphql";
 
-// TODO go over and make sure the nullability is correct
 @ObjectType()
 export class ConfigBase {
   @Field(() => String)
