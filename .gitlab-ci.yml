@@ -26,12 +26,11 @@ e2etest:
     - apk add git
     - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
-    - ls -la
+    - ls -la duo-backend/db_patches/
     - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - docker-compose -f docker-compose.e2e.yaml pull
     - docker-compose -f docker-compose.e2e.yaml build
     - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
-#    - docker-compose run cypress
     - docker-compose down
   tags:
     - docker
