@@ -1,33 +1,31 @@
-import React, { useState, useContext } from "react";
+import { Card, CardContent } from "@material-ui/core";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { request } from "graphql-request";
-import { Link } from "react-router-dom";
-import { Formik, Field, Form } from "formik";
-import { TextField, CheckboxWithLabel } from "formik-material-ui";
-import FormikDropdown from "./FormikDropdown";
-import { ErrorFocus } from "./ErrorFocus";
-import { Card, CardContent } from "@material-ui/core";
-import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
-import InformationModal from "./InformationModal";
-import { useGetPageContent } from "../hooks/useGetPageContent";
-import { useGetFields } from "../hooks/useGetFields";
+import CssBaseline from "@material-ui/core/CssBaseline";
 import FormLabel from "@material-ui/core/FormLabel";
-import orcid from "../images/orcid.png";
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import clsx from "clsx";
+import { Field, Form, Formik } from "formik";
+import { CheckboxWithLabel, TextField } from "formik-material-ui";
+import React, { useContext, useState } from "react";
+import { Link, Redirect } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
-import { Redirect } from "react-router-dom";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
+import { useGetFields } from "../hooks/useGetFields";
+import { useGetPageContent } from "../hooks/useGetPageContent";
+import { useOrcIDInformation } from "../hooks/useOrcIDInformation";
+import orcid from "../images/orcid.png";
 import {
   userFieldSchema,
   userPasswordFieldSchema
 } from "../utils/userFieldValidationSchema";
-import { getUnauthorizedApi } from "../hooks/useDataApi";
+import { ErrorFocus } from "./ErrorFocus";
+import FormikDropdown from "./FormikDropdown";
+import InformationModal from "./InformationModal";
 
 const queryString = require("query-string");
 

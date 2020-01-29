@@ -13,7 +13,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   DataType,
   EvaluatorOperator,
-  FieldDependency,
   ProposalTemplate,
   ProposalTemplateField,
   SelectionFromOptionsConfig
@@ -35,7 +34,9 @@ const FormikUICustomDependencySelector = ({
   const [operator, setOperator] = useState<EvaluatorOperator>(
     EvaluatorOperator.EQ
   );
-  const [dependencyValue, setDependencyValue] = useState<string>("");
+  const [dependencyValue, setDependencyValue] = useState<
+    string | boolean | number | Date
+  >("");
 
   const [availableValues, setAvailableValues] = useState<IOption[]>([]);
 
@@ -62,7 +63,7 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = () => {
-    let depArr = new Array<FieldDependency>();
+    let depArr = [];
     if (dependencyId && dependencyValue && operator) {
       depArr.push({
         proposal_question_id: templateField.proposal_question_id,
@@ -176,8 +177,8 @@ const FormikUICustomDependencySelector = ({
             fullWidth
             id="dependencyValue"
             value={dependencyValue}
-            onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-              setDependencyValue(event.target.value as string);
+            onChange={(event: React.ChangeEvent<{ value: any }>) => {
+              setDependencyValue(event.target.value);
             }}
           >
             {availableValues.map(option => {
