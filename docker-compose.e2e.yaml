@@ -45,4 +45,4 @@ services:
     command: npm run dev
   cypress:
     build: ./cypress
-    command: ["./wait-for-it.sh", "-t", "200","frontend:80", "--", "npm", "run", "cy:run"]
+    command: ["./wait-for-it.sh", "-t", "250","frontend:80", "--", "npm", "run", "cy:run"]

@@ -24,7 +24,9 @@ e2etest:
   retry: 2
   script: 
     - apk add git
+    - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
+    - ls -la
     - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - docker-compose -f docker-compose.e2e.yaml pull
     - docker-compose -f docker-compose.e2e.yaml build
