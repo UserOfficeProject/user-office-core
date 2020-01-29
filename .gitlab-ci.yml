@@ -21,18 +21,16 @@ test:
 e2etest:
   image: tiangolo/docker-with-compose
   stage: e2etest
-  retry: 2
   script: 
     - apk add git
     - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
-    - ls -la duo-backend/db_patches/
     - docker-compose -f docker-compose.e2e.yaml rm
     - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - docker-compose -f docker-compose.e2e.yaml pull
     - docker-compose -f docker-compose.e2e.yaml build
     - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
-    - docker-compose down
+    - docker-compose -f docker-compose.e2e.yaml down
   tags:
     - docker
 
