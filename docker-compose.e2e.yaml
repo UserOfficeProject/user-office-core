@@ -47,6 +47,5 @@ services:
         - backend
   cypress:
     build: ./cypress
-    command: npm run cy:run
     depends_on:
         - frontend
