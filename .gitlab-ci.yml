@@ -23,6 +23,7 @@ e2etest:
   stage: e2etest
   retry: 2
   script: 
+    - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - docker-compose -f docker-compose.e2e.yaml pull
     - docker-compose -f docker-compose.e2e.yaml build

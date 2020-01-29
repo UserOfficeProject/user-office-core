@@ -29,6 +29,7 @@ services:
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
+      NODE_ENV: development
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
       - "traefik.port=4000"
@@ -44,4 +45,4 @@ services:
     command: npm run dev
   cypress:
     build: ./cypress
-    command: ["./wait-for-it.sh", "-t", "300","frontend:80", "--", "npm", "run", "cy:run"]
+    command: ["./wait-for-it.sh", "-t", "300","frontend:3000", "--", "npm", "run", "cy:run"]
