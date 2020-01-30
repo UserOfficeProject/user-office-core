@@ -15,6 +15,7 @@ import { UserContext } from "../context/UserContextProvider";
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import orcid from "../images/orcid.png";
 import PhotoInSide from "./PhotoInSide";
+import { FormWrapper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -30,12 +31,6 @@ const useStyles = makeStyles(theme => ({
   },
   errorMessage: {
     color: "red"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
   },
   loginAlternative: {
     "border-top": "1px solid #e1e5ed",
@@ -118,7 +113,7 @@ export default function SignInSide() {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <div className={classes.paper}>
+          <FormWrapper hMargin="4">
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -187,7 +182,7 @@ export default function SignInSide() {
                 </div>
               </Grid>
             </Grid>
-          </div>
+          </FormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>
