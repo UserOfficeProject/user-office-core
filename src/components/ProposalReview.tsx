@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@material-ui/core";
 import { FormApi } from "./ProposalContainer";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
@@ -8,26 +8,6 @@ import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 import { Button } from "@material-ui/core";
 import withConfirm from "../utils/withConfirm";
 import { Proposal, ProposalStatus } from "../generated/sdk";
-
-const useStyles = makeStyles({
-  buttons: {
-    display: "flex",
-    justifyContent: "flex-end"
-  },
-  disabled: {
-    pointerEvents: "none",
-    opacity: 0.7
-  },
-  button: {
-    marginTop: "auto",
-    marginLeft: "10px",
-    backgroundColor: "#00C851",
-    color: "#ffff",
-    "&:hover": {
-      backgroundColor: "#007E33"
-    }
-  }
-});
 
 function ProposalReview({
   data,
@@ -39,12 +19,31 @@ function ProposalReview({
   confirm: Function;
 }) {
   const api = useContext(FormApi);
-  const classes = useStyles();
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
 
   const allStepsComplete =
     data.questionary && data.questionary.steps.every(step => step.isCompleted);
+
+  const classes = makeStyles(theme => ({
+    buttons: {
+      display: "flex",
+      justifyContent: "flex-end"
+    },
+    disabled: {
+      pointerEvents: "none",
+      opacity: 0.7
+    },
+    button: {
+      marginTop: "auto",
+      marginLeft: "10px",
+      backgroundColor: theme.palette.secondary.main,
+      color: "#ffff",
+      "&:hover": {
+        backgroundColor: theme.palette.secondary.light
+      }
+    }
+  }))();
 
   return (
     <>
