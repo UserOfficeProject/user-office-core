@@ -1,29 +1,19 @@
-import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
-import { Formik, Field, Form } from "formik";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { makeStyles } from "@material-ui/core/styles";
+import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
+import React, { useState } from "react";
+import { Redirect } from "react-router";
 import * as Yup from "yup";
 import { useAddReview } from "../hooks/useAddReview";
-import { useReviewData } from "../hooks/useReviewData";
-import { Redirect } from "react-router";
 import { useProposalData } from "../hooks/useProposalData";
+import { useReviewData } from "../hooks/useReviewData";
+import { StyledPaper } from "../styles/StyledComponents";
+import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  },
   buttons: {
     display: "flex",
     justifyContent: "flex-end"
@@ -54,11 +44,11 @@ export default function ProposalGrade({ match }) {
   }
   return (
     <Container maxWidth="lg" className={classes.container}>
-      <Paper className={classes.paper}>
+      <StyledPaper>
         <ProposaQuestionaryReview data={proposalData} />
-      </Paper>
+      </StyledPaper>
 
-      <Paper className={classes.paper}>
+      <StyledPaper>
         <Formik
           initialValues={{
             grade: reviewData.grade,
@@ -118,7 +108,7 @@ export default function ProposalGrade({ match }) {
             </div>
           </Form>
         </Formik>
-      </Paper>
+      </StyledPaper>
     </Container>
   );
 }

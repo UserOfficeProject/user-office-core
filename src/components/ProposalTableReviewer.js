@@ -11,21 +11,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import { UserContext } from "../context/UserContextProvider";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
+import { StyledPaper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4)
-  },
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
   },
   fixedHeight: {
     height: 240
@@ -69,7 +60,7 @@ export default function ProposalTableReviewer() {
     <Container maxWidth="lg" className={classes.container}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper className={classes.paper}>
+          <StyledPaper>
             <MaterialTable
               icons={tableIcons}
               title={"Proposals to review"}
@@ -122,7 +113,7 @@ export default function ProposalTableReviewer() {
                 }
               ]}
             />
-          </Paper>
+          </StyledPaper>
         </Grid>
       </Grid>
     </Container>

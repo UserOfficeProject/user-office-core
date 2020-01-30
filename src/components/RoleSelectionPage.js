@@ -5,21 +5,12 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { Redirect } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
+import { StyledPaper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4)
-  },
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
   },
   fixedHeight: {
     height: 240
@@ -41,11 +32,11 @@ export default function RoleSelectionPage() {
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>Select role: </Paper>
+            <StyledPaper className={classes.paper}>Select role: </StyledPaper>
           </Grid>
           {roles.map(role => (
             <Grid item xs={6} onClick={() => handleRole(role.shortCode)}>
-              <Paper className={classes.paper}>{role.title}</Paper>
+              <StyledPaper className={classes.paper}>{role.title}</StyledPaper>
             </Grid>
           ))}
         </Grid>
