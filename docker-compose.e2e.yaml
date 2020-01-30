@@ -47,5 +47,8 @@ services:
         - backend
   cypress:
     build: ./cypress
+    environment: 
+        DEBUG: "cypress"
+    command: ["./wait-for-it.sh", "-t", "200", "frontend:80", "--", "cypress", "run" ,"--headless"]
     depends_on:
         - frontend

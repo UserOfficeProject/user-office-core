@@ -4,13 +4,12 @@
     "private": true,
     "proxy": "http://localhost:4000",
     "dependencies": {
-        "cypress": "^3.8.1",
         "faker": "^4.1.0",
         "graphql-request": "^1.8.2"
     },
     "scripts": {
       "cypress:open": "cypress open",
-      "cy:run": "cypress run"
+      "cy:run": "cypress run --headless --browser chrome"
     }
   }
   
