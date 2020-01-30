@@ -1,7 +1,7 @@
 import { createMuiTheme } from "@material-ui/core/styles";
 
-export function getTheme() {
-  return createMuiTheme({
+const createTheme = () =>
+  createMuiTheme({
     palette: {
       primary: {
         dark: "#0081b0",
@@ -18,4 +18,36 @@ export function getTheme() {
       }
     }
   });
+
+const createDevelopTheme = () =>
+  createMuiTheme({
+    palette: {
+      primary: {
+        dark: "#b33739",
+        main: "#FF4E50",
+        light: "#FC913A"
+      },
+      secondary: {
+        dark: "#F9D423",
+        main: "#F9D423",
+        light: "#E1F5C4"
+      },
+      error: {
+        main: "#f44336"
+      },
+      action: {}
+    }
+  });
+
+export function getTheme() {
+  return isDevelop() ? createDevelopTheme() : createTheme();
 }
+
+const developHosts: any = {
+  localhost: true,
+  "useroffice-test.esss.lu.se": true
+};
+
+const isDevelop = () => {
+  return developHosts[window.location.hostname];
+};
