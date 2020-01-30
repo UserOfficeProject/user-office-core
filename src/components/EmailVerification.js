@@ -12,7 +12,7 @@ import { FormWrapper } from "../styles/StyledComponents";
 const useStyles = makeStyles(theme => ({
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: "blue"
+    backgroundColor: theme.palette.primary.dark
   },
   submit: {
     margin: theme.spacing(3, 0, 2)

@@ -207,7 +207,7 @@ export function NewFileEntry(props: {
       backgroundColor: theme.palette.primary.main,
       color: "white"
     }
-  }))(); // DRY
+  }))();
 
   const { uploadFile, progress, state, abort } = useFileUpload();
 

@@ -27,10 +27,10 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2)
   },
   sentMessageSuccess: {
-    color: "green"
+    color: theme.palette.secondary.main
   },
   sentMessageError: {
-    color: "red"
+    color: theme.palette.error.main
   }
 }));
 

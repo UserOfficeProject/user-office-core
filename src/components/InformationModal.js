@@ -7,15 +7,16 @@ import MuiDialogContent from "@material-ui/core/DialogContent";
 import MuiDialogActions from "@material-ui/core/DialogActions";
 import Typography from "@material-ui/core/Typography";
 import parse from "html-react-parser";
+
 const useStyles = makeStyles(theme => ({
   buttonLink: {
     background: "none",
     border: "none",
     padding: 0,
-    "font-size": "8px;",
-    "font-family": "arial",
-    color: "#069",
-    "text-decoration": "underline",
+    fontSize: "8px;",
+    fontFamily: "arial",
+    color: theme.palette.primary.main,
+    textDecoration: "underline",
     cursor: "pointer"
   }
 }));
@@ -48,7 +49,11 @@ export default function InformationDialog(props) {
   }
   return (
     <div>
-      <Button className={classes.buttonLink} onClick={handleClickOpen} style={props.linkStyle}>
+      <Button
+        className={classes.buttonLink}
+        onClick={handleClickOpen}
+        style={props.linkStyle}
+      >
         {props.linkText}
       </Button>
       <Dialog

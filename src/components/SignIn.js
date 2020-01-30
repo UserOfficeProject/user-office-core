@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2)
   },
   errorMessage: {
-    color: "red"
+    color: theme.palette.error.main
   },
   loginAlternative: {
     "border-top": "1px solid #e1e5ed",

@@ -4,13 +4,14 @@ export function getTheme() {
   return createMuiTheme({
     palette: {
       primary: {
-        dark: "#007daa",
+        dark: "#0081b0",
         main: "#0094ca",
-        light: "#7de1ff"
+        light: "#00a6e3"
       },
       secondary: {
-        main: "#72be00",
-        light: "#8bd916"
+        dark: "#85a600",
+        main: "#99bf00",
+        light: "#b8e600"
       },
       error: {
         main: "#f44336"
