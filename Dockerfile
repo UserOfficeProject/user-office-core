@@ -2,7 +2,7 @@
 FROM node:10 as build-stage
 WORKDIR /app
 COPY package*.json /app/
-RUN npm install --only=production
+RUN npm install --only=production --silent
 
 COPY ./ /app/
 RUN npm run build

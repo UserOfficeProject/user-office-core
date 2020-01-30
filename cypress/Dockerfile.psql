@@ -1,0 +1,2 @@
+FROM postgres:11.2
+COPY ./duo-backend/db_patches /docker-entrypoint-initdb.d/

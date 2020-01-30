@@ -7,6 +7,7 @@ cache:
 
 stages:
   - test
+  - e2etest
   - build
 
 test:
@@ -16,6 +17,23 @@ test:
     - NODE_ENV=ci npm run test
   tags:
     - docker
+
+e2etest:
+  image: tiangolo/docker-with-compose
+  stage: e2etest
+  script: 
+    - apk add git
+    - rm -rf duo-backend
+    - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
+    - docker-compose -f docker-compose.e2e.yaml rm
+    - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
+    - docker-compose -f docker-compose.e2e.yaml pull
+    - docker-compose -f docker-compose.e2e.yaml build
+    - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
+    - docker-compose -f docker-compose.e2e.yaml down
+  tags:
+    - docker
+
 
 docker build:
   image: docker:stable

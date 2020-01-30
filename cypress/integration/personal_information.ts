@@ -7,7 +7,7 @@ context("Personal information tests", () => {
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.visit("localhost:3000");
+    cy.visit("/");
     cy.viewport(1100, 1100);
   });
 
