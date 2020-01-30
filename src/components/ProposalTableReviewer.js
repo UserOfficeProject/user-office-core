@@ -1,17 +1,16 @@
-import React, { useState, useContext } from "react";
-import { useUserWithReviewsData } from "../hooks/useUserData";
-import { Redirect } from "react-router";
-import MaterialTable from "material-table";
-import { tableIcons } from "../utils/tableIcons";
-import { Edit, Visibility } from "@material-ui/icons";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import { UserContext } from "../context/UserContextProvider";
+import { Edit, Visibility } from "@material-ui/icons";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import MaterialTable from "material-table";
+import React, { useContext, useState } from "react";
+import { Redirect } from "react-router";
+import { UserContext } from "../context/UserContextProvider";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
+import { useUserWithReviewsData } from "../hooks/useUserData";
 import { StyledPaper } from "../styles/StyledComponents";
+import { tableIcons } from "../utils/tableIcons";
 
 const useStyles = makeStyles(theme => ({
   container: {

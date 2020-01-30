@@ -1,8 +1,6 @@
+import { Box, Paper, styled } from "@material-ui/core";
 import React from "react";
-
-import { Paper, styled, Box } from "@material-ui/core";
 import { getTheme } from "../theme";
-import { isArray } from "util";
 
 export const StyledPaper = styled(({ ...other }) => <Paper {...other} />)({
   margin: props => getSpacing(props.margin, [3, 0]),

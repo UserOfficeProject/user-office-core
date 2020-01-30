@@ -9,6 +9,7 @@ import { useSnackbar } from "notistack";
 import React from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../../utils/userFieldValidationSchema";
+import { StyledPaper } from "../../styles/StyledComponents";
 
 const useStyles = makeStyles({
   buttons: {

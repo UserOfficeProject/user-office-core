@@ -14,9 +14,8 @@ import * as Yup from "yup";
 import { UserContext } from "../context/UserContextProvider";
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import orcid from "../images/orcid.png";
-import PhotoInSide from "./PhotoInSide";
 import { FormWrapper } from "../styles/StyledComponents";
-import { getTheme } from "../theme";
+import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
   avatar: {

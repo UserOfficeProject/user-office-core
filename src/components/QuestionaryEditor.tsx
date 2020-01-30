@@ -1,26 +1,25 @@
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  LinearProgress,
+  makeStyles,
+  useTheme
+} from "@material-ui/core";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
-import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
-import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import { ProposalTemplateField } from "../generated/sdk";
+import { usePersistModel } from "../hooks/usePersistModel";
 import QuestionaryEditorModel, {
   EventType,
   IEvent
 } from "../models/QuestionaryEditorModel";
-import {
-  Paper,
-  makeStyles,
-  useTheme,
-  Button,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  LinearProgress
-} from "@material-ui/core";
-import { usePersistModel } from "../hooks/usePersistModel";
-import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
-import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { useSnackbar } from "notistack";
-import { ProposalTemplateField } from "../generated/sdk";
 import { StyledPaper } from "../styles/StyledComponents";
+import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
+import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
