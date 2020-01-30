@@ -1,23 +1,10 @@
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
 import React, { useContext } from "react";
 import { Redirect } from "react-router-dom";
 import { UserContext } from "../context/UserContextProvider";
-import { StyledPaper } from "../styles/StyledComponents";
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
 
 export default function RoleSelectionPage() {
-  const classes = useStyles();
   const { roles, currentRole, handleRole } = useContext(UserContext);
   if (!roles) {
     return <Redirect to="/SignIn" />;
@@ -28,18 +15,18 @@ export default function RoleSelectionPage() {
 
   return (
     <React.Fragment>
-      <Container maxWidth="lg" className={classes.container}>
+      <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <StyledPaper className={classes.paper}>Select role: </StyledPaper>
+            <StyledPaper>Select role: </StyledPaper>
           </Grid>
           {roles.map(role => (
             <Grid item xs={6} onClick={() => handleRole(role.shortCode)}>
-              <StyledPaper className={classes.paper}>{role.title}</StyledPaper>
+              <StyledPaper>{role.title}</StyledPaper>
             </Grid>
           ))}
         </Grid>
-      </Container>
+      </ContentContainer>
     </React.Fragment>
   );
 }

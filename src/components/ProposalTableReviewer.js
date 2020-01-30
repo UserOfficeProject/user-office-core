@@ -1,6 +1,4 @@
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
 import { Edit, Visibility } from "@material-ui/icons";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import MaterialTable from "material-table";
@@ -9,24 +7,13 @@ import { Redirect } from "react-router";
 import { UserContext } from "../context/UserContextProvider";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 import { useUserWithReviewsData } from "../hooks/useUserData";
-import { StyledPaper } from "../styles/StyledComponents";
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
 import { tableIcons } from "../utils/tableIcons";
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
 
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
   const { loading, userData } = useUserWithReviewsData(user.id);
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = useStyles();
 
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
@@ -56,7 +43,7 @@ export default function ProposalTableReviewer() {
     };
   });
   return (
-    <Container maxWidth="lg" className={classes.container}>
+    <ContentContainer>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <StyledPaper>
@@ -115,6 +102,6 @@ export default function ProposalTableReviewer() {
           </StyledPaper>
         </Grid>
       </Grid>
-    </Container>
+    </ContentContainer>
   );
 }

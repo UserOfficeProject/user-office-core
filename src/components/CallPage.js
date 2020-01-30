@@ -1,28 +1,15 @@
-import Container from "@material-ui/core/Container";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
 import { Add } from "@material-ui/icons";
 import MaterialTable from "material-table";
 import React, { useState } from "react";
 import { useCallsData } from "../hooks/useCallsData";
-import { StyledPaper } from "../styles/StyledComponents";
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
 import { tableIcons } from "../utils/tableIcons";
 import AddCall from "./AddCall";
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
-
 export default function CallPage() {
-  const classes = useStyles();
   const [show, setShow] = useState(false);
   const { loading, callsData } = useCallsData(show);
 
@@ -48,7 +35,7 @@ export default function CallPage() {
           <AddCall close={() => setShow(false)} />
         </DialogContent>
       </Dialog>
-      <Container maxWidth="lg" className={classes.container}>
+      <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
@@ -72,7 +59,7 @@ export default function CallPage() {
             </StyledPaper>
           </Grid>
         </Grid>
-      </Container>
+      </ContentContainer>
     </React.Fragment>
   );
 }

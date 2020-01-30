@@ -1,24 +1,11 @@
-import React, { useState } from "react";
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import PeopleTable from "./PeopleTable";
 import { Edit } from "@material-ui/icons";
+import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
-import { StyledPaper } from "../styles/StyledComponents";
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
+import PeopleTable from "./PeopleTable";
 
 export default function PeoplePage({ match }) {
-  const classes = useStyles();
   const [userData, setUserData] = useState(null);
 
   if (userData) {
@@ -27,7 +14,7 @@ export default function PeoplePage({ match }) {
 
   return (
     <React.Fragment>
-      <Container maxWidth="lg" className={classes.container}>
+      <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
@@ -40,7 +27,7 @@ export default function PeoplePage({ match }) {
             </StyledPaper>
           </Grid>
         </Grid>
-      </Container>
+      </ContentContainer>
     </React.Fragment>
   );
 }

@@ -1,4 +1,4 @@
-import { Box, Paper, styled } from "@material-ui/core";
+import { Box, Paper, styled, Container } from "@material-ui/core";
 import React from "react";
 import { getTheme } from "../theme";
 
@@ -17,6 +17,12 @@ export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
   flexDirection: props => props.flexDirection || "column",
   alignItems: props => props.alignItems || "center",
   overflow: props => props.overflow || "auto"
+});
+
+export const ContentContainer = styled(({ ...other }) => (
+  <Container maxWidth="lg" {...other} />
+))({
+  padding: props => getSpacing(props.padding, [4, 0])
 });
 
 const getSpacing = (userValue: any, defaultValue: any) => {
