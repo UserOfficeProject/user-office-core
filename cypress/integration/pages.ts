@@ -40,7 +40,7 @@ context("Page tests", () => {
 
         cy.reload();
         cy.contains("View Proposals").click();
-        cy.contains("DAQ").click();
+        cy.contains("FAQ").click();
         cy.contains(faqContents);
         cy.contains("Close").click();
         cy.contains("Logout").click();
