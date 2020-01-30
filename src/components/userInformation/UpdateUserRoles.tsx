@@ -1,7 +1,6 @@
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import AddBox from "@material-ui/icons/AddBox";
 import { makeStyles } from "@material-ui/styles";
 import MaterialTable from "material-table";
@@ -9,6 +8,7 @@ import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
 import { GetUserWithRolesQuery, Role } from "../../generated/sdk";
 import { useDataApi } from "../../hooks/useDataApi";
+import { StyledPaper } from "../../styles/StyledComponents";
 import { tableIcons } from "../../utils/materialIcons";
 import RoleModal from "./../RoleModal";
 
@@ -20,13 +20,6 @@ const useStyles = makeStyles({
   button: {
     marginTop: "25px",
     marginLeft: "10px"
-  },
-  paper: {
-    padding: "16px",
-    display: "flex",
-    overflow: "auto",
-    flexDirection: "column",
-    marginBottom: "25px"
   },
   container: {
     paddingTop: "25px",
@@ -94,7 +87,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     <Container maxWidth="lg" className={classes.container}>
       <Grid>
         <Grid item xs={12}>
-          <Paper className={classes.paper}>
+          <StyledPaper>
             <RoleModal
               show={modalOpen}
               close={() => setOpen(false)}
@@ -138,7 +131,7 @@ export default function UpdateUserRoles(props: { id: number }) {
                 Update Roles
               </Button>
             </div>
-          </Paper>
+          </StyledPaper>
         </Grid>
       </Grid>
     </Container>

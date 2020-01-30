@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import PhotoInSide from "./PhotoInSide";
+import { FormWrapper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -30,12 +31,6 @@ const useStyles = makeStyles(theme => ({
   },
   sentMessageError: {
     color: "red"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
   }
 }));
 
@@ -64,7 +59,7 @@ export default function ResetPasswordEmail() {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <div className={classes.paper}>
+          <FormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -103,7 +98,7 @@ export default function ResetPasswordEmail() {
                 <Link to="/SignIn/">Have an account? Sign In</Link>
               </Grid>
             </Grid>
-          </div>
+          </FormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>

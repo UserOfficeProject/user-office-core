@@ -16,6 +16,7 @@ import { getUnauthorizedApi } from "../hooks/useDataApi";
 import orcid from "../images/orcid.png";
 import PhotoInSide from "./PhotoInSide";
 import { FormWrapper } from "../styles/StyledComponents";
+import { getTheme } from "../theme";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -113,7 +114,7 @@ export default function SignInSide() {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <FormWrapper hMargin="4">
+          <FormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>

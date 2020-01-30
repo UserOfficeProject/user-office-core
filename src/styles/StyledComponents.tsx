@@ -2,27 +2,25 @@ import React from "react";
 
 import { Paper, styled, Box } from "@material-ui/core";
 import { getTheme } from "../theme";
+import { isArray } from "util";
 
-export const StyledPaper = styled(Paper)({
-  marginTop: getTheme().spacing(3),
-  marginBottom: getTheme().spacing(3),
-  padding: getTheme().spacing(2),
+export const StyledPaper = styled(({ ...other }) => <Paper {...other} />)({
+  margin: props => getSpacing(props.margin, [3, 0]),
+  padding: props => getSpacing(props.margin, [2]),
   [getTheme().breakpoints.up(600 + getTheme().spacing(3) * 2)]: {
-    marginTop: getTheme().spacing(6),
-    marginBottom: getTheme().spacing(6),
-    padding: getTheme().spacing(3)
+    margin: props => getSpacing(props.margin, [6, 0]),
+    padding: props => getSpacing(props.padding, [3])
   }
 });
 
-export const FormWrapper = styled(({ hMargin, vMargin, ...other }) => (
-  <Box {...other} />
-))({
-  marginTop: props => getTheme().spacing(props.vMargin || 8),
-  marginRight: props => getTheme().spacing(props.hMargin || 8),
-  marginBottom: props => getTheme().spacing(props.vMargin || 8),
-  marginLeft: props => getTheme().spacing(props.hMargin || 8),
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  overflow: "auto"
+export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
+  margin: props => getSpacing(props.margin, [8]),
+  display: props => props.display || "flex",
+  flexDirection: props => props.flexDirection || "column",
+  alignItems: props => props.alignItems || "center",
+  overflow: props => props.overflow || "auto"
 });
+
+const getSpacing = (userValue: any, defaultValue: any) => {
+  return getTheme().spacing.apply(getTheme(), userValue || defaultValue);
+};

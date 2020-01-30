@@ -35,11 +35,8 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.common.white
     }
   },
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+  container: {
+    marginBottom: theme.spacing(8)
   },
   avatar: {
     margin: theme.spacing(1),
@@ -192,7 +189,7 @@ export default function SignUp(props) {
     return <p>loading</p>;
   }
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" className={classes.container}>
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
