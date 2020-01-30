@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 var faker = require("faker");
-context("Proposaltests", () => {
+context("Proposal tests", () => {
   before(() => {
     //@ts-ignore
     cy.resetDB();
@@ -10,13 +10,14 @@ context("Proposaltests", () => {
     cy.visit("/");
   });
 
-  var textId;
   var boolId;
+  var textId;
   var dateId;
-  const textQuestion = faker.random.words(5);
-  const booleanQuestion = faker.random.words(4);
-  const dateQuestion = faker.random.words(1);
+  const booleanQuestion = faker.random.words(2);
+  const textQuestion = faker.random.words(2);
+  const dateQuestion = faker.random.words(2);
 
+  const topic = faker.random.words(1);
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
   const textAnswer = faker.random.words(5);
@@ -33,27 +34,7 @@ context("Proposaltests", () => {
 
     cy.get("[data-cy=topic-title-input]")
       .clear()
-      .type("E2E testing{enter}");
-
-    /* Text input */
-    cy.get("[data-cy=show-more-button]").click();
-
-    cy.contains("Add Text input").click();
-
-    cy.get("[data-cy=question]")
-      .clear()
-      .type(textQuestion);
-
-    cy.contains("Is required").click();
-
-    cy.contains("Save").click();
-
-    cy.contains(textQuestion)
-      .siblings("[data-cy='proposal-question-id']")
-      .invoke("html")
-      .then(fieldId => {
-        textId = fieldId;
-      });
+      .type(`${topic}{enter}`);
 
     /* Select from options */
     cy.get("[data-cy=show-more-button]").click();
@@ -73,6 +54,32 @@ context("Proposaltests", () => {
         boolId = fieldId;
       });
     /* --- */
+
+    /* Text input */
+    cy.get("[data-cy=show-more-button]").click();
+
+    cy.contains("Add Text input").click();
+
+    cy.get("[data-cy=question]")
+      .clear()
+      .type(textQuestion);
+
+    cy.get("#dependency-id").click();
+    cy.get("#menu- > .MuiPaper-root > .MuiList-root").click(); // Get first answer from dropdown
+
+    cy.get("#dependencyValue").click();
+    cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
+
+    cy.contains("Is required").click();
+
+    cy.contains("Save").click();
+
+    cy.contains(textQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke("html")
+      .then(fieldId => {
+        textId = fieldId;
+      });
 
     /* Date */
     cy.get("[data-cy=show-more-button]").click();
@@ -95,8 +102,8 @@ context("Proposaltests", () => {
       });
     /* --- */
 
-    cy.contains(textQuestion);
     cy.contains(booleanQuestion);
+    cy.contains(textQuestion);
     cy.contains(dateQuestion);
   });
 
@@ -118,11 +125,11 @@ context("Proposaltests", () => {
       .click();
 
     cy.contains("Save and continue").click();
-    cy.get(`#${textId}`).type(textAnswer);
     cy.get(`#${boolId}`).click();
+    cy.get(`#${textId}`).type(textAnswer);
     cy.get(`[data-cy='${dateId}_field'] button`).click();
     cy.wait(300);
-    cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometime
+    cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
     cy.contains("15").click();
     cy.contains("OK").click();
 

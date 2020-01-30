@@ -2,7 +2,8 @@ import { useState } from "react";
 import {
   DataType,
   ProposalTemplate,
-  ProposalTemplateField
+  ProposalTemplateField,
+  FieldDependency
 } from "../generated/sdk";
 import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi } from "./useDataApi";
@@ -48,12 +49,28 @@ export function usePersistModel() {
         id: field.proposal_question_id,
         question: field.question,
         config: field.config ? JSON.stringify(field.config) : undefined,
-        isEnabled: true, // <-- todo you can use this value, just add new field to ProposalTemplateField
-        dependencies: field.dependencies ? field.dependencies : []
+        isEnabled: true, // TODO implement UI for this toggle
+        dependencies: field.dependencies
+          ? prepareDependencies(field.dependencies)
+          : []
       })
       .then(data => {
         return data.updateProposalTemplateField;
       });
+  };
+
+  // Have this until GQL accepts Union types
+  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
+  const prepareDependencies = (dependencies: FieldDependency[]) => {
+    return dependencies.map(dependency => {
+      return {
+        ...dependency,
+        condition: {
+          ...dependency.condition,
+          params: JSON.stringify({ value: true })
+        }
+      };
+    });
   };
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {

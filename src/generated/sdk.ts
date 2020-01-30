@@ -121,7 +121,7 @@ export enum EvaluatorOperator {
 export type FieldCondition = {
    __typename?: 'FieldCondition',
   condition: EvaluatorOperator,
-  params: Scalars['String'],
+  params: Scalars['IntStringDateBool'],
 };
 
 export type FieldConditionInput = {
