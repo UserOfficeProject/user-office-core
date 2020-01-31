@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS role_users;
 DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS proposal_question_datatypes;
+DROP TABLE IF EXISTS institutions;
+DROP TABLE IF EXISTS nationalities;
 
 DROP SEQUENCE IF EXISTS proposals_short_code_seq;
 
