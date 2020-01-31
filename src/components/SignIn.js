@@ -14,6 +14,7 @@ import * as Yup from "yup";
 import { UserContext } from "../context/UserContextProvider";
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import orcid from "../images/orcid.png";
+import { FormWrapper } from "../styles/StyledComponents";
 import PhotoInSide from "./PhotoInSide";
 
 const useStyles = makeStyles(theme => ({
@@ -29,13 +30,7 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2)
   },
   errorMessage: {
-    color: "red"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+    color: theme.palette.error.main
   },
   loginAlternative: {
     "border-top": "1px solid #e1e5ed",
@@ -118,7 +113,7 @@ export default function SignInSide() {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <div className={classes.paper}>
+          <FormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -187,7 +182,7 @@ export default function SignInSide() {
                 </div>
               </Grid>
             </Grid>
-          </div>
+          </FormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>

@@ -14,12 +14,6 @@ import {
 } from "@material-ui/pickers";
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
-  },
   cardHeader: {
     fontSize: "18px",
     padding: "22px 0 0 12px"

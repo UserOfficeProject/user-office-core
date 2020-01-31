@@ -1,29 +1,29 @@
-import React, { ChangeEvent, useState, useRef, useEffect } from "react";
-import { FileMetaData } from "../models/FileUpload";
 import {
-  useFileUpload,
-  useGetFileMetadata,
-  UPLOAD_STATE
-} from "../hooks/useFileUpload";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import {
-  IconButton,
+  Avatar,
+  Button,
   CircularProgress,
+  IconButton,
+  List,
   ListItem,
   ListItemAvatar,
-  Avatar,
-  ListItemText,
   ListItemSecondaryAction,
-  Button,
-  makeStyles,
-  List
+  ListItemText,
+  makeStyles
 } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import ErrorIcon from "@material-ui/icons/Error";
+import AttachFileIcon from "@material-ui/icons/AttachFile";
 import CancelIcon from "@material-ui/icons/Cancel";
+import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+import ErrorIcon from "@material-ui/icons/Error";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import {
+  UPLOAD_STATE,
+  useFileUpload,
+  useGetFileMetadata
+} from "../hooks/useFileUpload";
 import { usePrevious } from "../hooks/usePrevious";
+import { FileMetaData } from "../models/FileUpload";
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -207,7 +207,7 @@ export function NewFileEntry(props: {
       backgroundColor: theme.palette.primary.main,
       color: "white"
     }
-  }))(); // DRY
+  }))();
 
   const { uploadFile, progress, state, abort } = useFileUpload();
 

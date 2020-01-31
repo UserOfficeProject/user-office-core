@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../utils/userFieldValidationSchema";
 import PhotoInSide from "./PhotoInSide";
+import { FormWrapper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -26,16 +27,10 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2)
   },
   sentMessage: {
-    color: "green"
+    color: theme.palette.secondary.main
   },
   errorMessage: {
-    color: "red"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+    color: theme.palette.error.main
   }
 }));
 
@@ -70,7 +65,7 @@ export default function ResetPassword({ match }) {
       >
         <Form className={classes.form}>
           <CssBaseline />
-          <div className={classes.paper}>
+          <FormWrapper margin={[8, 4]}>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -118,7 +113,7 @@ export default function ResetPassword({ match }) {
                 <Link to="/SignIn/">Back to Sign In? Sign In</Link>
               </Grid>
             </Grid>
-          </div>
+          </FormWrapper>
         </Form>
       </Formik>
     </PhotoInSide>

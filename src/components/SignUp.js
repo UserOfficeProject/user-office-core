@@ -35,11 +35,8 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.common.white
     }
   },
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+  container: {
+    marginBottom: theme.spacing(8)
   },
   avatar: {
     margin: theme.spacing(1),
@@ -55,16 +52,16 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(3)
   },
   errorBox: {
-    border: "2px solid red"
+    border: `2px solid ${theme.palette.error.main}`
   },
   agreeBox: {
     "font-size": ".8em"
   },
   errorText: {
-    color: "red"
+    color: theme.palette.error.main
   },
   requiredStar: {
-    color: "red",
+    color: theme.palette.error.main,
     content: " *"
   },
   orcidIconSmall: {
@@ -77,7 +74,7 @@ const useStyles = makeStyles(theme => ({
   orcButton: {
     "&:hover": {
       border: "1px solid #338caf",
-      color: "#338caf"
+      color: theme.palette.primary.light
     },
     border: "1px solid #D3D3D3",
     padding: ".3em",
@@ -192,7 +189,7 @@ export default function SignUp(props) {
     return <p>loading</p>;
   }
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" className={classes.container}>
       <Formik
         validateOnChange={false}
         validateOnBlur={false}

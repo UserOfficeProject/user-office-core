@@ -1,6 +1,5 @@
 import { StepButton } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
 import Step from "@material-ui/core/Step";
 import Stepper from "@material-ui/core/Stepper";
 import { makeStyles } from "@material-ui/core/styles";
@@ -13,10 +12,9 @@ import React, {
   useState
 } from "react";
 import { Prompt } from "react-router";
-import { Proposal, Questionary, ProposalStatus } from "../generated/sdk";
+import { Proposal, ProposalStatus, Questionary } from "../generated/sdk";
 import { useLoadProposal } from "../hooks/useLoadProposal";
-
-import "../styles/ProposalComponentStyles.css";
+import { StyledPaper } from "../styles/StyledComponents";
 import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionareStep from "./ProposalQuestionareStep";
@@ -43,16 +41,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const { enqueueSnackbar } = useSnackbar();
   const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
   const classes = makeStyles(theme => ({
-    paper: {
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
-      padding: theme.spacing(2),
-      [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-        marginTop: theme.spacing(6),
-        marginBottom: theme.spacing(6),
-        padding: theme.spacing(3)
-      }
-    },
     stepper: {
       padding: theme.spacing(3, 0, 5)
     },
@@ -217,7 +205,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
     <Container maxWidth="lg">
       <Prompt when={isDirty} message={location => getConfirmNavigMsg()} />
       <FormApi.Provider value={api}>
-        <Paper className={classes.paper}>
+        <StyledPaper>
           <Typography
             component="h1"
             variant="h4"
@@ -258,7 +246,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
           </Stepper>
 
           {getStepContent(stepIndex)}
-        </Paper>
+        </StyledPaper>
       </FormApi.Provider>
     </Container>
   );

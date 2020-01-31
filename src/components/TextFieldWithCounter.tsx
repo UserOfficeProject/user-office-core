@@ -3,7 +3,7 @@ import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 
 const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
-  const classes = makeStyles({
+  const classes = makeStyles(theme => ({
     counter: {
       color: "gray",
       display: "inline-block"
@@ -12,9 +12,9 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
       textAlign: "right"
     },
     error: {
-      color: "red!important"
+      color: `${theme.palette.error.main}!important`
     }
-  })();
+  }))();
   var [textLen, setTextLen] = useState(
     props.value ? String(props.value).length : 0
   );

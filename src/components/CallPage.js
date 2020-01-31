@@ -1,38 +1,15 @@
-import React, { useState } from "react";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import MaterialTable from "material-table";
-import { tableIcons } from "../utils/tableIcons";
-import { useCallsData } from "../hooks/useCallsData";
-import DialogContent from "@material-ui/core/DialogContent";
 import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
+import Grid from "@material-ui/core/Grid";
 import { Add } from "@material-ui/icons";
+import MaterialTable from "material-table";
+import React, { useState } from "react";
+import { useCallsData } from "../hooks/useCallsData";
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
+import { tableIcons } from "../utils/tableIcons";
 import AddCall from "./AddCall";
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
-
 export default function CallPage() {
-  const classes = useStyles();
   const [show, setShow] = useState(false);
   const { loading, callsData } = useCallsData(show);
 
@@ -58,10 +35,10 @@ export default function CallPage() {
           <AddCall close={() => setShow(false)} />
         </DialogContent>
       </Dialog>
-      <Container maxWidth="lg" className={classes.container}>
+      <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>
+            <StyledPaper>
               <MaterialTable
                 icons={tableIcons}
                 title="Calls"
@@ -79,10 +56,10 @@ export default function CallPage() {
                   }
                 ]}
               />
-            </Paper>
+            </StyledPaper>
           </Grid>
         </Grid>
-      </Container>
+      </ContentContainer>
     </React.Fragment>
   );
 }

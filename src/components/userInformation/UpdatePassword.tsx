@@ -1,7 +1,6 @@
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import { Field, Form, Formik } from "formik";
@@ -10,6 +9,7 @@ import { useSnackbar } from "notistack";
 import React from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { userPasswordFieldSchema } from "../../utils/userFieldValidationSchema";
+import { StyledPaper } from "../../styles/StyledComponents";
 
 const useStyles = makeStyles({
   buttons: {
@@ -19,13 +19,6 @@ const useStyles = makeStyles({
   button: {
     marginTop: "25px",
     marginLeft: "10px"
-  },
-  paper: {
-    padding: "16px",
-    display: "flex",
-    overflow: "auto",
-    flexDirection: "column",
-    marginBottom: "25px"
   },
   container: {
     paddingTop: "25px",
@@ -64,7 +57,7 @@ export default function UpdatePassword(props: { id: number }) {
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>
+            <StyledPaper>
               <Formik
                 initialValues={{
                   password: "",
@@ -122,7 +115,7 @@ export default function UpdatePassword(props: { id: number }) {
                   </Form>
                 )}
               </Formik>
-            </Paper>
+            </StyledPaper>
           </Grid>
         </Grid>
       </Container>

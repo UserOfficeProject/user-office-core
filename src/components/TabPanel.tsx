@@ -1,11 +1,11 @@
 import AppBar from "@material-ui/core/AppBar";
 import Box from "@material-ui/core/Box";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@material-ui/core/styles";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import Typography from "@material-ui/core/Typography";
 import React from "react";
+import { StyledPaper } from "../styles/StyledComponents";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -13,19 +13,6 @@ interface TabPanelProps {
   index: any;
   value: any;
 }
-
-const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  }
-}));
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -55,7 +42,6 @@ export default function FullWidthTabs(props: {
   children: React.ReactNode[];
   tabNames: string[];
 }) {
-  const classes = useStyles();
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
 
@@ -64,7 +50,7 @@ export default function FullWidthTabs(props: {
   };
 
   return (
-    <Paper className={classes.paper}>
+    <StyledPaper>
       <AppBar position="static" color="default">
         <Tabs
           value={value}
@@ -85,6 +71,6 @@ export default function FullWidthTabs(props: {
           {tabContent}
         </TabPanel>
       ))}
-    </Paper>
+    </StyledPaper>
   );
 }

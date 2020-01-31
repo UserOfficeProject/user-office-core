@@ -13,7 +13,6 @@ import "tinymce/plugins/code";
 
 import { Editor } from "@tinymce/tinymce-react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -21,18 +20,9 @@ import Divider from "@material-ui/core/Divider";
 import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
 import { useSnackbar } from "notistack";
+import { StyledPaper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  },
   buttons: {
     display: "flex",
     justifyContent: "flex-end"
@@ -75,7 +65,7 @@ export default function PageEditor() {
 
   return (
     <Container maxWidth="lg" className={classes.container}>
-      <Paper className={classes.paper}>
+      <StyledPaper>
         <Typography variant="h6" gutterBottom>
           Set user homepage
         </Typography>
@@ -103,8 +93,8 @@ export default function PageEditor() {
             Update
           </Button>
         </div>
-      </Paper>
-      <Paper className={classes.paper}>
+      </StyledPaper>
+      <StyledPaper>
         <Typography variant="h6" gutterBottom>
           Set help page
         </Typography>
@@ -134,8 +124,8 @@ export default function PageEditor() {
             Update
           </Button>
         </div>
-      </Paper>
-      <Paper className={classes.paper}>
+      </StyledPaper>
+      <StyledPaper>
         <Typography variant="h6" gutterBottom>
           Set privacy agreement
         </Typography>
@@ -163,8 +153,8 @@ export default function PageEditor() {
             Update
           </Button>
         </div>
-      </Paper>
-      <Paper className={classes.paper}>
+      </StyledPaper>
+      <StyledPaper>
         <Typography variant="h6" gutterBottom>
           Set cookie policy
         </Typography>
@@ -192,7 +182,7 @@ export default function PageEditor() {
             Update
           </Button>
         </div>
-      </Paper>
+      </StyledPaper>
     </Container>
   );
 }

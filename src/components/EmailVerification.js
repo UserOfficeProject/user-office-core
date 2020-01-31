@@ -7,23 +7,18 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDataApi } from "../hooks/useDataApi";
 import PhotoInSide from "./PhotoInSide";
+import { FormWrapper } from "../styles/StyledComponents";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: "blue"
+    backgroundColor: theme.palette.primary.dark
   },
   submit: {
     margin: theme.spacing(3, 0, 2)
   },
   signLink: {
     textDecoration: "none"
-  },
-  paper: {
-    margin: theme.spacing(8, 4),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
   }
 }));
 
@@ -45,7 +40,7 @@ export default function EmailVerification({ match }) {
 
   return (
     <PhotoInSide>
-      <div className={classes.paper}>
+      <FormWrapper>
         <Avatar className={classes.avatar}>
           <Email />
         </Avatar>
@@ -72,7 +67,7 @@ export default function EmailVerification({ match }) {
             useroffice@esss.se
           </p>
         )}
-      </div>
+      </FormWrapper>
     </PhotoInSide>
   );
 }

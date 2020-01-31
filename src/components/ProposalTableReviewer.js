@@ -1,42 +1,19 @@
-import React, { useState, useContext } from "react";
-import { useUserWithReviewsData } from "../hooks/useUserData";
-import { Redirect } from "react-router";
-import MaterialTable from "material-table";
-import { tableIcons } from "../utils/tableIcons";
-import { Edit, Visibility } from "@material-ui/icons";
-import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
-import { UserContext } from "../context/UserContextProvider";
+import { Edit, Visibility } from "@material-ui/icons";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import MaterialTable from "material-table";
+import React, { useContext, useState } from "react";
+import { Redirect } from "react-router";
+import { UserContext } from "../context/UserContextProvider";
 import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4)
-  },
-  paper: {
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-      marginTop: theme.spacing(6),
-      marginBottom: theme.spacing(6),
-      padding: theme.spacing(3)
-    }
-  },
-  fixedHeight: {
-    height: 240
-  }
-}));
+import { useUserWithReviewsData } from "../hooks/useUserData";
+import { ContentContainer, StyledPaper } from "../styles/StyledComponents";
+import { tableIcons } from "../utils/tableIcons";
 
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
   const { loading, userData } = useUserWithReviewsData(user.id);
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = useStyles();
 
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
@@ -66,10 +43,10 @@ export default function ProposalTableReviewer() {
     };
   });
   return (
-    <Container maxWidth="lg" className={classes.container}>
+    <ContentContainer>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Paper className={classes.paper}>
+          <StyledPaper>
             <MaterialTable
               icons={tableIcons}
               title={"Proposals to review"}
@@ -122,9 +99,9 @@ export default function ProposalTableReviewer() {
                 }
               ]}
             />
-          </Paper>
+          </StyledPaper>
         </Grid>
       </Grid>
-    </Container>
+    </ContentContainer>
   );
 }

@@ -2,7 +2,6 @@ import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import InputLabel from "@material-ui/core/InputLabel";
-import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/styles";
 import dateformat from "dateformat";
@@ -13,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { useGetFields } from "../../hooks/useGetFields";
 import orcid from "../../images/orcid.png";
+import { StyledPaper } from "../../styles/StyledComponents";
 import { userFieldSchema } from "../../utils/userFieldValidationSchema";
 import FormikDropdown from "../FormikDropdown";
 
@@ -25,13 +25,7 @@ const useStyles = makeStyles({
     marginTop: "25px",
     marginLeft: "10px"
   },
-  paper: {
-    padding: "16px",
-    display: "flex",
-    overflow: "auto",
-    flexDirection: "column",
-    marginBottom: "25px"
-  },
+
   container: {
     paddingTop: "25px",
     paddingBottom: "25px"
@@ -110,7 +104,7 @@ export default function UpdateUserInformation(props: { id: number }) {
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Paper className={classes.paper}>
+            <StyledPaper>
               <Formik
                 validateOnChange={false}
                 validateOnBlur={false}
@@ -331,7 +325,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                   </Form>
                 )}
               </Formik>
-            </Paper>
+            </StyledPaper>
           </Grid>
         </Grid>
       </Container>

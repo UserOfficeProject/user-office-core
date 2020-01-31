@@ -1,25 +1,25 @@
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  LinearProgress,
+  makeStyles,
+  useTheme
+} from "@material-ui/core";
+import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
-import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
-import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import { ProposalTemplateField } from "../generated/sdk";
+import { usePersistModel } from "../hooks/usePersistModel";
 import QuestionaryEditorModel, {
   EventType,
   IEvent
 } from "../models/QuestionaryEditorModel";
-import {
-  Paper,
-  makeStyles,
-  useTheme,
-  Button,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  LinearProgress
-} from "@material-ui/core";
-import { usePersistModel } from "../hooks/usePersistModel";
+import { StyledPaper } from "../styles/StyledComponents";
+import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
 import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
-import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { useSnackbar } from "notistack";
-import { ProposalTemplateField } from "../generated/sdk";
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
@@ -52,15 +52,6 @@ export default function QuestionaryEditor() {
 
   const theme = useTheme();
   const classes = makeStyles(theme => ({
-    paper: {
-      margin: theme.spacing(3),
-      padding: theme.spacing(2),
-      [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-        marginTop: theme.spacing(6),
-        marginBottom: theme.spacing(6),
-        padding: theme.spacing(3)
-      }
-    },
     modalContainer: {
       backgroundColor: "white"
     },
@@ -132,7 +123,7 @@ export default function QuestionaryEditor() {
     ) : null;
   return (
     <>
-      <Paper className={classes.paper} style={getContainerStyle(isLoading)}>
+      <StyledPaper style={getContainerStyle(isLoading)}>
         {progressJsx}
         <FormGroup row style={{ justifyContent: "flex-end" }}>
           <FormControlLabel
@@ -170,7 +161,7 @@ export default function QuestionaryEditor() {
           </Droppable>
         </DragDropContext>
         {addNewTopicFallbackButton}
-      </Paper>
+      </StyledPaper>
 
       <QuestionaryFieldEditor
         field={selectedField}

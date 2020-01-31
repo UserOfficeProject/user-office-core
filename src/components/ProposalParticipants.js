@@ -4,9 +4,9 @@ import { makeStyles } from "@material-ui/styles";
 import PeopleTable from "./PeopleTable";
 import { People } from "@material-ui/icons";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   errorText: {
-    color: "#f44336"
+    color: theme.palette.error.main
   },
   buttons: {
     display: "flex",
@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     marginTop: "25px",
     marginLeft: "10px"
   }
-});
+}));
 
 export default function ProposalParticipants(props) {
   const classes = useStyles();
