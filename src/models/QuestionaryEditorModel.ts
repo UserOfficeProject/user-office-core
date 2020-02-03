@@ -41,7 +41,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []); // TODO Check if memoization is not required any more
+  const memoizedDispatch = useCallback(dispatch, []);
   const api = useDataApi();
 
   useEffect(() => {
