@@ -2463,7 +2463,6 @@ export function getSdk(client: GraphQLClient) {
       return client.request<AddReviewMutation>(print(AddReviewDocument), variables);
     },
     addUserForReview(variables: AddUserForReviewMutationVariables): Promise<AddUserForReviewMutation> {
-     console.log('sdk ');
       return client.request<AddUserForReviewMutation>(print(AddUserForReviewDocument), variables);
     },
     getReview(variables: GetReviewQueryVariables): Promise<GetReviewQuery> {

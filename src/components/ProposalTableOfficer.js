@@ -4,12 +4,11 @@ import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../utils/tableIcons";
 import { Edit } from "@material-ui/icons";
-import { useDeleteProposal } from "../hooks/useDeleteProposal";
+import { useDataApi } from "../hooks/useDataApi";
 
 export default function ProposalTableOfficer() {
   const { loading, proposalsData, setProposalsData } = useProposalsData("");
-  const deleteProposal = useDeleteProposal();
-
+  const api = useDataApi();
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
     { title: "Title", field: "title" },
@@ -48,7 +47,7 @@ export default function ProposalTableOfficer() {
       editable={{
         onRowDelete: oldData =>
           new Promise(async resolve => {
-            await deleteProposal(oldData.id);
+            await api().deleteProposal(oldData.id);
             proposalsData.splice(proposalsData.indexOf(oldData), 1);
             setProposalsData(proposalsData.slice(0));
             resolve();

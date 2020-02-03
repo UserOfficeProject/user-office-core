@@ -1,14 +1,14 @@
-import React from "react";
 import { makeStyles } from "@material-ui/core";
-import { Formik, Form, Field } from "formik";
-import { useCreateUserInvite } from "../hooks/useCreateUserInvite";
-import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
+import React from "react";
+import { useDataApi } from "../hooks/useDataApi";
 import { emailFieldSchema } from "../utils/userFieldValidationSchema";
 
 export function InviteUserForm(props: { action: Function }) {
-  const { createUserInvite } = useCreateUserInvite();
+  const api = useDataApi();
   const classes = makeStyles({
     buttons: {
       display: "flex",
@@ -28,16 +28,16 @@ export function InviteUserForm(props: { action: Function }) {
         email: ""
       }}
       onSubmit={async values => {
-        const createResult = await createUserInvite(
-          values.name,
-          values.lastname,
-          values.email
-        );
+        const createResult = await api().createUserByEmailInvite({
+          firstname: values.name,
+          lastname: values.lastname,
+          email: values.email
+        });
         props.action({
           firstname: values.name,
           lastname: values.lastname,
           organisation: "",
-          id: createResult?.id
+          id: createResult?.createUserByEmailInvite.id
         });
       }}
       validationSchema={emailFieldSchema}

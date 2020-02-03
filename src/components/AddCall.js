@@ -6,12 +6,12 @@ import Container from "@material-ui/core/Container";
 import { Formik, Field, Form } from "formik";
 import { TextField } from "formik-material-ui";
 import * as Yup from "yup";
-import { useAddCall } from "../hooks/useAddCall";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
 } from "@material-ui/pickers";
+import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function AddCall(props) {
   const classes = useStyles();
-  const sendAddCall = useAddCall();
+  const api = useDataApi();
   const currentDay = new Date();
   const DatePickerField = ({ field, form, ...other }) => {
     const currentError = form.errors[field.name];
@@ -82,17 +82,17 @@ export default function AddCall(props) {
             cycleComment,
             surveyComment
           } = values;
-          sendAddCall(
+          await api().createCall({
             shortCode,
-            start,
-            end,
+            startCall: start,
+            endCall: end,
             startReview,
             endReview,
             startNotify,
             endNotify,
             cycleComment,
             surveyComment
-          );
+          });
           actions.setSubmitting(false);
           props.close();
         }}

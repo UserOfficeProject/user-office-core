@@ -3,22 +3,21 @@ import { useDataApi } from "./useDataApi";
 import { Proposal } from "../generated/sdk";
 
 export function useProposalData(id: number | null) {
-  const sendRequest = useDataApi();
   const [proposalData, setProposalData] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const api = useDataApi();
+
   useEffect(() => {
-    const getProposalInformation = (id: number) => {
-      sendRequest()
+    if (id) {
+      api()
         .getProposal({ id })
         .then(data => {
           setProposalData(data.proposal);
           setLoading(false);
         });
-    };
-    if (id) {
-      getProposalInformation(id);
     }
-  }, [id, sendRequest]);
+  }, [id, api]);
 
   return { loading, proposalData };
 }

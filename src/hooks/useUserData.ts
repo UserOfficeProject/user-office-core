@@ -3,14 +3,14 @@ import { UserWithReviewsQuery } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useUserWithReviewsData(id: number) {
-  const sendRequest = useDataApi();
+  const api = useDataApi();
   const [userData, setUserData] = useState<UserWithReviewsQuery["user"] | null>(
     null
   );
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
-    sendRequest()
+    api()
       .userWithReviews({
         id
       })
@@ -18,7 +18,7 @@ export function useUserWithReviewsData(id: number) {
         setUserData(data.user);
         setLoading(false);
       });
-  }, [id, sendRequest]);
+  }, [id, api]);
 
   return { loading, userData };
 }

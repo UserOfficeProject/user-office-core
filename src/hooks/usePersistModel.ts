@@ -9,8 +9,9 @@ import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi } from "./useDataApi";
 
 export function usePersistModel() {
-  const api = useDataApi();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const api = useDataApi();
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
     return api()

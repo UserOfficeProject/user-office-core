@@ -17,10 +17,10 @@ import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
-import { useSetPageContent } from "../hooks/useSetPageContent";
 import { useGetPageContent } from "../hooks/useGetPageContent";
 import { useSnackbar } from "notistack";
 import { StyledPaper } from "../styles/StyledComponents";
+import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
   buttons: {
@@ -48,7 +48,7 @@ export default function PageEditor() {
   const [loadingCookieContent, cookiePageContent] = useGetPageContent(
     "COOKIEPAGE"
   );
-  const sendPageContent = useSetPageContent();
+  const api = useDataApi();
 
   useEffect(() => {
     setHelpContent(helpPageContent);
@@ -58,9 +58,9 @@ export default function PageEditor() {
   }, [helpPageContent, homePageContent, privacyPageContent, cookiePageContent]);
 
   const handleClick = async (pageName, text) => {
-    sendPageContent(pageName, text).then(() =>
-      enqueueSnackbar("Updated Page", { variant: "success" })
-    );
+    api()
+      .setPageContent({ id: pageName, text: text })
+      .then(() => enqueueSnackbar("Updated Page", { variant: "success" }));
   };
 
   return (

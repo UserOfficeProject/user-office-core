@@ -5,8 +5,9 @@ import { ProposalAnswer } from "../models/ProposalModel";
 import { ProposalStatus } from "../generated/sdk";
 
 export function useUpdateProposal() {
-  const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
+
+  const api = useDataApi();
 
   const updateProposal = useCallback(
     async (parameters: {
@@ -23,11 +24,11 @@ export function useUpdateProposal() {
     }) => {
       setLoading(true);
       parameters.answers = prepareAnswers(parameters.answers);
-      const result = await sendRequest().updateProposal(parameters);
+      const result = await api().updateProposal(parameters);
       setLoading(false);
       return result;
     },
-    [sendRequest]
+    [api]
   );
 
   return { loading, updateProposal };
