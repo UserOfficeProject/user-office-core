@@ -47,7 +47,7 @@ export default function ProposalTableOfficer() {
       editable={{
         onRowDelete: oldData =>
           new Promise(async resolve => {
-            await api().deleteProposal(oldData.id);
+            await api().deleteProposal({ id: oldData.id });
             proposalsData.splice(proposalsData.indexOf(oldData), 1);
             setProposalsData(proposalsData.slice(0));
             resolve();
