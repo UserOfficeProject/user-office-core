@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Proposal } from "../generated/sdk";
+import { GetBlankProposalQuery } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useBlankProposal() {
-  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [proposal, setProposal] = useState<
+    GetBlankProposalQuery["blankProposal"]
+  >();
 
   const api = useDataApi();
 
