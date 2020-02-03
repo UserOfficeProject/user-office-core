@@ -21,7 +21,7 @@ build-test:
   tags:
     - docker
   except:
-    - master
+    - develop
 
 docker build:
   image: docker:stable
@@ -34,4 +34,4 @@ docker build:
   tags:
     - docker
   only:
-    - master
+    - develop
