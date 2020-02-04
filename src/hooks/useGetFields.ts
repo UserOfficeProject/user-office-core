@@ -3,17 +3,19 @@ import { GetFieldsQuery } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useGetFields() {
-  const sendRequest = useDataApi();
   const [fieldContent, setFieldContent] = useState<
     GetFieldsQuery["getFields"] | null
   >(null);
+
+  const api = useDataApi();
+
   useEffect(() => {
-    sendRequest()
+    api()
       .getFields()
       .then(data => {
         setFieldContent(data.getFields);
       });
-  }, [sendRequest]);
+  }, [api]);
 
   return fieldContent;
 }

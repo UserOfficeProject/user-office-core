@@ -9,10 +9,9 @@ const endpoint = "/graphql";
 
 export function useDataApi() {
   const { token, handleNewToken, handleLogout } = useContext(UserContext);
-
-  const sendRequest = useCallback(
-    function sendRequest() {
-      return getSdk(
+  return useCallback(
+    () =>
+      getSdk(
         token
           ? new AuthorizedGraphQLClient(
               endpoint,
@@ -24,11 +23,9 @@ export function useDataApi() {
               handleNewToken
             )
           : new GraphQLClient(endpoint)
-      );
-    },
+      ),
     [token, handleNewToken, handleLogout]
   );
-  return sendRequest;
 }
 
 export function getUnauthorizedApi() {

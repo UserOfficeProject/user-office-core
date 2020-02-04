@@ -3,20 +3,21 @@ import { useDataApi } from "./useDataApi";
 import { GetUsersQuery } from "../generated/sdk";
 
 export function useUsersData(filter: string) {
-  const sendRequest = useDataApi();
   const [usersData, setUsersData] = useState<GetUsersQuery["users"] | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+
+  const api = useDataApi();
   useEffect(() => {
     setLoading(true);
-    sendRequest()
+    api()
       .getUsers({ filter })
       .then(data => {
         setUsersData(data.users);
         setLoading(false);
       });
-  }, [filter, sendRequest]);
+  }, [filter, api]);
 
   return { loading, usersData };
 }

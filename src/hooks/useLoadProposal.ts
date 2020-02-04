@@ -2,13 +2,11 @@ import { useCallback } from "react";
 import { useDataApi } from "./useDataApi";
 
 export function useLoadProposal() {
-  const sendRequest = useDataApi();
+  const api = useDataApi();
 
   const loadProposal = useCallback(
-    async (id: number) => {
-      return (await sendRequest().getProposal({ id })).proposal!;
-    },
-    [sendRequest]
+    async (id: number) => (await api().getProposal({ id })).proposal!,
+    [api]
   );
 
   return { loadProposal };

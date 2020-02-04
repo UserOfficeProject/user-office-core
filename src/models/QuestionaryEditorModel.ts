@@ -1,12 +1,12 @@
 import produce from "immer";
 import { Reducer, useCallback, useEffect } from "react";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 import {
   ProposalTemplate,
   ProposalTemplateField,
   TemplateStep
 } from "../generated/sdk";
+import { useDataApi } from "../hooks/useDataApi";
+import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
@@ -42,17 +42,18 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
   const memoizedDispatch = useCallback(dispatch, []);
-
-  const getProposalTemplateRequest = useProposalQuestionTemplate();
+  const api = useDataApi();
 
   useEffect(() => {
-    getProposalTemplateRequest().then(data => {
-      memoizedDispatch({
-        type: EventType.READY,
-        payload: data
+    api()
+      .getProposalTemplate()
+      .then(data => {
+        memoizedDispatch({
+          type: EventType.READY,
+          payload: data.proposalTemplate
+        });
       });
-    });
-  }, [getProposalTemplateRequest, memoizedDispatch]);
+  }, [api, memoizedDispatch]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {

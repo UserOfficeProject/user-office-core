@@ -121,7 +121,7 @@ export enum EvaluatorOperator {
 export type FieldCondition = {
    __typename?: 'FieldCondition',
   condition: EvaluatorOperator,
-  params: Scalars['IntStringDateBool'],
+  params: Scalars['String'],
 };
 
 export type FieldConditionInput = {
@@ -193,7 +193,6 @@ export type Mutation = {
   deleteTopic: ProposalTemplateResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
   login: LoginResponseWrap,
-  prepareDB: SuccessResponseWrap,
   rejectProposal: ProposalResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -678,12 +677,6 @@ export type SelectionFromOptionsConfig = {
   tooltip: Scalars['String'],
   variant: Scalars['String'],
   options: Array<Scalars['String']>,
-};
-
-export type SuccessResponseWrap = {
-   __typename?: 'SuccessResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  isSuccess?: Maybe<Scalars['Boolean']>,
 };
 
 export type TemplateFieldResponseWrap = {

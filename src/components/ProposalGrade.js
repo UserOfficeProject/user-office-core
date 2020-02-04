@@ -7,11 +7,11 @@ import { TextField } from "formik-material-ui";
 import React, { useState } from "react";
 import { Redirect } from "react-router";
 import * as Yup from "yup";
-import { useAddReview } from "../hooks/useAddReview";
 import { useProposalData } from "../hooks/useProposalData";
 import { useReviewData } from "../hooks/useReviewData";
 import { StyledPaper } from "../styles/StyledComponents";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
+import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
   buttons: {
@@ -29,7 +29,7 @@ export default function ProposalGrade({ match }) {
   const { loading, reviewData } = useReviewData(parseInt(match.params.id));
   const [submitted, setSubmitted] = useState(false);
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
-  const sendAddReview = useAddReview();
+  const api = useDataApi();
 
   if (submitted) {
     return <Redirect push to={`/ProposalTableReviewer/`} />;
@@ -55,11 +55,11 @@ export default function ProposalGrade({ match }) {
             comment: reviewData.comment
           }}
           onSubmit={async (values, actions) => {
-            await sendAddReview(
-              parseInt(match.params.id),
-              values.grade,
-              values.comment
-            );
+            await api().addReview({
+              reviewID: parseInt(match.params.id),
+              grade: values.grade,
+              comment: values.comment
+            });
             setSubmitted(true);
             actions.setSubmitting(false);
           }}
