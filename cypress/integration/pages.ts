@@ -11,7 +11,7 @@ context("Page tests", () => {
     cy.wait(2000);
   });
 
-  const faqContents = faker.random.words(50);
+  const faqContents = faker.random.words(20);
   const ADMIN_EMAIL = "Aaron_Harris49@gmail.com";
   const ADMIN_PASS = "Test1234!";
 
@@ -37,7 +37,6 @@ context("Page tests", () => {
       cy.wait(3000).then(() => {
         win.tinyMCE.editors[0].setContent(faqContents); // faq page editor
         cy.get("#help-update-btn").click({ force: true });
-        cy.wait(3000);
         cy.reload();
         cy.contains("View Proposals").click();
         cy.contains("FAQ").click();
