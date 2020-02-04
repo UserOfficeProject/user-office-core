@@ -34,10 +34,10 @@ context("Page tests", () => {
     cy.contains("Set cookie policy");
 
     cy.window().then(win => {
-      cy.wait(1500).then(() => {
+      cy.wait(3000).then(() => {
         win.tinyMCE.editors[0].setContent(faqContents); // faq page editor
         cy.get("#help-update-btn").click({ force: true });
-
+        cy.wait(3000);
         cy.reload();
         cy.contains("View Proposals").click();
         cy.contains("FAQ").click();
