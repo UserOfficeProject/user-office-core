@@ -7,7 +7,7 @@ import {
 } from "../generated/sdk";
 import { DataType } from "../generated/sdk";
 
-export const createFormikCofigObjects = (
+export const createFormikConfigObjects = (
   fields: QuestionaryField[]
 ): { validationSchema: any; initialValues: any } => {
   let validationSchema: any = {};

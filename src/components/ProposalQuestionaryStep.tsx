@@ -11,10 +11,10 @@ import { IBasicComponentProps } from "./IBasicComponentProps";
 import JSDict from "../utils/Dictionary";
 import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
 import { ProposalComponentBoolean } from "./ProposalComponentBoolean";
-import { ProposalCompontentDatePicker } from "./ProposalCompontentDatePicker";
-import { ProposalCompontentFileUpload } from "./ProposalCompontentFileUpload";
+import { ProposalComponentDatePicker } from "./ProposalComponentDatePicker";
+import { ProposalComponentFileUpload } from "./ProposalComponentFileUpload";
 import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
-import { createFormikCofigObjects } from "./ProposalYupUtilities";
+import { createFormikConfigObjects } from "./ProposalYupUtilities";
 import { FormApi } from "./ProposalContainer";
 import { useUpdateProposal } from "../hooks/useUpdateProposal";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
@@ -30,7 +30,7 @@ import {
 } from "../generated/sdk";
 import { ProposalAnswer } from "../models/ProposalModel";
 
-export default function ProposalQuestionareStep(props: {
+export default function ProposalQuestionaryStep(props: {
   data: Proposal;
   topicId: number;
   setIsDirty: (isDirty: boolean) => void;
@@ -78,7 +78,7 @@ export default function ProposalQuestionareStep(props: {
       })
     : [];
 
-  const { initialValues, validationSchema } = createFormikCofigObjects(
+  const { initialValues, validationSchema } = createFormikConfigObjects(
     activeFields
   );
 
@@ -189,8 +189,8 @@ class ComponentFactory {
   constructor() {
     this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
     this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
+    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
     this.componentMap.put(
       DataType.SELECTION_FROM_OPTIONS,
       ProposalComponentMultipleChoice

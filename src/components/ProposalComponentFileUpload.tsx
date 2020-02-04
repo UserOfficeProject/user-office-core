@@ -5,7 +5,7 @@ import { ProposalErrorLabel } from "./ProposalErrorLabel";
 import { FileUploadComponent } from "./FileUploadComponent";
 import { FileUploadConfig } from "../generated/sdk";
 
-export class ProposalCompontentFileUpload extends React.Component<
+export class ProposalComponentFileUpload extends React.Component<
   IBasicComponentProps,
   { files: string[] }
 > {

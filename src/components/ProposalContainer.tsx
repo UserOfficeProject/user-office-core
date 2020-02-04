@@ -17,7 +17,7 @@ import { useLoadProposal } from "../hooks/useLoadProposal";
 import { StyledPaper } from "../styles/StyledComponents";
 import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
-import ProposalQuestionareStep from "./ProposalQuestionareStep";
+import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
 import ProposalReview from "./ProposalReview";
 
 export interface INotification {
@@ -135,7 +135,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
             step.topic.topic_title,
             step.isCompleted,
             (
-              <ProposalQuestionareStep
+              <ProposalQuestionaryStep
                 topicId={step.topic.topic_id}
                 data={proposalInfo}
                 setIsDirty={setIsDirty}

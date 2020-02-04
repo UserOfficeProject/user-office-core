@@ -5,7 +5,7 @@ import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/Proposal
 import { getFieldById } from "../models/ProposalModelFunctions";
 import { QuestionaryField } from "../generated/sdk";
 
-test("Textfield rendered without crashing", () => {
+test("TextField rendered without crashing", () => {
   var template = create1Topic3FieldWithDependenciesQuestionary();
   const renderer = ReactTestRenderer.create(
     <ProposalComponentTextInput

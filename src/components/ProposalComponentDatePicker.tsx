@@ -9,7 +9,7 @@ import { IBasicComponentProps } from "./IBasicComponentProps";
 import { Field } from "formik";
 import { getIn } from "formik";
 
-export function ProposalCompontentDatePicker(props: IBasicComponentProps) {
+export function ProposalComponentDatePicker(props: IBasicComponentProps) {
   let { templateField, onComplete, touched, errors } = props;
   const { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);

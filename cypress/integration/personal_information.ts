@@ -15,7 +15,7 @@ context("Personal information tests", () => {
   const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
-  const newPrefferedName = faker.hacker.noun();
+  const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word();
   const newTelephone = faker.phone.phoneNumber();
 
@@ -39,7 +39,7 @@ context("Personal information tests", () => {
 
     cy.get("[name='preferredname']")
       .clear()
-      .type(newPrefferedName, { force: true });
+      .type(newPreferredName, { force: true });
 
     cy.get("[name='position']")
       .clear()
@@ -71,7 +71,7 @@ context("Personal information tests", () => {
 
     cy.get("[name='preferredname']")
       .invoke("val")
-      .should("eq", newPrefferedName);
+      .should("eq", newPreferredName);
 
     cy.get("[name='position']")
       .invoke("val")
