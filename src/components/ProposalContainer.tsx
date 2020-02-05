@@ -13,7 +13,6 @@ import React, {
 } from "react";
 import { Prompt } from "react-router";
 import { Proposal, ProposalStatus, Questionary } from "../generated/sdk";
-import { useLoadProposal } from "../hooks/useLoadProposal";
 import { StyledPaper } from "../styles/StyledComponents";
 import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
@@ -38,6 +37,8 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+
+  const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
   const classes = makeStyles(theme => ({
@@ -88,8 +89,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
     if (isDirty) {
       const confirmed = window.confirm(getConfirmNavigMsg());
       if (confirmed) {
-        const proposalData = await loadProposal(proposalInfo.id);
-        setProposalInfo(proposalData);
+        const response = await api().getProposal({ id: state.proposal.id });
         setIsDirty(false);
         return true;
       } else {
