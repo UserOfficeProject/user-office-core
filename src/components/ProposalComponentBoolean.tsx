@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useContext } from "react";
 import {
   FormControl,
   FormControlLabel,
@@ -8,12 +8,15 @@ import {
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 import { getIn } from "formik";
+import { ProposalSubmissionContext } from "./ProposalContainer";
+import { EventType } from "../models/ProposalSubmissionModel";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, onComplete, errors, handleChange, touched } = props;
+  let { templateField, errors, handleChange, touched } = props;
   let { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const { dispatch } = useContext(ProposalSubmissionContext);
 
   const classes = makeStyles({
     label: {
@@ -29,9 +32,14 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             id={proposal_question_id}
             name={proposal_question_id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-              templateField.value = evt.target.checked;
+              dispatch({
+                type: EventType.FIELD_CHANGED,
+                payload: {
+                  id: proposal_question_id,
+                  newValue: evt.target.checked
+                }
+              });
               handleChange(evt); // letting Formik know that there was a change
-              onComplete();
             }}
             value={templateField.value}
             checked={templateField.value || false}

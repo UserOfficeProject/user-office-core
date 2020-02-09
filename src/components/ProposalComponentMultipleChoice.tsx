@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import {
   FormControl,
   FormLabel,
@@ -12,6 +12,8 @@ import {
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
 import { SelectionFromOptionsConfig } from "../generated/sdk";
+import { EventType } from "../models/ProposalSubmissionModel";
+import { ProposalSubmissionContext } from "./ProposalContainer";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -31,11 +33,13 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
     }
   })();
 
-  let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id } = templateField;
+  let { templateField, touched, errors, handleChange } = props;
+  let { proposal_question_id, value } = templateField;
+  let [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as SelectionFromOptionsConfig;
+  const { dispatch } = useContext(ProposalSubmissionContext);
 
   switch (config.variant) {
     case "dropdown":
@@ -44,13 +48,19 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
           <TextField
             id={proposal_question_id}
             name={proposal_question_id}
-            value={templateField.value}
+            value={stateValue}
             label={templateField.question}
             select
             onChange={(evt: any) => {
-              templateField.value = (evt.target as HTMLInputElement).value;
+              setStateValue((evt.target as HTMLInputElement).value);
               handleChange(evt); // letting Formik know that there was a change
-              onComplete();
+              dispatch({
+                type: EventType.FIELD_CHANGED,
+                payload: {
+                  id: proposal_question_id,
+                  newValue: (evt.target as HTMLInputElement).value
+                }
+              });
             }}
             SelectProps={{
               MenuProps: {}
@@ -86,11 +96,17 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
             id={templateField.proposal_question_id}
             name={templateField.proposal_question_id}
             onChange={evt => {
-              templateField.value = (evt.target as HTMLInputElement).value;
+              setStateValue((evt.target as HTMLInputElement).value);
               handleChange(evt); // letting Formik know that there was a change
-              onComplete();
+              dispatch({
+                type: EventType.FIELD_CHANGED,
+                payload: {
+                  id: proposal_question_id,
+                  newValue: (evt.target as HTMLInputElement).value
+                }
+              });
             }}
-            value={templateField.value}
+            value={stateValue}
             className={
               config.options!.length < 3
                 ? classes.horizontalLayout

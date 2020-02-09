@@ -1,9 +1,11 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
 import TextFieldWithCounter from "./TextFieldWithCounter";
 import { TextInputConfig } from "../generated/sdk";
+import { ProposalSubmissionContext } from "./ProposalContainer";
+import { EventType } from "../models/ProposalSubmissionModel";
 
 export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -11,11 +13,13 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
       margin: "15px 0 10px 0"
     }
   })();
-  let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id, question } = templateField;
+  let { templateField, touched, errors, handleChange } = props;
+  let { proposal_question_id, question, value } = templateField;
+  let [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as TextInputConfig;
+  const { dispatch } = useContext(ProposalSubmissionContext);
   return (
     <div>
       {config.htmlQuestion && (
@@ -32,12 +36,20 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         fullWidth
         required={config.required ? true : false}
         label={config.htmlQuestion ? "" : question}
-        value={templateField.value}
+        value={stateValue}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-          templateField.value = evt.target.value;
-          handleChange(evt); // letting Formik know that there was a change
+          setStateValue(evt.target.value);
         }}
-        onBlur={() => onComplete()}
+        onBlur={evt => {
+          handleChange(evt); // letting Formik know that there was a change
+          dispatch({
+            type: EventType.FIELD_CHANGED,
+            payload: {
+              id: proposal_question_id,
+              newValue: evt.target.value
+            }
+          });
+        }}
         placeholder={config.placeholder}
         error={isError}
         helperText={isError && errors[proposal_question_id]}
