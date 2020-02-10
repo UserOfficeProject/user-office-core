@@ -1,9 +1,9 @@
 import React from "react";
 import ReactTestRenderer from "react-test-renderer";
-import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
-import { getFieldById } from "../models/ProposalModelFunctions";
 import { QuestionaryField } from "../generated/sdk";
+import { getFieldById } from "../models/ProposalModelFunctions";
+import { create1Topic3FieldWithDependenciesQuestionary } from "../tests/ProposalTestBed";
+import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
 
 test("TextField rendered without crashing", () => {
   var template = create1Topic3FieldWithDependenciesQuestionary();
@@ -13,7 +13,6 @@ test("TextField rendered without crashing", () => {
         getFieldById(template, "links_with_industry")! as QuestionaryField
       }
       onComplete={() => {}}
-      handleChange={() => {}}
       errors={{}}
       touched={{}}
     />

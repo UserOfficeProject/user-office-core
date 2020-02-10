@@ -1,22 +1,19 @@
-import React, { ChangeEvent, useContext } from "react";
 import {
+  Checkbox,
   FormControl,
   FormControlLabel,
-  Checkbox,
   makeStyles
 } from "@material-ui/core";
+import { getIn } from "formik";
+import React, { ChangeEvent } from "react";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
-import { getIn } from "formik";
-import { ProposalSubmissionContext } from "./ProposalContainer";
-import { EventType } from "../models/ProposalSubmissionModel";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, errors, handleChange, touched } = props;
+  let { templateField, errors, onComplete, touched } = props;
   let { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const { dispatch } = useContext(ProposalSubmissionContext);
 
   const classes = makeStyles({
     label: {
@@ -32,14 +29,7 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             id={proposal_question_id}
             name={proposal_question_id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-              dispatch({
-                type: EventType.FIELD_CHANGED,
-                payload: {
-                  id: proposal_question_id,
-                  newValue: evt.target.checked
-                }
-              });
-              handleChange(evt); // letting Formik know that there was a change
+              onComplete(evt, evt.target.checked);
             }}
             value={templateField.value}
             checked={templateField.value || false}

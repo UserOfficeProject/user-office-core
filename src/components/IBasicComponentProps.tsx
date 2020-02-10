@@ -4,5 +4,5 @@ export interface IBasicComponentProps {
   templateField: QuestionaryField;
   touched: any;
   errors: any;
-  handleChange: any;
+  onComplete: (evt: React.SyntheticEvent, newValue: any) => void;
 }

@@ -1,22 +1,18 @@
-import React, { useContext, useState } from "react";
-import { FormControl, Tooltip } from "@material-ui/core";
 import DateFnsUtils from "@date-io/date-fns";
+import { FormControl, Tooltip } from "@material-ui/core";
 import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider
 } from "@material-ui/pickers";
+import { Field, getIn } from "formik";
+import React, { useState } from "react";
 import { IBasicComponentProps } from "./IBasicComponentProps";
-import { Field } from "formik";
-import { getIn } from "formik";
-import { EventType } from "../models/ProposalSubmissionModel";
-import { ProposalSubmissionContext } from "./ProposalContainer";
 
 export function ProposalComponentDatePicker(props: IBasicComponentProps) {
-  let { templateField, touched, errors } = props;
+  let { templateField, touched, errors, onComplete } = props;
   const { proposal_question_id, config, question, value } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const { dispatch } = useContext(ProposalSubmissionContext);
   const [stateValue, setStateValue] = useState(value || "");
 
   return (
@@ -40,13 +36,7 @@ export function ProposalComponentDatePicker(props: IBasicComponentProps) {
                   format="yyyy-MM-dd"
                   onChange={date => {
                     setStateValue(date);
-                    dispatch({
-                      type: EventType.FIELD_CHANGED,
-                      payload: {
-                        id: proposal_question_id,
-                        newValue: date
-                      }
-                    });
+                    onComplete(null as any, date); // There is no event in the callback for DatePicker :( We, therefore, send null as event and inform Formik through setFieldValue
                     form.setFieldValue(field.name, date, false);
                   }}
                   {...other}
