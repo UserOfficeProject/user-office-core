@@ -1,4 +1,4 @@
-import { StepButton } from "@material-ui/core";
+import { StepButton, LinearProgress } from "@material-ui/core";
 import Container from "@material-ui/core/Container";
 import Step from "@material-ui/core/Step";
 import Stepper from "@material-ui/core/Stepper";
@@ -18,6 +18,16 @@ import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
 import ProposalReview from "./ProposalReview";
+import { useDataApi } from "../hooks/useDataApi";
+import {
+  ProposalSubmissionModel,
+  IEvent,
+  EventType,
+  IProposalSubmissionModelState
+} from "../models/ProposalSubmissionModel";
+import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
+import { ProposalAnswer } from "../models/ProposalModel";
+import { getDataTypeSpec } from "../models/ProposalModelFunctions";
 
 export interface INotification {
   variant: "error" | "success";
@@ -30,17 +40,18 @@ enum StepType {
   REVIEW
 }
 
-export default function ProposalContainer(props: { data: Proposal }) {
-  const { loadProposal } = useLoadProposal();
-  const [proposalInfo, setProposalInfo] = useState(props.data);
+export const ProposalSubmissionContext = createContext<{
+  dispatch: React.Dispatch<IEvent>;
+} | null>(null);
 
+export default function ProposalContainer(props: { data: Proposal }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
-  const [isDirty, setIsDirty] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const isSubmitted = proposalInfo.status === ProposalStatus.SUBMITTED;
+
   const classes = makeStyles(theme => ({
     stepper: {
       padding: theme.spacing(3, 0, 5)
@@ -60,24 +71,137 @@ export default function ProposalContainer(props: { data: Proposal }) {
     }
   }))();
 
-  const handleNext = (data: Partial<Proposal>) => {
-    setProposalInfo({
-      ...proposalInfo,
-      ...data
-    });
-    setStepIndex(clampStep(stepIndex + 1));
-    setIsDirty(false);
+  const reduceMiddleware = ({
+    getState,
+    dispatch
+  }: {
+    getState: () => IProposalSubmissionModelState;
+    dispatch: React.Dispatch<IEvent>;
+  }) => {
+    return (next: Function) => async (action: IEvent) => {
+      next(action); // first update state/model
+      const state = getState();
+      switch (action.type) {
+        case EventType.BACK_CLICKED:
+          if (state.isDirty) {
+            if (await handleReset()) {
+              setStepIndex(clampStep(stepIndex - 1));
+            }
+          } else {
+            setStepIndex(clampStep(stepIndex - 1));
+          }
+          break;
+
+        case EventType.SAVE_STEP_CLICKED:
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: state.proposal.id,
+                  answers: prepareAnswers(action.payload.answers),
+                  topicsCompleted: [],
+                  partialSave: true
+                })
+                .then(data => data.updateProposal),
+            "Saved"
+          );
+          break;
+
+        case EventType.FINISH_STEP_CLICKED:
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: state.proposal.id,
+                  answers: prepareAnswers(action.payload.answers),
+                  topicsCompleted: [action.payload.topicId],
+                  partialSave: false
+                })
+                .then(data => data.updateProposal),
+            "Saved"
+          ).then(() => setStepIndex(clampStep(stepIndex + 1)));
+          break;
+
+        case EventType.SAVE_GENERAL_INFO_CLICKED:
+          var { id, status, shortCode } = state.proposal;
+          if (state.proposal.status === ProposalStatus.BLANK) {
+            const result = await executeAndMonitorCall(
+              () =>
+                api()
+                  .createProposal()
+                  .then(data => data.createProposal!.proposal!),
+              "Saved"
+            );
+            ({ id, status, shortCode } = result);
+            dispatch({
+              type: EventType.PROPOSAL_INFORMATION_CHANGED,
+              payload: { id, status, shortCode }
+            });
+          }
+
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: id,
+                  title: state.proposal.title,
+                  abstract: state.proposal.abstract,
+                  users: state.proposal.users.map(user => user.id)
+                })
+                .then(data => data.updateProposal),
+            "Saved"
+          );
+          setStepIndex(clampStep(stepIndex + 1));
+          break;
+        case EventType.RESET_CLICKED:
+          const stepBeforeReset = stepIndex;
+          if (await handleReset()) {
+            setStepIndex(stepBeforeReset);
+          }
+          break;
+        case EventType.API_ERROR_OCCURRED:
+          enqueueSnackbar(action.payload.message, { variant: "error" });
+          break;
+        case EventType.API_SUCCESS_OCCURRED:
+          enqueueSnackbar(action.payload.message, { variant: "success" });
+          break;
+      }
+    };
   };
 
-  const handleBack = async () => {
-    if (isDirty) {
-      if (await handleReset()) {
-        setStepIndex(clampStep(stepIndex - 1));
+  const executeAndMonitorCall = <T extends unknown>( // unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
+    call: TServiceCall<T>,
+    successToastMessage?: string
+  ) => {
+    setIsLoading(true);
+    return call().then(result => {
+      if (result.error) {
+        dispatch({
+          type: EventType.API_ERROR_OCCURRED,
+          payload: {
+            message: getTranslation(result.error as ResourceId)
+          }
+        });
+      } else {
+        if (successToastMessage) {
+          dispatch({
+            type: EventType.API_SUCCESS_OCCURRED,
+            payload: {
+              message: successToastMessage
+            }
+          });
+        }
       }
-    } else {
-      setStepIndex(clampStep(stepIndex - 1));
-    }
+      setIsLoading(false);
+      return result!;
+    });
   };
+
+  var { state, dispatch } = ProposalSubmissionModel(props.data, [
+    reduceMiddleware
+  ]);
+
+  const isSubmitted = state.proposal.status === ProposalStatus.SUBMITTED;
 
   const clampStep = (step: number) => {
     return clamp(step, 0, proposalSteps.length - 1);
@@ -86,11 +210,15 @@ export default function ProposalContainer(props: { data: Proposal }) {
    * Returns true if reset was performed, false otherwise
    */
   const handleReset = async (): Promise<boolean> => {
-    if (isDirty) {
+    if (state.isDirty) {
       const confirmed = window.confirm(getConfirmNavigMsg());
       if (confirmed) {
-        const response = await api().getProposal({ id: state.proposal.id });
-        setIsDirty(false);
+        const proposal = await executeAndMonitorCall(() =>
+          api()
+            .getProposal({ id: state.proposal.id })
+            .then(data => data.proposal!)
+        );
+        dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
         return true;
       } else {
         return false;
@@ -113,11 +241,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
         new QuestionaryUIStep(
           StepType.GENERAL,
           "New Proposal",
-          proposalInfo.status !== ProposalStatus.BLANK,
+          state.proposal.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
-              data={proposalInfo}
-              setIsDirty={setIsDirty}
+              data={state.proposal}
               readonly={isSubmitted}
             />
           )
@@ -126,9 +253,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
           let editable =
-            (index === 0 && proposalInfo.status !== ProposalStatus.BLANK) ||
+            (index === 0 && state.proposal.status !== ProposalStatus.BLANK) ||
             step.isCompleted ||
-            (steps[index - 1] && steps[index - 1].isCompleted === true);
+            (steps[index - 1] !== undefined &&
+              steps[index - 1].isCompleted === true);
 
           return new QuestionaryUIStep(
             StepType.QUESTIONARY,
@@ -137,8 +265,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
             (
               <ProposalQuestionaryStep
                 topicId={step.topic.topic_id}
-                data={proposalInfo}
-                setIsDirty={setIsDirty}
+                data={state}
                 readonly={!editable || isSubmitted}
                 key={step.topic.topic_id}
               />
@@ -150,29 +277,44 @@ export default function ProposalContainer(props: { data: Proposal }) {
         new QuestionaryUIStep(
           StepType.REVIEW,
           "Review",
-          proposalInfo.status === ProposalStatus.SUBMITTED,
-          (<ProposalReview data={proposalInfo} readonly={isSubmitted} />)
+          state.proposal.status === ProposalStatus.SUBMITTED,
+          (<ProposalReview data={state} readonly={isSubmitted} />)
         )
       );
       return allProposalSteps;
     };
 
-    const proposalSteps = createProposalSteps(proposalInfo.questionary!);
+    const proposalSteps = createProposalSteps(state.proposal.questionary!);
     setProposalSteps(proposalSteps);
+  }, [state, isSubmitted]);
 
-    var lastFinishedStep = proposalSteps
-      .slice()
-      .reverse()
-      .find(step => step.completed === true);
-
-    setStepIndex(
-      clamp(
-        lastFinishedStep ? proposalSteps.indexOf(lastFinishedStep) + 1 : 0,
-        0,
-        proposalSteps.length - 1
-      )
-    );
-  }, [proposalInfo, isSubmitted]);
+  // TODO
+  // this effect should be cleaned up as it is hard to read
+  // The purpose of this effect is to navigate user to the
+  // right step once proposal loads
+  useEffect(() => {
+    const proposal = props.data;
+    if (proposal.status === ProposalStatus.DRAFT) {
+      const questionarySteps = proposal.questionary.steps;
+      var lastFinishedStep = questionarySteps
+        .slice()
+        .reverse()
+        .find(step => step.isCompleted === true);
+      setStepIndex(
+        clamp(
+          lastFinishedStep ? questionarySteps.indexOf(lastFinishedStep) + 2 : 1,
+          1,
+          questionarySteps.length + 1
+        )
+      );
+    } else {
+      if (proposal.status === ProposalStatus.BLANK) {
+        setStepIndex(0);
+      } else {
+        setStepIndex(proposal.questionary.steps.length + 1);
+      }
+    }
+  }, [props.data]);
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
@@ -187,24 +329,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
     return proposalSteps[step].element;
   };
 
-  const api = {
-    next: handleNext,
-    back: handleBack,
-    reset: async () => {
-      const stepBeforeReset = stepIndex;
-      if (await handleReset()) {
-        setStepIndex(stepBeforeReset);
-      }
-    },
-    reportStatus: (notification: INotification) => {
-      enqueueSnackbar(notification.message, { variant: notification.variant });
-    }
-  };
-
+  const progressBar = isLoading ? <LinearProgress /> : null;
   return (
+    //@ts-ignore
     <Container maxWidth="lg">
-      <Prompt when={isDirty} message={location => getConfirmNavigMsg()} />
-      <FormApi.Provider value={api}>
+      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
+      <ProposalSubmissionContext.Provider value={{ dispatch }}>
         <StyledPaper>
           <Typography
             component="h1"
@@ -212,22 +342,22 @@ export default function ProposalContainer(props: { data: Proposal }) {
             align="center"
             className={classes.heading}
           >
-            {proposalInfo.title || "New Proposal"}
+            {state.proposal.title || "New Proposal"}
           </Typography>
           <div className={classes.infoline}>
-            {proposalInfo.shortCode
-              ? `Proposal ID: ${proposalInfo.shortCode}`
+            {state.proposal.shortCode
+              ? `Proposal ID: ${state.proposal.shortCode}`
               : null}
           </div>
           <div className={classes.infoline}>
-            {ProposalStatus[proposalInfo.status]}
+            {ProposalStatus[state.proposal.status]}
           </div>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
             {proposalSteps.map((step, index, steps) => (
               <Step key={step.title}>
                 <QuestionaryStepButton
                   onClick={async () => {
-                    if (!isDirty || (await handleReset())) {
+                    if (!state.isDirty || (await handleReset())) {
                       setStepIndex(index);
                     }
                   }}
@@ -244,10 +374,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
               </Step>
             ))}
           </Stepper>
-
+          {progressBar}
           {getStepContent(stepIndex)}
         </StyledPaper>
-      </FormApi.Provider>
+      </ProposalSubmissionContext.Provider>
     </Container>
   );
 }
@@ -260,29 +390,6 @@ class QuestionaryUIStep {
     public element: JSX.Element
   ) {}
 }
-
-type CallbackSignature = (data: Partial<Proposal>) => void;
-type VoidCallbackSignature = () => void;
-
-export const FormApi = createContext<{
-  next: CallbackSignature;
-  back: VoidCallbackSignature;
-  reset: VoidCallbackSignature;
-  reportStatus: (notification: INotification) => void;
-}>({
-  next: () => {
-    console.warn("Using default implementation for next");
-  },
-  back: () => {
-    console.warn("Using default implementation for back");
-  },
-  reset: () => {
-    console.warn("Using default implementation for reset");
-  },
-  reportStatus: () => {
-    console.warn("Using default implementation for reportStatus");
-  }
-});
 
 function QuestionaryStepButton(
   props: PropsWithChildren<any> & {
@@ -324,3 +431,19 @@ function QuestionaryStepButton(
     </StepButton>
   );
 }
+
+type TServiceCall<T> = () => Promise<T & { error?: string | null }>;
+
+const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+  if (answers) {
+    answers = answers.filter(
+      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
+    );
+    answers = answers.map(answer => {
+      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    });
+    return answers;
+  } else {
+    return [];
+  }
+};

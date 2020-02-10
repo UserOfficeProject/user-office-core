@@ -1,29 +1,34 @@
+import { Button, makeStyles } from "@material-ui/core";
 import React, { useContext } from "react";
-import { makeStyles } from "@material-ui/core";
-import { FormApi } from "./ProposalContainer";
+import { ProposalStatus } from "../generated/sdk";
+import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
 import { useSubmitProposal } from "../hooks/useSubmitProposal";
+import {
+  EventType,
+  IProposalSubmissionModelState
+} from "../models/ProposalSubmissionModel";
+import withConfirm from "../utils/withConfirm";
+import { ProposalSubmissionContext } from "./ProposalContainer";
 import ProposalNavigationFragment from "./ProposalNavigationFragment";
 import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
-import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
-import { Button } from "@material-ui/core";
-import withConfirm from "../utils/withConfirm";
-import { Proposal, ProposalStatus } from "../generated/sdk";
 
 function ProposalReview({
   data,
   readonly,
   confirm
 }: {
-  data: Proposal;
+  data: IProposalSubmissionModelState;
   readonly: boolean;
   confirm: Function;
 }) {
-  const api = useContext(FormApi);
+  const { dispatch } = useContext(ProposalSubmissionContext)!;
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
+  const proposal = data.proposal;
 
   const allStepsComplete =
-    data.questionary && data.questionary.steps.every(step => step.isCompleted);
+    proposal.questionary &&
+    proposal.questionary.steps.every(step => step.isCompleted);
 
   const classes = makeStyles(theme => ({
     buttons: {
@@ -48,7 +53,7 @@ function ProposalReview({
   return (
     <>
       <ProposalQuestionaryReview
-        data={data}
+        data={proposal}
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
@@ -58,9 +63,11 @@ function ProposalReview({
             callback: () => {
               confirm(
                 () => {
-                  submitProposal(data.id).then(isSubmitted => {
-                    data.status = ProposalStatus.SUBMITTED;
-                    api.next(data);
+                  submitProposal(proposal.id).then(isSubmitted => {
+                    dispatch({
+                      type: EventType.SUBMIT_PROPOSAL_CLICKED,
+                      payload: proposal
+                    });
                   });
                 },
                 {
@@ -71,11 +78,11 @@ function ProposalReview({
               )();
             },
             label:
-              data.status === ProposalStatus.SUBMITTED
+              proposal.status === ProposalStatus.SUBMITTED
                 ? "✔ Submitted"
                 : "Submit",
             disabled:
-              !allStepsComplete || data.status === ProposalStatus.SUBMITTED,
+              !allStepsComplete || proposal.status === ProposalStatus.SUBMITTED,
             isBusy: isLoading
           }}
           reset={undefined}
@@ -84,7 +91,7 @@ function ProposalReview({
         />
         <Button
           className={classes.button}
-          onClick={() => downloadPDFProposal(data.id)}
+          onClick={() => downloadPDFProposal(proposal.id)}
           variant="contained"
           disabled={!allStepsComplete}
         >
