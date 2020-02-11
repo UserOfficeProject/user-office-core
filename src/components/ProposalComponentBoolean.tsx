@@ -5,15 +5,22 @@ import {
   makeStyles
 } from "@material-ui/core";
 import { getIn } from "formik";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, errors, onComplete, touched } = props;
-  let { proposal_question_id, config, question } = templateField;
+  const { templateField, errors, onComplete, touched } = props;
+  const { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const [stateValue, setStateValue] = useState<boolean>(
+    templateField.value || false
+  );
+
+  useEffect(() => {
+    setStateValue(templateField.value || false);
+  }, [templateField]);
 
   const classes = makeStyles({
     label: {
@@ -31,8 +38,8 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
               onComplete(evt, evt.target.checked);
             }}
-            value={templateField.value}
-            checked={templateField.value || false}
+            value={stateValue}
+            checked={stateValue}
             inputProps={{
               "aria-label": "primary checkbox"
             }}

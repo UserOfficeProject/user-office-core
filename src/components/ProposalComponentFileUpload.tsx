@@ -1,5 +1,5 @@
 import { FormControl, FormLabel } from "@material-ui/core";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import { FileUploadConfig } from "../generated/sdk";
 import { FileUploadComponent } from "./FileUploadComponent";
 import { IBasicComponentProps } from "./IBasicComponentProps";
@@ -12,9 +12,14 @@ export class ProposalComponentFileUpload extends React.Component<
   render() {
     const { templateField, errors, onComplete } = this.props;
     const { proposal_question_id, value } = templateField;
-    let [stateValue, setStateValue] = useState(value);
     const isError = errors[proposal_question_id] ? true : false;
     const config = templateField.config as FileUploadConfig;
+    let [stateValue, setStateValue] = useState(value);
+
+    useEffect(() => {
+      setStateValue(templateField.value);
+    }, [templateField]);
+
     return (
       <FormControl error={isError} required={config.required ? true : false}>
         <FormLabel error={isError}>{templateField.question}</FormLabel>

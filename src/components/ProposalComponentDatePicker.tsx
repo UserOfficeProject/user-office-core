@@ -5,15 +5,19 @@ import {
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
 import { Field, getIn } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 
 export function ProposalComponentDatePicker(props: IBasicComponentProps) {
-  let { templateField, touched, errors, onComplete } = props;
+  const { templateField, touched, errors, onComplete } = props;
   const { proposal_question_id, config, question, value } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const [stateValue, setStateValue] = useState(value || "");
+
+  useEffect(() => {
+    setStateValue(templateField.value);
+  }, [templateField]);
 
   return (
     <FormControl error={isError}>

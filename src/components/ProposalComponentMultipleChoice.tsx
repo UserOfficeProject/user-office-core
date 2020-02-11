@@ -9,7 +9,7 @@ import {
   TextField
 } from "@material-ui/core";
 import { getIn } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SelectionFromOptionsConfig } from "../generated/sdk";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 
@@ -37,6 +37,10 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as SelectionFromOptionsConfig;
+
+  useEffect(() => {
+    setStateValue(templateField.value);
+  }, [templateField]);
 
   const handleOnChange = (evt: any, newValue: any) => {
     setStateValue(newValue);

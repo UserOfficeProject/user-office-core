@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
 import { getIn } from "formik";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import { TextInputConfig } from "../generated/sdk";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import TextFieldWithCounter from "./TextFieldWithCounter";
@@ -17,6 +17,10 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as TextInputConfig;
+
+  useEffect(() => {
+    setStateValue(templateField.value);
+  }, [templateField]);
 
   return (
     <div>
