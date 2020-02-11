@@ -18,7 +18,7 @@ import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
 import ProposalReview from "./ProposalReview";
-import { useDataApi } from "../hooks/useDataAPI";
+import { useDataApi } from "../hooks/useDataApi";
 import {
   ProposalSubmissionModel,
   IEvent,
