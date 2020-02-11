@@ -18,7 +18,7 @@ import { clamp } from "../utils/Math";
 import ProposalInformationView from "./ProposalInformationView";
 import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
 import ProposalReview from "./ProposalReview";
-import { useDataApi } from "../hooks/useDataApi";
+import { useDataApi } from "../hooks/useDataAPI";
 import {
   ProposalSubmissionModel,
   IEvent,
@@ -92,6 +92,38 @@ export default function ProposalContainer(props: { data: Proposal }) {
           }
           break;
 
+        case EventType.SAVE_GENERAL_INFO_CLICKED:
+          var { id, status, shortCode } = state.proposal;
+          if (state.proposal.status === ProposalStatus.BLANK) {
+            const result = await executeAndMonitorCall(
+              () =>
+                api()
+                  .createProposal()
+                  .then(data => data.createProposal!.proposal!),
+              "Saved"
+            );
+            ({ id, status, shortCode } = result);
+            dispatch({
+              type: EventType.PROPOSAL_METADATA_CHANGED,
+              payload: { id, status, shortCode }
+            });
+          }
+
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: id,
+                  title: state.proposal.title,
+                  abstract: state.proposal.abstract,
+                  users: state.proposal.users.map(user => user.id)
+                })
+                .then(data => data.updateProposal),
+            "Saved"
+          );
+          setStepIndex(clampStep(stepIndex + 1));
+          break;
+
         case EventType.SAVE_STEP_CLICKED:
           await executeAndMonitorCall(
             () =>
@@ -122,54 +154,33 @@ export default function ProposalContainer(props: { data: Proposal }) {
           ).then(() => setStepIndex(clampStep(stepIndex + 1)));
           break;
 
-        case EventType.SAVE_GENERAL_INFO_CLICKED:
-          var { id, status, shortCode } = state.proposal;
-          if (state.proposal.status === ProposalStatus.BLANK) {
-            const result = await executeAndMonitorCall(
-              () =>
-                api()
-                  .createProposal()
-                  .then(data => data.createProposal!.proposal!),
-              "Saved"
-            );
-            ({ id, status, shortCode } = result);
-            dispatch({
-              type: EventType.PROPOSAL_INFORMATION_CHANGED,
-              payload: { id, status, shortCode }
-            });
-          }
-
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .updateProposal({
-                  id: id,
-                  title: state.proposal.title,
-                  abstract: state.proposal.abstract,
-                  users: state.proposal.users.map(user => user.id)
-                })
-                .then(data => data.updateProposal),
-            "Saved"
-          );
-          setStepIndex(clampStep(stepIndex + 1));
-          break;
         case EventType.RESET_CLICKED:
           const stepBeforeReset = stepIndex;
           if (await handleReset()) {
             setStepIndex(stepBeforeReset);
           }
           break;
-        case EventType.API_ERROR_OCCURRED:
+
+        case EventType.API_CALL_ERROR:
           enqueueSnackbar(action.payload.message, { variant: "error" });
           break;
-        case EventType.API_SUCCESS_OCCURRED:
+
+        case EventType.API_CALL_SUCCESS:
           enqueueSnackbar(action.payload.message, { variant: "success" });
           break;
       }
     };
   };
 
-  const executeAndMonitorCall = <T extends unknown>( // unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
+  /**
+   * Executes api call in uniform fashion for this component˜
+   *
+   * @template T no need to specify because type is implied from call response
+   * @param {TServiceCall<T>} call an API call
+   * @param {string} [successToastMessage] optional message to show in snackvar on success
+   * @returns result of the call
+   */
+  const executeAndMonitorCall = <T extends unknown>( // declared as unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
     call: TServiceCall<T>,
     successToastMessage?: string
   ) => {
@@ -177,7 +188,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
     return call().then(result => {
       if (result.error) {
         dispatch({
-          type: EventType.API_ERROR_OCCURRED,
+          type: EventType.API_CALL_ERROR,
           payload: {
             message: getTranslation(result.error as ResourceId)
           }
@@ -185,7 +196,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       } else {
         if (successToastMessage) {
           dispatch({
-            type: EventType.API_SUCCESS_OCCURRED,
+            type: EventType.API_CALL_SUCCESS,
             payload: {
               message: successToastMessage
             }

@@ -93,7 +93,7 @@ export default function ProposalInformationView(props: {
                 onBlur={e => {
                   handleChange(e);
                   dispatch({
-                    type: EventType.PROPOSAL_INFORMATION_CHANGED,
+                    type: EventType.PROPOSAL_METADATA_CHANGED,
                     payload: { title: e.target.value }
                   });
                 }}
@@ -118,7 +118,7 @@ export default function ProposalInformationView(props: {
                 onBlur={e => {
                   handleChange(e);
                   dispatch({
-                    type: EventType.PROPOSAL_INFORMATION_CHANGED,
+                    type: EventType.PROPOSAL_METADATA_CHANGED,
                     payload: { abstract: e.target.value }
                   });
                 }}
@@ -135,7 +135,7 @@ export default function ProposalInformationView(props: {
             userChanged={(user: User) => {
               setFieldValue("proposer", user);
               dispatch({
-                type: EventType.PROPOSAL_INFORMATION_CHANGED,
+                type: EventType.PROPOSAL_METADATA_CHANGED,
                 payload: { proposer: user }
               });
             }}
@@ -148,7 +148,7 @@ export default function ProposalInformationView(props: {
             setUsers={(users: User[]) => {
               setUsers(users);
               dispatch({
-                type: EventType.PROPOSAL_INFORMATION_CHANGED,
+                type: EventType.PROPOSAL_METADATA_CHANGED,
                 payload: { users: users }
               });
             }}

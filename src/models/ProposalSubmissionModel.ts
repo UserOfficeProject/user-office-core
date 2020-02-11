@@ -23,9 +23,9 @@ export enum EventType {
   FIELD_CHANGED = "FIELD_CHANGED",
   MODEL_LOADED = "MODEL_LOADED",
   SUBMIT_PROPOSAL_CLICKED = "SUBMIT_PROPOSAL_CLICKED",
-  API_ERROR_OCCURRED = "API_ERROR_OCCURRED",
-  API_SUCCESS_OCCURRED = "API_SUCCESS_OCCURRED",
-  PROPOSAL_INFORMATION_CHANGED = "PROPOSAL_INFORMATION_CHANGED"
+  API_CALL_ERROR = "API_ERROR_OCCURRED",
+  API_CALL_SUCCESS = "API_SUCCESS_OCCURRED",
+  PROPOSAL_METADATA_CHANGED = "PROPOSAL_INFORMATION_CHANGED"
 }
 export interface IEvent {
   type: EventType;
@@ -58,7 +58,7 @@ export function ProposalSubmissionModel(
           draftState.isDirty = true;
           return draftState;
 
-        case EventType.PROPOSAL_INFORMATION_CHANGED:
+        case EventType.PROPOSAL_METADATA_CHANGED:
           draftState = {
             ...draftState,
             proposal: { ...draftState.proposal, ...action.payload }
