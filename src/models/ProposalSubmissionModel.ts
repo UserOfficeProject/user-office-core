@@ -93,6 +93,7 @@ export function ProposalSubmissionModel(
 
         case EventType.SUBMIT_PROPOSAL_CLICKED:
           draftState.proposal.status = ProposalStatus.SUBMITTED;
+          draftState.isDirty = false;
           break;
       }
     });
