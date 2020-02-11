@@ -53,7 +53,7 @@ export class QuestionaryField extends ProposalTemplateField {
     return new QuestionaryField(
       templateField,
       obj.value
-        ? JSON.parse(obj.value).value
+        ? obj.value
         : templateField.data_type === DataType.BOOLEAN
         ? false
         : ""
