@@ -1,5 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`TextField rendered without crashing 1`] = `
+<div>
+  <div
+    className="makeStyles-wrapper-3"
+  >
+    <div
+      className="MuiFormControl-root MuiTextField-root makeStyles-textField-1 MuiFormControl-fullWidth"
+    >
+      <label
+        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink"
+        data-shrink={true}
+        htmlFor="links_with_industry"
+        id="links_with_industry-label"
+      >
+        If yes, please describe:
+      </label>
+      <div
+        className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-fullWidth MuiInput-fullWidth MuiInputBase-formControl MuiInput-formControl"
+        onClick={[Function]}
+      >
+        <input
+          aria-invalid={false}
+          autoFocus={false}
+          className="MuiInputBase-input MuiInput-input"
+          disabled={false}
+          id="links_with_industry"
+          name="links_with_industry"
+          onAnimationStart={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          placeholder="Please specify links with industry"
+          required={false}
+          rows={1}
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+    <span
+      className="makeStyles-counter-2"
+    >
+      
+    </span>
+  </div>
+</div>
+`;
+
 exports[`Textfield rendered without crashing 1`] = `
 <div>
   <div
