@@ -102,7 +102,7 @@ export const dummyUserNotOnProposal = new User(
   "NoDO",
   "Damion",
   "182082741",
-  "adaasd",
+  "Apricot",
   "female",
   3,
   "1991-11-08",
