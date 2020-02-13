@@ -21,6 +21,7 @@ import {
 } from "../resolvers/types/FieldConfig";
 import { ILogger, logger } from "../utils/Logger";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { UpdateTopicArgs } from "../resolvers/mutations/UpdateTopicMutation";
 
 export default class TemplateMutations {
   constructor(
@@ -51,24 +52,18 @@ export default class TemplateMutations {
 
   async updateTopic(
     agent: User | null,
-    id: number,
-    title?: string,
-    isEnabled?: boolean
+    args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
     return this.dataSource
-      .updateTopic(id, {
-        title,
-        isEnabled
-      })
+      .updateTopic(args.id, args)
       .then(topic => topic)
       .catch(err => {
         logger.logException("Could not update topic", err, {
           agent,
-          id,
-          title
+          args
         });
         return rejection("INTERNAL_ERROR");
       });

@@ -12,7 +12,7 @@ import { TopicResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class UpdateTopicArgs {
+export class UpdateTopicArgs {
   @Field(() => Int)
   id: number;
 
@@ -26,17 +26,9 @@ class UpdateTopicArgs {
 @Resolver()
 export class UpdateTopicMutation {
   @Mutation(() => TopicResponseWrap)
-  updateTopic(
-    @Args() { id, title, isEnabled }: UpdateTopicArgs,
-    @Ctx() context: ResolverContext
-  ) {
+  updateTopic(@Args() args: UpdateTopicArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.template.updateTopic(
-        context.user,
-        id,
-        title,
-        isEnabled
-      ),
+      context.mutations.template.updateTopic(context.user, args),
       TopicResponseWrap
     );
   }
