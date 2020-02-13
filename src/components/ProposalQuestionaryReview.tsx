@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { Proposal, QuestionaryField } from "../generated/sdk";
 
-export default function ProposaQuestionaryReview(
+export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {
     data: Proposal;
   }

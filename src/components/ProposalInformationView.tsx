@@ -1,33 +1,28 @@
-import React, { useContext, useState } from "react";
+import { makeStyles } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import { Formik, Form } from "formik";
+import { Form, Formik } from "formik";
+import React, { useContext, useState } from "react";
 import * as Yup from "yup";
-import { FormApi } from "./ProposalContainer";
-import { useUpdateProposal } from "../hooks/useUpdateProposal";
-import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import ProposalParticipants from "./ProposalParticipants";
-import { useCreateProposal } from "../hooks/useCreateProposal";
-import { makeStyles } from "@material-ui/core";
 import { UserContext } from "../context/UserContextProvider";
-import { User, BasicUserDetails } from "../models/User";
-import ProposalParticipant from "./ProposalParticipant";
-import { getTranslation } from "@esss-swap/duo-localisation";
-import TextFieldWithCounter from "./TextFieldWithCounter";
 import { Proposal } from "../generated/sdk";
+import { EventType } from "../models/ProposalSubmissionModel";
+import { BasicUserDetails, User } from "../models/User";
+import { ProposalSubmissionContext } from "./ProposalContainer";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
+import ProposalParticipant from "./ProposalParticipant";
+import ProposalParticipants from "./ProposalParticipants";
+import TextFieldWithCounter from "./TextFieldWithCounter";
 
 export default function ProposalInformationView(props: {
   data: Proposal;
   readonly?: boolean;
   disabled?: boolean;
-  setIsDirty?: (val: boolean) => void;
 }) {
-  const api = useContext(FormApi);
-  const { loading: updatingProposal, updateProposal } = useUpdateProposal();
-  const { loading: creatingProposal, createProposal } = useCreateProposal();
-  const [users, setUsers] = useState(props.data.users || []);
   const [userError, setUserError] = useState(false);
-  const { user } = useContext(UserContext);
+  const { user: currentUser } = useContext(UserContext);
+  const { dispatch } = useContext(ProposalSubmissionContext)!;
+  const [users, setUsers] = useState<BasicUserDetails[]>(props.data.users);
 
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
@@ -43,59 +38,25 @@ export default function ProposalInformationView(props: {
     }
   })();
 
-  const informDirty = (isDirty: boolean) => {
-    props.setIsDirty && props.setIsDirty(isDirty);
-  };
   return (
     <Formik
       initialValues={{
         title: props.data.title,
         abstract: props.data.abstract,
-        proposer: props.data.proposer
+        proposer: props.data.proposer,
+        users: props.data.users
       }}
       onSubmit={async values => {
-        const userIds = users.map(user => user.id);
         if (
-          values.proposer.id !== user.id &&
-          !users.some((curUser: BasicUserDetails) => curUser.id === user.id)
+          values.proposer.id !== currentUser.id &&
+          !users.some((user: BasicUserDetails) => user.id === currentUser.id)
         ) {
           setUserError(true);
         } else {
-          var { id, status, shortCode } = props.data;
-          if (!id) {
-            const proposal = (await createProposal())?.proposal;
-            proposal && ({ id, status, shortCode } = proposal); // TODO report error
-          }
-          const result = await updateProposal({
-            id: id,
-            status: status,
-            title: values.title,
-            abstract: values.abstract,
-            users: userIds,
-            proposerId: values.proposer.id
+          dispatch({
+            type: EventType.SAVE_GENERAL_INFO_CLICKED,
+            payload: values
           });
-          if (result && result.updateProposal && result.updateProposal.error) {
-            api.reportStatus({
-              variant: "error",
-              //@ts-ignore-line
-              message: getTranslation(result.updateProposal.error)
-            });
-          } else {
-            api.next({
-              ...values,
-              id,
-              status,
-              users,
-              shortCode,
-              proposer: {
-                id: user.id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                organisation: user.organisation,
-                position: user.position
-              }
-            });
-          }
         }
       }}
       validationSchema={Yup.object().shape({
@@ -129,9 +90,12 @@ export default function ProposalInformationView(props: {
                 label="Title"
                 defaultValue={values.title}
                 fullWidth
-                onChange={e => {
+                onBlur={e => {
                   handleChange(e);
-                  informDirty(true);
+                  dispatch({
+                    type: EventType.PROPOSAL_METADATA_CHANGED,
+                    payload: { title: e.target.value }
+                  });
                 }}
                 error={touched.title && errors.title !== undefined}
                 helperText={touched.title && errors.title && errors.title}
@@ -151,9 +115,12 @@ export default function ProposalInformationView(props: {
                 rows="4"
                 defaultValue={values.abstract}
                 fullWidth
-                onChange={e => {
+                onBlur={e => {
                   handleChange(e);
-                  informDirty(true);
+                  dispatch({
+                    type: EventType.PROPOSAL_METADATA_CHANGED,
+                    payload: { abstract: e.target.value }
+                  });
                 }}
                 error={touched.abstract && errors.abstract !== undefined}
                 helperText={
@@ -167,7 +134,10 @@ export default function ProposalInformationView(props: {
           <ProposalParticipant
             userChanged={(user: User) => {
               setFieldValue("proposer", user);
-              informDirty(true);
+              dispatch({
+                type: EventType.PROPOSAL_METADATA_CHANGED,
+                payload: { proposer: user }
+              });
             }}
             title="Principal investigator"
             className={classes.pi}
@@ -177,14 +147,19 @@ export default function ProposalInformationView(props: {
             error={userError}
             setUsers={(users: User[]) => {
               setUsers(users);
-              informDirty(true);
+              dispatch({
+                type: EventType.PROPOSAL_METADATA_CHANGED,
+                payload: { users: users }
+              });
             }}
-            users={users}
+            // quickfix for material table changing immutable state
+            // https://github.com/mbrn/material-table/issues/666
+            users={JSON.parse(JSON.stringify(users))}
           />
           <ProposalNavigationFragment
             disabled={props.readonly}
             saveAndNext={{ callback: submitForm }}
-            isLoading={creatingProposal || updatingProposal}
+            isLoading={false}
           />
         </Form>
       )}

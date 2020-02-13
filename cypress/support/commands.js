@@ -64,7 +64,7 @@ Cypress.Commands.add("login", role => {
 });
 
 // call cy.presentationMode(); before your test to have delay between clicks.
-// Excelent for presentation purposes
+// Excellent for presentation purposes
 Cypress.Commands.add("presentationMode", () => {
   const COMMAND_DELAY = 300;
 

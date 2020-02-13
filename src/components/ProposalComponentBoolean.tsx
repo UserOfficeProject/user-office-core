@@ -1,19 +1,26 @@
-import React, { ChangeEvent } from "react";
 import {
+  Checkbox,
   FormControl,
   FormControlLabel,
-  Checkbox,
   makeStyles
 } from "@material-ui/core";
+import { getIn } from "formik";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
-import { getIn } from "formik";
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
-  let { templateField, onComplete, errors, handleChange, touched } = props;
-  let { proposal_question_id, config, question } = templateField;
+  const { templateField, errors, onComplete, touched } = props;
+  const { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const [stateValue, setStateValue] = useState<boolean>(
+    templateField.value || false
+  );
+
+  useEffect(() => {
+    setStateValue(templateField.value || false);
+  }, [templateField]);
 
   const classes = makeStyles({
     label: {
@@ -29,12 +36,10 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             id={proposal_question_id}
             name={proposal_question_id}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-              templateField.value = evt.target.checked;
-              handleChange(evt); // letting Formik know that there was a change
-              onComplete();
+              onComplete(evt, evt.target.checked);
             }}
-            value={templateField.value}
-            checked={templateField.value || false}
+            value={stateValue}
+            checked={stateValue}
             inputProps={{
               "aria-label": "primary checkbox"
             }}

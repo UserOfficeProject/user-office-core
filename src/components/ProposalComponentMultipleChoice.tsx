@@ -1,17 +1,17 @@
-import React from "react";
 import {
   FormControl,
-  FormLabel,
-  RadioGroup,
   FormControlLabel,
-  Radio,
+  FormLabel,
   makeStyles,
   MenuItem,
+  Radio,
+  RadioGroup,
   TextField
 } from "@material-ui/core";
-import { IBasicComponentProps } from "./IBasicComponentProps";
 import { getIn } from "formik";
+import React, { useState, useEffect } from "react";
 import { SelectionFromOptionsConfig } from "../generated/sdk";
+import { IBasicComponentProps } from "./IBasicComponentProps";
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
@@ -31,11 +31,21 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
     }
   })();
 
-  let { templateField, onComplete, touched, errors, handleChange } = props;
-  let { proposal_question_id } = templateField;
+  let { templateField, touched, errors, onComplete } = props;
+  let { proposal_question_id, value } = templateField;
+  let [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as SelectionFromOptionsConfig;
+
+  useEffect(() => {
+    setStateValue(templateField.value);
+  }, [templateField]);
+
+  const handleOnChange = (evt: any, newValue: any) => {
+    setStateValue(newValue);
+    onComplete(evt, newValue);
+  };
 
   switch (config.variant) {
     case "dropdown":
@@ -44,14 +54,12 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
           <TextField
             id={proposal_question_id}
             name={proposal_question_id}
-            value={templateField.value}
+            value={stateValue}
             label={templateField.question}
             select
-            onChange={(evt: any) => {
-              templateField.value = (evt.target as HTMLInputElement).value;
-              handleChange(evt); // letting Formik know that there was a change
-              onComplete();
-            }}
+            onChange={evt =>
+              handleOnChange(evt, (evt.target as HTMLInputElement).value)
+            }
             SelectProps={{
               MenuProps: {}
             }}
@@ -85,12 +93,10 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
           <RadioGroup
             id={templateField.proposal_question_id}
             name={templateField.proposal_question_id}
-            onChange={evt => {
-              templateField.value = (evt.target as HTMLInputElement).value;
-              handleChange(evt); // letting Formik know that there was a change
-              onComplete();
-            }}
-            value={templateField.value}
+            value={stateValue}
+            onChange={evt =>
+              handleOnChange(evt, (evt.target as HTMLInputElement).value)
+            }
             className={
               config.options!.length < 3
                 ? classes.horizontalLayout

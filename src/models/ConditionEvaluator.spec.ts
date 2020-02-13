@@ -14,7 +14,7 @@ test("Is dependency checking working", () => {
   expect(areDependenciesSatisfied(template, "links_with_industry")).toBe(false);
 });
 
-test("Updating value changes dependency sattisfaction", () => {
+test("Updating value changes dependency satisfaction", () => {
   let template = create1Topic3FieldWithDependenciesQuestionary();
 
   expect(areDependenciesSatisfied(template, "links_with_industry")).toBe(false);

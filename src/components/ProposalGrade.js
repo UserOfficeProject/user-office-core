@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import { useProposalData } from "../hooks/useProposalData";
 import { useReviewData } from "../hooks/useReviewData";
 import { StyledPaper } from "../styles/StyledComponents";
-import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
+import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
 import { useDataApi } from "../hooks/useDataApi";
 
 const useStyles = makeStyles(theme => ({
@@ -45,7 +45,7 @@ export default function ProposalGrade({ match }) {
   return (
     <Container maxWidth="lg" className={classes.container}>
       <StyledPaper>
-        <ProposaQuestionaryReview data={proposalData} />
+        <ProposalQuestionaryReview data={proposalData} />
       </StyledPaper>
 
       <StyledPaper>

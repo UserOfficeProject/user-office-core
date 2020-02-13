@@ -67,15 +67,15 @@ export function isDependencySatisfied(
   if (!field) {
     return true;
   }
-  const isParentSattisfied = areDependenciesSatisfied(
+  const isParentSatisfied = areDependenciesSatisfied(
     collection,
     dependency.proposal_question_dependency
   );
   return (
-    isParentSattisfied &&
+    isParentSatisfied &&
     new ConditionEvaluator()
-      .getConfitionEvaluator(condition)
-      .isSattisfied(field, params)
+      .getConditionEvaluator(condition)
+      .isSatisfied(field, params)
   );
 }
 export function areDependenciesSatisfied(
@@ -86,9 +86,9 @@ export function areDependenciesSatisfied(
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
+  const isAtLeastOneDissatisfied = field.dependencies!.some(dep => {
     let result = isDependencySatisfied(questionary, dep) === false;
     return result;
   });
-  return isAtLeastOneDissasisfied === false;
+  return isAtLeastOneDissatisfied === false;
 }

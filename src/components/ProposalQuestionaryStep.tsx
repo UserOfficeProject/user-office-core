@@ -1,48 +1,40 @@
-import React, { useContext, useState, useEffect } from "react";
-import * as Yup from "yup";
+import { makeStyles } from "@material-ui/core";
 import { Formik } from "formik";
+import React, { useContext, SyntheticEvent } from "react";
+import * as Yup from "yup";
+import { DataType, QuestionaryField, QuestionaryStep } from "../generated/sdk";
+import { useUpdateProposal } from "../hooks/useUpdateProposal";
+import { ProposalAnswer } from "../models/ProposalModel";
 import {
   areDependenciesSatisfied,
-  getQuestionaryStepByTopicId as getStepByTopicId,
-  getQuestionaryStepByTopicId
+  getQuestionaryStepByTopicId as getStepByTopicId
 } from "../models/ProposalModelFunctions";
-import { makeStyles } from "@material-ui/core";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import JSDict from "../utils/Dictionary";
-import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { ProposalComponentBoolean } from "./ProposalComponentBoolean";
-import { ProposalCompontentDatePicker } from "./ProposalCompontentDatePicker";
-import { ProposalCompontentFileUpload } from "./ProposalCompontentFileUpload";
-import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
-import { createFormikCofigObjects } from "./ProposalYupUtilities";
-import { FormApi } from "./ProposalContainer";
-import { useUpdateProposal } from "../hooks/useUpdateProposal";
-import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
-import submitFormAsync from "../utils/FormikAsyncFormHandler";
-import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
-import { ErrorFocus } from "./ErrorFocus";
 import {
-  Proposal,
-  QuestionaryStep,
-  DataType,
-  QuestionaryField
-} from "../generated/sdk";
-import { ProposalAnswer } from "../models/ProposalModel";
+  EventType,
+  IProposalSubmissionModelState
+} from "../models/ProposalSubmissionModel";
+import JSDict from "../utils/Dictionary";
+import submitFormAsync from "../utils/FormikAsyncFormHandler";
+import { ErrorFocus } from "./ErrorFocus";
+import { IBasicComponentProps } from "./IBasicComponentProps";
+import { ProposalComponentBoolean } from "./ProposalComponentBoolean";
+import { ProposalComponentDatePicker } from "./ProposalComponentDatePicker";
+import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
+import { ProposalComponentFileUpload } from "./ProposalComponentFileUpload";
+import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
+import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
+import { ProposalSubmissionContext } from "./ProposalContainer";
+import ProposalNavigationFragment from "./ProposalNavigationFragment";
+import { createFormikConfigObjects } from "./ProposalYupUtilities";
 
-export default function ProposalQuestionareStep(props: {
-  data: Proposal;
+export default function ProposalQuestionaryStep(props: {
+  data: IProposalSubmissionModelState;
   topicId: number;
-  setIsDirty: (isDirty: boolean) => void;
   readonly: boolean;
 }) {
   const { data, topicId } = props;
-  const api = useContext(FormApi);
-  const [, updateState] = useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
   const componentFactory = new ComponentFactory();
-  const { loading: formSaving, updateProposal } = useUpdateProposal();
-  const [isDirty, setIsDirty] = useState<boolean>(false);
+  const { loading: formSaving } = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {
       margin: "10px 0"
@@ -52,16 +44,13 @@ export default function ProposalQuestionareStep(props: {
       opacity: 0.7
     }
   })();
-
-  useEffect(() => {
-    setIsDirty(false);
-  }, [props.data]);
+  const { dispatch } = useContext(ProposalSubmissionContext)!;
 
   if (data == null) {
     return <div>loading...</div>;
   }
 
-  const questionary = data.questionary!;
+  const questionary = data.proposal.questionary!;
   const questionaryStep = getStepByTopicId(questionary, topicId) as
     | QuestionaryStep
     | undefined;
@@ -78,13 +67,11 @@ export default function ProposalQuestionareStep(props: {
       })
     : [];
 
-  const { initialValues, validationSchema } = createFormikCofigObjects(
+  const { initialValues, validationSchema } = createFormikConfigObjects(
     activeFields
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    const proposalId: number = props.data.id;
-
     const answers: ProposalAnswer[] = activeFields.map(field => {
       return (({ proposal_question_id, data_type, value }) => ({
         proposal_question_id,
@@ -93,23 +80,15 @@ export default function ProposalQuestionareStep(props: {
       }))(field); // convert field to answer object
     });
 
-    const result = await updateProposal({
-      id: proposalId,
-      answers,
-      topicsCompleted: markAsComplete ? [topicId] : [],
-      partialSave: !markAsComplete
+    dispatch({
+      type: markAsComplete
+        ? EventType.FINISH_STEP_CLICKED
+        : EventType.SAVE_STEP_CLICKED,
+      payload: {
+        answers: answers,
+        topicId: props.topicId
+      }
     });
-
-    if (result && result.updateProposal && result.updateProposal.error) {
-      api.reportStatus({
-        variant: "error",
-        message: getTranslation(result.updateProposal.error as ResourceId)
-      });
-    } else {
-      api.reportStatus({ variant: "success", message: "Saved" });
-      setIsDirty(false);
-      props.setIsDirty(false);
-    }
   };
 
   return (
@@ -128,14 +107,18 @@ export default function ProposalQuestionareStep(props: {
                 key={field.proposal_question_id}
               >
                 {componentFactory.createComponent(field, {
-                  onComplete: () => {
-                    forceUpdate();
-                    setIsDirty(true);
-                    props.setIsDirty(true);
-                  }, // for re-rendering when input changes
                   touched: touched, // for formik
                   errors: errors, // for formik
-                  handleChange: handleChange // for formik
+                  onComplete: (evt: SyntheticEvent, newValue: any) => {
+                    dispatch({
+                      type: EventType.FIELD_CHANGED,
+                      payload: {
+                        id: field.proposal_question_id,
+                        newValue: newValue
+                      }
+                    });
+                    handleChange(evt);
+                  } // for formik
                 })}
               </div>
             );
@@ -144,10 +127,13 @@ export default function ProposalQuestionareStep(props: {
             disabled={props.readonly}
             back={{
               callback: () => {
-                api.back();
+                dispatch({ type: EventType.BACK_CLICKED });
               }
             }}
-            reset={{ callback: api.reset, disabled: !isDirty }}
+            reset={{
+              callback: () => dispatch({ type: EventType.RESET_CLICKED }),
+              disabled: !props.data.isDirty
+            }}
             save={
               questionaryStep.isCompleted
                 ? undefined
@@ -155,7 +141,7 @@ export default function ProposalQuestionareStep(props: {
                     callback: () => {
                       saveStepData(false);
                     },
-                    disabled: !isDirty
+                    disabled: !props.data.isDirty
                   }
             }
             saveAndNext={{
@@ -164,11 +150,6 @@ export default function ProposalQuestionareStep(props: {
                   (isValid: boolean) => {
                     if (isValid) {
                       saveStepData(true);
-                      (getQuestionaryStepByTopicId(
-                        props.data.questionary!,
-                        topicId
-                      ) as QuestionaryStep).isCompleted = true;
-                      api.next({ ...props.data });
                     }
                   }
                 );
@@ -189,8 +170,8 @@ class ComponentFactory {
   constructor() {
     this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
     this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalCompontentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalCompontentFileUpload);
+    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
     this.componentMap.put(
       DataType.SELECTION_FROM_OPTIONS,
       ProposalComponentMultipleChoice

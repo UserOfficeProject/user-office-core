@@ -17,23 +17,23 @@ export class ConditionEvaluator {
     return this.validatorMap;
   }
 
-  getConfitionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
+  getConditionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
     return this.getMappings().get(id)!;
   }
 }
 
 export interface IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: string): boolean;
+  isSatisfied(field: QuestionaryField, params: string): boolean;
 }
 
 export class EqualityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: string): boolean {
+  isSatisfied(field: QuestionaryField, params: string): boolean {
     return field.value === params;
   }
 }
 
 export class InequalityValidator implements IFieldConditionEvaluator {
-  isSattisfied(field: QuestionaryField, params: string): boolean {
+  isSatisfied(field: QuestionaryField, params: string): boolean {
     return field.value !== params;
   }
 }
