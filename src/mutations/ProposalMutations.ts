@@ -11,6 +11,7 @@ import { isMatchingConstraints } from "../models/ProposalModelFunctions";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
 import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
+import { UpdateProposalFilesArgs } from "../resolvers/mutations/UpdateProposalFilesMutation";
 
 export default class ProposalMutations {
   constructor(
@@ -195,14 +196,12 @@ export default class ProposalMutations {
 
   async updateFiles(
     agent: User | null,
-    proposalId: number,
-    questionId: string,
-    files: string[]
+    args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }
-
+    const { proposalId, questionId, files } = args;
     let proposal = await this.dataSource.get(proposalId);
 
     if (
@@ -222,9 +221,7 @@ export default class ProposalMutations {
       .catch(err => {
         logger.logException("Could not update proposal files", err, {
           agent,
-          proposalId,
-          questionId,
-          files
+          args
         });
         return rejection("INTERNAL_ERROR");
       });

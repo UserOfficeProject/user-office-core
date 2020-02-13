@@ -14,12 +14,12 @@ import { wrapResponse } from "../wrapResponse";
 import { Response } from "../Decorators";
 
 @ArgsType()
-class UpdateProposalFilesArgs {
+export class UpdateProposalFilesArgs {
   @Field(() => Int)
-  public proposal_id: number;
+  public proposalId: number;
 
   @Field()
-  public question_id: string;
+  public questionId: string;
 
   @Field(() => [String])
   public files: string[];
@@ -36,16 +36,11 @@ class UpdateProposalFilesResponseWrap extends ResponseWrapBase<string[]> {
 export class UpdateProposalFilesMutation {
   @Mutation(() => UpdateProposalFilesResponseWrap)
   updateProposalFiles(
-    @Args() { proposal_id, question_id, files }: UpdateProposalFilesArgs,
+    @Args() args: UpdateProposalFilesArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.updateFiles(
-        context.user,
-        proposal_id,
-        question_id,
-        files
-      ),
+      context.mutations.proposal.updateFiles(context.user, args),
       UpdateProposalFilesResponseWrap
     );
   }
