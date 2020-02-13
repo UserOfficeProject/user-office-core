@@ -44,10 +44,8 @@ export default class AdminMutations {
       });
   }
 
-  async logClientError(error: string) {
-    logger.logException("Error recieved from client", error, {
-      error
-    });
+  async addClientLog(error: string) {
+    logger.logError("Error received from client", { error });
     return true;
   }
 }
