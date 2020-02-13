@@ -7,6 +7,7 @@ import { Review } from "../models/Review";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { logger } from "../utils/Logger";
 import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
+import { AddUserForReviewArgs } from "../resolvers/mutations/AddUserForReviewMutation";
 
 export default class ReviewMutations {
   constructor(
@@ -66,8 +67,7 @@ export default class ReviewMutations {
 
   async addUserForReview(
     agent: User | null,
-    userID: number,
-    proposalID: number
+    args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
@@ -75,8 +75,10 @@ export default class ReviewMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
+
+    const { proposalID, userID } = args;
     return this.dataSource
-      .addUserForReview(userID, proposalID)
+      .addUserForReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException("Failed to add user for review", err, {

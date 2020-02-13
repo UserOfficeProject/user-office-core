@@ -12,7 +12,7 @@ import { ReviewResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class AddUserForReviewArgs {
+export class AddUserForReviewArgs {
   @Field(() => Int)
   public userID: number;
 
@@ -28,11 +28,7 @@ export class AddUserForReviewMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.review.addUserForReview(
-        context.user,
-        args.userID,
-        args.proposalID
-      ),
+      context.mutations.review.addUserForReview(context.user, args),
       ReviewResponseWrap
     );
   }
