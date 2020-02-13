@@ -27,51 +27,48 @@ const callMutations = new CallMutations(
 
 test("A user can not create a call", () => {
   return expect(
-    callMutations.create(
-      dummyUser,
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "Comment review",
-      "Comment feedback"
-    )
+    callMutations.create(dummyUser, {
+      shortCode: "2019-02-19",
+      startCall: "2019-02-19",
+      endCall: "2019-02-19",
+      startReview: "2019-02-19",
+      endReview: "2019-02-19",
+      startNotify: "2019-02-19",
+      endNotify: "2019-02-19",
+      cycleComment: "Comment review",
+      surveyComment: "Comment feedback"
+    })
   ).resolves.toHaveProperty("reason", "NOT_USER_OFFICER");
 });
 
 test("A not logged in user can not create a call", () => {
   return expect(
-    callMutations.create(
-      null,
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "Comment review",
-      "Comment feedback"
-    )
+    callMutations.create(null, {
+      shortCode: "2019-02-19",
+      startCall: "2019-02-19",
+      endCall: "2019-02-19",
+      startReview: "2019-02-19",
+      endReview: "2019-02-19",
+      startNotify: "2019-02-19",
+      endNotify: "2019-02-19",
+      cycleComment: "Comment review",
+      surveyComment: "Comment feedback"
+    })
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
 
 test("A not logged in user can not create a call", () => {
   return expect(
-    callMutations.create(
-      dummyUserOfficer,
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "2019-02-19",
-      "Comment review",
-      "Comment feedback"
-    )
+    callMutations.create(dummyUserOfficer, {
+      shortCode: "2019-02-19",
+      startCall: "2019-02-19",
+      endCall: "2019-02-19",
+      startReview: "2019-02-19",
+      endReview: "2019-02-19",
+      startNotify: "2019-02-19",
+      endNotify: "2019-02-19",
+      cycleComment: "Comment review",
+      surveyComment: "Comment feedback"
+    })
   ).resolves.toBe(dummyCall);
 });
