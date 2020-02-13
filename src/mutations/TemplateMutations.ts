@@ -1,27 +1,26 @@
-import { ProposalDataSource } from "../datasources/ProposalDataSource";
+import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import { ApplicationEvent } from "../events/applicationEvents";
+import { EventBus } from "../events/eventBus";
+import {
+  createConfig,
+  DataType,
+  ProposalTemplate,
+  ProposalTemplateField,
+  Topic
+} from "../models/ProposalModel";
 import { User } from "../models/User";
 import { rejection, Rejection } from "../rejection";
-import {
-  Topic,
-  ProposalTemplateField,
-  DataType,
-  FieldDependency,
-  ProposalTemplate
-} from "../models/ProposalModel";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { EventBus } from "../events/eventBus";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { ILogger, logger } from "../utils/Logger";
-import { TemplateDataSource } from "../datasources/TemplateDataSource";
-import {
-  FieldConfigType,
-  EmbellishmentConfig,
-  SelectionFromOptionsConfig,
-  ConfigBase,
-  FileUploadConfig
-} from "../resolvers/types/FieldConfig";
-import { createConfig } from "../models/ProposalModel";
 import { CreateTemplateFieldArgs } from "../resolvers/mutations/CreateTemplateFieldMutation";
+import { UpdateProposalTemplateFieldArgs } from "../resolvers/mutations/UpdateProposalTemplateFieldMutation";
+import {
+  ConfigBase,
+  EmbellishmentConfig,
+  FieldConfigType,
+  FileUploadConfig,
+  SelectionFromOptionsConfig
+} from "../resolvers/types/FieldConfig";
+import { ILogger, logger } from "../utils/Logger";
+import { UserAuthorization } from "../utils/UserAuthorization";
 
 export default class TemplateMutations {
   constructor(
@@ -123,31 +122,18 @@ export default class TemplateMutations {
 
   async updateProposalTemplateField(
     agent: User | null,
-    id: string,
-    dataType?: DataType,
-    sortOrder?: number,
-    question?: string,
-    topicId?: number,
-    config?: string,
-    dependencies?: FieldDependency[]
+    args: UpdateProposalTemplateFieldArgs
   ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
     return this.dataSource
-      .updateTemplateField(id, {
-        dataType,
-        sortOrder,
-        question,
-        topicId,
-        config,
-        dependencies
-      })
+      .updateTemplateField(args.id, args)
       .then(template => template)
       .catch(err => {
         logger.logException("Could not update template field", err, {
           agent,
-          id
+          args
         });
         return rejection("INTERNAL_ERROR");
       });
