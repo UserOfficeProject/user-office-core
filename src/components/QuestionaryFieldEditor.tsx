@@ -22,7 +22,9 @@ export default function QuestionaryFieldEditor(props: {
     container: {
       backgroundColor: "white",
       padding: "20px",
-      maxWidth: "700px"
+      maxWidth: "700px",
+      maxHeight: "100%",
+      overflowY: "auto"
     },
     modal: {
       display: "flex",
