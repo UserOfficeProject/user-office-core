@@ -7,6 +7,7 @@ import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
 import { AddUserRoleArgs } from "../../resolvers/mutations/AddUserRoleMutation";
+import { CreateUserByEmailInviteArgs } from "../../resolvers/mutations/CreateUserByEmailInviteMutation";
 
 export default class PostgresUserDataSource implements UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<Boolean> {
@@ -103,11 +104,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning(["*"])
       .then((user: UserRecord[]) => createUserObject(user[0]));
   }
-  async createInviteUser(
-    firstname: string,
-    lastname: string,
-    email: string
-  ): Promise<number> {
+  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
+    const { firstname, lastname, email } = args;
     return database
       .insert({
         user_title: "",

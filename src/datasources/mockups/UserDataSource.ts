@@ -2,6 +2,7 @@ import { UserDataSource } from "../UserDataSource";
 import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { AddUserRoleArgs } from "../../resolvers/mutations/AddUserRoleMutation";
+import { CreateUserByEmailInviteArgs } from "../../resolvers/mutations/CreateUserByEmailInviteMutation";
 
 export const basicDummyUser = new BasicUserDetails(
   2,
@@ -125,11 +126,7 @@ export class userDataSource implements UserDataSource {
   getByOrcID(orcID: string): Promise<User | null> {
     throw new Error("Method not implemented.");
   }
-  async createInviteUser(
-    firstname: string,
-    lastname: string,
-    email: string
-  ): Promise<number> {
+  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
   async createOrganisation(name: string, verified: boolean): Promise<number> {
