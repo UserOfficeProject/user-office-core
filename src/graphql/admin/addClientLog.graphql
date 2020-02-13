@@ -1,0 +1,6 @@
+mutation addClientLog($error: String!) {
+  addClientLog(error: $error) {
+    isSuccess
+    error
+  }
+}
