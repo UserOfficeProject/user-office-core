@@ -12,7 +12,7 @@ import {
   UserContext,
   UserContextProvider
 } from "../context/UserContextProvider";
-import { useDataApi } from "../hooks/useDataApi";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { getTheme } from "../theme";
 import DashBoard from "./DashBoard";
 import EmailVerification from "./EmailVerification";
@@ -42,8 +42,6 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 );
 
 class App extends React.Component {
-  api = useDataApi();
-
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
     localStorage.removeItem("token");
@@ -52,7 +50,7 @@ class App extends React.Component {
     localStorage.removeItem("expToken");
   }
   componentDidCatch(error, info) {
-    this.api().addClientLog(error);
+    getUnauthorizedApi().addClientLog(error);
   }
   render() {
     return (

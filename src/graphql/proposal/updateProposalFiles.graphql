@@ -1,11 +1,11 @@
 mutation updateProposalFiles(
-  $proposal_id: Int!
-  $question_id: String!
+  $proposalId: Int!
+  $questionId: String!
   $files: [String!]!
 ) {
   updateProposalFiles(
-    proposal_id: $proposal_id
-    question_id: $question_id
+    proposalId: $proposalId
+    questionId: $questionId
     files: $files
   ) {
     files

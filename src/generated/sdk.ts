@@ -372,8 +372,8 @@ export type MutationUpdatePasswordArgs = {
 
 
 export type MutationUpdateProposalFilesArgs = {
-  proposal_id: Scalars['Int'],
-  question_id: Scalars['String'],
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
   files: Array<Scalars['String']>
 };
 
@@ -1271,8 +1271,8 @@ export type UpdateProposalMutation = (
 );
 
 export type UpdateProposalFilesMutationVariables = {
-  proposal_id: Scalars['Int'],
-  question_id: Scalars['String'],
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
   files: Array<Scalars['String']>
 };
 
@@ -2139,8 +2139,8 @@ export const UpdateProposalDocument = gql`
 }
     `;
 export const UpdateProposalFilesDocument = gql`
-    mutation updateProposalFiles($proposal_id: Int!, $question_id: String!, $files: [String!]!) {
-  updateProposalFiles(proposal_id: $proposal_id, question_id: $question_id, files: $files) {
+    mutation updateProposalFiles($proposalId: Int!, $questionId: String!, $files: [String!]!) {
+  updateProposalFiles(proposalId: $proposalId, questionId: $questionId, files: $files) {
     files
     error
   }
