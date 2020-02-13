@@ -1,13 +1,10 @@
 import { Review } from "../models/Review";
+import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
 
 export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;
   get(id: number): Promise<Review | null>;
-  submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review>;
+  submitReview(args: AddReviewArgs): Promise<Review>;
 
   getProposalReviews(id: number): Promise<Review[]>;
   getUserReviews(id: number): Promise<Review[]>;

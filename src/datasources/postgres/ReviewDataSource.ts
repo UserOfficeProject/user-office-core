@@ -4,6 +4,7 @@ import { ReviewRecord } from "./records";
 
 import database from "./database";
 import { ReviewStatus } from "../../models/Review";
+import { AddReviewArgs } from "../../resolvers/mutations/AddReviewMutation";
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
@@ -35,11 +36,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
   }
 
-  async submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review> {
+  async submitReview(args: AddReviewArgs): Promise<Review> {
+    const { reviewID, comment, grade } = args;
     return database
       .update(
         {

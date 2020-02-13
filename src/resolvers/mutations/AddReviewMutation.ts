@@ -14,7 +14,7 @@ import { wrapResponse } from "../wrapResponse";
 import { Review } from "../types/Review";
 
 @ArgsType()
-class AddReviewArgs {
+export class AddReviewArgs {
   @Field(() => Int)
   public reviewID: number;
 
@@ -30,12 +30,7 @@ export class AddReviewMutation {
   @Mutation(() => ReviewResponseWrap)
   addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
     return wrapResponse<Review>(
-      context.mutations.review.submitReview(
-        context.user,
-        args.reviewID,
-        args.comment,
-        args.grade
-      ),
+      context.mutations.review.submitReview(context.user, args),
       ReviewResponseWrap
     );
   }

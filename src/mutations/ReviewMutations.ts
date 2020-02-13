@@ -6,30 +6,30 @@ import { rejection, Rejection } from "../rejection";
 import { Review } from "../models/Review";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { logger } from "../utils/Logger";
+import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
 
 export default class ReviewMutations {
   constructor(
     private dataSource: ReviewDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) { }
+  ) {}
 
   async submitReview(
     agent: User | null,
-    reviewID: number,
-    comment: string,
-    grade: number
+    args: AddReviewArgs
   ): Promise<Review | Rejection> {
+    const { reviewID, comment, grade } = args;
     const review = await this.dataSource.get(reviewID);
     if (
       review &&
       !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
     ) {
-      logger.logWarn("Blocked submitting review", { agent, reviewID })
+      logger.logWarn("Blocked submitting review", { agent, args });
       return rejection("NOT_REVIEWER_OF_PROPOSAL");
     }
     return this.dataSource
-      .submitReview(reviewID, comment, grade)
+      .submitReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException("Could not submit review", err, {

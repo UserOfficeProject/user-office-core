@@ -1,5 +1,6 @@
 import { ReviewDataSource } from "../ReviewDataSource";
 import { Review } from "../../models/Review";
+import { AddReviewArgs } from "../../resolvers/mutations/AddReviewMutation";
 
 export const dummyReview = new Review(4, 10, 1, "Good proposal", 9, 0);
 
@@ -18,11 +19,7 @@ export class reviewDataSource implements ReviewDataSource {
     }
     return dummyReview;
   }
-  async submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review> {
+  async submitReview(args: AddReviewArgs): Promise<Review> {
     return dummyReview;
   }
   async getProposalReviews(id: number): Promise<Review[]> {
