@@ -14,7 +14,7 @@ import { ProposalResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class UpdateProposalArgs {
+export class UpdateProposalArgs {
   @Field(() => Int)
   public id: number;
 
@@ -54,36 +54,11 @@ export class UpdateProposalMutation {
   @Mutation(() => ProposalResponseWrap)
   updateProposal(
     @Args()
-    {
-      id,
-      title,
-      abstract,
-      answers,
-      topicsCompleted,
-      users,
-      proposerId,
-      partialSave,
-      excellenceScore,
-      technicalScore,
-      safetyScore
-    }: UpdateProposalArgs,
+    args: UpdateProposalArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.update(
-        context.user,
-        id,
-        title,
-        abstract,
-        answers,
-        topicsCompleted,
-        users,
-        proposerId,
-        partialSave,
-        excellenceScore,
-        technicalScore,
-        safetyScore
-      ),
+      context.mutations.proposal.update(context.user, args),
       ProposalResponseWrap
     );
   }

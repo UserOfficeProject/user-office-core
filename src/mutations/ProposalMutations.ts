@@ -12,6 +12,7 @@ import { TemplateDataSource } from "../datasources/TemplateDataSource";
 import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
 import { UpdateProposalFilesArgs } from "../resolvers/mutations/UpdateProposalFilesMutation";
+import { UpdateProposalArgs } from "../resolvers/mutations/UpdateProposalMutation";
 
 export default class ProposalMutations {
   constructor(
@@ -53,18 +54,22 @@ export default class ProposalMutations {
 
   async update(
     agent: User | null,
-    id: number,
-    title?: string,
-    abstract?: string,
-    answers?: ProposalAnswer[],
-    topicsCompleted?: number[],
-    users?: number[],
-    proposerId?: number,
-    partialSave?: boolean,
-    excellenceScore?: number,
-    technicalScore?: number,
-    safetyScore?: number
+    args: UpdateProposalArgs
   ): Promise<Proposal | Rejection> {
+    const {
+      id,
+      title,
+      abstract,
+      answers,
+      topicsCompleted,
+      users,
+      proposerId,
+      partialSave,
+      excellenceScore,
+      technicalScore,
+      safetyScore
+    } = args;
+
     return this.eventBus.wrap<Proposal>(
       async () => {
         if (agent == null) {
