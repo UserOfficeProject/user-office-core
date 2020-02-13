@@ -11,6 +11,7 @@ import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
 import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
+import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
 
 export default class UserMutations {
   constructor(
@@ -315,12 +316,12 @@ export default class UserMutations {
     }
   }
 
-  async addUserRole(agent: User | null, userID: number, roleID: number) {
+  async addUserRole(agent: User | null, args: AddUserRoleArgs) {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("INSUFFICIENT_PERMISSIONS");
     }
     return this.dataSource
-      .addUserRole(userID, roleID)
+      .addUserRole(args)
       .then(() => true)
       .catch(err => {
         logger.logException("Could not add user role", err, { agent });

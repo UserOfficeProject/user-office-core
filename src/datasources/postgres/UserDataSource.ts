@@ -6,9 +6,11 @@ import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
+import { AddUserRoleArgs } from "../../resolvers/mutations/AddUserRoleMutation";
 
 export default class PostgresUserDataSource implements UserDataSource {
-  addUserRole(userID: number, roleID: number): Promise<Boolean> {
+  addUserRole(args: AddUserRoleArgs): Promise<Boolean> {
+    const { userID, roleID } = args;
     return database
       .insert({
         user_id: userID,

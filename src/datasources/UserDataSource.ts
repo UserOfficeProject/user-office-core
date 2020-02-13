@@ -1,8 +1,9 @@
 import { User, BasicUserDetails } from "../models/User";
 import { Role } from "../models/Role";
+import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
 
 export interface UserDataSource {
-  addUserRole(userID: number, roleID: number): Promise<Boolean>;
+  addUserRole(args: AddUserRoleArgs): Promise<Boolean>;
   createInviteUser(
     firstname: string,
     lastname: string,
