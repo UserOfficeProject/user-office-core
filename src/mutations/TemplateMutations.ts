@@ -21,6 +21,7 @@ import {
   FileUploadConfig
 } from "../resolvers/types/FieldConfig";
 import { createConfig } from "../models/ProposalModel";
+import { CreateTemplateFieldArgs } from "../resolvers/mutations/CreateTemplateFieldMutation";
 
 export default class TemplateMutations {
   constructor(
@@ -93,12 +94,12 @@ export default class TemplateMutations {
 
   async createTemplateField(
     agent: User | null,
-    topicId: number,
-    dataType: DataType
+    args: CreateTemplateFieldArgs
   ): Promise<ProposalTemplateField | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_AUTHORIZED");
     }
+    const { dataType, topicId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
