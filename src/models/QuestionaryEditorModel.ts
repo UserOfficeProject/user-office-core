@@ -41,7 +41,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []);
+  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
   const api = useDataApi();
 
   useEffect(() => {
@@ -65,19 +65,19 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             return draft;
           }
 
-          var from: any = draft.steps.find(step => {
+          var from = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.source.droppableId
             );
-          });
+          })!;
 
-          var to: any = draft.steps.find(step => {
+          var to = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.destination.droppableId
             );
-          });
+          })!;
 
           to.fields.splice(
             action.payload.destination.index,

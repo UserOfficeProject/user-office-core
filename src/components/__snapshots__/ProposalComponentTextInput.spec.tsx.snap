@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Textfield rendered without crashing 1`] = `
+exports[`TextField rendered without crashing 1`] = `
 <div>
   <div
     className="makeStyles-wrapper-3"

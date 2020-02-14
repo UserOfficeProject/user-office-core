@@ -5,8 +5,9 @@ import { useDataApi } from "../hooks/useDataApi";
 import { useProposalData } from "../hooks/useProposalData";
 import ParticipantModal from "./ParticipantModal";
 import PeopleTable from "./PeopleTable";
-import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
 import ProposalTechnicalReview from "./ProposalTechnicalReview";
+import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
+import ProposalScore from "./ProposalScore";
 import ReviewTable from "./ReviewTable";
 import SimpleTabs from "./TabPanel";
 import { ButtonContainer } from "../styles/StyledComponents";
@@ -71,7 +72,7 @@ export default function ProposalReview({ match }: { match: any }) {
           "Reviewers"
         ]}
       >
-        <ProposaQuestionaryReview data={proposalData} />
+        <ProposalQuestionaryReview data={proposalData} />
         <ReviewTable reviews={proposalData.reviews} />
         <ProposalTechnicalReview data={techReview} setReview={setTechReview}/>
         <>

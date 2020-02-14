@@ -7,8 +7,8 @@ export function useUpdateProposalFiles() {
 
   const updateProposalFiles = useCallback(
     async (parameters: {
-      proposal_id: number;
-      question_id: string;
+      proposalId: number;
+      questionId: string;
       files: string[];
     }) => {
       setLoading(true);

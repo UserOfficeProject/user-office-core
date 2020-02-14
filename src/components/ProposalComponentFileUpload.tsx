@@ -1,19 +1,25 @@
-import React, { ChangeEvent } from "react";
 import { FormControl, FormLabel } from "@material-ui/core";
+import React, { ChangeEvent, useState, useEffect } from "react";
+import { FileUploadConfig } from "../generated/sdk";
+import { FileUploadComponent } from "./FileUploadComponent";
 import { IBasicComponentProps } from "./IBasicComponentProps";
 import { ProposalErrorLabel } from "./ProposalErrorLabel";
-import { FileUploadComponent } from "./FileUploadComponent";
-import { FileUploadConfig } from "../generated/sdk";
 
-export class ProposalCompontentFileUpload extends React.Component<
+export class ProposalComponentFileUpload extends React.Component<
   IBasicComponentProps,
   { files: string[] }
 > {
   render() {
-    const { templateField, errors, onComplete, handleChange } = this.props;
-    const { proposal_question_id } = templateField;
+    const { templateField, errors, onComplete } = this.props;
+    const { proposal_question_id, value } = templateField;
     const isError = errors[proposal_question_id] ? true : false;
     const config = templateField.config as FileUploadConfig;
+    let [stateValue, setStateValue] = useState(value);
+
+    useEffect(() => {
+      setStateValue(templateField.value);
+    }, [templateField]);
+
     return (
       <FormControl error={isError} required={config.required ? true : false}>
         <FormLabel error={isError}>{templateField.question}</FormLabel>
@@ -23,11 +29,10 @@ export class ProposalCompontentFileUpload extends React.Component<
           id={templateField.proposal_question_id}
           fileType={config.file_type ? config.file_type.join(",") : ""}
           onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-            templateField.value = evt.target.value;
-            handleChange(evt); // letting Formik know that there was a change
-            onComplete();
+            setStateValue(evt.target.value);
+            onComplete(evt, evt.target.value); // letting Formik know that there was a change
           }}
-          value={templateField.value}
+          value={stateValue}
         />
         {isError && (
           <ProposalErrorLabel>

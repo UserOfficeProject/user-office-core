@@ -25,7 +25,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
             data_type: DataType.EMBELLISHMENT,
             question: "",
             config: {
-              html: "General informaiton",
+              html: "General information",
               plain: "General information",
               small_label: "",
               required: false,

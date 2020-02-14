@@ -121,7 +121,7 @@ export enum EvaluatorOperator {
 export type FieldCondition = {
    __typename?: 'FieldCondition',
   condition: EvaluatorOperator,
-  params: Scalars['String'],
+  params: Scalars['IntStringDateBool'],
 };
 
 export type FieldConditionInput = {
@@ -178,6 +178,7 @@ export type LoginResponseWrap = {
 
 export type Mutation = {
    __typename?: 'Mutation',
+  addClientLog: SuccessResponseWrap,
   addReview: ReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
@@ -193,6 +194,7 @@ export type Mutation = {
   deleteTopic: ProposalTemplateResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
   login: LoginResponseWrap,
+  prepareDB: SuccessResponseWrap,
   rejectProposal: ProposalResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -208,6 +210,11 @@ export type Mutation = {
   updateTopic: TopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
   updateUser: UserResponseWrap,
+};
+
+
+export type MutationAddClientLogArgs = {
+  error: Scalars['String']
 };
 
 
@@ -365,8 +372,8 @@ export type MutationUpdatePasswordArgs = {
 
 
 export type MutationUpdateProposalFilesArgs = {
-  proposal_id: Scalars['Int'],
-  question_id: Scalars['String'],
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
   files: Array<Scalars['String']>
 };
 
@@ -679,6 +686,12 @@ export type SelectionFromOptionsConfig = {
   options: Array<Scalars['String']>,
 };
 
+export type SuccessResponseWrap = {
+   __typename?: 'SuccessResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  isSuccess?: Maybe<Scalars['Boolean']>,
+};
+
 export type TemplateFieldResponseWrap = {
    __typename?: 'TemplateFieldResponseWrap',
   error?: Maybe<Scalars['String']>,
@@ -787,6 +800,19 @@ export enum UserRole {
   USEROFFICER = 'USEROFFICER',
   REVIEWER = 'REVIEWER'
 }
+
+export type AddClientLogMutationVariables = {
+  error: Scalars['String']
+};
+
+
+export type AddClientLogMutation = (
+  { __typename?: 'Mutation' }
+  & { addClientLog: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'isSuccess' | 'error'>
+  ) }
+);
 
 export type GetPageContentQueryVariables = {
   id: PageName
@@ -1245,8 +1271,8 @@ export type UpdateProposalMutation = (
 );
 
 export type UpdateProposalFilesMutationVariables = {
-  proposal_id: Scalars['Int'],
-  question_id: Scalars['String'],
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
   files: Array<Scalars['String']>
 };
 
@@ -1850,6 +1876,14 @@ export const BasicUserDetailsFragmentDoc = gql`
   position
 }
     `;
+export const AddClientLogDocument = gql`
+    mutation addClientLog($error: String!) {
+  addClientLog(error: $error) {
+    isSuccess
+    error
+  }
+}
+    `;
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
@@ -2105,8 +2139,8 @@ export const UpdateProposalDocument = gql`
 }
     `;
 export const UpdateProposalFilesDocument = gql`
-    mutation updateProposalFiles($proposal_id: Int!, $question_id: String!, $files: [String!]!) {
-  updateProposalFiles(proposal_id: $proposal_id, question_id: $question_id, files: $files) {
+    mutation updateProposalFiles($proposalId: Int!, $questionId: String!, $files: [String!]!) {
+  updateProposalFiles(proposalId: $proposalId, questionId: $questionId, files: $files) {
     files
     error
   }
@@ -2393,6 +2427,9 @@ export const VerifyEmailDocument = gql`
     `;
 export function getSdk(client: GraphQLClient) {
   return {
+    addClientLog(variables: AddClientLogMutationVariables): Promise<AddClientLogMutation> {
+      return client.request<AddClientLogMutation>(print(AddClientLogDocument), variables);
+    },
     getPageContent(variables: GetPageContentQueryVariables): Promise<GetPageContentQuery> {
       return client.request<GetPageContentQuery>(print(GetPageContentDocument), variables);
     },
