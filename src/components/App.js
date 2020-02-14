@@ -1,22 +1,26 @@
-import React from "react";
-import SignUp from "./SignUp";
-import SignIn from "./SignIn";
-import ResetPassword from "./ResetPassword";
-import ResetPasswordEmail from "./ResetPasswordEmail";
-import EmailVerification from "./EmailVerification";
-import RoleSelectionPage from "./RoleSelectionPage";
-import DashBoard from "./DashBoard";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Redirect } from "react-router-dom";
-import { CookiesProvider } from "react-cookie";
-import { request } from "graphql-request";
 import { ThemeProvider } from "@material-ui/styles";
 import { SnackbarProvider } from "notistack";
+import React from "react";
+import { CookiesProvider } from "react-cookie";
 import {
-  UserContextProvider,
-  UserContext
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch
+} from "react-router-dom";
+import {
+  UserContext,
+  UserContextProvider
 } from "../context/UserContextProvider";
+import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { getTheme } from "../theme";
+import DashBoard from "./DashBoard";
+import EmailVerification from "./EmailVerification";
+import ResetPassword from "./ResetPassword";
+import ResetPasswordEmail from "./ResetPasswordEmail";
+import RoleSelectionPage from "./RoleSelectionPage";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>
@@ -46,10 +50,7 @@ class App extends React.Component {
     localStorage.removeItem("expToken");
   }
   componentDidCatch(error, info) {
-    const query = `mutation($error: String){logError(error: $error)}`;
-    request("/graphql", query, {
-      error
-    });
+    getUnauthorizedApi().addClientLog(error);
   }
   render() {
     return (
