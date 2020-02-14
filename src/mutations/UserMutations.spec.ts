@@ -47,45 +47,41 @@ const userMutations = new UserMutations(
 
 test("A user can invite another user by email", () => {
   return expect(
-    userMutations.createUserByEmailInvite(
-      dummyUser,
-      "firstname",
-      "lastname",
-      "email@google.com"
-    )
+    userMutations.createUserByEmailInvite(dummyUser, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: "email@google.com"
+    })
   ).resolves.toStrictEqual({ inviterId: dummyUser.id, userId: 5 });
 });
 
 test("A user must be logged in to invite another user by email", () => {
   return expect(
-    userMutations.createUserByEmailInvite(
-      null,
-      "firstname",
-      "lastname",
-      "email@google.com"
-    )
+    userMutations.createUserByEmailInvite(null, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: "email@google.com"
+    })
   ).resolves.toHaveProperty("reason", "NOT_LOGGED");
 });
 
 test("A user cannot invite another user by email if the user already has an account", () => {
   return expect(
-    userMutations.createUserByEmailInvite(
-      dummyUserNotOnProposal,
-      "firstname",
-      "lastname",
-      dummyUser.email
-    )
+    userMutations.createUserByEmailInvite(dummyUserNotOnProposal, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: dummyUser.email
+    })
   ).resolves.toHaveProperty("reason", "ACCOUNT_EXIST");
 });
 
 test("A user can reinvite another user by email if the user has not created an account", () => {
   return expect(
-    userMutations.createUserByEmailInvite(
-      dummyUser,
-      "firstname",
-      "lastname",
-      dummyPlaceHolderUser.email
-    )
+    userMutations.createUserByEmailInvite(dummyUser, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: dummyPlaceHolderUser.email
+    })
   ).resolves.toStrictEqual({
     inviterId: dummyUser.id,
     userId: dummyPlaceHolderUser.id

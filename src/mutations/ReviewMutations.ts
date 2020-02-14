@@ -6,30 +6,31 @@ import { rejection, Rejection } from "../rejection";
 import { Review } from "../models/Review";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { logger } from "../utils/Logger";
+import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
+import { AddUserForReviewArgs } from "../resolvers/mutations/AddUserForReviewMutation";
 
 export default class ReviewMutations {
   constructor(
     private dataSource: ReviewDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
-  ) { }
+  ) {}
 
   async submitReview(
     agent: User | null,
-    reviewID: number,
-    comment: string,
-    grade: number
+    args: AddReviewArgs
   ): Promise<Review | Rejection> {
+    const { reviewID, comment, grade } = args;
     const review = await this.dataSource.get(reviewID);
     if (
       review &&
       !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
     ) {
-      logger.logWarn("Blocked submitting review", { agent, reviewID })
+      logger.logWarn("Blocked submitting review", { agent, args });
       return rejection("NOT_REVIEWER_OF_PROPOSAL");
     }
     return this.dataSource
-      .submitReview(reviewID, comment, grade)
+      .submitReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException("Could not submit review", err, {
@@ -66,8 +67,7 @@ export default class ReviewMutations {
 
   async addUserForReview(
     agent: User | null,
-    userID: number,
-    proposalID: number
+    args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
@@ -75,8 +75,10 @@ export default class ReviewMutations {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("NOT_USER_OFFICER");
     }
+
+    const { proposalID, userID } = args;
     return this.dataSource
-      .addUserForReview(userID, proposalID)
+      .addUserForReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException("Failed to add user for review", err, {

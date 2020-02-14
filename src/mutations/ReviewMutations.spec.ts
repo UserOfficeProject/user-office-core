@@ -31,25 +31,36 @@ const reviewMutations = new ReviewMutations(
 
 test("A reviewer can submit a review on a proposal he is on", () => {
   return expect(
-    reviewMutations.submitReview(dummyUser, 10, "Good proposal", 9)
+    reviewMutations.submitReview(dummyUser, {
+      reviewID: 10,
+      comment: "Good proposal",
+      grade: 9
+    })
   ).resolves.toBe(dummyReview);
 });
 
 test("A user can't submit a review on a proposal", () => {
   return expect(
-    reviewMutations.submitReview(dummyUserNotOnProposal, 1, "Good proposal", 9)
+    reviewMutations.submitReview(dummyUserNotOnProposal, {
+      reviewID: 1,
+      comment: "Good proposal",
+      grade: 9
+    })
   ).resolves.toHaveProperty("reason", "NOT_REVIEWER_OF_PROPOSAL");
 });
 
 test("A userofficer can add a reviewer for a proposal", () => {
   return expect(
-    reviewMutations.addUserForReview(dummyUserOfficer, 1, 1)
+    reviewMutations.addUserForReview(dummyUserOfficer, {
+      userID: 1,
+      proposalID: 1
+    })
   ).resolves.toBeInstanceOf(Review);
 });
 
 test("A user can't add a reviewer for a proposal", () => {
   return expect(
-    reviewMutations.addUserForReview(dummyUser, 1, 1)
+    reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
   ).resolves.toHaveProperty("reason", "NOT_USER_OFFICER");
 });
 

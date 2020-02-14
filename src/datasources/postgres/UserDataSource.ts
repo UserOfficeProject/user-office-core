@@ -6,9 +6,12 @@ import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
 import { UserDataSource } from "../UserDataSource";
 import { Transaction } from "knex";
+import { AddUserRoleArgs } from "../../resolvers/mutations/AddUserRoleMutation";
+import { CreateUserByEmailInviteArgs } from "../../resolvers/mutations/CreateUserByEmailInviteMutation";
 
 export default class PostgresUserDataSource implements UserDataSource {
-  addUserRole(userID: number, roleID: number): Promise<Boolean> {
+  addUserRole(args: AddUserRoleArgs): Promise<Boolean> {
+    const { userID, roleID } = args;
     return database
       .insert({
         user_id: userID,
@@ -101,11 +104,8 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning(["*"])
       .then((user: UserRecord[]) => createUserObject(user[0]));
   }
-  async createInviteUser(
-    firstname: string,
-    lastname: string,
-    email: string
-  ): Promise<number> {
+  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
+    const { firstname, lastname, email } = args;
     return database
       .insert({
         user_title: "",

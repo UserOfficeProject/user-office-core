@@ -11,6 +11,8 @@ import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
 import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
+import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
+import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
 
 export default class UserMutations {
   constructor(
@@ -31,17 +33,15 @@ export default class UserMutations {
 
   async createUserByEmailInvite(
     agent: User | null,
-    firstname: string,
-    lastname: string,
-    email: string
+    args: CreateUserByEmailInviteArgs
   ): Promise<{ userId: number; inviterId: number } | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (!agent) {
           return rejection("NOT_LOGGED");
         }
-        //Check if email exist in database and if user has been invited before
-        const user = await this.dataSource.getByEmail(email);
+        // Check if email exist in database and if user has been invited before
+        const user = await this.dataSource.getByEmail(args.email);
         if (user && user.placeholder) {
           return {
             userId: user.id,
@@ -51,11 +51,7 @@ export default class UserMutations {
           return rejection("ACCOUNT_EXIST");
         }
         return {
-          userId: await this.dataSource.createInviteUser(
-            firstname,
-            lastname,
-            email
-          ),
+          userId: await this.dataSource.createInviteUser(args),
           inviterId: agent.id
         };
       },
@@ -315,12 +311,12 @@ export default class UserMutations {
     }
   }
 
-  async addUserRole(agent: User | null, userID: number, roleID: number) {
+  async addUserRole(agent: User | null, args: AddUserRoleArgs) {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection("INSUFFICIENT_PERMISSIONS");
     }
     return this.dataSource
-      .addUserRole(userID, roleID)
+      .addUserRole(args)
       .then(() => true)
       .catch(err => {
         logger.logException("Could not add user role", err, { agent });

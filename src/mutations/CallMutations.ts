@@ -5,6 +5,7 @@ import { EventBus } from "../events/eventBus";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { rejection, Rejection } from "../rejection";
 import { logger } from "../utils/Logger";
+import { CreateCallArgs } from "../resolvers/mutations/CreateCallMutation";
 
 export default class CallMutations {
   constructor(
@@ -15,15 +16,7 @@ export default class CallMutations {
 
   async create(
     agent: User | null,
-    shortCode: string,
-    startCall: string,
-    endCall: string,
-    startReview: string,
-    endReview: string,
-    startNotify: string,
-    endNotify: string,
-    cycleComment: string,
-    surveyComment: string
+    args: CreateCallArgs
   ): Promise<Call | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
@@ -32,22 +25,12 @@ export default class CallMutations {
       return rejection("NOT_USER_OFFICER");
     }
     return this.dataSource
-      .create(
-        shortCode,
-        startCall,
-        endCall,
-        startReview,
-        endReview,
-        startNotify,
-        endNotify,
-        cycleComment,
-        surveyComment
-      )
+      .create(args)
       .then(result => result)
       .catch(error => {
         logger.logException("Could not create call", error, {
           agent,
-          shortCode
+          shortCode: args.shortCode
         });
         return rejection("INTERNAL_ERROR");
       });

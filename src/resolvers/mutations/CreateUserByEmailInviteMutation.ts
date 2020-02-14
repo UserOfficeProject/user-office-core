@@ -14,7 +14,7 @@ import { ResponseWrapBase } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class CreateUserByEmailInviteArgs {
+export class CreateUserByEmailInviteArgs {
   @Field()
   public firstname: string;
 
@@ -43,12 +43,7 @@ export class CreateUserByEmailInviteMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.createUserByEmailInvite(
-        context.user,
-        args.firstname,
-        args.lastname,
-        args.email
-      ),
+      context.mutations.user.createUserByEmailInvite(context.user, args),
       CreateUserByEmailInviteResponseWrap
     );
   }

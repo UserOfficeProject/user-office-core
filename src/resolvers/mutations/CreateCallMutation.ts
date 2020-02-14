@@ -4,7 +4,7 @@ import { CallResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class CreateCallArgs {
+export class CreateCallArgs {
   @Field()
   public shortCode: string;
 
@@ -38,18 +38,7 @@ export class CreateCallMutation {
   @Mutation(() => CallResponseWrap)
   createCall(@Args() args: CreateCallArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.call.create(
-        context.user,
-        args.shortCode,
-        args.startCall,
-        args.endCall,
-        args.startReview,
-        args.endReview,
-        args.startNotify,
-        args.endNotify,
-        args.cycleComment,
-        args.surveyComment
-      ),
+      context.mutations.call.create(context.user, args),
       CallResponseWrap
     );
   }
