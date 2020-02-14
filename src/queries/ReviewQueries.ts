@@ -3,6 +3,7 @@ import { UserAuthorization } from "../utils/UserAuthorization";
 
 import { User } from "../models/User";
 import { Review } from "../models/Review";
+import { TechnicalReview } from "../models/TechnicalReview";
 
 export default class ReviewQueries {
   constructor(
@@ -34,6 +35,17 @@ export default class ReviewQueries {
       return this.dataSource.getProposalReviews(proposalId);
     } else {
       return [];
+    }
+  }
+
+  async technicalReviewForProposal(
+    user: User | null,
+    proposalID: number
+  ): Promise<TechnicalReview | null> {
+    if (await this.userAuth.isUserOfficer(user)) {
+      return this.dataSource.getTechnicalReview(proposalID);
+    } else {
+      return null;
     }
   }
 }
