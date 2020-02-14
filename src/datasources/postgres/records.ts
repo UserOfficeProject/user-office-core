@@ -103,6 +103,14 @@ export interface ReviewRecord {
   readonly status: number;
 }
 
+export interface TechnicalReviewRecord {
+  readonly technical_review_id: number;
+  readonly proposal_id: number;
+  readonly comment: string;
+  readonly time_allocation: number;
+  readonly status: number;
+}
+
 export interface CallRecord {
   readonly call_id: number;
   readonly call_short_code: string;

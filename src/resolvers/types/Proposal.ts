@@ -14,6 +14,7 @@ import { isRejection } from "../../rejection";
 import { ProposalStatus } from "../../models/ProposalModel";
 import { Questionary } from "./Questionary";
 import { Review } from "./Review";
+import { TechnicalReview } from "./TechnicalReview";
 import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
@@ -81,11 +82,21 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Review[]> {
-    const reviews = await context.queries.review.reviewsForProposal(
+    return await context.queries.review.reviewsForProposal(
       context.user,
       proposal.id
     );
-    return isRejection(reviews) ? [] : reviews;
+  }
+
+  @FieldResolver(() => TechnicalReview, { nullable: true })
+  async technicalReview(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<TechnicalReview | null> {
+    return await context.queries.review.technicalReviewForProposal(
+      context.user,
+      proposal.id
+    );
   }
 
   @FieldResolver(() => Questionary)
