@@ -5,6 +5,10 @@ query getProposals($filter: String!) {
       shortCode
       title
       status
+      technicalReview{
+        timeAllocation
+        status
+      }
     }
     totalCount
   }

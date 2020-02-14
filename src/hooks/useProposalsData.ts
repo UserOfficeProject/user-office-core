@@ -4,9 +4,7 @@ import { ProposalStatus } from "../generated/sdk";
 
 export function useProposalsData(filter: string) {
   const api = useDataApi();
-  const [proposalsData, setProposalsData] = useState<ProposalData[] | null>(
-    null
-  );
+  const [proposalsData, setProposalsData] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     api()

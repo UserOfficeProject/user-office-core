@@ -6,13 +6,17 @@ import { useProposalData } from "../hooks/useProposalData";
 import ParticipantModal from "./ParticipantModal";
 import PeopleTable from "./PeopleTable";
 import ProposaQuestionaryReview from "./ProposalQuestionaryReview";
-import ProposalScore from "./ProposalScore";
+import ProposalTechnicalReview from "./ProposalTechnicalReview";
 import ReviewTable from "./ReviewTable";
 import SimpleTabs from "./TabPanel";
+import { ButtonContainer } from "../styles/StyledComponents";
+import Button from "@material-ui/core/Button";
+import { TechnicalReview } from "../generated/sdk";
 
 export default function ProposalReview({ match }: { match: any }) {
   const [modalOpen, setOpen] = useState(false);
   const [reviewers, setReviewers] = useState<any>([]);
+  const [techReview, setTechReview] = useState<TechnicalReview | null | undefined>(null);
   const { proposalData } = useProposalData(parseInt(match.params.id));
   const api = useDataApi();
 
@@ -30,8 +34,10 @@ export default function ProposalReview({ match }: { match: any }) {
           };
         })
       );
+      setTechReview(proposalData.technicalReview)
     }
   }, [proposalData]);
+
 
   const addUser = async (user: any) => {
     await api().addUserForReview({
@@ -60,15 +66,15 @@ export default function ProposalReview({ match }: { match: any }) {
       <SimpleTabs
         tabNames={[
           "Information",
-          "Reviews/Reviewers",
+          "Reviews",
           "Technical",
-          "Excellence",
-          "Safety"
+          "Reviewers"
         ]}
       >
         <ProposaQuestionaryReview data={proposalData} />
+        <ReviewTable reviews={proposalData.reviews} />
+        <ProposalTechnicalReview data={techReview} setReview={setTechReview}/>
         <>
-          <ReviewTable reviews={proposalData.reviews} />
           <ParticipantModal
             show={modalOpen}
             close={setOpen}
@@ -87,13 +93,16 @@ export default function ProposalReview({ match }: { match: any }) {
             onRemove={removeUser}
             disabled={true}
           />
+            <ButtonContainer>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+              >
+                Update
+              </Button>
+              </ButtonContainer>
         </>
-        <ProposalScore
-          technicalScore={proposalData.technicalScore}
-          safetyScore={proposalData.safetyScore}
-          excellenceScore={proposalData.excellenceScore}
-          proposalId={proposalData.id}
-        />
       </SimpleTabs>
     </Container>
   );

@@ -19,6 +19,13 @@ query getProposal($id: Int!) {
     questionary {
       ...questionary
     }
+    technicalReview{
+      id
+      comment
+      timeAllocation
+      status
+      proposalID
+    }
     reviews {
       id
       grade
