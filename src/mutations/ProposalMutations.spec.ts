@@ -69,35 +69,19 @@ test("A user-officer can update a proposal in submit mode", () => {
 
 test("A user-officer can update a proposals score in submit mode", () => {
   return expect(
-    proposalMutations.update(
-      dummyUserOfficer,
-      dummyProposalSubmitted.id,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      2
-    )
+    proposalMutations.update(dummyUserOfficer, {
+      id: dummyProposalSubmitted.id,
+      proposerId: 2
+    })
   ).resolves.toBe(dummyProposalSubmitted);
 });
 
 test("A user can not update a proposals score mode", () => {
   return expect(
-    proposalMutations.update(
-      dummyUser,
-      dummyProposalSubmitted.id,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      2
-    )
+    proposalMutations.update(dummyUser, {
+      id: dummyProposalSubmitted.id,
+      proposerId: 2
+    })
   ).resolves.toHaveProperty("reason", "NOT_ALLOWED_PROPOSAL_SUBMITTED");
 });
 
@@ -108,21 +92,19 @@ test("A user not on a proposal can not update it", () => {
 });
 
 function tryUpdateProposal(user: User, proposalId: number) {
-  return proposalMutations.update(
-    user,
-    proposalId,
-    "Cras nulla nibh, dictum nec rhoncus eget, lobortis vel augue.",
-    "Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.",
-    [
+  return proposalMutations.update(user, {
+    id: proposalId,
+    title: "Cras nulla nibh, dictum nec rhoncus eget, lobortis vel augue.",
+    abstract:
+      "Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.",
+    answers: [
       {
         proposal_question_id: "fasta_seq",
         data_type: DataType.TEXT_INPUT,
         value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}'
       }
-    ],
-    undefined,
-    undefined
-  );
+    ]
+  });
 }
 
 //Accept
@@ -217,32 +199,32 @@ test("A non-logged in user cannot submit a proposal", () => {
 test("A user can attach files", () => {
   const dummyFileList = ["1020597501870552"];
   return expect(
-    proposalMutations.updateFiles(
-      dummyUser,
-      1,
-      "reference_files",
-      dummyFileList
-    )
+    proposalMutations.updateFiles(dummyUser, {
+      proposalId: 1,
+      questionId: "reference_files",
+      files: dummyFileList
+    })
   ).resolves.toBe(dummyFileList);
 });
 
 test("A non-belonging should not be able to attach files", () => {
   const dummyFileList = ["1020597501870552"];
   return expect(
-    proposalMutations.updateFiles(
-      dummyUserNotOnProposal,
-      1,
-      "reference_files",
-      dummyFileList
-    )
+    proposalMutations.updateFiles(dummyUserNotOnProposal, {
+      proposalId: 1,
+      questionId: "reference_files",
+      files: dummyFileList
+    })
   ).resolves.not.toBe(dummyFileList);
 });
 
 test("User must have valid session to attach files", () => {
   return expect(
-    proposalMutations.updateFiles(null, 1, "reference_files", [
-      "1020597501870552"
-    ])
+    proposalMutations.updateFiles(null, {
+      proposalId: 1,
+      questionId: "reference_files",
+      files: ["1020597501870552"]
+    })
   ).resolves.toHaveProperty("reason", "NOT_LOGGED_IN");
 });
 

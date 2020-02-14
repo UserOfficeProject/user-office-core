@@ -13,7 +13,7 @@ import { TemplateFieldResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class CreateTemplateFieldArgs {
+export class CreateTemplateFieldArgs {
   @Field(() => Int)
   topicId: number;
 
@@ -29,11 +29,7 @@ export class CreateTemplateFieldMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createTemplateField(
-        context.user,
-        args.topicId,
-        args.dataType
-      ),
+      context.mutations.template.createTemplateField(context.user, args),
       TemplateFieldResponseWrap
     );
   }

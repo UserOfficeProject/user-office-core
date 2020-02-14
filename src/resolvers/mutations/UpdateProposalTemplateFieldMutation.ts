@@ -18,7 +18,7 @@ import {
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
 
 @ArgsType()
-class UpdateProposalTemplateFieldArgs {
+export class UpdateProposalTemplateFieldArgs {
   @Field()
   public id: string;
 
@@ -40,8 +40,8 @@ class FieldConditionInput implements Partial<FieldCondition> {
   @Field(() => EvaluatorOperator)
   public condition: EvaluatorOperator;
 
-  @Field()
-  public params: string;
+  @Field(() => String)
+  public params: any;
 }
 
 @InputType()
@@ -63,16 +63,11 @@ export class UpdateProposalTemplateFieldMutation {
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext
   ) {
+    args.dependencies = this.unpackDependencies(args.dependencies);
     return wrapResponse(
       context.mutations.template.updateProposalTemplateField(
         context.user,
-        args.id,
-        undefined,
-        undefined,
-        args.question,
-        undefined,
-        args.config,
-        this.unpackDependencies(args.dependencies)
+        args
       ),
       ProposalTemplateResponseWrap
     );

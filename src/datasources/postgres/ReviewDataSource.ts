@@ -3,6 +3,8 @@ import { TechnicalReview } from "../../models/TechnicalReview";
 import { ReviewDataSource } from "../ReviewDataSource";
 import database from "./database";
 import { ReviewRecord, TechnicalReviewRecord } from "./records";
+import { AddReviewArgs } from "../../resolvers/mutations/AddReviewMutation";
+import { AddUserForReviewArgs } from "../../resolvers/mutations/AddUserForReviewMutation";
 
 export default class PostgresReviewDataSource implements ReviewDataSource {
   private createReviewObject(review: ReviewRecord) {
@@ -93,11 +95,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
   }
 
-  async submitReview(
-    reviewID: number,
-    comment: string,
-    grade: number
-  ): Promise<Review> {
+  async submitReview(args: AddReviewArgs): Promise<Review> {
+    const { reviewID, comment, grade } = args;
     return database
       .update(
         {
@@ -141,7 +140,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
-  async addUserForReview(userID: number, proposalID: number): Promise<Review> {
+  async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
+    const { userID, proposalID } = args;
     return database
       .insert({
         user_id: userID,

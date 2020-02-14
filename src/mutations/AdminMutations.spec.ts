@@ -1,17 +1,15 @@
 import "reflect-metadata";
-import AdminMutations from "./AdminMutations";
-import { EventBus } from "../events/eventBus";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-import { ApplicationEvent } from "../events/applicationEvents";
 import { adminDataSource } from "../datasources/mockups/AdminDataSource";
+import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
 import {
-  userDataSource,
-  dummyUser,
-  dummyUserOfficer
+  dummyUserOfficer,
+  userDataSource
 } from "../datasources/mockups/UserDataSource";
-import { rejection } from "../rejection";
+import { ApplicationEvent } from "../events/applicationEvents";
+import { EventBus } from "../events/eventBus";
 import { Page } from "../models/Admin";
+import { UserAuthorization } from "../utils/UserAuthorization";
+import AdminMutations from "./AdminMutations";
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(

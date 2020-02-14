@@ -3,6 +3,7 @@ import { Call } from "../../models/Call";
 import { CallRecord } from "./records";
 
 import database from "./database";
+import { CreateCallArgs } from "../../resolvers/mutations/CreateCallMutation";
 
 export default class PostgresCallDataSource implements CallDataSource {
   private createCallObject(call: CallRecord) {
@@ -40,28 +41,18 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async create(
-    shortCode: string,
-    startCall: string,
-    endCall: string,
-    startReview: string,
-    endReview: string,
-    startNotify: string,
-    endNotify: string,
-    cycleComment: string,
-    surveyComment: string
-  ): Promise<Call> {
+  async create(args: CreateCallArgs): Promise<Call> {
     return database
       .insert({
-        call_short_code: shortCode,
-        start_call: startCall,
-        end_call: endCall,
-        start_review: startReview,
-        end_review: endReview,
-        start_notify: startNotify,
-        end_notify: endNotify,
-        cycle_comment: cycleComment,
-        survey_comment: surveyComment
+        call_short_code: args.shortCode,
+        start_call: args.startCall,
+        end_call: args.endCall,
+        start_review: args.startReview,
+        end_review: args.endReview,
+        start_notify: args.startNotify,
+        end_notify: args.endNotify,
+        cycle_comment: args.cycleComment,
+        survey_comment: args.surveyComment
       })
       .into("call")
       .returning(["*"])
