@@ -38,11 +38,10 @@ services:
         DANGEROUSLY_DISABLE_HOST_CHECK: "true"
     build:
         context: ./
-        dockerfile: "Dockerfile.cypress"
+        dockerfile: "Dockerfile"
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.port=3000"
-    command: npm run dev
+      - "traefik.port=80"
     depends_on:
         - backend
   cypress:
