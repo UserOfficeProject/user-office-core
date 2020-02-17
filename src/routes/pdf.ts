@@ -22,10 +22,9 @@ const router = express.Router();
 const fs = require("fs");
 const hummus = require("hummus");
 
-const getAttachments = (attachmentId: string) => {
-  return baseContext.mutations.file.prepare(attachmentId).then(() => {
-    return baseContext.queries.file.getFileMetadata([attachmentId]);
-  });
+const getAttachments = async (attachmentId: string) => {
+  await baseContext.mutations.file.prepare(attachmentId);
+  return baseContext.queries.file.getFileMetadata([attachmentId]);
 };
 
 const createProposalPDF = async (
@@ -165,7 +164,7 @@ const createProposalPDF = async (
           }) as QuestionaryField[])
         : [];
       if (!step) {
-        throw "Could not dowload generated PDF";
+        throw "Could not download generated PDF";
       }
       writeBold(step.topic.topic_title);
       toc.push({
@@ -219,8 +218,9 @@ const createProposalPDF = async (
       writeStream.on("finish", async function() {
         const attachmentsMetadata = await Promise.all(
           attachmentIds.map(getAttachments)
-        ).catch(() => {
-          throw "Could not dowload generated PDF";
+        ).catch(e => {
+          logger.logException("Could not download generated PDF", e);
+          throw e;
         });
         var pdfWriter = hummus.createWriter(`downloads/${metaData.path}`);
         pdfWriter.appendPDFPagesFromPDF(`downloads/proposal-${proposalId}.pdf`);
@@ -256,8 +256,8 @@ const createProposalPDF = async (
       });
     });
   } catch (e) {
-    logger.logException("Could not dowload generated PDF", e);
-    throw "Could not dowload generated PDF";
+    logger.logException("Could not download generated PDF", e);
+    throw e;
   }
 };
 
@@ -319,7 +319,7 @@ router.get("/proposal/download/:proposal_ids", async (req: any, res) => {
       }
     );
   } catch (e) {
-    logger.logException("Could not dowload generated PDF", e);
+    logger.logException("Could not download generated PDF", e);
     res.status(500).send(e);
   }
 });
