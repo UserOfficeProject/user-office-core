@@ -55,7 +55,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         InputLabelProps={{
           shrink: true
         }}
-        maxLen={config.max}
+        maxLen={config.max || undefined}
       />
     </div>
   );
