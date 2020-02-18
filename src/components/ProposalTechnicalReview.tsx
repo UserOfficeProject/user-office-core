@@ -14,11 +14,11 @@ import { useSnackbar } from "notistack";
 
 export default function ProposalTechnicalReview(props: { data:
   TechnicalReview | null | undefined,
-  setReview: any
+  setReview: any,
+  id: number
 }) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>
@@ -38,7 +38,7 @@ export default function ProposalTechnicalReview(props: { data:
         onSubmit={async (values, actions) => {
           await api().addTechnicalReview(
             {
-              proposalID: props?.data?.proposalID!,
+              proposalID: props.id,
               timeAllocation: values.timeAllocation!,
               comment: values.comment!,
               status: TechnicalReviewStatus[values.status as TechnicalReviewStatus]
@@ -66,7 +66,6 @@ export default function ProposalTechnicalReview(props: { data:
                         { text: "Partially feasible", value: TechnicalReviewStatus.PARTIALLY_FEASIBLE },
                         { text: "Unfeasible", value: TechnicalReviewStatus.UNFEASIBLE }
                       ]}
-                      data-cy="gender"
                       required
                     />
               </Grid>

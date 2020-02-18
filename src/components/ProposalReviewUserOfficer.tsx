@@ -6,12 +6,10 @@ import { useProposalData } from "../hooks/useProposalData";
 import ParticipantModal from "./ParticipantModal";
 import PeopleTable from "./PeopleTable";
 import ProposalTechnicalReview from "./ProposalTechnicalReview";
+import ProposalAdmin from "./ProposalAdmin";
 import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
-import ProposalScore from "./ProposalScore";
 import ReviewTable from "./ReviewTable";
 import SimpleTabs from "./TabPanel";
-import { ButtonContainer } from "../styles/StyledComponents";
-import Button from "@material-ui/core/Button";
 import { TechnicalReview } from "../generated/sdk";
 
 export default function ProposalReview({ match }: { match: any }) {
@@ -66,15 +64,16 @@ export default function ProposalReview({ match }: { match: any }) {
     <Container maxWidth="lg">
       <SimpleTabs
         tabNames={[
-          "Information",
+          "General",
           "Reviews",
           "Technical",
-          "Reviewers"
+          "Reviewers",
+          "Admin"
         ]}
       >
         <ProposalQuestionaryReview data={proposalData} />
         <ReviewTable reviews={proposalData.reviews} />
-        <ProposalTechnicalReview data={techReview} setReview={setTechReview}/>
+        <ProposalTechnicalReview id={proposalData.id} data={techReview} setReview={setTechReview}/>
         <>
           <ParticipantModal
             show={modalOpen}
@@ -94,16 +93,8 @@ export default function ProposalReview({ match }: { match: any }) {
             onRemove={removeUser}
             disabled={true}
           />
-            <ButtonContainer>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Update
-              </Button>
-              </ButtonContainer>
         </>
+        <ProposalAdmin id={proposalData.id}/>
       </SimpleTabs>
     </Container>
   );

@@ -18,7 +18,8 @@ export default function ProposalTableOfficer() {
     { title: "Title", field: "title" },
     { title: "Time(Hr)", field: "technicalReview.timeAllocation" },
     { title: "Technical status", field: "technicalReview.status" },
-    { title: "Status", field: "status" }
+    { title: "Status", field: "status" },
+    { title: "Final Status", field: "finalStatus" }
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -32,7 +33,6 @@ export default function ProposalTableOfficer() {
   if (loading) {
     return <p>Loading</p>;
   }
-  console.log(proposalsData)
   return (
     <MaterialTable
       icons={tableIcons}
@@ -50,14 +50,6 @@ export default function ProposalTableOfficer() {
           tooltip: "View proposal",
           // @ts-ignore
           onClick: (event, rowData) => setEditProposalID(rowData.id),
-          position: "row"
-        },
-        {
-          icon: () => <GetAppIcon />,
-          tooltip: "Download proposal",
-          onClick: (event, rowData) =>
-            // @ts-ignore
-            downloadPDFProposal(rowData.id),
           position: "row"
         },
         {

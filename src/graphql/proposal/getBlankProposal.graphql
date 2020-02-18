@@ -3,9 +3,8 @@ query getBlankProposal {
     id
     status
     shortCode
-    excellenceScore
-    safetyScore
-    technicalScore
+    rankOrder
+    finalStatus
     title
     abstract
     created

@@ -5,9 +5,8 @@ query getProposal($id: Int!) {
     abstract
     status
     shortCode
-    excellenceScore
-    safetyScore
-    technicalScore
+    rankOrder
+    finalStatus
     created
     updated
     proposer {

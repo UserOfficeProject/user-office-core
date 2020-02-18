@@ -180,6 +180,7 @@ export type Mutation = {
    __typename?: 'Mutation',
   addClientLog: SuccessResponseWrap,
   addReview: ReviewResponseWrap,
+  addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   approveProposal: ProposalResponseWrap,
@@ -222,6 +223,14 @@ export type MutationAddReviewArgs = {
   reviewID: Scalars['Int'],
   comment: Scalars['String'],
   grade: Scalars['Int']
+};
+
+
+export type MutationAddTechnicalReviewArgs = {
+  proposalID: Scalars['Int'],
+  comment: Scalars['String'],
+  timeAllocation: Scalars['Int'],
+  status: TechnicalReviewStatus
 };
 
 
@@ -387,9 +396,8 @@ export type MutationUpdateProposalArgs = {
   users?: Maybe<Array<Scalars['Int']>>,
   proposerId?: Maybe<Scalars['Int']>,
   partialSave?: Maybe<Scalars['Boolean']>,
-  excellenceScore?: Maybe<Scalars['Int']>,
-  technicalScore?: Maybe<Scalars['Int']>,
-  safetyScore?: Maybe<Scalars['Int']>
+  rankOrder?: Maybe<Scalars['Int']>,
+  finalStatus?: Maybe<ProposalEndStatus>
 };
 
 
@@ -475,12 +483,12 @@ export type Proposal = {
   created: Scalars['DateTime'],
   updated: Scalars['DateTime'],
   shortCode: Scalars['String'],
-  excellenceScore?: Maybe<Scalars['Int']>,
-  technicalScore?: Maybe<Scalars['Int']>,
-  safetyScore?: Maybe<Scalars['Int']>,
+  rankOrder?: Maybe<Scalars['Int']>,
+  finalStatus?: Maybe<ProposalEndStatus>,
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews: Array<Review>,
+  technicalReview?: Maybe<TechnicalReview>,
   questionary: Questionary,
 };
 
@@ -489,6 +497,12 @@ export type ProposalAnswerInput = {
   data_type?: Maybe<DataType>,
   value?: Maybe<Scalars['String']>,
 };
+
+export enum ProposalEndStatus {
+  ACCEPTED = 'ACCEPTED',
+  RESERVED = 'RESERVED',
+  REJECTED = 'REJECTED'
+}
 
 export type ProposalResponseWrap = {
    __typename?: 'ProposalResponseWrap',
@@ -505,9 +519,7 @@ export type ProposalsQueryResult = {
 export enum ProposalStatus {
   BLANK = 'BLANK',
   DRAFT = 'DRAFT',
-  SUBMITTED = 'SUBMITTED',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED'
+  SUBMITTED = 'SUBMITTED'
 }
 
 export type ProposalTemplate = {
@@ -691,6 +703,28 @@ export type SuccessResponseWrap = {
   error?: Maybe<Scalars['String']>,
   isSuccess?: Maybe<Scalars['Boolean']>,
 };
+
+export type TechnicalReview = {
+   __typename?: 'TechnicalReview',
+  id: Scalars['Int'],
+  proposalID: Scalars['Int'],
+  comment: Scalars['String'],
+  timeAllocation: Scalars['Int'],
+  status: TechnicalReviewStatus,
+  proposal?: Maybe<Proposal>,
+};
+
+export type TechnicalReviewResponseWrap = {
+   __typename?: 'TechnicalReviewResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  technicalReview?: Maybe<TechnicalReview>,
+};
+
+export enum TechnicalReviewStatus {
+  FEASIBLE = 'FEASIBLE',
+  PARTIALLY_FEASIBLE = 'PARTIALLY_FEASIBLE',
+  UNFEASIBLE = 'UNFEASIBLE'
+}
 
 export type TemplateFieldResponseWrap = {
    __typename?: 'TemplateFieldResponseWrap',
@@ -1113,7 +1147,7 @@ export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
   & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'excellenceScore' | 'safetyScore' | 'technicalScore' | 'title' | 'abstract' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1156,7 +1190,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'excellenceScore' | 'safetyScore' | 'technicalScore' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1166,7 +1200,10 @@ export type GetProposalQuery = (
     )>, questionary: (
       { __typename?: 'Questionary' }
       & QuestionaryFragment
-    ), reviews: Array<(
+    ), technicalReview: Maybe<(
+      { __typename?: 'TechnicalReview' }
+      & Pick<TechnicalReview, 'id' | 'comment' | 'timeAllocation' | 'status' | 'proposalID'>
+    )>, reviews: Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
       & { reviewer: Maybe<(
@@ -1209,7 +1246,27 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
+      & { proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ), reviews: Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
+        & { reviewer: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+        )> }
+      )>, users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & Pick<TechnicalReview, 'id' | 'comment' | 'timeAllocation' | 'status' | 'proposalID'>
+      )> }
     )> }
   )> }
 );
@@ -1254,7 +1311,8 @@ export type UpdateProposalMutationVariables = {
   users?: Maybe<Array<Scalars['Int']>>,
   proposerId?: Maybe<Scalars['Int']>,
   partialSave?: Maybe<Scalars['Boolean']>,
-  excellenceScore?: Maybe<Scalars['Int']>
+  rankOrder?: Maybe<Scalars['Int']>,
+  finalStatus?: Maybe<ProposalEndStatus>
 };
 
 
@@ -1362,6 +1420,26 @@ export type AddReviewMutation = (
     & { review: Maybe<(
       { __typename?: 'Review' }
       & CoreReviewFragment
+    )> }
+  ) }
+);
+
+export type AddTechnicalReviewMutationVariables = {
+  proposalID: Scalars['Int'],
+  timeAllocation: Scalars['Int'],
+  comment: Scalars['String'],
+  status: TechnicalReviewStatus
+};
+
+
+export type AddTechnicalReviewMutation = (
+  { __typename?: 'Mutation' }
+  & { addTechnicalReview: (
+    { __typename?: 'TechnicalReviewResponseWrap' }
+    & Pick<TechnicalReviewResponseWrap, 'error'>
+    & { technicalReview: Maybe<(
+      { __typename?: 'TechnicalReview' }
+      & Pick<TechnicalReview, 'id'>
     )> }
   ) }
 );
@@ -2000,9 +2078,8 @@ export const GetBlankProposalDocument = gql`
     id
     status
     shortCode
-    excellenceScore
-    safetyScore
-    technicalScore
+    rankOrder
+    finalStatus
     title
     abstract
     created
@@ -2052,9 +2129,8 @@ export const GetProposalDocument = gql`
     abstract
     status
     shortCode
-    excellenceScore
-    safetyScore
-    technicalScore
+    rankOrder
+    finalStatus
     created
     updated
     proposer {
@@ -2065,6 +2141,13 @@ export const GetProposalDocument = gql`
     }
     questionary {
       ...questionary
+    }
+    technicalReview {
+      id
+      comment
+      timeAllocation
+      status
+      proposalID
     }
     reviews {
       id
@@ -2103,14 +2186,49 @@ export const GetProposalsDocument = gql`
   proposals(filter: $filter) {
     proposals {
       id
-      shortCode
       title
+      abstract
       status
+      shortCode
+      rankOrder
+      finalStatus
+      created
+      updated
+      proposer {
+        ...basicUserDetails
+      }
+      questionary {
+        ...questionary
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        reviewer {
+          firstname
+          lastname
+          username
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        id
+        comment
+        timeAllocation
+        status
+        proposalID
+      }
     }
     totalCount
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const SubmitProposalDocument = gql`
     mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {
@@ -2129,8 +2247,8 @@ export const UpdateFieldTopicRelDocument = gql`
 }
     `;
 export const UpdateProposalDocument = gql`
-    mutation updateProposal($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $topicsCompleted: [Int!], $users: [Int!], $proposerId: Int, $partialSave: Boolean, $excellenceScore: Int) {
-  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, topicsCompleted: $topicsCompleted, users: $users, proposerId: $proposerId, partialSave: $partialSave, excellenceScore: $excellenceScore) {
+    mutation updateProposal($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $topicsCompleted: [Int!], $users: [Int!], $proposerId: Int, $partialSave: Boolean, $rankOrder: Int, $finalStatus: ProposalEndStatus) {
+  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, topicsCompleted: $topicsCompleted, users: $users, proposerId: $proposerId, partialSave: $partialSave, rankOrder: $rankOrder, finalStatus: $finalStatus) {
     proposal {
       id
     }
@@ -2191,6 +2309,16 @@ export const AddReviewDocument = gql`
   }
 }
     ${CoreReviewFragmentDoc}`;
+export const AddTechnicalReviewDocument = gql`
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int!, $comment: String!, $status: TechnicalReviewStatus!) {
+  addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, status: $status) {
+    error
+    technicalReview {
+      id
+    }
+  }
+}
+    `;
 export const AddUserForReviewDocument = gql`
     mutation addUserForReview($userID: Int!, $proposalID: Int!) {
   addUserForReview(userID: $userID, proposalID: $proposalID) {
@@ -2498,6 +2626,9 @@ export function getSdk(client: GraphQLClient) {
     },
     addReview(variables: AddReviewMutationVariables): Promise<AddReviewMutation> {
       return client.request<AddReviewMutation>(print(AddReviewDocument), variables);
+    },
+    addTechnicalReview(variables: AddTechnicalReviewMutationVariables): Promise<AddTechnicalReviewMutation> {
+      return client.request<AddTechnicalReviewMutation>(print(AddTechnicalReviewDocument), variables);
     },
     addUserForReview(variables: AddUserForReviewMutationVariables): Promise<AddUserForReviewMutation> {
       return client.request<AddUserForReviewMutation>(print(AddUserForReviewDocument), variables);
