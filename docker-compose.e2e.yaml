@@ -34,11 +34,7 @@ services:
     depends_on:
         - db
   frontend:
-    environment:
-        DANGEROUSLY_DISABLE_HOST_CHECK: "true"
-    build:
-        context: ./
-        dockerfile: "Dockerfile"
+    image: dmsc/duo-frontend
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
