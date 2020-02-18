@@ -5,14 +5,17 @@ import { useDataApi } from "../hooks/useDataApi";
 import { useProposalData } from "../hooks/useProposalData";
 import ParticipantModal from "./ParticipantModal";
 import PeopleTable from "./PeopleTable";
+import ProposalTechnicalReview from "./ProposalTechnicalReview";
+import ProposalAdmin from "./ProposalAdmin";
 import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
-import ProposalScore from "./ProposalScore";
 import ReviewTable from "./ReviewTable";
 import SimpleTabs from "./TabPanel";
+import { TechnicalReview } from "../generated/sdk";
 
 export default function ProposalReview({ match }: { match: any }) {
   const [modalOpen, setOpen] = useState(false);
   const [reviewers, setReviewers] = useState<any>([]);
+  const [techReview, setTechReview] = useState<TechnicalReview | null | undefined>(null);
   const { proposalData } = useProposalData(parseInt(match.params.id));
   const api = useDataApi();
 
@@ -30,8 +33,10 @@ export default function ProposalReview({ match }: { match: any }) {
           };
         })
       );
+      setTechReview(proposalData.technicalReview)
     }
   }, [proposalData]);
+
 
   const addUser = async (user: any) => {
     await api().addUserForReview({
@@ -59,16 +64,17 @@ export default function ProposalReview({ match }: { match: any }) {
     <Container maxWidth="lg">
       <SimpleTabs
         tabNames={[
-          "Information",
-          "Reviews/Reviewers",
+          "General",
+          "Reviews",
           "Technical",
-          "Excellence",
-          "Safety"
+          "Reviewers",
+          "Admin"
         ]}
       >
         <ProposalQuestionaryReview data={proposalData} />
+        <ReviewTable reviews={proposalData.reviews} />
+        <ProposalTechnicalReview id={proposalData.id} data={techReview} setReview={setTechReview}/>
         <>
-          <ReviewTable reviews={proposalData.reviews} />
           <ParticipantModal
             show={modalOpen}
             close={setOpen}
@@ -88,12 +94,7 @@ export default function ProposalReview({ match }: { match: any }) {
             disabled={true}
           />
         </>
-        <ProposalScore
-          technicalScore={proposalData.technicalScore}
-          safetyScore={proposalData.safetyScore}
-          excellenceScore={proposalData.excellenceScore}
-          proposalId={proposalData.id}
-        />
+        <ProposalAdmin id={proposalData.id}/>
       </SimpleTabs>
     </Container>
   );

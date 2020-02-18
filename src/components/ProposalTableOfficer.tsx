@@ -2,17 +2,24 @@ import React, { useState } from "react";
 import { useProposalsData } from "../hooks/useProposalsData";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
-import { tableIcons } from "../utils/tableIcons";
+import { tableIcons } from "../utils/materialIcons";
 import { Edit } from "@material-ui/icons";
 import { useDataApi } from "../hooks/useDataApi";
+import { useDownloadPDFProposal } from "../hooks/useDownloadPDFProposal";
+import GetAppIcon from "@material-ui/icons/GetApp";
+
 
 export default function ProposalTableOfficer() {
   const { loading, proposalsData, setProposalsData } = useProposalsData("");
+  const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
     { title: "Title", field: "title" },
-    { title: "Status", field: "status" }
+    { title: "Time(Hr)", field: "technicalReview.timeAllocation" },
+    { title: "Technical status", field: "technicalReview.status" },
+    { title: "Status", field: "status" },
+    { title: "Final Status", field: "finalStatus" }
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -26,7 +33,6 @@ export default function ProposalTableOfficer() {
   if (loading) {
     return <p>Loading</p>;
   }
-
   return (
     <MaterialTable
       icons={tableIcons}
@@ -35,13 +41,27 @@ export default function ProposalTableOfficer() {
       data={proposalsData}
       options={{
         search: true,
+        selection: true,
         debounceInterval: 400
       }}
       actions={[
         {
           icon: () => <Edit />,
           tooltip: "View proposal",
-          onClick: (event, rowData) => setEditProposalID(rowData.id)
+          // @ts-ignore
+          onClick: (event, rowData) => setEditProposalID(rowData.id),
+          position: "row"
+        },
+        {
+          icon: () => <GetAppIcon />,
+          tooltip: "Download proposals",
+          onClick: (event, rowData) => {
+            downloadPDFProposal(
+              // @ts-ignore
+              rowData.map(row => row.id).join(",")
+            );
+          },
+          position: "toolbarOnSelect"
         }
       ]}
       editable={{

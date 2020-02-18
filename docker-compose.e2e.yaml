@@ -34,19 +34,14 @@ services:
     depends_on:
         - db
   frontend:
-    environment:
-        DANGEROUSLY_DISABLE_HOST_CHECK: "true"
-    build:
-        context: ./
-        dockerfile: "Dockerfile.cypress"
+    image: dmsc/duo-frontend
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
-      - "traefik.port=3000"
-    command: npm run dev
+      - "traefik.port=80"
     depends_on:
         - backend
   cypress:
     build: ./cypress
-    command: ["./wait-for-frontend.sh", "frontend:3000", "cypress run"]
+    command: ["./wait-for-frontend.sh", "frontend:80", "cypress run"]
     depends_on:
         - frontend

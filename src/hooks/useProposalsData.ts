@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDataApi } from "./useDataApi";
 import { ProposalStatus } from "../generated/sdk";
+import { Proposal } from "../generated/sdk";
 
 export function useProposalsData(filter: string) {
   const api = useDataApi();
-  const [proposalsData, setProposalsData] = useState<ProposalData[] | null>(
-    null
-  );
+  const [proposalsData, setProposalsData] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     api()
@@ -34,8 +33,6 @@ export function useProposalsData(filter: string) {
   return { loading, proposalsData, setProposalsData };
 }
 
-interface ProposalData {
-  id: number;
-  title: string;
+interface ProposalData extends Omit<Proposal, "status"> {
   status: string;
 }

@@ -25,6 +25,14 @@ export const ContentContainer = styled(({ ...other }) => (
   padding: props => getSpacing(props.padding, [4, 0])
 });
 
+export const ButtonContainer = styled(({ ...other }) => (
+  <div {...other}/>
+))({
+  display: "flex",
+  justifyContent: "flex-end"
+
+});
+
 const getSpacing = (userValue: any, defaultValue: any) => {
   return getTheme().spacing.apply(getTheme(), userValue || defaultValue);
 };

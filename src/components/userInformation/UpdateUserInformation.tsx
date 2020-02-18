@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { useGetFields } from "../../hooks/useGetFields";
 import orcid from "../../images/orcid.png";
-import { StyledPaper } from "../../styles/StyledComponents";
+import { StyledPaper, ButtonContainer } from "../../styles/StyledComponents";
 import { userFieldSchema } from "../../utils/userFieldValidationSchema";
 import FormikDropdown from "../FormikDropdown";
 
@@ -311,7 +311,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                         />
                       </Grid>
                     </Grid>
-                    <div className={classes.buttons}>
+                    <ButtonContainer>
                       <Button
                         disabled={isSubmitting}
                         type="submit"
@@ -321,7 +321,7 @@ export default function UpdateUserInformation(props: { id: number }) {
                       >
                         Update Profile
                       </Button>
-                    </div>
+                      </ButtonContainer>
                   </Form>
                 )}
               </Formik>

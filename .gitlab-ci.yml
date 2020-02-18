@@ -7,14 +7,25 @@ cache:
 
 stages:
   - test
-  - e2etest
   - build
+  - e2etest
 
 test:
   stage: test
   script:
     - npm install
     - NODE_ENV=ci npm run test
+  tags:
+    - docker
+
+docker build:
+  image: docker:stable
+  stage: build
+  script:
+    - docker info
+    - docker build . -t dmsc/duo-frontend
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
+    - docker push dmsc/duo-frontend
   tags:
     - docker
 
@@ -35,15 +46,4 @@ e2etest:
     - docker
 
 
-docker build:
-  image: docker:stable
-  stage: build
-  script:
-    - docker info
-    - docker build . -t dmsc/duo-frontend
-    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
-    - docker push dmsc/duo-frontend
-  tags:
-    - docker
-  only:
-    - develop
+
