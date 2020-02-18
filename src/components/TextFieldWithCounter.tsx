@@ -36,7 +36,7 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
     <div className={classes.wrapper}>
       <TextField {...other} onChange={handleChange} />
       <span className={getCounterClassNames()}>
-        {textLen ? `${textLen}/${maxLen}` : ""}
+        {textLen ? (maxLen ? `${textLen}/${maxLen}` : textLen) : ""}
       </span>
     </div>
   );

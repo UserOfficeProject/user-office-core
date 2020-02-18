@@ -44,8 +44,8 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
       validationSchema={Yup.object().shape({
         question: Yup.string().required("Question is required"),
         config: Yup.object({
-          min: Yup.number(),
-          max: Yup.number(),
+          min: Yup.number().nullable(),
+          max: Yup.number().nullable(),
           required: Yup.bool(),
           placeholder: Yup.string(),
           multiline: Yup.boolean()
