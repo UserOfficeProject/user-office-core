@@ -30,7 +30,6 @@ export class proposalDataSource implements ProposalDataSource {
       new Date("2019-07-17 08:25:12.23043+00"),
       "GQX639",
       1,
-      1,
       1
     );
 
@@ -43,7 +42,6 @@ export class proposalDataSource implements ProposalDataSource {
       new Date("2019-07-17 08:25:12.23043+00"),
       new Date("2019-07-17 08:25:12.23043+00"),
       "GQX639",
-      1,
       1,
       1
     );
