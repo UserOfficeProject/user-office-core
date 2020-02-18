@@ -12,6 +12,7 @@ import { Proposal as ProposalOrigin } from "../../models/Proposal";
 
 import { isRejection } from "../../rejection";
 import { ProposalStatus } from "../../models/ProposalModel";
+import { ProposalEndStatus } from "../../models/ProposalModel";
 import { Questionary } from "./Questionary";
 import { Review } from "./Review";
 import { TechnicalReview } from "./TechnicalReview";
@@ -41,13 +42,10 @@ export class Proposal implements Partial<ProposalOrigin> {
   public shortCode: string;
 
   @Field(() => Int, { nullable: true })
-  public excellenceScore?: number;
+  public rankOrder?: number;
 
-  @Field(() => Int, { nullable: true })
-  public technicalScore?: number;
-
-  @Field(() => Int, { nullable: true })
-  public safetyScore?: number;
+  @Field(() => ProposalEndStatus, { nullable: true })
+  public finalStatus?: ProposalEndStatus;
 
   public proposerId: number;
 }

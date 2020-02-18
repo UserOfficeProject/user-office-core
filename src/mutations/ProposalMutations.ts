@@ -65,9 +65,8 @@ export default class ProposalMutations {
       users,
       proposerId,
       partialSave,
-      excellenceScore,
-      technicalScore,
-      safetyScore
+      rankOrder,
+      finalStatus
     } = args;
 
     return this.eventBus.wrap<Proposal>(
@@ -113,26 +112,18 @@ export default class ProposalMutations {
         if (abstract !== undefined) {
           proposal.abstract = abstract;
         }
-
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          excellenceScore !== undefined
+          rankOrder !== undefined
         ) {
-          proposal.excellenceScore = excellenceScore;
+          proposal.rankOrder = rankOrder;
         }
 
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          technicalScore !== undefined
+          finalStatus !== undefined
         ) {
-          proposal.technicalScore = technicalScore;
-        }
-
-        if (
-          (await this.userAuth.isUserOfficer(agent)) &&
-          safetyScore !== undefined
-        ) {
-          proposal.safetyScore = safetyScore;
+          proposal.finalStatus = finalStatus;
         }
 
         if (users !== undefined) {

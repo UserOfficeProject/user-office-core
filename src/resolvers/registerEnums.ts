@@ -1,6 +1,10 @@
 import { registerEnumType } from "type-graphql";
 import { PageName } from "../models/Page";
-import { DataType, ProposalStatus } from "../models/ProposalModel";
+import {
+  DataType,
+  ProposalStatus,
+  ProposalEndStatus
+} from "../models/ProposalModel";
 import { ReviewStatus } from "../models/Review";
 import { TechnicalReviewStatus } from "../models/TechnicalReview";
 import { EvaluatorOperator } from "../models/ConditionEvaluator";
@@ -8,6 +12,7 @@ import { UserRole } from "../models/User";
 
 export const registerEnums = () => {
   registerEnumType(ProposalStatus, { name: "ProposalStatus" });
+  registerEnumType(ProposalEndStatus, { name: "ProposalEndStatus" });
   registerEnumType(ReviewStatus, { name: "ReviewStatus" });
   registerEnumType(TechnicalReviewStatus, { name: "TechnicalReviewStatus" });
   registerEnumType(PageName, { name: "PageName" });

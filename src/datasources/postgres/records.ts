@@ -191,9 +191,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.created_at,
     proposal.updated_at,
     proposal.short_code,
-    proposal.excellence_score,
-    proposal.safety_score,
-    proposal.technical_score
+    proposal.rank_order,
+    proposal.final_status
   );
 };
 

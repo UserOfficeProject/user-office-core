@@ -9,8 +9,7 @@ export class Proposal {
     public created: Date,
     public updated: Date,
     public shortCode: string,
-    public excellenceScore: number,
-    public safetyScore: number,
-    public technicalScore: number
+    public rankOrder: number,
+    public finalStatus: number
   ) {}
 }
