@@ -1,7 +1,7 @@
 import { ProposalDataSource } from "../datasources/ProposalDataSource";
 import { User } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalStatus } from "../models/ProposalModel";
+import { ProposalStatus, ProposalEndStatus } from "../models/ProposalModel";
 import { Proposal } from "../models/Proposal";
 import { ILogger } from "../utils/Logger";
 
@@ -90,7 +90,7 @@ export default class ProposalQueries {
       new Date(),
       "",
       0,
-      0
+      ProposalEndStatus.UNSET
     );
     return blankProposal;
   }

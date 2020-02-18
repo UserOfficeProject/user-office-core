@@ -175,6 +175,7 @@ export enum ProposalStatus {
 }
 
 export enum ProposalEndStatus {
+  UNSET = 0,
   ACCEPTED = 1,
   RESERVED = 2,
   REJECTED = 3
