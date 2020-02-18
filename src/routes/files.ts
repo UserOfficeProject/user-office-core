@@ -46,7 +46,7 @@ router.get("/files/download/:file_id", async (req, res) => {
       throw new Error("Could not prepare file");
     }
   } catch (e) {
-    logger.logException("Could not dowload file", e, { req });
+    logger.logException("Could not download file", e, { req });
     res.status(500).send(e);
   }
 });

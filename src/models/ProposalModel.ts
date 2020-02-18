@@ -219,8 +219,6 @@ defaultConfigs.put("SelectionFromOptionsConfig", {
   ...baseDefaultConfig
 });
 defaultConfigs.put("TextInputConfig", {
-  min: 0,
-  max: 1000000,
   multiline: false,
   placeholder: "",
   ...baseDefaultConfig

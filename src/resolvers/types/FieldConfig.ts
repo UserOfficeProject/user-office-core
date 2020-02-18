@@ -50,11 +50,11 @@ export class SelectionFromOptionsConfig extends ConfigBase {
 
 @ObjectType()
 export class TextInputConfig extends ConfigBase {
-  @Field(() => Int)
-  min: number;
+  @Field(() => Int, { nullable: true })
+  min: number | null;
 
-  @Field(() => Int)
-  max: number;
+  @Field(() => Int, { nullable: true })
+  max: number | null;
 
   @Field(() => Boolean)
   multiline: boolean;
