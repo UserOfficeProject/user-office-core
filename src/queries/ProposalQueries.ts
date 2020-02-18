@@ -21,9 +21,8 @@ export default class ProposalQueries {
 
     //If not a user officer remove excellence, tehnical and safety score
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      delete proposal.excellenceScore;
-      delete proposal.technicalScore;
-      delete proposal.safetyScore;
+      delete proposal.rankOrder;
+      delete proposal.finalStatus;
     }
     if ((await this.hasAccessRights(agent, proposal)) === true) {
       return proposal;
@@ -90,7 +89,6 @@ export default class ProposalQueries {
       new Date(),
       new Date(),
       "",
-      0,
       0,
       0
     );

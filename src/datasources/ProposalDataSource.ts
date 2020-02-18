@@ -17,8 +17,6 @@ export interface ProposalDataSource {
   create(id: number): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
-  acceptProposal(id: number): Promise<Proposal>;
-  rejectProposal(id: number): Promise<Proposal>;
   submitProposal(id: number): Promise<Proposal>;
   deleteProposal(id: number): Promise<Proposal>;
   updateAnswer(

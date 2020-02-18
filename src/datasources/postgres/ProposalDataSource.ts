@@ -56,12 +56,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async submitProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
-  async acceptProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.ACCEPTED);
-  }
-  async rejectProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.REJECTED);
-  }
 
   async deleteProposal(id: number): Promise<Proposal> {
     return database("proposals")
@@ -201,9 +195,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           abstract: proposal.abstract,
           status: proposal.status,
           proposer_id: proposal.proposerId,
-          excellence_score: proposal.excellenceScore,
-          safety_score: proposal.safetyScore,
-          technical_score: proposal.technicalScore
+          rank_order: proposal.rankOrder,
+          final_status: proposal.finalStatus
         },
         ["*"]
       )

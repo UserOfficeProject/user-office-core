@@ -12,6 +12,7 @@ import { ResolverContext } from "../../context";
 import { DataType } from "../../models/ProposalModel";
 import { ProposalResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
+import { ProposalEndStatus } from "../../models/ProposalModel";
 
 @ArgsType()
 export class UpdateProposalArgs {
@@ -40,13 +41,10 @@ export class UpdateProposalArgs {
   public partialSave?: boolean;
 
   @Field(() => Int, { nullable: true })
-  public excellenceScore?: number;
+  public rankOrder?: number;
 
-  @Field(() => Int, { nullable: true })
-  public technicalScore?: number;
-
-  @Field(() => Int, { nullable: true })
-  public safetyScore?: number;
+  @Field(() => ProposalEndStatus, { nullable: true })
+  public finalStatus?: ProposalEndStatus;
 }
 
 @Resolver()

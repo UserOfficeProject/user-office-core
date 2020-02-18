@@ -65,9 +65,8 @@ export default class ProposalMutations {
       users,
       proposerId,
       partialSave,
-      excellenceScore,
-      technicalScore,
-      safetyScore
+      rankOrder,
+      finalStatus
     } = args;
 
     return this.eventBus.wrap<Proposal>(
@@ -113,26 +112,18 @@ export default class ProposalMutations {
         if (abstract !== undefined) {
           proposal.abstract = abstract;
         }
-
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          excellenceScore !== undefined
+          rankOrder !== undefined
         ) {
-          proposal.excellenceScore = excellenceScore;
+          proposal.rankOrder = rankOrder;
         }
 
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          technicalScore !== undefined
+          finalStatus !== undefined
         ) {
-          proposal.technicalScore = technicalScore;
-        }
-
-        if (
-          (await this.userAuth.isUserOfficer(agent)) &&
-          safetyScore !== undefined
-        ) {
-          proposal.safetyScore = safetyScore;
+          proposal.finalStatus = finalStatus;
         }
 
         if (users !== undefined) {
@@ -227,52 +218,6 @@ export default class ProposalMutations {
         logger.logException("Could not update proposal files", err, {
           agent,
           args
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
-  async accept(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-    return this.dataSource
-      .acceptProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not accept proposal", err, {
-          agent,
-          proposalId
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
-  async reject(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-
-    return this.dataSource
-      .rejectProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not reject proposal", err, {
-          agent,
-          proposalId
         });
         return rejection("INTERNAL_ERROR");
       });

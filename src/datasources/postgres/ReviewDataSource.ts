@@ -1,9 +1,8 @@
+import { Review, ReviewStatus } from "../../models/Review";
+import { TechnicalReview } from "../../models/TechnicalReview";
 import { ReviewDataSource } from "../ReviewDataSource";
-import { Review } from "../../models/Review";
-import { ReviewRecord } from "./records";
-
 import database from "./database";
-import { ReviewStatus } from "../../models/Review";
+import { ReviewRecord, TechnicalReviewRecord } from "./records";
 import { AddReviewArgs } from "../../resolvers/mutations/AddReviewMutation";
 import { AddUserForReviewArgs } from "../../resolvers/mutations/AddUserForReviewMutation";
 
@@ -17,6 +16,65 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       review.grade,
       review.status
     );
+  }
+
+  private createTechnicalReviewObject(technicalReview: TechnicalReviewRecord) {
+    return new TechnicalReview(
+      technicalReview.technical_review_id,
+      technicalReview.proposal_id,
+      technicalReview.comment,
+      technicalReview.time_allocation,
+      technicalReview.status
+    );
+  }
+
+  async setTechnicalReview(
+    proposalID: number,
+    comment: string,
+    status: number,
+    timeAllocation: number
+  ): Promise<TechnicalReview> {
+    if (await this.getTechnicalReview(proposalID)) {
+      return database
+        .update({
+          proposal_id: proposalID,
+          comment,
+          time_allocation: timeAllocation,
+          status
+        })
+        .from("technical_review")
+        .where("proposal_id", proposalID)
+        .returning("*")
+        .then((records: TechnicalReviewRecord[]) =>
+          this.createTechnicalReviewObject(records[0])
+        );
+    }
+    return database
+      .insert({
+        proposal_id: proposalID,
+        comment,
+        time_allocation: timeAllocation,
+        status
+      })
+      .returning("*")
+      .into("technical_review")
+      .then((records: TechnicalReviewRecord[]) =>
+        this.createTechnicalReviewObject(records[0])
+      );
+  }
+
+  async getTechnicalReview(id: number): Promise<TechnicalReview | null> {
+    return database
+      .select()
+      .from("technical_review")
+      .where("proposal_id", id)
+      .first()
+      .then((review: TechnicalReviewRecord) => {
+        if (review === undefined) {
+          return null;
+        }
+        return this.createTechnicalReviewObject(review);
+      });
   }
 
   async get(id: number): Promise<Review | null> {
