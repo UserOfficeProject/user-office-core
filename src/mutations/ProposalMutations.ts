@@ -223,52 +223,6 @@ export default class ProposalMutations {
       });
   }
 
-  async accept(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-    return this.dataSource
-      .acceptProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not accept proposal", err, {
-          agent,
-          proposalId
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
-  async reject(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-
-    return this.dataSource
-      .rejectProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not reject proposal", err, {
-          agent,
-          proposalId
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
   async submit(
     agent: User | null,
     proposalId: number

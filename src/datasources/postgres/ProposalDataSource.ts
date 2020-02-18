@@ -56,12 +56,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async submitProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
-  async acceptProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.ACCEPTED);
-  }
-  async rejectProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.REJECTED);
-  }
 
   async deleteProposal(id: number): Promise<Proposal> {
     return database("proposals")

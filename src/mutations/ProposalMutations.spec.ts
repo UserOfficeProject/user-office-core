@@ -107,56 +107,6 @@ function tryUpdateProposal(user: User, proposalId: number) {
   });
 }
 
-//Accept
-
-test("A user officer can accept a proposal ", () => {
-  return expect(proposalMutations.accept(dummyUserOfficer, 1)).resolves.toBe(
-    dummyProposal
-  );
-});
-
-test("A non-officer user cannot accept a proposal", () => {
-  return expect(proposalMutations.accept(dummyUser, 1)).resolves.toHaveProperty(
-    "reason",
-    "NOT_USER_OFFICER"
-  );
-});
-
-test("A non-logged in user cannot accept a proposal", () => {
-  return expect(proposalMutations.accept(null, 1)).resolves.toHaveProperty(
-    "reason",
-    "NOT_LOGGED_IN"
-  );
-});
-
-test("A user officer can not accept a proposal that does not exist", () => {
-  return expect(
-    proposalMutations.accept(dummyUserOfficer, -1)
-  ).resolves.toHaveProperty("reason", "INTERNAL_ERROR");
-});
-
-//Reject
-
-test("A user officer can reject a proposal ", () => {
-  return expect(proposalMutations.reject(dummyUserOfficer, 1)).resolves.toBe(
-    dummyProposal
-  );
-});
-
-test("A non-officer user cannot reject a proposal", () => {
-  return expect(proposalMutations.reject(dummyUser, 1)).resolves.toHaveProperty(
-    "reason",
-    "NOT_USER_OFFICER"
-  );
-});
-
-test("A non-logged in user cannot reject a proposal", () => {
-  return expect(proposalMutations.reject(null, 1)).resolves.toHaveProperty(
-    "reason",
-    "NOT_LOGGED_IN"
-  );
-});
-
 //Submit
 
 test("A user officer can not reject a proposal that does not exist", () => {
