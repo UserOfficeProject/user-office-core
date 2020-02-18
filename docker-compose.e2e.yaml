@@ -42,6 +42,6 @@ services:
         - backend
   cypress:
     build: ./cypress
-    command: ["./wait-for-frontend.sh", "frontend:3000", "cypress run"]
+    command: ["./wait-for-frontend.sh", "frontend:80", "cypress run"]
     depends_on:
         - frontend
