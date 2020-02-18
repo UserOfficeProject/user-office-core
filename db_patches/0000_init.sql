@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS proposal_questions;
 DROP TABLE IF EXISTS proposal_topic_completenesses;
 DROP TABLE IF EXISTS proposal_topics;
 DROP TABLE IF EXISTS proposal_user;
+DROP TABLE IF EXISTS technical_review;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS role_user;
 DROP TABLE IF EXISTS proposals;
