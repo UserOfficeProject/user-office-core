@@ -17,11 +17,8 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import ErrorIcon from "@material-ui/icons/Error";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import {
-  UPLOAD_STATE,
-  useFileUpload,
-  useGetFileMetadata
-} from "../../hooks/useFileUpload";
+import { useDataApi } from "../../hooks/useDataApi";
+import { UPLOAD_STATE, useFileUpload } from "../../hooks/useFileUpload";
 import { usePrevious } from "../../hooks/usePrevious";
 import { FileMetaData } from "../../models/FileUpload";
 
@@ -33,10 +30,10 @@ export function FileUploadComponent(props: {
   onChange: Function;
   className?: string;
 }) {
-  const { getFileMetadata, filesMetadata } = useGetFileMetadata();
   const [files, setFiles] = useState<FileMetaData[]>([]);
   const previousFiles = usePrevious(files);
   const inputRef = useRef(null);
+  const api = useDataApi();
 
   const classes = makeStyles(theme => ({
     list: {
@@ -61,13 +58,18 @@ export function FileUploadComponent(props: {
 
   useEffect(() => {
     if (props.value) {
-      getFileMetadata(props.value.split(","));
+      api()
+        .getFileMetadata({ fileIds: props.value.split(",") })
+        .then(data => {
+          setFiles(data?.fileMetadata || []);
+        });
     }
-  }, []);
+  }, [api, props.value]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     setFiles(filesMetadata);
   }, [filesMetadata]);
+  */
 
   const onUploadComplete = (newFile: FileMetaData) => {
     setFiles(files.concat(newFile));
