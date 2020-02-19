@@ -55,7 +55,8 @@ async function bootstrap() {
       __dirname + "/src/resolvers/**/*Query.{ts,js}",
       __dirname + "/src/resolvers/**/*Mutation.{ts,js}",
       __dirname + "/src/resolvers/**/*Resolver.{ts,js}"
-    ]
+    ],
+    validate: false
   });
 
   app.use(
