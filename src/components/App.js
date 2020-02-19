@@ -15,12 +15,12 @@ import {
 import { getUnauthorizedApi } from "../hooks/useDataApi";
 import { getTheme } from "../theme";
 import DashBoard from "./DashBoard";
-import EmailVerification from "./EmailVerification";
-import ResetPassword from "./ResetPassword";
-import ResetPasswordEmail from "./ResetPasswordEmail";
-import RoleSelectionPage from "./RoleSelectionPage";
-import SignIn from "./SignIn";
-import SignUp from "./SignUp";
+import EmailVerification from "./user/EmailVerification";
+import ResetPassword from "./user/ResetPassword";
+import ResetPasswordEmail from "./user/ResetPasswordEmail";
+import RoleSelectionPage from "./user/RoleSelectionPage";
+import SignIn from "./user/SignIn";
+import SignUp from "./user/SignUp";
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>

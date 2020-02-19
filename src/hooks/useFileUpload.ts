@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FileMetaData } from "../models/FileUpload";
-import { useDataApi } from "./useDataApi";
 
 export enum UPLOAD_STATE {
   PRISTINE,
@@ -81,21 +80,4 @@ export function useFileUpload() {
   };
 
   return { uploadFile, progress, state, abort };
-}
-
-export function useGetFileMetadata() {
-  const sendRequest = useDataApi();
-  const [filesMetadata, setFilesMetadata] = useState<FileMetaData[]>([]);
-  const getFileMetadata = (fileIds: string[]) => {
-    const variables = {
-      fileIds
-    };
-    sendRequest()
-      .getFileMetadata(variables)
-      .then(data => {
-        setFilesMetadata(data && data.fileMetadata ? data.fileMetadata : []);
-      });
-  };
-
-  return { getFileMetadata, filesMetadata };
 }
