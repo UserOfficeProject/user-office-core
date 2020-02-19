@@ -21,6 +21,7 @@ import { useGetPageContent } from "../../hooks/useGetPageContent";
 import { useSnackbar } from "notistack";
 import { StyledPaper } from "../../styles/StyledComponents";
 import { useDataApi } from "../../hooks/useDataApi";
+import { PageName } from "../../generated/sdk";
 
 const useStyles = makeStyles(theme => ({
   buttons: {
@@ -40,13 +41,17 @@ export default function PageEditor() {
   const [helpContent, setHelpContent] = useState("");
   const [privacyContent, setPrivacyContent] = useState("");
   const [cookieContent, setCookieContent] = useState("");
-  const [loadingHelpContent, helpPageContent] = useGetPageContent("HELPPAGE");
-  const [loadingHomeContent, homePageContent] = useGetPageContent("HOMEPAGE");
+  const [loadingHelpContent, helpPageContent] = useGetPageContent(
+    PageName.HELPPAGE
+  );
+  const [loadingHomeContent, homePageContent] = useGetPageContent(
+    PageName.HOMEPAGE
+  );
   const [loadingPrivacyContent, privacyPageContent] = useGetPageContent(
-    "PRIVACYPAGE"
+    PageName.PRIVACYPAGE
   );
   const [loadingCookieContent, cookiePageContent] = useGetPageContent(
-    "COOKIEPAGE"
+    PageName.COOKIEPAGE
   );
   const api = useDataApi();
 
@@ -88,7 +93,7 @@ export default function PageEditor() {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => handleClick("HOMEPAGE", homeContent)}
+            onClick={() => handleClick(PageName.HOMEPAGE, homeContent)}
           >
             Update
           </Button>
@@ -118,7 +123,7 @@ export default function PageEditor() {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => handleClick("HELPPAGE", helpContent)}
+            onClick={() => handleClick(PageName.HELPPAGE, helpContent)}
             id="help-update-btn"
           >
             Update
@@ -148,7 +153,7 @@ export default function PageEditor() {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => handleClick("PRIVACYPAGE", privacyContent)}
+            onClick={() => handleClick(PageName.PRIVACYPAGE, privacyContent)}
           >
             Update
           </Button>
@@ -177,7 +182,7 @@ export default function PageEditor() {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={() => handleClick("COOKIEPAGE", cookieContent)}
+            onClick={() => handleClick(PageName.COOKIEPAGE, cookieContent)}
           >
             Update
           </Button>
