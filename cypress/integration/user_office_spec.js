@@ -6,7 +6,7 @@ context("User Officer tests", () => {
     cy.visit("/");
   });
 
-  const shortCode = faker.random.word();
+  const shortCode = faker.commerce.color();
   const startDate = faker.date
     .past()
     .toISOString()
