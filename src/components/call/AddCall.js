@@ -12,6 +12,8 @@ import {
   KeyboardDatePicker
 } from "@material-ui/pickers";
 import { useDataApi } from "../../hooks/useDataApi";
+import { useSnackbar } from "notistack";
+import { getTranslation } from "@esss-swap/duo-localisation";
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
@@ -33,6 +35,7 @@ const useStyles = makeStyles(theme => ({
 export default function AddCall(props) {
   const classes = useStyles();
   const api = useDataApi();
+  const { enqueueSnackbar } = useSnackbar();
   const currentDay = new Date();
   const DatePickerField = ({ field, form, ...other }) => {
     const currentError = form.errors[field.name];
@@ -82,17 +85,25 @@ export default function AddCall(props) {
             cycleComment,
             surveyComment
           } = values;
-          await api().createCall({
-            shortCode,
-            startCall: start,
-            endCall: end,
-            startReview,
-            endReview,
-            startNotify,
-            endNotify,
-            cycleComment,
-            surveyComment
-          });
+          await api()
+            .createCall({
+              shortCode,
+              startCall: start,
+              endCall: end,
+              startReview,
+              endReview,
+              startNotify,
+              endNotify,
+              cycleComment,
+              surveyComment
+            })
+            .then(data =>
+              data.createCall.error
+                ? enqueueSnackbar(getTranslation(data.createCall.error), {
+                    variant: "error"
+                  })
+                : null
+            );
           actions.setSubmitting(false);
           props.close();
         }}
