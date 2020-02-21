@@ -114,14 +114,16 @@ export default function ProposalQuestionaryStep(props: {
                   touched: touched, // for formik
                   errors: errors, // for formik
                   onComplete: (evt: SyntheticEvent, newValue: any) => {
-                    dispatch({
-                      type: EventType.FIELD_CHANGED,
-                      payload: {
-                        id: field.proposal_question_id,
-                        newValue: newValue
-                      }
-                    });
-                    handleChange(evt);
+                    if (field.value !== newValue) {
+                      dispatch({
+                        type: EventType.FIELD_CHANGED,
+                        payload: {
+                          id: field.proposal_question_id,
+                          newValue: newValue
+                        }
+                      });
+                      handleChange(evt);
+                    }
                   } // for formik
                 })}
               </div>
