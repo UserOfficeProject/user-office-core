@@ -111,14 +111,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
           await executeAndMonitorCall(
             () =>
-              api()
-                .updateProposal({
-                  id: id,
-                  title: state.proposal.title,
-                  abstract: state.proposal.abstract,
-                  users: state.proposal.users.map(user => user.id)
-                })
-                .then(data => data.updateProposal),
+              api().updateProposal({
+                id: id,
+                title: state.proposal.title,
+                abstract: state.proposal.abstract,
+                users: state.proposal.users.map(user => user.id)
+              }),
             "Saved"
           );
           setStepIndex(clampStep(stepIndex + 1));

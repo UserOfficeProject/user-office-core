@@ -1,10 +1,10 @@
 import {
   Button,
-  Checkbox,
   FormControlLabel,
   FormGroup,
   LinearProgress,
   makeStyles,
+  Switch,
   useTheme
 } from "@material-ui/core";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
@@ -121,22 +121,30 @@ export default function QuestionaryEditor() {
         &nbsp; Add topic
       </Button>
     ) : null;
+
+  const enableReorderTopicsToggle =
+    state.steps.length > 1 ? (
+      <FormGroup
+        row
+        style={{ justifyContent: "flex-end", paddingBottom: "25px" }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isTopicReorderMode}
+              onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
+              color="primary"
+            />
+          }
+          label="Reorder topics mode"
+        />
+      </FormGroup>
+    ) : null;
   return (
     <>
       <StyledPaper style={getContainerStyle(isLoading)}>
         {progressJsx}
-        <FormGroup row style={{ justifyContent: "flex-end" }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isTopicReorderMode}
-                onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
-                color="primary"
-              />
-            }
-            label="Enable reordering topics"
-          />
-        </FormGroup>
+        {enableReorderTopicsToggle}
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="topics" direction="horizontal" type="topic">
             {(provided, snapshot) => (
@@ -152,7 +160,7 @@ export default function QuestionaryEditor() {
                     index={index}
                     key={step.topic.topic_id}
                     onItemClick={onClick}
-                    condenseMode={isTopicReorderMode}
+                    dragMode={isTopicReorderMode}
                   />
                 ))}
                 {provided.placeholder}
