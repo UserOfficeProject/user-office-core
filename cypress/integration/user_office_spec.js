@@ -6,7 +6,7 @@ context("User Officer tests", () => {
     cy.visit("/");
   });
 
-  const shortCode = faker.commerce.color();
+  const shortCode = faker.random.word().split(" ")[0]; // faker random word is buggy, it ofter returns phrases
   const startDate = faker.date
     .past()
     .toISOString()
@@ -48,9 +48,13 @@ context("User Officer tests", () => {
       .type(endDate)
       .should("have.value", endDate);
 
-    cy.get("[data-cy=survey-comment] input").type(faker.random.word());
+    cy.get("[data-cy=survey-comment] input").type(
+      faker.random.word().split(" ")[0]
+    );
 
-    cy.get("[data-cy=cycle-comment] input").type(faker.random.word());
+    cy.get("[data-cy=cycle-comment] input").type(
+      faker.random.word().split(" ")[0]
+    );
 
     cy.get("[data-cy=submit]").click();
 

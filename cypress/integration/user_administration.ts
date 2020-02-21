@@ -17,7 +17,7 @@ context("User administration tests", () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
-  const newPosition = faker.random.word();
+  const newPosition = faker.random.word().split(" ")[0];
   const newTelephone = faker.phone.phoneNumber();
 
   it("Should be able administer user information", () => {

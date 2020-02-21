@@ -16,7 +16,7 @@ context("Personal information tests", () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
-  const newPosition = faker.random.word();
+  const newPosition = faker.random.word().split(" ")[0];
   const newTelephone = faker.phone.phoneNumber();
 
   it("Should be able update personal information", () => {
