@@ -1,19 +1,17 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import { Formik, Field, Form } from "formik";
-import { TextField } from "formik-material-ui";
-import * as Yup from "yup";
 import DateFnsUtils from "@date-io/date-fns";
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDatePicker
-} from "@material-ui/pickers";
-import { useDataApi } from "../../hooks/useDataApi";
-import { useSnackbar } from "notistack";
 import { getTranslation } from "@esss-swap/duo-localisation";
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import { useSnackbar } from "notistack";
+import React from "react";
+import * as Yup from "yup";
+import { useDataApi } from "../../hooks/useDataApi";
+import FormikUICustomDatePicker from "../common/FormikUICustomDatePicker";
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
@@ -37,28 +35,7 @@ export default function AddCall(props) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const currentDay = new Date();
-  const DatePickerField = ({ field, form, ...other }) => {
-    const currentError = form.errors[field.name];
 
-    return (
-      <KeyboardDatePicker
-        name={field.name}
-        value={field.value}
-        format="yyyy-MM-dd"
-        helperText={currentError}
-        error={Boolean(currentError)}
-        onError={error => {
-          // handle as a side effect
-          if (error !== currentError) {
-            form.setFieldError(field.name, error);
-          }
-        }}
-        // if you are using custom validation schema you probably want to pass `true` as third argument
-        onChange={date => form.setFieldValue(field.name, date, false)}
-        {...other}
-      />
-    );
-  };
   return (
     <Container component="main" maxWidth="xs">
       <Formik
@@ -138,7 +115,7 @@ export default function AddCall(props) {
               <Field
                 name="start"
                 label="Start"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
                 data-cy="start-date"
@@ -147,7 +124,7 @@ export default function AddCall(props) {
               <Field
                 name="end"
                 label="End"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
                 data-cy="end-date"
@@ -155,7 +132,7 @@ export default function AddCall(props) {
               <Field
                 name="startReview"
                 label="Start of review"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
                 data-cy="start-review"
@@ -163,21 +140,21 @@ export default function AddCall(props) {
               <Field
                 name="endReview"
                 label="End of review"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
               />
               <Field
                 name="startNotify"
                 label="Start of notification period"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
               />
               <Field
                 name="endNotify"
                 label="End of notification period"
-                component={DatePickerField}
+                component={FormikUICustomDatePicker}
                 margin="normal"
                 fullWidth
               />
