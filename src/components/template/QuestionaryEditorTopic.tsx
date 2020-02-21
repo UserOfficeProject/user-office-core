@@ -26,7 +26,7 @@ export default function QuestionaryEditorTopic(props: {
   dispatch: React.Dispatch<IEvent>;
   index: number;
   onItemClick: { (data: ProposalTemplateField): void };
-  condenseMode: boolean;
+  dragMode: boolean;
 }) {
   const theme = useTheme();
 
@@ -66,6 +66,12 @@ export default function QuestionaryEditorTopic(props: {
     addIcon: {
       textAlign: "right",
       paddingRight: "8px"
+    },
+    dragMode: {
+      borderColor: theme.palette.grey[400],
+      padding: "5px",
+      borderWidth: "1px",
+      borderStyle: "dashed"
     }
   }))();
 
@@ -127,7 +133,7 @@ export default function QuestionaryEditorTopic(props: {
   );
 
   const getItems = () => {
-    if (props.condenseMode) {
+    if (props.dragMode) {
       return null;
     } else {
       return data.fields.map((item, index) => (
@@ -147,24 +153,23 @@ export default function QuestionaryEditorTopic(props: {
       key={data.topic.topic_id.toString()}
       draggableId={data.topic.topic_id.toString()}
       index={index}
+      isDragDisabled={!props.dragMode}
     >
       {(provided, snapshotDraggable) => (
         <Grid
           container
-          className={classes.container}
+          className={`${classes.container} ${
+            props.dragMode ? classes.dragMode : null
+          }`}
           {...provided.draggableProps}
           ref={provided.innerRef}
           style={getItemStyle(
             snapshotDraggable.isDragging,
             provided.draggableProps.style
           )}
+          {...provided.dragHandleProps}
         >
-          <Grid
-            item
-            xs={10}
-            className={classes.topic}
-            {...provided.dragHandleProps}
-          >
+          <Grid item xs={10} className={classes.topic}>
             {titleJsx}
           </Grid>
           <Grid item xs={2} className={classes.addIcon}>

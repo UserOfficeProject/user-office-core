@@ -63,7 +63,7 @@ export default function QuestionaryEditorTopicItem(props: {
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
     display: "flex",
     padding: "12px 8px 8px 8px",
-    marginBottom: "4px",
+    margin: "1px",
     backgroundColor: isDragging
       ? theme.palette.grey[200]
       : isHover
