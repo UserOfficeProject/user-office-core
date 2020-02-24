@@ -10,6 +10,7 @@ import FormikDropdown from "../common/FormikDropdown";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
 import TitledContainer from "../common/TitledContainer";
+import { naturalKeySchema } from "../../utils/userFieldValidationSchema";
 
 export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
   const field = props.field;
@@ -27,6 +28,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
+        natural_key: naturalKeySchema,
         question: Yup.string().required("Question is required"),
         config: Yup.object({
           required: Yup.bool(),
@@ -37,6 +39,15 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Multiple choice">
+            <Field
+              name="natural_key"
+              label="Key"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              inputProps={{ "data-cy": "natural_key" }}
+            />
             <Field
               name="question"
               label="Question"

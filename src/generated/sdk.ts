@@ -183,7 +183,6 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
-  approveProposal: ProposalResponseWrap,
   createCall: CallResponseWrap,
   createProposal: ProposalResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
@@ -196,7 +195,6 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap,
   login: LoginResponseWrap,
   prepareDB: SuccessResponseWrap,
-  rejectProposal: ProposalResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
   resetPassword: BasicUserDetailsResponseWrap,
@@ -243,11 +241,6 @@ export type MutationAddUserForReviewArgs = {
 export type MutationAddUserRoleArgs = {
   userID: Scalars['Int'],
   roleID: Scalars['Int']
-};
-
-
-export type MutationApproveProposalArgs = {
-  id: Scalars['Int']
 };
 
 
@@ -331,11 +324,6 @@ export type MutationLoginArgs = {
 };
 
 
-export type MutationRejectProposalArgs = {
-  id: Scalars['Int']
-};
-
-
 export type MutationRemoveUserForReviewArgs = {
   reviewID: Scalars['Int']
 };
@@ -403,10 +391,11 @@ export type MutationUpdateProposalArgs = {
 
 export type MutationUpdateProposalTemplateFieldArgs = {
   id: Scalars['String'],
+  naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies?: Maybe<Array<FieldDependencyInput>>
+  dependencies: Array<FieldDependencyInput>
 };
 
 
@@ -499,6 +488,7 @@ export type ProposalAnswerInput = {
 };
 
 export enum ProposalEndStatus {
+  UNSET = 'UNSET',
   ACCEPTED = 'ACCEPTED',
   RESERVED = 'RESERVED',
   REJECTED = 'REJECTED'
@@ -530,6 +520,7 @@ export type ProposalTemplate = {
 export type ProposalTemplateField = {
    __typename?: 'ProposalTemplateField',
   proposal_question_id: Scalars['String'],
+  natural_key: Scalars['String'],
   data_type: DataType,
   sort_order: Scalars['Int'],
   question: Scalars['String'],
@@ -633,6 +624,7 @@ export type Questionary = {
 export type QuestionaryField = {
    __typename?: 'QuestionaryField',
   proposal_question_id: Scalars['String'],
+  natural_key: Scalars['String'],
   data_type: DataType,
   sort_order: Scalars['Int'],
   question: Scalars['String'],
@@ -1065,7 +1057,7 @@ export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfig
 
 export type ProposalTemplateFieldFragment = (
   { __typename?: 'ProposalTemplateField' }
-  & Pick<ProposalTemplateField, 'proposal_question_id' | 'data_type' | 'sort_order' | 'question' | 'topic_id'>
+  & Pick<ProposalTemplateField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -1104,7 +1096,7 @@ export type QuestionaryFragment = (
       & Pick<Topic, 'topic_title' | 'topic_id' | 'sort_order' | 'is_enabled'>
     ), fields: Array<(
       { __typename?: 'QuestionaryField' }
-      & Pick<QuestionaryField, 'proposal_question_id' | 'data_type' | 'question' | 'value' | 'sort_order' | 'topic_id'>
+      & Pick<QuestionaryField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id' | 'value'>
       & { config: (
         { __typename?: 'BooleanConfig' }
         & FieldConfigBooleanConfigFragment
@@ -1345,10 +1337,11 @@ export type UpdateProposalFilesMutation = (
 
 export type UpdateProposalTemplateFieldMutationVariables = {
   id: Scalars['String'],
+  naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies?: Maybe<Array<FieldDependencyInput>>
+  dependencies: Array<FieldDependencyInput>
 };
 
 
@@ -1879,6 +1872,7 @@ export const FieldConditionFragmentDoc = gql`
 export const ProposalTemplateFieldFragmentDoc = gql`
     fragment proposalTemplateField on ProposalTemplateField {
   proposal_question_id
+  natural_key
   data_type
   sort_order
   question
@@ -1908,13 +1902,13 @@ export const QuestionaryFragmentDoc = gql`
     isCompleted
     fields {
       proposal_question_id
+      natural_key
       data_type
+      sort_order
       question
       config {
         ...fieldConfig
       }
-      value
-      sort_order
       topic_id
       dependencies {
         proposal_question_dependency
@@ -1923,6 +1917,7 @@ export const QuestionaryFragmentDoc = gql`
         }
         proposal_question_id
       }
+      value
     }
   }
 }
@@ -2265,8 +2260,8 @@ export const UpdateProposalFilesDocument = gql`
 }
     `;
 export const UpdateProposalTemplateFieldDocument = gql`
-    mutation updateProposalTemplateField($id: String!, $question: String, $config: String, $isEnabled: Boolean, $dependencies: [FieldDependencyInput!]) {
-  updateProposalTemplateField(id: $id, question: $question, config: $config, isEnabled: $isEnabled, dependencies: $dependencies) {
+    mutation updateProposalTemplateField($id: String!, $naturalKey: String, $question: String, $config: String, $isEnabled: Boolean, $dependencies: [FieldDependencyInput!]!) {
+  updateProposalTemplateField(id: $id, naturalKey: $naturalKey, question: $question, config: $config, isEnabled: $isEnabled, dependencies: $dependencies) {
     template {
       steps {
         topic {

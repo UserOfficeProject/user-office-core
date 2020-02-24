@@ -102,3 +102,8 @@ export const emailFieldSchema = Yup.object().shape({
       });
     })
 });
+
+export const naturalKeySchema = Yup.string()
+  .matches(/^[A-Za-z\d_]*$/, "You can use letters, numbers and underscore")
+  .max(128)
+  .required("This field is required");

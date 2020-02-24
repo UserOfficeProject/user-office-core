@@ -1,12 +1,14 @@
 mutation updateProposalTemplateField(
   $id: String!
+  $naturalKey: String
   $question: String
   $config: String
   $isEnabled: Boolean
-  $dependencies: [FieldDependencyInput!]
+  $dependencies: [FieldDependencyInput!]!
 ) {
   updateProposalTemplateField(
     id: $id
+    naturalKey: $naturalKey
     question: $question
     config: $config
     isEnabled: $isEnabled

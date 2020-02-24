@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import * as Yup from "yup";
-import { AdminComponentShell } from "./AdminComponentShell";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import TitledContainer from "../common/TitledContainer";
-import FormikUICustomEditor from "../common/FormikUICustomEditor";
-import { FormControlLabel, Collapse } from "@material-ui/core";
+import { Collapse, FormControlLabel } from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox";
+import { Field, Form, Formik } from "formik";
+import { TextField } from "formik-material-ui";
+import React, { useState } from "react";
+import * as Yup from "yup";
 import { TextInputConfig } from "../../generated/sdk";
+import { EventType } from "../../models/QuestionaryEditorModel";
+import { naturalKeySchema } from "../../utils/userFieldValidationSchema";
+import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
+import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
+import FormikUICustomEditor from "../common/FormikUICustomEditor";
+import TitledContainer from "../common/TitledContainer";
+import { AdminComponentShell } from "./AdminComponentShell";
+import { AdminComponentSignature } from "./QuestionaryFieldEditor";
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
@@ -42,6 +43,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
+        natural_key: naturalKeySchema,
         question: Yup.string().required("Question is required"),
         config: Yup.object({
           min: Yup.number().nullable(),
@@ -55,6 +57,16 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Text input">
+            <Field
+              name="natural_key"
+              label="Key"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              inputProps={{ "data-cy": "natural_key" }}
+            />
+
             <Field
               name="question"
               label="Question"
