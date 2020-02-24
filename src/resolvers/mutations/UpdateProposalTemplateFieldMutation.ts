@@ -23,6 +23,9 @@ export class UpdateProposalTemplateFieldArgs {
   public id: string;
 
   @Field({ nullable: true })
+  public naturalKey: string;
+
+  @Field({ nullable: true })
   public question: string;
 
   @Field({ nullable: true })
@@ -31,7 +34,7 @@ export class UpdateProposalTemplateFieldArgs {
   @Field({ nullable: true })
   public isEnabled: boolean;
 
-  @Field(() => FieldDependencyInput, { nullable: true })
+  @Field(() => FieldDependencyInput)
   public dependencies: FieldDependencyInput[];
 }
 

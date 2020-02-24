@@ -50,6 +50,7 @@ export interface FieldDependencyRecord {
 
 export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
+  readonly natural_key: string;
   readonly data_type: string;
   readonly question: string;
   readonly topic_id: number;
@@ -172,6 +173,7 @@ export const createProposalTemplateFieldObject = (
 ) => {
   return new ProposalTemplateField(
     question.proposal_question_id,
+    question.natural_key,
     question.data_type as DataType,
     question.sort_order,
     question.question,

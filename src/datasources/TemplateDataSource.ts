@@ -12,6 +12,7 @@ export interface TemplateDataSource {
   // TemplateField
   createTemplateField(
     fieldId: string,
+    naturalKey: string,
     topicId: number,
     dataType: DataType,
     question: string,
@@ -21,6 +22,7 @@ export interface TemplateDataSource {
   updateTemplateField(
     proposal_question_id: string,
     values: {
+      natural_key?: string;
       dataType?: string;
       question?: string;
       topicId?: number;

@@ -13,6 +13,7 @@ import JSDict from "../utils/Dictionary";
 export class ProposalTemplateField {
   constructor(
     public proposal_question_id: string,
+    public natural_key: string,
     public data_type: DataType,
     public sort_order: number,
     public question: string,
@@ -24,6 +25,7 @@ export class ProposalTemplateField {
   static fromObject(obj: any) {
     return new ProposalTemplateField(
       obj.proposal_question_id,
+      obj.natural_key,
       obj.data_type,
       obj.sort_order,
       obj.question,
@@ -40,6 +42,7 @@ export class QuestionaryField extends ProposalTemplateField {
   constructor(templateField: ProposalTemplateField, public value: any) {
     super(
       templateField.proposal_question_id,
+      templateField.natural_key,
       templateField.data_type,
       templateField.sort_order,
       templateField.question,

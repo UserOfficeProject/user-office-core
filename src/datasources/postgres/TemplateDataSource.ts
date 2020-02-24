@@ -107,6 +107,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async updateTemplateField(
     proposal_question_id: string,
     values: {
+      naturalKey?: string;
       dataType?: string;
       question?: string;
       topicId?: number;
@@ -116,6 +117,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     }
   ): Promise<ProposalTemplate> {
     const rows = {
+      natural_key: values.naturalKey,
       data_type: values.dataType,
       question: values.question,
       topic_id: values.topicId,
@@ -146,6 +148,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async createTemplateField(
     fieldId: string,
+    naturalKey: string,
     topicId: number,
     dataType: DataType,
     question: string,
@@ -155,6 +158,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .insert(
         {
           proposal_question_id: fieldId,
+          natural_key: naturalKey,
           topic_id: topicId,
           data_type: dataType,
           question: question,

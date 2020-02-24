@@ -34,6 +34,7 @@ export class templateDataSource implements TemplateDataSource {
   }
   async createTemplateField(
     fieldId: string,
+    naturalKey: string,
     topicId: number,
     dataType: DataType,
     question: string,
@@ -41,6 +42,7 @@ export class templateDataSource implements TemplateDataSource {
   ): Promise<ProposalTemplateField> {
     return createDummyField({
       proposal_question_id: fieldId,
+      natural_key: naturalKey,
       topic_id: topicId,
       data_type: dataType,
       question: question,
@@ -60,10 +62,11 @@ export class templateDataSource implements TemplateDataSource {
   async updateTemplateField(
     proposal_question_id: string,
     values: {
-      data_type?: DataType | undefined;
-      question?: string | undefined;
-      topic?: number | undefined;
-      config?: string | undefined;
+      natural_key?: string;
+      data_type?: DataType;
+      question?: string;
+      topic?: number;
+      config?: string;
       sort_order: number;
     }
   ): Promise<ProposalTemplate> {
