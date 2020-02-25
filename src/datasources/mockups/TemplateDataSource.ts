@@ -22,6 +22,9 @@ export var dummyProposalSubmitted: Proposal;
 export var dummyAnswers: ProposalAnswer[];
 
 export class templateDataSource implements TemplateDataSource {
+  async isNaturalKeyPresent(natural_key: string): Promise<Boolean> {
+    return true;
+  }
   public init() {
     dummyTemplate = createDummyTemplate();
   }
