@@ -199,12 +199,13 @@ export const createProposalObject = (proposal: ProposalRecord) => {
 };
 
 export const createFieldDependencyObject = (
-  fieldDependency: FieldDependencyRecord
+  fieldDependency: FieldDependencyRecord & { natural_key: string }
 ) => {
   const conditionJson = JSON.parse(fieldDependency.condition);
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,
+    fieldDependency.natural_key,
     new FieldCondition(
       conditionJson.condition.toUpperCase(),
       conditionJson.params

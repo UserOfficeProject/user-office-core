@@ -8,14 +8,11 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { FieldCondition } from "../types/FieldCondition";
-import {
-  FieldDependency as FieldDependencyOrigin,
-  FieldDependency
-} from "../../models/ProposalModel";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
+import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
+import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
+import { FieldCondition } from "../types/FieldCondition";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
 export class UpdateProposalTemplateFieldArgs {
@@ -48,12 +45,12 @@ class FieldConditionInput implements Partial<FieldCondition> {
 }
 
 @InputType()
-class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
+export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
   @Field(() => String)
-  public proposal_question_dependency: string;
+  public dependency_id: string;
 
   @Field(() => String)
-  public proposal_question_id: string;
+  public question_id: string;
 
   @Field(() => FieldConditionInput)
   public condition: FieldConditionInput;
@@ -78,7 +75,7 @@ export class UpdateProposalTemplateFieldMutation {
 
   // Have this until GQL accepts Union types
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  unpackDependencies(dependencies: FieldDependency[]) {
+  unpackDependencies(dependencies: FieldDependencyInput[]) {
     return dependencies.map(dependency => {
       return {
         ...dependency,

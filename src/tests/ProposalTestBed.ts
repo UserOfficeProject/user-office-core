@@ -73,6 +73,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
             new FieldDependency(
               "links_with_industry",
               "has_links_with_industry",
+              "has_links_with_industry",
               new FieldCondition(EvaluatorOperator.EQ, "yes")
             )
           ]
@@ -122,6 +123,7 @@ export const createDummyTemplate = () => {
     dependencies: [
       new FieldDependency(
         "linksToField",
+        "hasLinksToField",
         "hasLinksToField",
         new FieldCondition(EvaluatorOperator.EQ, "yes")
       )

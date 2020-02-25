@@ -1,3 +1,4 @@
+import { FieldDependencyInput } from "./../resolvers/mutations/UpdateProposalTemplateFieldMutation";
 import {
   ProposalTemplate,
   Topic,
@@ -28,7 +29,7 @@ export interface TemplateDataSource {
       topicId?: number;
       config?: string;
       sortOrder?: number;
-      dependencies?: FieldDependency[];
+      dependencies?: FieldDependencyInput[];
     }
   ): Promise<ProposalTemplate>;
   deleteTemplateField(fieldId: string): Promise<ProposalTemplate>;

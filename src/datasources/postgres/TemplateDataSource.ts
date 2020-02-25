@@ -19,12 +19,22 @@ import {
 } from "../../models/ProposalModel";
 
 import to from "await-to-js";
+import { FieldDependencyInput } from "../../resolvers/mutations/UpdateProposalTemplateFieldMutation";
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getProposalTemplate(): Promise<ProposalTemplate> {
-    const dependenciesRecord: FieldDependencyRecord[] = await database
-      .select("*")
-      .from("proposal_question_dependencies");
+    const dependenciesRecord: (FieldDependencyRecord & {
+      natural_key: string;
+    })[] = await database("proposal_question_dependencies")
+      .join(
+        "proposal_questions",
+        "proposal_question_dependencies.proposal_question_dependency",
+        "proposal_questions.proposal_question_id"
+      )
+      .select(
+        "proposal_question_dependencies.*",
+        "proposal_questions.natural_key"
+      );
 
     const fieldRecords: ProposalQuestionRecord[] = await database
       .select("*")
@@ -57,7 +67,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
     fields.forEach(field => {
       field.dependencies = dependencies.filter(
-        dep => dep.proposal_question_id === field.proposal_question_id
+        dep => dep.question_id === field.proposal_question_id
       );
     });
 
@@ -113,7 +123,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       topicId?: number;
       config?: string;
       sortOrder?: number;
-      dependencies?: FieldDependency[];
+      dependencies?: FieldDependencyInput[];
     }
   ): Promise<ProposalTemplate> {
     const rows = {
@@ -132,8 +142,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
       for (const dependency of values.dependencies) {
         await database("proposal_question_dependencies").insert({
-          proposal_question_id: dependency.proposal_question_id,
-          proposal_question_dependency: dependency.proposal_question_dependency,
+          proposal_question_id: dependency.question_id,
+          proposal_question_dependency: dependency.dependency_id,
           condition: dependency.condition
         });
       }
