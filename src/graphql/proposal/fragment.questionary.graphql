@@ -18,11 +18,12 @@ fragment questionary on Questionary {
       }
       topic_id
       dependencies {
-        proposal_question_dependency
+        question_id
+        dependency_id
+        dependency_natural_key
         condition {
           ...fieldCondition
         }
-        proposal_question_id
       }
       value
     }

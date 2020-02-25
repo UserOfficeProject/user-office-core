@@ -69,7 +69,7 @@ export function usePersistModel() {
         ...dependency,
         condition: {
           ...dependency.condition,
-          params: JSON.stringify({ value: true })
+          params: JSON.stringify({ value: dependency.condition.params })
         }
       };
     });

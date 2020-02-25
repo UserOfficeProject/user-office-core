@@ -133,14 +133,15 @@ export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | Fil
 
 export type FieldDependency = {
    __typename?: 'FieldDependency',
-  proposal_question_id: Scalars['String'],
-  proposal_question_dependency: Scalars['String'],
+  question_id: Scalars['String'],
+  dependency_id: Scalars['String'],
+  dependency_natural_key: Scalars['String'],
   condition: FieldCondition,
 };
 
 export type FieldDependencyInput = {
-  proposal_question_dependency: Scalars['String'],
-  proposal_question_id: Scalars['String'],
+  dependency_id: Scalars['String'],
+  question_id: Scalars['String'],
   condition: FieldConditionInput,
 };
 
@@ -1078,7 +1079,7 @@ export type ProposalTemplateFieldFragment = (
     & FieldConfigTextInputConfigFragment
   ), dependencies: Maybe<Array<(
     { __typename?: 'FieldDependency' }
-    & Pick<FieldDependency, 'proposal_question_dependency' | 'proposal_question_id'>
+    & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
     & { condition: (
       { __typename?: 'FieldCondition' }
       & FieldConditionFragment
@@ -1117,7 +1118,7 @@ export type QuestionaryFragment = (
         & FieldConfigTextInputConfigFragment
       ), dependencies: Maybe<Array<(
         { __typename?: 'FieldDependency' }
-        & Pick<FieldDependency, 'proposal_question_dependency' | 'proposal_question_id'>
+        & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
         & { condition: (
           { __typename?: 'FieldCondition' }
           & FieldConditionFragment
@@ -1881,11 +1882,12 @@ export const ProposalTemplateFieldFragmentDoc = gql`
   }
   topic_id
   dependencies {
-    proposal_question_dependency
+    question_id
+    dependency_id
+    dependency_natural_key
     condition {
       ...fieldCondition
     }
-    proposal_question_id
   }
 }
     ${FieldConfigFragmentDoc}
@@ -1911,11 +1913,12 @@ export const QuestionaryFragmentDoc = gql`
       }
       topic_id
       dependencies {
-        proposal_question_dependency
+        question_id
+        dependency_id
+        dependency_natural_key
         condition {
           ...fieldCondition
         }
-        proposal_question_id
       }
       value
     }

@@ -73,12 +73,13 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
             topic_id: 0,
             dependencies: [
               {
-                proposal_question_dependency: "has_links_with_industry",
+                dependency_id: "has_links_with_industry",
                 condition: {
                   condition: EvaluatorOperator.EQ,
                   params: "yes"
                 },
-                proposal_question_id: "links_with_industry"
+                question_id: "links_with_industry",
+                dependency_natural_key: "has_links_with_industry"
               }
             ]
           }

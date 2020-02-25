@@ -83,12 +83,8 @@ export default function QuestionaryEditorTopicItem(props: {
         <ul>
           {dependencies.map(dep => {
             return (
-              <li
-                key={
-                  dep.proposal_question_id + dep.proposal_question_dependency
-                }
-              >
-                {dep.proposal_question_dependency}
+              <li key={dep.question_id + dep.dependency_id}>
+                {dep.dependency_natural_key}
               </li>
             );
           })}
@@ -125,7 +121,7 @@ export default function QuestionaryEditorTopicItem(props: {
             className={classes.questionId}
             data-cy="proposal-question-id"
           >
-            {props.data.proposal_question_id}
+            {props.data.natural_key}
           </Grid>
           <Grid item xs={2} className={classes.icon}>
             {getTemplateFieldIcon(props.data.data_type)}
