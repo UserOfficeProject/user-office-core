@@ -43,4 +43,6 @@ export interface TemplateDataSource {
   deleteTopic(id: number): Promise<Topic>;
 
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
+
+  isNaturalKeyPresent(natural_key: string): Promise<Boolean>;
 }

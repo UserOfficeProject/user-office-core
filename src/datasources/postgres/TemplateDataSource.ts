@@ -231,4 +231,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     });
     return topicOrder;
   }
+
+  isNaturalKeyPresent(natural_key: string): Promise<Boolean> {
+    return database("proposal_questions")
+      .where({ natural_key })
+      .select("natural_key")
+      .then((result: []) => result.length > 0);
+  }
 }
