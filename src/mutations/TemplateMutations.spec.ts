@@ -139,13 +139,11 @@ test("User can not update topic order", async () => {
 });
 
 test("Officer can delete a topic", async () => {
-  expect(templateMutations.deleteTopic(dummyUser, 1)).resolves.toBeInstanceOf(
-    Topic
-  );
+  const topic = await templateMutations.deleteTopic(dummyUserOfficer, 1);
+  expect(topic instanceof Topic).toBe(true);
 });
 
 test("Dummy user can't delete a topic", async () => {
-  expect(
-    templateMutations.deleteTopic(dummyUser, 1)
-  ).resolves.not.toBeInstanceOf(Topic);
+  const topic = await templateMutations.deleteTopic(dummyUser, 1);
+  expect(topic instanceof Topic).toBe(false);
 });
