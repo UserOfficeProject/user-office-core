@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import * as Yup from "yup";
 import { TextInputConfig } from "../../generated/sdk";
 import { EventType } from "../../models/QuestionaryEditorModel";
-import { naturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
 import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
 import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
 import FormikUICustomEditor from "../common/FormikUICustomEditor";
@@ -20,6 +20,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     config.htmlQuestion !== null
   );
+  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
 
   return (
     <Formik

@@ -8,10 +8,11 @@ import FormikUICustomSelect from "../common/FormikUICustomSelect";
 import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
 import TitledContainer from "../common/TitledContainer";
-import { naturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
 
 export const AdminComponentFileUpload: AdminComponentSignature = props => {
   const field = props.field;
+  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
 
   return (
     <Formik

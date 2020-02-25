@@ -547,6 +547,7 @@ export type Query = {
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
   getPageContent?: Maybe<Scalars['String']>,
+  isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplate?: Maybe<ProposalTemplate>,
@@ -584,6 +585,11 @@ export type QueryGetOrcIdInformationArgs = {
 
 export type QueryGetPageContentArgs = {
   id: PageName
+};
+
+
+export type QueryIsNaturalKeyPresentArgs = {
+  naturalKey: Scalars['String']
 };
 
 
@@ -1172,6 +1178,16 @@ export type GetFileMetadataQuery = (
     { __typename?: 'FileMetadata' }
     & Pick<FileMetadata, 'fileId' | 'originalFileName' | 'mimeType' | 'sizeInBytes' | 'createdDate'>
   )>> }
+);
+
+export type GetIsNaturalKeyPresentQueryVariables = {
+  naturalKey: Scalars['String']
+};
+
+
+export type GetIsNaturalKeyPresentQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'isNaturalKeyPresent'>
 );
 
 export type GetProposalQueryVariables = {
@@ -2119,6 +2135,11 @@ export const GetFileMetadataDocument = gql`
   }
 }
     `;
+export const GetIsNaturalKeyPresentDocument = gql`
+    query getIsNaturalKeyPresent($naturalKey: String!) {
+  isNaturalKeyPresent(naturalKey: $naturalKey)
+}
+    `;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -2591,6 +2612,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables);
+    },
+    getIsNaturalKeyPresent(variables: GetIsNaturalKeyPresentQueryVariables): Promise<GetIsNaturalKeyPresentQuery> {
+      return client.request<GetIsNaturalKeyPresentQuery>(print(GetIsNaturalKeyPresentDocument), variables);
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return client.request<GetProposalQuery>(print(GetProposalDocument), variables);
