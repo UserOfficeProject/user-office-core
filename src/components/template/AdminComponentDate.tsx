@@ -8,9 +8,11 @@ import { AdminComponentShell } from "./AdminComponentShell";
 import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
 import TitledContainer from "../common/TitledContainer";
 import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
+import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
 
 export const AdminComponentDate: AdminComponentSignature = props => {
   const field = props.field;
+  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
   return (
     <Formik
       initialValues={field}
@@ -24,12 +26,22 @@ export const AdminComponentDate: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
+        natural_key: naturalKeySchema,
         question: Yup.string().required("Question is required")
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Date">
+            <Field
+              name="natural_key"
+              label="Key"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              inputProps={{ "data-cy": "natural_key" }}
+            />
             <Field
               name="question"
               label="Question"

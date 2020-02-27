@@ -9,21 +9,23 @@ fragment questionary on Questionary {
     isCompleted
     fields {
       proposal_question_id
+      natural_key
       data_type
+      sort_order
       question
       config {
         ...fieldConfig
       }
-      value
-      sort_order
       topic_id
       dependencies {
-        proposal_question_dependency
+        question_id
+        dependency_id
+        dependency_natural_key
         condition {
           ...fieldCondition
         }
-        proposal_question_id
       }
+      value
     }
   }
 }

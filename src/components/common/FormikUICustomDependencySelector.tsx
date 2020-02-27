@@ -59,25 +59,25 @@ const FormikUICustomDependencySelector = ({
     }
     if (templateField.dependencies && templateField.dependencies.length > 0) {
       var dependency = templateField.dependencies[0]; // currently only 1 supported
-      setDependencyId(dependency.proposal_question_dependency);
+      setDependencyId(dependency.dependency_id);
       setOperator(dependency.condition.condition);
       setDependencyValue(dependency.condition.params);
     }
   }, [templateField]);
 
   const updateFormik = () => {
-    let depArr = [];
+    let dependencies = [];
     if (dependencyId && dependencyValue && operator) {
-      depArr.push({
-        proposal_question_id: templateField.proposal_question_id,
-        proposal_question_dependency: dependencyId,
+      dependencies.push({
+        question_id: templateField.proposal_question_id,
+        dependency_id: dependencyId,
         condition: {
           condition: operator,
           params: dependencyValue
         }
       });
     }
-    form.setFieldValue(field.name, depArr);
+    form.setFieldValue(field.name, dependencies);
   };
 
   useEffect(() => {

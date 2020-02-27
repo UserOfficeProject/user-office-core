@@ -1,5 +1,6 @@
-import * as Yup from "yup";
 import { request } from "graphql-request";
+import * as Yup from "yup";
+import { useDataApi } from "../hooks/useDataApi";
 
 export const userFieldSchema = Yup.object().shape({
   firstname: Yup.string()
@@ -102,3 +103,34 @@ export const emailFieldSchema = Yup.object().shape({
       });
     })
 });
+
+export function useNaturalKeySchema(initialValue: string) {
+  const api = useDataApi();
+  return Yup.string()
+    .matches(/^[A-Za-z\d_]*$/, "You can use letters, numbers and underscore")
+    .max(128)
+    .required("This field is required")
+    .test("checkDuplNaturalKey", "This key is already used", function(value) {
+      if (!value) {
+        return this.createError({ message: "Please specify key" });
+      }
+      if (value === initialValue) {
+        return true;
+      }
+
+      return new Promise((resolve, reject) => {
+        api()
+          .getIsNaturalKeyPresent({ naturalKey: value })
+          .then(responseWrap => {
+            const response = responseWrap.isNaturalKeyPresent;
+            if (response === null) {
+              reject();
+            }
+            console.log(response);
+            resolve(!response!);
+          });
+      });
+    });
+}
+
+export const naturalKeySchema = Yup.string();

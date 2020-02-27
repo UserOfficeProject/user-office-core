@@ -133,14 +133,15 @@ export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | Fil
 
 export type FieldDependency = {
    __typename?: 'FieldDependency',
-  proposal_question_id: Scalars['String'],
-  proposal_question_dependency: Scalars['String'],
+  question_id: Scalars['String'],
+  dependency_id: Scalars['String'],
+  dependency_natural_key: Scalars['String'],
   condition: FieldCondition,
 };
 
 export type FieldDependencyInput = {
-  proposal_question_dependency: Scalars['String'],
-  proposal_question_id: Scalars['String'],
+  dependency_id: Scalars['String'],
+  question_id: Scalars['String'],
   condition: FieldConditionInput,
 };
 
@@ -183,7 +184,6 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
-  approveProposal: ProposalResponseWrap,
   createCall: CallResponseWrap,
   createProposal: ProposalResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
@@ -196,7 +196,6 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap,
   login: LoginResponseWrap,
   prepareDB: SuccessResponseWrap,
-  rejectProposal: ProposalResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
   resetPassword: BasicUserDetailsResponseWrap,
@@ -243,11 +242,6 @@ export type MutationAddUserForReviewArgs = {
 export type MutationAddUserRoleArgs = {
   userID: Scalars['Int'],
   roleID: Scalars['Int']
-};
-
-
-export type MutationApproveProposalArgs = {
-  id: Scalars['Int']
 };
 
 
@@ -331,11 +325,6 @@ export type MutationLoginArgs = {
 };
 
 
-export type MutationRejectProposalArgs = {
-  id: Scalars['Int']
-};
-
-
 export type MutationRemoveUserForReviewArgs = {
   reviewID: Scalars['Int']
 };
@@ -403,10 +392,11 @@ export type MutationUpdateProposalArgs = {
 
 export type MutationUpdateProposalTemplateFieldArgs = {
   id: Scalars['String'],
+  naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies?: Maybe<Array<FieldDependencyInput>>
+  dependencies: Array<FieldDependencyInput>
 };
 
 
@@ -499,6 +489,7 @@ export type ProposalAnswerInput = {
 };
 
 export enum ProposalEndStatus {
+  UNSET = 'UNSET',
   ACCEPTED = 'ACCEPTED',
   RESERVED = 'RESERVED',
   REJECTED = 'REJECTED'
@@ -530,6 +521,7 @@ export type ProposalTemplate = {
 export type ProposalTemplateField = {
    __typename?: 'ProposalTemplateField',
   proposal_question_id: Scalars['String'],
+  natural_key: Scalars['String'],
   data_type: DataType,
   sort_order: Scalars['Int'],
   question: Scalars['String'],
@@ -555,6 +547,7 @@ export type Query = {
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
   getPageContent?: Maybe<Scalars['String']>,
+  isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplate?: Maybe<ProposalTemplate>,
@@ -592,6 +585,11 @@ export type QueryGetOrcIdInformationArgs = {
 
 export type QueryGetPageContentArgs = {
   id: PageName
+};
+
+
+export type QueryIsNaturalKeyPresentArgs = {
+  naturalKey: Scalars['String']
 };
 
 
@@ -633,6 +631,7 @@ export type Questionary = {
 export type QuestionaryField = {
    __typename?: 'QuestionaryField',
   proposal_question_id: Scalars['String'],
+  natural_key: Scalars['String'],
   data_type: DataType,
   sort_order: Scalars['Int'],
   question: Scalars['String'],
@@ -1065,7 +1064,7 @@ export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfig
 
 export type ProposalTemplateFieldFragment = (
   { __typename?: 'ProposalTemplateField' }
-  & Pick<ProposalTemplateField, 'proposal_question_id' | 'data_type' | 'sort_order' | 'question' | 'topic_id'>
+  & Pick<ProposalTemplateField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -1086,7 +1085,7 @@ export type ProposalTemplateFieldFragment = (
     & FieldConfigTextInputConfigFragment
   ), dependencies: Maybe<Array<(
     { __typename?: 'FieldDependency' }
-    & Pick<FieldDependency, 'proposal_question_dependency' | 'proposal_question_id'>
+    & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
     & { condition: (
       { __typename?: 'FieldCondition' }
       & FieldConditionFragment
@@ -1104,7 +1103,7 @@ export type QuestionaryFragment = (
       & Pick<Topic, 'topic_title' | 'topic_id' | 'sort_order' | 'is_enabled'>
     ), fields: Array<(
       { __typename?: 'QuestionaryField' }
-      & Pick<QuestionaryField, 'proposal_question_id' | 'data_type' | 'question' | 'value' | 'sort_order' | 'topic_id'>
+      & Pick<QuestionaryField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id' | 'value'>
       & { config: (
         { __typename?: 'BooleanConfig' }
         & FieldConfigBooleanConfigFragment
@@ -1125,7 +1124,7 @@ export type QuestionaryFragment = (
         & FieldConfigTextInputConfigFragment
       ), dependencies: Maybe<Array<(
         { __typename?: 'FieldDependency' }
-        & Pick<FieldDependency, 'proposal_question_dependency' | 'proposal_question_id'>
+        & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
         & { condition: (
           { __typename?: 'FieldCondition' }
           & FieldConditionFragment
@@ -1179,6 +1178,16 @@ export type GetFileMetadataQuery = (
     { __typename?: 'FileMetadata' }
     & Pick<FileMetadata, 'fileId' | 'originalFileName' | 'mimeType' | 'sizeInBytes' | 'createdDate'>
   )>> }
+);
+
+export type GetIsNaturalKeyPresentQueryVariables = {
+  naturalKey: Scalars['String']
+};
+
+
+export type GetIsNaturalKeyPresentQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'isNaturalKeyPresent'>
 );
 
 export type GetProposalQueryVariables = {
@@ -1345,10 +1354,11 @@ export type UpdateProposalFilesMutation = (
 
 export type UpdateProposalTemplateFieldMutationVariables = {
   id: Scalars['String'],
+  naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies?: Maybe<Array<FieldDependencyInput>>
+  dependencies: Array<FieldDependencyInput>
 };
 
 
@@ -1879,6 +1889,7 @@ export const FieldConditionFragmentDoc = gql`
 export const ProposalTemplateFieldFragmentDoc = gql`
     fragment proposalTemplateField on ProposalTemplateField {
   proposal_question_id
+  natural_key
   data_type
   sort_order
   question
@@ -1887,11 +1898,12 @@ export const ProposalTemplateFieldFragmentDoc = gql`
   }
   topic_id
   dependencies {
-    proposal_question_dependency
+    question_id
+    dependency_id
+    dependency_natural_key
     condition {
       ...fieldCondition
     }
-    proposal_question_id
   }
 }
     ${FieldConfigFragmentDoc}
@@ -1908,21 +1920,23 @@ export const QuestionaryFragmentDoc = gql`
     isCompleted
     fields {
       proposal_question_id
+      natural_key
       data_type
+      sort_order
       question
       config {
         ...fieldConfig
       }
-      value
-      sort_order
       topic_id
       dependencies {
-        proposal_question_dependency
+        question_id
+        dependency_id
+        dependency_natural_key
         condition {
           ...fieldCondition
         }
-        proposal_question_id
       }
+      value
     }
   }
 }
@@ -2121,6 +2135,11 @@ export const GetFileMetadataDocument = gql`
   }
 }
     `;
+export const GetIsNaturalKeyPresentDocument = gql`
+    query getIsNaturalKeyPresent($naturalKey: String!) {
+  isNaturalKeyPresent(naturalKey: $naturalKey)
+}
+    `;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -2265,8 +2284,8 @@ export const UpdateProposalFilesDocument = gql`
 }
     `;
 export const UpdateProposalTemplateFieldDocument = gql`
-    mutation updateProposalTemplateField($id: String!, $question: String, $config: String, $isEnabled: Boolean, $dependencies: [FieldDependencyInput!]) {
-  updateProposalTemplateField(id: $id, question: $question, config: $config, isEnabled: $isEnabled, dependencies: $dependencies) {
+    mutation updateProposalTemplateField($id: String!, $naturalKey: String, $question: String, $config: String, $isEnabled: Boolean, $dependencies: [FieldDependencyInput!]!) {
+  updateProposalTemplateField(id: $id, naturalKey: $naturalKey, question: $question, config: $config, isEnabled: $isEnabled, dependencies: $dependencies) {
     template {
       steps {
         topic {
@@ -2593,6 +2612,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables);
+    },
+    getIsNaturalKeyPresent(variables: GetIsNaturalKeyPresentQueryVariables): Promise<GetIsNaturalKeyPresentQuery> {
+      return client.request<GetIsNaturalKeyPresentQuery>(print(GetIsNaturalKeyPresentDocument), variables);
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return client.request<GetProposalQuery>(print(GetProposalDocument), variables);
