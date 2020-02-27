@@ -124,7 +124,10 @@ export default class PostgresFileDataSource implements IFileDataSource {
       }
 
       [err] = await to(connection.query("BEGIN")); // start the transaction
-      if (err) return reject(`Could not begin transaction \n${err}`);
+      if (err) {
+        database.client.releaseConnection(connection);
+        return reject(`Could not begin transaction \n${err}`);
+      }
 
       const blobManager = new LargeObjectManager({ pg: connection });
       // @ts-ignore
@@ -133,6 +136,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
       );
       if (err) {
         connection.emit("error", err);
+        database.client.releaseConnection(connection);
         return reject(`Could not create readale stream \n${err}`);
       }
 
@@ -141,6 +145,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
       stream.on("end", function() {
         // @ts-ignore Already checked
         connection.query("COMMIT", () => resolve());
+        database.client.releaseConnection(connection);
       });
 
       // Store it as an image
