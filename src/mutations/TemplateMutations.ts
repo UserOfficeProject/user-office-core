@@ -99,6 +99,7 @@ export default class TemplateMutations {
     return this.dataSource
       .createTemplateField(
         newFieldId,
+        newFieldId, // natural key defaults to id
         topicId,
         dataType,
         "New question",

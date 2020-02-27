@@ -14,10 +14,22 @@ export default class TemplateQueries {
   async getProposalTemplate(
     agent: User | null
   ): Promise<ProposalTemplate | null> {
-    if (agent == null) {
+    if (!agent) {
       return null;
     }
 
     return await this.dataSource.getProposalTemplate();
+  }
+
+  async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
+    if (!agent) {
+      return null;
+    }
+
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return null;
+    }
+
+    return await this.dataSource.isNaturalKeyPresent(naturalKey);
   }
 }

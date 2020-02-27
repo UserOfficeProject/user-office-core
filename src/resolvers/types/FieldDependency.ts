@@ -6,10 +6,13 @@ import { FieldCondition } from "./FieldCondition";
 @ObjectType()
 export class FieldDependency implements Partial<FieldDependencyOrigin> {
   @Field()
-  public proposal_question_id: string;
+  public question_id: string;
 
   @Field()
-  public proposal_question_dependency: string;
+  public dependency_id: string;
+
+  @Field()
+  public dependency_natural_key: string;
 
   @Field(() => FieldCondition)
   public condition: FieldCondition;
