@@ -30,7 +30,7 @@ docker build:
     - docker info
     - docker build . -t dmsc/duo-backend
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
-    - docker push dmsc/duo-backend
+    - docker push dmsc/duo-backend:$CI_COMMIT_SHA
   tags:
     - docker
   only:
