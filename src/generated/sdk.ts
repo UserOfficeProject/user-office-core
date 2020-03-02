@@ -437,11 +437,11 @@ export type MutationUpdateUserArgs = {
 
 export type OrcIdInformation = {
    __typename?: 'OrcIDInformation',
-  firstname: Scalars['String'],
-  lastname: Scalars['String'],
-  orcid: Scalars['String'],
-  orcidHash: Scalars['String'],
-  refreshToken: Scalars['String'],
+  firstname?: Maybe<Scalars['String']>,
+  lastname?: Maybe<Scalars['String']>,
+  orcid?: Maybe<Scalars['String']>,
+  orcidHash?: Maybe<Scalars['String']>,
+  refreshToken?: Maybe<Scalars['String']>,
   token?: Maybe<Scalars['String']>,
 };
 
