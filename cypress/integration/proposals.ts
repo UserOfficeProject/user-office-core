@@ -173,11 +173,10 @@ context("Proposal tests", () => {
     cy.login("officer");
 
     cy.contains("View Proposals").click();
-
-    cy.get("[title=Delete]")
+    cy.get('[type="checkbox"]')
       .first()
-      .click();
-    cy.get("[title=Save]")
+      .check();
+    cy.get("[title='Delete proposals']")
       .first()
       .click();
   });

@@ -82,7 +82,7 @@ export default function ProposalTechnicalReview(props: {
               <Grid item xs={6}>
                 <Field
                   name="timeAllocation"
-                  label="Time Allocation(hr)"
+                  label="Time Allocation(Days)"
                   type="number"
                   component={TextField}
                   margin="normal"
@@ -92,7 +92,7 @@ export default function ProposalTechnicalReview(props: {
                   required
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12}>
                 <Field
                   name="comment"
                   label="Comment"
