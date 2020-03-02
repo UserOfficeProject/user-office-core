@@ -1,10 +1,41 @@
 query getProposals($filter: String!) {
   proposals(filter: $filter) {
     proposals {
+    id
+    title
+    abstract
+    status
+    shortCode
+    rankOrder
+    finalStatus
+    created
+    updated
+        proposer {
+      ...basicUserDetails
+    }
+      reviews {
       id
-      shortCode
-      title
+      grade
+      comment
       status
+      userID
+      reviewer {
+        firstname
+        lastname
+        username
+        id
+      }
+    }
+    users {
+      ...basicUserDetails
+    }
+    technicalReview{
+      id
+      comment
+      timeAllocation
+      status
+      proposalID
+    }
     }
     totalCount
   }

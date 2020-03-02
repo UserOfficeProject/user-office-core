@@ -3,11 +3,13 @@ import { GetPageContentQuery, PageName } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useGetPageContent(pageName: PageName) {
-  const api = useDataApi();
   const [pageContent, setPageContent] = useState<
     GetPageContentQuery["getPageContent"]
   >(null);
   const [loading, setLoading] = useState(true);
+
+  const api = useDataApi();
+
   useEffect(() => {
     setLoading(true);
     api()

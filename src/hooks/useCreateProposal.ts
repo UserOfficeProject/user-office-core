@@ -2,8 +2,9 @@ import { useCallback, useState } from "react";
 import { useDataApi } from "./useDataApi";
 
 export function useCreateProposal() {
-  const api = useDataApi();
   const [loading, setLoading] = useState(false);
+
+  const api = useDataApi();
 
   const createProposal = useCallback(async () => {
     setLoading(true);

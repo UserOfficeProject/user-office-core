@@ -3,18 +3,20 @@ import { Review } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useReviewData(id: number) {
-  const sendRequest = useDataApi();
   const [reviewData, setReviewData] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const api = useDataApi();
+
   useEffect(() => {
     setLoading(true);
-    sendRequest()
+    api()
       .getReview({ id })
       .then(data => {
         setReviewData(data.review);
         setLoading(false);
       });
-  }, [id, sendRequest]);
+  }, [id, api]);
 
   return { loading, reviewData };
 }

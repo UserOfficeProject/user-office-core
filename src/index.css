@@ -12,7 +12,10 @@ code {
     monospace;
 }
 
-
 .MuiPaper-elevation2.MuiPaper-root {
   box-shadow: none;
+}
+
+.MuiFormLabel-asterisk {
+  color: red;
 }

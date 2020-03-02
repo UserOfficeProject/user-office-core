@@ -5,9 +5,8 @@ query getProposal($id: Int!) {
     abstract
     status
     shortCode
-    excellenceScore
-    safetyScore
-    technicalScore
+    rankOrder
+    finalStatus
     created
     updated
     proposer {
@@ -18,6 +17,13 @@ query getProposal($id: Int!) {
     }
     questionary {
       ...questionary
+    }
+    technicalReview{
+      id
+      comment
+      timeAllocation
+      status
+      proposalID
     }
     reviews {
       id

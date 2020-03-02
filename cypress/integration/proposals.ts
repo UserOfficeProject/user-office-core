@@ -7,7 +7,7 @@ context("Proposal tests", () => {
   });
   beforeEach(() => {
     cy.viewport(1100, 800);
-    cy.visit("localhost:3000");
+    cy.visit("/");
   });
 
   var boolId;
@@ -16,6 +16,7 @@ context("Proposal tests", () => {
   const booleanQuestion = faker.random.words(2);
   const textQuestion = faker.random.words(2);
   const dateQuestion = faker.random.words(2);
+  const fileQuestion = faker.random.words(2);
 
   const topic = faker.random.words(1);
   const title = faker.random.words(3);
@@ -102,6 +103,25 @@ context("Proposal tests", () => {
       });
     /* --- */
 
+    /* File */
+    cy.get("[data-cy=show-more-button]").click();
+
+    cy.contains("Add File upload").click();
+
+    cy.get("[data-cy=question]")
+      .clear()
+      .type(fileQuestion);
+
+    cy.contains("Save").click();
+
+    cy.contains(dateQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke("html")
+      .then(fieldId => {
+        dateId = fieldId;
+      });
+    /* --- */
+
     cy.contains(booleanQuestion);
     cy.contains(textQuestion);
     cy.contains(dateQuestion);
@@ -153,11 +173,10 @@ context("Proposal tests", () => {
     cy.login("officer");
 
     cy.contains("View Proposals").click();
-
-    cy.get("[title=Delete]")
+    cy.get('[type="checkbox"]')
       .first()
-      .click();
-    cy.get("[title=Save]")
+      .check();
+    cy.get("[title='Delete proposals']")
       .first()
       .click();
   });
@@ -175,6 +194,9 @@ context("Proposal tests", () => {
     cy.get("[data-cy='delete']").click();
 
     cy.contains(dateQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.contains(fileQuestion).click();
     cy.get("[data-cy='delete']").click();
 
     cy.get("[data-cy=show-more-button]").click();

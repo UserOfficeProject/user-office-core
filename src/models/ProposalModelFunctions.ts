@@ -60,22 +60,21 @@ export function isDependencySatisfied(
   dependency: FieldDependency
 ): boolean {
   const { condition, params } = dependency.condition;
-  const field = getFieldById(
-    collection,
-    dependency.proposal_question_dependency
-  ) as QuestionaryField | undefined;
+  const field = getFieldById(collection, dependency.dependency_id) as
+    | QuestionaryField
+    | undefined;
   if (!field) {
     return true;
   }
-  const isParentSattisfied = areDependenciesSatisfied(
+  const isParentSatisfied = areDependenciesSatisfied(
     collection,
-    dependency.proposal_question_dependency
+    dependency.dependency_id
   );
   return (
-    isParentSattisfied &&
+    isParentSatisfied &&
     new ConditionEvaluator()
-      .getConfitionEvaluator(condition)
-      .isSattisfied(field, params)
+      .getConditionEvaluator(condition)
+      .isSatisfied(field, params)
   );
 }
 export function areDependenciesSatisfied(
@@ -86,9 +85,9 @@ export function areDependenciesSatisfied(
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
+  const isAtLeastOneDissatisfied = field.dependencies!.some(dep => {
     let result = isDependencySatisfied(questionary, dep) === false;
     return result;
   });
-  return isAtLeastOneDissasisfied === false;
+  return isAtLeastOneDissatisfied === false;
 }

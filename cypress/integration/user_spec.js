@@ -3,7 +3,7 @@ const faker = require("faker");
 
 context("User tests", () => {
   beforeEach(() => {
-    cy.visit("localhost:3000/SignUp?code=WRMVXa");
+    cy.visit("/SignUp?code=WRMVXa");
   });
 
   // Login details

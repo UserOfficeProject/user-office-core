@@ -8,6 +8,7 @@ cache:
 stages:
   - test
   - build
+  - e2etest
 
 test:
   stage: test
@@ -27,5 +28,22 @@ docker build:
     - docker push dmsc/duo-frontend
   tags:
     - docker
-  only:
-    - master
+
+e2etest:
+  image: tiangolo/docker-with-compose
+  stage: e2etest
+  script: 
+    - apk add git
+    - rm -rf duo-backend
+    - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
+    - docker-compose -f docker-compose.e2e.yaml rm
+    - docker-compose -f docker-compose.e2e.yaml down --remove-orphans
+    - docker-compose -f docker-compose.e2e.yaml pull
+    - docker-compose -f docker-compose.e2e.yaml build
+    - docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
+    - docker-compose -f docker-compose.e2e.yaml down
+  tags:
+    - docker
+
+
+

@@ -1,12 +1,12 @@
 import produce from "immer";
 import { Reducer, useCallback, useEffect } from "react";
-import { useProposalQuestionTemplate } from "../hooks/useProposalQuestionTemplate";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 import {
   ProposalTemplate,
   ProposalTemplateField,
   TemplateStep
 } from "../generated/sdk";
+import { useDataApi } from "../hooks/useDataApi";
+import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
@@ -41,18 +41,19 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const [state, dispatch] = useReducerWithMiddleWares<
     Reducer<ProposalTemplate, IEvent>
   >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []);
-
-  const getProposalTemplateRequest = useProposalQuestionTemplate();
+  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+  const api = useDataApi();
 
   useEffect(() => {
-    getProposalTemplateRequest().then(data => {
-      memoizedDispatch({
-        type: EventType.READY,
-        payload: data
+    api()
+      .getProposalTemplate()
+      .then(data => {
+        memoizedDispatch({
+          type: EventType.READY,
+          payload: data.proposalTemplate
+        });
       });
-    });
-  }, [getProposalTemplateRequest, memoizedDispatch]);
+  }, [api, memoizedDispatch]);
 
   function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
     return produce(state, draft => {
@@ -64,19 +65,19 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             return draft;
           }
 
-          var from: any = draft.steps.find(step => {
+          var from = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.source.droppableId
             );
-          });
+          })!;
 
-          var to: any = draft.steps.find(step => {
+          var to = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.destination.droppableId
             );
-          });
+          })!;
 
           to.fields.splice(
             action.payload.destination.index,

@@ -9,8 +9,9 @@ import { EventType, IEvent } from "../models/QuestionaryEditorModel";
 import { useDataApi } from "./useDataApi";
 
 export function usePersistModel() {
-  const api = useDataApi();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const api = useDataApi();
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
     return api()
@@ -47,6 +48,7 @@ export function usePersistModel() {
     return api()
       .updateProposalTemplateField({
         id: field.proposal_question_id,
+        naturalKey: field.natural_key,
         question: field.question,
         config: field.config ? JSON.stringify(field.config) : undefined,
         isEnabled: true, // TODO implement UI for this toggle
@@ -67,7 +69,7 @@ export function usePersistModel() {
         ...dependency,
         condition: {
           ...dependency.condition,
-          params: JSON.stringify({ value: true })
+          params: JSON.stringify({ value: dependency.condition.params })
         }
       };
     });

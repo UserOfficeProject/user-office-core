@@ -7,7 +7,7 @@ context("Personal information tests", () => {
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.visit("localhost:3000");
+    cy.visit("/");
     cy.viewport(1100, 1100);
   });
 
@@ -15,8 +15,8 @@ context("Personal information tests", () => {
   const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
-  const newPrefferedName = faker.hacker.noun();
-  const newPosition = faker.random.word();
+  const newPreferredName = faker.hacker.noun();
+  const newPosition = faker.random.word().split(" ")[0];
   const newTelephone = faker.phone.phoneNumber();
 
   it("Should be able update personal information", () => {
@@ -39,7 +39,7 @@ context("Personal information tests", () => {
 
     cy.get("[name='preferredname']")
       .clear()
-      .type(newPrefferedName, { force: true });
+      .type(newPreferredName, { force: true });
 
     cy.get("[name='position']")
       .clear()
@@ -71,7 +71,7 @@ context("Personal information tests", () => {
 
     cy.get("[name='preferredname']")
       .invoke("val")
-      .should("eq", newPrefferedName);
+      .should("eq", newPreferredName);
 
     cy.get("[name='position']")
       .invoke("val")
