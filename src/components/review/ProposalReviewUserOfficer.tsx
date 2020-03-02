@@ -1,10 +1,10 @@
 import Container from "@material-ui/core/Container";
-import React, { useState } from "react";
-import { useProposalData } from "../../hooks/useProposalData";
-import ProposalTechnicalReview from "./ProposalTechnicalReview";
-import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
+import React, { useEffect, useState } from "react";
+import { Proposal, TechnicalReview } from "../../generated/sdk";
+import { useDataApi } from "../../hooks/useDataApi";
 import SimpleTabs from "../common/TabPanel";
-import { TechnicalReview } from "../../generated/sdk";
+import GeneralInformation from "../proposal/GeneralInformation";
+import ProposalTechnicalReview from "./ProposalTechnicalReview";
 
 export default function ProposalReview({ match }: { match: any }) {
   // const [modalOpen, setOpen] = useState(false);
@@ -12,9 +12,8 @@ export default function ProposalReview({ match }: { match: any }) {
   const [techReview, setTechReview] = useState<
     TechnicalReview | null | undefined
   >(null);
-  const { proposalData } = useProposalData(parseInt(match.params.id));
-
-
+  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const api = useDataApi();
   // To be added for reviews
   // const api = useDataApi();
 
@@ -36,8 +35,6 @@ export default function ProposalReview({ match }: { match: any }) {
   //   }
   // }, [proposalData]);
 
-
-
   // const addUser = async (user: any) => {
   //   await api().addUserForReview({
   //     userID: user.id,
@@ -57,17 +54,24 @@ export default function ProposalReview({ match }: { match: any }) {
   //   });
   // };
 
-  if (!proposalData) {
+  useEffect(() => {
+    api()
+      .getProposal({ id: parseInt(match.params.id) })
+      .then(data => setProposal(data.proposal));
+  }, [api, match.params.id]);
+
+  if (!proposal) {
     return <p>Loading</p>;
   }
   return (
     <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={["General", "Technical"]}
-      >
-        <ProposalQuestionaryReview data={proposalData} />
+      <SimpleTabs tabNames={["General", "Technical"]}>
+        <GeneralInformation
+          data={proposal}
+          onProposalChanged={newProposal => setProposal(newProposal)}
+        />
         <ProposalTechnicalReview
-          id={proposalData.id}
+          id={proposal.id}
           data={techReview}
           setReview={setTechReview}
         />
