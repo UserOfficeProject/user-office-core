@@ -9,6 +9,7 @@ import { Topic } from "./Topic";
 import { ProposalTemplateField } from "./ProposalTemplateField";
 import { ProposalTemplate } from "./ProposalTemplate";
 import { Review } from "./Review";
+import { TechnicalReview } from "./TechnicalReview";
 import { BasicUserDetails } from "./BasicUserDetails";
 
 @ObjectType()
@@ -38,6 +39,15 @@ export class ReviewResponseWrap extends ResponseWrapBase<Review> {
   @Response()
   @Field(() => Review, { nullable: true })
   public review: Review;
+}
+
+@ObjectType()
+export class TechnicalReviewResponseWrap extends ResponseWrapBase<
+  TechnicalReview
+> {
+  @Response()
+  @Field(() => TechnicalReview, { nullable: true })
+  public technicalReview: TechnicalReview;
 }
 
 @ObjectType()
@@ -84,4 +94,11 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
+}
+
+@ObjectType()
+export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Boolean, { nullable: true })
+  public isSuccess: boolean;
 }

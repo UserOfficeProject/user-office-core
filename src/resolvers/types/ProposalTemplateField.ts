@@ -12,6 +12,9 @@ export class ProposalTemplateField
   @Field()
   public proposal_question_id: string;
 
+  @Field()
+  public natural_key: string;
+
   @Field(() => DataType)
   public data_type: DataType;
 

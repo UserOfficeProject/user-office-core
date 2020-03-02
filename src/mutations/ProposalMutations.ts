@@ -11,6 +11,8 @@ import { isMatchingConstraints } from "../models/ProposalModelFunctions";
 import { TemplateDataSource } from "../datasources/TemplateDataSource";
 import { to } from "await-to-js";
 import { logger } from "../utils/Logger";
+import { UpdateProposalFilesArgs } from "../resolvers/mutations/UpdateProposalFilesMutation";
+import { UpdateProposalArgs } from "../resolvers/mutations/UpdateProposalMutation";
 
 export default class ProposalMutations {
   constructor(
@@ -52,18 +54,21 @@ export default class ProposalMutations {
 
   async update(
     agent: User | null,
-    id: number,
-    title?: string,
-    abstract?: string,
-    answers?: ProposalAnswer[],
-    topicsCompleted?: number[],
-    users?: number[],
-    proposerId?: number,
-    partialSave?: boolean,
-    excellenceScore?: number,
-    technicalScore?: number,
-    safetyScore?: number
+    args: UpdateProposalArgs
   ): Promise<Proposal | Rejection> {
+    const {
+      id,
+      title,
+      abstract,
+      answers,
+      topicsCompleted,
+      users,
+      proposerId,
+      partialSave,
+      rankOrder,
+      finalStatus
+    } = args;
+
     return this.eventBus.wrap<Proposal>(
       async () => {
         if (agent == null) {
@@ -107,26 +112,18 @@ export default class ProposalMutations {
         if (abstract !== undefined) {
           proposal.abstract = abstract;
         }
-
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          excellenceScore !== undefined
+          rankOrder !== undefined
         ) {
-          proposal.excellenceScore = excellenceScore;
+          proposal.rankOrder = rankOrder;
         }
 
         if (
           (await this.userAuth.isUserOfficer(agent)) &&
-          technicalScore !== undefined
+          finalStatus !== undefined
         ) {
-          proposal.technicalScore = technicalScore;
-        }
-
-        if (
-          (await this.userAuth.isUserOfficer(agent)) &&
-          safetyScore !== undefined
-        ) {
-          proposal.safetyScore = safetyScore;
+          proposal.finalStatus = finalStatus;
         }
 
         if (users !== undefined) {
@@ -195,14 +192,12 @@ export default class ProposalMutations {
 
   async updateFiles(
     agent: User | null,
-    proposalId: number,
-    questionId: string,
-    files: string[]
+    args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
     if (agent == null) {
       return rejection("NOT_LOGGED_IN");
     }
-
+    const { proposalId, questionId, files } = args;
     let proposal = await this.dataSource.get(proposalId);
 
     if (
@@ -222,55 +217,7 @@ export default class ProposalMutations {
       .catch(err => {
         logger.logException("Could not update proposal files", err, {
           agent,
-          proposalId,
-          questionId,
-          files
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
-  async accept(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-    return this.dataSource
-      .acceptProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not accept proposal", err, {
-          agent,
-          proposalId
-        });
-        return rejection("INTERNAL_ERROR");
-      });
-  }
-
-  async reject(
-    agent: User | null,
-    proposalId: number
-  ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
-    }
-
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
-    }
-
-    return this.dataSource
-      .rejectProposal(proposalId)
-      .then(proposal => proposal)
-      .catch(err => {
-        logger.logException("Could not reject proposal", err, {
-          agent,
-          proposalId
+          args
         });
         return rejection("INTERNAL_ERROR");
       });

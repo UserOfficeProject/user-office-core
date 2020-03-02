@@ -7,6 +7,7 @@ export interface AdminDataSource {
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;
   setPageText(id: number, text: string): Promise<Page>;
+  resetDB(): Promise<boolean>;
 }
 export class Entry {
   constructor(public id: number, public value: string) {}

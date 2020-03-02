@@ -25,6 +25,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       new QuestionaryField(
         new ProposalTemplateField(
           "ttl_general",
+          "ttl_general",
           DataType.EMBELLISHMENT,
           0,
           "",
@@ -39,6 +40,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       ),
       new QuestionaryField(
         new ProposalTemplateField(
+          "has_links_with_industry",
           "has_links_with_industry",
           DataType.SELECTION_FROM_OPTIONS,
           1,
@@ -58,6 +60,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
       new QuestionaryField(
         new ProposalTemplateField(
           "links_with_industry",
+          "links_with_industry",
           DataType.TEXT_INPUT,
           2,
           "If yes, please describe:",
@@ -69,6 +72,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = () => {
           [
             new FieldDependency(
               "links_with_industry",
+              "has_links_with_industry",
               "has_links_with_industry",
               new FieldCondition(EvaluatorOperator.EQ, "yes")
             )
@@ -89,6 +93,7 @@ export const create1TopicFieldlessTemplate = () => {
 export const createDummyField = (values: {
   data_type?: DataType;
   proposal_question_id?: string;
+  natural_key?: string;
   sort_order?: number;
   topic_id?: number;
   question?: string;
@@ -97,6 +102,7 @@ export const createDummyField = (values: {
 }): ProposalTemplateField => {
   return new ProposalTemplateField(
     values.proposal_question_id || "random_field_name_" + Math.random(),
+    values.natural_key || "is_dangerous",
     values.data_type || DataType.TEXT_INPUT,
     values.sort_order || Math.round(Math.random() * 100),
     values.question || "Some random question",
@@ -117,6 +123,7 @@ export const createDummyTemplate = () => {
     dependencies: [
       new FieldDependency(
         "linksToField",
+        "hasLinksToField",
         "hasLinksToField",
         new FieldCondition(EvaluatorOperator.EQ, "yes")
       )

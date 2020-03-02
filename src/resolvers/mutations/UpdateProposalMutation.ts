@@ -12,9 +12,10 @@ import { ResolverContext } from "../../context";
 import { DataType } from "../../models/ProposalModel";
 import { ProposalResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
+import { ProposalEndStatus } from "../../models/ProposalModel";
 
 @ArgsType()
-class UpdateProposalArgs {
+export class UpdateProposalArgs {
   @Field(() => Int)
   public id: number;
 
@@ -40,13 +41,10 @@ class UpdateProposalArgs {
   public partialSave?: boolean;
 
   @Field(() => Int, { nullable: true })
-  public excellenceScore?: number;
+  public rankOrder?: number;
 
-  @Field(() => Int, { nullable: true })
-  public technicalScore?: number;
-
-  @Field(() => Int, { nullable: true })
-  public safetyScore?: number;
+  @Field(() => ProposalEndStatus, { nullable: true })
+  public finalStatus?: ProposalEndStatus;
 }
 
 @Resolver()
@@ -54,36 +52,11 @@ export class UpdateProposalMutation {
   @Mutation(() => ProposalResponseWrap)
   updateProposal(
     @Args()
-    {
-      id,
-      title,
-      abstract,
-      answers,
-      topicsCompleted,
-      users,
-      proposerId,
-      partialSave,
-      excellenceScore,
-      technicalScore,
-      safetyScore
-    }: UpdateProposalArgs,
+    args: UpdateProposalArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.update(
-        context.user,
-        id,
-        title,
-        abstract,
-        answers,
-        topicsCompleted,
-        users,
-        proposerId,
-        partialSave,
-        excellenceScore,
-        technicalScore,
-        safetyScore
-      ),
+      context.mutations.proposal.update(context.user, args),
       ProposalResponseWrap
     );
   }

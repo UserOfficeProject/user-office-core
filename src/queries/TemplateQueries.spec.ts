@@ -1,3 +1,4 @@
+import { dummyUser } from "./../datasources/mockups/UserDataSource";
 import "reflect-metadata";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
@@ -41,4 +42,17 @@ test("Proposal template should have fields", async () => {
     dummyUserOfficer
   )) as ProposalTemplate;
   return expect(template.steps[0].fields!.length).toBeGreaterThan(0);
+});
+
+test("User officer should be able to get if natural key exists", async () => {
+  let exists = await templateQueries.isNaturalKeyPresent(
+    dummyUserOfficer,
+    "some_key"
+  );
+  return expect(exists).not.toBe(null);
+});
+
+test("User should not be able to get if natural key exists", async () => {
+  let exists = await templateQueries.isNaturalKeyPresent(dummyUser, "some_key");
+  return expect(exists).toBe(null);
 });

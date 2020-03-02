@@ -42,24 +42,22 @@ beforeEach(() => {
 test("A userofficer can update topic", async () => {
   const newTopicTitle = "new topic title";
   const topicEnabled = false;
-  const topic = await templateMutations.updateTopic(
-    dummyUserOfficer,
-    1,
-    newTopicTitle,
-    topicEnabled
-  );
+  const topic = await templateMutations.updateTopic(dummyUserOfficer, {
+    id: 1,
+    title: newTopicTitle,
+    isEnabled: topicEnabled
+  });
   expect(topic instanceof Topic).toBe(true);
   expect((topic as Topic).topic_title).toEqual(newTopicTitle);
   expect((topic as Topic).is_enabled).toEqual(topicEnabled);
 });
 
 test("A user can not update topic", async () => {
-  const topic = await templateMutations.updateTopic(
-    dummyUser,
-    1,
-    "New topic title",
-    false
-  );
+  const topic = await templateMutations.updateTopic(dummyUser, {
+    id: 1,
+    title: "New topic title",
+    isEnabled: false
+  });
 
   expect(topic instanceof Topic).toBe(false);
 });
@@ -67,11 +65,11 @@ test("A user can not update topic", async () => {
 test("A user-officer can create topic", async () => {
   let template = await templateMutations.createTopic(dummyUserOfficer, 0);
   expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
-  var numberfOfTopics = (template as ProposalTemplate).steps.length;
+  var numberOfTopics = (template as ProposalTemplate).steps.length;
 
   template = await templateMutations.createTopic(dummyUserOfficer, 1);
   expect((template as ProposalTemplate).steps.length).toEqual(
-    numberfOfTopics + 1
+    numberOfTopics + 1
   ); // added new one
 });
 
@@ -98,19 +96,17 @@ test("A user can not update fieltTopicRel", async () => {
 });
 
 test("User can not create field", async () => {
-  const response = await templateMutations.createTemplateField(
-    dummyUser,
-    1,
-    DataType.EMBELLISHMENT
-  );
+  const response = await templateMutations.createTemplateField(dummyUser, {
+    topicId: 1,
+    dataType: DataType.EMBELLISHMENT
+  });
   expect(response).not.toBeInstanceOf(ProposalTemplate);
 });
 
 test("User officer can create field", async () => {
   const response = await templateMutations.createTemplateField(
     dummyUserOfficer,
-    1,
-    DataType.EMBELLISHMENT
+    { topicId: 1, dataType: DataType.EMBELLISHMENT }
   );
   expect(response).toBeInstanceOf(ProposalTemplateField);
 
@@ -143,13 +139,11 @@ test("User can not update topic order", async () => {
 });
 
 test("Officer can delete a topic", async () => {
-  expect(templateMutations.deleteTopic(dummyUser, 1)).resolves.toBeInstanceOf(
-    Topic
-  );
+  const topic = await templateMutations.deleteTopic(dummyUserOfficer, 1);
+  expect(topic instanceof Topic).toBe(true);
 });
 
 test("Dummy user can't delete a topic", async () => {
-  expect(
-    templateMutations.deleteTopic(dummyUser, 1)
-  ).resolves.not.toBeInstanceOf(Topic);
+  const topic = await templateMutations.deleteTopic(dummyUser, 1);
+  expect(topic instanceof Topic).toBe(false);
 });

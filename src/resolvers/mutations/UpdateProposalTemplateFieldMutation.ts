@@ -8,16 +8,19 @@ import {
   Resolver
 } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { FieldCondition } from "../types/FieldCondition";
-import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
 import { EvaluatorOperator } from "../../models/ConditionEvaluator";
+import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
+import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
+import { FieldCondition } from "../types/FieldCondition";
+import { wrapResponse } from "../wrapResponse";
 
 @ArgsType()
-class UpdateProposalTemplateFieldArgs {
+export class UpdateProposalTemplateFieldArgs {
   @Field()
   public id: string;
+
+  @Field({ nullable: true })
+  public naturalKey: string;
 
   @Field({ nullable: true })
   public question: string;
@@ -28,7 +31,7 @@ class UpdateProposalTemplateFieldArgs {
   @Field({ nullable: true })
   public isEnabled: boolean;
 
-  @Field(() => FieldDependencyInput, { nullable: true })
+  @Field(() => FieldDependencyInput)
   public dependencies: FieldDependencyInput[];
 }
 
@@ -37,17 +40,17 @@ class FieldConditionInput implements Partial<FieldCondition> {
   @Field(() => EvaluatorOperator)
   public condition: EvaluatorOperator;
 
-  @Field()
-  public params: string;
+  @Field(() => String)
+  public params: any;
 }
 
 @InputType()
-class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
+export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
   @Field(() => String)
-  public proposal_question_dependency: string;
+  public dependency_id: string;
 
   @Field(() => String)
-  public proposal_question_id: string;
+  public question_id: string;
 
   @Field(() => FieldConditionInput)
   public condition: FieldConditionInput;
@@ -60,18 +63,27 @@ export class UpdateProposalTemplateFieldMutation {
     @Args() args: UpdateProposalTemplateFieldArgs,
     @Ctx() context: ResolverContext
   ) {
+    args.dependencies = this.unpackDependencies(args.dependencies);
     return wrapResponse(
       context.mutations.template.updateProposalTemplateField(
         context.user,
-        args.id,
-        undefined,
-        undefined,
-        args.question,
-        undefined,
-        args.config,
-        args.dependencies
+        args
       ),
       ProposalTemplateResponseWrap
     );
+  }
+
+  // Have this until GQL accepts Union types
+  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
+  unpackDependencies(dependencies: FieldDependencyInput[]) {
+    return dependencies.map(dependency => {
+      return {
+        ...dependency,
+        condition: {
+          ...dependency.condition,
+          params: JSON.parse(dependency.condition.params).value
+        }
+      };
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { CallDataSource } from "../CallDataSource";
 import { Call } from "../../models/Call";
+import { CreateCallArgs } from "../../resolvers/mutations/CreateCallMutation";
 
 export const dummyCall = new Call(
   1,
@@ -22,17 +23,7 @@ export class callDataSource implements CallDataSource {
   async getCalls(): Promise<Call[]> {
     return [dummyCall];
   }
-  async create(
-    shortCode: string,
-    startCall: string,
-    endCall: string,
-    startReview: string,
-    endReview: string,
-    startNotify: string,
-    endNotify: string,
-    cycleComment: string,
-    surveyComment: string
-  ) {
+  async create(args: CreateCallArgs) {
     return dummyCall;
   }
 }

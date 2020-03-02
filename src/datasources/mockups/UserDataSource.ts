@@ -1,6 +1,8 @@
 import { UserDataSource } from "../UserDataSource";
 import { User, BasicUserDetails } from "../../models/User";
 import { Role } from "../../models/Role";
+import { AddUserRoleArgs } from "../../resolvers/mutations/AddUserRoleMutation";
+import { CreateUserByEmailInviteArgs } from "../../resolvers/mutations/CreateUserByEmailInviteMutation";
 
 export const basicDummyUser = new BasicUserDetails(
   2,
@@ -101,7 +103,7 @@ export const dummyUserNotOnProposal = new User(
   "NoDO",
   "Damion",
   "182082741",
-  "adaasd",
+  "Apricot",
   "female",
   3,
   "1991-11-08",
@@ -118,17 +120,13 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class userDataSource implements UserDataSource {
-  async addUserRole(userID: number, roleID: number): Promise<Boolean> {
-    return true
+  async addUserRole(args: AddUserRoleArgs): Promise<Boolean> {
+    return true;
   }
   getByOrcID(orcID: string): Promise<User | null> {
     throw new Error("Method not implemented.");
   }
-  async createInviteUser(
-    firstname: string,
-    lastname: string,
-    email: string
-  ): Promise<number> {
+  async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     return 5;
   }
   async createOrganisation(name: string, verified: boolean): Promise<number> {
@@ -151,7 +149,7 @@ export class userDataSource implements UserDataSource {
   async getPasswordByEmail(email: string): Promise<string> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserEmailVerified(id: number): Promise<void> { }
+  async setUserEmailVerified(id: number): Promise<void> {}
   async setUserPassword(
     id: number,
     password: string
@@ -179,7 +177,7 @@ export class userDataSource implements UserDataSource {
   async getPasswordByUsername(username: string): Promise<string | null> {
     return "$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm";
   }
-  async setUserRoles(id: number, roles: number[]): Promise<void> { }
+  async setUserRoles(id: number, roles: number[]): Promise<void> {}
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: "user_officer", title: "User Officer" }];

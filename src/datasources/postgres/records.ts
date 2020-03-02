@@ -50,6 +50,7 @@ export interface FieldDependencyRecord {
 
 export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
+  readonly natural_key: string;
   readonly data_type: string;
   readonly question: string;
   readonly topic_id: number;
@@ -100,6 +101,14 @@ export interface ReviewRecord {
   readonly proposal_id: number;
   readonly comment: string;
   readonly grade: number;
+  readonly status: number;
+}
+
+export interface TechnicalReviewRecord {
+  readonly technical_review_id: number;
+  readonly proposal_id: number;
+  readonly comment: string;
+  readonly time_allocation: number;
   readonly status: number;
 }
 
@@ -164,6 +173,7 @@ export const createProposalTemplateFieldObject = (
 ) => {
   return new ProposalTemplateField(
     question.proposal_question_id,
+    question.natural_key,
     question.data_type as DataType,
     question.sort_order,
     question.question,
@@ -183,20 +193,23 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.created_at,
     proposal.updated_at,
     proposal.short_code,
-    proposal.excellence_score,
-    proposal.safety_score,
-    proposal.technical_score
+    proposal.rank_order,
+    proposal.final_status
   );
 };
 
 export const createFieldDependencyObject = (
-  fieldDependency: FieldDependencyRecord
+  fieldDependency: FieldDependencyRecord & { natural_key: string }
 ) => {
   const conditionJson = JSON.parse(fieldDependency.condition);
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,
-    new FieldCondition(conditionJson.condition, conditionJson.params)
+    fieldDependency.natural_key,
+    new FieldCondition(
+      conditionJson.condition.toUpperCase(),
+      conditionJson.params
+    )
   );
 };
 

@@ -14,7 +14,7 @@ import { wrapResponse } from "../wrapResponse";
 import { Response } from "../Decorators";
 
 @ArgsType()
-class AddUserRoleArgs {
+export class AddUserRoleArgs {
   @Field(() => Int)
   public userID: number;
 
@@ -34,11 +34,7 @@ export class AddUserRoleMutation {
   @Mutation(() => AddUserRoleResponseWrap)
   addUserRole(@Args() args: AddUserRoleArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.user.addUserRole(
-        context.user,
-        args.userID,
-        args.roleID
-      ),
+      context.mutations.user.addUserRole(context.user, args),
       AddUserRoleResponseWrap
     );
   }

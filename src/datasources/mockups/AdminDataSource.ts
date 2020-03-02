@@ -2,7 +2,10 @@ import { AdminDataSource, Entry } from "../AdminDataSource";
 import { Page } from "../../models/Admin";
 
 export class adminDataSource implements AdminDataSource {
-  getInstitution(id: number): Promise<string | null> {
+  async resetDB(): Promise<boolean> {
+    throw new Error("Method not implemented.");
+  }
+  async getInstitution(id: number): Promise<string | null> {
     throw new Error("Method not implemented.");
   }
   async getInstitutions(): Promise<Entry[]> {

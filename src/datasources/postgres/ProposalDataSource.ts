@@ -56,12 +56,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async submitProposal(id: number): Promise<Proposal> {
     return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
-  async acceptProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.ACCEPTED);
-  }
-  async rejectProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.REJECTED);
-  }
 
   async deleteProposal(id: number): Promise<Proposal> {
     return database("proposals")
@@ -201,9 +195,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           abstract: proposal.abstract,
           status: proposal.status,
           proposer_id: proposal.proposerId,
-          excellence_score: proposal.excellenceScore,
-          safety_score: proposal.safetyScore,
-          technical_score: proposal.technicalScore
+          rank_order: proposal.rankOrder,
+          final_status: proposal.finalStatus
         },
         ["*"]
       )
@@ -284,9 +277,18 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getQuestionary(proposalId: number): Promise<Questionary> {
-    const dependencyRecords: FieldDependencyRecord[] = await database
-      .select("*")
-      .from("proposal_question_dependencies");
+    const dependencyRecords: (FieldDependencyRecord & {
+      natural_key: string;
+    })[] = await database("proposal_question_dependencies")
+      .join(
+        "proposal_questions",
+        "proposal_question_dependencies.proposal_question_id",
+        "proposal_questions.proposal_question_id"
+      )
+      .select(
+        "proposal_question_dependencies.*",
+        "proposal_questions.natural_key"
+      );
 
     const fieldRecords: Array<ProposalQuestionRecord & { value: any }> = (
       await database.raw(`
@@ -344,10 +346,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     fields.forEach(field => {
       // @ts-ignore we are nullchecking inside the filter callbackfn
       field.dependencies = dependencies.filter(dep => {
-        return (
-          dep !== null &&
-          dep.proposal_question_id === field.proposal_question_id
-        );
+        return dep !== null && dep.question_id === field.proposal_question_id;
       });
     });
 

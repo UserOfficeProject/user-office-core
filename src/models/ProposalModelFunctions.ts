@@ -59,16 +59,15 @@ export function isDependencySatisfied(
 ): boolean {
   //const { condition, params } = dependency.condition;
   const { condition, params } = dependency.condition;
-  const field = getFieldById(
-    collection,
-    dependency.proposal_question_dependency
-  ) as QuestionaryField | undefined;
+  const field = getFieldById(collection, dependency.dependency_id) as
+    | QuestionaryField
+    | undefined;
   if (!field) {
     return true;
   }
   const isParentSattisfied = areDependenciesSatisfied(
     collection,
-    dependency.proposal_question_dependency
+    dependency.dependency_id
   );
   return (
     isParentSattisfied &&
