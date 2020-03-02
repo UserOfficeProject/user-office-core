@@ -16,7 +16,8 @@ export function createToC(
   // Start new PDF to contain TOC pages only
   const newPDFWriter = hummus.createWriter(outFile);
   const outlineSize = countOutline(origOutline);
-  const howManyPages = countPages(outlineSize);
+  //const howManyPages = countPages(outlineSize);
+  const howManyPages = 1;
   const tocText = getTOCText(origOutline, howManyPages);
   //const tocPageSize = addTOCPages(newPDFWriter, tocText, font)
   newPDFWriter.appendPDFPagesFromPDF(inFile);
