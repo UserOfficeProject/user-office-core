@@ -3,7 +3,7 @@ import { useProposalsData } from "../../hooks/useProposalsData";
 import { Redirect } from "react-router";
 import MaterialTable from "material-table";
 import { tableIcons } from "../../utils/materialIcons";
-import { Edit } from "@material-ui/icons";
+import { Visibility, Delete } from "@material-ui/icons";
 import { useDataApi } from "../../hooks/useDataApi";
 import { useDownloadPDFProposal } from "../../hooks/useDownloadPDFProposal";
 import GetAppIcon from "@material-ui/icons/GetApp";
@@ -15,10 +15,9 @@ export default function ProposalTableOfficer() {
   const columns = [
     { title: "Proposal ID", field: "shortCode" },
     { title: "Title", field: "title" },
-    { title: "Time(Hr)", field: "technicalReview.timeAllocation" },
+    { title: "Time(Days)", field: "technicalReview.timeAllocation" },
     { title: "Technical status", field: "technicalReview.status" },
-    { title: "Status", field: "status" },
-    { title: "Final Status", field: "finalStatus" }
+    { title: "Status", field: "status" }
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -32,6 +31,7 @@ export default function ProposalTableOfficer() {
   if (loading) {
     return <p>Loading</p>;
   }
+
   return (
     <MaterialTable
       icons={tableIcons}
@@ -45,10 +45,21 @@ export default function ProposalTableOfficer() {
       }}
       actions={[
         {
-          icon: () => <Edit />,
+          icon: () => <Visibility />,
           tooltip: "View proposal",
           // @ts-ignore
           onClick: (event, rowData) => setEditProposalID(rowData.id),
+          position: "row"
+        },
+        {
+          icon: () => <GetAppIcon />,
+          tooltip: "Download proposals",
+          onClick: (event, rowData) => {
+            downloadPDFProposal(
+              // @ts-ignore
+              rowData.id
+            );
+          },
           position: "row"
         },
         {
@@ -61,17 +72,25 @@ export default function ProposalTableOfficer() {
             );
           },
           position: "toolbarOnSelect"
+        },
+        {
+          icon: () => <Delete />,
+          tooltip: "Delete proposals",
+          onClick: (event, rowData) => {
+            // @ts-ignore
+            rowData.forEach(row => {
+            new Promise(async resolve => {
+              await api().deleteProposal({ id: row.id });
+              proposalsData.splice(proposalsData.findIndex(val => val.id === row.id), 1);
+              setProposalsData([...proposalsData]);
+              resolve();
+            })
+
+            })
+          },
+          position: "toolbarOnSelect"
         }
       ]}
-      editable={{
-        onRowDelete: oldData =>
-          new Promise(async resolve => {
-            await api().deleteProposal({ id: oldData.id });
-            proposalsData.splice(proposalsData.indexOf(oldData), 1);
-            setProposalsData(proposalsData.slice(0));
-            resolve();
-          })
-      }}
     />
   );
 }
