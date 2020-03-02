@@ -9,7 +9,8 @@ import React, {
   createContext,
   PropsWithChildren,
   useEffect,
-  useState
+  useState,
+  useContext
 } from "react";
 import { Prompt } from "react-router";
 import { Proposal, ProposalStatus, Questionary } from "../../generated/sdk";
@@ -28,6 +29,7 @@ import {
 import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
 import { ProposalAnswer } from "../../models/ProposalModel";
 import { getDataTypeSpec } from "../../models/ProposalModelFunctions";
+import { UserContext } from "../../context/UserContextProvider";
 
 export interface INotification {
   variant: "error" | "success";
@@ -48,6 +50,8 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { currentRole } = useContext(UserContext);
+  const isNonOfficer = currentRole !== "user_officer";
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
@@ -254,7 +258,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
           (
             <ProposalInformationView
               data={state.proposal}
-              readonly={isSubmitted}
+              readonly={isSubmitted && isNonOfficer}
             />
           )
         )
@@ -275,7 +279,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
               <ProposalQuestionaryStep
                 topicId={step.topic.topic_id}
                 data={state}
-                readonly={!editable || isSubmitted}
+                readonly={(!editable || isSubmitted) && isNonOfficer}
                 key={step.topic.topic_id}
               />
             )
@@ -287,7 +291,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
           StepType.REVIEW,
           "Review",
           state.proposal.status === ProposalStatus.SUBMITTED,
-          (<ProposalReview data={state} readonly={isSubmitted} />)
+          (
+            <ProposalReview
+              data={state}
+              readonly={isSubmitted && isNonOfficer}
+            />
+          )
         )
       );
       return allProposalSteps;
@@ -295,7 +304,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
     const proposalSteps = createProposalSteps(state.proposal.questionary!);
     setProposalSteps(proposalSteps);
-  }, [state, isSubmitted]);
+  }, [state, isSubmitted, isNonOfficer]);
 
   // TODO
   // this effect should be cleaned up as it is hard to read
