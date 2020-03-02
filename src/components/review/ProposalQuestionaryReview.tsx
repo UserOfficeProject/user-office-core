@@ -33,8 +33,11 @@ export default function ProposalQuestionaryReview(
     return !!field.value;
   });
 
-  // Get all questions with a file upload and create a string with fileid comma seperated
-  const fileIds = completedFields.filter(field => field.data_type === DataType.FILE_UPLOAD).map(fileId => fileId.value).join(",");
+  // Get all questions with a file upload and create a string with fileid comma separated
+  const fileIds = completedFields
+    .filter(field => field.data_type === DataType.FILE_UPLOAD)
+    .map(fileId => fileId.value)
+    .join(",");
 
   useEffect(() => {
     if (fileIds) {
@@ -50,7 +53,14 @@ export default function ProposalQuestionaryReview(
     return <div>Loading...</div>;
   }
 
-const downloadLink = (file: FileMetaData | undefined) => <><a href={`/files/download/${file?.fileId}`} download>{file?.originalFileName}</a><br/></>; 
+  const downloadLink = (file: FileMetaData | undefined) => (
+    <>
+      <a href={`/files/download/${file?.fileId}`} download>
+        {file?.originalFileName}
+      </a>
+      <br />
+    </>
+  );
 
   const users = props.data.users || [];
   return (
@@ -83,7 +93,15 @@ const downloadLink = (file: FileMetaData | undefined) => <><a href={`/files/down
           {completedFields.map((row: QuestionaryField) => (
             <TableRow key={row.proposal_question_id}>
               <TableCell>{row.question}</TableCell>
-              <TableCell>{row.data_type === DataType.FILE_UPLOAD ?  row.value.split(",").map((value:string) => downloadLink(files.find(file => file.fileId === value))) : row.value.toString()}</TableCell>
+              <TableCell>
+                {row.data_type === DataType.FILE_UPLOAD
+                  ? row.value
+                      .split(",")
+                      .map((value: string) =>
+                        downloadLink(files.find(file => file.fileId === value))
+                      )
+                  : row.value.toString()}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -1,16 +1,15 @@
 import Container from "@material-ui/core/Container";
 import { Add } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
+import { Proposal, TechnicalReview } from "../../generated/sdk";
 import { useDataApi } from "../../hooks/useDataApi";
-import { useProposalData } from "../../hooks/useProposalData";
+import SimpleTabs from "../common/TabPanel";
+import GeneralInformation from "../proposal/GeneralInformation";
 import ParticipantModal from "../proposal/ParticipantModal";
+import ProposalAdmin from "../proposal/ProposalAdmin";
 import PeopleTable from "../user/PeopleTable";
 import ProposalTechnicalReview from "./ProposalTechnicalReview";
-import ProposalAdmin from "../proposal/ProposalAdmin";
-import ProposalQuestionaryReview from "./ProposalQuestionaryReview";
 import ReviewTable from "./ReviewTable";
-import SimpleTabs from "../common/TabPanel";
-import { TechnicalReview } from "../../generated/sdk";
 
 export default function ProposalReview({ match }: { match: any }) {
   const [modalOpen, setOpen] = useState(false);
@@ -18,13 +17,13 @@ export default function ProposalReview({ match }: { match: any }) {
   const [techReview, setTechReview] = useState<
     TechnicalReview | null | undefined
   >(null);
-  const { proposalData } = useProposalData(parseInt(match.params.id));
+  const [proposal, setProposal] = useState<Proposal | null>(null);
   const api = useDataApi();
 
   useEffect(() => {
-    if (proposalData) {
+    if (proposal) {
       setReviewers(
-        proposalData.reviews!.map((review: any) => {
+        proposal.reviews!.map((review: any) => {
           const { firstname, lastname, id, username } = review.reviewer;
           return {
             firstname,
@@ -35,9 +34,15 @@ export default function ProposalReview({ match }: { match: any }) {
           };
         })
       );
-      setTechReview(proposalData.technicalReview);
+      setTechReview(proposal.technicalReview);
     }
-  }, [proposalData]);
+  }, [proposal]);
+
+  useEffect(() => {
+    api()
+      .getProposal({ id: parseInt(match.params.id) })
+      .then(data => setProposal(data.proposal));
+  }, [api, match.params.id]);
 
   const addUser = async (user: any) => {
     await api().addUserForReview({
@@ -58,7 +63,7 @@ export default function ProposalReview({ match }: { match: any }) {
     });
   };
 
-  if (!proposalData) {
+  if (!proposal) {
     return <p>Loading</p>;
   }
   return (
@@ -66,10 +71,13 @@ export default function ProposalReview({ match }: { match: any }) {
       <SimpleTabs
         tabNames={["General", "Reviews", "Technical", "Reviewers", "Admin"]}
       >
-        <ProposalQuestionaryReview data={proposalData} />
-        <ReviewTable reviews={proposalData.reviews} />
+        <GeneralInformation
+          data={proposal}
+          onProposalChanged={newProposal => setProposal(newProposal)}
+        />
+        <ReviewTable reviews={proposal.reviews} />
         <ProposalTechnicalReview
-          id={proposalData.id}
+          id={proposal.id}
           data={techReview}
           setReview={setTechReview}
         />
@@ -93,7 +101,7 @@ export default function ProposalReview({ match }: { match: any }) {
             disabled={true}
           />
         </>
-        <ProposalAdmin id={proposalData.id} />
+        <ProposalAdmin id={proposal.id} />
       </SimpleTabs>
     </Container>
   );
