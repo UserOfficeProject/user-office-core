@@ -1259,9 +1259,6 @@ export type GetProposalsQuery = (
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      ), questionary: (
-        { __typename?: 'Questionary' }
-        & QuestionaryFragment
       ), reviews: Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
@@ -2216,9 +2213,6 @@ export const GetProposalsDocument = gql`
       proposer {
         ...basicUserDetails
       }
-      questionary {
-        ...questionary
-      }
       reviews {
         id
         grade
@@ -2246,8 +2240,7 @@ export const GetProposalsDocument = gql`
     totalCount
   }
 }
-    ${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
+    ${BasicUserDetailsFragmentDoc}`;
 export const SubmitProposalDocument = gql`
     mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {

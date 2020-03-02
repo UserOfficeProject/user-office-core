@@ -13,9 +13,6 @@ query getProposals($filter: String!) {
         proposer {
       ...basicUserDetails
     }
-    questionary {
-      ...questionary
-    }
       reviews {
       id
       grade
