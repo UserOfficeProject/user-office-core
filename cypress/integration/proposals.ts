@@ -176,7 +176,7 @@ context("Proposal tests", () => {
     cy.get('[type="checkbox"]')
       .first()
       .check();
-    cy.get("[title=Delete proposals]")
+    cy.get("[title='Delete proposals']")
       .first()
       .click();
   });
