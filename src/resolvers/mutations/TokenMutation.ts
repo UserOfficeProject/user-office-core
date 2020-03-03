@@ -1,15 +1,7 @@
-import { Resolver, ObjectType, Arg, Ctx, Mutation, Field } from "type-graphql";
+import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { Response } from "../Decorators";
+import { TokenResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
-
-@ObjectType()
-class TokenResponseWrap extends ResponseWrapBase<string> {
-  @Response()
-  @Field()
-  public token: String;
-}
 
 @Resolver()
 export class TokenMutation {
