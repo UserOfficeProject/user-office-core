@@ -236,7 +236,7 @@ test("A user officer can update any password ", () => {
 test("A user must not be able to obtain token for another user", async () => {
   return expect(
     isRejection(
-      await userMutations.obtainTokenForUser(dummyUser, dummyUserOfficer.id)
+      await userMutations.getTokenForUser(dummyUser, dummyUserOfficer.id)
     )
   ).toBe(true);
 });
