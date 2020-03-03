@@ -31,7 +31,7 @@ function DialogConfirmation({title, text, action, handleOpen, open} : {open: boo
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button data-cy="confirm" onClick={handleClose} color="primary">
             Cancel
           </Button>
           <Button onClick={handleAccept} color="primary" autoFocus>

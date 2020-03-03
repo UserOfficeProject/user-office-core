@@ -179,6 +179,9 @@ context("Proposal tests", () => {
     cy.get("[title='Delete proposals']")
       .first()
       .click();
+    cy.get("[data-cy=confirm] button")
+      .first()
+      .click();
   });
 
   it("Office should be able to delete proposal questions", () => {
