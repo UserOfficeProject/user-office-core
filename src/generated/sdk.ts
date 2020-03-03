@@ -1647,7 +1647,9 @@ export type GetTokenMutation = (
   ) }
 );
 
-export type GetTokenForUserMutationVariables = {};
+export type GetTokenForUserMutationVariables = {
+  userId: Scalars['Int']
+};
 
 
 export type GetTokenForUserMutation = (
@@ -2461,8 +2463,8 @@ export const GetTokenDocument = gql`
 }
     `;
 export const GetTokenForUserDocument = gql`
-    mutation getTokenForUser {
-  getTokenForUser(userId: 1) {
+    mutation getTokenForUser($userId: Int!) {
+  getTokenForUser(userId: $userId) {
     token
     error
   }
@@ -2697,7 +2699,7 @@ export function getSdk(client: GraphQLClient) {
     getToken(variables: GetTokenMutationVariables): Promise<GetTokenMutation> {
       return client.request<GetTokenMutation>(print(GetTokenDocument), variables);
     },
-    getTokenForUser(variables?: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
+    getTokenForUser(variables: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
       return client.request<GetTokenForUserMutation>(print(GetTokenForUserDocument), variables);
     },
     getUser(variables: GetUserQueryVariables): Promise<GetUserQuery> {

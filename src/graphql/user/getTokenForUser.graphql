@@ -1,5 +1,5 @@
-mutation getTokenForUser {
-  getTokenForUser(userId: 1) {
+mutation getTokenForUser($userId: Int!) {
+  getTokenForUser(userId: $userId) {
     token
     error
   }

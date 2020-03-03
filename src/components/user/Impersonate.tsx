@@ -27,7 +27,7 @@ export function Impersonate(props: { id: number }) {
                 style={{ display: "block", margin: "0 auto" }}
                 onClick={() =>
                   api()
-                    .getTokenForUser({ id: props.id })
+                    .getTokenForUser({ userId: props.id })
                     .then(data => {
                       const { token, error } = data.getTokenForUser;
                       if (error) {
