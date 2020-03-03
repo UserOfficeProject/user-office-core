@@ -1,0 +1,6 @@
+mutation getTokenForUser {
+  getTokenForUser(userId: 1) {
+    token
+    error
+  }
+}

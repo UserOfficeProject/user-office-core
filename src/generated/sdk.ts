@@ -171,12 +171,6 @@ export type FileUploadConfig = {
 };
 
 
-export type LoginResponseWrap = {
-   __typename?: 'LoginResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  token?: Maybe<Scalars['String']>,
-};
-
 export type Mutation = {
    __typename?: 'Mutation',
   addClientLog: SuccessResponseWrap,
@@ -194,7 +188,8 @@ export type Mutation = {
   deleteTemplateField: ProposalTemplateResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
-  login: LoginResponseWrap,
+  getTokenForUser: TokenResponseWrap,
+  login: TokenResponseWrap,
   prepareDB: SuccessResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -319,6 +314,11 @@ export type MutationEmailVerificationArgs = {
 };
 
 
+export type MutationGetTokenForUserArgs = {
+  userId: Scalars['Int']
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'],
   password: Scalars['String']
@@ -437,11 +437,11 @@ export type MutationUpdateUserArgs = {
 
 export type OrcIdInformation = {
    __typename?: 'OrcIDInformation',
-  firstname?: Maybe<Scalars['String']>,
-  lastname?: Maybe<Scalars['String']>,
-  orcid?: Maybe<Scalars['String']>,
-  orcidHash?: Maybe<Scalars['String']>,
-  refreshToken?: Maybe<Scalars['String']>,
+  firstname: Scalars['String'],
+  lastname: Scalars['String'],
+  orcid: Scalars['String'],
+  orcidHash: Scalars['String'],
+  refreshToken: Scalars['String'],
   token?: Maybe<Scalars['String']>,
 };
 
@@ -1525,6 +1525,17 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type GetTokenForUserMutationVariables = {};
+
+
+export type GetTokenForUserMutation = (
+  { __typename?: 'Mutation' }
+  & { getTokenForUser: (
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
+  ) }
+);
+
 export type CreateUserMutationVariables = {
   user_title?: Maybe<Scalars['String']>,
   firstname: Scalars['String'],
@@ -1723,8 +1734,8 @@ export type LoginMutationVariables = {
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'LoginResponseWrap' }
-    & Pick<LoginResponseWrap, 'token' | 'error'>
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
   ) }
 );
 
@@ -2381,6 +2392,14 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const GetTokenForUserDocument = gql`
+    mutation getTokenForUser {
+  getTokenForUser(userId: 1) {
+    token
+    error
+  }
+}
+    `;
 export const CreateUserDocument = gql`
     mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
   createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
@@ -2656,6 +2675,9 @@ export function getSdk(client: GraphQLClient) {
     },
     userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
+    },
+    getTokenForUser(variables?: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
+      return client.request<GetTokenForUserMutation>(print(GetTokenForUserDocument), variables);
     },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
       return client.request<CreateUserMutation>(print(CreateUserDocument), variables);
