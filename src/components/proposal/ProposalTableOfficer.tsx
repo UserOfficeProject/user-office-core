@@ -7,9 +7,12 @@ import { Visibility, Delete } from "@material-ui/icons";
 import { useDataApi } from "../../hooks/useDataApi";
 import { useDownloadPDFProposal } from "../../hooks/useDownloadPDFProposal";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import DialogConfirmation from "../common/DialogConfirmation"
 
 export default function ProposalTableOfficer() {
   const { loading, proposalsData, setProposalsData } = useProposalsData("");
+  const [open, setOpen] = React.useState(false);
+  const [selectedProposals, setSelectedProposals] = React.useState([]);
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const columns = [
@@ -22,6 +25,19 @@ export default function ProposalTableOfficer() {
 
   const [editProposalID, setEditProposalID] = useState(0);
 
+  const deleteProposals = () => {
+    selectedProposals.forEach(id => {
+            new Promise(async resolve => {
+              await api().deleteProposal({ id });
+              proposalsData.splice(proposalsData.findIndex(val => val.id === id), 1);
+              setProposalsData([...proposalsData]);
+              resolve();
+             })
+
+            })
+  }
+
+
   if (editProposalID) {
     return (
       <Redirect push to={`/ProposalReviewUserOfficer/${editProposalID}`} />
@@ -33,6 +49,8 @@ export default function ProposalTableOfficer() {
   }
 
   return (
+    <>
+    <DialogConfirmation title="Delete proposals" text="This action will delete proposals and all data associated with them" open={open} action={deleteProposals} handleOpen={setOpen} /> 
     <MaterialTable
       icons={tableIcons}
       title={"Proposals"}
@@ -77,20 +95,15 @@ export default function ProposalTableOfficer() {
           icon: () => <Delete />,
           tooltip: "Delete proposals",
           onClick: (event, rowData) => {
+            setOpen(true);
             // @ts-ignore
-            rowData.forEach(row => {
-            new Promise(async resolve => {
-              await api().deleteProposal({ id: row.id });
-              proposalsData.splice(proposalsData.findIndex(val => val.id === row.id), 1);
-              setProposalsData([...proposalsData]);
-              resolve();
-            })
+            setSelectedProposals(rowData.map(row => row.id))
 
-            })
           },
           position: "toolbarOnSelect"
         }
       ]}
     />
+    </>
   );
 }
