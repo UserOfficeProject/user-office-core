@@ -1525,17 +1525,6 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
-export type GetTokenForUserMutationVariables = {};
-
-
-export type GetTokenForUserMutation = (
-  { __typename?: 'Mutation' }
-  & { getTokenForUser: (
-    { __typename?: 'TokenResponseWrap' }
-    & Pick<TokenResponseWrap, 'token' | 'error'>
-  ) }
-);
-
 export type CreateUserMutationVariables = {
   user_title?: Maybe<Scalars['String']>,
   firstname: Scalars['String'],
@@ -1653,6 +1642,17 @@ export type GetTokenMutationVariables = {
 export type GetTokenMutation = (
   { __typename?: 'Mutation' }
   & { token: (
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
+  ) }
+);
+
+export type GetTokenForUserMutationVariables = {};
+
+
+export type GetTokenForUserMutation = (
+  { __typename?: 'Mutation' }
+  & { getTokenForUser: (
     { __typename?: 'TokenResponseWrap' }
     & Pick<TokenResponseWrap, 'token' | 'error'>
   ) }
@@ -2392,14 +2392,6 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
-export const GetTokenForUserDocument = gql`
-    mutation getTokenForUser {
-  getTokenForUser(userId: 1) {
-    token
-    error
-  }
-}
-    `;
 export const CreateUserDocument = gql`
     mutation createUser($user_title: String, $firstname: String!, $middlename: String, $lastname: String!, $password: String!, $preferredname: String, $orcid: String!, $orcidHash: String!, $refreshToken: String!, $gender: String!, $nationality: Int!, $birthdate: String!, $organisation: Int!, $department: String!, $position: String!, $email: String!, $telephone: String!, $telephone_alt: String, $otherOrganisation: String) {
   createUser(user_title: $user_title, firstname: $firstname, middlename: $middlename, lastname: $lastname, password: $password, preferredname: $preferredname, orcid: $orcid, orcidHash: $orcidHash, refreshToken: $refreshToken, gender: $gender, nationality: $nationality, birthdate: $birthdate, organisation: $organisation, department: $department, position: $position, email: $email, telephone: $telephone, telephone_alt: $telephone_alt, otherOrganisation: $otherOrganisation) {
@@ -2463,6 +2455,14 @@ export const GetRolesDocument = gql`
 export const GetTokenDocument = gql`
     mutation getToken($token: String!) {
   token(token: $token) {
+    token
+    error
+  }
+}
+    `;
+export const GetTokenForUserDocument = gql`
+    mutation getTokenForUser {
+  getTokenForUser(userId: 1) {
     token
     error
   }
@@ -2676,9 +2676,6 @@ export function getSdk(client: GraphQLClient) {
     userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
-    getTokenForUser(variables?: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
-      return client.request<GetTokenForUserMutation>(print(GetTokenForUserDocument), variables);
-    },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
       return client.request<CreateUserMutation>(print(CreateUserDocument), variables);
     },
@@ -2699,6 +2696,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getToken(variables: GetTokenMutationVariables): Promise<GetTokenMutation> {
       return client.request<GetTokenMutation>(print(GetTokenDocument), variables);
+    },
+    getTokenForUser(variables?: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
+      return client.request<GetTokenForUserMutation>(print(GetTokenForUserDocument), variables);
     },
     getUser(variables: GetUserQueryVariables): Promise<GetUserQuery> {
       return client.request<GetUserQuery>(print(GetUserDocument), variables);

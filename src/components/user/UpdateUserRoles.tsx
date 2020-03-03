@@ -65,8 +65,10 @@ export default function UpdateUserRoles(props: { id: number }) {
       api()
         .getUserWithRoles({ id: props.id })
         .then(data => {
-          setUserData({ ...data.user! });
-          setRoles(data.user!.roles);
+          if (data?.user) {
+            setUserData({ ...data.user! });
+            setRoles(data.user!.roles);
+          }
         });
     };
     getUserInformation();
