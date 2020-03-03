@@ -11,7 +11,7 @@ context("Page tests", () => {
     cy.wait(2000);
   });
 
-  const faqContents = faker.hacker.phrase();
+  const faqContents = faker.random.words(2);
   const ADMIN_EMAIL = "Aaron_Harris49@gmail.com";
   const ADMIN_PASS = "Test1234!";
 
