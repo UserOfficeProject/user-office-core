@@ -171,12 +171,6 @@ export type FileUploadConfig = {
 };
 
 
-export type LoginResponseWrap = {
-   __typename?: 'LoginResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  token?: Maybe<Scalars['String']>,
-};
-
 export type Mutation = {
    __typename?: 'Mutation',
   addClientLog: SuccessResponseWrap,
@@ -194,7 +188,8 @@ export type Mutation = {
   deleteTemplateField: ProposalTemplateResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
-  login: LoginResponseWrap,
+  getTokenForUser: TokenResponseWrap,
+  login: TokenResponseWrap,
   prepareDB: SuccessResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -319,6 +314,11 @@ export type MutationEmailVerificationArgs = {
 };
 
 
+export type MutationGetTokenForUserArgs = {
+  userId: Scalars['Int']
+};
+
+
 export type MutationLoginArgs = {
   email: Scalars['String'],
   password: Scalars['String']
@@ -437,11 +437,11 @@ export type MutationUpdateUserArgs = {
 
 export type OrcIdInformation = {
    __typename?: 'OrcIDInformation',
-  firstname?: Maybe<Scalars['String']>,
-  lastname?: Maybe<Scalars['String']>,
-  orcid?: Maybe<Scalars['String']>,
-  orcidHash?: Maybe<Scalars['String']>,
-  refreshToken?: Maybe<Scalars['String']>,
+  firstname: Scalars['String'],
+  lastname: Scalars['String'],
+  orcid: Scalars['String'],
+  orcidHash: Scalars['String'],
+  refreshToken: Scalars['String'],
   token?: Maybe<Scalars['String']>,
 };
 
@@ -1647,6 +1647,19 @@ export type GetTokenMutation = (
   ) }
 );
 
+export type GetTokenForUserMutationVariables = {
+  userId: Scalars['Int']
+};
+
+
+export type GetTokenForUserMutation = (
+  { __typename?: 'Mutation' }
+  & { getTokenForUser: (
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
+  ) }
+);
+
 export type GetUserQueryVariables = {
   id: Scalars['Int']
 };
@@ -1723,8 +1736,8 @@ export type LoginMutationVariables = {
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'LoginResponseWrap' }
-    & Pick<LoginResponseWrap, 'token' | 'error'>
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
   ) }
 );
 
@@ -2449,6 +2462,14 @@ export const GetTokenDocument = gql`
   }
 }
     `;
+export const GetTokenForUserDocument = gql`
+    mutation getTokenForUser($userId: Int!) {
+  getTokenForUser(userId: $userId) {
+    token
+    error
+  }
+}
+    `;
 export const GetUserDocument = gql`
     query getUser($id: Int!) {
   user(id: $id) {
@@ -2677,6 +2698,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getToken(variables: GetTokenMutationVariables): Promise<GetTokenMutation> {
       return client.request<GetTokenMutation>(print(GetTokenDocument), variables);
+    },
+    getTokenForUser(variables: GetTokenForUserMutationVariables): Promise<GetTokenForUserMutation> {
+      return client.request<GetTokenForUserMutation>(print(GetTokenForUserDocument), variables);
     },
     getUser(variables: GetUserQueryVariables): Promise<GetUserQuery> {
       return client.request<GetUserQuery>(print(GetUserDocument), variables);

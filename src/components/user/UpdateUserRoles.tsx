@@ -1,3 +1,4 @@
+import { Container } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import AddBox from "@material-ui/icons/AddBox";
@@ -7,7 +8,7 @@ import { useSnackbar } from "notistack";
 import React, { useEffect, useState } from "react";
 import { GetUserWithRolesQuery, Role } from "../../generated/sdk";
 import { useDataApi } from "../../hooks/useDataApi";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
+import { StyledPaper } from "../../styles/StyledComponents";
 import { tableIcons } from "../../utils/materialIcons";
 import RoleModal from "./RoleModal";
 
@@ -64,8 +65,10 @@ export default function UpdateUserRoles(props: { id: number }) {
       api()
         .getUserWithRoles({ id: props.id })
         .then(data => {
-          setUserData({ ...data.user! });
-          setRoles(data.user!.roles);
+          if (data?.user) {
+            setUserData({ ...data.user! });
+            setRoles(data.user!.roles);
+          }
         });
     };
     getUserInformation();
@@ -79,7 +82,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     return <p>Loading</p>;
   }
   return (
-    <ContentContainer>
+    <Container maxWidth="lg">
       <Grid>
         <Grid item xs={12}>
           <StyledPaper>
@@ -129,6 +132,6 @@ export default function UpdateUserRoles(props: { id: number }) {
           </StyledPaper>
         </Grid>
       </Grid>
-    </ContentContainer>
+    </Container>
   );
 }

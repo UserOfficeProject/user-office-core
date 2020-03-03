@@ -1,0 +1,6 @@
+mutation getTokenForUser($userId: Int!) {
+  getTokenForUser(userId: $userId) {
+    token
+    error
+  }
+}
