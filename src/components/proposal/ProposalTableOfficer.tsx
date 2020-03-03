@@ -8,6 +8,7 @@ import { useDataApi } from "../../hooks/useDataApi";
 import { useDownloadPDFProposal } from "../../hooks/useDownloadPDFProposal";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import DialogConfirmation from "../common/DialogConfirmation"
+import { getTranslation } from "@esss-swap/duo-localisation";
 
 export default function ProposalTableOfficer() {
   const { loading, proposalsData, setProposalsData } = useProposalsData("");
@@ -19,7 +20,7 @@ export default function ProposalTableOfficer() {
     { title: "Proposal ID", field: "shortCode" },
     { title: "Title", field: "title" },
     { title: "Time(Days)", field: "technicalReview.timeAllocation" },
-    { title: "Technical status", field: "technicalReview.status" },
+    { title: "Technical status", field: "technicalReview.status", render: (rowData: any) => rowData.technicalReview ? getTranslation(rowData.technicalReview.status) : ""},
     { title: "Status", field: "status" }
   ];
 

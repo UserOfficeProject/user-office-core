@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@esss-swap/duo-localisation": "^1.1.7",
+    "@esss-swap/duo-localisation": "^1.1.8",
     "@graphql-codegen/cli": "^1.11.2",
     "@graphql-codegen/typescript": "^1.11.2",
     "@graphql-codegen/typescript-graphql-request": "^1.11.2",
