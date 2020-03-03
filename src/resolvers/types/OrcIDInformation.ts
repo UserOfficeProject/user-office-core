@@ -2,19 +2,19 @@ import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class OrcIDInformation {
-  @Field()
+  @Field(() => String, { nullable: true })
   firstname: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   lastname: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   orcid: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   orcidHash: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   refreshToken: string;
 
   @Field(() => String, { nullable: true })
