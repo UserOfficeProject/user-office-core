@@ -4,14 +4,14 @@ import { TokenResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
 @Resolver()
-export class ObtainTokenForMutation {
+export class GetTokenForUserMutation {
   @Mutation(() => TokenResponseWrap)
-  login(
+  getTokenForUser(
     @Arg("userId", () => Int) userId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.obtainTokenForUser(context.user, userId),
+      context.mutations.user.getTokenForUser(context.user, userId),
       TokenResponseWrap
     );
   }

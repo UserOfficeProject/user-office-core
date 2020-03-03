@@ -239,7 +239,7 @@ export default class UserMutations {
     return token;
   }
 
-  async obtainTokenForUser(
+  async getTokenForUser(
     agent: User | null,
     userId: number
   ): Promise<string | Rejection> {
