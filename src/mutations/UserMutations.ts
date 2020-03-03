@@ -239,6 +239,28 @@ export default class UserMutations {
     return token;
   }
 
+  async getTokenForUser(
+    agent: User | null,
+    userId: number
+  ): Promise<string | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("INSUFFICIENT_PERMISSIONS");
+    }
+
+    const user = await this.dataSource.get(userId);
+
+    if (!user) {
+      return rejection("USER_DOES_NOT_EXIST");
+    }
+
+    const roles = await this.dataSource.getUserRoles(user.id);
+    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+      expiresIn: process.env.tokenLife
+    });
+
+    return token;
+  }
+
   async token(token: string): Promise<string | Rejection> {
     try {
       const decoded = jsonwebtoken.verify(token, process.env.secret);
