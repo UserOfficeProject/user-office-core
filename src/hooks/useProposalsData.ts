@@ -33,6 +33,6 @@ export function useProposalsData(filter: string) {
   return { loading, proposalsData, setProposalsData };
 }
 
-interface ProposalData extends Omit<Proposal, "status"> {
+interface ProposalData extends Omit<Proposal, "status" | "questionary"> {
   status: string;
 }

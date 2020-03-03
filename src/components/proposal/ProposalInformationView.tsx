@@ -23,6 +23,7 @@ export default function ProposalInformationView(props: {
   const { user: currentUser } = useContext(UserContext);
   const { dispatch } = useContext(ProposalSubmissionContext)!;
   const [users, setUsers] = useState<BasicUserDetails[]>(props.data.users);
+  const { currentRole } = useContext(UserContext);
 
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
@@ -49,7 +50,8 @@ export default function ProposalInformationView(props: {
       onSubmit={async values => {
         if (
           values.proposer.id !== currentUser.id &&
-          !users.some((user: BasicUserDetails) => user.id === currentUser.id)
+          !users.some((user: BasicUserDetails) => user.id === currentUser.id) &&
+          currentRole !== "user_officer"
         ) {
           setUserError(true);
         } else {
