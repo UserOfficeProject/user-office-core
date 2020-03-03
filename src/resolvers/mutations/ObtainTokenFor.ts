@@ -1,26 +1,17 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { ResolverContext } from "../../context";
 import { TokenResponseWrap } from "../types/CommonWrappers";
 import { wrapResponse } from "../wrapResponse";
 
-@ArgsType()
-class LoginArgs {
-  @Field()
-  email: string;
-
-  @Field()
-  password: string;
-}
-
 @Resolver()
-export class LoginMutation {
+export class ObtainTokenForMutation {
   @Mutation(() => TokenResponseWrap)
   login(
-    @Args() { email, password }: LoginArgs,
+    @Arg("userId", () => Int) userId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.login(email, password),
+      context.mutations.user.obtainTokenForUser(context.user, userId),
       TokenResponseWrap
     );
   }

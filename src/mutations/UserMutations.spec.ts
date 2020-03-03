@@ -1,17 +1,17 @@
-import UserMutations from "./UserMutations";
-import { EventBus } from "../events/eventBus";
-import { UserAuthorization } from "../utils/UserAuthorization";
 import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-import { ApplicationEvent } from "../events/applicationEvents";
 import {
-  userDataSource,
+  dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
-  dummyPlaceHolderUser
+  userDataSource
 } from "../datasources/mockups/UserDataSource";
-import { rejection } from "../rejection";
+import { ApplicationEvent } from "../events/applicationEvents";
+import { EventBus } from "../events/eventBus";
 import { BasicUserDetails } from "../models/User";
+import { isRejection } from "../rejection";
+import { UserAuthorization } from "../utils/UserAuthorization";
+import UserMutations from "./UserMutations";
 
 const jsonwebtoken = require("jsonwebtoken");
 
@@ -231,4 +231,12 @@ test("A user officer can update any password ", () => {
   return expect(
     userMutations.updatePassword(dummyUserOfficer, dummyUser.id, "Test1234!")
   ).resolves.toBeInstanceOf(BasicUserDetails);
+});
+
+test("A user must not be able to obtain token for another user", async () => {
+  return expect(
+    isRejection(
+      await userMutations.obtainTokenForUser(dummyUser, dummyUserOfficer.id)
+    )
+  ).toBe(true);
 });
