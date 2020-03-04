@@ -12,8 +12,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   db:
     build:
-        context: ./
-        dockerfile: "./cypress/Dockerfile.psql"
+      context: ./
+      dockerfile: "./cypress/Dockerfile.psql"
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -32,16 +32,17 @@ services:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
       - "traefik.port=4000"
     depends_on:
-        - db
+      - db
   frontend:
     image: dmsc/duo-frontend
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
     depends_on:
-        - backend
+      - backend
   cypress:
+    ipc: host
     build: ./cypress
     command: ["./wait-for-frontend.sh", "frontend:80", "cypress run"]
     depends_on:
-        - frontend
+      - frontend
