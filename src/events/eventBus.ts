@@ -1,4 +1,4 @@
-import { isRejection, Rejection } from "../rejection";
+import { isRejection, Rejection } from '../rejection';
 
 type EventHandler<T> = (event: T) => void;
 
@@ -26,6 +26,7 @@ export class EventBus<T extends { type: string }> {
       const event = formEvent(result);
       this.publish(event);
     }
+
     return result;
   }
 }

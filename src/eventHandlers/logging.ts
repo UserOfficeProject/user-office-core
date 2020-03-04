@@ -1,4 +1,4 @@
-import { ApplicationEvent } from "../events/applicationEvents";
+import { ApplicationEvent } from '../events/applicationEvents';
 
 export default function createHandler() {
   // Handler that just logs every event to stdout
