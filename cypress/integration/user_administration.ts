@@ -31,32 +31,32 @@ context("User administration tests", () => {
       .click();
 
     cy.get("[name='firstname']")
-      .clear({ force: true })
-      .type(newFirstName, { force: true });
+      .clear()
+      .type(newFirstName);
 
     cy.get("[name='middlename']")
       .clear()
-      .type(newMiddleName, { force: true });
+      .type(newMiddleName);
 
     cy.get("[name='lastname']")
       .clear()
-      .type(newLastName, { force: true });
+      .type(newLastName);
 
     cy.get("[name='preferredname']")
       .clear()
-      .type(newPrefferedName, { force: true });
+      .type(newPrefferedName);
 
     cy.get("[name='position']")
       .clear()
-      .type(newPosition, { force: true });
+      .type(newPosition);
 
     cy.get("[name='department']")
       .clear()
-      .type(newDepartment, { force: true });
+      .type(newDepartment);
 
     cy.get("[name='telephone']")
       .clear()
-      .type(newTelephone, { force: true });
+      .type(newTelephone);
 
     cy.contains("Update Profile").click();
 
