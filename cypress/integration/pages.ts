@@ -34,15 +34,17 @@ context("Page tests", () => {
     cy.contains("Set cookie policy");
 
     cy.window().then(win => {
-      cy.wait(3000).then(() => {
-        win.tinyMCE.editors[0].setContent(faqContents); // faq page editor
+      cy.wait(10000).then(() => {
+        win.tinyMCE.get("HELPPAGE").setContent(faqContents); // faq page editor
         cy.get("#help-update-btn").click({ force: true });
         cy.reload();
         cy.contains("View Proposals").click();
         cy.contains("FAQ").click();
-        cy.contains(faqContents);
-        cy.contains("Close").click();
-        cy.contains("Logout").click();
+        cy.wait(3000).then(() => {
+          cy.contains(faqContents);
+          cy.contains("Close").click();
+          cy.contains("Logout").click();
+        });
       });
     });
   });
