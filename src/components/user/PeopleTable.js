@@ -45,6 +45,7 @@ function sendUserRequest(
 function PeopleTable(props) {
   const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
+  const [pageSize, setPageSize] = useState(5);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const columns = [
     { title: "Name", field: "firstname" },
@@ -86,19 +87,22 @@ function PeopleTable(props) {
         data={
           props.data
             ? props.data
-            : query =>
-                sendUserRequest(
+            : query => {
+                setPageSize(query.pageSize);
+                return sendUserRequest(
                   query,
                   sendRequest,
                   setLoading,
                   props.selectedUsers,
                   props.userRole
-                )
+                );
+              }
         }
         isLoading={loading}
         options={{
           search: props.search,
-          debounceInterval: 400
+          debounceInterval: 400,
+          pageSize
         }}
         actions={actionArray}
         editable={
