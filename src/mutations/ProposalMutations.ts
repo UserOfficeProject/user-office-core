@@ -25,7 +25,12 @@ export default class ProposalMutations {
     private logger: ILogger
   ) {}
 
-  async create(agent: User): Promise<Proposal | Rejection> {
+  /* NOTE: User | null??? This should be solved differently.
+  ** We are sending null from the tests to simulate not logged in user.
+  ** This is not the way we should test if user is logged in or not.
+  ** There should be an auth checker that handles those cases.
+  */
+  async create(agent: User | null): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (agent == null) {
@@ -53,7 +58,7 @@ export default class ProposalMutations {
         return {
           type: Event.PROPOSAL_CREATED,
           proposal,
-          loggedInUserId: agent.id,
+          loggedInUserId: agent ? agent.id : null,
         };
       }
     );
@@ -238,7 +243,10 @@ export default class ProposalMutations {
       });
   }
 
-  async submit(agent: User, proposalId: number): Promise<Proposal | Rejection> {
+  async submit(
+    agent: User | null,
+    proposalId: number
+  ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (agent == null) {
@@ -274,7 +282,7 @@ export default class ProposalMutations {
         return {
           type: Event.PROPOSAL_SUBMITTED,
           proposal,
-          loggedInUserId: agent.id,
+          loggedInUserId: agent ? agent.id : null,
         };
       }
     );

@@ -33,7 +33,7 @@ export default class UserMutations {
   }
 
   async createUserByEmailInvite(
-    agent: User,
+    agent: User | null,
     args: CreateUserByEmailInviteArgs
   ): Promise<{ userId: number; inviterId: number } | Rejection> {
     return this.eventBus.wrap(
@@ -61,7 +61,7 @@ export default class UserMutations {
           type: Event.EMAIL_INVITE,
           userId: res.userId,
           inviterId: res.inviterId,
-          loggedInUserId: agent.id,
+          loggedInUserId: agent ? agent.id : null,
         };
       }
     );
@@ -170,7 +170,10 @@ export default class UserMutations {
     );
   }
 
-  async update(agent: User, args: UpdateUserArgs): Promise<User | Rejection> {
+  async update(
+    agent: User | null,
+    args: UpdateUserArgs
+  ): Promise<User | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (
@@ -215,7 +218,11 @@ export default class UserMutations {
             return rejection('INTERNAL_ERROR');
           });
       },
-      user => ({ type: Event.USER_UPDATED, user, loggedInUserId: agent.id })
+      user => ({
+        type: Event.USER_UPDATED,
+        user,
+        loggedInUserId: agent ? agent.id : null,
+      })
     );
   }
 
