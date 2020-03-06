@@ -8,7 +8,7 @@ date:
 */
 
 CREATE TABLE IF NOT EXISTS event_logs(
-    id serial UNIQUE,
+    id serial PRIMARY KEY,
     changed_by int REFERENCES users (user_id),
     event_type text DEFAULT NULL,
     row_data text DEFAULT NULL,

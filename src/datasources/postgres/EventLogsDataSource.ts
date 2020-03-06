@@ -1,17 +1,18 @@
 import database from './database';
-import { EventLogsDataSource } from '../EventLogsDataSource';
+import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
 import { EventLog } from '../../models/EventLog';
+import { EventLogRecord } from './records';
 
 export default class PostgresEventLogsDataSource
   implements EventLogsDataSource {
-  private createEventLogObject(eventLog: EventLog) {
+  private createEventLogObject(eventLog: EventLogRecord) {
     return new EventLog(
       eventLog.id,
-      eventLog.changedBy,
-      eventLog.eventType,
-      eventLog.rowData,
-      eventLog.eventTStamp,
-      eventLog.changedObjectId
+      eventLog.changed_by,
+      eventLog.event_type,
+      eventLog.row_data,
+      eventLog.event_tstamp,
+      eventLog.changed_object_id
     );
   }
 
@@ -19,39 +20,37 @@ export default class PostgresEventLogsDataSource
     changedBy: number,
     eventType: string,
     rowData: string,
-    eventTStamp: string,
     changedObjectId: number
   ) {
     return database
       .insert({
-        changedBy,
-        eventType,
-        rowData,
-        eventTStamp,
-        changedObjectId,
+        changed_by: changedBy,
+        event_type: eventType,
+        row_data: rowData,
+        changed_object_id: changedObjectId,
       })
       .returning('*')
       .into('event_logs')
-      .then((records: EventLog[]) => this.createEventLogObject(records[0]));
+      .then((records: EventLogRecord[]) =>
+        this.createEventLogObject(records[0])
+      );
   }
 
-  async get(id: number) {
+  async get(filter: EventLogFilter) {
     return database
       .select()
       .from('event_logs')
-      .where('changed_object_id', id)
-      .then((eventLogs: EventLog[]) => {
-        return eventLogs.map(
-          (eventLog: EventLog) =>
-            new EventLog(
-              eventLog.id,
-              eventLog.changedBy,
-              eventLog.eventType,
-              eventLog.rowData,
-              eventLog.eventTStamp,
-              eventLog.changedObjectId
-            )
-        );
+      .modify(queryBuilder => {
+        if (filter.changedObjectId && filter.changedObjectId !== '*') {
+          queryBuilder.where('changed_object_id', filter.changedObjectId);
+        }
+
+        if (filter.eventType && filter.eventType !== '*') {
+          queryBuilder.where('event_type', 'like', `${filter.eventType}%`);
+        }
+      })
+      .then((eventLogs: EventLogRecord[]) => {
+        return eventLogs.map(eventLog => this.createEventLogObject(eventLog));
       });
   }
 }

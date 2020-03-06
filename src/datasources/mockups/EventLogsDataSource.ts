@@ -1,5 +1,5 @@
 import { EventLog } from '../../models/EventLog';
-import { EventLogsDataSource } from '../EventLogsDataSource';
+import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
 
 export const dummyEventLog = new EventLog(
   1,
@@ -15,13 +15,12 @@ export class eventLogsDataSource implements EventLogsDataSource {
     changedBy: number,
     eventType: string,
     rowData: string,
-    eventTStamp: string,
     changedObjectId: number
   ) {
     return dummyEventLog;
   }
 
-  async get(id: number) {
+  async get(filter: EventLogFilter) {
     return [dummyEventLog];
   }
 }

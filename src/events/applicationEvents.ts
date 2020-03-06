@@ -1,48 +1,62 @@
-import { Proposal } from "../models/Proposal";
-import { User } from "../models/User";
+import { Proposal } from '../models/Proposal';
+import { User } from '../models/User';
 
 interface ProposalAcceptedEvent {
-  type: "PROPOSAL_ACCEPTED";
+  type: 'PROPOSAL_ACCEPTED';
   proposal: Proposal;
+  loggedInUserId: number;
 }
 
 interface ProposalSubmittedEvent {
-  type: "PROPOSAL_SUBMITTED";
+  type: 'PROPOSAL_SUBMITTED';
   proposal: Proposal;
+  loggedInUserId: number;
 }
 
 interface ProposalUpdatedEvent {
-  type: "PROPOSAL_UPDATED";
+  type: 'PROPOSAL_UPDATED';
   proposal: Proposal;
+  loggedInUserId: number;
 }
 
 interface ProposalRejectedEvent {
-  type: "PROPOSAL_REJECTED";
+  type: 'PROPOSAL_REJECTED';
   proposal: Proposal;
   reason: string;
+  loggedInUserId: number;
 }
 
 interface ProposalCreatedEvent {
-  type: "PROPOSAL_CREATED";
+  type: 'PROPOSAL_CREATED';
   proposal: Proposal;
+  loggedInUserId: number;
 }
 
 interface UserResetPasswordEmailEvent {
-  type: "PASSWORD_RESET_EMAIL";
+  type: 'PASSWORD_RESET_EMAIL';
   user: User;
   link: string;
+  loggedInUserId: number;
 }
 
-interface AccountCreation {
-  type: "ACCOUNT_CREATED";
+interface UserUpdateEvent {
+  type: 'USER_UPDATED';
+  user: User;
+  loggedInUserId: number;
+}
+
+interface UserCreateEvent {
+  type: 'USER_CREATED';
   user: User;
   link: string;
+  loggedInUserId: number;
 }
 
 interface EmailInvite {
-  type: "EMAIL_INVITE";
+  type: 'EMAIL_INVITE';
   userId: number;
   inviterId: number;
+  loggedInUserId: number;
 }
 
 export type ApplicationEvent =
@@ -51,6 +65,7 @@ export type ApplicationEvent =
   | ProposalSubmittedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
-  | AccountCreation
+  | UserCreateEvent
   | EmailInvite
-  | UserResetPasswordEmailEvent;
+  | UserResetPasswordEmailEvent
+  | UserUpdateEvent;

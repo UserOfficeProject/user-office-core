@@ -1,6 +1,6 @@
-import { Page } from "../../models/Admin";
-import { FileMetadata } from "../../models/Blob";
-import { Proposal } from "../../models/Proposal";
+import { Page } from '../../models/Admin';
+import { FileMetadata } from '../../models/Blob';
+import { Proposal } from '../../models/Proposal';
 import {
   createConfigByType,
   DataType,
@@ -8,9 +8,9 @@ import {
   FieldDependency,
   ProposalTemplateField,
   QuestionaryField,
-  Topic
-} from "../../models/ProposalModel";
-import { BasicUserDetails, User } from "../../models/User";
+  Topic,
+} from '../../models/ProposalModel';
+import { BasicUserDetails, User } from '../../models/User';
 
 // Interfaces corresponding exactly to database tables
 
@@ -155,6 +155,15 @@ export interface FileRecord {
   readonly created_at: Date;
 }
 
+export interface EventLogRecord {
+  readonly id: number;
+  readonly changed_by: number;
+  readonly event_type: string;
+  readonly row_data: string;
+  readonly event_tstamp: string;
+  readonly changed_object_id: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -186,8 +195,8 @@ export const createProposalTemplateFieldObject = (
 export const createProposalObject = (proposal: ProposalRecord) => {
   return new Proposal(
     proposal.proposal_id,
-    proposal.title || "",
-    proposal.abstract || "",
+    proposal.title || '',
+    proposal.abstract || '',
     proposal.proposer_id,
     proposal.status,
     proposal.created_at,
@@ -218,7 +227,7 @@ export const createQuestionaryFieldObject = (
 ) => {
   return new QuestionaryField(
     createProposalTemplateFieldObject(question),
-    question.value ? JSON.parse(question.value).value : ""
+    question.value ? JSON.parse(question.value).value : ''
   );
 };
 

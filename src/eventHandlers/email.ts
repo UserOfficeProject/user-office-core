@@ -156,7 +156,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "ACCOUNT_CREATED": {
+      case "USER_CREATED": {
         if (process.env.NODE_ENV === "development") {
           await userDataSource.setUserEmailVerified(event.user.id);
           console.log("verify user without email in development");
