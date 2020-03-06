@@ -2,7 +2,7 @@ import { EventLog } from '../models/EventLog';
 
 export interface EventLogsDataSource {
   set(
-    changedBy: number,
+    changedBy: number | null,
     eventType: string,
     rowData: string,
     changedObjectId: number
