@@ -14,6 +14,7 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { ILogger } from '../utils/Logger';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { Event } from '../events/event.enum';
 
 export default class ProposalMutations {
   constructor(
@@ -50,7 +51,7 @@ export default class ProposalMutations {
       },
       proposal => {
         return {
-          type: 'PROPOSAL_CREATED',
+          type: Event.PROPOSAL_CREATED,
           proposal,
           loggedInUserId: agent.id,
         };
@@ -195,7 +196,7 @@ export default class ProposalMutations {
       },
       (proposal): ApplicationEvent => {
         return {
-          type: 'PROPOSAL_UPDATED',
+          type: Event.PROPOSAL_UPDATED,
           proposal,
           loggedInUserId: agent.id,
         };
@@ -271,7 +272,7 @@ export default class ProposalMutations {
       },
       proposal => {
         return {
-          type: 'PROPOSAL_SUBMITTED',
+          type: Event.PROPOSAL_SUBMITTED,
           proposal,
           loggedInUserId: agent.id,
         };

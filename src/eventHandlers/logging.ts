@@ -1,4 +1,5 @@
 import { ApplicationEvent } from '../events/applicationEvents';
+import { Event } from '../events/event.enum';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 
 export default function createHandler(
@@ -11,11 +12,11 @@ export default function createHandler(
     console.log(`${timestamp} -- ${json}`);
 
     switch (event.type) {
-      case 'PROPOSAL_CREATED':
-      case 'PROPOSAL_UPDATED':
-      case 'PROPOSAL_SUBMITTED':
-      case 'PROPOSAL_ACCEPTED':
-      case 'PROPOSAL_REJECTED':
+      case Event.PROPOSAL_CREATED:
+      case Event.PROPOSAL_UPDATED:
+      case Event.PROPOSAL_SUBMITTED:
+      case Event.PROPOSAL_ACCEPTED:
+      case Event.PROPOSAL_REJECTED:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,
@@ -24,8 +25,8 @@ export default function createHandler(
         );
         break;
 
-      case 'USER_CREATED':
-      case 'USER_UPDATED':
+      case Event.USER_CREATED:
+      case Event.USER_UPDATED:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,

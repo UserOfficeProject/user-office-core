@@ -13,6 +13,7 @@ import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { Event } from '../events/event.enum';
 
 export default class UserMutations {
   constructor(
@@ -57,7 +58,7 @@ export default class UserMutations {
       },
       res => {
         return {
-          type: 'EMAIL_INVITE',
+          type: Event.EMAIL_INVITE,
           userId: res.userId,
           inviterId: res.inviterId,
           loggedInUserId: agent.id,
@@ -161,7 +162,7 @@ export default class UserMutations {
         return { user, link };
       },
       res => ({
-        type: 'USER_CREATED',
+        type: Event.USER_CREATED,
         user: res.user,
         link: res.link,
         loggedInUserId: res.user.id,
@@ -214,7 +215,7 @@ export default class UserMutations {
             return rejection('INTERNAL_ERROR');
           });
       },
-      user => ({ type: 'USER_UPDATED', user, loggedInUserId: agent.id })
+      user => ({ type: Event.USER_UPDATED, user, loggedInUserId: agent.id })
     );
   }
 
@@ -315,7 +316,7 @@ export default class UserMutations {
       },
       res => {
         return {
-          type: 'PASSWORD_RESET_EMAIL',
+          type: Event.PASSWORD_RESET_EMAIL,
           user: res.user,
           link: res.link,
           loggedInUserId: res.user.id,
