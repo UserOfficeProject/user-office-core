@@ -34,7 +34,7 @@ interface ProposalCreatedEvent {
 }
 
 interface UserResetPasswordEmailEvent {
-  type: Event.PASSWORD_RESET_EMAIL;
+  type: Event.USER_PASSWORD_RESET_EMAIL;
   user: User;
   link: string;
   loggedInUserId: number | null;

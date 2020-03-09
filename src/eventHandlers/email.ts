@@ -44,7 +44,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case Event.PASSWORD_RESET_EMAIL: {
+      case Event.USER_PASSWORD_RESET_EMAIL: {
         client.transmissions
           .send({
             content: {

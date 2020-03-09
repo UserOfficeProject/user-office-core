@@ -160,8 +160,8 @@ export interface EventLogRecord {
   readonly changed_by: number;
   readonly event_type: string;
   readonly row_data: string;
-  readonly event_tstamp: string;
-  readonly changed_object_id: number;
+  readonly event_tstamp: Date;
+  readonly changed_object_id: string;
 }
 
 export const createPageObject = (record: PagetextRecord) => {

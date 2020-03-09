@@ -5,7 +5,7 @@ export interface EventLogsDataSource {
     changedBy: number | null,
     eventType: string,
     rowData: string,
-    changedObjectId: number
+    changedObjectId: string
   ): Promise<EventLog>;
   get(filter: EventLogFilter): Promise<EventLog[] | null>;
 }

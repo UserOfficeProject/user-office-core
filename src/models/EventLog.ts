@@ -4,7 +4,7 @@ export class EventLog {
     public changedBy: number,
     public eventType: string,
     public rowData: string,
-    public eventTStamp: string,
-    public changedObjectId: number
+    public eventTStamp: Date,
+    public changedObjectId: string
   ) {}
 }

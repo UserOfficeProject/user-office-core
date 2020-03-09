@@ -323,7 +323,7 @@ export default class UserMutations {
       },
       res => {
         return {
-          type: Event.PASSWORD_RESET_EMAIL,
+          type: Event.USER_PASSWORD_RESET_EMAIL,
           user: res.user,
           link: res.link,
           loggedInUserId: res.user.id,

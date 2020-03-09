@@ -20,7 +20,7 @@ export default class PostgresEventLogsDataSource
     changedBy: number,
     eventType: string,
     rowData: string,
-    changedObjectId: number
+    changedObjectId: string
   ) {
     return database
       .insert({

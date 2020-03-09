@@ -5,7 +5,7 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 export default function createHandler(
   eventLogsDataSource: EventLogsDataSource
 ) {
-  // Handler that logs every wrapped with the event bus event to stdout and event_logs table.
+  // Handler that logs every mutation wrapped with the event bus event to stdout and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
     const timestamp = new Date().toLocaleString();
@@ -13,7 +13,8 @@ export default function createHandler(
 
     switch (event.type) {
       case Event.PROPOSAL_CREATED:
-      case Event.PROPOSAL_UPDATED:
+      // NOTE: For now we are skipping the PROPOSAL_UPDATED event.
+      // case Event.PROPOSAL_UPDATED:
       case Event.PROPOSAL_SUBMITTED:
       case Event.PROPOSAL_ACCEPTED:
       case Event.PROPOSAL_REJECTED:
@@ -21,17 +22,18 @@ export default function createHandler(
           event.loggedInUserId,
           event.type,
           json,
-          event.proposal.id
+          event.proposal.id.toString()
         );
         break;
 
       case Event.USER_CREATED:
       case Event.USER_UPDATED:
+      case Event.USER_PASSWORD_RESET_EMAIL:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,
           json,
-          event.user.id
+          event.user.id.toString()
         );
         break;
       default:
