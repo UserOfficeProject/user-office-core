@@ -7,6 +7,7 @@ import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
 import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
 import PostgresFileDataSource from "./datasources/postgres/FileDataSource";
 import PostgresAdminDataSource from "./datasources/postgres/AdminDataSource";
+import PostgresEventLogsDataSource from './datasources/postgres/EventLogsDataSource';
 import TemplateDataSource from "./datasources/postgres/TemplateDataSource";
 
 import UserQueries from "./queries/UserQueries";
@@ -25,9 +26,9 @@ import FileQueries from "./queries/FileQueries";
 import FileMutations from "./mutations/FileMutations";
 import AdminQueries from "./queries/AdminQueries";
 import AdminMutations from "./mutations/AdminMutations";
-
 import TemplateMutations from "./mutations/TemplateMutations";
 import TemplateQueries from "./queries/TemplateQueries";
+import EventLogQueries from './queries/EventLogQueries';
 import { logger } from "./utils/Logger";
 
 // Site specific data sources and event handlers (only ESS atm)
@@ -38,13 +39,14 @@ const callDataSource = new PostgresCallDataSource();
 const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
 const templateDataSource = new TemplateDataSource();
+const eventLogsDataSource = new PostgresEventLogsDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
   reviewDataSource
 );
 
-const eventHandlers = createEventHandlers(userDataSource);
+const eventHandlers = createEventHandlers(userDataSource, eventLogsDataSource);
 
 // From this point nothing is site-specific
 const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
@@ -108,6 +110,11 @@ const templateMutations = new TemplateMutations(
   logger
 );
 
+const eventLogQueries = new EventLogQueries(
+  eventLogsDataSource,
+  userAuthorization
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -117,7 +124,8 @@ const context: BasicResolverContext = {
     call: callQueries,
     file: fileQueries,
     admin: adminQueries,
-    template: templateQueries
+    template: templateQueries,
+    eventLogs: eventLogQueries,
   },
   mutations: {
     user: userMutations,
