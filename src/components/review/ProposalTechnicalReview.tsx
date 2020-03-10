@@ -18,6 +18,7 @@ export default function ProposalTechnicalReview(props: {
 }) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>
@@ -30,9 +31,9 @@ export default function ProposalTechnicalReview(props: {
           comment: props?.data?.comment
         }}
         validationSchema={Yup.object().shape({
-          status: Yup.string().required("status is required"),
-          timeAllocation: Yup.number().required("time is required"),
-          comment: Yup.string().required("comment is required")
+          status: Yup.string().nullable(),
+          timeAllocation: Yup.number().nullable(),
+          comment: Yup.string().nullable()
         })}
         onSubmit={async (values, actions) => {
           await api()
@@ -76,7 +77,6 @@ export default function ProposalTechnicalReview(props: {
                       value: TechnicalReviewStatus.UNFEASIBLE
                     }
                   ]}
-                  required
                 />
               </Grid>
               <Grid item xs={6}>
@@ -89,7 +89,6 @@ export default function ProposalTechnicalReview(props: {
                   fullWidth
                   autoComplete="off"
                   data-cy="timeAllocation"
-                  required
                 />
               </Grid>
               <Grid item xs={12}>
@@ -102,9 +101,9 @@ export default function ProposalTechnicalReview(props: {
                   fullWidth
                   autoComplete="off"
                   data-cy="comment"
-                  multiline={true}
-                  rows={2}
-                  required
+                  multiline
+                  rowsMax="16"
+                  rows="4"
                 />
               </Grid>
             </Grid>

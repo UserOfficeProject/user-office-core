@@ -222,9 +222,9 @@ export type MutationAddReviewArgs = {
 
 export type MutationAddTechnicalReviewArgs = {
   proposalID: Scalars['Int'],
-  comment: Scalars['String'],
-  timeAllocation: Scalars['Int'],
-  status: TechnicalReviewStatus
+  comment?: Maybe<Scalars['String']>,
+  timeAllocation?: Maybe<Scalars['Int']>,
+  status?: Maybe<TechnicalReviewStatus>
 };
 
 
@@ -267,7 +267,8 @@ export type MutationCreateTopicArgs = {
 export type MutationCreateUserByEmailInviteArgs = {
   firstname: Scalars['String'],
   lastname: Scalars['String'],
-  email: Scalars['String']
+  email: Scalars['String'],
+  userRole: UserRole
 };
 
 
@@ -707,9 +708,9 @@ export type TechnicalReview = {
    __typename?: 'TechnicalReview',
   id: Scalars['Int'],
   proposalID: Scalars['Int'],
-  comment: Scalars['String'],
-  timeAllocation: Scalars['Int'],
-  status: TechnicalReviewStatus,
+  comment?: Maybe<Scalars['String']>,
+  timeAllocation?: Maybe<Scalars['Int']>,
+  status?: Maybe<TechnicalReviewStatus>,
   proposal?: Maybe<Proposal>,
 };
 
@@ -752,7 +753,7 @@ export type TextInputConfig = {
 export type TokenResponseWrap = {
    __typename?: 'TokenResponseWrap',
   error?: Maybe<Scalars['String']>,
-  token: Scalars['String'],
+  token?: Maybe<Scalars['String']>,
 };
 
 export type Topic = {
@@ -799,7 +800,7 @@ export type User = {
   orcid: Scalars['String'],
   refreshToken: Scalars['String'],
   gender: Scalars['String'],
-  nationality: Scalars['Int'],
+  nationality?: Maybe<Scalars['Int']>,
   birthdate: Scalars['String'],
   organisation: Scalars['Int'],
   department: Scalars['String'],
@@ -1433,9 +1434,9 @@ export type AddReviewMutation = (
 
 export type AddTechnicalReviewMutationVariables = {
   proposalID: Scalars['Int'],
-  timeAllocation: Scalars['Int'],
-  comment: Scalars['String'],
-  status: TechnicalReviewStatus
+  timeAllocation?: Maybe<Scalars['Int']>,
+  comment?: Maybe<Scalars['String']>,
+  status?: Maybe<TechnicalReviewStatus>
 };
 
 
@@ -1563,7 +1564,8 @@ export type CreateUserMutation = (
 export type CreateUserByEmailInviteMutationVariables = {
   firstname: Scalars['String'],
   lastname: Scalars['String'],
-  email: Scalars['String']
+  email: Scalars['String'],
+  userRole: UserRole
 };
 
 
@@ -2335,7 +2337,7 @@ export const AddReviewDocument = gql`
 }
     ${CoreReviewFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int!, $comment: String!, $status: TechnicalReviewStatus!) {
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $status: TechnicalReviewStatus) {
   addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, status: $status) {
     error
     technicalReview {
@@ -2405,8 +2407,8 @@ export const CreateUserDocument = gql`
 }
     `;
 export const CreateUserByEmailInviteDocument = gql`
-    mutation createUserByEmailInvite($firstname: String!, $lastname: String!, $email: String!) {
-  createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email) {
+    mutation createUserByEmailInvite($firstname: String!, $lastname: String!, $email: String!, $userRole: UserRole!) {
+  createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email, userRole: $userRole) {
     error
     id
   }
