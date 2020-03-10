@@ -22,13 +22,13 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   @Field(() => Int)
   public proposalID: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public comment: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public timeAllocation: number;
 
-  @Field(() => TechnicalReviewStatus)
+  @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
 }
 
