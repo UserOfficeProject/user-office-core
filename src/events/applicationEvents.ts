@@ -1,5 +1,5 @@
 import { Proposal } from "../models/Proposal";
-import { User } from "../models/User";
+import { User, UserRole } from "../models/User";
 
 interface ProposalAcceptedEvent {
   type: "PROPOSAL_ACCEPTED";
@@ -43,6 +43,7 @@ interface EmailInvite {
   type: "EMAIL_INVITE";
   userId: number;
   inviterId: number;
+  role: UserRole;
 }
 
 export type ApplicationEvent =

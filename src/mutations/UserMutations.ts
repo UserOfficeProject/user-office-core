@@ -13,6 +13,7 @@ import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
 import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
 import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
+import { UserRole } from "../models/User";
 
 export default class UserMutations {
   constructor(
@@ -34,7 +35,9 @@ export default class UserMutations {
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
-  ): Promise<{ userId: number; inviterId: number } | Rejection> {
+  ): Promise<
+    { userId: number; inviterId: number; role: UserRole } | Rejection
+  > {
     return this.eventBus.wrap(
       async () => {
         if (!agent) {
@@ -45,21 +48,43 @@ export default class UserMutations {
         if (user && user.placeholder) {
           return {
             userId: user.id,
-            inviterId: agent.id
+            inviterId: agent.id,
+            role: args.userRole
           };
         } else if (user) {
           return rejection("ACCOUNT_EXIST");
         }
-        return {
-          userId: await this.dataSource.createInviteUser(args),
-          inviterId: agent.id
-        };
+
+        if (
+          args.userRole === UserRole.REVIEWER &&
+          (await this.userAuth.isUserOfficer(agent))
+        ) {
+          const userId = await this.dataSource.createInviteUser(args);
+          await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
+
+          return {
+            userId,
+            inviterId: agent.id,
+            role: UserRole.REVIEWER
+          };
+        } else if (args.userRole === UserRole.USER) {
+          const userId = await this.dataSource.createInviteUser(args);
+          await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+
+          return {
+            userId,
+            inviterId: agent.id,
+            role: UserRole.USER
+          };
+        }
+        return rejection("NOT_ALLOWED");
       },
       res => {
         return {
           type: "EMAIL_INVITE",
           userId: res.userId,
-          inviterId: res.inviterId
+          inviterId: res.inviterId,
+          role: res.role
         };
       }
     );
@@ -135,11 +160,14 @@ export default class UserMutations {
           );
         }
 
-        const [updateRolesErr] = await to(
-          this.dataSource.setUserRoles(user.id, [1])
-        );
+        const roles = await this.dataSource.getUserRoles(user.id);
 
-        if (!user || updateRolesErr) {
+        //If user has no role assign it the user role
+        if (!roles.length) {
+          this.dataSource.setUserRoles(user.id, [UserRole.USER]);
+        }
+
+        if (!user) {
           logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
