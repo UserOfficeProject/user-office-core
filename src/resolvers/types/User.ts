@@ -45,7 +45,7 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public gender: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public nationality: number;
 
   @Field()
