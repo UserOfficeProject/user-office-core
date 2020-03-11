@@ -14,6 +14,7 @@ import AdminQueries from "../queries/AdminQueries";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import TemplateMutations from "../mutations/TemplateMutations";
 import TemplateQueries from "../queries/TemplateQueries";
+import EventLogQueries from '../queries/EventLogQueries';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -23,6 +24,7 @@ interface ResolverContextQueries {
   file: FileQueries;
   admin: AdminQueries;
   template: TemplateQueries;
+  eventLogs: EventLogQueries
 }
 
 interface ResolverContextMutations {

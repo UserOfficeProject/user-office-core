@@ -1,49 +1,64 @@
+import { Event } from "./event.enum";
 import { Proposal } from "../models/Proposal";
 import { User, UserRole } from "../models/User";
 
 interface ProposalAcceptedEvent {
-  type: "PROPOSAL_ACCEPTED";
+  type: Event.PROPOSAL_ACCEPTED;
   proposal: Proposal;
+  loggedInUserId: number | null;
 }
 
 interface ProposalSubmittedEvent {
-  type: "PROPOSAL_SUBMITTED";
+  type: Event.PROPOSAL_SUBMITTED;
   proposal: Proposal;
+  loggedInUserId: number | null;
 }
 
 interface ProposalUpdatedEvent {
-  type: "PROPOSAL_UPDATED";
+  type: Event.PROPOSAL_UPDATED;
   proposal: Proposal;
+  loggedInUserId: number | null;
 }
 
 interface ProposalRejectedEvent {
-  type: "PROPOSAL_REJECTED";
+  type: Event.PROPOSAL_REJECTED;
   proposal: Proposal;
   reason: string;
+  loggedInUserId: number | null;
 }
 
 interface ProposalCreatedEvent {
-  type: "PROPOSAL_CREATED";
+  type: Event.PROPOSAL_CREATED;
   proposal: Proposal;
+  loggedInUserId: number | null;
 }
 
 interface UserResetPasswordEmailEvent {
-  type: "PASSWORD_RESET_EMAIL";
+  type: Event.USER_PASSWORD_RESET_EMAIL;
   user: User;
   link: string;
+  loggedInUserId: number | null;
 }
 
-interface AccountCreation {
-  type: "ACCOUNT_CREATED";
+interface UserUpdateEvent {
+  type: Event.USER_UPDATED;
+  user: User;
+  loggedInUserId: number | null;
+}
+
+interface UserCreateEvent {
+  type: Event.USER_CREATED;
   user: User;
   link: string;
+  loggedInUserId: number | null;
 }
 
 interface EmailInvite {
-  type: "EMAIL_INVITE";
+  type: Event.EMAIL_INVITE;
   userId: number;
   inviterId: number;
   role: UserRole;
+  loggedInUserId: number | null;
 }
 
 export type ApplicationEvent =
@@ -52,6 +67,7 @@ export type ApplicationEvent =
   | ProposalSubmittedEvent
   | ProposalRejectedEvent
   | ProposalCreatedEvent
-  | AccountCreation
+  | UserCreateEvent
   | EmailInvite
-  | UserResetPasswordEmailEvent;
+  | UserResetPasswordEmailEvent
+  | UserUpdateEvent;

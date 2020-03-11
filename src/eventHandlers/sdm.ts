@@ -1,4 +1,5 @@
 import { ApplicationEvent } from "../events/applicationEvents";
+import { Event } from '../events/event.enum';
 import { RabbitMQMessageBroker } from "../messageBroker";
 
 export default function createHandler() {
@@ -8,13 +9,13 @@ export default function createHandler() {
     const rabbitMQ = new RabbitMQMessageBroker();
 
     switch (event.type) {
-      case "PROPOSAL_ACCEPTED": {
+      case Event.PROPOSAL_ACCEPTED: {
         const { proposal } = event;
         const message = [proposal.id, proposal.status];
         const json = JSON.stringify(message);
         rabbitMQ.sendMessage(json);
       }
-      case "PROPOSAL_CREATED": {
+      case Event.PROPOSAL_CREATED: {
         const { proposal } = event;
         const message = [proposal.id, proposal.status];
         const json = JSON.stringify(message);

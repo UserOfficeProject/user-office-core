@@ -13,6 +13,7 @@ import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
 import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
 import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
+import { Event } from "../events/event.enum";
 import { UserRole } from "../models/User";
 
 export default class UserMutations {
@@ -81,10 +82,11 @@ export default class UserMutations {
       },
       res => {
         return {
-          type: "EMAIL_INVITE",
+          type: Event.EMAIL_INVITE,
           userId: res.userId,
           inviterId: res.inviterId,
-          role: res.role
+          role: res.role,
+          loggedInUserId: res.inviterId
         };
       }
     );
@@ -187,9 +189,12 @@ export default class UserMutations {
 
         return { user, link };
       },
-      res => {
-        return { type: "ACCOUNT_CREATED", user: res.user, link: res.link };
-      }
+      res => ({
+        type: Event.USER_CREATED,
+        user: res.user,
+        link: res.link,
+        loggedInUserId: res.user.id
+      })
     );
   }
 
@@ -197,45 +202,56 @@ export default class UserMutations {
     agent: User | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, args.id))
-    ) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
-    }
+    return this.eventBus.wrap(
+      async () => {
+        if (
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.userAuth.isUser(agent, args.id))
+        ) {
+          return rejection("INSUFFICIENT_PERMISSIONS");
+        }
 
-    const checkArgs = checkUserArgs(args);
-    if (isRejection(checkArgs)) {
-      return checkArgs;
-    }
+        const checkArgs = checkUserArgs(args);
+        if (isRejection(checkArgs)) {
+          return checkArgs;
+        }
 
-    let user = await this.dataSource.get(args.id); //Hacky
+        let user = await this.dataSource.get(args.id); //Hacky
 
-    if (!user) {
-      return rejection("INTERNAL_ERROR");
-    }
-    user = {
-      ...user,
-      ...args
-    };
+        if (!user) {
+          return rejection("INTERNAL_ERROR");
+        }
+        user = {
+          ...user,
+          ...args
+        };
 
-    if (args.roles !== undefined) {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("INSUFFICIENT_PERMISSIONS");
-      }
-      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
-      if (err) {
-        logger.logError("Could not set user roles", { err });
-        return rejection("INTERNAL_ERROR");
-      }
-    }
-    return this.dataSource
-      .update(user)
-      .then(user => user)
-      .catch(err => {
-        logger.logException("Could not create user", err, { user });
-        return rejection("INTERNAL_ERROR");
-      });
+        if (args.roles !== undefined) {
+          if (!(await this.userAuth.isUserOfficer(agent))) {
+            return rejection("INSUFFICIENT_PERMISSIONS");
+          }
+          const [err] = await to(
+            this.dataSource.setUserRoles(args.id, args.roles)
+          );
+          if (err) {
+            logger.logError("Could not set user roles", { err });
+            return rejection("INTERNAL_ERROR");
+          }
+        }
+        return this.dataSource
+          .update(user)
+          .then(user => user)
+          .catch(err => {
+            logger.logException("Could not create user", err, { user });
+            return rejection("INTERNAL_ERROR");
+          });
+      },
+      user => ({
+        type: Event.USER_UPDATED,
+        user,
+        loggedInUserId: agent ? agent.id : null
+      })
+    );
   }
 
   async login(email: string, password: string): Promise<string | Rejection> {
@@ -334,7 +350,12 @@ export default class UserMutations {
         return { user, link };
       },
       res => {
-        return { type: "PASSWORD_RESET_EMAIL", user: res.user, link: res.link };
+        return {
+          type: Event.USER_PASSWORD_RESET_EMAIL,
+          user: res.user,
+          link: res.link,
+          loggedInUserId: res.user.id
+        };
       }
     );
   }
