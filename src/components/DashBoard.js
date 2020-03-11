@@ -82,7 +82,8 @@ const useStyles = makeStyles(theme => ({
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
-    })
+    }),
+    overflowX: 'hidden'
   },
   drawerPaperClose: {
     overflowX: "hidden",
@@ -190,7 +191,6 @@ export default function Dashboard({ match }) {
         <Divider />
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
         <Switch>
           <Route
             path="/ProposalSubmission/:proposalID"
