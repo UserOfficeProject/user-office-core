@@ -191,7 +191,6 @@ export default function Dashboard({ match }) {
         <Divider />
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
         <Switch>
           <Route
             path="/ProposalSubmission/:proposalID"
