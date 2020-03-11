@@ -1,5 +1,6 @@
 /* CLEANUP */
 DROP TABLE IF EXISTS call;
+DROP TABLE IF EXISTS event_logs;
 DROP TABLE IF EXISTS pagetext;
 DROP TABLE IF EXISTS proposal_answers_files;
 DROP TABLE IF EXISTS files;
