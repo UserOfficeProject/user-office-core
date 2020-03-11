@@ -24,10 +24,13 @@ const EventLogList: React.FC<EventLogListProps> = ({
   );
   const columns = [
     { title: 'Event log ID', field: 'id' },
-    { title: 'Changed by', field: 'changedBy.email' },
+    {
+      title: 'Changed by',
+      render: (rowData: any) =>
+        `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
+    },
     {
       title: 'Changed on',
-      field: 'eventTStamp',
       render: (rowData: any) =>
         dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
     },
