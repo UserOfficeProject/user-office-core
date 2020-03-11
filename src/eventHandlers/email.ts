@@ -1,6 +1,8 @@
 import { ApplicationEvent } from "../events/applicationEvents";
 import { UserDataSource } from "../datasources/UserDataSource";
 import { logger } from "../utils/Logger";
+import { UserRole } from "../models/User";
+import { User } from "../resolvers/types/User";
 
 const SparkPost = require("sparkpost");
 const options = {
@@ -83,7 +85,10 @@ export default function createHandler(userDataSource: UserDataSource) {
         client.transmissions
           .send({
             content: {
-              template_id: "user-office-registration-invitation"
+              template_id:
+                event.role === UserRole.USER
+                  ? "user-office-registration-invitation"
+                  : "user-office-registration-invitation-reviewer"
             },
             substitution_data: {
               firstname: user.preferredname,
