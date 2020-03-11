@@ -8,7 +8,7 @@ import {
 } from "../datasources/mockups/UserDataSource";
 import { ApplicationEvent } from "../events/applicationEvents";
 import { EventBus } from "../events/eventBus";
-import { BasicUserDetails } from "../models/User";
+import { BasicUserDetails, UserRole } from "../models/User";
 import { isRejection } from "../rejection";
 import { UserAuthorization } from "../utils/UserAuthorization";
 import UserMutations from "./UserMutations";
@@ -50,9 +50,14 @@ test("A user can invite another user by email", () => {
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: "firstname",
       lastname: "lastname",
-      email: "email@google.com"
+      email: "email@google.com",
+      userRole: UserRole.USER
     })
-  ).resolves.toStrictEqual({ inviterId: dummyUser.id, userId: 5 });
+  ).resolves.toStrictEqual({
+    inviterId: dummyUser.id,
+    userId: 5,
+    role: UserRole.USER
+  });
 });
 
 test("A user must be logged in to invite another user by email", () => {
@@ -60,7 +65,8 @@ test("A user must be logged in to invite another user by email", () => {
     userMutations.createUserByEmailInvite(null, {
       firstname: "firstname",
       lastname: "lastname",
-      email: "email@google.com"
+      email: "email@google.com",
+      userRole: UserRole.USER
     })
   ).resolves.toHaveProperty("reason", "NOT_LOGGED");
 });
@@ -70,7 +76,8 @@ test("A user cannot invite another user by email if the user already has an acco
     userMutations.createUserByEmailInvite(dummyUserNotOnProposal, {
       firstname: "firstname",
       lastname: "lastname",
-      email: dummyUser.email
+      email: dummyUser.email,
+      userRole: UserRole.USER
     })
   ).resolves.toHaveProperty("reason", "ACCOUNT_EXIST");
 });
@@ -80,12 +87,40 @@ test("A user can reinvite another user by email if the user has not created an a
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: "firstname",
       lastname: "lastname",
-      email: dummyPlaceHolderUser.email
+      email: dummyPlaceHolderUser.email,
+      userRole: UserRole.USER
     })
   ).resolves.toStrictEqual({
     inviterId: dummyUser.id,
-    userId: dummyPlaceHolderUser.id
+    userId: dummyPlaceHolderUser.id,
+    role: UserRole.USER
   });
+});
+
+test("A user officer can invite a reviewer by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(dummyUserOfficer, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: dummyPlaceHolderUser.email,
+      userRole: UserRole.REVIEWER
+    })
+  ).resolves.toStrictEqual({
+    inviterId: dummyUserOfficer.id,
+    userId: dummyPlaceHolderUser.id,
+    role: UserRole.REVIEWER
+  });
+});
+
+test("A user cannot invite a reviewer by email", () => {
+  return expect(
+    userMutations.createUserByEmailInvite(dummyUser, {
+      firstname: "firstname",
+      lastname: "lastname",
+      email: "email@google.com",
+      userRole: UserRole.REVIEWER
+    })
+  ).resolves.toHaveProperty("reason", "NOT_ALLOWED");
 });
 
 test("A user can update it's own name", () => {
