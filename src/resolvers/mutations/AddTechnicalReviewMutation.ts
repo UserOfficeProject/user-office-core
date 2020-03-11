@@ -17,13 +17,13 @@ export class AddTechnicalReviewArgs {
   @Field(() => Int)
   public proposalID: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public comment: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public timeAllocation: number;
 
-  @Field(() => TechnicalReviewStatus)
+  @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
 }
 
@@ -34,7 +34,6 @@ export class AddTechnicalReviewMutation {
     @Args() args: AddTechnicalReviewArgs,
     @Ctx() context: ResolverContext
   ) {
-    console.log(args.status);
     return wrapResponse<TechnicalReview>(
       context.mutations.review.setTechnicalReview(context.user, args),
       TechnicalReviewResponseWrap

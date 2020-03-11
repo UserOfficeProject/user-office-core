@@ -106,6 +106,6 @@ export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
 @ObjectType()
 export class TokenResponseWrap extends ResponseWrapBase<string> {
   @Response()
-  @Field()
+  @Field(() => String, { nullable: true })
   public token: string;
 }

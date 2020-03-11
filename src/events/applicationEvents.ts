@@ -1,6 +1,6 @@
-import { Event } from './event.enum';
-import { Proposal } from '../models/Proposal';
-import { User } from '../models/User';
+import { Event } from "./event.enum";
+import { Proposal } from "../models/Proposal";
+import { User, UserRole } from "../models/User";
 
 interface ProposalAcceptedEvent {
   type: Event.PROPOSAL_ACCEPTED;
@@ -57,6 +57,7 @@ interface EmailInvite {
   type: Event.EMAIL_INVITE;
   userId: number;
   inviterId: number;
+  role: UserRole;
   loggedInUserId: number | null;
 }
 
