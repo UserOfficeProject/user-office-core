@@ -39,16 +39,18 @@ const EventLogList: React.FC<EventLogListProps> = ({
   }
 
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={'Event logs'}
-      columns={columns}
-      data={eventLogsData}
-      options={{
-        search: true,
-        debounceInterval: 400,
-      }}
-    />
+    <div data-cy="event-logs-table">
+      <MaterialTable
+        icons={tableIcons}
+        title={'Event logs'}
+        columns={columns}
+        data={eventLogsData}
+        options={{
+          search: true,
+          debounceInterval: 400,
+        }}
+      />
+    </div>
   );
 };
 
