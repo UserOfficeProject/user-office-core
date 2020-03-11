@@ -82,7 +82,8 @@ const useStyles = makeStyles(theme => ({
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
-    })
+    }),
+    overflowX: 'hidden'
   },
   drawerPaperClose: {
     overflowX: "hidden",
@@ -98,10 +99,12 @@ const useStyles = makeStyles(theme => ({
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    height: "100vh",
+    height: "calc(100vh - 64px)",
+    marginTop: "64px",
     overflow: "auto",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    padding: `0 ${theme.spacing(2)}px`
   },
   bottomNavigation: {
     display: "flex",
@@ -188,7 +191,6 @@ export default function Dashboard({ match }) {
         <Divider />
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
         <Switch>
           <Route
             path="/ProposalSubmission/:proposalID"

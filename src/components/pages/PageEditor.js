@@ -85,6 +85,7 @@ export default function PageEditor() {
               toolbar: "bold italic",
               branding: false
             }}
+            id={PageName.HOMEPAGE}
             onEditorChange={content => setHomeContent(content)}
           />
         )}
@@ -115,6 +116,7 @@ export default function PageEditor() {
               branding: false,
               images_upload_url: "postAcceptor.php"
             }}
+            id={PageName.HELPPAGE}
             onEditorChange={content => setHelpContent(content)}
           />
         )}
@@ -145,6 +147,7 @@ export default function PageEditor() {
               toolbar: "bold italic",
               branding: false
             }}
+            id={PageName.PRIVACYPAGE}
             onEditorChange={content => setPrivacyContent(content)}
           />
         )}
@@ -174,6 +177,7 @@ export default function PageEditor() {
               toolbar: "bold italic",
               branding: false
             }}
+            id={PageName.COOKIEPAGE}
             onEditorChange={content => setCookieContent(content)}
           />
         )}

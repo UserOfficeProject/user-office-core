@@ -1,10 +1,11 @@
-import Container from "@material-ui/core/Container";
-import React, { useEffect, useState } from "react";
-import { Proposal, TechnicalReview } from "../../generated/sdk";
-import { useDataApi } from "../../hooks/useDataApi";
-import SimpleTabs from "../common/TabPanel";
-import GeneralInformation from "../proposal/GeneralInformation";
-import ProposalTechnicalReview from "./ProposalTechnicalReview";
+import Container from '@material-ui/core/Container';
+import React, { useEffect, useState } from 'react';
+import { Proposal, TechnicalReview } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import SimpleTabs from '../common/TabPanel';
+import GeneralInformation from '../proposal/GeneralInformation';
+import ProposalTechnicalReview from './ProposalTechnicalReview';
+import EventLogList from '../eventLog/EventLogList';
 
 export default function ProposalReview({ match }: { match: any }) {
   // const [modalOpen, setOpen] = useState(false);
@@ -66,7 +67,7 @@ export default function ProposalReview({ match }: { match: any }) {
   }
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={["General", "Technical"]}>
+      <SimpleTabs tabNames={['General', 'Technical', 'Logs']}>
         <GeneralInformation
           data={proposal}
           onProposalChanged={newProposal => setProposal(newProposal)}
@@ -75,6 +76,10 @@ export default function ProposalReview({ match }: { match: any }) {
           id={proposal.id}
           data={techReview}
           setReview={setTechReview}
+        />
+        <EventLogList
+          changedObjectId={proposal.id}
+          eventType="PROPOSAL"
         />
       </SimpleTabs>
     </Container>

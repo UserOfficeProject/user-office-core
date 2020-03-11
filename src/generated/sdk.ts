@@ -118,6 +118,16 @@ export enum EvaluatorOperator {
   NEQ = 'NEQ'
 }
 
+export type EventLog = {
+   __typename?: 'EventLog',
+  id: Scalars['Int'],
+  eventType: Scalars['String'],
+  rowData: Scalars['String'],
+  eventTStamp: Scalars['DateTime'],
+  changedObjectId: Scalars['String'],
+  changedBy: User,
+};
+
 export type FieldCondition = {
    __typename?: 'FieldCondition',
   condition: EvaluatorOperator,
@@ -544,6 +554,7 @@ export type Query = {
   call?: Maybe<Call>,
   calls?: Maybe<Array<Call>>,
   checkEmailExist?: Maybe<Scalars['Boolean']>,
+  eventLogs?: Maybe<Array<EventLog>>,
   fileMetadata?: Maybe<Array<FileMetadata>>,
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
@@ -571,6 +582,12 @@ export type QueryCallArgs = {
 
 export type QueryCheckEmailExistArgs = {
   email: Scalars['String']
+};
+
+
+export type QueryEventLogsArgs = {
+  changedObjectId: Scalars['String'],
+  eventType: Scalars['String']
 };
 
 
@@ -909,6 +926,24 @@ export type GetCallsQuery = (
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall'>
+  )>> }
+);
+
+export type GetEventLogsQueryVariables = {
+  eventType: Scalars['String'],
+  changedObjectId: Scalars['String']
+};
+
+
+export type GetEventLogsQuery = (
+  { __typename?: 'Query' }
+  & { eventLogs: Maybe<Array<(
+    { __typename?: 'EventLog' }
+    & Pick<EventLog, 'id' | 'eventType' | 'eventTStamp' | 'rowData' | 'changedObjectId'>
+    & { changedBy: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstname' | 'lastname' | 'email'>
+    ) }
   )>> }
 );
 
@@ -2024,6 +2059,23 @@ export const GetCallsDocument = gql`
   }
 }
     `;
+export const GetEventLogsDocument = gql`
+    query getEventLogs($eventType: String!, $changedObjectId: String!) {
+  eventLogs(eventType: $eventType, changedObjectId: $changedObjectId) {
+    id
+    eventType
+    changedBy {
+      id
+      firstname
+      lastname
+      email
+    }
+    eventTStamp
+    rowData
+    changedObjectId
+  }
+}
+    `;
 export const CreateProposalDocument = gql`
     mutation createProposal {
   createProposal {
@@ -2604,6 +2656,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getCalls(variables?: GetCallsQueryVariables): Promise<GetCallsQuery> {
       return client.request<GetCallsQuery>(print(GetCallsDocument), variables);
+    },
+    getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
+      return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
     },
     createProposal(variables?: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);
