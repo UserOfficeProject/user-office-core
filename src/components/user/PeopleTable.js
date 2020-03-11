@@ -1,10 +1,12 @@
 import { Email } from "@material-ui/icons";
 import { makeStyles } from "@material-ui/styles";
-import MaterialTable from "material-table";
+import MaterialTable, { MTableToolbar } from "material-table";
 import React, { useState } from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { tableIcons } from "../../utils/tableIcons";
 import { InviteUserForm } from "./InviteUserForm";
+import Button from "@material-ui/core/Button";
+import { UserRole } from "../../generated/sdk";
 
 function sendUserRequest(
   searchQuery,
@@ -61,9 +63,17 @@ function PeopleTable(props) {
     }
   })();
   if (sendUserEmail) {
-    return <InviteUserForm action={props.action} />;
+    return (
+      <InviteUserForm
+        title="Invite User"
+        action={props.action}
+        close={() => setSendUserEmail(false)}
+        userRole={UserRole.USER}
+      />
+    );
   }
   let actionArray = [];
+
   props.action &&
     actionArray.push({
       icon: () => props.actionIcon,
@@ -84,6 +94,22 @@ function PeopleTable(props) {
         icons={tableIcons}
         title={props.title}
         columns={columns}
+        components={{
+          Toolbar: data => (
+            <div>
+              <MTableToolbar {...data} />
+              {props.menyItems?.map((item, i) => (
+                <Button
+                  variant="outlined"
+                  onClick={() => item.action()}
+                  key={i}
+                >
+                  {item.title}
+                </Button>
+              ))}
+            </div>
+          )
+        }}
         data={
           props.data
             ? props.data
