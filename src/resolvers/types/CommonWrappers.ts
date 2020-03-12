@@ -102,3 +102,10 @@ export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
   @Field(() => Boolean, { nullable: true })
   public isSuccess: boolean;
 }
+
+@ObjectType()
+export class TokenResponseWrap extends ResponseWrapBase<string> {
+  @Response()
+  @Field(() => String, { nullable: true })
+  public token: string;
+}

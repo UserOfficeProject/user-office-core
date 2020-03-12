@@ -1,6 +1,9 @@
 import { ApplicationEvent } from "../events/applicationEvents";
+import { Event } from '../events/event.enum';
 import { UserDataSource } from "../datasources/UserDataSource";
 import { logger } from "../utils/Logger";
+import { UserRole } from "../models/User";
+import { User } from "../resolvers/types/User";
 
 const SparkPost = require("sparkpost");
 const options = {
@@ -15,7 +18,7 @@ export default function createHandler(userDataSource: UserDataSource) {
     function sendEmail(_address: string, _topic: string, _message: string) {}
 
     switch (event.type) {
-      case "PROPOSAL_ACCEPTED": {
+      case Event.PROPOSAL_ACCEPTED: {
         const proposal = event.proposal;
         const participants = await userDataSource.getProposalUsers(proposal.id);
 
@@ -29,7 +32,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "PROPOSAL_REJECTED": {
+      case Event.PROPOSAL_REJECTED: {
         const proposal = event.proposal;
         const participants = await userDataSource.getProposalUsers(proposal.id);
 
@@ -43,7 +46,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "PASSWORD_RESET_EMAIL": {
+      case Event.USER_PASSWORD_RESET_EMAIL: {
         client.transmissions
           .send({
             content: {
@@ -71,7 +74,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "EMAIL_INVITE": {
+      case Event.EMAIL_INVITE: {
         const user = await userDataSource.get(event.userId);
         const inviter = await userDataSource.getBasicUserInfo(event.inviterId);
 
@@ -83,7 +86,10 @@ export default function createHandler(userDataSource: UserDataSource) {
         client.transmissions
           .send({
             content: {
-              template_id: "user-office-registration-invitation"
+              template_id:
+                event.role === UserRole.USER
+                  ? "user-office-registration-invitation"
+                  : "user-office-registration-invitation-reviewer"
             },
             substitution_data: {
               firstname: user.preferredname,
@@ -104,7 +110,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "PROPOSAL_SUBMITTED": {
+      case Event.PROPOSAL_SUBMITTED: {
         const principalInvestigator = await userDataSource.get(
           event.proposal.proposerId
         );
@@ -156,7 +162,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         return;
       }
 
-      case "ACCOUNT_CREATED": {
+      case Event.USER_CREATED: {
         if (process.env.NODE_ENV === "development") {
           await userDataSource.setUserEmailVerified(event.user.id);
           console.log("verify user without email in development");

@@ -13,6 +13,8 @@ import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
 import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
 import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
 import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
+import { Event } from "../events/event.enum";
+import { UserRole } from "../models/User";
 
 export default class UserMutations {
   constructor(
@@ -34,7 +36,9 @@ export default class UserMutations {
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
-  ): Promise<{ userId: number; inviterId: number } | Rejection> {
+  ): Promise<
+    { userId: number; inviterId: number; role: UserRole } | Rejection
+  > {
     return this.eventBus.wrap(
       async () => {
         if (!agent) {
@@ -45,21 +49,44 @@ export default class UserMutations {
         if (user && user.placeholder) {
           return {
             userId: user.id,
-            inviterId: agent.id
+            inviterId: agent.id,
+            role: args.userRole
           };
         } else if (user) {
           return rejection("ACCOUNT_EXIST");
         }
-        return {
-          userId: await this.dataSource.createInviteUser(args),
-          inviterId: agent.id
-        };
+
+        if (
+          args.userRole === UserRole.REVIEWER &&
+          (await this.userAuth.isUserOfficer(agent))
+        ) {
+          const userId = await this.dataSource.createInviteUser(args);
+          await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
+
+          return {
+            userId,
+            inviterId: agent.id,
+            role: UserRole.REVIEWER
+          };
+        } else if (args.userRole === UserRole.USER) {
+          const userId = await this.dataSource.createInviteUser(args);
+          await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+
+          return {
+            userId,
+            inviterId: agent.id,
+            role: UserRole.USER
+          };
+        }
+        return rejection("NOT_ALLOWED");
       },
       res => {
         return {
-          type: "EMAIL_INVITE",
+          type: Event.EMAIL_INVITE,
           userId: res.userId,
-          inviterId: res.inviterId
+          inviterId: res.inviterId,
+          role: res.role,
+          loggedInUserId: res.inviterId
         };
       }
     );
@@ -135,11 +162,14 @@ export default class UserMutations {
           );
         }
 
-        const [updateRolesErr] = await to(
-          this.dataSource.setUserRoles(user.id, [1])
-        );
+        const roles = await this.dataSource.getUserRoles(user.id);
 
-        if (!user || updateRolesErr) {
+        //If user has no role assign it the user role
+        if (!roles.length) {
+          this.dataSource.setUserRoles(user.id, [UserRole.USER]);
+        }
+
+        if (!user) {
           logger.logError("Could not create user", { args });
           return rejection("INTERNAL_ERROR");
         }
@@ -159,9 +189,12 @@ export default class UserMutations {
 
         return { user, link };
       },
-      res => {
-        return { type: "ACCOUNT_CREATED", user: res.user, link: res.link };
-      }
+      res => ({
+        type: Event.USER_CREATED,
+        user: res.user,
+        link: res.link,
+        loggedInUserId: res.user.id
+      })
     );
   }
 
@@ -169,45 +202,56 @@ export default class UserMutations {
     agent: User | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, args.id))
-    ) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
-    }
+    return this.eventBus.wrap(
+      async () => {
+        if (
+          !(await this.userAuth.isUserOfficer(agent)) &&
+          !(await this.userAuth.isUser(agent, args.id))
+        ) {
+          return rejection("INSUFFICIENT_PERMISSIONS");
+        }
 
-    const checkArgs = checkUserArgs(args);
-    if (isRejection(checkArgs)) {
-      return checkArgs;
-    }
+        const checkArgs = checkUserArgs(args);
+        if (isRejection(checkArgs)) {
+          return checkArgs;
+        }
 
-    let user = await this.dataSource.get(args.id); //Hacky
+        let user = await this.dataSource.get(args.id); //Hacky
 
-    if (!user) {
-      return rejection("INTERNAL_ERROR");
-    }
-    user = {
-      ...user,
-      ...args
-    };
+        if (!user) {
+          return rejection("INTERNAL_ERROR");
+        }
+        user = {
+          ...user,
+          ...args
+        };
 
-    if (args.roles !== undefined) {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("INSUFFICIENT_PERMISSIONS");
-      }
-      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
-      if (err) {
-        logger.logError("Could not set user roles", { err });
-        return rejection("INTERNAL_ERROR");
-      }
-    }
-    return this.dataSource
-      .update(user)
-      .then(user => user)
-      .catch(err => {
-        logger.logException("Could not create user", err, { user });
-        return rejection("INTERNAL_ERROR");
-      });
+        if (args.roles !== undefined) {
+          if (!(await this.userAuth.isUserOfficer(agent))) {
+            return rejection("INSUFFICIENT_PERMISSIONS");
+          }
+          const [err] = await to(
+            this.dataSource.setUserRoles(args.id, args.roles)
+          );
+          if (err) {
+            logger.logError("Could not set user roles", { err });
+            return rejection("INTERNAL_ERROR");
+          }
+        }
+        return this.dataSource
+          .update(user)
+          .then(user => user)
+          .catch(err => {
+            logger.logException("Could not create user", err, { user });
+            return rejection("INTERNAL_ERROR");
+          });
+      },
+      user => ({
+        type: Event.USER_UPDATED,
+        user,
+        loggedInUserId: agent ? agent.id : null
+      })
+    );
   }
 
   async login(email: string, password: string): Promise<string | Rejection> {
@@ -232,6 +276,28 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection("EMAIL_NOT_VERIFIED");
     }
+    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+      expiresIn: process.env.tokenLife
+    });
+
+    return token;
+  }
+
+  async getTokenForUser(
+    agent: User | null,
+    userId: number
+  ): Promise<string | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection("INSUFFICIENT_PERMISSIONS");
+    }
+
+    const user = await this.dataSource.get(userId);
+
+    if (!user) {
+      return rejection("USER_DOES_NOT_EXIST");
+    }
+
+    const roles = await this.dataSource.getUserRoles(user.id);
     const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
       expiresIn: process.env.tokenLife
     });
@@ -284,7 +350,12 @@ export default class UserMutations {
         return { user, link };
       },
       res => {
-        return { type: "PASSWORD_RESET_EMAIL", user: res.user, link: res.link };
+        return {
+          type: Event.USER_PASSWORD_RESET_EMAIL,
+          user: res.user,
+          link: res.link,
+          loggedInUserId: res.user.id
+        };
       }
     );
   }
