@@ -1,50 +1,48 @@
-import express, { NextFunction, Request, Response } from "express";
-import graphqlHTTP, { RequestInfo } from "express-graphql";
-import "reflect-metadata";
-import { buildSchema } from "type-graphql";
-import baseContext from "./src/buildContext";
-import { ResolverContext } from "./src/context";
-import { registerEnums } from "./src/resolvers/registerEnums";
-import { logger } from "./src/utils/Logger";
+import cookieParser from 'cookie-parser';
+import express, { Request, Response } from 'express';
+import graphqlHTTP, { RequestInfo } from 'express-graphql';
+import 'reflect-metadata';
+import jwt from 'express-jwt';
+import { buildSchema } from 'type-graphql';
 
-const jwt = require("express-jwt");
-const files = require("./src/routes/files");
-const proposalDownload = require("./src/routes/pdf");
-
-var cookieParser = require("cookie-parser");
+import baseContext from './src/buildContext';
+import { ResolverContext } from './src/context';
+import { registerEnums } from './src/resolvers/registerEnums';
+import files from './src/routes/files';
+import proposalDownload from './src/routes/pdf';
+import { logger } from './src/utils/Logger';
 
 interface Req extends Request {
   user?: any;
 }
 
 async function bootstrap() {
-  var app = express();
+  const app = express();
+  const secret = process.env.secret as string;
 
   // authentication middleware
   const authMiddleware = jwt({
     credentialsRequired: false,
-    secret: process.env.secret
+    secret,
   });
 
   const extensions = async (info: RequestInfo) => {
     if (info.result.errors) {
-      logger.logError("Failed GRAPHQL execution", {
+      logger.logError('Failed GRAPHQL execution', {
         result: info.result,
         operationName: info.operationName,
-        user: info.context.user
+        user: info.context.user,
       });
     }
   };
 
-  app.use(
-    authMiddleware,
-    (err: any, req: Request, res: Response, next: NextFunction) => {
-      if (err.code === "invalid_token") {
-        return res.status(401).send("jwt expired");
-      }
-      return res.sendStatus(400);
+  app.use(authMiddleware, (err: any, req: Request, res: Response) => {
+    if (err.code === 'invalid_token') {
+      return res.status(401).send('jwt expired');
     }
-  );
+
+    return res.sendStatus(400);
+  });
 
   registerEnums();
 
@@ -52,15 +50,15 @@ async function bootstrap() {
 
   const schema = await buildSchema({
     resolvers: [
-      __dirname + "/src/resolvers/**/*Query.{ts,js}",
-      __dirname + "/src/resolvers/**/*Mutation.{ts,js}",
-      __dirname + "/src/resolvers/**/*Resolver.{ts,js}"
+      __dirname + '/src/resolvers/**/*Query.{ts,js}',
+      __dirname + '/src/resolvers/**/*Mutation.{ts,js}',
+      __dirname + '/src/resolvers/**/*Resolver.{ts,js}',
     ],
-    validate: false
+    validate: false,
   });
 
   app.use(
-    "/graphql",
+    '/graphql',
     graphqlHTTP(async (req: Req) => {
       // Adds the currently logged-in user to the context object, which makes it available to the resolvers
       // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
@@ -75,7 +73,7 @@ async function bootstrap() {
         schema,
         graphiql: true,
         context,
-        extensions
+        extensions,
       };
     })
   );
@@ -86,16 +84,16 @@ async function bootstrap() {
 
   app.listen(process.env.PORT || 4000);
 
-  app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
-    logger.logException("Unhandled EXPRESS JS exception", err, { req, res });
-    res.status(500).send("SERVER EXCEPTION");
+  app.use(function(err: any, req: Request, res: Response) {
+    logger.logException('Unhandled EXPRESS JS exception', err, { req, res });
+    res.status(500).send('SERVER EXCEPTION');
   });
 
-  process.on("uncaughtException", err => {
-    logger.logException("Unhandled NODE exception", err);
+  process.on('uncaughtException', err => {
+    logger.logException('Unhandled NODE exception', err);
   });
 
-  console.log("Running a GraphQL API server at localhost:4000/graphql");
+  console.log('Running a GraphQL API server at localhost:4000/graphql');
 }
 
 bootstrap();
