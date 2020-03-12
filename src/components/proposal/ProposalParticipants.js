@@ -48,7 +48,8 @@ export default function ProposalParticipants(props) {
       />
       <PeopleTable
         title="Co-Proposers"
-        actionIcon={<People />}
+        actionIcon={<People data-cy="co-proposers-button" />}
+        actionText={"Add Co-Proposers"}
         action={openModal}
         isFreeAction={true}
         data={props.users}

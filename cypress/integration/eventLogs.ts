@@ -38,7 +38,6 @@ context('Event log tests', () => {
       .click();
     cy.contains('Logs').click();
     cy.contains('PROPOSAL_CREATED');
-    cy.contains('Javon4@hotmail.com');
   });
 
   it('If user uptates his info, officer should be able to see the event logs for that update', () => {
@@ -86,8 +85,6 @@ context('Event log tests', () => {
 
     const lastRowText = eventLogsTableLastRow.invoke('text');
 
-    // NOTE: This email should not be hardcoded here. We should use email of user who did the change if we can get that info. For now it works.
-    lastRowText.should('contain', 'Javon4@hotmail.com');
     lastRowText.should('contain', 'USER_UPDATED');
     lastRowText.should('contain', updateProfileDate);
   });

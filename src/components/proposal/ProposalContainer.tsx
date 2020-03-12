@@ -112,13 +112,13 @@ export default function ProposalContainer(props: { data: Proposal }) {
               payload: { id, status, shortCode }
             });
           }
-
           await executeAndMonitorCall(
             () =>
               api().updateProposal({
                 id: id,
                 title: state.proposal.title,
                 abstract: state.proposal.abstract,
+                proposerId: state.proposal.proposer.id,
                 users: state.proposal.users.map(user => user.id)
               }),
             "Saved"

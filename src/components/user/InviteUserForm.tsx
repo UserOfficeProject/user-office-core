@@ -6,8 +6,8 @@ import { TextField } from "formik-material-ui";
 import React from "react";
 import { useDataApi } from "../../hooks/useDataApi";
 import { emailFieldSchema } from "../../utils/userFieldValidationSchema";
-
-export function InviteUserForm(props: { action: Function }) {
+import { UserRole } from "../../generated/sdk";
+export function InviteUserForm(props: { action: Function, title: string, userRole: UserRole, close: Function}) {
   const api = useDataApi();
   const classes = makeStyles({
     buttons: {
@@ -19,7 +19,7 @@ export function InviteUserForm(props: { action: Function }) {
       marginLeft: "10px"
     }
   })();
-
+  
   return (
     <Formik
       initialValues={{
@@ -31,7 +31,8 @@ export function InviteUserForm(props: { action: Function }) {
         const createResult = await api().createUserByEmailInvite({
           firstname: values.name,
           lastname: values.lastname,
-          email: values.email
+          email: values.email,
+          userRole: props.userRole
         });
         props.action({
           firstname: values.name,
@@ -39,13 +40,14 @@ export function InviteUserForm(props: { action: Function }) {
           organisation: "",
           id: createResult?.createUserByEmailInvite.id
         });
+        props.close()
       }}
       validationSchema={emailFieldSchema}
     >
       {subformik => (
         <Form>
           <Typography component="h1" variant="h5">
-            Invite by Email
+            {props.title}
           </Typography>
           <Field
             name="name"
@@ -75,6 +77,14 @@ export function InviteUserForm(props: { action: Function }) {
           />
 
           <div className={classes.buttons}>
+          <Button
+              onClick={() => props.close()}
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={() => subformik.submitForm()}
               variant="contained"

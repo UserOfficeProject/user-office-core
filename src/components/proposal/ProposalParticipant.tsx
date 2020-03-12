@@ -28,7 +28,7 @@ export default function ProposalParticipant(props: {
       <ParticipantModal
         show={isPickerOpen}
         userRole={"USER"}
-        title={"Add Co-Proposer"}
+        title={"Set Principal Investigator"}
         close={() => {
           setIsPickerOpen(false);
         }}

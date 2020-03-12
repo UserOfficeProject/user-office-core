@@ -1,4 +1,4 @@
-mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int!, $comment: String!, $status: TechnicalReviewStatus!) {
+mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $status: TechnicalReviewStatus) {
   addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, status: $status) {
     error
     technicalReview {
