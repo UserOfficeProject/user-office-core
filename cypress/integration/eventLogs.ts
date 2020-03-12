@@ -69,8 +69,7 @@ context('Event log tests', () => {
 
     cy.get("[name='firstname']").should('have.value', newFirstName);
 
-    // NOTE: Should wait because event log component is not visible for some time.
-    cy.wait(300);
+    cy.contains('Logs').click();
 
     let eventLogsTable = cy.get('[data-cy="event-logs-table"]');
 
