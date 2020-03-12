@@ -17,24 +17,29 @@ export default function ProposalReview({ match }: { match: any }) {
   const api = useDataApi();
   // To be added for reviews
   // const api = useDataApi();
+  useEffect(() => {
+    api()
+      .getProposal({ id: parseInt(match.params.id) })
+      .then(data => setProposal(data.proposal));
+  }, [api, match.params.id]);
 
-  // useEffect(() => {
-  //   if (proposalData) {
-  //     setReviewers(
-  //       proposalData.reviews!.map((review: any) => {
-  //         const { firstname, lastname, id, username } = review.reviewer;
-  //         return {
-  //           firstname,
-  //           lastname,
-  //           username,
-  //           id,
-  //           reviewID: review.id
-  //         };
-  //       })
-  //     );
-  //     setTechReview(proposalData.technicalReview);
-  //   }
-  // }, [proposalData]);
+  useEffect(() => {
+    if (proposal) {
+      // setReviewers(
+      //   proposal.reviews!.map((review: any) => {
+      //     const { firstname, lastname, id, username } = review.reviewer;
+      //     return {
+      //       firstname,
+      //       lastname,
+      //       username,
+      //       id,
+      //       reviewID: review.id
+      //     };
+      //   })
+      // );
+      setTechReview(proposal.technicalReview);
+    }
+  }, [proposal]);
 
   // const addUser = async (user: any) => {
   //   await api().addUserForReview({
@@ -55,11 +60,7 @@ export default function ProposalReview({ match }: { match: any }) {
   //   });
   // };
 
-  useEffect(() => {
-    api()
-      .getProposal({ id: parseInt(match.params.id) })
-      .then(data => setProposal(data.proposal));
-  }, [api, match.params.id]);
+
 
   if (!proposal) {
     return <p>Loading</p>;

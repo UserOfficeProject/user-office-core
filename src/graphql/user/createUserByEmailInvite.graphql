@@ -2,11 +2,13 @@ mutation createUserByEmailInvite(
   $firstname: String!
   $lastname: String!
   $email: String!
+  $userRole: UserRole!
 ) {
   createUserByEmailInvite(
     firstname: $firstname
     lastname: $lastname
     email: $email
+    userRole: $userRole
   ) {
     error
     id

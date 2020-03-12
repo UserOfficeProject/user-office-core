@@ -60,7 +60,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       } else {
         const newToken = data.token.token;
         this.setHeader("authorization", `Bearer ${newToken}`);
-        this.tokenRenewed && this.tokenRenewed(newToken);
+        this.tokenRenewed && this.tokenRenewed(newToken!);
       }
     }
     return super.request(query, variables);

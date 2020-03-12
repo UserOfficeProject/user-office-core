@@ -31,7 +31,7 @@ function ParticipantModal(props: {
         <PeopleTable
           title={props.title}
           actionText="Select user"
-          actionIcon={<AddBox />}
+          actionIcon={<AddBox data-cy="select-user"/>}
           action={addUser}
           selectedUsers={props.selectedUsers}
           userRole={props.userRole}

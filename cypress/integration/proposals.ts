@@ -137,13 +137,6 @@ context("Proposal tests", () => {
 
     cy.get("#abstract").type(abstract);
 
-    cy.get("[data-cy=co-proposers] button")
-      .first()
-      .click();
-    cy.get("[title='Select user']")
-      .first()
-      .click();
-
     cy.contains("Save and continue").click();
     cy.get(`#${boolId}`).click();
     cy.get(`#${textId}`).type(textAnswer);
