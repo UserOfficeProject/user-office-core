@@ -1,23 +1,24 @@
-import * as fs from "fs";
-import { Page } from "../../models/Admin";
-import { AdminDataSource, Entry } from "../AdminDataSource";
-import database from "./database";
+import * as fs from 'fs';
+
+import { Page } from '../../models/Admin';
+import { AdminDataSource, Entry } from '../AdminDataSource';
+import database from './database';
 import {
   CountryRecord,
   createPageObject,
   InstitutionRecord,
   NationalityRecord,
-  PagetextRecord
-} from "./records";
-import Knex = require("knex");
-import { logger } from "../../utils/Logger";
+  PagetextRecord,
+} from './records';
+import Knex = require('knex');
+import { logger } from '../../utils/Logger';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async get(id: number): Promise<string | null> {
     return database
-      .select("content")
-      .from("pagetext")
-      .where("pagetext_id", id)
+      .select('content')
+      .from('pagetext')
+      .where('pagetext_id', id)
       .first()
       .then(res => (res ? res.content : null));
   }
@@ -25,15 +26,16 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async setPageText(id: number, content: string): Promise<Page> {
     return database
       .update({
-        content
+        content,
       })
-      .from("pagetext")
-      .where("pagetext_id", id)
-      .returning("*")
+      .from('pagetext')
+      .where('pagetext_id', id)
+      .returning('*')
       .then((updatedRows: Array<PagetextRecord>) => {
         if (updatedRows.length === 0) {
           throw new Error(`Could not update page with id:${id}`);
         }
+
         return createPageObject(updatedRows[0]);
       });
   }
@@ -41,7 +43,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async getNationalities(): Promise<Entry[]> {
     return database
       .select()
-      .from("nationalities")
+      .from('nationalities')
       .then((natDB: NationalityRecord[]) =>
         natDB.map(nat => {
           return { id: nat.nationality_id, value: nat.nationality };
@@ -52,10 +54,10 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async getInstitutions(): Promise<Entry[]> {
     return database
       .select()
-      .from("institutions")
-      .where("verified", true)
-      .orderByRaw("institution_id=1 desc")
-      .orderBy("institution", "asc")
+      .from('institutions')
+      .where('verified', true)
+      .orderByRaw('institution_id=1 desc')
+      .orderBy('institution', 'asc')
       .then((intDB: InstitutionRecord[]) =>
         intDB.map(int => {
           return { id: int.institution_id, value: int.institution };
@@ -65,9 +67,9 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async getInstitution(id: number): Promise<string | null> {
     return database
-      .select("*")
-      .from("institutions")
-      .where("institution_id", id)
+      .select('*')
+      .from('institutions')
+      .where('institution_id', id)
       .first()
       .then((res: InstitutionRecord) => res.institution);
   }
@@ -75,7 +77,7 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   async getCountries(): Promise<Entry[]> {
     return database
       .select()
-      .from("countries")
+      .from('countries')
       .then((countDB: CountryRecord[]) =>
         countDB.map(count => {
           return { id: count.country_id, value: count.country };
@@ -84,17 +86,19 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async resetDB() {
-    const directoryPath = "./db_patches";
+    const directoryPath = './db_patches';
     fs.readdir(directoryPath, async function(err, files) {
       if (err) {
         logger.logError(err.message, err);
+
         return false;
       }
-      for await (let file of files) {
-        var contents = fs.readFileSync(`${directoryPath}/${file}`, "utf8");
+      for await (const file of files) {
+        const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
         await database.raw(contents);
       }
     });
+
     return true;
   }
 }

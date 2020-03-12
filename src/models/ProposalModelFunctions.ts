@@ -1,4 +1,9 @@
-import { ConditionEvaluator } from "./ConditionEvaluator";
+import {
+  TextInputConfig,
+  SelectionFromOptionsConfig,
+} from '../resolvers/types/FieldConfig';
+import JSDict from '../utils/Dictionary';
+import { ConditionEvaluator } from './ConditionEvaluator';
 import {
   ProposalTemplateField,
   QuestionaryField,
@@ -6,13 +11,8 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency
-} from "./ProposalModel";
-import JSDict from "../utils/Dictionary";
-import {
-  TextInputConfig,
-  SelectionFromOptionsConfig
-} from "../resolvers/types/FieldConfig";
+  FieldDependency,
+} from './ProposalModel';
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -25,6 +25,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   const step = collection.steps.find(step => step.topic.topic_id === topicId);
+
   return step ? step.topic : undefined;
 }
 export function getQuestionaryStepByTopicId(
@@ -42,8 +43,10 @@ export function getFieldById(
     needle = step.fields.find(
       field => field.proposal_question_id === questionId
     );
+
     return needle === undefined;
   });
+
   return needle;
 }
 export function getAllFields(collection: AbstractCollection) {
@@ -51,6 +54,7 @@ export function getAllFields(collection: AbstractCollection) {
   collection.steps.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
+
   return allFields;
 }
 export function isDependencySatisfied(
@@ -69,6 +73,7 @@ export function isDependencySatisfied(
     collection,
     dependency.dependency_id
   );
+
   return (
     isParentSattisfied &&
     new ConditionEvaluator()
@@ -85,9 +90,11 @@ export function areDependenciesSatisfied(
     return true;
   }
   const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
-    let result = isDependencySatisfied(questionary, dep) === false;
+    const result = isDependencySatisfied(questionary, dep) === false;
+
     return result;
   });
+
   return isAtLeastOneDissasisfied === false;
 }
 
@@ -97,6 +104,7 @@ export function isMatchingConstraints(
 ): boolean {
   const val = JSON.parse(value).value;
   const validator = validatorMap.get(field.data_type) || new BaseValidator();
+
   return validator.validate(val, field);
 }
 
@@ -109,11 +117,12 @@ class BaseValidator implements IConstraintValidator {
 
   validate(value: any, field: QuestionaryField) {
     if (this.dataType && field.data_type !== this.dataType) {
-      throw new Error("Field validator ");
+      throw new Error('Field validator ');
     }
     if (field.config.required && !value) {
       return false;
     }
+
     return true;
   }
 }
@@ -133,6 +142,7 @@ class TextInputValidator extends BaseValidator {
     if (config.max && value && value.length > config.max) {
       return false;
     }
+
     return true;
   }
 }

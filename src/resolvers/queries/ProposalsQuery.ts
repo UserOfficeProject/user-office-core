@@ -6,10 +6,11 @@ import {
   Field,
   Int,
   Args,
-  ObjectType
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Proposal } from "../types/Proposal";
+  ObjectType,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Proposal } from '../types/Proposal';
 
 @ArgsType()
 class ProposalsArgs {

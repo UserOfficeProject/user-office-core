@@ -1,3 +1,4 @@
+import { Proposal } from '../../models/Proposal';
 import {
   ProposalTemplate,
   ProposalTemplateField,
@@ -5,15 +6,14 @@ import {
   Topic,
   ProposalAnswer,
   TemplateStep,
-  Questionary
-} from "../../models/ProposalModel";
-import { Proposal } from "../../models/Proposal";
+  Questionary,
+} from '../../models/ProposalModel';
 import {
   createDummyTemplate,
   createDummyField,
-  createDummyTopic
-} from "../../tests/ProposalTestBed";
-import { TemplateDataSource } from "../TemplateDataSource";
+  createDummyTopic,
+} from '../../tests/ProposalTestBed';
+import { TemplateDataSource } from '../TemplateDataSource';
 
 export var dummyTemplate: ProposalTemplate;
 export var dummyQuestionary: Questionary;
@@ -22,7 +22,7 @@ export var dummyProposalSubmitted: Proposal;
 export var dummyAnswers: ProposalAnswer[];
 
 export class templateDataSource implements TemplateDataSource {
-  async isNaturalKeyPresent(natural_key: string): Promise<Boolean> {
+  async isNaturalKeyPresent(natural_key: string): Promise<boolean> {
     return true;
   }
   public init() {
@@ -49,7 +49,7 @@ export class templateDataSource implements TemplateDataSource {
       topic_id: topicId,
       data_type: dataType,
       question: question,
-      config: JSON.parse(config || "{}")
+      config: JSON.parse(config || '{}'),
     });
   }
 
@@ -73,7 +73,7 @@ export class templateDataSource implements TemplateDataSource {
       sort_order: number;
     }
   ): Promise<ProposalTemplate> {
-    var template = await this.getProposalTemplate();
+    const template = await this.getProposalTemplate();
     template.steps.forEach(topic => {
       topic.fields!.forEach(field => {
         if (field.proposal_question_id === proposal_question_id) {
@@ -91,7 +91,7 @@ export class templateDataSource implements TemplateDataSource {
   ): Promise<Topic> {
     return new Topic(
       id,
-      values.title || "Topic title",
+      values.title || 'Topic title',
       3,
       values.isEnabled !== undefined ? values.isEnabled : true
     );
@@ -101,8 +101,9 @@ export class templateDataSource implements TemplateDataSource {
     dummyTemplate.steps.splice(
       sortOrder,
       0,
-      new TemplateStep(new Topic(2, "New Topic", sortOrder, false), [])
+      new TemplateStep(new Topic(2, 'New Topic', sortOrder, false), [])
     );
+
     return dummyTemplate;
   }
 

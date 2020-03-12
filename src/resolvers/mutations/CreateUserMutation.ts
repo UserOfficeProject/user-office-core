@@ -5,12 +5,13 @@ import {
   Field,
   Mutation,
   Resolver,
-  Int
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { isRejection } from "../../rejection";
-import { UserResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Int,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { isRejection } from '../../rejection';
+import { UserResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUserArgs {

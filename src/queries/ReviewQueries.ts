@@ -1,9 +1,8 @@
-import { ReviewDataSource } from "../datasources/ReviewDataSource";
-import { UserAuthorization } from "../utils/UserAuthorization";
-
-import { User } from "../models/User";
-import { Review } from "../models/Review";
-import { TechnicalReview } from "../models/TechnicalReview";
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { Review } from '../models/Review';
+import { TechnicalReview } from '../models/TechnicalReview';
+import { User } from '../models/User';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewQueries {
   constructor(

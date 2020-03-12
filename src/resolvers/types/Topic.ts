@@ -1,6 +1,6 @@
-import { ObjectType, Field, Int } from "type-graphql";
+import { ObjectType, Field, Int } from 'type-graphql';
 
-import { Topic as TopicOrigin } from "../../models/ProposalModel";
+import { Topic as TopicOrigin } from '../../models/ProposalModel';
 @ObjectType()
 export class Topic implements Partial<TopicOrigin> {
   @Field(type => Int)

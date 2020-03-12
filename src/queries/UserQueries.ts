@@ -1,9 +1,11 @@
-import { UserDataSource } from "../datasources/UserDataSource";
-import { User, BasicUserDetails } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-var rp = require("request-promise");
-const jsonwebtoken = require("jsonwebtoken");
-import * as bcrypt from "bcryptjs";
+import * as bcrypt from 'bcryptjs';
+
+import { UserDataSource } from '../datasources/UserDataSource';
+import { User, BasicUserDetails } from '../models/User';
+import { UserAuthorization } from '../utils/UserAuthorization';
+
+const jsonwebtoken = require('jsonwebtoken');
+const rp = require('request-promise');
 
 export default class UserQueries {
   constructor(
@@ -34,6 +36,7 @@ export default class UserQueries {
     if (!user) {
       return null;
     }
+
     return new BasicUserDetails(
       user.id,
       user.firstname,
@@ -48,24 +51,25 @@ export default class UserQueries {
   }
 
   async getOrcIDAccessToken(authorizationCode: string) {
-    var options = {
-      method: "POST",
+    const options = {
+      method: 'POST',
       uri: process.env.ORCID_TOKEN_URL,
       qs: {
         client_id: process.env.ORCID_CLIENT_ID,
         client_secret: process.env.ORCID_CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code: authorizationCode
+        grant_type: 'authorization_code',
+        code: authorizationCode,
       },
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        'content-type': 'application/x-www-form-urlencoded',
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
+
     return rp(options)
       .then(function(resp: any) {
         return {
-          ...resp
+          ...resp,
         };
       })
       .catch(function(err: any) {
@@ -75,13 +79,13 @@ export default class UserQueries {
 
   async getOrcIDInformation(authorizationCode: string) {
     // If in development fake response
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       return {
-        orcid: "0000-0000-0000-0000",
-        orcidHash: "asdadgiuerervnaofhioa",
-        refreshToken: "asdadgiuerervnaofhioa",
-        firstname: "Kalle",
-        lastname: "Kallesson"
+        orcid: '0000-0000-0000-0000',
+        orcidHash: 'asdadgiuerervnaofhioa',
+        refreshToken: 'asdadgiuerervnaofhioa',
+        firstname: 'Kalle',
+        lastname: 'Kallesson',
       };
     }
 
@@ -94,34 +98,36 @@ export default class UserQueries {
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
       const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-        expiresIn: process.env.tokenLife
+        expiresIn: process.env.tokenLife,
       });
+
       return { token };
     }
-    var options = {
+    const options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
-        Accept: "application/vnd.orcid+json",
-        Authorization: `Bearer ${orcData.access_token}`
+        Accept: 'application/vnd.orcid+json',
+        Authorization: `Bearer ${orcData.access_token}`,
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
 
     return rp(options)
       .then(function(resp: any) {
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
-        const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+        const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
         const hash = bcrypt.hashSync(resp.name.path, salt);
+
         return {
           orcid: resp.name.path,
           orcidHash: hash,
           refreshToken: orcData.refresh_token,
-          firstname: resp.name["given-names"]
-            ? resp.name["given-names"].value
+          firstname: resp.name['given-names']
+            ? resp.name['given-names'].value
             : null,
-          lastname: resp.name["family-name"]
-            ? resp.name["family-name"].value
-            : null
+          lastname: resp.name['family-name']
+            ? resp.name['family-name'].value
+            : null,
         };
       })
       .catch(function(err: any) {
@@ -140,6 +146,7 @@ export default class UserQueries {
     if (agent == null) {
       return null;
     }
+
     return this.dataSource.getUsers(
       filter,
       first,

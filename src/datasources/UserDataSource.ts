@@ -1,14 +1,14 @@
-import { User, BasicUserDetails } from "../models/User";
-import { Role } from "../models/Role";
-import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
-import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
+import { Role } from '../models/Role';
+import { User, BasicUserDetails } from '../models/User';
+import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
+import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 
 export interface UserDataSource {
-  addUserRole(args: AddUserRoleArgs): Promise<Boolean>;
+  addUserRole(args: AddUserRoleArgs): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
-  checkEmailExist(email: string): Promise<Boolean>;
-  checkOrcIDExist(orcID: string): Promise<Boolean>;
+  checkEmailExist(email: string): Promise<boolean>;
+  checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;

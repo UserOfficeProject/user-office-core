@@ -1,20 +1,22 @@
-import { User, checkUserArgs, BasicUserDetails } from "../models/User";
-import { UserDataSource } from "../datasources/UserDataSource";
-import { isRejection, rejection, Rejection } from "../rejection";
-import { EventBus } from "../events/eventBus";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import { to } from 'await-to-js';
+import * as bcrypt from 'bcryptjs';
 
-const jsonwebtoken = require("jsonwebtoken");
-import * as bcrypt from "bcryptjs";
-import { to } from "await-to-js";
-import { logger } from "../utils/Logger";
-import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
-import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
-import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
-import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
-import { Event } from "../events/event.enum";
-import { UserRole } from "../models/User";
+import { UserDataSource } from '../datasources/UserDataSource';
+import { ApplicationEvent } from '../events/applicationEvents';
+import { Event } from '../events/event.enum';
+import { EventBus } from '../events/eventBus';
+import { User, checkUserArgs, BasicUserDetails } from '../models/User';
+import { UserRole } from '../models/User';
+import { isRejection, rejection, Rejection } from '../rejection';
+import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
+import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
+import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
+
+const jsonwebtoken = require('jsonwebtoken');
+
 
 export default class UserMutations {
   constructor(
@@ -28,8 +30,9 @@ export default class UserMutations {
 
     //Setting fixed salt for development
     //const salt = bcrypt.genSaltSync(10);
-    const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+    const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
     const hash = bcrypt.hashSync(password, salt);
+
     return hash;
   }
 
@@ -42,7 +45,7 @@ export default class UserMutations {
     return this.eventBus.wrap(
       async () => {
         if (!agent) {
-          return rejection("NOT_LOGGED");
+          return rejection('NOT_LOGGED');
         }
         // Check if email exist in database and if user has been invited before
         const user = await this.dataSource.getByEmail(args.email);
@@ -50,10 +53,10 @@ export default class UserMutations {
           return {
             userId: user.id,
             inviterId: agent.id,
-            role: args.userRole
+            role: args.userRole,
           };
         } else if (user) {
-          return rejection("ACCOUNT_EXIST");
+          return rejection('ACCOUNT_EXIST');
         }
 
         if (
@@ -66,7 +69,7 @@ export default class UserMutations {
           return {
             userId,
             inviterId: agent.id,
-            role: UserRole.REVIEWER
+            role: UserRole.REVIEWER,
           };
         } else if (args.userRole === UserRole.USER) {
           const userId = await this.dataSource.createInviteUser(args);
@@ -75,10 +78,11 @@ export default class UserMutations {
           return {
             userId,
             inviterId: agent.id,
-            role: UserRole.USER
+            role: UserRole.USER,
           };
         }
-        return rejection("NOT_ALLOWED");
+
+        return rejection('NOT_ALLOWED');
       },
       res => {
         return {
@@ -86,7 +90,7 @@ export default class UserMutations {
           userId: res.userId,
           inviterId: res.inviterId,
           role: res.role,
-          loggedInUserId: res.inviterId
+          loggedInUserId: res.inviterId,
         };
       }
     );
@@ -99,10 +103,11 @@ export default class UserMutations {
       async () => {
         if (
           this.createHash(args.orcid) !== args.orcidHash &&
-          !(process.env.NODE_ENV === "development")
+          !(process.env.NODE_ENV === 'development')
         ) {
-          logger.logError("ORCID hash mismatch", { args });
-          return rejection("ORCID_HASH_MISMATCH");
+          logger.logError('ORCID hash mismatch', { args });
+
+          return rejection('ORCID_HASH_MISMATCH');
         }
 
         const hash = this.createHash(args.password);
@@ -128,15 +133,16 @@ export default class UserMutations {
             id: user.id,
             placeholder: false,
             password: hash,
-            ...args
+            ...args,
           });
 
           if (isRejection(updatedUser) || !changePassword) {
-            logger.logError("Could not create user", {
+            logger.logError('Could not create user', {
               updatedUser,
-              changePassword
+              changePassword,
             });
-            return rejection("INTERNAL_ERROR");
+
+            return rejection('INTERNAL_ERROR');
           }
           user = updatedUser;
         } else {
@@ -170,22 +176,23 @@ export default class UserMutations {
         }
 
         if (!user) {
-          logger.logError("Could not create user", { args });
-          return rejection("INTERNAL_ERROR");
+          logger.logError('Could not create user', { args });
+
+          return rejection('INTERNAL_ERROR');
         }
 
         const token = jsonwebtoken.sign(
           {
             id: user.id,
-            type: "emailVerification",
-            updated: user.updated
+            type: 'emailVerification',
+            updated: user.updated,
           },
           process.env.secret,
-          { expiresIn: "24h" }
+          { expiresIn: '24h' }
         );
 
         // Email verification link
-        const link = process.env.baseURL + "/emailVerification/" + token;
+        const link = process.env.baseURL + '/emailVerification/' + token;
 
         return { user, link };
       },
@@ -193,7 +200,7 @@ export default class UserMutations {
         type: Event.USER_CREATED,
         user: res.user,
         link: res.link,
-        loggedInUserId: res.user.id
+        loggedInUserId: res.user.id,
       })
     );
   }
@@ -208,7 +215,7 @@ export default class UserMutations {
           !(await this.userAuth.isUserOfficer(agent)) &&
           !(await this.userAuth.isUser(agent, args.id))
         ) {
-          return rejection("INSUFFICIENT_PERMISSIONS");
+          return rejection('INSUFFICIENT_PERMISSIONS');
         }
 
         const checkArgs = checkUserArgs(args);
@@ -219,37 +226,40 @@ export default class UserMutations {
         let user = await this.dataSource.get(args.id); //Hacky
 
         if (!user) {
-          return rejection("INTERNAL_ERROR");
+          return rejection('INTERNAL_ERROR');
         }
         user = {
           ...user,
-          ...args
+          ...args,
         };
 
         if (args.roles !== undefined) {
           if (!(await this.userAuth.isUserOfficer(agent))) {
-            return rejection("INSUFFICIENT_PERMISSIONS");
+            return rejection('INSUFFICIENT_PERMISSIONS');
           }
           const [err] = await to(
             this.dataSource.setUserRoles(args.id, args.roles)
           );
           if (err) {
-            logger.logError("Could not set user roles", { err });
-            return rejection("INTERNAL_ERROR");
+            logger.logError('Could not set user roles', { err });
+
+            return rejection('INTERNAL_ERROR');
           }
         }
+
         return this.dataSource
           .update(user)
           .then(user => user)
           .catch(err => {
-            logger.logException("Could not create user", err, { user });
-            return rejection("INTERNAL_ERROR");
+            logger.logException('Could not create user', err, { user });
+
+            return rejection('INTERNAL_ERROR');
           });
       },
       user => ({
         type: Event.USER_UPDATED,
         user,
-        loggedInUserId: agent ? agent.id : null
+        loggedInUserId: agent ? agent.id : null,
       })
     );
   }
@@ -258,26 +268,26 @@ export default class UserMutations {
     const user = await this.dataSource.getByEmail(email);
 
     if (!user) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
     const roles = await this.dataSource.getUserRoles(user.id);
     const result = await this.dataSource.getPasswordByEmail(email);
 
     if (!result) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
     const valid = bcrypt.compareSync(password, result);
 
     if (!valid) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
     if (!user.emailVerified) {
-      return rejection("EMAIL_NOT_VERIFIED");
+      return rejection('EMAIL_NOT_VERIFIED');
     }
     const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-      expiresIn: process.env.tokenLife
+      expiresIn: process.env.tokenLife,
     });
 
     return token;
@@ -288,18 +298,18 @@ export default class UserMutations {
     userId: number
   ): Promise<string | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
     const user = await this.dataSource.get(userId);
 
     if (!user) {
-      return rejection("USER_DOES_NOT_EXIST");
+      return rejection('USER_DOES_NOT_EXIST');
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
     const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-      expiresIn: process.env.tokenLife
+      expiresIn: process.env.tokenLife,
     });
 
     return token;
@@ -312,13 +322,15 @@ export default class UserMutations {
         { user: decoded.user, roles: decoded.roles },
         process.env.secret,
         {
-          expiresIn: process.env.tokenLife
+          expiresIn: process.env.tokenLife,
         }
       );
+
       return freshToken;
     } catch (error) {
-      logger.logError("Bad token", { token });
-      return rejection("BAD_TOKEN");
+      logger.logError('Bad token', { token });
+
+      return rejection('BAD_TOKEN');
     }
   }
 
@@ -330,21 +342,22 @@ export default class UserMutations {
         const user = await this.dataSource.getByEmail(email);
 
         if (!user) {
-          logger.logInfo("Could not find user by email", { email });
-          return rejection("COULD_NOT_FIND_USER_BY_EMAIL");
+          logger.logInfo('Could not find user by email', { email });
+
+          return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
         }
 
         const token = jsonwebtoken.sign(
           {
             id: user.id,
-            type: "passwordReset",
-            updated: user.updated
+            type: 'passwordReset',
+            updated: user.updated,
           },
           process.env.secret,
-          { expiresIn: "24h" }
+          { expiresIn: '24h' }
         );
 
-        const link = process.env.baseURL + "/resetPassword/" + token;
+        const link = process.env.baseURL + '/resetPassword/' + token;
 
         // Send reset email with link
         return { user, link };
@@ -354,7 +367,7 @@ export default class UserMutations {
           type: Event.USER_PASSWORD_RESET_EMAIL,
           user: res.user,
           link: res.link,
-          loggedInUserId: res.user.id
+          loggedInUserId: res.user.id,
         };
       }
     );
@@ -369,29 +382,33 @@ export default class UserMutations {
       if (
         user &&
         user.updated === decoded.updated &&
-        decoded.type === "emailVerification"
+        decoded.type === 'emailVerification'
       ) {
         await this.dataSource.setUserEmailVerified(user.id);
+
         return true;
       } else {
-        return rejection("COULD_NOT_VERIFY_USER");
+        return rejection('COULD_NOT_VERIFY_USER');
       }
     } catch (error) {
-      logger.logException("Could not verify email", error, { token });
-      return rejection("COULD_NOT_VERIFY_USER");
+      logger.logException('Could not verify email', error, { token });
+
+      return rejection('COULD_NOT_VERIFY_USER');
     }
   }
 
   async addUserRole(agent: User | null, args: AddUserRoleArgs) {
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
+
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
       .catch(err => {
-        logger.logException("Could not add user role", err, { agent });
-        return rejection("INTERNAL_ERROR");
+        logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
       });
   }
   async updatePassword(
@@ -403,23 +420,25 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, id))
     ) {
-      return rejection("NOT_ALLOWED");
+      return rejection('NOT_ALLOWED');
     }
     try {
       const hash = this.createHash(password);
-      let user = await this.dataSource.get(id);
+      const user = await this.dataSource.get(id);
       if (user) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
-        logger.logError("Could not update password. Used does not exist", {
+        logger.logError('Could not update password. Used does not exist', {
           agent,
-          id
+          id,
         });
-        return rejection("USER_DOES_NOT_EXIST");
+
+        return rejection('USER_DOES_NOT_EXIST');
       }
     } catch (error) {
-      logger.logException("Could not update password", error, { agent, id });
-      return rejection("INTERNAL_ERROR");
+      logger.logException('Could not update password', error, { agent, id });
+
+      return rejection('INTERNAL_ERROR');
     }
   }
   async resetPassword(
@@ -436,24 +455,27 @@ export default class UserMutations {
       if (
         user &&
         user.updated === decoded.updated &&
-        decoded.type === "passwordReset"
+        decoded.type === 'passwordReset'
       ) {
         return this.dataSource
           .setUserPassword(user.id, hash)
           .then(user => user)
           .catch(err => {
-            logger.logError("Could not reset password", { err });
-            return rejection("INTERNAL_ERROR");
+            logger.logError('Could not reset password', { err });
+
+            return rejection('INTERNAL_ERROR');
           });
       }
-      logger.logError("Could not reset password incomplete data", {
+      logger.logError('Could not reset password incomplete data', {
         user,
-        decoded
+        decoded,
       });
-      return rejection("INTERNAL_ERROR");
+
+      return rejection('INTERNAL_ERROR');
     } catch (error) {
-      logger.logError("Could not reset password", { error, token });
-      return rejection("INTERNAL_ERROR");
+      logger.logError('Could not reset password', { error, token });
+
+      return rejection('INTERNAL_ERROR');
     }
   }
 }

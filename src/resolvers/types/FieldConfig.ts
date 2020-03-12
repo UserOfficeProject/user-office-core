@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, createUnionType } from "type-graphql";
+import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
 
 @ObjectType()
 export class ConfigBase {
@@ -67,13 +67,13 @@ export class TextInputConfig extends ConfigBase {
 }
 
 export const FieldConfigType = createUnionType({
-  name: "FieldConfig", // the name of the GraphQL union
+  name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
     BooleanConfig,
     DateConfig,
     EmbellishmentConfig,
     FileUploadConfig,
     SelectionFromOptionsConfig,
-    TextInputConfig
-  ] // function that returns array of object types classes
+    TextInputConfig,
+  ], // function that returns array of object types classes
 });

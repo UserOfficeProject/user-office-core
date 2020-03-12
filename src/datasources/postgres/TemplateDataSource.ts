@@ -1,51 +1,50 @@
-import database from "./database";
-import {
-  TopicRecord,
-  ProposalQuestionRecord,
-  createTopicObject,
-  createProposalTemplateFieldObject,
-  createFieldDependencyObject,
-  FieldDependencyRecord
-} from "./records";
+import to from 'await-to-js';
 
-import { TemplateDataSource } from "../TemplateDataSource";
 import {
   ProposalTemplate,
   ProposalTemplateField,
   FieldDependency,
   Topic,
   DataType,
-  TemplateStep
-} from "../../models/ProposalModel";
-
-import to from "await-to-js";
-import { FieldDependencyInput } from "../../resolvers/mutations/UpdateProposalTemplateFieldMutation";
+  TemplateStep,
+} from '../../models/ProposalModel';
+import { FieldDependencyInput } from '../../resolvers/mutations/UpdateProposalTemplateFieldMutation';
+import { TemplateDataSource } from '../TemplateDataSource';
+import database from './database';
+import {
+  TopicRecord,
+  ProposalQuestionRecord,
+  createTopicObject,
+  createProposalTemplateFieldObject,
+  createFieldDependencyObject,
+  FieldDependencyRecord,
+} from './records';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getProposalTemplate(): Promise<ProposalTemplate> {
     const dependenciesRecord: (FieldDependencyRecord & {
       natural_key: string;
-    })[] = await database("proposal_question_dependencies")
+    })[] = await database('proposal_question_dependencies')
       .join(
-        "proposal_questions",
-        "proposal_question_dependencies.proposal_question_dependency",
-        "proposal_questions.proposal_question_id"
+        'proposal_questions',
+        'proposal_question_dependencies.proposal_question_dependency',
+        'proposal_questions.proposal_question_id'
       )
       .select(
-        "proposal_question_dependencies.*",
-        "proposal_questions.natural_key"
+        'proposal_question_dependencies.*',
+        'proposal_questions.natural_key'
       );
 
     const fieldRecords: ProposalQuestionRecord[] = await database
-      .select("*")
-      .from("proposal_questions")
-      .orderBy("sort_order");
+      .select('*')
+      .from('proposal_questions')
+      .orderBy('sort_order');
 
     const topicRecords: TopicRecord[] = await database
-      .select("p.*")
-      .from("proposal_topics as p")
-      .where("p.is_enabled", true)
-      .orderBy("sort_order");
+      .select('p.*')
+      .from('proposal_topics as p')
+      .where('p.is_enabled', true)
+      .orderBy('sort_order');
 
     const topics = topicRecords.map(record => createTopicObject(record));
     const fields = fieldRecords.map(record =>
@@ -55,7 +54,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       createFieldDependencyObject(record)
     );
 
-    let steps = Array<TemplateStep>();
+    const steps = Array<TemplateStep>();
     topics.forEach(topic => {
       steps.push(
         new TemplateStep(
@@ -75,14 +74,14 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async createTopic(sortOrder: number): Promise<ProposalTemplate> {
-    await database("proposal_topics")
+    await database('proposal_topics')
       .update({ sort_order: sortOrder + 1 })
-      .where("sort_order", ">=", sortOrder);
+      .where('sort_order', '>=', sortOrder);
 
-    await database("proposal_topics").insert({
-      topic_title: "New Topic",
+    await database('proposal_topics').insert({
+      topic_title: 'New Topic',
       sort_order: sortOrder,
-      is_enabled: true
+      is_enabled: true,
     });
 
     return this.getProposalTemplate();
@@ -101,16 +100,17 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         {
           topic_title: values.title,
           is_enabled: values.isEnabled,
-          sortOrder: values.sortOrder
+          sortOrder: values.sortOrder,
         },
-        ["*"]
+        ['*']
       )
-      .from("proposal_topics")
+      .from('proposal_topics')
       .where({ topic_id: id });
 
     if (!resultSet || resultSet.length != 1) {
-      throw new Error("INSERT Topic resultSet must contain exactly 1 row");
+      throw new Error('INSERT Topic resultSet must contain exactly 1 row');
     }
+
     return createTopicObject(resultSet[0]);
   }
 
@@ -132,27 +132,27 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       question: values.question,
       topic_id: values.topicId,
       config: values.config,
-      sort_order: values.sortOrder
+      sort_order: values.sortOrder,
     };
 
     if (values.dependencies) {
-      await database("proposal_question_dependencies")
-        .where("proposal_question_id", proposal_question_id)
+      await database('proposal_question_dependencies')
+        .where('proposal_question_id', proposal_question_id)
         .del();
 
       for (const dependency of values.dependencies) {
-        await database("proposal_question_dependencies").insert({
+        await database('proposal_question_dependencies').insert({
           proposal_question_id: dependency.question_id,
           proposal_question_dependency: dependency.dependency_id,
-          condition: dependency.condition
+          condition: dependency.condition,
         });
       }
     }
 
     return database
-      .update(rows, ["*"])
-      .from("proposal_questions")
-      .where("proposal_question_id", proposal_question_id)
+      .update(rows, ['*'])
+      .from('proposal_questions')
+      .where('proposal_question_id', proposal_question_id)
       .then(async () => await this.getProposalTemplate());
   }
 
@@ -172,14 +172,14 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           topic_id: topicId,
           data_type: dataType,
           question: question,
-          config: config
+          config: config,
         },
-        ["*"]
+        ['*']
       )
-      .from("proposal_questions");
+      .from('proposal_questions');
 
     if (!resultSet || resultSet.length != 1) {
-      throw new Error("INSERT field resultSet must contain exactly 1 row");
+      throw new Error('INSERT field resultSet must contain exactly 1 row');
     }
 
     return createProposalTemplateFieldObject(resultSet[0]);
@@ -188,54 +188,58 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getTemplateField(
     fieldId: string
   ): Promise<ProposalTemplateField | null> {
-    return database("proposal_questions")
+    return database('proposal_questions')
       .where({ proposal_question_id: fieldId })
-      .select("*")
+      .select('*')
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length === 0) {
           return null;
         }
+
         return createProposalTemplateFieldObject(resultSet[0]);
       });
   }
 
   async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
     const [, rowsAffected] = await to(
-      database("proposal_questions")
+      database('proposal_questions')
         .where({ proposal_question_id: fieldId })
         .del()
     );
     if (rowsAffected !== 1) {
       throw new Error(`Could not delete template field ${fieldId}`);
     }
+
     return await this.getProposalTemplate();
   }
 
   async deleteTopic(id: number): Promise<Topic> {
-    return database("proposal_topics")
+    return database('proposal_topics')
       .where({ topic_id: id })
-      .del(["*"])
+      .del(['*'])
       .then((result: TopicRecord[]) => {
         if (!result || result.length !== 1) {
           throw new Error(`Could not delete topic ${id}`);
         }
+
         return createTopicObject(result[0]);
       });
   }
 
   async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
     topicOrder.forEach(async (topicId, index) => {
-      return database("proposal_topics")
+      return database('proposal_topics')
         .update({ sort_order: index })
         .where({ topic_id: topicId });
     });
+
     return topicOrder;
   }
 
-  isNaturalKeyPresent(natural_key: string): Promise<Boolean> {
-    return database("proposal_questions")
+  isNaturalKeyPresent(natural_key: string): Promise<boolean> {
+    return database('proposal_questions')
       .where({ natural_key })
-      .select("natural_key")
+      .select('natural_key')
       .then((result: []) => result.length > 0);
   }
 }

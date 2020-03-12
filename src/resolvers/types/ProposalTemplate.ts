@@ -1,7 +1,7 @@
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field } from 'type-graphql';
 
-import { ProposalTemplate as ProposalTemplateOrigin } from "../../models/ProposalModel";
-import { TemplateStep } from "./TemplateStep";
+import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
+import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
 export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {

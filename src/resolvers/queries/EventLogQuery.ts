@@ -1,4 +1,5 @@
 import { Query, Ctx, Resolver, ArgsType, Field, Args } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { EventLog } from '../types/EventLog';
 

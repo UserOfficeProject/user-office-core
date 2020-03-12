@@ -1,6 +1,6 @@
-import { Rejection, isRejection } from "../rejection";
-import { ResponseWrapBase } from "./types/CommonWrappers";
-import { getResponseField } from "./Decorators";
+import { Rejection, isRejection } from '../rejection';
+import { getResponseField } from './Decorators';
+import { ResponseWrapBase } from './types/CommonWrappers';
 
 export async function wrapResponse<T>(
   executor: Promise<T | Rejection>,

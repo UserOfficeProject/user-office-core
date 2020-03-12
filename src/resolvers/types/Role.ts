@@ -1,5 +1,5 @@
-import "reflect-metadata";
-import { Field, ObjectType, Int } from "type-graphql";
+import 'reflect-metadata';
+import { Field, ObjectType, Int } from 'type-graphql';
 
 @ObjectType()
 export class Role {

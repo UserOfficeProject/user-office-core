@@ -11,5 +11,5 @@ export class Review {
 
 export enum ReviewStatus {
   DRAFT = 0,
-  SUBMITTED = 1
+  SUBMITTED = 1,
 }

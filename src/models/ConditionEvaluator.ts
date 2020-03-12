@@ -1,9 +1,9 @@
-import JSDict from "../utils/Dictionary";
-import { QuestionaryField } from "./ProposalModel";
+import JSDict from '../utils/Dictionary';
+import { QuestionaryField } from './ProposalModel';
 
 export enum EvaluatorOperator {
-  EQ = "EQ",
-  NEQ = "NEQ"
+  EQ = 'EQ',
+  NEQ = 'NEQ',
 }
 
 export class ConditionEvaluator {
@@ -19,6 +19,7 @@ export class ConditionEvaluator {
       this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
       this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
     }
+
     return this.validatorMap;
   }
 

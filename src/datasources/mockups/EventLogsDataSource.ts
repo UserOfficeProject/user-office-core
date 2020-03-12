@@ -39,8 +39,7 @@ export class eventLogsDataSource implements EventLogsDataSource {
 
     if (filter.changedObjectId && filter.changedObjectId !== '*') {
       dummyEventLogsCopy = dummyEventLogsCopy.filter(
-        eventLog =>
-          eventLog.changedObjectId === filter.changedObjectId
+        eventLog => eventLog.changedObjectId === filter.changedObjectId
       );
     }
 

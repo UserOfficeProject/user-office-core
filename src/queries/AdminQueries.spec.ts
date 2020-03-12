@@ -1,12 +1,12 @@
-import "reflect-metadata";
-import AdminQueries from "./AdminQueries";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-import { adminDataSource } from "../datasources/mockups/AdminDataSource";
+import 'reflect-metadata';
+import { adminDataSource } from '../datasources/mockups/AdminDataSource';
+import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
 import {
   userDataSource,
-  dummyUser
-} from "../datasources/mockups/UserDataSource";
+  dummyUser,
+} from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import AdminQueries from './AdminQueries';
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
@@ -14,6 +14,6 @@ const userAuthorization = new UserAuthorization(
 );
 const adminQueries = new AdminQueries(new adminDataSource(), userAuthorization);
 
-test("A user can get page text", () => {
-  return expect(adminQueries.getPageText(1)).resolves.toBe("HELLO WORLD");
+test('A user can get page text', () => {
+  return expect(adminQueries.getPageText(1)).resolves.toBe('HELLO WORLD');
 });

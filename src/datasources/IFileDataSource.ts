@@ -1,4 +1,4 @@
-import { FileMetadata } from "../models/Blob";
+import { FileMetadata } from '../models/Blob';
 export interface IFileDataSource {
   prepare(fileId: string, output: string): Promise<string>;
   // Read

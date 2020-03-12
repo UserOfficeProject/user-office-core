@@ -1,14 +1,14 @@
-import "reflect-metadata";
-import { ProposalDataSource } from "../ProposalDataSource";
+import 'reflect-metadata';
+import { Proposal } from '../../models/Proposal';
 import {
   ProposalTemplate,
   DataType,
   ProposalAnswer,
   Questionary,
-  ProposalStatus
-} from "../../models/ProposalModel";
-import { Proposal } from "../../models/Proposal";
-import { create1Topic3FieldWithDependenciesQuestionary } from "../../tests/ProposalTestBed";
+  ProposalStatus,
+} from '../../models/ProposalModel';
+import { create1Topic3FieldWithDependenciesQuestionary } from '../../tests/ProposalTestBed';
+import { ProposalDataSource } from '../ProposalDataSource';
 
 export var dummyTemplate: ProposalTemplate;
 export var dummyQuestionary: Questionary;
@@ -22,41 +22,41 @@ export class proposalDataSource implements ProposalDataSource {
 
     dummyProposal = new Proposal(
       1,
-      "title",
-      "abstract",
+      'title',
+      'abstract',
       1, // main proposer
       ProposalStatus.DRAFT, // status
-      new Date("2019-07-17 08:25:12.23043+00"),
-      new Date("2019-07-17 08:25:12.23043+00"),
-      "GQX639",
+      new Date('2019-07-17 08:25:12.23043+00'),
+      new Date('2019-07-17 08:25:12.23043+00'),
+      'GQX639',
       1,
       1
     );
 
     dummyProposalSubmitted = new Proposal(
       2,
-      "submitted proposal",
-      "abstract",
+      'submitted proposal',
+      'abstract',
       1, // main proposer
       ProposalStatus.SUBMITTED, // status
-      new Date("2019-07-17 08:25:12.23043+00"),
-      new Date("2019-07-17 08:25:12.23043+00"),
-      "GQX639",
+      new Date('2019-07-17 08:25:12.23043+00'),
+      new Date('2019-07-17 08:25:12.23043+00'),
+      'GQX639',
       1,
       1
     );
 
     dummyAnswers = [
       {
-        proposal_question_id: "has_references",
+        proposal_question_id: 'has_references',
         data_type: DataType.BOOLEAN,
-        value: "true"
+        value: 'true',
       },
       {
-        proposal_question_id: "fasta_seq",
+        proposal_question_id: 'fasta_seq',
         data_type: DataType.TEXT_INPUT,
-        value: "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"
-      }
+        value: 'ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*',
+      },
     ];
   }
   async deleteProposal(id: number): Promise<Proposal> {
@@ -80,7 +80,7 @@ export class proposalDataSource implements ProposalDataSource {
     proposal_id: number,
     question_id: string
   ): Promise<string[]> {
-    return ["file_id_012345"];
+    return ['file_id_012345'];
   }
 
   async updateAnswer(
@@ -90,7 +90,7 @@ export class proposalDataSource implements ProposalDataSource {
   ): Promise<string> {
     return question_id;
   }
-  async checkActiveCall(): Promise<Boolean> {
+  async checkActiveCall(): Promise<boolean> {
     return true;
   }
 
@@ -98,7 +98,7 @@ export class proposalDataSource implements ProposalDataSource {
     if (id && id > 0) {
       return dummyProposal;
     }
-    throw new Error("Wrong ID");
+    throw new Error('Wrong ID');
   }
   async update(proposal: Proposal): Promise<Proposal> {
     if (proposal.id && proposal.id > 0) {
@@ -108,21 +108,21 @@ export class proposalDataSource implements ProposalDataSource {
         return dummyProposal;
       }
     }
-    throw new Error("Error");
+    throw new Error('Error');
   }
   async setProposalUsers(id: number, users: number[]): Promise<void> {}
   async acceptProposal(id: number): Promise<Proposal> {
     if (id && id > 0) {
       return dummyProposal;
     }
-    throw new Error("Wrong ID");
+    throw new Error('Wrong ID');
   }
 
   async submitProposal(id: number): Promise<Proposal> {
     if (id && id > 0) {
       return dummyProposal;
     }
-    throw new Error("Wrong ID");
+    throw new Error('Wrong ID');
   }
 
   async get(id: number) {
@@ -133,6 +133,7 @@ export class proposalDataSource implements ProposalDataSource {
         return dummyProposal;
       }
     }
+
     return null;
   }
 

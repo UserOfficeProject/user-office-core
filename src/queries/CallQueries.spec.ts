@@ -1,17 +1,15 @@
-import "reflect-metadata";
-import CallQueries from "./CallQueries";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-
+import 'reflect-metadata';
 import {
   callDataSource,
-  dummyCall
-} from "../datasources/mockups/CallDataSource";
-
+  dummyCall,
+} from '../datasources/mockups/CallDataSource';
+import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
 import {
   userDataSource,
-  dummyUser
-} from "../datasources/mockups/UserDataSource";
+  dummyUser,
+} from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import CallQueries from './CallQueries';
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
@@ -19,7 +17,7 @@ const userAuthorization = new UserAuthorization(
 );
 const callMutations = new CallQueries(new callDataSource(), userAuthorization);
 
-test("A user can get a call", () => {
+test('A user can get a call', () => {
   return expect(callMutations.get(dummyUser, 1)).resolves.toBe(dummyCall);
 });
 
@@ -27,9 +25,9 @@ test("A not logged in user can't get a call", () => {
   return expect(callMutations.get(null, 1)).resolves.toBe(null);
 });
 
-test("A user can get all calls", () => {
+test('A user can get all calls', () => {
   return expect(callMutations.getAll(dummyUser)).resolves.toStrictEqual([
-    dummyCall
+    dummyCall,
   ]);
 });
 

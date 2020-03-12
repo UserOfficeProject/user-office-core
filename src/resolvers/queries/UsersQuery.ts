@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import {
   Resolver,
   Query,
@@ -7,11 +7,12 @@ import {
   Int,
   Field,
   ObjectType,
-  ArgsType
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { BasicUserDetails } from "../types/BasicUserDetails";
-import { UserRole } from "../../models/User";
+  ArgsType,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { UserRole } from '../../models/User';
+import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @ObjectType()
 class UserQueryResult {
@@ -36,7 +37,7 @@ export class UsersArgs {
   @Field(() => UserRole, { nullable: true })
   userRole?: UserRole;
 
-  @Field(() => [Int], { nullable: "itemsAndList" })
+  @Field(() => [Int], { nullable: 'itemsAndList' })
   subtractUsers?: [number];
 }
 

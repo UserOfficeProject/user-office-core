@@ -1,5 +1,5 @@
-import { Call } from "../models/Call";
-import { CreateCallArgs } from "../resolvers/mutations/CreateCallMutation";
+import { Call } from '../models/Call';
+import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
 
 export interface CallDataSource {
   // Read

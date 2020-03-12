@@ -1,10 +1,11 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from 'type-graphql';
+
 import {
   DataType,
-  ProposalTemplateField as ProposalTemplateFieldOrigin
-} from "../../models/ProposalModel";
-import { FieldConfigType } from "./FieldConfig";
-import { FieldDependency } from "./FieldDependency";
+  ProposalTemplateField as ProposalTemplateFieldOrigin,
+} from '../../models/ProposalModel';
+import { FieldConfigType } from './FieldConfig';
+import { FieldDependency } from './FieldDependency';
 
 @ObjectType()
 export class ProposalTemplateField

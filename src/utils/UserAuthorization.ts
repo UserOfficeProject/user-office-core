@@ -1,7 +1,7 @@
-import { User } from "../models/User";
-import { Proposal } from "../models/Proposal";
-import { UserDataSource } from "../datasources/UserDataSource";
-import { ReviewDataSource } from "../datasources/ReviewDataSource";
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { UserDataSource } from '../datasources/UserDataSource';
+import { Proposal } from '../models/Proposal';
+import { User } from '../models/User';
 
 export class UserAuthorization {
   constructor(
@@ -15,7 +15,7 @@ export class UserAuthorization {
     }
 
     return this.userDataSource.getUserRoles(agent.id).then(roles => {
-      return roles.some(role => role.shortCode === "user_officer");
+      return roles.some(role => role.shortCode === 'user_officer');
     });
   }
 
@@ -26,6 +26,7 @@ export class UserAuthorization {
     if (agent.id !== id) {
       return false;
     }
+
     return true;
   }
 
@@ -36,6 +37,7 @@ export class UserAuthorization {
     if (agent.id === proposal.proposerId) {
       return true;
     }
+
     return this.userDataSource.getProposalUsers(proposal.id).then(users => {
       return users.some(user => user.id === agent.id);
     });
@@ -45,6 +47,7 @@ export class UserAuthorization {
     if (agent == null) {
       return false;
     }
+
     return this.reviewDataSource.getUserReviews(agent.id).then(reviews => {
       return reviews.some(review => review.proposalID === proposalID);
     });

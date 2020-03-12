@@ -1,20 +1,20 @@
-import ProposalMutations from "../mutations/ProposalMutations";
-import UserMutations from "../mutations/UserMutations";
-import CallMutations from "../mutations/CallMutations";
-import ProposalQueries from "../queries/ProposalQueries";
-import UserQueries from "../queries/UserQueries";
-import CallQueries from "../queries/CallQueries";
-import ReviewQueries from "../queries/ReviewQueries";
-import ReviewMutations from "../mutations/ReviewMutations";
-import { User } from "../models/User";
-import FileMutations from "../mutations/FileMutations";
-import FileQueries from "../queries/FileQueries";
-import AdminMutations from "../mutations/AdminMutations";
-import AdminQueries from "../queries/AdminQueries";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import TemplateMutations from "../mutations/TemplateMutations";
-import TemplateQueries from "../queries/TemplateQueries";
+import { User } from '../models/User';
+import AdminMutations from '../mutations/AdminMutations';
+import CallMutations from '../mutations/CallMutations';
+import FileMutations from '../mutations/FileMutations';
+import ProposalMutations from '../mutations/ProposalMutations';
+import ReviewMutations from '../mutations/ReviewMutations';
+import TemplateMutations from '../mutations/TemplateMutations';
+import UserMutations from '../mutations/UserMutations';
+import AdminQueries from '../queries/AdminQueries';
+import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
+import FileQueries from '../queries/FileQueries';
+import ProposalQueries from '../queries/ProposalQueries';
+import ReviewQueries from "../queries/ReviewQueries";
+import UserQueries from "../queries/UserQueries";
+import { UserAuthorization } from '../utils/UserAuthorization';
+import TemplateQueries from '../queries/TemplateQueries';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -24,7 +24,7 @@ interface ResolverContextQueries {
   file: FileQueries;
   admin: AdminQueries;
   template: TemplateQueries;
-  eventLogs: EventLogQueries
+  eventLogs: EventLogQueries;
 }
 
 interface ResolverContextMutations {

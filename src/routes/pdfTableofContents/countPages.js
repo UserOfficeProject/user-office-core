@@ -1,4 +1,4 @@
-const { verticalMax, verticalMargin, lineSpacing } = require("./config");
+const { verticalMax, verticalMargin, lineSpacing } = require('./config');
 
 module.exports = itemCount => {
   const verticalTextStart = verticalMax - verticalMargin;

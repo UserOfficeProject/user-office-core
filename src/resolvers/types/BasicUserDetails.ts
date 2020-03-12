@@ -1,6 +1,6 @@
-import { ObjectType, Field, Int } from "type-graphql";
+import { ObjectType, Field, Int } from 'type-graphql';
 
-import { BasicUserDetails as BasicUserDetailsOrigin } from "../../models/User";
+import { BasicUserDetails as BasicUserDetailsOrigin } from '../../models/User';
 
 @ObjectType()
 export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {

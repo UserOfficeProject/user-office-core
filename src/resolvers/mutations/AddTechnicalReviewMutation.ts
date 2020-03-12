@@ -5,13 +5,14 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { TechnicalReviewResponseWrap } from "../types/CommonWrappers";
-import { TechnicalReview } from "../types/TechnicalReview";
-import { wrapResponse } from "../wrapResponse";
-import { TechnicalReviewStatus } from "../../models/TechnicalReview";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { TechnicalReviewStatus } from '../../models/TechnicalReview';
+import { TechnicalReviewResponseWrap } from '../types/CommonWrappers';
+import { TechnicalReview } from '../types/TechnicalReview';
+import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 export class AddTechnicalReviewArgs {
   @Field(() => Int)

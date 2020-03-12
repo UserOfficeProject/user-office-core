@@ -1,6 +1,6 @@
-import database from './database';
-import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
 import { EventLog } from '../../models/EventLog';
+import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
+import database from './database';
 import { EventLogRecord } from './records';
 
 export default class PostgresEventLogsDataSource

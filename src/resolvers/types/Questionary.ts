@@ -1,7 +1,7 @@
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field } from 'type-graphql';
 
-import { Questionary as QuestionaryOrigin } from "../../models/ProposalModel";
-import { QuestionaryStep } from "./QuestionaryStep";
+import { Questionary as QuestionaryOrigin } from '../../models/ProposalModel';
+import { QuestionaryStep } from './QuestionaryStep';
 
 @ObjectType()
 export class Questionary implements Partial<QuestionaryOrigin> {

@@ -1,33 +1,33 @@
-import { BasicResolverContext } from "./context";
+import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
-import PostgresAdminDataSource from "./datasources/postgres/AdminDataSource";
-import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
-import PostgresFileDataSource from "./datasources/postgres/FileDataSource";
-import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSource";
-import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
+import PostgresAdminDataSource from './datasources/postgres/AdminDataSource';
+import PostgresCallDataSource from './datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from './datasources/postgres/EventLogsDataSource';
-import TemplateDataSource from "./datasources/postgres/TemplateDataSource";
-import PostgresUserDataSource from "./datasources/postgres/UserDataSource";
-import createEventHandlers from "./eventHandlers";
-import { ApplicationEvent } from "./events/applicationEvents";
-import { EventBus } from "./events/eventBus";
-import AdminMutations from "./mutations/AdminMutations";
-import CallMutations from "./mutations/CallMutations";
-import FileMutations from "./mutations/FileMutations";
-import ProposalMutations from "./mutations/ProposalMutations";
-import ReviewMutations from "./mutations/ReviewMutations";
-import TemplateMutations from "./mutations/TemplateMutations";
-import UserMutations from "./mutations/UserMutations";
-import AdminQueries from "./queries/AdminQueries";
-import CallQueries from "./queries/CallQueries";
-import FileQueries from "./queries/FileQueries";
-import ProposalQueries from "./queries/ProposalQueries";
-import ReviewQueries from "./queries/ReviewQueries";
-import TemplateQueries from "./queries/TemplateQueries";
-import UserQueries from "./queries/UserQueries";
+import PostgresFileDataSource from './datasources/postgres/FileDataSource';
+import PostgresProposalDataSource from './datasources/postgres/ProposalDataSource';
+import PostgresReviewDataSource from './datasources/postgres/ReviewDataSource';
+import TemplateDataSource from './datasources/postgres/TemplateDataSource';
+import PostgresUserDataSource from './datasources/postgres/UserDataSource';
+import createEventHandlers from './eventHandlers';
+import { ApplicationEvent } from './events/applicationEvents';
+import { EventBus } from './events/eventBus';
+import AdminMutations from './mutations/AdminMutations';
+import CallMutations from './mutations/CallMutations';
+import FileMutations from './mutations/FileMutations';
+import ProposalMutations from './mutations/ProposalMutations';
+import ReviewMutations from './mutations/ReviewMutations';
+import TemplateMutations from './mutations/TemplateMutations';
+import UserMutations from './mutations/UserMutations';
+import AdminQueries from './queries/AdminQueries';
+import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
-import { logger } from "./utils/Logger";
-import { UserAuthorization } from "./utils/UserAuthorization";
+import FileQueries from './queries/FileQueries';
+import ProposalQueries from './queries/ProposalQueries';
+import ReviewQueries from './queries/ReviewQueries';
+import TemplateQueries from './queries/TemplateQueries';
+import UserQueries from './queries/UserQueries';
+import { logger } from './utils/Logger';
+import { UserAuthorization } from './utils/UserAuthorization';
 
 // Site specific data sources and event handlers (only ESS atm)
 const userDataSource = new PostgresUserDataSource();
@@ -132,8 +132,8 @@ const context: BasicResolverContext = {
     call: callMutations,
     file: fileMutations,
     admin: adminMutations,
-    template: templateMutations
-  }
+    template: templateMutations,
+  },
 };
 
 export default context;

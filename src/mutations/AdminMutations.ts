@@ -1,19 +1,20 @@
-import { AdminDataSource } from "../datasources/AdminDataSource";
-import { User } from "../models/User";
-import { EventBus } from "../events/eventBus";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { Rejection, rejection } from "../rejection";
-import { Page } from "../models/Admin";
-import { logger } from "../utils/Logger";
+import { AdminDataSource } from '../datasources/AdminDataSource';
+import { ApplicationEvent } from '../events/applicationEvents';
+import { EventBus } from '../events/eventBus';
+import { Page } from '../models/Admin';
+import { User } from '../models/User';
+import { Rejection, rejection } from '../rejection';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class AdminMutations {
   async resetDB(): Promise<boolean | Rejection> {
-    if (process.env.NODE_ENV === "development") {
-      logger.logWarn("Resetting database", {});
+    if (process.env.NODE_ENV === 'development') {
+      logger.logWarn('Resetting database', {});
+
       return this.dataSource.resetDB();
     } else {
-      return rejection("NOT_ALLOWED");
+      return rejection('NOT_ALLOWED');
     }
   }
   constructor(
@@ -28,24 +29,27 @@ export default class AdminMutations {
     text: string
   ): Promise<Page | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
+      return rejection('NOT_AUTHORIZED');
     }
+
     return this.dataSource
       .setPageText(id, text)
       .then(page => {
         return page;
       })
       .catch(error => {
-        logger.logException("Could not set page text", error, {
+        logger.logException('Could not set page text', error, {
           agent,
-          id
+          id,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
   async addClientLog(error: string) {
-    logger.logError("Error received from client", { error });
+    logger.logError('Error received from client', { error });
+
     return true;
   }
 }

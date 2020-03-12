@@ -1,9 +1,8 @@
-import { CallDataSource } from "../CallDataSource";
-import { Call } from "../../models/Call";
-import { CallRecord } from "./records";
-
-import database from "./database";
-import { CreateCallArgs } from "../../resolvers/mutations/CreateCallMutation";
+import { Call } from '../../models/Call';
+import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
+import { CallDataSource } from '../CallDataSource';
+import database from './database';
+import { CallRecord } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
   private createCallObject(call: CallRecord) {
@@ -24,8 +23,8 @@ export default class PostgresCallDataSource implements CallDataSource {
   async get(id: number): Promise<Call | null> {
     return database
       .select()
-      .from("call")
-      .where("call_id", id)
+      .from('call')
+      .where('call_id', id)
       .first()
       .then((call: CallRecord | null) =>
         call ? this.createCallObject(call) : null
@@ -34,8 +33,8 @@ export default class PostgresCallDataSource implements CallDataSource {
 
   async getCalls(): Promise<Call[]> {
     return database
-      .select(["*"])
-      .from("call")
+      .select(['*'])
+      .from('call')
       .then((callDB: CallRecord[]) =>
         callDB.map(call => this.createCallObject(call))
       );
@@ -52,14 +51,15 @@ export default class PostgresCallDataSource implements CallDataSource {
         start_notify: args.startNotify,
         end_notify: args.endNotify,
         cycle_comment: args.cycleComment,
-        survey_comment: args.surveyComment
+        survey_comment: args.surveyComment,
       })
-      .into("call")
-      .returning(["*"])
+      .into('call')
+      .returning(['*'])
       .then((call: CallRecord[]) => {
         if (call.length !== 1) {
-          throw new Error("Could not create call");
+          throw new Error('Could not create call');
         }
+
         return this.createCallObject(call[0]);
       });
   }

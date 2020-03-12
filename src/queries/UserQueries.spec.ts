@@ -1,13 +1,13 @@
-import UserQueries from "./UserQueries";
+import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
 import {
   userDataSource,
   dummyUser,
   dummyUserOfficer,
   basicDummyUser,
-  basicDummyUserNotOnProposal
-} from "../datasources/mockups/UserDataSource";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
+  basicDummyUserNotOnProposal,
+} from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import UserQueries from './UserQueries';
 
 const userAuthorization = new UserAuthorization(
   new userDataSource(),
@@ -15,7 +15,7 @@ const userAuthorization = new UserAuthorization(
 );
 const userQueries = new UserQueries(new userDataSource(), userAuthorization);
 
-test("A user officer fetch can fetch any user account", () => {
+test('A user officer fetch can fetch any user account', () => {
   return expect(userQueries.get(dummyUserOfficer, dummyUser.id)).resolves.toBe(
     dummyUser
   );
@@ -27,32 +27,32 @@ test("A user is allowed to fetch it's own account ", () => {
   );
 });
 
-test("A user is not allowed to fetch other peoples account ", () => {
+test('A user is not allowed to fetch other peoples account ', () => {
   return expect(userQueries.get(dummyUser, dummyUserOfficer.id)).resolves.toBe(
     null
   );
 });
 
-test("A user officer is allowed to fetch all accounts", () => {
+test('A user officer is allowed to fetch all accounts', () => {
   return expect(
-    userQueries.getAll(dummyUserOfficer, "")
+    userQueries.getAll(dummyUserOfficer, '')
   ).resolves.toStrictEqual({
     totalCount: 2,
-    users: [basicDummyUser, basicDummyUserNotOnProposal]
+    users: [basicDummyUser, basicDummyUserNotOnProposal],
   });
 });
 
-test("A user is allowed to fetch all accounts", () => {
-  return expect(userQueries.getAll(dummyUser, "")).resolves.toStrictEqual({
+test('A user is allowed to fetch all accounts', () => {
+  return expect(userQueries.getAll(dummyUser, '')).resolves.toStrictEqual({
     totalCount: 2,
-    users: [basicDummyUser, basicDummyUserNotOnProposal]
+    users: [basicDummyUser, basicDummyUserNotOnProposal],
   });
 });
 
-test("A user that is not logged in is not allowed to fetch all accounts", () => {
-  return expect(userQueries.getAll(null, "")).resolves.toBe(null);
+test('A user that is not logged in is not allowed to fetch all accounts', () => {
+  return expect(userQueries.getAll(null, '')).resolves.toBe(null);
 });
 
-test("A user is not allowed to fetch roles", () => {
+test('A user is not allowed to fetch roles', () => {
   return expect(userQueries.getRoles(dummyUser)).resolves.toBe(null);
 });

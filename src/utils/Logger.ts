@@ -1,17 +1,17 @@
 class GrayLogLogger implements ILogger {
-  log = require("gelf-pro");
+  log = require('gelf-pro');
 
   constructor(server: string, port: number, private environment: string) {
     this.log.setConfig({
       fields: {
-        facility: "DMSC",
-        service: "UserOfficeBackend"
+        facility: 'DMSC',
+        service: 'UserOfficeBackend',
       },
-      adapterName: "udp",
+      adapterName: 'udp',
       adapterOptions: {
         host: server,
-        port: port
-      }
+        port: port,
+      },
     });
   }
 
@@ -21,7 +21,7 @@ class GrayLogLogger implements ILogger {
       title: message,
       environment: this.environment,
       stackTrace: new Error().stack,
-      context: JSON.stringify(context)
+      context: JSON.stringify(context),
     };
   }
 
@@ -81,14 +81,15 @@ class ConsoleLogger implements ILogger {
         message,
         (() => {
           const { name, message, stack } = exception;
+
           return {
             exception: { name, message, stack },
             level_str: LEVEL[LEVEL.ERROR],
-            ...context
+            ...context,
           };
         })()
       );
-      if (typeof exception === "string" || exception instanceof String) {
+      if (typeof exception === 'string' || exception instanceof String) {
         this.logError(message, { exception, ...context });
       } else {
         this.logError(message, context || {});
@@ -114,12 +115,12 @@ export class MutedLogger implements ILogger {
 }
 
 export enum LEVEL {
-  INFO = "INFO",
-  DEBUG = "DEBUG",
-  WARN = "WARN",
-  ERROR = "ERROR",
-  EXCEPTION = "EXCEPTION",
-  FATAL = "FATAL"
+  INFO = 'INFO',
+  DEBUG = 'DEBUG',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
+  EXCEPTION = 'EXCEPTION',
+  FATAL = 'FATAL',
 }
 
 export interface ILogger {
@@ -140,8 +141,8 @@ class LoggerFactory {
     if (this.logger) {
       return this.logger;
     }
-    const env = process.env.NODE_ENV || "unset";
-    if (env === "development") {
+    const env = process.env.NODE_ENV || 'unset';
+    if (env === 'development') {
       this.logger = new ConsoleLogger();
       /*this.logger = new GrayLogLogger(
         process.env.GRAYLOG_SERVER!,
@@ -150,7 +151,7 @@ class LoggerFactory {
       );*/
     } else {
       const server = process.env.GRAYLOG_SERVER;
-      const port = parseInt(process.env.GRAYLOG_PORT || "0");
+      const port = parseInt(process.env.GRAYLOG_PORT || '0');
       if (server && port) {
         this.logger = new GrayLogLogger(server, port, env);
       } else {

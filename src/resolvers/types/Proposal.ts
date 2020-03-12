@@ -5,18 +5,18 @@ import {
   Int,
   ObjectType,
   Resolver,
-  Root
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Proposal as ProposalOrigin } from "../../models/Proposal";
+  Root,
+} from 'type-graphql';
 
-import { isRejection } from "../../rejection";
-import { ProposalStatus } from "../../models/ProposalModel";
-import { ProposalEndStatus } from "../../models/ProposalModel";
-import { Questionary } from "./Questionary";
-import { Review } from "./Review";
-import { TechnicalReview } from "./TechnicalReview";
-import { BasicUserDetails } from "./BasicUserDetails";
+import { ResolverContext } from '../../context';
+import { Proposal as ProposalOrigin } from '../../models/Proposal';
+import { ProposalStatus } from '../../models/ProposalModel';
+import { ProposalEndStatus } from '../../models/ProposalModel';
+import { isRejection } from '../../rejection';
+import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
+import { Review } from './Review';
+import { TechnicalReview } from './TechnicalReview';
 
 @ObjectType()
 export class Proposal implements Partial<ProposalOrigin> {
@@ -61,6 +61,7 @@ export class ProposalResolver {
       context.user,
       proposal.id
     );
+
     return isRejection(users) ? [] : users;
   }
 
@@ -106,6 +107,7 @@ export class ProposalResolver {
       context.user,
       proposal.id
     );
+
     return isRejection(questionary) ? null : questionary;
   }
 }

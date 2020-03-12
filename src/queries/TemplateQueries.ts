@@ -1,8 +1,8 @@
-import { User } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalTemplate } from "../models/ProposalModel";
-import { ILogger } from "../utils/Logger";
-import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { ProposalTemplate } from '../models/ProposalModel';
+import { User } from '../models/User';
+import { ILogger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class TemplateQueries {
   constructor(

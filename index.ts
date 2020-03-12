@@ -1,8 +1,7 @@
 import cookieParser from 'cookie-parser';
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import graphqlHTTP, { RequestInfo } from 'express-graphql';
 import 'reflect-metadata';
-import jwt from 'express-jwt';
 import { buildSchema } from 'type-graphql';
 
 import baseContext from './src/buildContext';
@@ -11,6 +10,9 @@ import { registerEnums } from './src/resolvers/registerEnums';
 import files from './src/routes/files';
 import proposalDownload from './src/routes/pdf';
 import { logger } from './src/utils/Logger';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const jwt = require('express-jwt');
 
 interface Req extends Request {
   user?: any;
@@ -36,13 +38,16 @@ async function bootstrap() {
     }
   };
 
-  app.use(authMiddleware, (err: any, req: Request, res: Response) => {
-    if (err.code === 'invalid_token') {
-      return res.status(401).send('jwt expired');
-    }
+  app.use(
+    authMiddleware,
+    (err: any, req: Request, res: Response, next: NextFunction) => {
+      if (err.code === 'invalid_token') {
+        return res.status(401).send('jwt expired');
+      }
 
-    return res.sendStatus(400);
-  });
+      return res.sendStatus(400);
+    }
+  );
 
   registerEnums();
 
@@ -84,7 +89,7 @@ async function bootstrap() {
 
   app.listen(process.env.PORT || 4000);
 
-  app.use(function(err: any, req: Request, res: Response) {
+  app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
     logger.logException('Unhandled EXPRESS JS exception', err, { req, res });
     res.status(500).send('SERVER EXCEPTION');
   });

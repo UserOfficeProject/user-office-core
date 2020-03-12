@@ -5,14 +5,15 @@ import {
   Field,
   InputType,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { EvaluatorOperator } from "../../models/ConditionEvaluator";
-import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
-import { ProposalTemplateResponseWrap } from "../types/CommonWrappers";
-import { FieldCondition } from "../types/FieldCondition";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
+import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { FieldCondition } from '../types/FieldCondition';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateProposalTemplateFieldArgs {
@@ -64,6 +65,7 @@ export class UpdateProposalTemplateFieldMutation {
     @Ctx() context: ResolverContext
   ) {
     args.dependencies = this.unpackDependencies(args.dependencies);
+
     return wrapResponse(
       context.mutations.template.updateProposalTemplateField(
         context.user,
@@ -81,8 +83,8 @@ export class UpdateProposalTemplateFieldMutation {
         ...dependency,
         condition: {
           ...dependency.condition,
-          params: JSON.parse(dependency.condition.params).value
-        }
+          params: JSON.parse(dependency.condition.params).value,
+        },
       };
     });
   }

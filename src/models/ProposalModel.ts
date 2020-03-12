@@ -1,4 +1,3 @@
-import { EvaluatorOperator } from "./ConditionEvaluator";
 import {
   FieldConfigType,
   BooleanConfig,
@@ -6,9 +5,10 @@ import {
   EmbellishmentConfig,
   FileUploadConfig,
   SelectionFromOptionsConfig,
-  TextInputConfig
-} from "../resolvers/types/FieldConfig";
-import JSDict from "../utils/Dictionary";
+  TextInputConfig,
+} from '../resolvers/types/FieldConfig';
+import JSDict from '../utils/Dictionary';
+import { EvaluatorOperator } from './ConditionEvaluator';
 
 export class ProposalTemplateField {
   constructor(
@@ -53,13 +53,14 @@ export class QuestionaryField extends ProposalTemplateField {
   }
   static fromObject(obj: any) {
     const templateField = ProposalTemplateField.fromObject(obj);
+
     return new QuestionaryField(
       templateField,
       obj.value
         ? obj.value
         : templateField.data_type === DataType.BOOLEAN
         ? false
-        : ""
+        : ''
     );
   }
 }
@@ -77,12 +78,12 @@ export class Questionary {
 }
 
 export enum DataType {
-  BOOLEAN = "BOOLEAN",
-  DATE = "DATE",
-  EMBELLISHMENT = "EMBELLISHMENT",
-  FILE_UPLOAD = "FILE_UPLOAD",
-  SELECTION_FROM_OPTIONS = "SELECTION_FROM_OPTIONS",
-  TEXT_INPUT = "TEXT_INPUT"
+  BOOLEAN = 'BOOLEAN',
+  DATE = 'DATE',
+  EMBELLISHMENT = 'EMBELLISHMENT',
+  FILE_UPLOAD = 'FILE_UPLOAD',
+  SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
+  TEXT_INPUT = 'TEXT_INPUT',
 }
 
 export class Topic {
@@ -158,7 +159,7 @@ export class FieldDependency {
       obj.proposal_question_id,
       obj.proposal_question_dependency,
       obj.dependency_natural_key,
-      typeof obj.condition == "string"
+      typeof obj.condition == 'string'
         ? JSON.parse(obj.condition)
         : obj.condition
     );
@@ -176,14 +177,14 @@ export class FieldCondition {
 export enum ProposalStatus {
   BLANK = -1,
   DRAFT = 0,
-  SUBMITTED = 1
+  SUBMITTED = 1,
 }
 
 export enum ProposalEndStatus {
   UNSET = 0,
   ACCEPTED = 1,
   RESERVED = 2,
-  REJECTED = 3
+  REJECTED = 3,
 }
 
 export interface ProposalAnswer {
@@ -196,7 +197,7 @@ export interface DataTypeSpec {
   readonly: boolean;
 }
 
-const baseDefaultConfig = { required: false, small_label: "", tooltip: "" };
+const baseDefaultConfig = { required: false, small_label: '', tooltip: '' };
 const defaultConfigs = JSDict.Create<
   string,
   | BooleanConfig
@@ -206,28 +207,28 @@ const defaultConfigs = JSDict.Create<
   | SelectionFromOptionsConfig
   | TextInputConfig
 >();
-defaultConfigs.put("BooleanConfig", { ...baseDefaultConfig });
-defaultConfigs.put("DateConfig", { ...baseDefaultConfig });
-defaultConfigs.put("EmbellishmentConfig", {
-  plain: "",
-  html: "",
+defaultConfigs.put('BooleanConfig', { ...baseDefaultConfig });
+defaultConfigs.put('DateConfig', { ...baseDefaultConfig });
+defaultConfigs.put('EmbellishmentConfig', {
+  plain: '',
+  html: '',
   omitFromPdf: false,
-  ...baseDefaultConfig
+  ...baseDefaultConfig,
 });
-defaultConfigs.put("FileUploadConfig", {
+defaultConfigs.put('FileUploadConfig', {
   max_files: 1,
   file_type: [],
-  ...baseDefaultConfig
+  ...baseDefaultConfig,
 });
-defaultConfigs.put("SelectionFromOptionsConfig", {
+defaultConfigs.put('SelectionFromOptionsConfig', {
   options: [],
-  variant: "radio",
-  ...baseDefaultConfig
+  variant: 'radio',
+  ...baseDefaultConfig,
 });
-defaultConfigs.put("TextInputConfig", {
+defaultConfigs.put('TextInputConfig', {
   multiline: false,
-  placeholder: "",
-  ...baseDefaultConfig
+  placeholder: '',
+  ...baseDefaultConfig,
 });
 
 const f = JSDict.Create<string, () => typeof FieldConfigType>();
@@ -243,12 +244,14 @@ export function createConfig<T extends typeof FieldConfigType>(
   init: Partial<T> | string = {}
 ): T {
   const defaults = defaultConfigs.get(config.constructor.name);
-  const initValues = typeof init === "string" ? JSON.parse(init) : init;
+  const initValues = typeof init === 'string' ? JSON.parse(init) : init;
   Object.assign(config, { ...defaults, ...initValues });
+
   return config;
 }
 
 export function createConfigByType(dataType: DataType, init: object | string) {
   const config = f.get(dataType)!;
+
   return createConfig(config(), init);
 }

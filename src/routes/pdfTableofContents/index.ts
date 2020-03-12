@@ -1,11 +1,12 @@
-const hummus = require("hummus");
-const writeOutline = require("./writeOutline");
+const hummus = require('hummus');
+
 //const addTOCPages = require("./src/addTOCPages");
-const countPages = require("./countPages");
-const countOutline = require("./countOutline");
-const getTOCText = require("./getTOCText");
-const translatePageNumbers = require("./translatePageNumbers");
-const writeLinks = require("./writeLinks");
+const countOutline = require('./countOutline');
+const countPages = require('./countPages');
+const getTOCText = require('./getTOCText');
+const translatePageNumbers = require('./translatePageNumbers');
+const writeLinks = require('./writeLinks');
+const writeOutline = require('./writeOutline');
 
 export function createToC(
   inFile: string,
@@ -45,13 +46,13 @@ export function createToC(
   }
 
   // before writer closes, add outline to PDF
-  events.on("OnCatalogWrite", (e: any) => {
-    let d = e.catalogDictionaryContext;
+  events.on('OnCatalogWrite', (e: any) => {
+    const d = e.catalogDictionaryContext;
     if (outline !== null) {
-      d.writeKey("Outlines")
+      d.writeKey('Outlines')
         .writeObjectReferenceValue(outline)
-        .writeKey("PageMode")
-        .writeNameValue("UseOutlines");
+        .writeKey('PageMode')
+        .writeNameValue('UseOutlines');
     }
   });
 

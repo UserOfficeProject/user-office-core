@@ -5,11 +5,12 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { TopicResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { TopicResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateTopicArgs {

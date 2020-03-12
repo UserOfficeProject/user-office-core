@@ -5,12 +5,13 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { DataType } from "../../models/ProposalModel";
-import { TemplateFieldResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { DataType } from '../../models/ProposalModel';
+import { TemplateFieldResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateTemplateFieldArgs {

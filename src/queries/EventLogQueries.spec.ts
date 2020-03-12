@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import {
   eventLogsDataSource,
   dummyEventLogUserUpdated,
@@ -12,6 +11,7 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import EventLogQueries from './EventLogQueries';
 
 const dummyEventLogDataSource = new eventLogsDataSource();

@@ -3,6 +3,7 @@ import { to } from 'await-to-js';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
+import { Event } from '../events/event.enum';
 import { EventBus } from '../events/eventBus';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -14,7 +15,6 @@ import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutatio
 import { ILogger } from '../utils/Logger';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { Event } from '../events/event.enum';
 
 export default class ProposalMutations {
   constructor(

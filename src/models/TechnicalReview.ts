@@ -11,5 +11,5 @@ export class TechnicalReview {
 export enum TechnicalReviewStatus {
   FEASIBLE = 0,
   PARTIALLY_FEASIBLE = 1,
-  UNFEASIBLE = 2
+  UNFEASIBLE = 2,
 }
