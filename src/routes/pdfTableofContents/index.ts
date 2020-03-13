@@ -1,12 +1,13 @@
+import countOutline from './countOutline';
+import getTOCText from './getTOCText';
+import translatePageNumbers from './translatePageNumbers';
+import writeOutline from './writeOutline';
+
+/* eslint-disable @typescript-eslint/no-var-requires */
 const hummus = require('hummus');
 
-//const addTOCPages = require("./src/addTOCPages");
-const countOutline = require('./countOutline');
-const countPages = require('./countPages');
-const getTOCText = require('./getTOCText');
-const translatePageNumbers = require('./translatePageNumbers');
 const writeLinks = require('./writeLinks');
-const writeOutline = require('./writeOutline');
+/* eslint-enable @typescript-eslint/no-var-requires */
 
 export function createToC(
   inFile: string,

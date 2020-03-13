@@ -20,7 +20,7 @@ import {
   FileUploadConfig,
   SelectionFromOptionsConfig,
 } from '../resolvers/types/FieldConfig';
-import { ILogger, logger } from '../utils/Logger';
+import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class TemplateMutations {
@@ -28,7 +28,7 @@ export default class TemplateMutations {
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
   async createTopic(

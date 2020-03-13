@@ -1,14 +1,15 @@
+/* eslint-disable prettier/prettier */
 import 'reflect-metadata';
 
 import {
   dummyProposalSubmitted,
   dummyProposal,
-  proposalDataSource,
+  ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
-import { templateDataSource } from '../datasources/mockups/TemplateDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
@@ -24,11 +25,11 @@ import ProposalMutations from './ProposalMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
-const dummyProposalDataSource = new proposalDataSource();
-const dummyTemplateDataSource = new templateDataSource();
+const dummyProposalDataSource = new ProposalDataSourceMock();
+const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
@@ -42,11 +43,30 @@ beforeEach(() => {
   dummyProposalDataSource.init();
 });
 
-test("A user on the proposal can update it's title if it is in edit mode", () => {
+// TODO: See if we can use camelcase here.
+/* eslint-disable @typescript-eslint/camelcase */
+function tryUpdateProposal(user: User, proposalId: number) {
+  return proposalMutations.update(user, {
+    id: proposalId,
+    title: 'Cras nulla nibh, dictum nec rhoncus eget, lobortis vel augue.',
+    abstract:
+      'Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.',
+    answers: [
+      {
+        proposal_question_id: 'fasta_seq',
+        data_type: DataType.TEXT_INPUT,
+        value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}',
+      },
+    ],
+  });
+}
+/* eslint-enable @typescript-eslint/camelcase */
+
+test('A user on the proposal can update it\'s title if it is in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
-test("A user on the proposal can't update it's title if it is not in edit mode", () => {
+test('A user on the proposal can\'t update it\'s title if it is not in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 2)).resolves.toHaveProperty(
     'reason',
     'NOT_ALLOWED_PROPOSAL_SUBMITTED'
@@ -88,22 +108,6 @@ test('A user not on a proposal can not update it', () => {
     tryUpdateProposal(dummyUserNotOnProposal, 1)
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
-
-function tryUpdateProposal(user: User, proposalId: number) {
-  return proposalMutations.update(user, {
-    id: proposalId,
-    title: 'Cras nulla nibh, dictum nec rhoncus eget, lobortis vel augue.',
-    abstract:
-      'Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.',
-    answers: [
-      {
-        proposal_question_id: 'fasta_seq',
-        data_type: DataType.TEXT_INPUT,
-        value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}',
-      },
-    ],
-  });
-}
 
 //Submit
 

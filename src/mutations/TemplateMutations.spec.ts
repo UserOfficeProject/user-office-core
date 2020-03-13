@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
-import { templateDataSource } from '../datasources/mockups/TemplateDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficer,
   dummyUser,
-  userDataSource,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
@@ -23,10 +23,10 @@ import TemplateMutations from './TemplateMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
-const dummyTemplateDataSource = new templateDataSource();
+const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const templateMutations = new TemplateMutations(
   dummyTemplateDataSource,
@@ -116,13 +116,13 @@ test('User officer can create field', async () => {
 });
 
 test('User can not delete field', async () => {
-  expect(
+  await expect(
     templateMutations.deleteTemplateField(dummyUser, 'field_id')
   ).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
 test('User officer can delete field', async () => {
-  expect(
+  await expect(
     templateMutations.deleteTemplateField(dummyUserOfficer, 'field_id')
   ).resolves.toBeInstanceOf(ProposalTemplate);
 });
@@ -144,7 +144,7 @@ test('Officer can delete a topic', async () => {
   expect(topic instanceof Topic).toBe(true);
 });
 
-test("Dummy user can't delete a topic", async () => {
+test('Dummy user can not delete a topic', async () => {
   const topic = await templateMutations.deleteTopic(dummyUser, 1);
   expect(topic instanceof Topic).toBe(false);
 });

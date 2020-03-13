@@ -1,3 +1,6 @@
+// TODO: Check if we can go only with camelcase.
+// For now it is fine because of database fields.
+/* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../../models/Proposal';
 import {
   ProposalTemplate,
@@ -15,14 +18,14 @@ import {
 } from '../../tests/ProposalTestBed';
 import { TemplateDataSource } from '../TemplateDataSource';
 
-export var dummyTemplate: ProposalTemplate;
-export var dummyQuestionary: Questionary;
-export var dummyProposal: Proposal;
-export var dummyProposalSubmitted: Proposal;
-export var dummyAnswers: ProposalAnswer[];
+export let dummyTemplate: ProposalTemplate;
+export let dummyQuestionary: Questionary;
+export let dummyProposal: Proposal;
+export let dummyProposalSubmitted: Proposal;
+export let dummyAnswers: ProposalAnswer[];
 
-export class templateDataSource implements TemplateDataSource {
-  async isNaturalKeyPresent(natural_key: string): Promise<boolean> {
+export class TemplateDataSourceMock implements TemplateDataSource {
+  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
     return true;
   }
   public init() {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/camelcase */
+import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
 import { Role } from '../../models/Role';
@@ -7,8 +9,6 @@ import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUse
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import { UserRecord, createUserObject, createBasicUserObject } from './records';
-
-const BluePromise = require('bluebird');
 
 export default class PostgresUserDataSource implements UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {

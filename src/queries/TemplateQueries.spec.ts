@@ -1,20 +1,21 @@
-import { dummyUser } from './../datasources/mockups/UserDataSource';
 import 'reflect-metadata';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
-import { templateDataSource } from '../datasources/mockups/TemplateDataSource';
+
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUserOfficer,
+  dummyUser,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalTemplate } from '../models/ProposalModel';
 import TemplateQueries from '../queries/TemplateQueries';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
-const dummyTemplateDataSource = new templateDataSource();
+const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const templateQueries = new TemplateQueries(
   dummyTemplateDataSource,
@@ -42,7 +43,7 @@ test('Proposal template should have fields', async () => {
     dummyUserOfficer
   )) as ProposalTemplate;
 
-  return expect(template.steps[0].fields!.length).toBeGreaterThan(0);
+  return expect(template.steps[0].fields.length).toBeGreaterThan(0);
 });
 
 test('User officer should be able to get if natural key exists', async () => {

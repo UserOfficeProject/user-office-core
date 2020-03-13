@@ -6,15 +6,27 @@ export enum EvaluatorOperator {
   NEQ = 'NEQ',
 }
 
+export class EqualityValidator implements FieldConditionEvaluator {
+  isSatisfied(field: QuestionaryField, params: object): boolean {
+    return field.value === params;
+  }
+}
+
+export class InequalityValidator implements FieldConditionEvaluator {
+  isSatisfied(field: QuestionaryField, params: object): boolean {
+    return field.value !== params;
+  }
+}
+
 export class ConditionEvaluator {
-  private validatorMap!: JSDict<EvaluatorOperator, IFieldConditionEvaluator>;
+  private validatorMap!: JSDict<EvaluatorOperator, FieldConditionEvaluator>;
 
   private getMappings() {
     if (!this.validatorMap) {
       // lazy initialization
       this.validatorMap = JSDict.Create<
         EvaluatorOperator,
-        IFieldConditionEvaluator
+        FieldConditionEvaluator
       >();
       this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
       this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
@@ -23,23 +35,11 @@ export class ConditionEvaluator {
     return this.validatorMap;
   }
 
-  getConditionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
-    return this.getMappings().get(id)!;
+  getConditionEvaluator(id: EvaluatorOperator): FieldConditionEvaluator {
+    return this.getMappings().get(id) as FieldConditionEvaluator;
   }
 }
 
-export interface IFieldConditionEvaluator {
+export interface FieldConditionEvaluator {
   isSatisfied(field: QuestionaryField, params: object): boolean;
-}
-
-export class EqualityValidator implements IFieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: object): boolean {
-    return field.value === params;
-  }
-}
-
-export class InequalityValidator implements IFieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: object): boolean {
-    return field.value !== params;
-  }
 }

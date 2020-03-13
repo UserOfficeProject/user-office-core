@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../models/Proposal';
 import { Questionary } from '../models/ProposalModel';
 

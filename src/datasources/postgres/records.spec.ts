@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
 import { createConfig } from '../../models/ProposalModel';
 import {

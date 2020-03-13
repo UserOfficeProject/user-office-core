@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/camelcase */
+import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
 import { Proposal } from '../../models/Proposal';
@@ -18,8 +20,6 @@ import {
   createTopicObject,
   createQuestionaryFieldObject,
 } from './records';
-
-const BluePromise = require('bluebird');
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
   public async checkActiveCall(): Promise<boolean> {
@@ -349,7 +349,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
 
     fields.forEach(field => {
-      // @ts-ignore we are nullchecking inside the filter callbackfn
       field.dependencies = dependencies.filter(dep => {
         return dep !== null && dep.question_id === field.proposal_question_id;
       });

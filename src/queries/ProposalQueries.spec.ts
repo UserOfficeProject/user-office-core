@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import {
   dummyProposal,
-  proposalDataSource,
+  ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
@@ -14,10 +14,10 @@ import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 
-const dummyProposalDataSource = new proposalDataSource();
+const dummyProposalDataSource = new ProposalDataSourceMock();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,

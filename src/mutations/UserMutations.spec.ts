@@ -1,10 +1,12 @@
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import jsonwebtoken from 'jsonwebtoken';
+
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyPlaceHolderUser,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
-  userDataSource,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
@@ -13,7 +15,7 @@ import { isRejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import UserMutations from './UserMutations';
 
-const jsonwebtoken = require('jsonwebtoken');
+const secret = process.env.secret as string;
 
 const goodToken = jsonwebtoken.sign(
   {
@@ -21,7 +23,7 @@ const goodToken = jsonwebtoken.sign(
     type: 'passwordReset',
     updated: dummyUser.updated,
   },
-  process.env.secret,
+  secret,
   { expiresIn: '24h' }
 );
 
@@ -30,17 +32,17 @@ const badToken = jsonwebtoken.sign(
     id: dummyUser.id,
     updated: dummyUser.updated,
   },
-  process.env.secret,
+  secret,
   { expiresIn: '-24h' }
 );
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const userMutations = new UserMutations(
-  new userDataSource(),
+  new UserDataSourceMock(),
   userAuthorization,
   dummyEventBus
 );
@@ -123,7 +125,7 @@ test('A user cannot invite a reviewer by email', () => {
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
 
-test("A user can update it's own name", () => {
+test('A user can update its own name', () => {
   return expect(
     userMutations.update(dummyUser, {
       id: 2,
@@ -163,7 +165,7 @@ test('A userofficer can update another users name', () => {
   ).resolves.toBe(dummyUser);
 });
 
-test("A user cannot update it's roles", () => {
+test('A user cannot update its roles', () => {
   return expect(
     userMutations.update(dummyUser, {
       id: 2,
@@ -216,31 +218,31 @@ test('A user should be able to update a token if valid', () => {
   ).resolves.toBe('string');
 });
 
-test("A user can reset it's password by providing a valid email", () => {
+test('A user can reset its password by providing a valid email', () => {
   return expect(
     userMutations.resetPasswordEmail(dummyUser.email)
   ).resolves.toHaveProperty('user');
 });
 
-test("A user get's a error if providing a email not attached to a account", () => {
+test('A user gets an error if providing a email not attached to a account', () => {
   return expect(
     userMutations.resetPasswordEmail('dummyemail@ess.se')
   ).resolves.toHaveProperty('reason', 'COULD_NOT_FIND_USER_BY_EMAIL');
 });
 
-test("A user can update it's password if it has a valid token", () => {
+test('A user can update its password if it has a valid token', () => {
   return expect(
     userMutations.resetPassword(goodToken, 'Test1234!')
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
-test("A user can not update it's password if it has a bad token", () => {
+test('A user can not update its password if it has a bad token', () => {
   return expect(
     userMutations.resetPassword(badToken, 'Test1234!')
   ).resolves.toHaveProperty('reason');
 });
 
-test("A user can update it's password ", () => {
+test('A user can update its password ', () => {
   return expect(
     userMutations.updatePassword(dummyUser, dummyUser.id, 'Test1234!')
   ).resolves.toBeInstanceOf(BasicUserDetails);

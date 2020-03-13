@@ -11,10 +11,10 @@ import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
 import ProposalQueries from '../queries/ProposalQueries';
-import ReviewQueries from "../queries/ReviewQueries";
-import UserQueries from "../queries/UserQueries";
-import { UserAuthorization } from '../utils/UserAuthorization';
+import ReviewQueries from '../queries/ReviewQueries';
 import TemplateQueries from '../queries/TemplateQueries';
+import UserQueries from '../queries/UserQueries';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;

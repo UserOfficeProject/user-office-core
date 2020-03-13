@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {
   FieldConfigType,
   BooleanConfig,
@@ -9,6 +10,53 @@ import {
 } from '../resolvers/types/FieldConfig';
 import JSDict from '../utils/Dictionary';
 import { EvaluatorOperator } from './ConditionEvaluator';
+
+export class FieldDependency {
+  constructor(
+    public question_id: string,
+    public dependency_id: string,
+    public dependency_natural_key: string,
+    public condition: FieldCondition
+  ) {}
+
+  static fromObject(obj: any) {
+    return new FieldDependency(
+      obj.proposal_question_id,
+      obj.proposal_question_dependency,
+      obj.dependency_natural_key,
+      typeof obj.condition == 'string'
+        ? JSON.parse(obj.condition)
+        : obj.condition
+    );
+  }
+}
+
+export enum DataType {
+  BOOLEAN = 'BOOLEAN',
+  DATE = 'DATE',
+  EMBELLISHMENT = 'EMBELLISHMENT',
+  FILE_UPLOAD = 'FILE_UPLOAD',
+  SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
+  TEXT_INPUT = 'TEXT_INPUT',
+}
+
+export class Topic {
+  constructor(
+    public topic_id: number,
+    public topic_title: string,
+    public sort_order: number,
+    public is_enabled: boolean
+  ) {}
+
+  public static fromObject(obj: any) {
+    return new Topic(
+      obj.topic_id,
+      obj.topic_title,
+      obj.sort_order,
+      obj.is_enabled
+    );
+  }
+}
 
 export class ProposalTemplateField {
   constructor(
@@ -65,68 +113,6 @@ export class QuestionaryField extends ProposalTemplateField {
   }
 }
 
-export class Questionary {
-  constructor(public steps: QuestionaryStep[]) {}
-
-  static fromObject(obj: any): Questionary {
-    return new Questionary(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
-        : []
-    );
-  }
-}
-
-export enum DataType {
-  BOOLEAN = 'BOOLEAN',
-  DATE = 'DATE',
-  EMBELLISHMENT = 'EMBELLISHMENT',
-  FILE_UPLOAD = 'FILE_UPLOAD',
-  SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
-  TEXT_INPUT = 'TEXT_INPUT',
-}
-
-export class Topic {
-  constructor(
-    public topic_id: number,
-    public topic_title: string,
-    public sort_order: number,
-    public is_enabled: boolean
-  ) {}
-
-  public static fromObject(obj: any) {
-    return new Topic(
-      obj.topic_id,
-      obj.topic_title,
-      obj.sort_order,
-      obj.is_enabled
-    );
-  }
-}
-
-export class ProposalTemplate {
-  constructor(public steps: TemplateStep[] = []) {}
-
-  static fromObject(obj: any) {
-    return new ProposalTemplate(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
-        : []
-    );
-  }
-}
-
-export class TemplateStep {
-  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
-
-  public static fromObject(obj: any) {
-    return new TemplateStep(
-      Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
-    );
-  }
-}
-
 export class QuestionaryStep {
   constructor(
     public topic: Topic,
@@ -146,22 +132,37 @@ export class QuestionaryStep {
   }
 }
 
-export class FieldDependency {
-  constructor(
-    public question_id: string,
-    public dependency_id: string,
-    public dependency_natural_key: string,
-    public condition: FieldCondition
-  ) {}
+export class Questionary {
+  constructor(public steps: QuestionaryStep[]) {}
+
+  static fromObject(obj: any): Questionary {
+    return new Questionary(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
+        : []
+    );
+  }
+}
+
+export class TemplateStep {
+  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
+
+  public static fromObject(obj: any) {
+    return new TemplateStep(
+      Topic.fromObject(obj.topic),
+      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
+    );
+  }
+}
+
+export class ProposalTemplate {
+  constructor(public steps: TemplateStep[] = []) {}
 
   static fromObject(obj: any) {
-    return new FieldDependency(
-      obj.proposal_question_id,
-      obj.proposal_question_dependency,
-      obj.dependency_natural_key,
-      typeof obj.condition == 'string'
-        ? JSON.parse(obj.condition)
-        : obj.condition
+    return new ProposalTemplate(
+      obj.steps
+        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
+        : []
     );
   }
 }

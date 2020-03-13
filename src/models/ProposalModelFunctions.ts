@@ -69,6 +69,7 @@ export function isDependencySatisfied(
   if (!field) {
     return true;
   }
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const isParentSattisfied = areDependenciesSatisfied(
     collection,
     dependency.dependency_id
@@ -89,7 +90,7 @@ export function areDependenciesSatisfied(
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
+  const isAtLeastOneDissasisfied = field.dependencies?.some(dep => {
     const result = isDependencySatisfied(questionary, dep) === false;
 
     return result;
@@ -98,21 +99,7 @@ export function areDependenciesSatisfied(
   return isAtLeastOneDissasisfied === false;
 }
 
-export function isMatchingConstraints(
-  value: any,
-  field: ProposalTemplateField
-): boolean {
-  const val = JSON.parse(value).value;
-  const validator = validatorMap.get(field.data_type) || new BaseValidator();
-
-  return validator.validate(val, field);
-}
-
-interface IConstraintValidator {
-  validate(value: any, field: ProposalTemplateField): boolean;
-}
-
-class BaseValidator implements IConstraintValidator {
+class BaseValidator implements ConstraintValidator {
   constructor(private dataType?: DataType | undefined) {}
 
   validate(value: any, field: QuestionaryField) {
@@ -165,9 +152,23 @@ class SelectFromOptionsInputValidator extends BaseValidator {
   }
 }
 
-const validatorMap = JSDict.Create<DataType, IConstraintValidator>();
+const validatorMap = JSDict.Create<DataType, ConstraintValidator>();
 validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
 validatorMap.put(
   DataType.SELECTION_FROM_OPTIONS,
   new SelectFromOptionsInputValidator()
 );
+
+export function isMatchingConstraints(
+  value: any,
+  field: ProposalTemplateField
+): boolean {
+  const val = JSON.parse(value).value;
+  const validator = validatorMap.get(field.data_type) || new BaseValidator();
+
+  return validator.validate(val, field);
+}
+
+interface ConstraintValidator {
+  validate(value: any, field: ProposalTemplateField): boolean;
+}

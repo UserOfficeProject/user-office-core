@@ -1,10 +1,10 @@
 import JSDict from './Dictionary';
 
-let globalDictionary: JSDict<number, User>;
+class User {
+  constructor(public id: number, public name: string) {}
+}
 
-beforeEach(() => {
-  createDictionary();
-});
+let globalDictionary: JSDict<number, User>;
 
 function createDictionary() {
   globalDictionary = JSDict.Create();
@@ -13,6 +13,10 @@ function createDictionary() {
   globalDictionary.put(3, new User(3, 'Alexander'));
 }
 
+beforeEach(() => {
+  createDictionary();
+});
+
 test('Can add new item', () => {
   globalDictionary.put(4, new User(4, 'Maria'));
 
@@ -20,9 +24,5 @@ test('Can add new item', () => {
 });
 
 test('Can get item', () => {
-  return expect(globalDictionary.get(1)!.name).toBe('Rafael');
+  return expect(globalDictionary.get(1)?.name).toBe('Rafael');
 });
-
-class User {
-  constructor(public id: number, public name: string) {}
-}

@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import * as bcrypt from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
+// TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
+import { CoreOptions, UriOptions } from 'request';
+import rp from 'request-promise';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { User, BasicUserDetails } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
-const jsonwebtoken = require('jsonwebtoken');
-const rp = require('request-promise');
 
 export default class UserQueries {
   constructor(
@@ -51,9 +53,9 @@ export default class UserQueries {
   }
 
   async getOrcIDAccessToken(authorizationCode: string) {
-    const options = {
+    const options: CoreOptions & UriOptions = {
       method: 'POST',
-      uri: process.env.ORCID_TOKEN_URL,
+      uri: process.env.ORCID_TOKEN_URL as string,
       qs: {
         client_id: process.env.ORCID_CLIENT_ID,
         client_secret: process.env.ORCID_CLIENT_SECRET,
@@ -97,7 +99,8 @@ export default class UserQueries {
     const user = await this.dataSource.getByOrcID(orcData.orcid);
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
-      const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+      const secret = process.env.secret as string;
+      const token = jsonwebtoken.sign({ user, roles }, secret, {
         expiresIn: process.env.tokenLife,
       });
 

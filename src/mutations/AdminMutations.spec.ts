@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { adminDataSource } from '../datasources/mockups/AdminDataSource';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   dummyUserOfficer,
-  userDataSource,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
@@ -13,11 +13,11 @@ import AdminMutations from './AdminMutations';
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const adminMutations = new AdminMutations(
-  new adminDataSource(),
+  new AdminDataSourceMock(),
   userAuthorization,
   dummyEventBus
 );

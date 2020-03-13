@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import {
-  callDataSource,
+  CallDataSourceMock,
   dummyCall,
 } from '../datasources/mockups/CallDataSource';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
@@ -16,11 +16,11 @@ import CallMutations from './CallMutations';
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const callMutations = new CallMutations(
-  new callDataSource(),
+  new CallDataSourceMock(),
   userAuthorization,
   dummyEventBus
 );
@@ -57,7 +57,7 @@ test('A not logged in user can not create a call', () => {
   ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
-test('A not logged in user can not create a call', () => {
+test('A logged in user officer can create a call', () => {
   return expect(
     callMutations.create(dummyUserOfficer, {
       shortCode: '2019-02-19',

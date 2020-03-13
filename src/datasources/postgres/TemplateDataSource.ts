@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
 
 import {
   ProposalTemplate,
   ProposalTemplateField,
-  FieldDependency,
   Topic,
   DataType,
   TemplateStep,

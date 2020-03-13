@@ -15,7 +15,7 @@ export const dummyCall = new Call(
   ''
 );
 
-export class callDataSource implements CallDataSource {
+export class CallDataSourceMock implements CallDataSource {
   async get(id: number): Promise<Call | null> {
     return dummyCall;
   }

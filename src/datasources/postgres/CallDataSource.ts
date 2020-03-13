@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Call } from '../../models/Call';
 import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
 import { CallDataSource } from '../CallDataSource';

@@ -1,10 +1,11 @@
-const {
+import {
   verticalMax,
   verticalMargin,
   lineSpacing,
   leftMarginEnd,
-} = require('./config');
-const createLink = require('./createLink');
+} from './config';
+import createLink from './createLink';
+
 const annotationArrayKey = 'Annots';
 
 const isFirstLineOnSubsequentPage = (pageSize, pageIndex, idx) =>

@@ -1,3 +1,6 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/camelcase */
+// @ts-nocheck
 import fs from 'fs';
 
 import to from 'await-to-js';
@@ -6,11 +9,11 @@ import { LargeObjectManager } from 'pg-large-object';
 import { WriteStream, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
-import { IFileDataSource } from '../IFileDataSource';
+import { FileDataSource } from '../IFileDataSource';
 import database from './database';
 import { FileRecord, createFileMetadata } from './records';
 
-export default class PostgresFileDataSource implements IFileDataSource {
+export default class PostgresFileDataSource implements FileDataSource {
   public async prepare(fileId: string, output: string): Promise<string> {
     const result = await database('files')
       .select('oid')
@@ -45,12 +48,10 @@ export default class PostgresFileDataSource implements IFileDataSource {
     sizeInBytes: number,
     path: string
   ): Promise<FileMetadata> {
-    let err, oid, resultSet: any;
-
-    oid = await this.storeBlob(path);
+    const oid = await this.storeBlob(path);
 
     fs.unlinkSync(path);
-    resultSet = await database
+    const resultSet = await database
       .insert({
         file_name: fileName,
         mime_type: mimeType,
@@ -82,24 +83,23 @@ export default class PostgresFileDataSource implements IFileDataSource {
     return new Promise<number>(async (resolve, reject) => {
       let err: any, oid: number, stream: WriteStream;
 
-      [err] = await to(connection!.query('BEGIN')); // start the transaction
+      [err] = await to(connection.query('BEGIN')); // start the transaction
       if (err) {
         return reject(`Could not begin transaction \n${err}`);
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
-      // @ts-ignore
       [err, [oid, stream]] = await to(
         blobManager.createAndWritableStreamAsync()
       );
       if (err) {
-        connection!.emit('error', err);
+        connection.emit('error', err);
 
         return reject(`Could not create writeable stream \n${err}`);
       }
 
       stream.on('finish', () => {
-        connection!.query('COMMIT', () => resolve(oid));
+        connection.query('COMMIT', () => resolve(oid));
       });
 
       const fileStream = fs.createReadStream(filePath);
@@ -136,7 +136,6 @@ export default class PostgresFileDataSource implements IFileDataSource {
       }
 
       const blobManager = new LargeObjectManager({ pg: connection });
-      // @ts-ignore
       [err, [size, stream]] = await to(
         blobManager.openAndReadableStreamAsync(oid)
       );
@@ -150,8 +149,7 @@ export default class PostgresFileDataSource implements IFileDataSource {
       console.log('Streaming a large object with a total size of', size);
 
       stream.on('end', function() {
-        // @ts-ignore Already checked
-        connection.query('COMMIT', () => resolve());
+        connection?.query('COMMIT', () => resolve());
         database.client.releaseConnection(connection);
       });
 

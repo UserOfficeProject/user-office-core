@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import {
-  reviewDataSource,
+  ReviewDataSourceMock,
   dummyReview,
 } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
@@ -17,11 +17,11 @@ import ReviewMutations from './ReviewMutations';
 
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
-  new reviewDataSource(),
+  new ReviewDataSourceMock(),
   userAuthorization,
   dummyEventBus
 );
@@ -38,7 +38,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
   ).resolves.toBe(dummyReview);
 });
 
-test("A user can't submit a review on a proposal", () => {
+test('A user can not submit a review on a proposal', () => {
   return expect(
     reviewMutations.submitReview(dummyUserNotOnProposal, {
       reviewID: 1,
@@ -57,7 +57,7 @@ test('A userofficer can add a reviewer for a proposal', () => {
   ).resolves.toBeInstanceOf(Review);
 });
 
-test("A user can't add a reviewer for a proposal", () => {
+test('A user can not add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
   ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
@@ -69,7 +69,7 @@ test('A userofficer can remove a reviewer for a proposal', () => {
   ).resolves.toBeInstanceOf(Review);
 });
 
-test("A user can't remove a reviewer for a proposal", () => {
+test('A user can not remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUser, 1)
   ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');

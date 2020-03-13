@@ -1,4 +1,13 @@
-class GrayLogLogger implements ILogger {
+export enum LEVEL {
+  INFO = 'INFO',
+  DEBUG = 'DEBUG',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
+  EXCEPTION = 'EXCEPTION',
+  FATAL = 'FATAL',
+}
+
+class GrayLogLogger implements Logger {
   log = require('gelf-pro');
 
   constructor(server: string, port: number, private environment: string) {
@@ -17,7 +26,7 @@ class GrayLogLogger implements ILogger {
 
   private createPayload(level: LEVEL, message: string, context: object) {
     return {
-      level_str: LEVEL[level],
+      levelStr: LEVEL[level],
       title: message,
       environment: this.environment,
       stackTrace: new Error().stack,
@@ -54,7 +63,7 @@ class GrayLogLogger implements ILogger {
   }
 }
 
-class ConsoleLogger implements ILogger {
+class ConsoleLogger implements Logger {
   logInfo(message: string, context: object) {
     this.log(LEVEL.INFO, message, context);
   }
@@ -84,7 +93,7 @@ class ConsoleLogger implements ILogger {
 
           return {
             exception: { name, message, stack },
-            level_str: LEVEL[LEVEL.ERROR],
+            levelStr: LEVEL[LEVEL.ERROR],
             ...context,
           };
         })()
@@ -102,7 +111,8 @@ class ConsoleLogger implements ILogger {
   }
 }
 
-export class MutedLogger implements ILogger {
+/* eslint-disable @typescript-eslint/no-empty-function */
+export class MutedLogger implements Logger {
   logInfo(message: string, context: object): void {}
   logWarn(message: string, context: object): void {}
   logDebug(message: string, context: object): void {}
@@ -113,17 +123,9 @@ export class MutedLogger implements ILogger {
     context?: object
   ): void {}
 }
+/* eslint-enable @typescript-eslint/no-empty-function */
 
-export enum LEVEL {
-  INFO = 'INFO',
-  DEBUG = 'DEBUG',
-  WARN = 'WARN',
-  ERROR = 'ERROR',
-  EXCEPTION = 'EXCEPTION',
-  FATAL = 'FATAL',
-}
-
-export interface ILogger {
+export interface Logger {
   logInfo(message: string, context: object): void;
   logWarn(message: string, context: object): void;
   logDebug(message: string, context: object): void;
@@ -136,8 +138,8 @@ export interface ILogger {
 }
 
 class LoggerFactory {
-  static logger: ILogger;
-  static getLogger(): ILogger {
+  static logger: Logger;
+  static getLogger(): Logger {
     if (this.logger) {
       return this.logger;
     }

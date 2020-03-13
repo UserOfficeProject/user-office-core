@@ -1,4 +1,4 @@
-const amqp = require('amqplib');
+import amqp from 'amqplib';
 
 export interface MessageBroker {
   sendMessage(message: string): void;

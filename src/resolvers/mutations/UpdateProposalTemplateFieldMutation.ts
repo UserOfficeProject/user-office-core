@@ -15,27 +15,6 @@ import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { FieldCondition } from '../types/FieldCondition';
 import { wrapResponse } from '../wrapResponse';
 
-@ArgsType()
-export class UpdateProposalTemplateFieldArgs {
-  @Field()
-  public id: string;
-
-  @Field({ nullable: true })
-  public naturalKey: string;
-
-  @Field({ nullable: true })
-  public question: string;
-
-  @Field({ nullable: true })
-  public config: string;
-
-  @Field({ nullable: true })
-  public isEnabled: boolean;
-
-  @Field(() => FieldDependencyInput)
-  public dependencies: FieldDependencyInput[];
-}
-
 @InputType()
 class FieldConditionInput implements Partial<FieldCondition> {
   @Field(() => EvaluatorOperator)
@@ -55,6 +34,27 @@ export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
 
   @Field(() => FieldConditionInput)
   public condition: FieldConditionInput;
+}
+
+@ArgsType()
+export class UpdateProposalTemplateFieldArgs {
+  @Field()
+  public id: string;
+
+  @Field({ nullable: true })
+  public naturalKey: string;
+
+  @Field({ nullable: true })
+  public question: string;
+
+  @Field({ nullable: true })
+  public config: string;
+
+  @Field({ nullable: true })
+  public isEnabled: boolean;
+
+  @Field(() => FieldDependencyInput)
+  public dependencies: FieldDependencyInput[];
 }
 
 @Resolver()

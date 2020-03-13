@@ -2,14 +2,14 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
 import { User } from '../models/User';
-import { ILogger } from '../utils/Logger';
+import { Logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
   async get(agent: User | null, id: number) {

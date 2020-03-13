@@ -119,7 +119,7 @@ export const dummyUserNotOnProposal = new User(
   '2019-07-17 08:25:12.23043+00'
 );
 
-export class userDataSource implements UserDataSource {
+export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
@@ -149,7 +149,9 @@ export class userDataSource implements UserDataSource {
   async getPasswordByEmail(email: string): Promise<string> {
     return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
-  async setUserEmailVerified(id: number): Promise<void> {}
+  async setUserEmailVerified(id: number): Promise<void> {
+    // Do something here or remove the function.
+  }
   async setUserPassword(
     id: number,
     password: string
@@ -177,7 +179,9 @@ export class userDataSource implements UserDataSource {
   async getPasswordByUsername(username: string): Promise<string | null> {
     return '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm';
   }
-  async setUserRoles(id: number, roles: number[]): Promise<void> {}
+  async setUserRoles(id: number, roles: number[]): Promise<void> {
+    // Do something here or remove the function.
+  }
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
       return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];

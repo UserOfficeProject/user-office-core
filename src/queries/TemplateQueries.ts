@@ -1,14 +1,14 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { ProposalTemplate } from '../models/ProposalModel';
 import { User } from '../models/User';
-import { ILogger } from '../utils/Logger';
+import { Logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class TemplateQueries {
   constructor(
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
   async getProposalTemplate(

@@ -1,5 +1,6 @@
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -15,15 +16,14 @@ import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
-const jsonwebtoken = require('jsonwebtoken');
-
-
 export default class UserMutations {
   constructor(
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
+
+  private secret = process.env.secret as string;
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -187,7 +187,7 @@ export default class UserMutations {
             type: 'emailVerification',
             updated: user.updated,
           },
-          process.env.secret,
+          this.secret,
           { expiresIn: '24h' }
         );
 
@@ -286,7 +286,7 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
       expiresIn: process.env.tokenLife,
     });
 
@@ -308,7 +308,7 @@ export default class UserMutations {
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
-    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
+    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
       expiresIn: process.env.tokenLife,
     });
 
@@ -317,10 +317,10 @@ export default class UserMutations {
 
   async token(token: string): Promise<string | Rejection> {
     try {
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const freshToken = jsonwebtoken.sign(
         { user: decoded.user, roles: decoded.roles },
-        process.env.secret,
+        this.secret,
         {
           expiresIn: process.env.tokenLife,
         }
@@ -353,7 +353,7 @@ export default class UserMutations {
             type: 'passwordReset',
             updated: user.updated,
           },
-          process.env.secret,
+          this.secret,
           { expiresIn: '24h' }
         );
 
@@ -376,7 +376,7 @@ export default class UserMutations {
   async emailVerification(token: string) {
     // Check that token is valid
     try {
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const user = await this.dataSource.get(decoded.id);
       //Check that user exist and that it has not been updated since token creation
       if (
@@ -448,7 +448,8 @@ export default class UserMutations {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      // TODO: Define verify responce type and use that instead of any.
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation

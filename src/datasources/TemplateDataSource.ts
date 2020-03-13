@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {
   ProposalTemplate,
   Topic,
   ProposalTemplateField,
-  FieldDependency,
   DataType,
 } from '../models/ProposalModel';
 import { FieldDependencyInput } from './../resolvers/mutations/UpdateProposalTemplateFieldMutation';

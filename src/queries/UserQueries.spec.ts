@@ -1,6 +1,6 @@
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
   basicDummyUser,
@@ -10,10 +10,13 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 import UserQueries from './UserQueries';
 
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
-const userQueries = new UserQueries(new userDataSource(), userAuthorization);
+const userQueries = new UserQueries(
+  new UserDataSourceMock(),
+  userAuthorization
+);
 
 test('A user officer fetch can fetch any user account', () => {
   return expect(userQueries.get(dummyUserOfficer, dummyUser.id)).resolves.toBe(
@@ -21,7 +24,7 @@ test('A user officer fetch can fetch any user account', () => {
   );
 });
 
-test("A user is allowed to fetch it's own account ", () => {
+test('A user is allowed to fetch its own account ', () => {
   return expect(userQueries.get(dummyUser, dummyUser.id)).resolves.toBe(
     dummyUser
   );

@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/camelcase */
+import SparkPost from 'sparkpost';
+
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { UserRole } from '../models/User';
-import { User } from '../resolvers/types/User';
 import { logger } from '../utils/Logger';
 
-const SparkPost = require('sparkpost');
 const options = {
   endpoint: 'https://api.eu.sparkpost.com:443',
 };
@@ -15,7 +16,9 @@ export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
 
   return async function emailHandler(event: ApplicationEvent) {
-    function sendEmail(_address: string, _topic: string, _message: string) {}
+    function sendEmail(_address: string, _topic: string, _message: string) {
+      // Do something or remove the function.
+    }
 
     switch (event.type) {
       case Event.PROPOSAL_ACCEPTED: {
@@ -59,7 +62,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             },
             recipients: [{ address: event.user.email }],
           })
-          .then((res: string) => {
+          .then((res: any) => {
             logger.logInfo('Emai send on for password reset:', {
               result: res,
               event,
@@ -103,7 +106,7 @@ export default function createHandler(userDataSource: UserDataSource) {
             },
             recipients: [{ address: user.email }],
           })
-          .then((res: string) => {
+          .then((res: any) => {
             logger.logInfo('Successful email transmission', { res });
           })
           .catch((err: string) => {
@@ -150,7 +153,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               }),
             ],
           })
-          .then((res: string) => {
+          .then((res: any) => {
             logger.logInfo('Email sent on proposal submission:', {
               result: res,
               event,
@@ -183,7 +186,7 @@ export default function createHandler(userDataSource: UserDataSource) {
               },
               recipients: [{ address: event.user.email }],
             })
-            .then((res: string) => {
+            .then((res: any) => {
               logger.logInfo('Email sent on user creation:', {
                 result: res,
                 event,

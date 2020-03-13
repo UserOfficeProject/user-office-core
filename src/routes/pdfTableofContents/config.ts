@@ -1,6 +1,6 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export = {
   fontPath: path.join(__dirname, 'src', 'data', 'monkey.ttf'),
   leftMarginEnd: 78,
   horizontalMax: 595,

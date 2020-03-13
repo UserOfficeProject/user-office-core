@@ -1,7 +1,7 @@
 import { Page } from '../../models/Admin';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 
-export class adminDataSource implements AdminDataSource {
+export class AdminDataSourceMock implements AdminDataSource {
   async resetDB(): Promise<boolean> {
     throw new Error('Method not implemented.');
   }

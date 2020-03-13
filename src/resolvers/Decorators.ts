@@ -15,6 +15,14 @@ export function Response(): (target: object, propertyKey: string) => void {
   };
 }
 
+function getResponseFields(origin: any): object {
+  const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
+  const result: any = {};
+  properties.forEach(key => (result[key] = origin[key]));
+
+  return result;
+}
+
 export function getResponseField(origin: any): string | null {
   const responseFields = getResponseFields(origin);
   const keys = Object.keys(responseFields);
@@ -24,12 +32,4 @@ export function getResponseField(origin: any): string | null {
   }
 
   return keys[0];
-}
-
-function getResponseFields(origin: any): object {
-  const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
-  const result: any = {};
-  properties.forEach(key => (result[key] = origin[key]));
-
-  return result;
 }

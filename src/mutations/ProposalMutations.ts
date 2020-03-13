@@ -12,7 +12,7 @@ import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { ILogger } from '../utils/Logger';
+import { Logger } from '../utils/Logger';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -22,7 +22,7 @@ export default class ProposalMutations {
     private templateDataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
   /* NOTE: User | null??? This should be solved differently.
@@ -172,7 +172,7 @@ export default class ProposalMutations {
                 return rejection('VALUE_CONSTRAINT_REJECTION');
               }
               await this.dataSource.updateAnswer(
-                proposal!.id,
+                proposal?.id,
                 answer.proposal_question_id,
                 answer.value
               );

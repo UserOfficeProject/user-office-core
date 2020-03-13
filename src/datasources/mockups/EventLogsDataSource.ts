@@ -24,7 +24,7 @@ export const dummyEventLogs = [
   dummyEventLogProposalCreated,
 ];
 
-export class eventLogsDataSource implements EventLogsDataSource {
+export class EventLogsDataSourceMock implements EventLogsDataSource {
   async set(
     changedBy: number,
     eventType: string,

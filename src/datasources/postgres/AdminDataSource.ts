@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 
 import { Page } from '../../models/Admin';
+import { logger } from '../../utils/Logger';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import database from './database';
 import {
@@ -10,8 +11,6 @@ import {
   NationalityRecord,
   PagetextRecord,
 } from './records';
-import Knex = require('knex');
-import { logger } from '../../utils/Logger';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async get(id: number): Promise<string | null> {

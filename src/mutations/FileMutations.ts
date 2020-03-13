@@ -1,4 +1,4 @@
-import { IFileDataSource } from '../datasources/IFileDataSource';
+import { FileDataSource } from '../datasources/IFileDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
 import { FileMetadata } from '../models/Blob';
@@ -8,7 +8,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class FileMutations {
   constructor(
-    private dataSource: IFileDataSource,
+    private dataSource: FileDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>
   ) {}
@@ -34,7 +34,7 @@ export default class FileMutations {
 
     return this.dataSource
       .prepare(fileId, filePath)
-      .then(fid => filePath)
+      .then(() => filePath)
       .catch(err => {
         logger.logException('Could not prepare file', err, { fileId });
 
