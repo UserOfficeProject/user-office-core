@@ -11,7 +11,6 @@ import files from './src/routes/files';
 import proposalDownload from './src/routes/pdf';
 import { logger } from './src/utils/Logger';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const jwt = require('express-jwt');
 
 interface Req extends Request {
