@@ -16,7 +16,7 @@
     "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --inspect --respawn --transpileOnly ./index.ts"
   },
   "lint-staged": {
-    "*.{.js,.ts}": "npm run lint"
+    "**/*.{js,ts}": "npm run lint"
   },
   "husky": {
     "hooks": {
