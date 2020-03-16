@@ -1,6 +1,6 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme, Theme } from '@material-ui/core/styles';
 
-const createTheme = () =>
+const createTheme = (): Theme =>
   createMuiTheme({
     palette: {
       primary: {
@@ -19,7 +19,7 @@ const createTheme = () =>
     },
   });
 
-const createDevelopTheme = () =>
+const createDevelopTheme = (): Theme =>
   createMuiTheme({
     palette: {
       primary: {
@@ -39,15 +39,15 @@ const createDevelopTheme = () =>
     },
   });
 
-export function getTheme() {
-  return isDevelop() ? createDevelopTheme() : createTheme();
-}
-
 const developHosts: any = {
   localhost: true,
   'useroffice-test.esss.lu.se': true,
 };
 
-const isDevelop = () => {
+const isDevelop = (): boolean => {
   return developHosts[window.location.hostname];
 };
+
+export function getTheme(): Theme {
+  return isDevelop() ? createDevelopTheme() : createTheme();
+}

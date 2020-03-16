@@ -17,13 +17,13 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 import { DataType } from '../../generated/sdk';
 import { TemplateStep, ProposalTemplateField } from '../../generated/sdk';
-import { EventType, IEvent } from '../../models/QuestionaryEditorModel';
+import { EventType, Event } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
 
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
   index: number;
   onItemClick: { (data: ProposalTemplateField): void };
   dragMode: boolean;

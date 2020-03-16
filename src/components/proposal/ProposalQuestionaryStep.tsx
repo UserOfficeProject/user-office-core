@@ -16,13 +16,13 @@ import {
 } from '../../models/ProposalModelFunctions';
 import {
   EventType,
-  IProposalSubmissionModelState,
+  ProposalSubmissionModelState,
 } from '../../models/ProposalSubmissionModel';
 import JSDict from '../../utils/Dictionary';
 import submitFormAsync from '../../utils/FormikAsyncFormHandler';
 import { ErrorFocus } from '../common/ErrorFocus';
 import { createFormikConfigObjects } from './createFormikConfigObjects';
-import { IBasicComponentProps } from './IBasicComponentProps';
+import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalComponentBoolean } from './ProposalComponentBoolean';
 import { ProposalComponentDatePicker } from './ProposalComponentDatePicker';
 import { ProposalComponentEmbellishment } from './ProposalComponentEmbellishment';
@@ -32,8 +32,42 @@ import { ProposalComponentTextInput } from './ProposalComponentTextInput';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 
+class ComponentFactory {
+  private componentMap = JSDict.Create<string, any>();
+
+  constructor() {
+    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
+    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
+    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
+    this.componentMap.put(
+      DataType.SELECTION_FROM_OPTIONS,
+      ProposalComponentMultipleChoice
+    );
+    this.componentMap.put(
+      DataType.EMBELLISHMENT,
+      ProposalComponentEmbellishment
+    );
+  }
+  createComponent(
+    field: QuestionaryField,
+    props: any
+  ): React.ComponentElement<BasicComponentProps, any> {
+    props.templateField = field;
+    props.key = field.proposal_question_id;
+
+    const component = this.componentMap.get(field.data_type);
+
+    if (!component) {
+      throw new Error(`Could not create component for type ${field.data_type}`);
+    }
+
+    return React.createElement(component, props);
+  }
+}
+
 export default function ProposalQuestionaryStep(props: {
-  data: IProposalSubmissionModelState;
+  data: ProposalSubmissionModelState;
   topicId: number;
   readonly: boolean;
 }) {
@@ -169,38 +203,4 @@ export default function ProposalQuestionaryStep(props: {
       )}
     </Formik>
   );
-}
-
-class ComponentFactory {
-  private componentMap = JSDict.Create<string, any>();
-
-  constructor() {
-    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
-    this.componentMap.put(
-      DataType.SELECTION_FROM_OPTIONS,
-      ProposalComponentMultipleChoice
-    );
-    this.componentMap.put(
-      DataType.EMBELLISHMENT,
-      ProposalComponentEmbellishment
-    );
-  }
-  createComponent(
-    field: QuestionaryField,
-    props: any
-  ): React.ComponentElement<IBasicComponentProps, any> {
-    props.templateField = field;
-    props.key = field.proposal_question_id;
-
-    const component = this.componentMap.get(field.data_type);
-
-    if (!component) {
-      throw new Error(`Could not create component for type ${field.data_type}`);
-    }
-
-    return React.createElement(component, props);
-  }
 }

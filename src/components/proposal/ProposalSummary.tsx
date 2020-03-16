@@ -6,7 +6,7 @@ import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useSubmitProposal } from '../../hooks/useSubmitProposal';
 import {
   EventType,
-  IProposalSubmissionModelState,
+  ProposalSubmissionModelState,
 } from '../../models/ProposalSubmissionModel';
 import withConfirm from '../../utils/withConfirm';
 import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
@@ -18,7 +18,7 @@ function ProposalReview({
   readonly,
   confirm,
 }: {
-  data: IProposalSubmissionModelState;
+  data: ProposalSubmissionModelState;
   readonly: boolean;
   confirm: Function;
 }) {

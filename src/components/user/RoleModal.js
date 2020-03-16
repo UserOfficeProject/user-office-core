@@ -11,6 +11,7 @@ function RoleModal(props) {
       aria-describedby="simple-modal-description"
       open={props.show}
       onClose={() => props.close()}
+      disableScrollLock={true}
     >
       <DialogContent>
         <RoleTable add={props.add} />

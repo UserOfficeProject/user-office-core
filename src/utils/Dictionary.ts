@@ -14,7 +14,7 @@ export default class JSDict<K extends KEY, V> implements Dictionary<K, V> {
     this.dict = {};
   }
 
-  public getKeys() {
+  public getKeys(): K[] {
     const keys: K[] = [];
     for (const key in this.dict) {
       keys.push(key);
@@ -23,7 +23,7 @@ export default class JSDict<K extends KEY, V> implements Dictionary<K, V> {
     return keys;
   }
 
-  public getValues() {
+  public getValues(): V[] {
     const vals: V[] = [];
     for (const key in this.dict) {
       const v = this.dict[key];
@@ -41,17 +41,17 @@ export default class JSDict<K extends KEY, V> implements Dictionary<K, V> {
     return v != null && typeof v !== 'undefined';
   }
 
-  public get(key: K) {
+  public get(key: K): V | null {
     const v = this.dict[key];
 
     return this.exists(v) ? v : null;
   }
 
-  public put(key: K, val: V) {
+  public put(key: K, val: V): void {
     this.dict[key] = val;
   }
 
-  static Create<Keys extends KEY, Values>() {
+  static Create<Keys extends KEY, Values>(): JSDict<Keys, Values> {
     return new JSDict<Keys, Values>();
   }
 }

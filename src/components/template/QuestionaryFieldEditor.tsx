@@ -4,7 +4,7 @@ import React, { FunctionComponent } from 'react';
 
 import { DataType } from '../../generated/sdk';
 import { ProposalTemplateField, ProposalTemplate } from '../../generated/sdk';
-import { IEvent } from '../../models/QuestionaryEditorModel';
+import { Event } from '../../models/QuestionaryEditorModel';
 import JSDict from '../../utils/Dictionary';
 import { AdminComponentBoolean } from './AdminComponentBoolean';
 import { AdminComponentDate } from './AdminComponentDate';
@@ -15,7 +15,7 @@ import { AdminComponentTextInput } from './AdminComponentTextInput';
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
   closeMe: Function;
   template: ProposalTemplate;
 }) {
@@ -82,7 +82,7 @@ export default function QuestionaryFieldEditor(props: {
 interface AdminComponentProps {
   field: ProposalTemplateField;
   template: ProposalTemplate;
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
   closeMe: Function;
 }
 

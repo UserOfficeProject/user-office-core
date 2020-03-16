@@ -54,6 +54,14 @@
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": "*", "next": "return" }
-    ]
+    ],
+    "@typescript-eslint/no-empty-function": [
+      "error",
+      { "allow": ["arrowFunctions"] }
+    ],
+    // TODO: Switch to default "error" and fix them all
+    "@typescript-eslint/camelcase": "warn",
+    "react/display-name": "warn",
+    "react/prop-types": "warn"
   }
 }

@@ -8,32 +8,6 @@ import { getSdk } from '../generated/sdk';
 
 const endpoint = '/graphql';
 
-export function useDataApi() {
-  const { token, handleNewToken, handleLogout } = useContext(UserContext);
-
-  return useCallback(
-    () =>
-      getSdk(
-        token
-          ? new AuthorizedGraphQLClient(
-              endpoint,
-              token,
-              reason => {
-                console.log(reason);
-                handleLogout();
-              },
-              handleNewToken
-            )
-          : new GraphQLClient(endpoint)
-      ),
-    [token, handleNewToken, handleLogout]
-  );
-}
-
-export function getUnauthorizedApi() {
-  return getSdk(new GraphQLClient(endpoint));
-}
-
 class AuthorizedGraphQLClient extends GraphQLClient {
   private renewalDate: number;
 
@@ -62,7 +36,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       } else {
         const newToken = data.token.token;
         this.setHeader('authorization', `Bearer ${newToken}`);
-        this.tokenRenewed && this.tokenRenewed(newToken!);
+        this.tokenRenewed && this.tokenRenewed(newToken as string);
       }
     }
 
@@ -74,4 +48,30 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 
     return (decode(token) as any).iat + oneHour;
   }
+}
+
+export function useDataApi() {
+  const { token, handleNewToken, handleLogout } = useContext(UserContext);
+
+  return useCallback(
+    () =>
+      getSdk(
+        token
+          ? new AuthorizedGraphQLClient(
+              endpoint,
+              token,
+              reason => {
+                console.log(reason);
+                handleLogout();
+              },
+              handleNewToken
+            )
+          : new GraphQLClient(endpoint)
+      ),
+    [token, handleNewToken, handleLogout]
+  );
+}
+
+export function getUnauthorizedApi() {
+  return getSdk(new GraphQLClient(endpoint));
 }

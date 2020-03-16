@@ -21,8 +21,13 @@ export default function RoleSelectionPage() {
           <Grid item xs={12}>
             <StyledPaper>Select role: </StyledPaper>
           </Grid>
-          {roles.map(role => (
-            <Grid item xs={6} onClick={() => handleRole(role.shortCode)}>
+          {roles.map((role, i) => (
+            <Grid
+              key={i}
+              item
+              xs={6}
+              onClick={() => handleRole(role.shortCode)}
+            >
               <StyledPaper>{role.title}</StyledPaper>
             </Grid>
           ))}

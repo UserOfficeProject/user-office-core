@@ -1,6 +1,6 @@
-const proxy = require('http-proxy-middleware');
+import proxy from 'http-proxy-middleware';
 
-module.exports = function(app) {
+export default function(app) {
   app.use(
     '/files/*',
     proxy({
@@ -15,4 +15,4 @@ module.exports = function(app) {
       changeOrigin: true,
     })
   );
-};
+}

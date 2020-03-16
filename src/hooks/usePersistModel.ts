@@ -6,7 +6,7 @@ import {
   ProposalTemplateField,
   FieldDependency,
 } from '../generated/sdk';
-import { EventType, IEvent } from '../models/QuestionaryEditorModel';
+import { EventType, Event } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
 
 export function usePersistModel() {
@@ -45,6 +45,20 @@ export function usePersistModel() {
       .then(data => data.updateTopicOrder);
   };
 
+  // Have this until GQL accepts Union types
+  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
+  const prepareDependencies = (dependencies: FieldDependency[]) => {
+    return dependencies.map(dependency => {
+      return {
+        ...dependency,
+        condition: {
+          ...dependency.condition,
+          params: JSON.stringify({ value: dependency.condition.params }),
+        },
+      };
+    });
+  };
+
   const updateItem = async (field: ProposalTemplateField) => {
     return api()
       .updateProposalTemplateField({
@@ -60,20 +74,6 @@ export function usePersistModel() {
       .then(data => {
         return data.updateProposalTemplateField;
       });
-  };
-
-  // Have this until GQL accepts Union types
-  // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  const prepareDependencies = (dependencies: FieldDependency[]) => {
-    return dependencies.map(dependency => {
-      return {
-        ...dependency,
-        condition: {
-          ...dependency.condition,
-          params: JSON.stringify({ value: dependency.condition.params }),
-        },
-      };
-    });
   };
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
@@ -130,7 +130,7 @@ export function usePersistModel() {
     dispatch,
   }: {
     getState: () => ProposalTemplate;
-    dispatch: React.Dispatch<IEvent>;
+    dispatch: React.Dispatch<Event>;
   }) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
@@ -145,7 +145,7 @@ export function usePersistModel() {
       });
     };
 
-    return (next: Function) => (action: IEvent) => {
+    return (next: Function) => (action: Event) => {
       next(action);
       const state = getState();
 

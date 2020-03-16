@@ -4,9 +4,9 @@ import React, { ChangeEvent, useState, useEffect } from 'react';
 
 import { TextInputConfig } from '../../generated/sdk';
 import TextFieldWithCounter from '../common/TextFieldWithCounter';
-import { IBasicComponentProps } from './IBasicComponentProps';
+import { BasicComponentProps } from './IBasicComponentProps';
 
-export function ProposalComponentTextInput(props: IBasicComponentProps) {
+export function ProposalComponentTextInput(props: BasicComponentProps) {
   const classes = makeStyles({
     textField: {
       margin: '15px 0 10px 0',

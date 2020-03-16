@@ -5,6 +5,21 @@ import { ProposalAnswer } from '../models/ProposalModel';
 import { getDataTypeSpec } from '../models/ProposalModelFunctions';
 import { useDataApi } from './useDataApi';
 
+const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+  if (answers) {
+    answers = answers.filter(
+      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
+    );
+    answers = answers.map(answer => {
+      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    });
+
+    return answers;
+  } else {
+    return [];
+  }
+};
+
 export function useUpdateProposal() {
   const [loading, setLoading] = useState(false);
 
@@ -35,18 +50,3 @@ export function useUpdateProposal() {
 
   return { loading, updateProposal };
 }
-
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
-    );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-
-    return answers;
-  } else {
-    return [];
-  }
-};

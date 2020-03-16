@@ -1,8 +1,17 @@
+function paddZero(num: number): string {
+  if (num < 10) {
+    // Adding leading zero to minutes
+    return `0${num}`;
+  }
+
+  return num.toString();
+}
+
 function getFormattedDate(
   date: Date,
   prefomattedDate?: string,
   hideYear = false
-) {
+): string {
   const MONTH_NAMES = [
     'January',
     'February',
@@ -39,17 +48,8 @@ function getFormattedDate(
   return `${day}. ${month} ${year}. at ${paddZero(hours)}:${paddZero(minutes)}`;
 }
 
-function paddZero(num: number): string {
-  if (num < 10) {
-    // Adding leading zero to minutes
-    return `0${num}`;
-  }
-
-  return num.toString();
-}
-
 // --- Main function
-export function timeAgo(dateParam: Date) {
+export function timeAgo(dateParam: Date): string | null {
   if (!dateParam) {
     return null;
   }

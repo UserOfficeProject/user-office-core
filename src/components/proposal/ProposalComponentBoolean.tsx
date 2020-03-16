@@ -7,10 +7,10 @@ import {
 import { getIn } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
-import { IBasicComponentProps } from './IBasicComponentProps';
+import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalErrorLabel } from './ProposalErrorLabel';
 
-export function ProposalComponentBoolean(props: IBasicComponentProps) {
+export function ProposalComponentBoolean(props: BasicComponentProps) {
   const { templateField, errors, onComplete, touched } = props;
   const { proposal_question_id, config, question } = templateField;
   const fieldError = getIn(errors, proposal_question_id);

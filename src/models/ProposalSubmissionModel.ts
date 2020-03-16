@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { Reducer } from 'react';
+import { Reducer, Dispatch } from 'react';
 
 import {
   Proposal,
@@ -28,12 +28,12 @@ export enum EventType {
   API_CALL_SUCCESS = 'API_SUCCESS_OCCURRED',
   PROPOSAL_METADATA_CHANGED = 'PROPOSAL_INFORMATION_CHANGED',
 }
-export interface IEvent {
+export interface Event {
   type: EventType;
   payload?: any;
 }
 
-export interface IProposalSubmissionModelState {
+export interface ProposalSubmissionModelState {
   isDirty: boolean;
   proposal: Proposal;
 }
@@ -42,12 +42,11 @@ export interface IProposalSubmissionModelState {
 export function ProposalSubmissionModel(
   initialProposal: Proposal,
   middlewares?: Array<Function>
-) {
-  const [modelState, dispatch] = useReducerWithMiddleWares<
-    Reducer<IProposalSubmissionModelState, IEvent>
-  >(reducer, { isDirty: false, proposal: initialProposal }, middlewares || []);
-
-  function reducer(state: IProposalSubmissionModelState, action: IEvent) {
+): {
+  state: ProposalSubmissionModelState;
+  dispatch: Dispatch<Event>;
+} {
+  function reducer(state: ProposalSubmissionModelState, action: Event) {
     return produce(state, draftState => {
       switch (action.type) {
         case EventType.FIELD_CHANGED:
@@ -83,7 +82,7 @@ export function ProposalSubmissionModel(
             ...action.payload.proposal,
           };
           (getQuestionaryStepByTopicId(
-            draftState.proposal.questionary!,
+            draftState.proposal.questionary,
             action.payload.topicId
           ) as QuestionaryStep).isCompleted = true;
           draftState.isDirty = false;
@@ -101,6 +100,10 @@ export function ProposalSubmissionModel(
       }
     });
   }
+
+  const [modelState, dispatch] = useReducerWithMiddleWares<
+    Reducer<ProposalSubmissionModelState, Event>
+  >(reducer, { isDirty: false, proposal: initialProposal }, middlewares || []);
 
   return { state: modelState, dispatch };
 }

@@ -8,12 +8,12 @@ import {
   ProposalTemplateField,
   EmbellishmentConfig,
 } from '../../generated/sdk';
-import { IEvent } from '../../models/QuestionaryEditorModel';
+import { Event } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 
 export default function QuestionaryEditorTopicItem(props: {
   data: ProposalTemplateField;
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
   index: number;
   onClick: { (data: ProposalTemplateField): void };
 }) {

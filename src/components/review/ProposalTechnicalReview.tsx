@@ -20,17 +20,19 @@ export default function ProposalTechnicalReview(props: {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
+  const initialValues = {
+    status: props?.data?.status || '',
+    timeAllocation: props?.data?.timeAllocation,
+    comment: props?.data?.comment,
+  };
+
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>
         Technical Review
       </Typography>
       <Formik
-        initialValues={{
-          status: props?.data?.status,
-          timeAllocation: props?.data?.timeAllocation,
-          comment: props?.data?.comment,
-        }}
+        initialValues={initialValues}
         validationSchema={Yup.object().shape({
           status: Yup.string().nullable(),
           timeAllocation: Yup.number().nullable(),

@@ -5,4 +5,4 @@ dist
 public
 cypress
 
-src/serviceWorker.ts
+src/serviceWorker.js

@@ -43,7 +43,7 @@ export const userFieldSchema = Yup.object().shape({
         return this.createError({ message: 'Please specify email' });
       }
 
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         const query = `query($email: String!)
       {
           checkEmailExist(email: $email)
@@ -91,7 +91,7 @@ export const emailFieldSchema = Yup.object().shape({
         return this.createError({ message: 'Please specify email' });
       }
 
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         const query = `query($email: String!)
       {
           checkEmailExist(email: $email)
@@ -105,7 +105,7 @@ export const emailFieldSchema = Yup.object().shape({
     }),
 });
 
-export function useNaturalKeySchema(initialValue: string) {
+export function useNaturalKeySchema(initialValue: string): any {
   const api = useDataApi();
 
   return Yup.string()
@@ -127,9 +127,10 @@ export function useNaturalKeySchema(initialValue: string) {
             const response = responseWrap.isNaturalKeyPresent;
             if (response === null) {
               reject();
+            } else {
+              console.log(response);
+              resolve(response);
             }
-            console.log(response);
-            resolve(!response!);
           });
       });
     });

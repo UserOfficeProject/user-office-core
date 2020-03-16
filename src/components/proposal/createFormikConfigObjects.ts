@@ -8,20 +8,6 @@ import {
 } from '../../generated/sdk';
 import { DataType } from '../../generated/sdk';
 
-export const createFormikConfigObjects = (
-  fields: QuestionaryField[]
-): { validationSchema: any; initialValues: any } => {
-  const validationSchema: any = {};
-  const initialValues: any = {};
-
-  fields.forEach(field => {
-    validationSchema[field.proposal_question_id] = toYupValidationSchema(field);
-    initialValues[field.proposal_question_id] = toYupInitialValues(field);
-  });
-
-  return { initialValues, validationSchema };
-};
-
 const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
   let config: FieldConfig;
   switch (field.data_type) {
@@ -73,4 +59,18 @@ const toYupValidationSchema = (field: QuestionaryField): Yup.Schema<any> => {
 
 const toYupInitialValues = (field: QuestionaryField): any => {
   return field.value;
+};
+
+export const createFormikConfigObjects = (
+  fields: QuestionaryField[]
+): { validationSchema: any; initialValues: any } => {
+  const validationSchema: any = {};
+  const initialValues: any = {};
+
+  fields.forEach(field => {
+    validationSchema[field.proposal_question_id] = toYupValidationSchema(field);
+    initialValues[field.proposal_question_id] = toYupInitialValues(field);
+  });
+
+  return { initialValues, validationSchema };
 };

@@ -13,14 +13,14 @@ const defaultOptions = {
   confirmationText: 'OK',
   cancellationText: 'Cancel',
   dialogProps: {},
-  onClose: () => {},
-  onCancel: () => {},
+  onClose: (): void => {},
+  onCancel: (): void => {},
 };
 
 const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
   props: any
-) => {
-  const classes = makeStyles(theme => ({
+): JSX.Element => {
+  const classes = makeStyles(() => ({
     title: {
       marginTop: '12px',
     },
@@ -55,7 +55,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
   );
   /* Returns function opening the dialog, passed to the wrapped component. */
   const confirm = useCallback(
-    (onConfirm, options: IOptions) => () => {
+    (onConfirm, options: Options) => (): void => {
       setOnConfirm(() => onConfirm);
       setOptions({ ...defaultOptions, ...options });
     },
@@ -88,7 +88,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
   );
 };
 
-interface IOptions {
+interface Options {
   title: string;
   description: string;
   confirmationText?: string;

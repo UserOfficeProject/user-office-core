@@ -39,7 +39,7 @@ export function useBasicUserData() {
   return { loadBasicUserData };
 }
 
-export interface IBasicUserData {
+export interface BasicUserData {
   firstname: string;
   lastname: string;
   organisation: string;

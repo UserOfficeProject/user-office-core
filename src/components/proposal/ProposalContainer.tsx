@@ -22,9 +22,9 @@ import { ProposalAnswer } from '../../models/ProposalModel';
 import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
   ProposalSubmissionModel,
-  IEvent,
+  Event,
   EventType,
-  IProposalSubmissionModelState,
+  ProposalSubmissionModelState,
 } from '../../models/ProposalSubmissionModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import { clamp } from '../../utils/Math';
@@ -32,7 +32,7 @@ import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
 
-export interface INotification {
+export interface Notification {
   variant: 'error' | 'success';
   message: string;
 }
@@ -44,7 +44,7 @@ enum StepType {
 }
 
 export const ProposalSubmissionContext = createContext<{
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
 } | null>(null);
 
 export default function ProposalContainer(props: { data: Proposal }) {
@@ -80,10 +80,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
     getState,
     dispatch,
   }: {
-    getState: () => IProposalSubmissionModelState;
-    dispatch: React.Dispatch<IEvent>;
+    getState: () => ProposalSubmissionModelState;
+    dispatch: React.Dispatch<Event>;
   }) => {
-    return (next: Function) => async (action: IEvent) => {
+    return (next: Function) => async (action: Event) => {
       next(action); // first update state/model
       const state = getState();
       switch (action.type) {

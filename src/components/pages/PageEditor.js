@@ -1,7 +1,4 @@
 // It is important to import the Editor which accepts plugins.
-
-import React, { useState, useEffect } from 'react';
-
 import 'tinymce/tinymce';
 import 'tinymce/themes/silver/theme';
 import 'tinymce/skins/ui/oxide/skin.min.css';
@@ -18,6 +15,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Editor } from '@tinymce/tinymce-react';
 import { useSnackbar } from 'notistack';
+import React, { useState, useEffect } from 'react';
 
 import { PageName } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';

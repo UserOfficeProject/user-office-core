@@ -7,9 +7,9 @@ import {
 import { Field, getIn } from 'formik';
 import React, { useState, useEffect } from 'react';
 
-import { IBasicComponentProps } from './IBasicComponentProps';
+import { BasicComponentProps } from './IBasicComponentProps';
 
-export function ProposalComponentDatePicker(props: IBasicComponentProps) {
+export function ProposalComponentDatePicker(props: BasicComponentProps) {
   const { templateField, touched, errors, onComplete } = props;
   const { proposal_question_id, config, question, value } = templateField;
   const fieldError = getIn(errors, proposal_question_id);

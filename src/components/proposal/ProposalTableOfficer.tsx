@@ -1,3 +1,5 @@
+// FIXME: This should be fixed for sure. It produces compile errors and ts-ignore should never be used.
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { getTranslation } from '@esss-swap/duo-localisation';
 import { Visibility, Delete } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';

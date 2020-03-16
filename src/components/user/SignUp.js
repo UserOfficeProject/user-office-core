@@ -11,6 +11,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
@@ -27,8 +28,6 @@ import {
 import { ErrorFocus } from '../common/ErrorFocus';
 import FormikDropdown from '../common/FormikDropdown';
 import InformationModal from '../pages/InformationModal';
-
-const queryString = require('query-string');
 
 const useStyles = makeStyles(theme => ({
   '@global': {

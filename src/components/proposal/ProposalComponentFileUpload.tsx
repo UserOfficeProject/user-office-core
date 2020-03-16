@@ -3,11 +3,11 @@ import React, { ChangeEvent, useState, useEffect } from 'react';
 
 import { FileUploadConfig } from '../../generated/sdk';
 import { FileUploadComponent } from '../common/FileUploadComponent';
-import { IBasicComponentProps } from './IBasicComponentProps';
+import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalErrorLabel } from './ProposalErrorLabel';
 
 export function ProposalComponentFileUpload(
-  props: IBasicComponentProps & { files: string[] }
+  props: BasicComponentProps & { files: string[] }
 ) {
   const { templateField, errors, onComplete } = props;
   const { proposal_question_id, value } = templateField;

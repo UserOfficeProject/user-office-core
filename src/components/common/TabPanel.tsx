@@ -62,13 +62,13 @@ export default function FullWidthTabs(props: {
           aria-label="full width tabs example"
         >
           {props.tabNames.map((tabName, i) => (
-            <Tab label={tabName} {...a11yProps(i)} />
+            <Tab key={i} label={tabName} {...a11yProps(i)} />
           ))}
         </Tabs>
       </AppBar>
 
       {props.children.map((tabContent, i) => (
-        <TabPanel value={value} index={i} dir={theme.direction}>
+        <TabPanel key={i} value={value} index={i} dir={theme.direction}>
           {tabContent}
         </TabPanel>
       ))}

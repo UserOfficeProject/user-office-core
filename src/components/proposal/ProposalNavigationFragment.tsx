@@ -9,13 +9,13 @@ import { Fragment, Component } from 'react';
 import React from 'react';
 
 const ProposalNavigationFragment = (props: {
-  back?: IButtonConfig;
-  reset?: IButtonConfig;
-  save?: IButtonConfig;
-  saveAndNext?: IButtonConfig;
+  back?: ButtonConfig;
+  reset?: ButtonConfig;
+  save?: ButtonConfig;
+  saveAndNext?: ButtonConfig;
   isLoading: boolean;
   disabled?: boolean;
-}) => {
+}): JSX.Element => {
   if (props.disabled === true) {
     return <div></div>;
   }
@@ -103,7 +103,7 @@ const ProposalNavigationFragment = (props: {
 
 export default ProposalNavigationFragment;
 
-interface IButtonConfig {
+interface ButtonConfig {
   callback: () => void;
   label?: string;
   disabled?: boolean;

@@ -16,15 +16,20 @@ import { ProposalTemplateField } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   EventType,
-  IEvent,
+  Event,
 } from '../../models/QuestionaryEditorModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import QuestionaryFieldEditor from './QuestionaryFieldEditor';
 
 export default function QuestionaryEditor() {
+  const { enqueueSnackbar } = useSnackbar();
+  const [
+    selectedField,
+    setSelectedField,
+  ] = useState<ProposalTemplateField | null>(null);
   const reducerMiddleware = () => {
-    return (next: Function) => (action: IEvent) => {
+    return (next: Function) => (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
@@ -37,7 +42,6 @@ export default function QuestionaryEditor() {
       }
     };
   };
-  const { enqueueSnackbar } = useSnackbar();
   const { persistModel, isLoading } = usePersistModel();
   const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
@@ -45,11 +49,6 @@ export default function QuestionaryEditor() {
   ]);
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
-
-  const [
-    selectedField,
-    setSelectedField,
-  ] = React.useState<ProposalTemplateField | null>(null);
 
   const theme = useTheme();
   const classes = makeStyles(theme => ({

@@ -32,31 +32,15 @@ export enum EventType {
   REORDER_TOPIC_REQUESTED,
 }
 
-export interface IEvent {
+export interface Event {
   type: EventType;
   payload: any;
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const blankInitTemplate: ProposalTemplate = { steps: [] };
-  const [state, dispatch] = useReducerWithMiddleWares<
-    Reducer<ProposalTemplate, IEvent>
-  >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
-  const api = useDataApi();
 
-  useEffect(() => {
-    api()
-      .getProposalTemplate()
-      .then(data => {
-        memoizedDispatch({
-          type: EventType.READY,
-          payload: data.proposalTemplate,
-        });
-      });
-  }, [api, memoizedDispatch]);
-
-  function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
+  function reducer(state: ProposalTemplate, action: Event): ProposalTemplate {
     return produce(state, draft => {
       switch (action.type) {
         case EventType.READY:
@@ -66,14 +50,14 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             return draft;
           }
 
-          var from = draft.steps.find(step => {
+          const from = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.source.droppableId
             );
           })!;
 
-          var to = draft.steps.find(step => {
+          const to = draft.steps.find(step => {
             return (
               step.topic.topic_id.toString() ===
               action.payload.destination.droppableId
@@ -100,7 +84,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft, action.payload.topicId)!.topic_title =
+          getTopicById(draft, action.payload.topicId).topic_title =
             action.payload.title;
 
           return draft;
@@ -144,6 +128,23 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
       }
     });
   }
+
+  const [state, dispatch] = useReducerWithMiddleWares<
+    Reducer<ProposalTemplate, Event>
+  >(reducer, blankInitTemplate, middlewares || []);
+  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+  const api = useDataApi();
+
+  useEffect(() => {
+    api()
+      .getProposalTemplate()
+      .then(data => {
+        memoizedDispatch({
+          type: EventType.READY,
+          payload: data.proposalTemplate,
+        });
+      });
+  }, [api, memoizedDispatch]);
 
   return { state, dispatch };
 }
