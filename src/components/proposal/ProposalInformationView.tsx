@@ -1,18 +1,19 @@
-import { makeStyles } from "@material-ui/core";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import { Form, Formik } from "formik";
-import React, { useContext, useState } from "react";
-import * as Yup from "yup";
-import { UserContext } from "../../context/UserContextProvider";
-import { Proposal } from "../../generated/sdk";
-import { EventType } from "../../models/ProposalSubmissionModel";
-import { BasicUserDetails, User } from "../../models/User";
-import { ProposalSubmissionContext } from "./ProposalContainer";
-import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import ProposalParticipant from "./ProposalParticipant";
-import ProposalParticipants from "./ProposalParticipants";
-import TextFieldWithCounter from "../common/TextFieldWithCounter";
+import { makeStyles } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { Form, Formik } from 'formik';
+import React, { useContext, useState } from 'react';
+import * as Yup from 'yup';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { Proposal } from '../../generated/sdk';
+import { EventType } from '../../models/ProposalSubmissionModel';
+import { BasicUserDetails, User } from '../../models/User';
+import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import { ProposalSubmissionContext } from './ProposalContainer';
+import ProposalNavigationFragment from './ProposalNavigationFragment';
+import ProposalParticipant from './ProposalParticipant';
+import ProposalParticipants from './ProposalParticipants';
 
 export default function ProposalInformationView(props: {
   data: Proposal;
@@ -30,13 +31,13 @@ export default function ProposalInformationView(props: {
 
   const classes = makeStyles({
     disabled: {
-      pointerEvents: "none",
-      opacity: 0.7
+      pointerEvents: 'none',
+      opacity: 0.7,
     },
     pi: {
-      marginTop: "30px",
-      marginBottom: "30px"
-    }
+      marginTop: '30px',
+      marginBottom: '30px',
+    },
   })();
 
   return (
@@ -45,29 +46,29 @@ export default function ProposalInformationView(props: {
         title: props.data.title,
         abstract: props.data.abstract,
         proposer: props.data.proposer,
-        users: props.data.users
+        users: props.data.users,
       }}
       onSubmit={async values => {
         if (
           values.proposer.id !== currentUser.id &&
           !users.some((user: BasicUserDetails) => user.id === currentUser.id) &&
-          currentRole !== "user_officer"
+          currentRole !== 'user_officer'
         ) {
           setUserError(true);
         } else {
           dispatch({
             type: EventType.SAVE_GENERAL_INFO_CLICKED,
-            payload: values
+            payload: values,
           });
         }
       }}
       validationSchema={Yup.object().shape({
         title: Yup.string()
-          .max(MAX_TITLE_LEN, "Title must be at most 175 characters")
-          .required("Title is required"),
+          .max(MAX_TITLE_LEN, 'Title must be at most 175 characters')
+          .required('Title is required'),
         abstract: Yup.string()
-          .max(MAX_ABSTRACT_LEN, "Abstract must be at most 1500 characters")
-          .required("Abstract is required")
+          .max(MAX_ABSTRACT_LEN, 'Abstract must be at most 1500 characters')
+          .required('Abstract is required'),
       })}
     >
       {({
@@ -76,7 +77,7 @@ export default function ProposalInformationView(props: {
         touched,
         handleChange,
         submitForm,
-        setFieldValue
+        setFieldValue,
       }) => (
         <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
@@ -96,7 +97,7 @@ export default function ProposalInformationView(props: {
                   handleChange(e);
                   dispatch({
                     type: EventType.PROPOSAL_METADATA_CHANGED,
-                    payload: { title: e.target.value }
+                    payload: { title: e.target.value },
                   });
                 }}
                 error={touched.title && errors.title !== undefined}
@@ -121,7 +122,7 @@ export default function ProposalInformationView(props: {
                   handleChange(e);
                   dispatch({
                     type: EventType.PROPOSAL_METADATA_CHANGED,
-                    payload: { abstract: e.target.value }
+                    payload: { abstract: e.target.value },
                   });
                 }}
                 error={touched.abstract && errors.abstract !== undefined}
@@ -135,10 +136,10 @@ export default function ProposalInformationView(props: {
           </Grid>
           <ProposalParticipant
             userChanged={(user: User) => {
-              setFieldValue("proposer", user);
+              setFieldValue('proposer', user);
               dispatch({
                 type: EventType.PROPOSAL_METADATA_CHANGED,
-                payload: { proposer: user }
+                payload: { proposer: user },
               });
             }}
             title="Principal investigator"
@@ -151,7 +152,7 @@ export default function ProposalInformationView(props: {
               setUsers(users);
               dispatch({
                 type: EventType.PROPOSAL_METADATA_CHANGED,
-                payload: { users: users }
+                payload: { users: users },
               });
             }}
             // quickfix for material table changing immutable state

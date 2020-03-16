@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState } from 'react';
+
 import {
   DataType,
   ProposalTemplate,
   ProposalTemplateField,
-  FieldDependency
-} from "../generated/sdk";
-import { EventType, IEvent } from "../models/QuestionaryEditorModel";
-import { useDataApi } from "./useDataApi";
+  FieldDependency,
+} from '../generated/sdk';
+import { EventType, IEvent } from '../models/QuestionaryEditorModel';
+import { useDataApi } from './useDataApi';
 
 export function usePersistModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -17,7 +18,7 @@ export function usePersistModel() {
     return api()
       .updateFieldTopicRel({
         topicId,
-        fieldIds
+        fieldIds,
       })
       .then(data => data.updateFieldTopicRel);
   };
@@ -29,7 +30,7 @@ export function usePersistModel() {
     return api()
       .updateTopic({
         ...values,
-        topicId
+        topicId,
       })
       .then(data => {
         return data.updateTopic;
@@ -39,7 +40,7 @@ export function usePersistModel() {
   const updateTopicOrder = async (topicOrder: number[]) => {
     return api()
       .updateTopicOrder({
-        topicOrder
+        topicOrder,
       })
       .then(data => data.updateTopicOrder);
   };
@@ -54,7 +55,7 @@ export function usePersistModel() {
         isEnabled: true, // TODO implement UI for this toggle
         dependencies: field.dependencies
           ? prepareDependencies(field.dependencies)
-          : []
+          : [],
       })
       .then(data => {
         return data.updateProposalTemplateField;
@@ -69,33 +70,37 @@ export function usePersistModel() {
         ...dependency,
         condition: {
           ...dependency.condition,
-          params: JSON.stringify({ value: dependency.condition.params })
-        }
+          params: JSON.stringify({ value: dependency.condition.params }),
+        },
       };
     });
   };
 
   const createTemplateField = async (topicId: number, dataType: DataType) => {
     setIsLoading(true);
+
     return api()
       .createTemplateField({
         topicId: topicId,
-        dataType: dataType
+        dataType: dataType,
       })
       .then(data => {
         setIsLoading(false);
+
         return data.createTemplateField;
       });
   };
 
   const deleteField = async (id: string) => {
     setIsLoading(true);
+
     return api()
       .deleteTemplateField({
-        id
+        id,
       })
       .then(data => {
         setIsLoading(false);
+
         return data.deleteTemplateField;
       });
   };
@@ -103,7 +108,7 @@ export function usePersistModel() {
   const deleteTopic = async (id: number) => {
     return api()
       .deleteTopic({
-        id
+        id,
       })
       .then(data => data.deleteTopic);
   };
@@ -122,7 +127,7 @@ export function usePersistModel() {
 
   const persistModel = ({
     getState,
-    dispatch
+    dispatch,
   }: {
     getState: () => ProposalTemplate;
     dispatch: React.Dispatch<IEvent>;
@@ -133,7 +138,7 @@ export function usePersistModel() {
         if (result.error) {
           dispatch({
             type: EventType.SERVICE_ERROR_OCCURRED,
-            payload: result.error
+            payload: result.error,
           });
         }
         setIsLoading(false);
@@ -179,7 +184,7 @@ export function usePersistModel() {
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           executeAndMonitorCall(() =>
             updateTopic(action.payload.topicId, {
-              title: action.payload.title as string
+              title: action.payload.title as string,
             })
           );
           break;
@@ -189,8 +194,9 @@ export function usePersistModel() {
             const result = await updateItem(field);
             dispatch({
               type: EventType.FIELD_UPDATED,
-              payload: result.template
+              payload: result.template,
             });
+
             return result;
           });
           break;
@@ -203,9 +209,10 @@ export function usePersistModel() {
             if (result.field) {
               dispatch({
                 type: EventType.FIELD_CREATED,
-                payload: { ...result.field }
+                payload: { ...result.field },
               });
             }
+
             return result;
           });
           break;
@@ -215,9 +222,10 @@ export function usePersistModel() {
             if (result.template) {
               dispatch({
                 type: EventType.FIELD_DELETED,
-                payload: result.template
+                payload: result.template,
               });
             }
+
             return result;
           });
           break;
@@ -230,9 +238,10 @@ export function usePersistModel() {
             if (result.template) {
               dispatch({
                 type: EventType.TOPIC_CREATED,
-                payload: result.template
+                payload: result.template,
               });
             }
+
             return result;
           });
           break;

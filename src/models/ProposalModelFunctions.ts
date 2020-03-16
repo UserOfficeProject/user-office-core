@@ -4,10 +4,10 @@ import {
   ProposalTemplate,
   ProposalTemplateField,
   Questionary,
-  QuestionaryField
-} from "../generated/sdk";
-import { ConditionEvaluator } from "./ConditionEvaluator";
-import { DataTypeSpec } from "./ProposalModel";
+  QuestionaryField,
+} from '../generated/sdk';
+import { ConditionEvaluator } from './ConditionEvaluator';
+import { DataTypeSpec } from './ProposalModel';
 
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
@@ -22,6 +22,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   // @ts-ignore-line
   const step = collection.steps.find(step => step.topic.topic_id === topicId);
+
   return step ? step.topic : undefined;
 }
 export function getQuestionaryStepByTopicId(
@@ -43,8 +44,10 @@ export function getFieldById(
       // @ts-ignore-line
       field => field.proposal_question_id === questionId
     );
+
     return needle === undefined;
   });
+
   return needle;
 }
 export function getAllFields(collection: AbstractCollection) {
@@ -53,6 +56,7 @@ export function getAllFields(collection: AbstractCollection) {
   collection.steps.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
+
   return allFields;
 }
 export function isDependencySatisfied(
@@ -70,6 +74,7 @@ export function isDependencySatisfied(
     collection,
     dependency.dependency_id
   );
+
   return (
     isParentSatisfied &&
     new ConditionEvaluator()
@@ -86,8 +91,10 @@ export function areDependenciesSatisfied(
     return true;
   }
   const isAtLeastOneDissatisfied = field.dependencies!.some(dep => {
-    let result = isDependencySatisfied(questionary, dep) === false;
+    const result = isDependencySatisfied(questionary, dep) === false;
+
     return result;
   });
+
   return isAtLeastOneDissatisfied === false;
 }

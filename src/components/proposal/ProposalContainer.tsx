@@ -1,45 +1,46 @@
-import { StepButton, LinearProgress } from "@material-ui/core";
-import Container from "@material-ui/core/Container";
-import Step from "@material-ui/core/Step";
-import Stepper from "@material-ui/core/Stepper";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import { useSnackbar } from "notistack";
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { StepButton, LinearProgress } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
+import Step from '@material-ui/core/Step';
+import Stepper from '@material-ui/core/Stepper';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
 import React, {
   createContext,
   PropsWithChildren,
   useEffect,
   useState,
-  useContext
-} from "react";
-import { Prompt } from "react-router";
-import { Proposal, ProposalStatus, Questionary } from "../../generated/sdk";
-import { StyledPaper } from "../../styles/StyledComponents";
-import { clamp } from "../../utils/Math";
-import ProposalInformationView from "./ProposalInformationView";
-import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
-import ProposalReview from "./ProposalSummary";
-import { useDataApi } from "../../hooks/useDataApi";
+  useContext,
+} from 'react';
+import { Prompt } from 'react-router';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { ProposalAnswer } from '../../models/ProposalModel';
+import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
   ProposalSubmissionModel,
   IEvent,
   EventType,
-  IProposalSubmissionModelState
-} from "../../models/ProposalSubmissionModel";
-import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
-import { ProposalAnswer } from "../../models/ProposalModel";
-import { getDataTypeSpec } from "../../models/ProposalModelFunctions";
-import { UserContext } from "../../context/UserContextProvider";
+  IProposalSubmissionModelState,
+} from '../../models/ProposalSubmissionModel';
+import { StyledPaper } from '../../styles/StyledComponents';
+import { clamp } from '../../utils/Math';
+import ProposalInformationView from './ProposalInformationView';
+import ProposalQuestionaryStep from './ProposalQuestionaryStep';
+import ProposalReview from './ProposalSummary';
 
 export interface INotification {
-  variant: "error" | "success";
+  variant: 'error' | 'success';
   message: string;
 }
 
 enum StepType {
   GENERAL,
   QUESTIONARY,
-  REVIEW
+  REVIEW,
 }
 
 export const ProposalSubmissionContext = createContext<{
@@ -51,33 +52,33 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentRole } = useContext(UserContext);
-  const isNonOfficer = currentRole !== "user_officer";
+  const isNonOfficer = currentRole !== 'user_officer';
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
   const classes = makeStyles(theme => ({
     stepper: {
-      padding: theme.spacing(3, 0, 5)
+      padding: theme.spacing(3, 0, 5),
     },
     heading: {
-      textOverflow: "ellipsis",
-      width: "80%",
-      margin: "0 auto",
-      textAlign: "center",
-      minWidth: "450px",
-      whiteSpace: "nowrap",
-      overflow: "hidden"
+      textOverflow: 'ellipsis',
+      width: '80%',
+      margin: '0 auto',
+      textAlign: 'center',
+      minWidth: '450px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
     },
     infoline: {
       color: theme.palette.grey[600],
-      textAlign: "right"
-    }
+      textAlign: 'right',
+    },
   }))();
 
   const reduceMiddleware = ({
     getState,
-    dispatch
+    dispatch,
   }: {
     getState: () => IProposalSubmissionModelState;
     dispatch: React.Dispatch<IEvent>;
@@ -104,12 +105,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
                 api()
                   .createProposal()
                   .then(data => data.createProposal!.proposal!),
-              "Saved"
+              'Saved'
             );
             ({ id, status, shortCode } = result);
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode }
+              payload: { id, status, shortCode },
             });
           }
           await executeAndMonitorCall(
@@ -119,9 +120,9 @@ export default function ProposalContainer(props: { data: Proposal }) {
                 title: state.proposal.title,
                 abstract: state.proposal.abstract,
                 proposerId: state.proposal.proposer.id,
-                users: state.proposal.users.map(user => user.id)
+                users: state.proposal.users.map(user => user.id),
               }),
-            "Saved"
+            'Saved'
           );
           setStepIndex(clampStep(stepIndex + 1));
           break;
@@ -134,10 +135,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
                   id: state.proposal.id,
                   answers: prepareAnswers(action.payload.answers),
                   topicsCompleted: [],
-                  partialSave: true
+                  partialSave: true,
                 })
                 .then(data => data.updateProposal),
-            "Saved"
+            'Saved'
           );
           break;
 
@@ -149,10 +150,10 @@ export default function ProposalContainer(props: { data: Proposal }) {
                   id: state.proposal.id,
                   answers: prepareAnswers(action.payload.answers),
                   topicsCompleted: [action.payload.topicId],
-                  partialSave: false
+                  partialSave: false,
                 })
                 .then(data => data.updateProposal),
-            "Saved"
+            'Saved'
           ).then(() => setStepIndex(clampStep(stepIndex + 1)));
           break;
 
@@ -164,11 +165,11 @@ export default function ProposalContainer(props: { data: Proposal }) {
           break;
 
         case EventType.API_CALL_ERROR:
-          enqueueSnackbar(action.payload.message, { variant: "error" });
+          enqueueSnackbar(action.payload.message, { variant: 'error' });
           break;
 
         case EventType.API_CALL_SUCCESS:
-          enqueueSnackbar(action.payload.message, { variant: "success" });
+          enqueueSnackbar(action.payload.message, { variant: 'success' });
           break;
       }
     };
@@ -187,31 +188,33 @@ export default function ProposalContainer(props: { data: Proposal }) {
     successToastMessage?: string
   ) => {
     setIsLoading(true);
+
     return call().then(result => {
       if (result.error) {
         dispatch({
           type: EventType.API_CALL_ERROR,
           payload: {
-            message: getTranslation(result.error as ResourceId)
-          }
+            message: getTranslation(result.error as ResourceId),
+          },
         });
       } else {
         if (successToastMessage) {
           dispatch({
             type: EventType.API_CALL_SUCCESS,
             payload: {
-              message: successToastMessage
-            }
+              message: successToastMessage,
+            },
           });
         }
       }
       setIsLoading(false);
+
       return result!;
     });
   };
 
   var { state, dispatch } = ProposalSubmissionModel(props.data, [
-    reduceMiddleware
+    reduceMiddleware,
   ]);
 
   const isSubmitted = state.proposal.status === ProposalStatus.SUBMITTED;
@@ -232,28 +235,30 @@ export default function ProposalContainer(props: { data: Proposal }) {
             .then(data => data.proposal!)
         );
         dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
+
         return true;
       } else {
         return false;
       }
     }
+
     return false;
   };
 
   const getConfirmNavigMsg = () => {
-    return "Changes you recently made in this step will not be saved! Are you sure?";
+    return 'Changes you recently made in this step will not be saved! Are you sure?';
   };
 
   useEffect(() => {
     const createProposalSteps = (
       questionary: Questionary
     ): QuestionaryUIStep[] => {
-      var allProposalSteps = new Array<QuestionaryUIStep>();
+      let allProposalSteps = new Array<QuestionaryUIStep>();
 
       allProposalSteps.push(
         new QuestionaryUIStep(
           StepType.GENERAL,
-          "New Proposal",
+          'New Proposal',
           state.proposal.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
@@ -265,7 +270,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       );
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
-          let editable =
+          const editable =
             (index === 0 && state.proposal.status !== ProposalStatus.BLANK) ||
             step.isCompleted ||
             (steps[index - 1] !== undefined &&
@@ -289,7 +294,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       allProposalSteps.push(
         new QuestionaryUIStep(
           StepType.REVIEW,
-          "Review",
+          'Review',
           state.proposal.status === ProposalStatus.SUBMITTED,
           (
             <ProposalReview
@@ -299,6 +304,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
           )
         )
       );
+
       return allProposalSteps;
     };
 
@@ -314,7 +320,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
     const proposal = props.data;
     if (proposal.status === ProposalStatus.DRAFT) {
       const questionarySteps = proposal.questionary.steps;
-      var lastFinishedStep = questionarySteps
+      const lastFinishedStep = questionarySteps
         .slice()
         .reverse()
         .find(step => step.isCompleted === true);
@@ -336,11 +342,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
-      return "Loading...";
+      return 'Loading...';
     }
 
     if (!proposalSteps[step]) {
       console.error(`Invalid step ${step}`);
+
       return <span>Error</span>;
     }
 
@@ -348,6 +355,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
   };
 
   const progressBar = isLoading ? <LinearProgress /> : null;
+
   return (
     //@ts-ignore
     <Container maxWidth="lg">
@@ -360,7 +368,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
             align="center"
             className={classes.heading}
           >
-            {state.proposal.title || "New Proposal"}
+            {state.proposal.title || 'New Proposal'}
           </Typography>
           <div className={classes.infoline}>
             {state.proposal.shortCode
@@ -419,31 +427,32 @@ function QuestionaryStepButton(
 ) {
   const classes = makeStyles(theme => ({
     active: {
-      "& SVG": {
-        color: theme.palette.secondary.main + "!important"
-      }
+      '& SVG': {
+        color: theme.palette.secondary.main + '!important',
+      },
     },
     editable: {
-      "& SVG": {
-        color: theme.palette.primary.main + "!important"
-      }
-    }
+      '& SVG': {
+        color: theme.palette.primary.main + '!important',
+      },
+    },
   }))();
 
   const { active, clickable, editable } = props;
 
-  var buttonClasses = [];
+  const buttonClasses = [];
 
   if (active) {
     buttonClasses.push(classes.active);
   } else if (editable) {
     buttonClasses.push(classes.editable);
   }
+
   return (
     <StepButton
       {...props}
       disabled={!clickable}
-      className={buttonClasses.join(" ")}
+      className={buttonClasses.join(' ')}
     >
       {props.children}
     </StepButton>
@@ -460,6 +469,7 @@ const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
     answers = answers.map(answer => {
       return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
     });
+
     return answers;
   } else {
     return [];

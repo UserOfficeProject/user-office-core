@@ -1,13 +1,13 @@
-import React from "react";
 import {
   MenuItem,
   Select,
   Checkbox,
   ListItemText,
   Input,
-  InputLabel
-} from "@material-ui/core";
-import { FormikActions } from "formik";
+  InputLabel,
+} from '@material-ui/core';
+import { FormikActions } from 'formik';
+import React from 'react';
 const FormikUICustomSelect = ({
   field,
   form,
@@ -33,9 +33,9 @@ const FormikUICustomSelect = ({
     PaperProps: {
       style: {
         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250
-      }
-    }
+        width: 250,
+      },
+    },
   };
   const handleChange = (
     event: React.ChangeEvent<{
@@ -44,6 +44,7 @@ const FormikUICustomSelect = ({
   ) => {
     form.setFieldValue(field.name, event.target.value); // value is string[]
   };
+
   return (
     <>
       <InputLabel htmlFor={id}>{label}</InputLabel>
@@ -52,7 +53,7 @@ const FormikUICustomSelect = ({
         value={field.value}
         onChange={handleChange}
         input={<Input id="select-multiple-checkbox" />}
-        renderValue={selected => (selected as string[]).join(", ")}
+        renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={MenuProps}
         id={id}
         {...props}

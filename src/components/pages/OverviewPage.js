@@ -1,14 +1,16 @@
-import Grid from "@material-ui/core/Grid";
-import parse from "html-react-parser";
-import React, { useContext } from "react";
-import { UserContext } from "../../context/UserContextProvider";
-import { useGetPageContent } from "../../hooks/useGetPageContent";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
-import ProposalTableUser from "../proposal/ProposalTableUser";
+import Grid from '@material-ui/core/Grid';
+import parse from 'html-react-parser';
+import React, { useContext } from 'react';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import ProposalTableUser from '../proposal/ProposalTableUser';
 
 export default function OverviewPage() {
   const { user } = useContext(UserContext);
-  const [loadingHomeContent, homePageContent] = useGetPageContent("HOMEPAGE");
+  const [loadingHomeContent, homePageContent] = useGetPageContent('HOMEPAGE');
+
   return (
     <React.Fragment>
       <ContentContainer>

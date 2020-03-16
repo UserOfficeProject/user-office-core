@@ -1,11 +1,12 @@
-import AppBar from "@material-ui/core/AppBar";
-import Box from "@material-ui/core/Box";
-import { useTheme } from "@material-ui/core/styles";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
-import Typography from "@material-ui/core/Typography";
-import React from "react";
-import { StyledPaper } from "../../styles/StyledComponents";
+import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
+import { useTheme } from '@material-ui/core/styles';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import Typography from '@material-ui/core/Typography';
+import React from 'react';
+
+import { StyledPaper } from '../../styles/StyledComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -34,7 +35,7 @@ function TabPanel(props: TabPanelProps) {
 function a11yProps(index: any) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
+    'aria-controls': `full-width-tabpanel-${index}`,
   };
 }
 

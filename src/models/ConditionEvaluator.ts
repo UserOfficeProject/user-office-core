@@ -1,5 +1,5 @@
-import JSDict from "../utils/Dictionary";
-import { EvaluatorOperator, QuestionaryField } from "../generated/sdk";
+import { EvaluatorOperator, QuestionaryField } from '../generated/sdk';
+import JSDict from '../utils/Dictionary';
 
 export class ConditionEvaluator {
   private validatorMap!: JSDict<EvaluatorOperator, IFieldConditionEvaluator>;
@@ -14,6 +14,7 @@ export class ConditionEvaluator {
       this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
       this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
     }
+
     return this.validatorMap;
   }
 

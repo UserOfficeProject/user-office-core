@@ -1,16 +1,17 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import FormikUICustomTable from "../common/FormikUICustomTable";
-import * as Yup from "yup";
-import FormikDropdown from "../common/FormikDropdown";
-import { AdminComponentShell } from "./AdminComponentShell";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import TitledContainer from "../common/TitledContainer";
-import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { EventType } from '../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import FormikDropdown from '../common/FormikDropdown';
+import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import FormikUICustomTable from '../common/FormikUICustomTable';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
   const field = props.field;
@@ -23,18 +24,18 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
-          }
+            field: { ...field, ...vals },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
         natural_key: naturalKeySchema,
-        question: Yup.string().required("Question is required"),
+        question: Yup.string().required('Question is required'),
         config: Yup.object({
           required: Yup.bool(),
-          variant: Yup.string().required("Variant is required")
-        })
+          variant: Yup.string().required('Variant is required'),
+        }),
       })}
     >
       {formikProps => (
@@ -47,7 +48,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "natural_key" }}
+              inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
               name="question"
@@ -56,7 +57,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "question" }}
+              inputProps={{ 'data-cy': 'question' }}
             />
 
             <TitledContainer label="Constraints">
@@ -67,7 +68,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 component={FormikUICustomCheckbox}
                 margin="normal"
                 fullWidth
-                inputProps={{ "data-cy": "required" }}
+                inputProps={{ 'data-cy': 'required' }}
               />
             </TitledContainer>
 
@@ -76,8 +77,8 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 name="config.variant"
                 label="Variant"
                 items={[
-                  { text: "Radio", value: "radio" },
-                  { text: "Dropdown", value: "dropdown" }
+                  { text: 'Radio', value: 'radio' },
+                  { text: 'Dropdown', value: 'dropdown' },
                 ]}
                 data-cy="variant"
               />
@@ -88,7 +89,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 title=""
                 name="config.options"
                 component={FormikUICustomTable}
-                columns={[{ title: "Answer", field: "answer" }]}
+                columns={[{ title: 'Answer', field: 'answer' }]}
                 dataTransforms={{
                   toTable: (options: string[]) => {
                     return options.map(option => {
@@ -97,7 +98,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                   },
                   fromTable: (rows: any[]) => {
                     return rows.map(row => row.answer);
-                  }
+                  },
                 }}
                 margin="normal"
                 fullWidth
@@ -113,7 +114,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                inputProps={{ "data-cy": "dependencies" }}
+                inputProps={{ 'data-cy': 'dependencies' }}
               />
             </TitledContainer>
           </AdminComponentShell>

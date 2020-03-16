@@ -1,6 +1,7 @@
-import React from "react";
-import { useBlankProposal } from "../../hooks/useBlankProposal";
-import ProposalContainer from "./ProposalContainer";
+import React from 'react';
+
+import { useBlankProposal } from '../../hooks/useBlankProposal';
+import ProposalContainer from './ProposalContainer';
 
 export default function ProposalSubmission() {
   const { proposal } = useBlankProposal();

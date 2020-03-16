@@ -2,12 +2,13 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  makeStyles
-} from "@material-ui/core";
-import { getIn } from "formik";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalErrorLabel } from "./ProposalErrorLabel";
+  makeStyles,
+} from '@material-ui/core';
+import { getIn } from 'formik';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+
+import { IBasicComponentProps } from './IBasicComponentProps';
+import { ProposalErrorLabel } from './ProposalErrorLabel';
 
 export function ProposalComponentBoolean(props: IBasicComponentProps) {
   const { templateField, errors, onComplete, touched } = props;
@@ -24,8 +25,8 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
 
   const classes = makeStyles({
     label: {
-      marginRight: "5px"
-    }
+      marginRight: '5px',
+    },
   })();
 
   return (
@@ -41,7 +42,7 @@ export function ProposalComponentBoolean(props: IBasicComponentProps) {
             value={stateValue}
             checked={stateValue}
             inputProps={{
-              "aria-label": "primary checkbox"
+              'aria-label': 'primary checkbox',
             }}
             required={config.required ? true : false}
           />

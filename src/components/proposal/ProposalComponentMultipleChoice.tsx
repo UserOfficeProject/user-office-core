@@ -6,34 +6,35 @@ import {
   MenuItem,
   Radio,
   RadioGroup,
-  TextField
-} from "@material-ui/core";
-import { getIn } from "formik";
-import React, { useState, useEffect } from "react";
-import { SelectionFromOptionsConfig } from "../../generated/sdk";
-import { IBasicComponentProps } from "./IBasicComponentProps";
+  TextField,
+} from '@material-ui/core';
+import { getIn } from 'formik';
+import React, { useState, useEffect } from 'react';
+
+import { SelectionFromOptionsConfig } from '../../generated/sdk';
+import { IBasicComponentProps } from './IBasicComponentProps';
 
 export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   const classes = makeStyles({
     horizontalLayout: {
-      flexDirection: "row"
+      flexDirection: 'row',
     },
     verticalLayout: {
-      flexDirection: "column"
+      flexDirection: 'column',
     },
     wrapper: {
-      margin: "18px 0 0 0",
-      display: "inline-flex"
+      margin: '18px 0 0 0',
+      display: 'inline-flex',
     },
     label: {
-      marginTop: "10px",
-      marginRight: "5px"
-    }
+      marginTop: '10px',
+      marginRight: '5px',
+    },
   })();
 
-  let { templateField, touched, errors, onComplete } = props;
-  let { proposal_question_id, value } = templateField;
-  let [stateValue, setStateValue] = useState(value);
+  const { templateField, touched, errors, onComplete } = props;
+  const { proposal_question_id, value } = templateField;
+  const [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as SelectionFromOptionsConfig;
@@ -48,7 +49,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
   };
 
   switch (config.variant) {
-    case "dropdown":
+    case 'dropdown':
       return (
         <FormControl fullWidth>
           <TextField
@@ -61,7 +62,7 @@ export function ProposalComponentMultipleChoice(props: IBasicComponentProps) {
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
             }
             SelectProps={{
-              MenuProps: {}
+              MenuProps: {},
             }}
             error={isError}
             helperText={config.small_label}

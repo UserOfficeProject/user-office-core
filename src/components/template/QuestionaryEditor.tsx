@@ -5,21 +5,22 @@ import {
   LinearProgress,
   makeStyles,
   Switch,
-  useTheme
-} from "@material-ui/core";
-import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { useSnackbar } from "notistack";
-import React, { useState } from "react";
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
-import { ProposalTemplateField } from "../../generated/sdk";
-import { usePersistModel } from "../../hooks/usePersistModel";
+  useTheme,
+} from '@material-ui/core';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { useSnackbar } from 'notistack';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+
+import { ProposalTemplateField } from '../../generated/sdk';
+import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   EventType,
-  IEvent
-} from "../../models/QuestionaryEditorModel";
-import { StyledPaper } from "../../styles/StyledComponents";
-import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
-import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
+  IEvent,
+} from '../../models/QuestionaryEditorModel';
+import { StyledPaper } from '../../styles/StyledComponents';
+import QuestionaryEditorTopic from './QuestionaryEditorTopic';
+import QuestionaryFieldEditor from './QuestionaryFieldEditor';
 
 export default function QuestionaryEditor() {
   const reducerMiddleware = () => {
@@ -27,7 +28,7 @@ export default function QuestionaryEditor() {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
-          enqueueSnackbar(action.payload, { variant: "error" });
+          enqueueSnackbar(action.payload, { variant: 'error' });
           break;
 
         case EventType.FIELD_CREATED:
@@ -37,49 +38,49 @@ export default function QuestionaryEditor() {
     };
   };
   const { enqueueSnackbar } = useSnackbar();
-  var { persistModel, isLoading } = usePersistModel();
-  var { state, dispatch } = QuestionaryEditorModel([
+  const { persistModel, isLoading } = usePersistModel();
+  const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
-    reducerMiddleware
+    reducerMiddleware,
   ]);
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const [
     selectedField,
-    setSelectedField
+    setSelectedField,
   ] = React.useState<ProposalTemplateField | null>(null);
 
   const theme = useTheme();
   const classes = makeStyles(theme => ({
     modalContainer: {
-      backgroundColor: "white"
+      backgroundColor: 'white',
     },
     centeredButton: {
-      display: "flex",
-      margin: "10px auto"
-    }
+      display: 'flex',
+      margin: '10px auto',
+    },
   }))();
 
   const getTopicListStyle = (isDraggingOver: any) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
-    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
-    display: "flex"
+    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+    display: 'flex',
   });
 
   const onDragEnd = (result: DropResult) => {
-    if (result.type === "field") {
+    if (result.type === 'field') {
       dispatch({
         type: EventType.REORDER_FIELD_REQUESTED,
-        payload: { source: result.source, destination: result.destination }
+        payload: { source: result.source, destination: result.destination },
       });
     }
-    if (result.type === "topic") {
+    if (result.type === 'topic') {
       dispatch({
         type: EventType.REORDER_TOPIC_REQUESTED,
-        payload: { source: result.source, destination: result.destination }
+        payload: { source: result.source, destination: result.destination },
       });
     }
   };
@@ -95,9 +96,9 @@ export default function QuestionaryEditor() {
   const getContainerStyle = (isBusy: boolean): any => {
     return isLoading
       ? {
-          pointerEvents: "none",
-          userSelect: "none",
-          opacity: 0.5
+          pointerEvents: 'none',
+          userSelect: 'none',
+          opacity: 0.5,
         }
       : {};
   };
@@ -113,7 +114,7 @@ export default function QuestionaryEditor() {
         onClick={() =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0 }
+            payload: { sortOrder: 0 },
           })
         }
       >
@@ -126,7 +127,7 @@ export default function QuestionaryEditor() {
     state.steps.length > 1 ? (
       <FormGroup
         row
-        style={{ justifyContent: "flex-end", paddingBottom: "25px" }}
+        style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
       >
         <FormControlLabel
           control={
@@ -140,6 +141,7 @@ export default function QuestionaryEditor() {
         />
       </FormGroup>
     ) : null;
+
   return (
     <>
       <StyledPaper style={getContainerStyle(isLoading)}>

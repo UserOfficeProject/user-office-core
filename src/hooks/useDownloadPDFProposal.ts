@@ -1,12 +1,12 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
 export function useDownloadPDFProposal() {
   const downloadProposalPDF = useCallback(proposalId => {
-    var element = document.createElement("a");
-    element.setAttribute("href", "/proposal/download/" + proposalId);
-    element.setAttribute("download", "download");
+    const element = document.createElement('a');
+    element.setAttribute('href', '/proposal/download/' + proposalId);
+    element.setAttribute('download', 'download');
 
-    element.style.display = "none";
+    element.style.display = 'none';
     document.body.appendChild(element);
 
     element.click();

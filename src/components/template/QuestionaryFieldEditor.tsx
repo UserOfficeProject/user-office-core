@@ -1,16 +1,17 @@
-import React, { FunctionComponent } from "react";
-import { Grid, Modal, Backdrop, Fade } from "@material-ui/core";
-import { DataType } from "../../generated/sdk";
-import JSDict from "../../utils/Dictionary";
-import { IEvent } from "../../models/QuestionaryEditorModel";
-import { makeStyles } from "@material-ui/core/styles";
-import { AdminComponentEmbellishment } from "./AdminComponentEmbellishment";
-import { AdminComponentTextInput } from "./AdminComponentTextInput";
-import { AdminComponentMultipleChoice } from "./AdminComponentMultipleChoice";
-import { AdminComponentBoolean } from "./AdminComponentBoolean";
-import { AdminComponentFileUpload } from "./AdminComponentFileUpload";
-import { AdminComponentDate } from "./AdminComponentDate";
-import { ProposalTemplateField, ProposalTemplate } from "../../generated/sdk";
+import { Grid, Modal, Backdrop, Fade } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import React, { FunctionComponent } from 'react';
+
+import { DataType } from '../../generated/sdk';
+import { ProposalTemplateField, ProposalTemplate } from '../../generated/sdk';
+import { IEvent } from '../../models/QuestionaryEditorModel';
+import JSDict from '../../utils/Dictionary';
+import { AdminComponentBoolean } from './AdminComponentBoolean';
+import { AdminComponentDate } from './AdminComponentDate';
+import { AdminComponentEmbellishment } from './AdminComponentEmbellishment';
+import { AdminComponentFileUpload } from './AdminComponentFileUpload';
+import { AdminComponentMultipleChoice } from './AdminComponentMultipleChoice';
+import { AdminComponentTextInput } from './AdminComponentTextInput';
 
 export default function QuestionaryFieldEditor(props: {
   field: ProposalTemplateField | null;
@@ -20,17 +21,17 @@ export default function QuestionaryFieldEditor(props: {
 }) {
   const classes = makeStyles(() => ({
     container: {
-      backgroundColor: "white",
-      padding: "20px",
-      maxWidth: "700px",
-      maxHeight: "100%",
-      overflowY: "auto"
+      backgroundColor: 'white',
+      padding: '20px',
+      maxWidth: '700px',
+      maxHeight: '100%',
+      overflowY: 'auto',
     },
     modal: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center"
-    }
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   }))();
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
@@ -50,6 +51,7 @@ export default function QuestionaryFieldEditor(props: {
   if (componentMap.get(props.field.data_type) === null) {
     return <span>Error ocurred</span>;
   }
+
   return (
     <Modal
       className={classes.modal}
@@ -60,7 +62,7 @@ export default function QuestionaryFieldEditor(props: {
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{
-        timeout: 500
+        timeout: 500,
       }}
     >
       <Fade in={props.field != null}>
@@ -69,7 +71,7 @@ export default function QuestionaryFieldEditor(props: {
             field: props.field,
             dispatch: props.dispatch,
             closeMe: props.closeMe,
-            template: props.template
+            template: props.template,
           })}
         </Grid>
       </Fade>
@@ -87,8 +89,8 @@ interface AdminComponentProps {
 interface AdminComponentShellProps extends AdminComponentProps {
   label: string;
 }
-export interface AdminComponentSignature
-  extends FunctionComponent<AdminComponentProps> {}
+export type AdminComponentSignature = FunctionComponent<AdminComponentProps>;
 
-export interface AdminComponentShellSignature
-  extends FunctionComponent<AdminComponentShellProps> {}
+export type AdminComponentShellSignature = FunctionComponent<
+  AdminComponentShellProps
+>;

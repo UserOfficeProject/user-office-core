@@ -1,6 +1,7 @@
-import React from 'react';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
+import React from 'react';
+
 import { useEventLogsData } from '../../hooks/useEventLogsData';
 import { tableIcons } from '../../utils/materialIcons';
 

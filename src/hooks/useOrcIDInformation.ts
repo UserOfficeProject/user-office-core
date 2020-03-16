@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
-import { useDataApi } from "./useDataApi";
-import { GetOrcIdInformationQuery } from "../generated/sdk";
+import { useEffect, useState } from 'react';
+
+import { GetOrcIdInformationQuery } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
 
 export function useOrcIDInformation(authorizationCode?: string | null) {
   const [orcData, setOrcData] = useState<
-    GetOrcIdInformationQuery["getOrcIDInformation"]
+    GetOrcIdInformationQuery['getOrcIDInformation']
   >(null);
   const [loading, setLoading] = useState(true);
 
@@ -14,6 +15,7 @@ export function useOrcIDInformation(authorizationCode?: string | null) {
     if (!authorizationCode) {
       setOrcData(null);
       setLoading(false);
+
       return;
     }
     api()

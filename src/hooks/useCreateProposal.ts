@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
-import { useDataApi } from "./useDataApi";
+import { useCallback, useState } from 'react';
+
+import { useDataApi } from './useDataApi';
 
 export function useCreateProposal() {
   const [loading, setLoading] = useState(false);
@@ -8,10 +9,12 @@ export function useCreateProposal() {
 
   const createProposal = useCallback(async () => {
     setLoading(true);
+
     return api()
       .createProposal()
       .then(data => {
         setLoading(false);
+
         return data.createProposal;
       });
   }, [api]);

@@ -1,31 +1,32 @@
-import produce from "immer";
-import { Reducer } from "react";
+import produce from 'immer';
+import { Reducer } from 'react';
+
 import {
   Proposal,
   ProposalStatus,
   QuestionaryField,
-  QuestionaryStep
-} from "../generated/sdk";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
+  QuestionaryStep,
+} from '../generated/sdk';
+import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
-  getQuestionaryStepByTopicId
-} from "./ProposalModelFunctions";
+  getQuestionaryStepByTopicId,
+} from './ProposalModelFunctions';
 
 export enum EventType {
-  BACK_CLICKED = "BACK_CLICKED",
-  RESET_CLICKED = "RESET_CLICKED",
-  SAVE_AND_NEXT_CLICKED = "SAVE_AND_NEXT_CLICKED",
-  SAVE_CLICKED = "SAVE_CLICKED",
-  SAVE_STEP_CLICKED = "SAVE_STEP_CLICKED",
-  FINISH_STEP_CLICKED = "FINISH_STEP_CLICKED",
-  SAVE_GENERAL_INFO_CLICKED = "SAVE_GENERAL_INFO_CLICKED",
-  FIELD_CHANGED = "FIELD_CHANGED",
-  MODEL_LOADED = "MODEL_LOADED",
-  SUBMIT_PROPOSAL_CLICKED = "SUBMIT_PROPOSAL_CLICKED",
-  API_CALL_ERROR = "API_ERROR_OCCURRED",
-  API_CALL_SUCCESS = "API_SUCCESS_OCCURRED",
-  PROPOSAL_METADATA_CHANGED = "PROPOSAL_INFORMATION_CHANGED"
+  BACK_CLICKED = 'BACK_CLICKED',
+  RESET_CLICKED = 'RESET_CLICKED',
+  SAVE_AND_NEXT_CLICKED = 'SAVE_AND_NEXT_CLICKED',
+  SAVE_CLICKED = 'SAVE_CLICKED',
+  SAVE_STEP_CLICKED = 'SAVE_STEP_CLICKED',
+  FINISH_STEP_CLICKED = 'FINISH_STEP_CLICKED',
+  SAVE_GENERAL_INFO_CLICKED = 'SAVE_GENERAL_INFO_CLICKED',
+  FIELD_CHANGED = 'FIELD_CHANGED',
+  MODEL_LOADED = 'MODEL_LOADED',
+  SUBMIT_PROPOSAL_CLICKED = 'SUBMIT_PROPOSAL_CLICKED',
+  API_CALL_ERROR = 'API_ERROR_OCCURRED',
+  API_CALL_SUCCESS = 'API_SUCCESS_OCCURRED',
+  PROPOSAL_METADATA_CHANGED = 'PROPOSAL_INFORMATION_CHANGED',
 }
 export interface IEvent {
   type: EventType;
@@ -56,14 +57,16 @@ export function ProposalSubmissionModel(
           ) as QuestionaryField;
           field.value = action.payload.newValue;
           draftState.isDirty = true;
+
           return draftState;
 
         case EventType.PROPOSAL_METADATA_CHANGED:
           draftState = {
             ...draftState,
-            proposal: { ...draftState.proposal, ...action.payload }
+            proposal: { ...draftState.proposal, ...action.payload },
           };
           draftState.isDirty = true;
+
           return draftState;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
@@ -77,7 +80,7 @@ export function ProposalSubmissionModel(
         case EventType.FINISH_STEP_CLICKED:
           draftState.proposal = {
             ...draftState.proposal,
-            ...action.payload.proposal
+            ...action.payload.proposal,
           };
           (getQuestionaryStepByTopicId(
             draftState.proposal.questionary!,
@@ -98,5 +101,6 @@ export function ProposalSubmissionModel(
       }
     });
   }
+
   return { state: modelState, dispatch };
 }

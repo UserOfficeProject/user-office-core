@@ -1,4 +1,4 @@
-import { QuestionaryField } from "../../generated/sdk";
+import { QuestionaryField } from '../../generated/sdk';
 
 export interface IBasicComponentProps {
   templateField: QuestionaryField;

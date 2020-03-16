@@ -1,22 +1,23 @@
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import Grid from "@material-ui/core/Grid";
-import { Add } from "@material-ui/icons";
-import MaterialTable from "material-table";
-import React, { useState } from "react";
-import { useCallsData } from "../../hooks/useCallsData";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
-import { tableIcons } from "../../utils/tableIcons";
-import AddCall from "./AddCall";
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import Grid from '@material-ui/core/Grid';
+import { Add } from '@material-ui/icons';
+import MaterialTable from 'material-table';
+import React, { useState } from 'react';
+
+import { useCallsData } from '../../hooks/useCallsData';
+import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import { tableIcons } from '../../utils/tableIcons';
+import AddCall from './AddCall';
 
 export default function CallPage() {
   const [show, setShow] = useState(false);
   const { loading, callsData } = useCallsData(show);
 
   const columns = [
-    { title: "Short Code", field: "shortCode" },
-    { title: "Start Date", field: "startCall" },
-    { title: "End Date", field: "endCall" }
+    { title: 'Short Code', field: 'shortCode' },
+    { title: 'Start Date', field: 'startCall' },
+    { title: 'End Date', field: 'endCall' },
   ];
 
   if (loading) {
@@ -45,15 +46,15 @@ export default function CallPage() {
                 columns={columns}
                 data={callsData}
                 options={{
-                  search: false
+                  search: false,
                 }}
                 actions={[
                   {
                     icon: () => <Add data-cy="add-call" />,
                     isFreeAction: true,
-                    tooltip: "Add Call",
-                    onClick: (event, rowData) => setShow(true)
-                  }
+                    tooltip: 'Add Call',
+                    onClick: (event, rowData) => setShow(true),
+                  },
                 ]}
               />
             </StyledPaper>

@@ -1,46 +1,47 @@
 // It is important to import the Editor which accepts plugins.
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-import "tinymce/tinymce";
-import "tinymce/themes/silver/theme";
-import "tinymce/skins/ui/oxide/skin.min.css";
-import "tinymce/skins/ui/oxide/content.min.css";
-import "tinymce/plugins/link";
-import "tinymce/plugins/preview";
-import "tinymce/plugins/image";
-import "tinymce/plugins/code";
+import 'tinymce/tinymce';
+import 'tinymce/themes/silver/theme';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/ui/oxide/content.min.css';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/preview';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/code';
 
-import { Editor } from "@tinymce/tinymce-react";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import { useGetPageContent } from "../../hooks/useGetPageContent";
-import { useSnackbar } from "notistack";
-import { StyledPaper } from "../../styles/StyledComponents";
-import { useDataApi } from "../../hooks/useDataApi";
-import { PageName } from "../../generated/sdk";
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import Divider from '@material-ui/core/Divider';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { Editor } from '@tinymce/tinymce-react';
+import { useSnackbar } from 'notistack';
+
+import { PageName } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { StyledPaper } from '../../styles/StyledComponents';
 
 const useStyles = makeStyles(theme => ({
   buttons: {
-    display: "flex",
-    justifyContent: "flex-end"
+    display: 'flex',
+    justifyContent: 'flex-end',
   },
   button: {
-    marginTop: "25px",
-    marginLeft: "10px"
-  }
+    marginTop: '25px',
+    marginLeft: '10px',
+  },
 }));
 
 export default function PageEditor() {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const [homeContent, setHomeContent] = useState("");
-  const [helpContent, setHelpContent] = useState("");
-  const [privacyContent, setPrivacyContent] = useState("");
-  const [cookieContent, setCookieContent] = useState("");
+  const [homeContent, setHomeContent] = useState('');
+  const [helpContent, setHelpContent] = useState('');
+  const [privacyContent, setPrivacyContent] = useState('');
+  const [cookieContent, setCookieContent] = useState('');
   const [loadingHelpContent, helpPageContent] = useGetPageContent(
     PageName.HELPPAGE
   );
@@ -65,7 +66,7 @@ export default function PageEditor() {
   const handleClick = async (pageName, text) => {
     api()
       .setPageContent({ id: pageName, text: text })
-      .then(() => enqueueSnackbar("Updated Page", { variant: "success" }));
+      .then(() => enqueueSnackbar('Updated Page', { variant: 'success' }));
   };
 
   return (
@@ -81,9 +82,9 @@ export default function PageEditor() {
             init={{
               skin: false,
               content_css: false,
-              plugins: ["link", "preview", "image", "code"],
-              toolbar: "bold italic",
-              branding: false
+              plugins: ['link', 'preview', 'image', 'code'],
+              toolbar: 'bold italic',
+              branding: false,
             }}
             id={PageName.HOMEPAGE}
             onEditorChange={content => setHomeContent(content)}
@@ -111,10 +112,10 @@ export default function PageEditor() {
             init={{
               skin: false,
               content_css: false,
-              plugins: ["link", "preview", "image", "code"],
-              toolbar: "bold italic",
+              plugins: ['link', 'preview', 'image', 'code'],
+              toolbar: 'bold italic',
               branding: false,
-              images_upload_url: "postAcceptor.php"
+              images_upload_url: 'postAcceptor.php',
             }}
             id={PageName.HELPPAGE}
             onEditorChange={content => setHelpContent(content)}
@@ -143,9 +144,9 @@ export default function PageEditor() {
             init={{
               skin: false,
               content_css: false,
-              plugins: ["link", "preview", "image", "code"],
-              toolbar: "bold italic",
-              branding: false
+              plugins: ['link', 'preview', 'image', 'code'],
+              toolbar: 'bold italic',
+              branding: false,
             }}
             id={PageName.PRIVACYPAGE}
             onEditorChange={content => setPrivacyContent(content)}
@@ -173,9 +174,9 @@ export default function PageEditor() {
             init={{
               skin: false,
               content_css: false,
-              plugins: ["link", "preview", "image", "code"],
-              toolbar: "bold italic",
-              branding: false
+              plugins: ['link', 'preview', 'image', 'code'],
+              toolbar: 'bold italic',
+              branding: false,
             }}
             id={PageName.COOKIEPAGE}
             onEditorChange={content => setCookieContent(content)}

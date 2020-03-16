@@ -4,8 +4,9 @@
  * It is used in the user details page for now.
  */
 
-import React from 'react';
 import { Container, Grid } from '@material-ui/core';
+import React from 'react';
+
 import { StyledPaper } from '../../styles/StyledComponents';
 import EventLogList from './EventLogList';
 

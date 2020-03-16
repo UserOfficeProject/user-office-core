@@ -1,8 +1,9 @@
-import Grid from "@material-ui/core/Grid";
-import React, { useContext } from "react";
-import { Redirect } from "react-router-dom";
-import { UserContext } from "../../context/UserContextProvider";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
+import Grid from '@material-ui/core/Grid';
+import React, { useContext } from 'react';
+import { Redirect } from 'react-router-dom';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function RoleSelectionPage() {
   const { roles, currentRole, handleRole } = useContext(UserContext);

@@ -1,33 +1,34 @@
-import DateFnsUtils from "@date-io/date-fns";
-import { getTranslation } from "@esss-swap/duo-localisation";
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import { useSnackbar } from "notistack";
-import React from "react";
-import * as Yup from "yup";
-import { useDataApi } from "../../hooks/useDataApi";
-import FormikUICustomDatePicker from "../common/FormikUICustomDatePicker";
+import DateFnsUtils from '@date-io/date-fns';
+import { getTranslation } from '@esss-swap/duo-localisation';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { useDataApi } from '../../hooks/useDataApi';
+import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
-    fontSize: "18px",
-    padding: "22px 0 0 12px"
+    fontSize: '18px',
+    padding: '22px 0 0 12px',
   },
   heading: {
-    textAlign: "center"
+    textAlign: 'center',
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(3)
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
-  }
+    margin: theme.spacing(3, 0, 2),
+  },
 }));
 
 export default function AddCall(props) {
@@ -40,15 +41,15 @@ export default function AddCall(props) {
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          shortCode: "",
+          shortCode: '',
           start: currentDay,
           end: currentDay,
           startReview: currentDay,
           endReview: currentDay,
           startNotify: currentDay,
           endNotify: currentDay,
-          cycleComment: "",
-          surveyComment: ""
+          cycleComment: '',
+          surveyComment: '',
         }}
         onSubmit={async (values, actions) => {
           const {
@@ -60,7 +61,7 @@ export default function AddCall(props) {
             startNotify,
             endNotify,
             cycleComment,
-            surveyComment
+            surveyComment,
           } = values;
           await api()
             .createCall({
@@ -72,12 +73,12 @@ export default function AddCall(props) {
               startNotify,
               endNotify,
               cycleComment,
-              surveyComment
+              surveyComment,
             })
             .then(data =>
               data.createCall.error
                 ? enqueueSnackbar(getTranslation(data.createCall.error), {
-                    variant: "error"
+                    variant: 'error',
                   })
                 : null
             );
@@ -85,15 +86,15 @@ export default function AddCall(props) {
           props.close();
         }}
         validationSchema={Yup.object().shape({
-          shortCode: Yup.string().required("Short Code is required"),
-          start: Yup.date().required("Date is required"),
-          end: Yup.date().required("Date is required"),
-          startReview: Yup.date().required("Date is required"),
-          endReview: Yup.date().required("Date is required"),
-          startNotify: Yup.date().required("Date is required"),
-          endNotify: Yup.date().required("Date is required"),
-          cycleComment: Yup.string().required("Date is required"),
-          surveyComment: Yup.string().required("Date is required")
+          shortCode: Yup.string().required('Short Code is required'),
+          start: Yup.date().required('Date is required'),
+          end: Yup.date().required('Date is required'),
+          startReview: Yup.date().required('Date is required'),
+          endReview: Yup.date().required('Date is required'),
+          startNotify: Yup.date().required('Date is required'),
+          endNotify: Yup.date().required('Date is required'),
+          cycleComment: Yup.string().required('Date is required'),
+          surveyComment: Yup.string().required('Date is required'),
         })}
       >
         {({ values, errors, handleChange }) => (

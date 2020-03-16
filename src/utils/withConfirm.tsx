@@ -1,20 +1,20 @@
-import React, { Fragment, useState, useCallback } from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import React, { Fragment, useState, useCallback } from 'react';
 
 const defaultOptions = {
-  title: "",
-  description: "",
-  confirmationText: "OK",
-  cancellationText: "Cancel",
+  title: '',
+  description: '',
+  confirmationText: 'OK',
+  cancellationText: 'Cancel',
   dialogProps: {},
   onClose: () => {},
-  onCancel: () => {}
+  onCancel: () => {},
 };
 
 const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
@@ -22,8 +22,8 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
 ) => {
   const classes = makeStyles(theme => ({
     title: {
-      marginTop: "12px"
-    }
+      marginTop: '12px',
+    },
   }))();
   const [onConfirm, setOnConfirm] = useState<Function | null>(null);
   const [options, setOptions] = useState(defaultOptions);
@@ -34,7 +34,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
     cancellationText,
     dialogProps,
     onClose,
-    onCancel
+    onCancel,
   } = options;
   const handleClose = useCallback(() => {
     onClose();
@@ -61,6 +61,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
     },
     []
   );
+
   return (
     <Fragment>
       <WrappedComponent {...props} confirm={confirm} />

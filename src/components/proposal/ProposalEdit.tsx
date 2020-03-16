@@ -1,6 +1,7 @@
-import React from "react";
-import ProposalContainer from "./ProposalContainer";
-import { useProposalData } from "../../hooks/useProposalData";
+import React from 'react';
+
+import { useProposalData } from '../../hooks/useProposalData';
+import ProposalContainer from './ProposalContainer';
 
 export default function ProposalEdit(props: { match: any }): JSX.Element {
   const { proposalData } = useProposalData(

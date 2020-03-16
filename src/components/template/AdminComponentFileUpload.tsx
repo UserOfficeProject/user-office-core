@@ -1,14 +1,15 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import * as Yup from "yup";
-import FormikUICustomSelect from "../common/FormikUICustomSelect";
-import { AdminComponentShell } from "./AdminComponentShell";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import TitledContainer from "../common/TitledContainer";
-import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { EventType } from '../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import FormikUICustomSelect from '../common/FormikUICustomSelect';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentFileUpload: AdminComponentSignature = props => {
   const field = props.field;
@@ -21,19 +22,19 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
-          }
+            field: { ...field, ...vals },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
         natural_key: naturalKeySchema,
-        question: Yup.string().required("Question is required"),
+        question: Yup.string().required('Question is required'),
         config: Yup.object({
           file_type: Yup.array(),
           small_label: Yup.string(),
-          max_files: Yup.number()
-        })
+          max_files: Yup.number(),
+        }),
       })}
     >
       {() => (
@@ -46,7 +47,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "natural_key" }}
+              inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
               name="question"
@@ -55,7 +56,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "question" }}
+              inputProps={{ 'data-cy': 'question' }}
             />
             <TitledContainer label="Options">
               <Field
@@ -77,12 +78,12 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
                 id="fileType"
                 component={FormikUICustomSelect}
                 availableOptions={[
-                  ".pdf",
-                  ".doc",
-                  ".docx",
-                  "audio/*",
-                  "video/*",
-                  "image/*"
+                  '.pdf',
+                  '.doc',
+                  '.docx',
+                  'audio/*',
+                  'video/*',
+                  'image/*',
                 ]}
                 margin="normal"
                 fullWidth

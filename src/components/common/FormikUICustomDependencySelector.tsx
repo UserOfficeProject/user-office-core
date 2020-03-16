@@ -5,52 +5,53 @@ import {
   InputLabel,
   makeStyles,
   MenuItem,
-  Select
-} from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
-import { FormikActions } from "formik";
-import React, { useCallback, useEffect, useState } from "react";
+  Select,
+} from '@material-ui/core';
+import ClearIcon from '@material-ui/icons/Clear';
+import { FormikActions } from 'formik';
+import React, { useCallback, useEffect, useState } from 'react';
+
 import {
   DataType,
   EvaluatorOperator,
   ProposalTemplate,
   ProposalTemplateField,
-  SelectionFromOptionsConfig
-} from "../../generated/sdk";
+  SelectionFromOptionsConfig,
+} from '../../generated/sdk';
 import {
   getAllFields,
-  getFieldById
-} from "../../models/ProposalModelFunctions";
+  getFieldById,
+} from '../../models/ProposalModelFunctions';
 
 const FormikUICustomDependencySelector = ({
   field,
   template,
   form,
-  templateField
+  templateField,
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
   template: ProposalTemplate;
   templateField: ProposalTemplateField;
 }) => {
-  const [dependencyId, setDependencyId] = useState<string>("");
+  const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(
     EvaluatorOperator.EQ
   );
   const [dependencyValue, setDependencyValue] = useState<
     string | boolean | number | Date
-  >("");
+  >('');
 
   const [availableValues, setAvailableValues] = useState<IOption[]>([]);
 
   const classes = makeStyles(theme => ({
     menuItem: {
-      display: "flex",
-      alignItems: "center",
-      "& SVG": {
-        marginRight: theme.spacing(1)
-      }
-    }
+      display: 'flex',
+      alignItems: 'center',
+      '& SVG': {
+        marginRight: theme.spacing(1),
+      },
+    },
   }))();
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const FormikUICustomDependencySelector = ({
       return;
     }
     if (templateField.dependencies && templateField.dependencies.length > 0) {
-      var dependency = templateField.dependencies[0]; // currently only 1 supported
+      const dependency = templateField.dependencies[0]; // currently only 1 supported
       setDependencyId(dependency.dependency_id);
       setOperator(dependency.condition.condition);
       setDependencyValue(dependency.condition.params);
@@ -66,15 +67,15 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = () => {
-    let dependencies = [];
+    const dependencies = [];
     if (dependencyId && dependencyValue && operator) {
       dependencies.push({
         question_id: templateField.proposal_question_id,
         dependency_id: dependencyId,
         condition: {
           condition: operator,
-          params: dependencyValue
-        }
+          params: dependencyValue,
+        },
       });
     }
     form.setFieldValue(field.name, dependencies);
@@ -88,8 +89,8 @@ const FormikUICustomDependencySelector = ({
       }
       if (depField.data_type === DataType.BOOLEAN) {
         setAvailableValues([
-          { label: "true", value: true },
-          { label: "false", value: false }
+          { label: 'true', value: true },
+          { label: 'false', value: false },
         ]);
       } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
         setAvailableValues(
@@ -106,7 +107,7 @@ const FormikUICustomDependencySelector = ({
   const updateFormikMemoized = useCallback(updateFormik, [
     dependencyId,
     operator,
-    dependencyValue
+    dependencyValue,
   ]);
 
   useEffect(() => {
@@ -198,8 +199,8 @@ const FormikUICustomDependencySelector = ({
       <Grid item xs={1}>
         <IconButton
           onClick={() => {
-            setDependencyId("");
-            setDependencyValue("");
+            setDependencyId('');
+            setDependencyValue('');
           }}
         >
           <ClearIcon />

@@ -1,19 +1,20 @@
-import DateFnsUtils from "@date-io/date-fns";
-import { FormControl, Tooltip } from "@material-ui/core";
+import DateFnsUtils from '@date-io/date-fns';
+import { FormControl, Tooltip } from '@material-ui/core';
 import {
   KeyboardDatePicker,
-  MuiPickersUtilsProvider
-} from "@material-ui/pickers";
-import { Field, getIn } from "formik";
-import React, { useState, useEffect } from "react";
-import { IBasicComponentProps } from "./IBasicComponentProps";
+  MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
+import { Field, getIn } from 'formik';
+import React, { useState, useEffect } from 'react';
+
+import { IBasicComponentProps } from './IBasicComponentProps';
 
 export function ProposalComponentDatePicker(props: IBasicComponentProps) {
   const { templateField, touched, errors, onComplete } = props;
   const { proposal_question_id, config, question, value } = templateField;
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const [stateValue, setStateValue] = useState(value || "");
+  const [stateValue, setStateValue] = useState(value || '');
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -23,7 +24,7 @@ export function ProposalComponentDatePicker(props: IBasicComponentProps) {
     <FormControl error={isError}>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Field
-          data-cy={proposal_question_id + "_field"}
+          data-cy={proposal_question_id + '_field'}
           name={proposal_question_id}
           label={question}
           component={({ field, form, ...other }: { field: any; form: any }) => {

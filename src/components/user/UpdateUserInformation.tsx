@@ -1,13 +1,16 @@
+import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/styles';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+
 import { useDataApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import orcid from '../../images/orcid.png';
@@ -15,8 +18,6 @@ import { ButtonContainer } from '../../styles/StyledComponents';
 import { userFieldSchema } from '../../utils/userFieldValidationSchema';
 import FormikDropdown from '../common/FormikDropdown';
 import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
-import DateFnsUtils from '@date-io/date-fns'; // choose your lib
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 const useStyles = makeStyles({
   button: {

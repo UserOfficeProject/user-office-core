@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { decode } from "jsonwebtoken";
-import { useCookies } from "react-cookie";
+import { decode } from 'jsonwebtoken';
+import React, { useEffect } from 'react';
+import { useCookies } from 'react-cookie';
 
 const initUserData = {
   user: null,
   token: null,
   roles: null,
-  currentRole: null
+  currentRole: null,
 };
 
 const checkLocalStorage = (dispatch, state) => {
@@ -14,17 +14,17 @@ const checkLocalStorage = (dispatch, state) => {
     const decoded = decode(localStorage.token);
     if (decoded && decoded.exp > Date.now() / 1000) {
       dispatch({
-        type: "setUserFromLocalStorage",
+        type: 'setUserFromLocalStorage',
         payload: {
           user: decoded.user,
           roles: decoded.roles,
           currentRole: localStorage.currentRole,
           token: localStorage.token,
-          expToken: decoded.exp
-        }
+          expToken: decoded.exp,
+        },
       });
     } else {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
     }
   }
 };
@@ -33,15 +33,15 @@ export const UserContext = React.createContext();
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "setUserFromLocalStorage":
+    case 'setUserFromLocalStorage':
       return {
         currentRole: action.payload.currentRole,
         user: action.payload.user,
         roles: action.payload.roles,
         token: action.payload.token,
-        expToken: action.payload.expToken
+        expToken: action.payload.expToken,
       };
-    case "loginUser":
+    case 'loginUser':
       const decoded = decode(action.payload);
       localStorage.user = decoded.user;
       localStorage.token = action.payload;
@@ -49,36 +49,40 @@ const reducer = (state, action) => {
       if (decoded.roles.length === 1) {
         localStorage.currentRole = decoded.roles[0].shortCode;
       }
+
       return {
         token: action.payload,
         user: decoded.user,
         expToken: decoded.exp,
         roles: decoded.roles,
         currentRole:
-          decoded.roles.length === 1 ? decoded.roles[0].shortCode : null
+          decoded.roles.length === 1 ? decoded.roles[0].shortCode : null,
       };
-    case "setToken":
+    case 'setToken':
       const newToken = decode(action.payload);
       localStorage.token = action.payload;
       localStorage.expToken = newToken.exp;
+
       return {
         ...state,
         token: action.payload,
-        expToken: newToken.exp
+        expToken: newToken.exp,
       };
-    case "selectRole":
+    case 'selectRole':
       localStorage.currentRole = action.payload;
+
       return {
         ...state,
-        currentRole: action.payload
+        currentRole: action.payload,
       };
-    case "logOffUser":
-      localStorage.removeItem("token");
-      localStorage.removeItem("currentRole");
-      localStorage.removeItem("user");
-      localStorage.removeItem("expToken");
+    case 'logOffUser':
+      localStorage.removeItem('token');
+      localStorage.removeItem('currentRole');
+      localStorage.removeItem('user');
+      localStorage.removeItem('expToken');
+
       return {
-        initUserData
+        initUserData,
       };
 
     default:
@@ -91,17 +95,17 @@ export const UserContextProvider = props => {
   const [, setCookie] = useCookies();
   checkLocalStorage(dispatch, state);
   useEffect(() => {
-    setCookie("token", state.token, { path: "/", secure: false });
+    setCookie('token', state.token, { path: '/', secure: false });
   }, [setCookie, state]);
 
   return (
     <UserContext.Provider
       value={{
         ...state,
-        handleLogin: data => dispatch({ type: "loginUser", payload: data }),
-        handleLogout: data => dispatch({ type: "logOffUser", payload: data }),
-        handleRole: role => dispatch({ type: "selectRole", payload: role }),
-        handleNewToken: token => dispatch({ type: "setToken", payload: token })
+        handleLogin: data => dispatch({ type: 'loginUser', payload: data }),
+        handleLogout: data => dispatch({ type: 'logOffUser', payload: data }),
+        handleRole: role => dispatch({ type: 'selectRole', payload: role }),
+        handleNewToken: token => dispatch({ type: 'setToken', payload: token }),
       }}
     >
       {props.children}

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useDataApi } from "./useDataApi";
+import { useState } from 'react';
+
+import { useDataApi } from './useDataApi';
 
 export function useSubmitProposal() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -8,10 +9,12 @@ export function useSubmitProposal() {
 
   const submitProposal = async (id: number) => {
     setIsLoading(true);
+
     return api()
       .submitProposal({ id })
       .then(data => {
         setIsLoading(false);
+
         return !data.submitProposal.error;
       });
   };

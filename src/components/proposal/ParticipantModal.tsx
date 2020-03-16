@@ -1,8 +1,9 @@
-import React from "react";
-import DialogContent from "@material-ui/core/DialogContent";
-import Dialog from "@material-ui/core/Dialog";
-import PeopleTable from "../user/PeopleTable";
-import { AddBox } from "@material-ui/icons";
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import { AddBox } from '@material-ui/icons';
+import React from 'react';
+
+import PeopleTable from '../user/PeopleTable';
 
 function ParticipantModal(props: {
   title: string;
@@ -17,9 +18,10 @@ function ParticipantModal(props: {
       firstname: rowData.firstname,
       lastname: rowData.lastname,
       organisation: rowData.organisation,
-      id: rowData.id
+      id: rowData.id,
     });
   };
+
   return (
     <Dialog
       aria-labelledby="simple-modal-title"
@@ -31,7 +33,7 @@ function ParticipantModal(props: {
         <PeopleTable
           title={props.title}
           actionText="Select user"
-          actionIcon={<AddBox data-cy="select-user"/>}
+          actionIcon={<AddBox data-cy="select-user" />}
           action={addUser}
           selectedUsers={props.selectedUsers}
           userRole={props.userRole}

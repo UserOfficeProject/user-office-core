@@ -1,17 +1,18 @@
-import produce from "immer";
-import { Reducer, useCallback, useEffect } from "react";
+import produce from 'immer';
+import { Reducer, useCallback, useEffect } from 'react';
+
 import {
   ProposalTemplate,
   ProposalTemplateField,
-  TemplateStep
-} from "../generated/sdk";
-import { useDataApi } from "../hooks/useDataApi";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
+  TemplateStep,
+} from '../generated/sdk';
+import { useDataApi } from '../hooks/useDataApi';
+import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-  getTopicById
-} from "./ProposalModelFunctions";
+  getTopicById,
+} from './ProposalModelFunctions';
 
 export enum EventType {
   READY,
@@ -28,7 +29,7 @@ export enum EventType {
   DELETE_TOPIC_REQUESTED,
   CREATE_TOPIC_REQUESTED,
   TOPIC_CREATED,
-  REORDER_TOPIC_REQUESTED
+  REORDER_TOPIC_REQUESTED,
 }
 
 export interface IEvent {
@@ -50,7 +51,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,
-          payload: data.proposalTemplate
+          payload: data.proposalTemplate,
         });
       });
   }, [api, memoizedDispatch]);
@@ -101,6 +102,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
           getTopicById(draft, action.payload.topicId)!.topic_title =
             action.payload.title;
+
           return draft;
         case EventType.UPDATE_FIELD_REQUESTED:
           const field: ProposalTemplateField = action.payload.field;
@@ -108,8 +110,9 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
           } else {
-            console.error("Object(s) are not defined", field, fieldToUpdate);
+            console.error('Object(s) are not defined', field, fieldToUpdate);
           }
+
           return draft;
         case EventType.FIELD_CREATED:
           const newField: ProposalTemplateField = action.payload;
@@ -120,6 +123,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           if (stepToExtend) {
             stepToExtend.fields.push(newField);
           }
+
           return draft;
         case EventType.DELETE_TOPIC_REQUESTED:
           const stepToDelete = getQuestionaryStepByTopicId(
@@ -131,6 +135,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           }
           const stepIdx = draft.steps.indexOf(stepToDelete);
           draft.steps.splice(stepIdx, 1);
+
           return draft;
         case EventType.TOPIC_CREATED:
         case EventType.FIELD_UPDATED:

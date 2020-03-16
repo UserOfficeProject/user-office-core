@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/styles';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+
 import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
@@ -35,7 +36,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   };
 
   const removeRole = (role: any) => {
-    let newRoles = [...roles];
+    const newRoles = [...roles];
     newRoles.splice(
       newRoles.findIndex(element => role.id === element.id),
       1
@@ -78,6 +79,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   if (!userData) {
     return <p>Loading</p>;
   }
+
   return (
     <React.Fragment>
       <RoleModal show={modalOpen} close={() => setOpen(false)} add={addRole} />
