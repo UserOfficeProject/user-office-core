@@ -1,21 +1,29 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import cookieParser from 'cookie-parser';
 import express, { Request, Response, NextFunction } from 'express';
 import graphqlHTTP, { RequestInfo } from 'express-graphql';
 import 'reflect-metadata';
+import jwt from 'express-jwt';
 import { buildSchema } from 'type-graphql';
 
 import baseContext from './src/buildContext';
 import { ResolverContext } from './src/context';
+import { Role } from './src/models/Role';
+import { User } from './src/models/User';
 import { registerEnums } from './src/resolvers/registerEnums';
 import files from './src/routes/files';
 import proposalDownload from './src/routes/pdf';
 import { logger } from './src/utils/Logger';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const jwt = require('express-jwt');
-
 interface Req extends Request {
-  user?: any;
+  user?: {
+    user?: User;
+    roles?: Role[];
+  };
+}
+
+interface MiddlewareError extends Error {
+  code: string | number;
 }
 
 async function bootstrap() {
@@ -40,7 +48,12 @@ async function bootstrap() {
 
   app.use(
     authMiddleware,
-    (err: any, req: Request, res: Response, next: NextFunction) => {
+    (err: MiddlewareError, req: Request, res: Response, next: NextFunction) => {
+      /**
+       * TODO: Check if this is really useful. We have general error handling middleware on line 108.
+       * Where that invalid_token code comes from???
+       * What is the scenario where we can enter this block???
+       */
       if (err.code === 'invalid_token') {
         return res.status(401).send('jwt expired');
       }
@@ -68,8 +81,10 @@ async function bootstrap() {
       // Adds the currently logged-in user to the context object, which makes it available to the resolvers
       // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
       let user = null;
+      const userId = req.user?.user?.id as number;
+
       if (req.user) {
-        user = await baseContext.queries.user.getAgent(req.user.user.id);
+        user = await baseContext.queries.user.getAgent(userId);
       }
 
       const context: ResolverContext = { ...baseContext, user };
@@ -89,13 +104,15 @@ async function bootstrap() {
 
   app.listen(process.env.PORT || 4000);
 
-  app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
-    logger.logException('Unhandled EXPRESS JS exception', err, { req, res });
-    res.status(500).send('SERVER EXCEPTION');
-  });
+  app.use(
+    (err: Error | string, req: Request, res: Response, next: NextFunction) => {
+      logger.logException('Unhandled EXPRESS JS exception', err, { req, res });
+      res.status(500).send('SERVER EXCEPTION');
+    }
+  );
 
-  process.on('uncaughtException', err => {
-    logger.logException('Unhandled NODE exception', err);
+  process.on('uncaughtException', error => {
+    logger.logException('Unhandled NODE exception', error);
   });
 
   console.log('Running a GraphQL API server at localhost:4000/graphql');
