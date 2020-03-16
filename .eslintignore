@@ -1,0 +1,8 @@
+node_modules
+.next
+build
+dist
+public
+cypress
+
+src/serviceWorker.ts
