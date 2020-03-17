@@ -1,3 +1,6 @@
+// FIXME: This file should be reviewed once more. It is too messy and lot of things are used before they are defined.
+// Maybe it should be split into multiple files or organized better.
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { StepButton, LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
@@ -43,6 +46,30 @@ enum StepType {
   REVIEW,
 }
 
+const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+  if (answers) {
+    answers = answers.filter(
+      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
+    );
+    answers = answers.map(answer => {
+      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    });
+
+    return answers;
+  } else {
+    return [];
+  }
+};
+
+class QuestionaryUIStep {
+  constructor(
+    public stepType: StepType,
+    public title: string,
+    public completed: boolean,
+    public element: JSX.Element
+  ) {}
+}
+
 export const ProposalSubmissionContext = createContext<{
   dispatch: React.Dispatch<Event>;
 } | null>(null);
@@ -56,6 +83,75 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
+  const clampStep = (step: number): number => {
+    return clamp(step, 0, proposalSteps.length - 1);
+  };
+
+  const getConfirmNavigMsg = (): string => {
+    return 'Changes you recently made in this step will not be saved! Are you sure?';
+  };
+
+  /**
+   * Executes api call in uniform fashion for this component˜
+   *
+   * @template T no need to specify because type is implied from call response
+   * @param {TServiceCall<T>} call an API call
+   * @param {string} [successToastMessage] optional message to show in snackvar on success
+   * @returns result of the call
+   */
+  const executeAndMonitorCall = <T extends unknown>( // declared as unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
+    call: TServiceCall<T>,
+    successToastMessage?: string
+  ) => {
+    setIsLoading(true);
+
+    return call().then(result => {
+      if (result.error) {
+        dispatch({
+          type: EventType.API_CALL_ERROR,
+          payload: {
+            message: getTranslation(result.error as ResourceId),
+          },
+        });
+      } else {
+        if (successToastMessage) {
+          dispatch({
+            type: EventType.API_CALL_SUCCESS,
+            payload: {
+              message: successToastMessage,
+            },
+          });
+        }
+      }
+      setIsLoading(false);
+
+      return result!;
+    });
+  };
+
+  /**
+   * Returns true if reset was performed, false otherwise
+   */
+  const handleReset = async (): Promise<boolean> => {
+    if (state.isDirty) {
+      const confirmed = window.confirm(getConfirmNavigMsg());
+      if (confirmed) {
+        const proposal = await executeAndMonitorCall(() =>
+          api()
+            .getProposal({ id: state.proposal.id })
+            .then(data => data.proposal!)
+        );
+        dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
+
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return false;
+  };
 
   const classes = makeStyles(theme => ({
     stepper: {
@@ -98,13 +194,14 @@ export default function ProposalContainer(props: { data: Proposal }) {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          var { id, status, shortCode } = state.proposal;
+          let { id, status, shortCode } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
               () =>
                 api()
                   .createProposal()
-                  .then(data => data.createProposal!.proposal!),
+                  // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
+                  .then(data => data.createProposal.proposal!),
               'Saved'
             );
             ({ id, status, shortCode } = result);
@@ -175,79 +272,11 @@ export default function ProposalContainer(props: { data: Proposal }) {
     };
   };
 
-  /**
-   * Executes api call in uniform fashion for this component˜
-   *
-   * @template T no need to specify because type is implied from call response
-   * @param {TServiceCall<T>} call an API call
-   * @param {string} [successToastMessage] optional message to show in snackvar on success
-   * @returns result of the call
-   */
-  const executeAndMonitorCall = <T extends unknown>( // declared as unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
-    call: TServiceCall<T>,
-    successToastMessage?: string
-  ) => {
-    setIsLoading(true);
-
-    return call().then(result => {
-      if (result.error) {
-        dispatch({
-          type: EventType.API_CALL_ERROR,
-          payload: {
-            message: getTranslation(result.error as ResourceId),
-          },
-        });
-      } else {
-        if (successToastMessage) {
-          dispatch({
-            type: EventType.API_CALL_SUCCESS,
-            payload: {
-              message: successToastMessage,
-            },
-          });
-        }
-      }
-      setIsLoading(false);
-
-      return result!;
-    });
-  };
-
-  var { state, dispatch } = ProposalSubmissionModel(props.data, [
+  const { state, dispatch } = ProposalSubmissionModel(props.data, [
     reduceMiddleware,
   ]);
 
   const isSubmitted = state.proposal.status === ProposalStatus.SUBMITTED;
-
-  const clampStep = (step: number) => {
-    return clamp(step, 0, proposalSteps.length - 1);
-  };
-  /**
-   * Returns true if reset was performed, false otherwise
-   */
-  const handleReset = async (): Promise<boolean> => {
-    if (state.isDirty) {
-      const confirmed = window.confirm(getConfirmNavigMsg());
-      if (confirmed) {
-        const proposal = await executeAndMonitorCall(() =>
-          api()
-            .getProposal({ id: state.proposal.id })
-            .then(data => data.proposal!)
-        );
-        dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
-
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    return false;
-  };
-
-  const getConfirmNavigMsg = () => {
-    return 'Changes you recently made in this step will not be saved! Are you sure?';
-  };
 
   useEffect(() => {
     const createProposalSteps = (
@@ -308,7 +337,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       return allProposalSteps;
     };
 
-    const proposalSteps = createProposalSteps(state.proposal.questionary!);
+    const proposalSteps = createProposalSteps(state.proposal.questionary);
     setProposalSteps(proposalSteps);
   }, [state, isSubmitted, isNonOfficer]);
 
@@ -357,7 +386,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const progressBar = isLoading ? <LinearProgress /> : null;
 
   return (
-    //@ts-ignore
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
       <ProposalSubmissionContext.Provider value={{ dispatch }}>
@@ -408,15 +436,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
   );
 }
 
-class QuestionaryUIStep {
-  constructor(
-    public stepType: StepType,
-    public title: string,
-    public completed: boolean,
-    public element: JSX.Element
-  ) {}
-}
-
 function QuestionaryStepButton(
   props: PropsWithChildren<any> & {
     active?: boolean;
@@ -460,18 +479,3 @@ function QuestionaryStepButton(
 }
 
 type TServiceCall<T> = () => Promise<T & { error?: string | null }>;
-
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
-    );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-
-    return answers;
-  } else {
-    return [];
-  }
-};

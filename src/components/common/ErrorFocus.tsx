@@ -1,12 +1,12 @@
 import { connect, FormikContext } from 'formik';
 import { Component } from 'react';
 
-interface IProps {
+interface ErrorFocusInternalProps {
   formik: FormikContext<any>;
 }
 
-class ErrorFocusInternal extends Component<IProps> {
-  public componentDidUpdate(prevProps: IProps) {
+class ErrorFocusInternal extends Component<ErrorFocusInternalProps> {
+  public componentDidUpdate(prevProps: ErrorFocusInternalProps): void {
     const { isSubmitting, isValidating, errors } = prevProps.formik;
     const keys = Object.keys(errors);
     if (keys.length > 0 && isSubmitting && !isValidating) {
@@ -18,7 +18,7 @@ class ErrorFocusInternal extends Component<IProps> {
     }
   }
 
-  public render = () => null;
+  public render = (): null => null;
 }
 
 export const ErrorFocus = connect<{}>(ErrorFocusInternal);

@@ -34,12 +34,12 @@ export default function ProposalParticipants(props) {
     props.setUsers(newUsers);
   };
 
-  const openModal = rowData => {
+  const openModal = () => {
     setOpen(true);
   };
 
   return (
-    <form>
+    <React.Fragment>
       <ParticipantModal
         show={modalOpen}
         close={setOpen.bind(this, false)}
@@ -64,6 +64,6 @@ export default function ProposalParticipants(props) {
           Investigator or a Co-Proposer!
         </p>
       )}
-    </form>
+    </React.Fragment>
   );
 }

@@ -18,12 +18,14 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
   const [textLen, setTextLen] = useState(
     props.value ? String(props.value).length : 0
   );
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (evt: ChangeEvent<HTMLInputElement>): void => {
     props.onChange && props.onChange(evt);
     setTextLen(evt.target.value.length);
   };
 
-  const getCounterClassNames = () => {
+  const { maxLen, ...other } = props;
+
+  const getCounterClassNames = (): string => {
     const classNames = [classes.counter];
     if (maxLen && textLen > maxLen) {
       classNames.push(classes.error);
@@ -31,8 +33,6 @@ const TextFieldWithCounter = (props: TextFieldProps & { maxLen?: number }) => {
 
     return classNames.join(' ');
   };
-
-  const { maxLen, ...other } = props;
 
   return (
     <div className={classes.wrapper}>

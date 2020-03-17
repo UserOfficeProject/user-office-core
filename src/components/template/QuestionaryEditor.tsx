@@ -51,7 +51,7 @@ export default function QuestionaryEditor() {
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles(() => ({
     modalContainer: {
       backgroundColor: 'white',
     },
@@ -69,7 +69,7 @@ export default function QuestionaryEditor() {
     display: 'flex',
   });
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = (result: DropResult): void => {
     if (result.type === 'field') {
       dispatch({
         type: EventType.REORDER_FIELD_REQUESTED,
@@ -84,15 +84,15 @@ export default function QuestionaryEditor() {
     }
   };
 
-  const onClick = (data: ProposalTemplateField) => {
+  const onClick = (data: ProposalTemplateField): void => {
     setSelectedField(data);
   };
 
-  const handleFieldEditorClose = () => {
+  const handleFieldEditorClose = (): void => {
     setSelectedField(null);
   };
 
-  const getContainerStyle = (isBusy: boolean): any => {
+  const getContainerStyle = (): any => {
     return isLoading
       ? {
           pointerEvents: 'none',
@@ -110,7 +110,7 @@ export default function QuestionaryEditor() {
         variant="outlined"
         color="primary"
         className={classes.centeredButton}
-        onClick={() =>
+        onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
             payload: { sortOrder: 0 },
@@ -132,7 +132,7 @@ export default function QuestionaryEditor() {
           control={
             <Switch
               checked={isTopicReorderMode}
-              onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
+              onChange={(): void => setIsTopicReorderMode(!isTopicReorderMode)}
               color="primary"
             />
           }
@@ -143,7 +143,7 @@ export default function QuestionaryEditor() {
 
   return (
     <>
-      <StyledPaper style={getContainerStyle(isLoading)}>
+      <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         {enableReorderTopicsToggle}
         <DragDropContext onDragEnd={onDragEnd}>

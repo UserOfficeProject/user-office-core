@@ -36,7 +36,7 @@ export function FileUploadComponent(props: {
   const inputRef = useRef(null);
   const api = useDataApi();
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles(() => ({
     list: {
       listStyle: 'none',
       padding: 0,
@@ -72,21 +72,21 @@ export function FileUploadComponent(props: {
   }, [filesMetadata]);
   */
 
-  const onUploadComplete = (newFile: FileMetaData) => {
-    setFiles(files.concat(newFile));
-    dispatchChange();
-  };
-
-  const onDeleteClicked = (deleteFile: FileMetaData) => {
-    setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
-    dispatchChange();
-  };
-
-  const dispatchChange = () => {
+  const dispatchChange = (): void => {
     const inputElement: HTMLInputElement = inputRef.current!;
     const event: any = {};
     event.target = inputElement;
     props.onChange(event);
+  };
+
+  const onUploadComplete = (newFile: FileMetaData): void => {
+    setFiles(files.concat(newFile));
+    dispatchChange();
+  };
+
+  const onDeleteClicked = (deleteFile: FileMetaData): void => {
+    setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
+    dispatchChange();
   };
 
   const { fileType, id } = props;
@@ -184,7 +184,7 @@ export function FileEntry(props: {
         </IconButton>
         <IconButton
           edge="end"
-          onClick={() => {
+          onClick={(): void => {
             props.onDeleteClicked(props.metaData);
           }}
         >
@@ -219,7 +219,7 @@ export function NewFileEntry(props: {
     const selectedFile = e.target.files ? e.target.files[0] : null;
     if (!selectedFile) return;
 
-    uploadFile(selectedFile!, props.onUploadComplete);
+    uploadFile(selectedFile, props.onUploadComplete);
   };
 
   switch (state) {

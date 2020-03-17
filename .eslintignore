@@ -6,3 +6,5 @@ public
 cypress
 
 src/serviceWorker.js
+src/setupProxy.js
+server.js
