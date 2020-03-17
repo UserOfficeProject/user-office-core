@@ -114,12 +114,12 @@ class NavigButton extends Component<
   StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>
 > {
   render() {
-    const { className, ...other } = this.props;
+    const { className, isbusy, ...other } = this.props;
 
     return (
       <div className={className} style={{ position: 'relative' }}>
         <Button {...other} />
-        {this.props.isbusy && (
+        {isbusy && (
           <CircularProgress
             size={24}
             style={{

@@ -41,7 +41,7 @@ function ProposalReview({
       opacity: 0.7,
     },
     button: {
-      marginTop: 'auto',
+      marginTop: proposal.status === 'BLANK' ? '40px' : 'auto',
       marginLeft: '10px',
       backgroundColor: theme.palette.secondary.main,
       color: '#ffff',
@@ -64,7 +64,7 @@ function ProposalReview({
             callback: () => {
               confirm(
                 () => {
-                  submitProposal(proposal.id).then(isSubmitted => {
+                  submitProposal(proposal.id).then(() => {
                     dispatch({
                       type: EventType.SUBMIT_PROPOSAL_CLICKED,
                       payload: proposal,
@@ -88,7 +88,7 @@ function ProposalReview({
           }}
           reset={undefined}
           isLoading={false}
-          disabled={false}
+          disabled={proposal.status === 'BLANK'}
         />
         <Button
           className={classes.button}

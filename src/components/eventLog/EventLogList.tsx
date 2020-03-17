@@ -3,6 +3,7 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { EventLog } from '../../generated/sdk';
 import { useEventLogsData } from '../../hooks/useEventLogsData';
 import { tableIcons } from '../../utils/materialIcons';
 
@@ -28,12 +29,12 @@ const EventLogList: React.FC<EventLogListProps> = ({
     { title: 'Event log ID', field: 'id' },
     {
       title: 'Changed by',
-      render: (rowData: any): string =>
+      render: (rowData: EventLog): string =>
         `${rowData.changedBy.firstname} ${rowData.changedBy.lastname}`,
     },
     {
       title: 'Changed on',
-      render: (rowData: any): string =>
+      render: (rowData: EventLog): string =>
         dateformat(new Date(rowData.eventTStamp), 'dd-mmm-yyyy HH:MM:ss'),
     },
     { title: 'Event type', field: 'eventType' },
@@ -60,7 +61,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
 };
 
 EventLogList.propTypes = {
-  changedObjectId: PropTypes.string,
+  changedObjectId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   eventType: PropTypes.string,
 };
 

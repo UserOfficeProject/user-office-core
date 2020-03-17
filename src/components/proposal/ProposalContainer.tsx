@@ -421,7 +421,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
                     step.completed ||
                     steps[index - 1].completed === true
                   }
-                  clickable={true}
                 >
                   <span>{step.title}</span>
                 </QuestionaryStepButton>
@@ -437,12 +436,13 @@ export default function ProposalContainer(props: { data: Proposal }) {
 }
 
 function QuestionaryStepButton(
-  props: PropsWithChildren<any> & {
+  props: PropsWithChildren<{
+    onClick: () => Promise<void>;
     active?: boolean;
     completed?: boolean;
-    clickable: boolean;
+    clickable?: boolean;
     editable: boolean;
-  }
+  }>
 ) {
   const classes = makeStyles(theme => ({
     active: {
@@ -457,22 +457,19 @@ function QuestionaryStepButton(
     },
   }))();
 
-  const { active, clickable, editable } = props;
+  // NOTE: Without editable because it fires console warning when passed to StepButton component.
+  const { editable, ...propsWithoutEditable } = props;
 
   const buttonClasses = [];
 
-  if (active) {
+  if (propsWithoutEditable.active) {
     buttonClasses.push(classes.active);
   } else if (editable) {
     buttonClasses.push(classes.editable);
   }
 
   return (
-    <StepButton
-      {...props}
-      disabled={!clickable}
-      className={buttonClasses.join(' ')}
-    >
+    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
       {props.children}
     </StepButton>
   );

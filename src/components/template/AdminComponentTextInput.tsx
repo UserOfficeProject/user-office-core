@@ -23,6 +23,13 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
   );
   const naturalKeySchema = useNaturalKeySchema(field.natural_key);
 
+  /**
+   * NOTE: The console warning "Warning: `value` prop on `input` should not be null." is a bit complicated for now.
+   * https://github.com/jaredpalmer/formik/issues/568
+   * https://github.com/jaredpalmer/formik/issues/1525
+   * The main problem is that we use `null` for default value. Maybe we should convert this to string and reduce the pain.
+   */
+
   return (
     <Formik
       initialValues={field}
