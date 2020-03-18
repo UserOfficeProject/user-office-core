@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { GetPageContentQuery, PageName } from "../generated/sdk";
+import { PageName } from "../generated/sdk";
 import { useDataApi } from "./useDataApi";
 
 export function useGetPageContent(pageName: PageName) {
-  const [pageContent, setPageContent] = useState<
-    GetPageContentQuery["getPageContent"]
-  >(null);
-  const [loading, setLoading] = useState(true);
+  const [pageContent, setPageContent] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const api = useDataApi();
 
@@ -24,5 +22,5 @@ export function useGetPageContent(pageName: PageName) {
       });
   }, [pageName, api]);
 
-  return [loading, pageContent];
+  return [loading, pageContent] as const;
 }

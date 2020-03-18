@@ -466,7 +466,8 @@ export enum PageName {
   HOMEPAGE = 'HOMEPAGE',
   HELPPAGE = 'HELPPAGE',
   PRIVACYPAGE = 'PRIVACYPAGE',
-  COOKIEPAGE = 'COOKIEPAGE'
+  COOKIEPAGE = 'COOKIEPAGE',
+  REVIEWPAGE = 'REVIEWPAGE'
 }
 
 export type PageResponseWrap = {
