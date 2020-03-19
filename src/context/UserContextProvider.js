@@ -1,5 +1,5 @@
 import { decode } from 'jsonwebtoken';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 
 const initUserData = {
