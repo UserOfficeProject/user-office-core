@@ -29,12 +29,12 @@ context('Page tests', () => {
     cy.contains('Edit Pages').click();
 
     cy.contains('Set user homepage');
-    cy.contains('Help').click();
+    cy.contains('help').click();
 
     cy.window().then(win => {
       cy.wait(10000).then(() => {
         win.tinyMCE.get('HELPPAGE').setContent(faqContents); // faq page editor
-        cy.contains('Update').click();
+        cy.get('#help-update-btn').click();
         cy.reload();
         cy.contains('View Proposals').click();
         cy.contains('FAQ').click();
