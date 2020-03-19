@@ -27,6 +27,10 @@ declare global {
       login: (role: string) => void;
     }
   }
+
+  interface Window {
+    tinyMCE: any;
+  }
 }
 
 export {};
