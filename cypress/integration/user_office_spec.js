@@ -1,12 +1,12 @@
 /// <reference types="Cypress" />
-const faker = require("faker");
+const faker = require('faker');
 
-context("User Officer tests", () => {
+context('User Officer tests', () => {
   beforeEach(() => {
-    cy.visit("/");
+    cy.visit('/');
   });
 
-  const shortCode = faker.random.word().split(" ")[0]; // faker random word is buggy, it ofter returns phrases
+  const shortCode = faker.random.word().split(' ')[0]; // faker random word is buggy, it ofter returns phrases
   const startDate = faker.date
     .past()
     .toISOString()
@@ -17,46 +17,46 @@ context("User Officer tests", () => {
     .toISOString()
     .slice(0, 10);
 
-  it("A user-officer should be able to add a call", () => {
-    cy.get("[data-cy=input-email] input")
-      .type("Aaron_Harris49@gmail.com")
-      .should("have.value", "Aaron_Harris49@gmail.com");
+  it('A user-officer should be able to add a call', () => {
+    cy.get('[data-cy=input-email] input')
+      .type('Aaron_Harris49@gmail.com')
+      .should('have.value', 'Aaron_Harris49@gmail.com');
 
-    cy.get("[data-cy=input-password] input")
-      .type("Test1234!")
-      .should("have.value", "Test1234!");
+    cy.get('[data-cy=input-password] input')
+      .type('Test1234!')
+      .should('have.value', 'Test1234!');
 
-    cy.get("[data-cy=submit]").click();
+    cy.get('[data-cy=submit]').click();
 
-    cy.contains("Proposals");
+    cy.contains('Proposals');
 
-    cy.contains("View Calls").click();
+    cy.contains('View Calls').click();
 
-    cy.get("[data-cy=add-call]").click();
+    cy.get('[data-cy=add-call]').click();
 
-    cy.get("[data-cy=short-code] input")
+    cy.get('[data-cy=short-code] input')
       .type(shortCode)
-      .should("have.value", shortCode);
+      .should('have.value', shortCode);
 
-    cy.get("[data-cy=start-date] input").clear();
-    cy.get("[data-cy=start-date] input")
+    cy.get('[data-cy=start-date] input').clear();
+    cy.get('[data-cy=start-date] input')
       .type(startDate)
-      .should("have.value", startDate);
+      .should('have.value', startDate);
 
-    cy.get("[data-cy=end-date] input").clear();
-    cy.get("[data-cy=end-date] input")
+    cy.get('[data-cy=end-date] input').clear();
+    cy.get('[data-cy=end-date] input')
       .type(endDate)
-      .should("have.value", endDate);
+      .should('have.value', endDate);
 
-    cy.get("[data-cy=survey-comment] input").type(
-      faker.random.word().split(" ")[0]
+    cy.get('[data-cy=survey-comment] input').type(
+      faker.random.word().split(' ')[0]
     );
 
-    cy.get("[data-cy=cycle-comment] input").type(
-      faker.random.word().split(" ")[0]
+    cy.get('[data-cy=cycle-comment] input').type(
+      faker.random.word().split(' ')[0]
     );
 
-    cy.get("[data-cy=submit]").click();
+    cy.get('[data-cy=submit]').click();
 
     cy.contains(shortCode);
   });

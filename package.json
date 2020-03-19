@@ -18,6 +18,7 @@
     "@types/react-dom": "16.8.5",
     "@types/react-router": "^5.1.3",
     "@types/react-router-dom": "^4.3.5",
+    "@types/tinymce": "^4.5.24",
     "@types/yup": "^0.26.26",
     "clsx": "^1.0.4",
     "dateformat": "^3.0.3",
@@ -53,11 +54,21 @@
     "build": "react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",
+    "lint": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --quiet",
+    "lint:fix": "tsc --noEmit && eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "eject": "react-scripts eject",
     "start": "node server.js",
     "cypress:open": "cypress open",
     "cy:run": "cypress run",
     "generate:local": "sed 's@<SCHEMA_URL>@http://localhost:4000/graphql@g' codegen_template.yml > codegen_tmp.yml && graphql-codegen -c codegen_tmp.yml && rm ./codegen_tmp.yml"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,jsx,tsx}": "npm run lint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -75,12 +86,26 @@
     ]
   },
   "devDependencies": {
+    "@types/eslint": "^6.1.1",
     "@types/faker": "^4.1.8",
     "@types/jest": "24.0.16",
     "@types/node": "12.6.9",
     "@types/react-test-renderer": "^16.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
     "cypress": "^3.8.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-cypress": "^2.10.3",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jest": "^23.6.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-react-hooks": "^2.3.0",
     "faker": "^4.1.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "prettier": "^1.19.1",
     "react-test-renderer": "^16.12.0"
   }
 }

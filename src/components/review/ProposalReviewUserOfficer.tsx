@@ -1,11 +1,12 @@
 import Container from '@material-ui/core/Container';
 import React, { useEffect, useState } from 'react';
+
 import { Proposal, TechnicalReview } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import SimpleTabs from '../common/TabPanel';
+import EventLogList from '../eventLog/EventLogList';
 import GeneralInformation from '../proposal/GeneralInformation';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
-import EventLogList from '../eventLog/EventLogList';
 
 export default function ProposalReview({ match }: { match: any }) {
   // const [modalOpen, setOpen] = useState(false);
@@ -60,11 +61,10 @@ export default function ProposalReview({ match }: { match: any }) {
   //   });
   // };
 
-
-
   if (!proposal) {
     return <p>Loading</p>;
   }
+
   return (
     <Container maxWidth="lg">
       <SimpleTabs tabNames={['General', 'Technical', 'Logs']}>
@@ -77,10 +77,7 @@ export default function ProposalReview({ match }: { match: any }) {
           data={techReview}
           setReview={setTechReview}
         />
-        <EventLogList
-          changedObjectId={proposal.id}
-          eventType="PROPOSAL"
-        />
+        <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
       </SimpleTabs>
     </Container>
   );

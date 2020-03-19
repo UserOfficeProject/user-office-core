@@ -1,4 +1,3 @@
-
 type KEY = string | number | symbol;
 
 interface Dictionary<K extends KEY, V> {
@@ -9,53 +8,50 @@ interface Dictionary<K extends KEY, V> {
 }
 
 export default class JSDict<K extends KEY, V> implements Dictionary<K, V> {
+  private dict: { [key in K]?: V };
 
-	private dict: { [key in K]?: V };
+  constructor() {
+    this.dict = {};
+  }
 
-	constructor() {
-		this.dict = {};
-	}
+  public getKeys(): K[] {
+    const keys: K[] = [];
+    for (const key in this.dict) {
+      keys.push(key);
+    }
 
-	public getKeys() {
-		let keys: K[] = [];
-		for(let key in this.dict) {
-			keys.push(key);
-		}
+    return keys;
+  }
 
-		return keys;
-	}
+  public getValues(): V[] {
+    const vals: V[] = [];
+    for (const key in this.dict) {
+      const v = this.dict[key];
 
-	public getValues() {
-		let vals: V[] = [];
-		for (let key in this.dict) {
-			let v = this.dict[key];
+      if (this.exists(v)) {
+        vals.push(v);
+      }
+    }
 
-			if (this.exists(v)) {
-				vals.push(v);
-			}
-		}
+    return vals;
+  }
 
-		return vals;
-	}
+  // Type predicate to ensure v exists
+  private exists(v: V | undefined): v is V {
+    return v != null && typeof v !== 'undefined';
+  }
 
-	// Type predicate to ensure v exists
-	private exists(v: V | undefined): v is V {
-		return v != null && typeof v !== "undefined";
-	}
+  public get(key: K): V | null {
+    const v = this.dict[key];
 
-	public get(key: K) {
-		let v = this.dict[key];
+    return this.exists(v) ? v : null;
+  }
 
-		return this.exists(v)
-			? v
-			: null;
-	}
+  public put(key: K, val: V): void {
+    this.dict[key] = val;
+  }
 
-	public put(key: K, val: V) {
-		this.dict[key] = val;
-	}
-
-	static Create<Keys extends KEY, Values>() {
-		return new JSDict<Keys, Values>();
-	}
+  static Create<Keys extends KEY, Values>(): JSDict<Keys, Values> {
+    return new JSDict<Keys, Values>();
+  }
 }

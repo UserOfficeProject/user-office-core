@@ -1,5 +1,5 @@
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { default as React } from "react";
+import { KeyboardDatePicker } from '@material-ui/pickers';
+import { default as React } from 'react';
 
 const FormikUICustomDatePicker = ({
   field,

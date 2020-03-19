@@ -1,13 +1,14 @@
+import { Container, Divider, makeStyles } from '@material-ui/core';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import UpdateUserInformation from './UpdateUserInformation';
-import UpdatePassword from './UpdatePassword';
-import UpdateUserRoles from './UpdateUserRoles';
-import { Impersonate } from './Impersonate';
+
+import { getTheme } from '../../theme';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
-import { Container, Divider, makeStyles } from '@material-ui/core';
-import { getTheme } from '../../theme';
+import { Impersonate } from './Impersonate';
+import UpdatePassword from './UpdatePassword';
+import UpdateUserInformation from './UpdateUserInformation';
+import UpdateUserRoles from './UpdateUserRoles';
 
 const useStyles = makeStyles({
   divider: {

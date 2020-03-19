@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { User } from "../../models/User";
-import { IconButton, Typography } from "@material-ui/core";
-import ParticipantModal from "./ParticipantModal";
-import EditIcon from "@material-ui/icons/Edit";
-import { useBasicUserData, IBasicUserData } from "../../hooks/useUserData";
+import { IconButton, Typography } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import React, { useState, useEffect } from 'react';
+
+import { useBasicUserData, BasicUserData } from '../../hooks/useUserData';
+import { User } from '../../models/User';
+import ParticipantModal from './ParticipantModal';
 
 export default function ProposalParticipant(props: {
   userId?: number;
@@ -11,7 +12,7 @@ export default function ProposalParticipant(props: {
   title?: string;
   className?: string;
 }) {
-  const [curUser, setCurUser] = useState<IBasicUserData | null>(null);
+  const [curUser, setCurUser] = useState<BasicUserData | null>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const { loadBasicUserData } = useBasicUserData();
 
@@ -27,8 +28,8 @@ export default function ProposalParticipant(props: {
     <div className={props.className}>
       <ParticipantModal
         show={isPickerOpen}
-        userRole={"USER"}
-        title={"Set Principal Investigator"}
+        userRole={'USER'}
+        title={'Set Principal Investigator'}
         close={() => {
           setIsPickerOpen(false);
         }}
@@ -44,7 +45,7 @@ export default function ProposalParticipant(props: {
       <div>
         {curUser
           ? `${curUser.firstname} ${curUser.lastname}; ${curUser.organisation}`
-          : ""}
+          : ''}
         <IconButton edge="end" onClick={() => setIsPickerOpen(true)}>
           <EditIcon />
         </IconButton>

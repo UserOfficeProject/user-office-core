@@ -1,26 +1,27 @@
-import { ThemeProvider } from "@material-ui/styles";
-import { SnackbarProvider } from "notistack";
-import React from "react";
-import { CookiesProvider } from "react-cookie";
+import { ThemeProvider } from '@material-ui/styles';
+import { SnackbarProvider } from 'notistack';
+import React from 'react';
+import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
   Redirect,
   Route,
-  Switch
-} from "react-router-dom";
+  Switch,
+} from 'react-router-dom';
+
 import {
   UserContext,
-  UserContextProvider
-} from "../context/UserContextProvider";
-import { getUnauthorizedApi } from "../hooks/useDataApi";
-import { getTheme } from "../theme";
-import DashBoard from "./DashBoard";
-import EmailVerification from "./user/EmailVerification";
-import ResetPassword from "./user/ResetPassword";
-import ResetPasswordEmail from "./user/ResetPasswordEmail";
-import RoleSelectionPage from "./user/RoleSelectionPage";
-import SignIn from "./user/SignIn";
-import SignUp from "./user/SignUp";
+  UserContextProvider,
+} from '../context/UserContextProvider';
+import { getUnauthorizedApi } from '../hooks/useDataApi';
+import { getTheme } from '../theme';
+import DashBoard from './DashBoard';
+import EmailVerification from './user/EmailVerification';
+import ResetPassword from './user/ResetPassword';
+import ResetPasswordEmail from './user/ResetPasswordEmail';
+import RoleSelectionPage from './user/RoleSelectionPage';
+import SignIn from './user/SignIn';
+import SignUp from './user/SignUp';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <UserContext.Consumer>
@@ -44,10 +45,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 class App extends React.Component {
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
-    localStorage.removeItem("token");
-    localStorage.removeItem("currentRole");
-    localStorage.removeItem("user");
-    localStorage.removeItem("expToken");
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentRole');
+    localStorage.removeItem('user');
+    localStorage.removeItem('expToken');
   }
   componentDidCatch(error, info) {
     getUnauthorizedApi().addClientLog(error);
@@ -58,7 +59,7 @@ class App extends React.Component {
         <CookiesProvider>
           <UserContextProvider>
             <SnackbarProvider
-              anchorOrigin={{ vertical: "top", horizontal: "center" }}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
             >
               <Router>
@@ -84,6 +85,7 @@ class App extends React.Component {
                         <UserContext.Consumer>
                           {({ handleLogout }) => {
                             handleLogout();
+
                             return <Redirect to="/" />;
                           }}
                         </UserContext.Consumer>

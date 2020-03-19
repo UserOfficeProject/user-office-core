@@ -1,37 +1,37 @@
-import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogActions from "@material-ui/core/DialogActions";
-import Typography from "@material-ui/core/Typography";
-import parse from "html-react-parser";
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import parse from 'html-react-parser';
+import React from 'react';
 
 const useStyles = makeStyles(theme => ({
   buttonLink: {
-    background: "none",
-    border: "none",
+    background: 'none',
+    border: 'none',
     padding: 0,
-    fontSize: "8px;",
-    fontFamily: "arial",
+    fontSize: '8px;',
+    fontFamily: 'arial',
     color: theme.palette.primary.main,
-    textDecoration: "underline",
-    cursor: "pointer"
-  }
+    textDecoration: 'underline',
+    cursor: 'pointer',
+  },
 }));
 
 const DialogContent = withStyles(theme => ({
   root: {
-    padding: theme.spacing(2)
-  }
+    padding: theme.spacing(2),
+  },
 }))(MuiDialogContent);
 
 const DialogActions = withStyles(theme => ({
   root: {
     margin: 0,
-    padding: theme.spacing(1)
-  }
+    padding: theme.spacing(1),
+  },
 }))(MuiDialogActions);
 
 export default function InformationDialog(props) {
@@ -47,6 +47,7 @@ export default function InformationDialog(props) {
   if (!props.text) {
     return null;
   }
+
   return (
     <div>
       <Button

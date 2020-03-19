@@ -1,49 +1,77 @@
-import { StepButton, LinearProgress } from "@material-ui/core";
-import Container from "@material-ui/core/Container";
-import Step from "@material-ui/core/Step";
-import Stepper from "@material-ui/core/Stepper";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import { useSnackbar } from "notistack";
+// FIXME: This file should be reviewed once more. It is too messy and lot of things are used before they are defined.
+// Maybe it should be split into multiple files or organized better.
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { StepButton, LinearProgress } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
+import Step from '@material-ui/core/Step';
+import Stepper from '@material-ui/core/Stepper';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
 import React, {
   createContext,
   PropsWithChildren,
   useEffect,
   useState,
-  useContext
-} from "react";
-import { Prompt } from "react-router";
-import { Proposal, ProposalStatus, Questionary } from "../../generated/sdk";
-import { StyledPaper } from "../../styles/StyledComponents";
-import { clamp } from "../../utils/Math";
-import ProposalInformationView from "./ProposalInformationView";
-import ProposalQuestionaryStep from "./ProposalQuestionaryStep";
-import ProposalReview from "./ProposalSummary";
-import { useDataApi } from "../../hooks/useDataApi";
+  useContext,
+} from 'react';
+import { Prompt } from 'react-router';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { ProposalAnswer } from '../../models/ProposalModel';
+import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
   ProposalSubmissionModel,
-  IEvent,
+  Event,
   EventType,
-  IProposalSubmissionModelState
-} from "../../models/ProposalSubmissionModel";
-import { getTranslation, ResourceId } from "@esss-swap/duo-localisation";
-import { ProposalAnswer } from "../../models/ProposalModel";
-import { getDataTypeSpec } from "../../models/ProposalModelFunctions";
-import { UserContext } from "../../context/UserContextProvider";
+  ProposalSubmissionModelState,
+} from '../../models/ProposalSubmissionModel';
+import { StyledPaper } from '../../styles/StyledComponents';
+import { clamp } from '../../utils/Math';
+import ProposalInformationView from './ProposalInformationView';
+import ProposalQuestionaryStep from './ProposalQuestionaryStep';
+import ProposalReview from './ProposalSummary';
 
-export interface INotification {
-  variant: "error" | "success";
+export interface Notification {
+  variant: 'error' | 'success';
   message: string;
 }
 
 enum StepType {
   GENERAL,
   QUESTIONARY,
-  REVIEW
+  REVIEW,
+}
+
+const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+  if (answers) {
+    answers = answers.filter(
+      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
+    );
+    answers = answers.map(answer => {
+      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    });
+
+    return answers;
+  } else {
+    return [];
+  }
+};
+
+class QuestionaryUIStep {
+  constructor(
+    public stepType: StepType,
+    public title: string,
+    public completed: boolean,
+    public element: JSX.Element
+  ) {}
 }
 
 export const ProposalSubmissionContext = createContext<{
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
 } | null>(null);
 
 export default function ProposalContainer(props: { data: Proposal }) {
@@ -51,127 +79,17 @@ export default function ProposalContainer(props: { data: Proposal }) {
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentRole } = useContext(UserContext);
-  const isNonOfficer = currentRole !== "user_officer";
+  const isNonOfficer = currentRole !== 'user_officer';
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
-  const classes = makeStyles(theme => ({
-    stepper: {
-      padding: theme.spacing(3, 0, 5)
-    },
-    heading: {
-      textOverflow: "ellipsis",
-      width: "80%",
-      margin: "0 auto",
-      textAlign: "center",
-      minWidth: "450px",
-      whiteSpace: "nowrap",
-      overflow: "hidden"
-    },
-    infoline: {
-      color: theme.palette.grey[600],
-      textAlign: "right"
-    }
-  }))();
+  const clampStep = (step: number): number => {
+    return clamp(step, 0, proposalSteps.length - 1);
+  };
 
-  const reduceMiddleware = ({
-    getState,
-    dispatch
-  }: {
-    getState: () => IProposalSubmissionModelState;
-    dispatch: React.Dispatch<IEvent>;
-  }) => {
-    return (next: Function) => async (action: IEvent) => {
-      next(action); // first update state/model
-      const state = getState();
-      switch (action.type) {
-        case EventType.BACK_CLICKED:
-          if (state.isDirty) {
-            if (await handleReset()) {
-              setStepIndex(clampStep(stepIndex - 1));
-            }
-          } else {
-            setStepIndex(clampStep(stepIndex - 1));
-          }
-          break;
-
-        case EventType.SAVE_GENERAL_INFO_CLICKED:
-          var { id, status, shortCode } = state.proposal;
-          if (state.proposal.status === ProposalStatus.BLANK) {
-            const result = await executeAndMonitorCall(
-              () =>
-                api()
-                  .createProposal()
-                  .then(data => data.createProposal!.proposal!),
-              "Saved"
-            );
-            ({ id, status, shortCode } = result);
-            dispatch({
-              type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode }
-            });
-          }
-          await executeAndMonitorCall(
-            () =>
-              api().updateProposal({
-                id: id,
-                title: state.proposal.title,
-                abstract: state.proposal.abstract,
-                proposerId: state.proposal.proposer.id,
-                users: state.proposal.users.map(user => user.id)
-              }),
-            "Saved"
-          );
-          setStepIndex(clampStep(stepIndex + 1));
-          break;
-
-        case EventType.SAVE_STEP_CLICKED:
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .updateProposal({
-                  id: state.proposal.id,
-                  answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [],
-                  partialSave: true
-                })
-                .then(data => data.updateProposal),
-            "Saved"
-          );
-          break;
-
-        case EventType.FINISH_STEP_CLICKED:
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .updateProposal({
-                  id: state.proposal.id,
-                  answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [action.payload.topicId],
-                  partialSave: false
-                })
-                .then(data => data.updateProposal),
-            "Saved"
-          ).then(() => setStepIndex(clampStep(stepIndex + 1)));
-          break;
-
-        case EventType.RESET_CLICKED:
-          const stepBeforeReset = stepIndex;
-          if (await handleReset()) {
-            setStepIndex(stepBeforeReset);
-          }
-          break;
-
-        case EventType.API_CALL_ERROR:
-          enqueueSnackbar(action.payload.message, { variant: "error" });
-          break;
-
-        case EventType.API_CALL_SUCCESS:
-          enqueueSnackbar(action.payload.message, { variant: "success" });
-          break;
-      }
-    };
+  const getConfirmNavigMsg = (): string => {
+    return 'Changes you recently made in this step will not be saved! Are you sure?';
   };
 
   /**
@@ -187,38 +105,31 @@ export default function ProposalContainer(props: { data: Proposal }) {
     successToastMessage?: string
   ) => {
     setIsLoading(true);
+
     return call().then(result => {
       if (result.error) {
         dispatch({
           type: EventType.API_CALL_ERROR,
           payload: {
-            message: getTranslation(result.error as ResourceId)
-          }
+            message: getTranslation(result.error as ResourceId),
+          },
         });
       } else {
         if (successToastMessage) {
           dispatch({
             type: EventType.API_CALL_SUCCESS,
             payload: {
-              message: successToastMessage
-            }
+              message: successToastMessage,
+            },
           });
         }
       }
       setIsLoading(false);
+
       return result!;
     });
   };
 
-  var { state, dispatch } = ProposalSubmissionModel(props.data, [
-    reduceMiddleware
-  ]);
-
-  const isSubmitted = state.proposal.status === ProposalStatus.SUBMITTED;
-
-  const clampStep = (step: number) => {
-    return clamp(step, 0, proposalSteps.length - 1);
-  };
   /**
    * Returns true if reset was performed, false otherwise
    */
@@ -232,28 +143,151 @@ export default function ProposalContainer(props: { data: Proposal }) {
             .then(data => data.proposal!)
         );
         dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
+
         return true;
       } else {
         return false;
       }
     }
+
     return false;
   };
 
-  const getConfirmNavigMsg = () => {
-    return "Changes you recently made in this step will not be saved! Are you sure?";
+  const classes = makeStyles(theme => ({
+    stepper: {
+      padding: theme.spacing(3, 0, 5),
+    },
+    heading: {
+      textOverflow: 'ellipsis',
+      width: '80%',
+      margin: '0 auto',
+      textAlign: 'center',
+      minWidth: '450px',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+    },
+    infoline: {
+      color: theme.palette.grey[600],
+      textAlign: 'right',
+    },
+  }))();
+
+  const reduceMiddleware = ({
+    getState,
+    dispatch,
+  }: {
+    getState: () => ProposalSubmissionModelState;
+    dispatch: React.Dispatch<Event>;
+  }) => {
+    return (next: Function) => async (action: Event) => {
+      next(action); // first update state/model
+      const state = getState();
+      switch (action.type) {
+        case EventType.BACK_CLICKED:
+          if (state.isDirty) {
+            if (await handleReset()) {
+              setStepIndex(clampStep(stepIndex - 1));
+            }
+          } else {
+            setStepIndex(clampStep(stepIndex - 1));
+          }
+          break;
+
+        case EventType.SAVE_GENERAL_INFO_CLICKED:
+          let { id, status, shortCode } = state.proposal;
+          if (state.proposal.status === ProposalStatus.BLANK) {
+            const result = await executeAndMonitorCall(
+              () =>
+                api()
+                  .createProposal()
+                  // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
+                  .then(data => data.createProposal.proposal!),
+              'Saved'
+            );
+            ({ id, status, shortCode } = result);
+            dispatch({
+              type: EventType.PROPOSAL_METADATA_CHANGED,
+              payload: { id, status, shortCode },
+            });
+          }
+          await executeAndMonitorCall(
+            () =>
+              api().updateProposal({
+                id: id,
+                title: state.proposal.title,
+                abstract: state.proposal.abstract,
+                proposerId: state.proposal.proposer.id,
+                users: state.proposal.users.map(user => user.id),
+              }),
+            'Saved'
+          );
+          setStepIndex(clampStep(stepIndex + 1));
+          break;
+
+        case EventType.SAVE_STEP_CLICKED:
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: state.proposal.id,
+                  answers: prepareAnswers(action.payload.answers),
+                  topicsCompleted: [],
+                  partialSave: true,
+                })
+                .then(data => data.updateProposal),
+            'Saved'
+          );
+          break;
+
+        case EventType.FINISH_STEP_CLICKED:
+          await executeAndMonitorCall(
+            () =>
+              api()
+                .updateProposal({
+                  id: state.proposal.id,
+                  answers: prepareAnswers(action.payload.answers),
+                  topicsCompleted: [action.payload.topicId],
+                  partialSave: false,
+                })
+                .then(data => data.updateProposal),
+            'Saved'
+          ).then(() => setStepIndex(clampStep(stepIndex + 1)));
+          break;
+
+        case EventType.RESET_CLICKED:
+          const stepBeforeReset = stepIndex;
+          if (await handleReset()) {
+            setStepIndex(stepBeforeReset);
+          }
+          break;
+
+        case EventType.API_CALL_ERROR:
+          enqueueSnackbar(action.payload.message, { variant: 'error' });
+          break;
+
+        case EventType.API_CALL_SUCCESS:
+          enqueueSnackbar(action.payload.message, { variant: 'success' });
+          break;
+      }
+    };
   };
+
+  const { state, dispatch } = ProposalSubmissionModel(props.data, [
+    reduceMiddleware,
+  ]);
+
+  const isSubmitted = state.proposal.status === ProposalStatus.SUBMITTED;
 
   useEffect(() => {
     const createProposalSteps = (
       questionary: Questionary
     ): QuestionaryUIStep[] => {
-      var allProposalSteps = new Array<QuestionaryUIStep>();
+      let allProposalSteps = new Array<QuestionaryUIStep>();
 
       allProposalSteps.push(
         new QuestionaryUIStep(
           StepType.GENERAL,
-          "New Proposal",
+          'New Proposal',
           state.proposal.status !== ProposalStatus.BLANK,
           (
             <ProposalInformationView
@@ -265,7 +299,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       );
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
-          let editable =
+          const editable =
             (index === 0 && state.proposal.status !== ProposalStatus.BLANK) ||
             step.isCompleted ||
             (steps[index - 1] !== undefined &&
@@ -289,7 +323,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       allProposalSteps.push(
         new QuestionaryUIStep(
           StepType.REVIEW,
-          "Review",
+          'Review',
           state.proposal.status === ProposalStatus.SUBMITTED,
           (
             <ProposalReview
@@ -299,10 +333,11 @@ export default function ProposalContainer(props: { data: Proposal }) {
           )
         )
       );
+
       return allProposalSteps;
     };
 
-    const proposalSteps = createProposalSteps(state.proposal.questionary!);
+    const proposalSteps = createProposalSteps(state.proposal.questionary);
     setProposalSteps(proposalSteps);
   }, [state, isSubmitted, isNonOfficer]);
 
@@ -314,7 +349,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
     const proposal = props.data;
     if (proposal.status === ProposalStatus.DRAFT) {
       const questionarySteps = proposal.questionary.steps;
-      var lastFinishedStep = questionarySteps
+      const lastFinishedStep = questionarySteps
         .slice()
         .reverse()
         .find(step => step.isCompleted === true);
@@ -336,11 +371,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
   const getStepContent = (step: number) => {
     if (!proposalSteps || proposalSteps.length === 0) {
-      return "Loading...";
+      return 'Loading...';
     }
 
     if (!proposalSteps[step]) {
       console.error(`Invalid step ${step}`);
+
       return <span>Error</span>;
     }
 
@@ -348,8 +384,8 @@ export default function ProposalContainer(props: { data: Proposal }) {
   };
 
   const progressBar = isLoading ? <LinearProgress /> : null;
+
   return (
-    //@ts-ignore
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
       <ProposalSubmissionContext.Provider value={{ dispatch }}>
@@ -360,7 +396,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
             align="center"
             className={classes.heading}
           >
-            {state.proposal.title || "New Proposal"}
+            {state.proposal.title || 'New Proposal'}
           </Typography>
           <div className={classes.infoline}>
             {state.proposal.shortCode
@@ -385,7 +421,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
                     step.completed ||
                     steps[index - 1].completed === true
                   }
-                  clickable={true}
                 >
                   <span>{step.title}</span>
                 </QuestionaryStepButton>
@@ -400,68 +435,44 @@ export default function ProposalContainer(props: { data: Proposal }) {
   );
 }
 
-class QuestionaryUIStep {
-  constructor(
-    public stepType: StepType,
-    public title: string,
-    public completed: boolean,
-    public element: JSX.Element
-  ) {}
-}
-
 function QuestionaryStepButton(
-  props: PropsWithChildren<any> & {
+  props: PropsWithChildren<{
+    onClick: () => Promise<void>;
     active?: boolean;
     completed?: boolean;
-    clickable: boolean;
+    clickable?: boolean;
     editable: boolean;
-  }
+  }>
 ) {
   const classes = makeStyles(theme => ({
     active: {
-      "& SVG": {
-        color: theme.palette.secondary.main + "!important"
-      }
+      '& SVG': {
+        color: theme.palette.secondary.main + '!important',
+      },
     },
     editable: {
-      "& SVG": {
-        color: theme.palette.primary.main + "!important"
-      }
-    }
+      '& SVG': {
+        color: theme.palette.primary.main + '!important',
+      },
+    },
   }))();
 
-  const { active, clickable, editable } = props;
+  // NOTE: Without editable because it fires console warning when passed to StepButton component.
+  const { editable, ...propsWithoutEditable } = props;
 
-  var buttonClasses = [];
+  const buttonClasses = [];
 
-  if (active) {
+  if (propsWithoutEditable.active) {
     buttonClasses.push(classes.active);
   } else if (editable) {
     buttonClasses.push(classes.editable);
   }
+
   return (
-    <StepButton
-      {...props}
-      disabled={!clickable}
-      className={buttonClasses.join(" ")}
-    >
+    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
       {props.children}
     </StepButton>
   );
 }
 
 type TServiceCall<T> = () => Promise<T & { error?: string | null }>;
-
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
-    );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-    return answers;
-  } else {
-    return [];
-  }
-};

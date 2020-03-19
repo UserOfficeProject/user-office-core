@@ -1,26 +1,34 @@
-import { Collapse, FormControlLabel } from "@material-ui/core";
-import Checkbox from "@material-ui/core/Checkbox";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import React, { useState } from "react";
-import * as Yup from "yup";
-import { TextInputConfig } from "../../generated/sdk";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import FormikUICustomEditor from "../common/FormikUICustomEditor";
-import TitledContainer from "../common/TitledContainer";
-import { AdminComponentShell } from "./AdminComponentShell";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
+import { Collapse, FormControlLabel } from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React, { useState } from 'react';
+import * as Yup from 'yup';
+
+import { TextInputConfig } from '../../generated/sdk';
+import { EventType } from '../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import FormikUICustomEditor from '../common/FormikUICustomEditor';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
-  var config = field.config as TextInputConfig;
+  const config = field.config as TextInputConfig;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     config.htmlQuestion !== null
   );
   const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+
+  /**
+   * NOTE: The console warning "Warning: `value` prop on `input` should not be null." is a bit complicated for now.
+   * https://github.com/jaredpalmer/formik/issues/568
+   * https://github.com/jaredpalmer/formik/issues/1525
+   * The main problem is that we use `null` for default value. Maybe we should convert this to string and reduce the pain.
+   */
 
   return (
     <Formik
@@ -36,23 +44,23 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
                 ...vals.config,
                 htmlQuestion: isRichQuestion
                   ? (vals.config as TextInputConfig).htmlQuestion
-                  : null
-              }
-            }
-          }
+                  : null,
+              },
+            },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
         natural_key: naturalKeySchema,
-        question: Yup.string().required("Question is required"),
+        question: Yup.string().required('Question is required'),
         config: Yup.object({
           min: Yup.number().nullable(),
           max: Yup.number().nullable(),
           required: Yup.bool(),
           placeholder: Yup.string(),
-          multiline: Yup.boolean()
-        })
+          multiline: Yup.boolean(),
+        }),
       })}
     >
       {formikProps => (
@@ -65,7 +73,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "natural_key" }}
+              inputProps={{ 'data-cy': 'natural_key' }}
             />
 
             <Field
@@ -75,7 +83,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "question" }}
+              inputProps={{ 'data-cy': 'question' }}
             />
             <FormControlLabel
               control={
@@ -99,9 +107,9 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
                 init={{
                   skin: false,
                   content_css: false,
-                  plugins: ["link", "preview", "image", "code"],
-                  toolbar: "bold italic",
-                  branding: false
+                  plugins: ['link', 'preview', 'image', 'code'],
+                  toolbar: 'bold italic',
+                  branding: false,
                 }}
                 data-cy="htmlQuestion"
               />

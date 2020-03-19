@@ -1,11 +1,12 @@
 /**
  * This container component just wraps EventLogList component
  * and gives it a bit different styling.
- * It is used in the user details page for now.
+ * It was used in the user details page. But might be deprecated and removed in the future.
  */
 
-import React from 'react';
 import { Container, Grid } from '@material-ui/core';
+import React from 'react';
+
 import { StyledPaper } from '../../styles/StyledComponents';
 import EventLogList from './EventLogList';
 

@@ -1,11 +1,13 @@
-import Grid from "@material-ui/core/Grid";
-import parse from "html-react-parser";
-import React from "react";
-import { useGetPageContent } from "../../hooks/useGetPageContent";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
+import Grid from '@material-ui/core/Grid';
+import parse from 'html-react-parser';
+import React from 'react';
+
+import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function HelpPage() {
-  const [loadingHelpContent, helpPageContent] = useGetPageContent("HELPPAGE");
+  const [loadingHelpContent, helpPageContent] = useGetPageContent('HELPPAGE');
+
   return (
     <React.Fragment>
       <ContentContainer>

@@ -1,18 +1,18 @@
-const proxy = require("http-proxy-middleware");
+const proxy = require('http-proxy-middleware');
 
 module.exports = function(app) {
   app.use(
-    "/files/*",
+    '/files/*',
     proxy({
-      target: "http://localhost:4000",
-      changeOrigin: true
+      target: 'http://localhost:4000',
+      changeOrigin: true,
     })
   );
   app.use(
-    "/proposal/*",
+    '/proposal/*',
     proxy({
-      target: "http://localhost:4000",
-      changeOrigin: true
+      target: 'http://localhost:4000',
+      changeOrigin: true,
     })
   );
 };

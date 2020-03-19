@@ -1,9 +1,9 @@
-import React from "react";
-import { FormControlLabel, Checkbox } from "@material-ui/core";
+import { FormControlLabel, Checkbox } from '@material-ui/core';
+import React from 'react';
 const FormikUICustomCheckbox = ({
   field,
   checked,
-  label
+  label,
 }: {
   field: { name: string; value: string };
   checked: boolean;

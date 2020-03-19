@@ -1,11 +1,12 @@
-import AppBar from "@material-ui/core/AppBar";
-import Box from "@material-ui/core/Box";
-import { useTheme } from "@material-ui/core/styles";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
-import Typography from "@material-ui/core/Typography";
-import React from "react";
-import { StyledPaper } from "../../styles/StyledComponents";
+import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
+import { useTheme } from '@material-ui/core/styles';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import Typography from '@material-ui/core/Typography';
+import React from 'react';
+
+import { StyledPaper } from '../../styles/StyledComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -34,7 +35,7 @@ function TabPanel(props: TabPanelProps) {
 function a11yProps(index: any) {
   return {
     id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
+    'aria-controls': `full-width-tabpanel-${index}`,
   };
 }
 
@@ -61,13 +62,13 @@ export default function FullWidthTabs(props: {
           aria-label="full width tabs example"
         >
           {props.tabNames.map((tabName, i) => (
-            <Tab label={tabName} {...a11yProps(i)} />
+            <Tab key={i} label={tabName} {...a11yProps(i)} />
           ))}
         </Tabs>
       </AppBar>
 
       {props.children.map((tabContent, i) => (
-        <TabPanel value={value} index={i} dir={theme.direction}>
+        <TabPanel key={i} value={value} index={i} dir={theme.direction}>
           {tabContent}
         </TabPanel>
       ))}

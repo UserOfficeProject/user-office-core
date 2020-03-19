@@ -1,8 +1,9 @@
-import React from 'react';
-import UpdateUserInformation from './UpdateUserInformation';
-import UpdatePassword from './UpdatePassword';
-import SimpleTabs from '../common/TabPanel';
 import { Container } from '@material-ui/core';
+import React from 'react';
+
+import SimpleTabs from '../common/TabPanel';
+import UpdatePassword from './UpdatePassword';
+import UpdateUserInformation from './UpdateUserInformation';
 
 export default function ProfilePage({ match }) {
   return (

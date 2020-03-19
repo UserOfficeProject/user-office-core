@@ -23,59 +23,62 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import { request } from 'graphql-request';
 
-import { request } from "graphql-request";
-
-Cypress.Commands.add("resetDB", () => {
+const resetDB = () => {
   const query = `mutation {
     prepareDB {
       isSuccess
       error
     }
   }`;
-  request("/graphql", query).then(data => console.log(data));
-});
+  request('/graphql', query).then(data => console.log(data));
+};
 
-Cypress.Commands.add("login", role => {
+const login = role => {
   const testCredentialStore = {
     user: {
-      email: "Javon4@hotmail.com",
-      password: "Test1234!"
+      email: 'Javon4@hotmail.com',
+      password: 'Test1234!',
     },
     officer: {
-      email: "Aaron_Harris49@gmail.com",
-      password: "Test1234!"
-    }
+      email: 'Aaron_Harris49@gmail.com',
+      password: 'Test1234!',
+    },
   };
 
   const credentials = testCredentialStore[role];
 
-  cy.visit("/");
+  cy.visit('/');
 
-  cy.get("[data-cy=input-email] input")
+  cy.get('[data-cy=input-email] input')
     .type(credentials.email)
-    .should("have.value", credentials.email);
+    .should('have.value', credentials.email);
 
-  cy.get("[data-cy=input-password] input")
+  cy.get('[data-cy=input-password] input')
     .type(credentials.password)
-    .should("have.value", credentials.password);
+    .should('have.value', credentials.password);
 
-  cy.get("[data-cy=submit]").click();
-});
+  cy.get('[data-cy=submit]').click();
+};
+
+Cypress.Commands.add('resetDB', resetDB);
+
+Cypress.Commands.add('login', login);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes
-Cypress.Commands.add("presentationMode", () => {
+Cypress.Commands.add('presentationMode', () => {
   const COMMAND_DELAY = 300;
 
   for (const command of [
-    "visit",
-    "click",
-    "trigger",
-    "type",
-    "clear",
-    "reload",
-    "contains"
+    'visit',
+    'click',
+    'trigger',
+    'type',
+    'clear',
+    'reload',
+    'contains',
   ]) {
     Cypress.Commands.overwrite(command, (originalFn, ...args) => {
       const origVal = originalFn(...args);
