@@ -99,6 +99,7 @@ export const UserContextProvider = props => {
       value={{
         ...state,
         handleLogin: data => dispatch({ type: "loginUser", payload: data }),
+        // Using useCallback here as these are used in useDataAPI dependency array
         handleLogout: useCallback(
           data => dispatch({ type: "logOffUser", payload: data }),
           []
