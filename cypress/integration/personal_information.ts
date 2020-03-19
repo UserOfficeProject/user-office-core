@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+/// <reference types="../types" />
 var faker = require('faker');
 
 context('Personal information tests', () => {
