@@ -107,7 +107,7 @@ export default function MenuItems({ role }) {
   );
   const reviewer = (
     <div>
-      <ListItem component={Link} to="/ProposalTableReviewer" button>
+      <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>

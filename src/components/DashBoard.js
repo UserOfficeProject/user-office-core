@@ -18,6 +18,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 import { UserContext } from '../context/UserContextProvider';
+import { UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
@@ -216,9 +217,19 @@ export default function Dashboard({ match }) {
             component={ProposalReviewUserOfficer}
           />
           {currentRole === 'user_officer' && <Route component={ProposalPage} />}
-          {currentRole === 'user' && <Route component={OverviewPage} />}
+          {currentRole === 'user' && (
+            <Route
+              render={props => (
+                <OverviewPage {...props} userRole={UserRole.USER} />
+              )}
+            />
+          )}
           {currentRole === 'reviewer' && (
-            <Route component={ProposalTableReviewer} />
+            <Route
+              render={props => (
+                <OverviewPage {...props} userRole={UserRole.REVIEWER} />
+              )}
+            />
           )}
         </Switch>
         <BottomNavigation className={classes.bottomNavigation}>
