@@ -1,6 +1,8 @@
 import { UserDataSource } from "../datasources/UserDataSource";
 import { User, BasicUserDetails } from "../models/User";
 import { UserAuthorization } from "../utils/UserAuthorization";
+import { logger } from "../utils/Logger";
+
 var rp = require("request-promise");
 const jsonwebtoken = require("jsonwebtoken");
 import * as bcrypt from "bcryptjs";
@@ -69,6 +71,7 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
+        logger.logException("Could not get getOrcIDAccessToken", err);
         return null;
       });
   }
@@ -125,6 +128,7 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
+        logger.logException("Could not get getOrcIDInformation", err);
         return null;
       });
   }
