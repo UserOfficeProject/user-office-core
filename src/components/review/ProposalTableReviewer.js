@@ -1,4 +1,3 @@
-import Grid from "@material-ui/core/Grid";
 import { Edit, Visibility } from "@material-ui/icons";
 import GetAppIcon from "@material-ui/icons/GetApp";
 import MaterialTable from "material-table";
@@ -7,7 +6,6 @@ import { Redirect } from "react-router";
 import { UserContext } from "../../context/UserContextProvider";
 import { useDownloadPDFProposal } from "../../hooks/useDownloadPDFProposal";
 import { useUserWithReviewsData } from "../../hooks/useUserData";
-import { ContentContainer, StyledPaper } from "../../styles/StyledComponents";
 import { tableIcons } from "../../utils/tableIcons";
 
 export default function ProposalTableReviewer() {
@@ -43,65 +41,53 @@ export default function ProposalTableReviewer() {
     };
   });
   return (
-    <ContentContainer>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <StyledPaper>
-            <MaterialTable
-              icons={tableIcons}
-              title={"Proposals to review"}
-              columns={columns}
-              data={reviewData}
-              options={{
-                search: false,
-                selection: true
-              }}
-              localization={{
-                toolbar: {
-                  nRowsSelected: "{0} proposal(s) selected"
-                }
-              }}
-              actions={[
-                {
-                  position: "row",
-                  action: rowData => {
-                    return {
-                      position: "row",
-                      icon:
-                        rowData.status === "SUBMITTED"
-                          ? () => <Visibility />
-                          : () => <Edit />,
-                      tooltip:
-                        rowData.status === "SUBMITTED"
-                          ? "View proposal"
-                          : "Edit proposal",
-                      onClick: (event, rowData) =>
-                        setEditReviewID(rowData.reviewId)
-                    };
-                  }
-                },
-                {
-                  icon: () => <GetAppIcon />,
-                  tooltip: "Download proposal",
-                  onClick: (event, rowData) =>
-                    downloadPDFProposal(rowData.proposalId),
-                  position: "row"
-                },
-                {
-                  icon: () => <GetAppIcon />,
-                  tooltip: "Download proposals",
-                  onClick: (event, rowData) => {
-                    downloadPDFProposal(
-                      rowData.map(row => row.proposalId).join(",")
-                    );
-                  },
-                  position: "toolbarOnSelect"
-                }
-              ]}
-            />
-          </StyledPaper>
-        </Grid>
-      </Grid>
-    </ContentContainer>
+    <MaterialTable
+      icons={tableIcons}
+      title={"Proposals to review"}
+      columns={columns}
+      data={reviewData}
+      options={{
+        search: false,
+        selection: true
+      }}
+      localization={{
+        toolbar: {
+          nRowsSelected: "{0} proposal(s) selected"
+        }
+      }}
+      actions={[
+        {
+          position: "row",
+          action: rowData => {
+            return {
+              position: "row",
+              icon:
+                rowData.status === "SUBMITTED"
+                  ? () => <Visibility />
+                  : () => <Edit />,
+              tooltip:
+                rowData.status === "SUBMITTED"
+                  ? "View proposal"
+                  : "Edit proposal",
+              onClick: (event, rowData) => setEditReviewID(rowData.reviewId)
+            };
+          }
+        },
+        {
+          icon: () => <GetAppIcon />,
+          tooltip: "Download proposal",
+          onClick: (event, rowData) => downloadPDFProposal(rowData.proposalId),
+          position: "row"
+        },
+        {
+          icon: () => <GetAppIcon />,
+          tooltip: "Download proposals",
+          onClick: (event, rowData) => {
+            downloadPDFProposal(rowData.map(row => row.proposalId).join(","));
+          },
+          position: "toolbarOnSelect"
+        }
+      ]}
+    />
   );
 }
