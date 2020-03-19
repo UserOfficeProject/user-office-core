@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { decode } from "jsonwebtoken";
 import { useCookies } from "react-cookie";
 
@@ -99,9 +99,15 @@ export const UserContextProvider = props => {
       value={{
         ...state,
         handleLogin: data => dispatch({ type: "loginUser", payload: data }),
-        handleLogout: data => dispatch({ type: "logOffUser", payload: data }),
+        handleLogout: useCallback(
+          data => dispatch({ type: "logOffUser", payload: data }),
+          []
+        ),
         handleRole: role => dispatch({ type: "selectRole", payload: role }),
-        handleNewToken: token => dispatch({ type: "setToken", payload: token })
+        handleNewToken: useCallback(
+          token => dispatch({ type: "setToken", payload: token }),
+          []
+        )
       }}
     >
       {props.children}
