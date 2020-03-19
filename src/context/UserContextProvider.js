@@ -1,5 +1,5 @@
 import { decode } from 'jsonwebtoken';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 
 const initUserData = {
@@ -103,9 +103,16 @@ export const UserContextProvider = props => {
       value={{
         ...state,
         handleLogin: data => dispatch({ type: 'loginUser', payload: data }),
-        handleLogout: data => dispatch({ type: 'logOffUser', payload: data }),
+        // Using useCallback here as these are used in useDataAPI dependency array
+        handleLogout: useCallback(
+          data => dispatch({ type: 'logOffUser', payload: data }),
+          []
+        ),
         handleRole: role => dispatch({ type: 'selectRole', payload: role }),
-        handleNewToken: token => dispatch({ type: 'setToken', payload: token }),
+        handleNewToken: useCallback(
+          token => dispatch({ type: 'setToken', payload: token }),
+          []
+        ),
       }}
     >
       {props.children}
