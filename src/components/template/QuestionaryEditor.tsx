@@ -5,29 +5,35 @@ import {
   LinearProgress,
   makeStyles,
   Switch,
-  useTheme
-} from "@material-ui/core";
-import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { useSnackbar } from "notistack";
-import React, { useState } from "react";
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
-import { ProposalTemplateField } from "../../generated/sdk";
-import { usePersistModel } from "../../hooks/usePersistModel";
+  useTheme,
+} from '@material-ui/core';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { useSnackbar } from 'notistack';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+
+import { ProposalTemplateField } from '../../generated/sdk';
+import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   EventType,
-  IEvent
-} from "../../models/QuestionaryEditorModel";
-import { StyledPaper } from "../../styles/StyledComponents";
-import QuestionaryEditorTopic from "./QuestionaryEditorTopic";
-import QuestionaryFieldEditor from "./QuestionaryFieldEditor";
+  Event,
+} from '../../models/QuestionaryEditorModel';
+import { StyledPaper } from '../../styles/StyledComponents';
+import QuestionaryEditorTopic from './QuestionaryEditorTopic';
+import QuestionaryFieldEditor from './QuestionaryFieldEditor';
 
 export default function QuestionaryEditor() {
+  const { enqueueSnackbar } = useSnackbar();
+  const [
+    selectedField,
+    setSelectedField,
+  ] = useState<ProposalTemplateField | null>(null);
   const reducerMiddleware = () => {
-    return (next: Function) => (action: IEvent) => {
+    return (next: Function) => (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.SERVICE_ERROR_OCCURRED:
-          enqueueSnackbar(action.payload, { variant: "error" });
+          enqueueSnackbar(action.payload, { variant: 'error' });
           break;
 
         case EventType.FIELD_CREATED:
@@ -36,68 +42,62 @@ export default function QuestionaryEditor() {
       }
     };
   };
-  const { enqueueSnackbar } = useSnackbar();
-  var { persistModel, isLoading } = usePersistModel();
-  var { state, dispatch } = QuestionaryEditorModel([
+  const { persistModel, isLoading } = usePersistModel();
+  const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
-    reducerMiddleware
+    reducerMiddleware,
   ]);
 
   const [isTopicReorderMode, setIsTopicReorderMode] = useState(false);
 
-  const [
-    selectedField,
-    setSelectedField
-  ] = React.useState<ProposalTemplateField | null>(null);
-
   const theme = useTheme();
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles(() => ({
     modalContainer: {
-      backgroundColor: "white"
+      backgroundColor: 'white',
     },
     centeredButton: {
-      display: "flex",
-      margin: "10px auto"
-    }
+      display: 'flex',
+      margin: '10px auto',
+    },
   }))();
 
   const getTopicListStyle = (isDraggingOver: any) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
-    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)",
-    display: "flex"
+    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+    display: 'flex',
   });
 
-  const onDragEnd = (result: DropResult) => {
-    if (result.type === "field") {
+  const onDragEnd = (result: DropResult): void => {
+    if (result.type === 'field') {
       dispatch({
         type: EventType.REORDER_FIELD_REQUESTED,
-        payload: { source: result.source, destination: result.destination }
+        payload: { source: result.source, destination: result.destination },
       });
     }
-    if (result.type === "topic") {
+    if (result.type === 'topic') {
       dispatch({
         type: EventType.REORDER_TOPIC_REQUESTED,
-        payload: { source: result.source, destination: result.destination }
+        payload: { source: result.source, destination: result.destination },
       });
     }
   };
 
-  const onClick = (data: ProposalTemplateField) => {
+  const onClick = (data: ProposalTemplateField): void => {
     setSelectedField(data);
   };
 
-  const handleFieldEditorClose = () => {
+  const handleFieldEditorClose = (): void => {
     setSelectedField(null);
   };
 
-  const getContainerStyle = (isBusy: boolean): any => {
+  const getContainerStyle = (): any => {
     return isLoading
       ? {
-          pointerEvents: "none",
-          userSelect: "none",
-          opacity: 0.5
+          pointerEvents: 'none',
+          userSelect: 'none',
+          opacity: 0.5,
         }
       : {};
   };
@@ -110,10 +110,10 @@ export default function QuestionaryEditor() {
         variant="outlined"
         color="primary"
         className={classes.centeredButton}
-        onClick={() =>
+        onClick={(): void =>
           dispatch({
             type: EventType.CREATE_TOPIC_REQUESTED,
-            payload: { sortOrder: 0 }
+            payload: { sortOrder: 0 },
           })
         }
       >
@@ -126,13 +126,13 @@ export default function QuestionaryEditor() {
     state.steps.length > 1 ? (
       <FormGroup
         row
-        style={{ justifyContent: "flex-end", paddingBottom: "25px" }}
+        style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
       >
         <FormControlLabel
           control={
             <Switch
               checked={isTopicReorderMode}
-              onChange={() => setIsTopicReorderMode(!isTopicReorderMode)}
+              onChange={(): void => setIsTopicReorderMode(!isTopicReorderMode)}
               color="primary"
             />
           }
@@ -140,9 +140,10 @@ export default function QuestionaryEditor() {
         />
       </FormGroup>
     ) : null;
+
   return (
     <>
-      <StyledPaper style={getContainerStyle(isLoading)}>
+      <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         {enableReorderTopicsToggle}
         <DragDropContext onDragEnd={onDragEnd}>

@@ -1,7 +1,7 @@
-import React from "react";
-import { Editor } from "@tinymce/tinymce-react";
-import { FormikActions } from "formik";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core';
+import { Editor } from '@tinymce/tinymce-react';
+import { FormikActions } from 'formik';
+import React from 'react';
 
 const FormikUICustomEditor = ({
   field,
@@ -14,11 +14,11 @@ const FormikUICustomEditor = ({
 }) => {
   const classes = makeStyles(theme => ({
     label: {
-      marginTop: "17px",
-      fontSize: "1.1875em",
-      display: "block",
-      color: theme.palette.grey[800]
-    }
+      marginTop: '17px',
+      fontSize: '1.1875em',
+      display: 'block',
+      color: theme.palette.grey[800],
+    },
   }))();
 
   return (

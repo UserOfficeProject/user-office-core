@@ -8,19 +8,20 @@ import {
   ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
-  makeStyles
-} from "@material-ui/core";
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import CancelIcon from "@material-ui/icons/Cancel";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import ErrorIcon from "@material-ui/icons/Error";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { useDataApi } from "../../hooks/useDataApi";
-import { UPLOAD_STATE, useFileUpload } from "../../hooks/useFileUpload";
-import { usePrevious } from "../../hooks/usePrevious";
-import { FileMetaData } from "../../models/FileUpload";
+  makeStyles,
+} from '@material-ui/core';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import CancelIcon from '@material-ui/icons/Cancel';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import ErrorIcon from '@material-ui/icons/Error';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+
+import { useDataApi } from '../../hooks/useDataApi';
+import { UPLOAD_STATE, useFileUpload } from '../../hooks/useFileUpload';
+import { usePrevious } from '../../hooks/usePrevious';
+import { FileMetaData } from '../../models/FileUpload';
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -35,15 +36,15 @@ export function FileUploadComponent(props: {
   const inputRef = useRef(null);
   const api = useDataApi();
 
-  const classes = makeStyles(theme => ({
+  const classes = makeStyles(() => ({
     list: {
-      listStyle: "none",
+      listStyle: 'none',
       padding: 0,
       marginBottom: 0,
-      "& li": {
-        paddingLeft: 0
-      }
-    }
+      '& li': {
+        paddingLeft: 0,
+      },
+    },
   }))();
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function FileUploadComponent(props: {
   useEffect(() => {
     if (props.value) {
       api()
-        .getFileMetadata({ fileIds: props.value.split(",") })
+        .getFileMetadata({ fileIds: props.value.split(',') })
         .then(data => {
           setFiles(data?.fileMetadata || []);
         });
@@ -71,21 +72,21 @@ export function FileUploadComponent(props: {
   }, [filesMetadata]);
   */
 
-  const onUploadComplete = (newFile: FileMetaData) => {
+  const dispatchChange = (): void => {
+    const inputElement: HTMLInputElement = inputRef.current!;
+    const event: any = {};
+    event.target = inputElement;
+    props.onChange(event);
+  };
+
+  const onUploadComplete = (newFile: FileMetaData): void => {
     setFiles(files.concat(newFile));
     dispatchChange();
   };
 
-  const onDeleteClicked = (deleteFile: FileMetaData) => {
+  const onDeleteClicked = (deleteFile: FileMetaData): void => {
     setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
     dispatchChange();
-  };
-
-  const dispatchChange = () => {
-    const inputElement: HTMLInputElement = inputRef.current!;
-    let event: any = {};
-    event.target = inputElement;
-    props.onChange(event);
   };
 
   const { fileType, id } = props;
@@ -100,6 +101,7 @@ export function FileUploadComponent(props: {
 
   const amountFilesInfo =
     maxFiles > 1 ? <span>Max: {maxFiles} file(s)</span> : null;
+
   return (
     <>
       <input
@@ -107,7 +109,7 @@ export function FileUploadComponent(props: {
         id={id}
         name={id}
         readOnly
-        value={files.map(metaData => metaData.fileId).join(",")}
+        value={files.map(metaData => metaData.fileId).join(',')}
         ref={inputRef}
       />
       {amountFilesInfo}
@@ -137,30 +139,30 @@ export function FileEntry(props: {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
-      marginBottim: theme.spacing(2)
+      marginBottim: theme.spacing(2),
     },
     avatar: {
       backgroundColor: theme.palette.primary.main,
-      color: "white"
+      color: 'white',
     },
     downloadLink: {
-      display: "inline-flex",
-      color: "rgba(0, 0, 0, 0.54)"
-    }
+      display: 'inline-flex',
+      color: 'rgba(0, 0, 0, 0.54)',
+    },
   }))();
 
   const downloadLink = `/files/download/${props.metaData.fileId}`; // TODO to get a path to server? Or how to allow download via proxy
 
-  const formatBytes = (bytes: number, decimals: number = 2): string => {
-    if (bytes === 0) return "0 Bytes";
+  const formatBytes = (bytes: number, decimals = 2): string => {
+    if (bytes === 0) return '0 Bytes';
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   return (
@@ -182,7 +184,7 @@ export function FileEntry(props: {
         </IconButton>
         <IconButton
           edge="end"
-          onClick={() => {
+          onClick={(): void => {
             props.onDeleteClicked(props.metaData);
           }}
         >
@@ -200,24 +202,24 @@ export function NewFileEntry(props: {
   const classes = makeStyles(theme => ({
     fileListWrapper: {
       marginTop: theme.spacing(2),
-      marginBottim: theme.spacing(2)
+      marginBottim: theme.spacing(2),
     },
     addIcon: {
-      marginRight: theme.spacing(1)
+      marginRight: theme.spacing(1),
     },
     avatar: {
       backgroundColor: theme.palette.primary.main,
-      color: "white"
-    }
+      color: 'white',
+    },
   }))();
 
   const { uploadFile, progress, state, abort } = useFileUpload();
 
   const onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
-    let selectedFile = e.target.files ? e.target.files[0] : null;
+    const selectedFile = e.target.files ? e.target.files[0] : null;
     if (!selectedFile) return;
 
-    uploadFile(selectedFile!, props.onUploadComplete);
+    uploadFile(selectedFile, props.onUploadComplete);
   };
 
   switch (state) {
@@ -227,7 +229,7 @@ export function NewFileEntry(props: {
           <label>
             <input
               accept={props.filetype}
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
               type="file"
               multiple={false}
               onChange={onFileSelected}
@@ -274,7 +276,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText
             primary="Uploading..."
-            secondary={Math.round(progress) + "%"}
+            secondary={Math.round(progress) + '%'}
           />
           <ListItemSecondaryAction>
             {/* Add cancel upload button */}
@@ -282,5 +284,6 @@ export function NewFileEntry(props: {
         </>
       );
   }
+
   return <div>Unknown state</div>;
 }

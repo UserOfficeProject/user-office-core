@@ -1,7 +1,8 @@
-import React from "react";
-import DialogContent from "@material-ui/core/DialogContent";
-import Dialog from "@material-ui/core/Dialog";
-import RoleTable from "./RoleTable";
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import React from 'react';
+
+import RoleTable from './RoleTable';
 
 function RoleModal(props) {
   return (
@@ -10,6 +11,7 @@ function RoleModal(props) {
       aria-describedby="simple-modal-description"
       open={props.show}
       onClose={() => props.close()}
+      disableScrollLock={true}
     >
       <DialogContent>
         <RoleTable add={props.add} />

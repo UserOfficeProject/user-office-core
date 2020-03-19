@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useDataApi } from './useDataApi';
+
 import { EventLog, User } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
 
 export function useEventLogsData(eventType: string, changedObjectId: string) {
   const api = useDataApi();
@@ -18,7 +19,7 @@ export function useEventLogsData(eventType: string, changedObjectId: string) {
             data.eventLogs.map(eventLog => {
               return {
                 ...eventLog,
-                changedBy: eventLog.changedBy as User
+                changedBy: eventLog.changedBy as User,
               };
             })
           );

@@ -1,25 +1,26 @@
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Email from "@material-ui/icons/Email";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useDataApi } from "../../hooks/useDataApi";
-import PhotoInSide from "./PhotoInSide";
-import { FormWrapper } from "../../styles/StyledComponents";
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Email from '@material-ui/icons/Email';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { useDataApi } from '../../hooks/useDataApi';
+import { FormWrapper } from '../../styles/StyledComponents';
+import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.primary.dark
+    backgroundColor: theme.palette.primary.dark,
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
+    margin: theme.spacing(3, 0, 2),
   },
   signLink: {
-    textDecoration: "none"
-  }
+    textDecoration: 'none',
+  },
 }));
 
 export default function EmailVerification({ match }) {
@@ -45,8 +46,8 @@ export default function EmailVerification({ match }) {
           <Email />
         </Avatar>
         <Typography component="h1" variant="h5">
-          {emailVerified && "Email Verified"}
-          {errorMessage && "Email Verfication Failed"}
+          {emailVerified && 'Email Verified'}
+          {errorMessage && 'Email Verfication Failed'}
         </Typography>
         {emailVerified && (
           <Link to="/SignIn/" className={classes.signLink}>

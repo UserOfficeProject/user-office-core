@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { UserWithReviewsQuery } from "../generated/sdk";
-import { useDataApi } from "./useDataApi";
+import { useCallback, useEffect, useState } from 'react';
+
+import { UserWithReviewsQuery } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
 
 export function useUserWithReviewsData(id: number) {
   const api = useDataApi();
-  const [userData, setUserData] = useState<UserWithReviewsQuery["user"] | null>(
+  const [userData, setUserData] = useState<UserWithReviewsQuery['user'] | null>(
     null
   );
   const [loading, setLoading] = useState(true);
@@ -12,7 +13,7 @@ export function useUserWithReviewsData(id: number) {
     setLoading(true);
     api()
       .userWithReviews({
-        id
+        id,
       })
       .then(data => {
         setUserData(data.user);
@@ -38,7 +39,7 @@ export function useBasicUserData() {
   return { loadBasicUserData };
 }
 
-export interface IBasicUserData {
+export interface BasicUserData {
   firstname: string;
   lastname: string;
   organisation: string;

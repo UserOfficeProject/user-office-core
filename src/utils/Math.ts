@@ -1,3 +1,3 @@
-export function clamp(input: number, lower: number, upper: number) {
+export function clamp(input: number, lower: number, upper: number): number {
   return Math.min(Math.max(input, lower), upper);
 }

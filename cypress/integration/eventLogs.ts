@@ -5,7 +5,6 @@ context('Event log tests', () => {
   const dateformat = require('dateformat');
 
   before(() => {
-    //@ts-ignore
     cy.resetDB();
   });
   beforeEach(() => {
@@ -20,7 +19,7 @@ context('Event log tests', () => {
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
     const title = faker.random.words(3);
     const abstract = faker.random.words(8);
-    //@ts-ignore
+
     cy.login('user');
 
     cy.contains('New Proposal').click();
@@ -30,7 +29,6 @@ context('Event log tests', () => {
 
     cy.contains('Logout').click();
 
-    //@ts-ignore
     cy.login('officer');
 
     cy.get('button[title="View proposal"]')
@@ -42,7 +40,7 @@ context('Event log tests', () => {
 
   it('If user uptates his info, officer should be able to see the event logs for that update', () => {
     const newFirstName = faker.name.firstName();
-    //@ts-ignore
+
     cy.login('user');
 
     cy.get("[data-cy='profile-page-btn']").click();
@@ -58,7 +56,6 @@ context('Event log tests', () => {
 
     cy.contains('Logout').click();
 
-    //@ts-ignore
     cy.login('officer');
 
     cy.contains('View People').click();

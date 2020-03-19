@@ -1,18 +1,20 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import FormikUICustomEditor from "../common/FormikUICustomEditor";
-import * as Yup from "yup";
-import { AdminComponentShell } from "./AdminComponentShell";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import TitledContainer from "../common/TitledContainer";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import { EmbellishmentConfig } from "../../generated/sdk";
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { EmbellishmentConfig } from '../../generated/sdk';
+import { EventType } from '../../models/QuestionaryEditorModel';
+import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import FormikUICustomEditor from '../common/FormikUICustomEditor';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
   const field = props.field;
+
   return (
     <Formik
       initialValues={field}
@@ -20,16 +22,16 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
-          }
+            field: { ...field, ...vals },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
         config: Yup.object({
-          html: Yup.string().required("Content is required"),
-          plain: Yup.string().required("Plain description is required")
-        })
+          html: Yup.string().required('Content is required'),
+          plain: Yup.string().required('Plain description is required'),
+        }),
       })}
     >
       {formikProps => (
@@ -44,9 +46,9 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
               init={{
                 skin: false,
                 content_css: false,
-                plugins: ["link", "preview", "image", "code"],
-                toolbar: "bold italic",
-                branding: false
+                plugins: ['link', 'preview', 'image', 'code'],
+                toolbar: 'bold italic',
+                branding: false,
               }}
               data-cy="html"
             />

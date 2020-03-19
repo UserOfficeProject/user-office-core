@@ -1,8 +1,9 @@
-import { AddBox } from "@material-ui/icons";
-import MaterialTable from "material-table";
-import React from "react";
-import { useDataApi } from "../../hooks/useDataApi";
-import { tableIcons } from "../../utils/tableIcons";
+import { AddBox } from '@material-ui/icons';
+import MaterialTable from 'material-table';
+import React from 'react';
+
+import { useDataApi } from '../../hooks/useDataApi';
+import { tableIcons } from '../../utils/tableIcons';
 
 function sendRoleRequest(apiCall) {
   return apiCall()
@@ -13,7 +14,7 @@ function sendRoleRequest(apiCall) {
         totalCount: data.roles.length,
         data: data.roles.map(role => {
           return { title: role.title, id: role.id };
-        })
+        }),
       };
     });
 }
@@ -21,8 +22,8 @@ function sendRoleRequest(apiCall) {
 function RoleTable(props) {
   const sendRequest = useDataApi();
   const columns = [
-    { title: "Title", field: "title" },
-    { title: "ID", field: "id" }
+    { title: 'Title', field: 'title' },
+    { title: 'ID', field: 'id' },
   ];
 
   return (
@@ -32,15 +33,15 @@ function RoleTable(props) {
       columns={columns}
       data={() => sendRoleRequest(sendRequest)}
       options={{
-        search: true
+        search: true,
       }}
       actions={[
         {
           icon: () => <AddBox />,
-          tooltip: "Select role",
+          tooltip: 'Select role',
           onClick: (event, rowData) =>
-            props.add({ id: rowData.id, title: rowData.title })
-        }
+            props.add({ id: rowData.id, title: rowData.title }),
+        },
       ]}
     />
   );

@@ -1,7 +1,7 @@
-import React from "react";
-import { TextField } from "formik-material-ui";
-import { MenuItem } from "@material-ui/core";
-import { Field } from "formik";
+import { MenuItem } from '@material-ui/core';
+import { Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
 
 class FormikDropdown extends React.Component<TProps> {
   render() {
@@ -14,7 +14,7 @@ class FormikDropdown extends React.Component<TProps> {
         margin="normal"
         component={TextField}
         InputLabelProps={{
-          shrink: true
+          shrink: true,
         }}
         fullWidth
         required={this.props.required}

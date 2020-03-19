@@ -1,46 +1,52 @@
-import { makeStyles } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import React from "react";
-import { useDataApi } from "../../hooks/useDataApi";
-import { emailFieldSchema } from "../../utils/userFieldValidationSchema";
-import { UserRole } from "../../generated/sdk";
-export function InviteUserForm(props: { action: Function, title: string, userRole: UserRole, close: Function}) {
+import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+
+import { UserRole } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { emailFieldSchema } from '../../utils/userFieldValidationSchema';
+export function InviteUserForm(props: {
+  action: Function;
+  title: string;
+  userRole: UserRole;
+  close: Function;
+}) {
   const api = useDataApi();
   const classes = makeStyles({
     buttons: {
-      display: "flex",
-      justifyContent: "flex-end"
+      display: 'flex',
+      justifyContent: 'flex-end',
     },
     button: {
-      marginTop: "25px",
-      marginLeft: "10px"
-    }
+      marginTop: '25px',
+      marginLeft: '10px',
+    },
   })();
-  
+
   return (
     <Formik
       initialValues={{
-        name: "",
-        lastname: "",
-        email: ""
+        name: '',
+        lastname: '',
+        email: '',
       }}
       onSubmit={async values => {
         const createResult = await api().createUserByEmailInvite({
           firstname: values.name,
           lastname: values.lastname,
           email: values.email,
-          userRole: props.userRole
+          userRole: props.userRole,
         });
         props.action({
           firstname: values.name,
           lastname: values.lastname,
-          organisation: "",
-          id: createResult?.createUserByEmailInvite.id
+          organisation: '',
+          id: createResult?.createUserByEmailInvite.id,
         });
-        props.close()
+        props.close();
       }}
       validationSchema={emailFieldSchema}
     >
@@ -77,7 +83,7 @@ export function InviteUserForm(props: { action: Function, title: string, userRol
           />
 
           <div className={classes.buttons}>
-          <Button
+            <Button
               onClick={() => props.close()}
               variant="contained"
               color="secondary"

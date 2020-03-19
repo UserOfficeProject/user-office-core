@@ -1,15 +1,16 @@
-import React, { Fragment } from "react";
-import Typography from "@material-ui/core/Typography";
-import { Formik, Form, Field } from "formik";
-import Grid from "@material-ui/core/Grid";
-import { TextField } from "formik-material-ui";
-import Button from "@material-ui/core/Button";
-import { useDataApi } from "../../hooks/useDataApi";
-import * as Yup from "yup";
-import { TechnicalReviewStatus, TechnicalReview } from "../../generated/sdk";
-import FormikDropdown from "../common/FormikDropdown";
-import { ButtonContainer } from "../../styles/StyledComponents";
-import { useSnackbar } from "notistack";
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
+import React, { Fragment } from 'react';
+import * as Yup from 'yup';
+
+import { TechnicalReviewStatus, TechnicalReview } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { ButtonContainer } from '../../styles/StyledComponents';
+import FormikDropdown from '../common/FormikDropdown';
 
 export default function ProposalTechnicalReview(props: {
   data: TechnicalReview | null | undefined;
@@ -19,21 +20,23 @@ export default function ProposalTechnicalReview(props: {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
+  const initialValues = {
+    status: props?.data?.status || '',
+    timeAllocation: props?.data?.timeAllocation,
+    comment: props?.data?.comment,
+  };
+
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>
         Technical Review
       </Typography>
       <Formik
-        initialValues={{
-          status: props?.data?.status,
-          timeAllocation: props?.data?.timeAllocation,
-          comment: props?.data?.comment
-        }}
+        initialValues={initialValues}
         validationSchema={Yup.object().shape({
           status: Yup.string().nullable(),
           timeAllocation: Yup.number().nullable(),
-          comment: Yup.string().nullable()
+          comment: Yup.string().nullable(),
         })}
         onSubmit={async (values, actions) => {
           await api()
@@ -42,11 +45,11 @@ export default function ProposalTechnicalReview(props: {
               timeAllocation: values.timeAllocation!,
               comment: values.comment!,
               status:
-                TechnicalReviewStatus[values.status as TechnicalReviewStatus]
+                TechnicalReviewStatus[values.status as TechnicalReviewStatus],
             })
             .then(data =>
-              enqueueSnackbar("Updated", {
-                variant: data.addTechnicalReview.error ? "error" : "success"
+              enqueueSnackbar('Updated', {
+                variant: data.addTechnicalReview.error ? 'error' : 'success',
               })
             );
           props.setReview({
@@ -54,7 +57,7 @@ export default function ProposalTechnicalReview(props: {
             timeAllocation: values.timeAllocation!,
             comment: values.comment!,
             status:
-              TechnicalReviewStatus[values.status as TechnicalReviewStatus]
+              TechnicalReviewStatus[values.status as TechnicalReviewStatus],
           });
           actions.setSubmitting(false);
         }}
@@ -67,15 +70,15 @@ export default function ProposalTechnicalReview(props: {
                   name="status"
                   label="Status"
                   items={[
-                    { text: "Feasible", value: TechnicalReviewStatus.FEASIBLE },
+                    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
                     {
-                      text: "Partially feasible",
-                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE
+                      text: 'Partially feasible',
+                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
                     },
                     {
-                      text: "Unfeasible",
-                      value: TechnicalReviewStatus.UNFEASIBLE
-                    }
+                      text: 'Unfeasible',
+                      value: TechnicalReviewStatus.UNFEASIBLE,
+                    },
                   ]}
                 />
               </Grid>

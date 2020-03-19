@@ -1,9 +1,10 @@
-import React, { HTMLAttributes, useState } from "react";
-import { Proposal } from "../../generated/sdk";
-import ProposalQuestionaryReview from "../review/ProposalQuestionaryReview";
-import ProposalContainer from "./ProposalContainer";
-import { Switch, FormControlLabel } from "@material-ui/core";
-import { useDataApi } from "../../hooks/useDataApi";
+import { Switch, FormControlLabel } from '@material-ui/core';
+import React, { HTMLAttributes, useState } from 'react';
+
+import { Proposal } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
+import ProposalContainer from './ProposalContainer';
 
 export default function GeneralInformation(
   props: HTMLAttributes<any> & {
@@ -17,10 +18,11 @@ export default function GeneralInformation(
 
   const readonlyView = <ProposalQuestionaryReview data={proposal} />;
   const editableView = <ProposalContainer data={proposal} />;
+
   return (
     <div>
       <FormControlLabel
-        style={{ display: "block", textAlign: "right" }}
+        style={{ display: 'block', textAlign: 'right' }}
         control={
           <Switch
             checked={isEditable}
@@ -37,7 +39,7 @@ export default function GeneralInformation(
             color="primary"
           />
         }
-        label={isEditable ? "Close" : "Edit proposal"}
+        label={isEditable ? 'Close' : 'Edit proposal'}
       />
       {isEditable ? editableView : readonlyView}
     </div>

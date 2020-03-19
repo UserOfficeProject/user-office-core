@@ -1,7 +1,8 @@
-import React from "react";
-import MaterialTable from "material-table";
-import { FormikActions } from "formik";
-import { tableIcons } from "../../utils/materialIcons";
+import { FormikActions } from 'formik';
+import MaterialTable from 'material-table';
+import React from 'react';
+
+import { tableIcons } from '../../utils/materialIcons';
 
 export const FormikUICustomTable = ({
   columns,
@@ -59,7 +60,7 @@ export const FormikUICustomTable = ({
             setState(data);
             form.setFieldValue(field.name, dataTransforms.fromTable(data));
             resolve();
-          })
+          }),
       }}
       {...props}
       data-cy="options"

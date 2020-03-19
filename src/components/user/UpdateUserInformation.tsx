@@ -1,13 +1,16 @@
+import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/styles';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+
 import { useDataApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import orcid from '../../images/orcid.png';
@@ -15,8 +18,6 @@ import { ButtonContainer } from '../../styles/StyledComponents';
 import { userFieldSchema } from '../../utils/userFieldValidationSchema';
 import FormikDropdown from '../common/FormikDropdown';
 import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
-import DateFnsUtils from '@date-io/date-fns'; // choose your lib
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 const useStyles = makeStyles({
   button: {
@@ -139,91 +140,93 @@ export default function UpdateUserInformation(props: { id: number }) {
             <Grid container spacing={3}>
               <Grid item xs={6}>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <FormikDropdown
-                    name="user_title"
-                    label="Title"
-                    items={[
-                      { text: 'Ms.', value: 'Ms.' },
-                      { text: 'Mr.', value: 'Mr.' },
-                      { text: 'Dr.', value: 'Dr.' },
-                      { text: 'Prof.', value: 'Prof.' },
-                      { text: 'Rather not say', value: 'unspecified' },
-                    ]}
-                    data-cy="title"
-                  />
-                  <Field
-                    name="firstname"
-                    label="Firstname"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="firstname"
-                  />
-                  <Field
-                    name="middlename"
-                    label="Middle name"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="middlename"
-                  />
-                  <Field
-                    name="lastname"
-                    label="Lastname"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="lastname"
-                  />
-                  <Field
-                    name="preferredname"
-                    label="Preferred name"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    data-cy="preferredname"
-                  />
-                  <FormikDropdown
-                    name="gender"
-                    label="Gender"
-                    items={[
-                      { text: 'Female', value: 'female' },
-                      { text: 'Male', value: 'male' },
-                      { text: 'Other', value: 'other' },
-                    ]}
-                    data-cy="gender"
-                  />
-                  {values.gender === 'other' && (
+                  <>
+                    <FormikDropdown
+                      name="user_title"
+                      label="Title"
+                      items={[
+                        { text: 'Ms.', value: 'Ms.' },
+                        { text: 'Mr.', value: 'Mr.' },
+                        { text: 'Dr.', value: 'Dr.' },
+                        { text: 'Prof.', value: 'Prof.' },
+                        { text: 'Rather not say', value: 'unspecified' },
+                      ]}
+                      data-cy="title"
+                    />
                     <Field
-                      name="othergender"
-                      label="Please specify gender"
+                      name="firstname"
+                      label="Firstname"
                       type="text"
                       component={TextField}
                       margin="normal"
                       fullWidth
-                      data-cy="othergender"
-                      required
+                      data-cy="firstname"
                     />
-                  )}
-                  <FormikDropdown
-                    name="nationality"
-                    label="Nationality"
-                    items={nationalitiesList}
-                    data-cy="nationality"
-                  />
+                    <Field
+                      name="middlename"
+                      label="Middle name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="middlename"
+                    />
+                    <Field
+                      name="lastname"
+                      label="Lastname"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="lastname"
+                    />
+                    <Field
+                      name="preferredname"
+                      label="Preferred name"
+                      type="text"
+                      component={TextField}
+                      margin="normal"
+                      fullWidth
+                      data-cy="preferredname"
+                    />
+                    <FormikDropdown
+                      name="gender"
+                      label="Gender"
+                      items={[
+                        { text: 'Female', value: 'female' },
+                        { text: 'Male', value: 'male' },
+                        { text: 'Other', value: 'other' },
+                      ]}
+                      data-cy="gender"
+                    />
+                    {values.gender === 'other' && (
+                      <Field
+                        name="othergender"
+                        label="Please specify gender"
+                        type="text"
+                        component={TextField}
+                        margin="normal"
+                        fullWidth
+                        data-cy="othergender"
+                        required
+                      />
+                    )}
+                    <FormikDropdown
+                      name="nationality"
+                      label="Nationality"
+                      items={nationalitiesList}
+                      data-cy="nationality"
+                    />
 
-                  <Field
-                    name="birthdate"
-                    label="Birthdate"
-                    component={FormikUICustomDatePicker}
-                    margin="normal"
-                    fullWidth
-                    data-cy="birthdate"
-                  />
+                    <Field
+                      name="birthdate"
+                      label="Birthdate"
+                      component={FormikUICustomDatePicker}
+                      margin="normal"
+                      fullWidth
+                      data-cy="birthdate"
+                    />
+                  </>
                 </MuiPickersUtilsProvider>
               </Grid>
               <Grid item xs={6}>
