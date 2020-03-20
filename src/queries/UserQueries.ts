@@ -7,6 +7,7 @@ import rp from 'request-promise';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { User, BasicUserDetails } from '../models/User';
+import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserQueries {
@@ -75,6 +76,7 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
+        logger.logException("Could not get getOrcIDAccessToken", err);
         return null;
       });
   }
@@ -134,6 +136,7 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
+        logger.logException("Could not get getOrcIDInformation", err);
         return null;
       });
   }
