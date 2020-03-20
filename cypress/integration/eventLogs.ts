@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+/// <reference types="../types" />
 
 context('Event log tests', () => {
   const faker = require('faker');
