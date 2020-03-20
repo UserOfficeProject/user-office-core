@@ -211,6 +211,7 @@ export const createFieldDependencyObject = (
   fieldDependency: FieldDependencyRecord & { natural_key: string }
 ) => {
   const conditionJson = JSON.parse(fieldDependency.condition);
+
   return new FieldDependency(
     fieldDependency.proposal_question_id,
     fieldDependency.proposal_question_dependency,

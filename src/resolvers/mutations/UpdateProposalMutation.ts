@@ -6,13 +6,26 @@ import {
   InputType,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { DataType } from "../../models/ProposalModel";
-import { ProposalResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { ProposalEndStatus } from "../../models/ProposalModel";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { DataType } from '../../models/ProposalModel';
+import { ProposalEndStatus } from '../../models/ProposalModel';
+import { ProposalResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
+
+@InputType()
+class ProposalAnswerInput {
+  @Field()
+  proposal_question_id: string;
+
+  @Field(() => DataType, { nullable: true })
+  data_type: DataType;
+
+  @Field(() => String, { nullable: true })
+  value: string;
+}
 
 @ArgsType()
 export class UpdateProposalArgs {
@@ -60,16 +73,4 @@ export class UpdateProposalMutation {
       ProposalResponseWrap
     );
   }
-}
-
-@InputType()
-class ProposalAnswerInput {
-  @Field()
-  proposal_question_id: string;
-
-  @Field(() => DataType, { nullable: true })
-  data_type: DataType;
-
-  @Field(() => String, { nullable: true })
-  value: string;
 }

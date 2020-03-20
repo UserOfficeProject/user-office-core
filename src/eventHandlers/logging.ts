@@ -1,6 +1,6 @@
+import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 
 export default function createHandler(
   eventLogsDataSource: EventLogsDataSource

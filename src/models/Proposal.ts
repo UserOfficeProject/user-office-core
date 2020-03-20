@@ -1,4 +1,4 @@
-import { ProposalStatus } from "./ProposalModel";
+import { ProposalStatus } from './ProposalModel';
 export class Proposal {
   constructor(
     public id: number,

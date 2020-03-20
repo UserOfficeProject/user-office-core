@@ -24,7 +24,7 @@ export const dummyEventLogs = [
   dummyEventLogProposalCreated,
 ];
 
-export class eventLogsDataSource implements EventLogsDataSource {
+export class EventLogsDataSourceMock implements EventLogsDataSource {
   async set(
     changedBy: number,
     eventType: string,
@@ -39,8 +39,7 @@ export class eventLogsDataSource implements EventLogsDataSource {
 
     if (filter.changedObjectId && filter.changedObjectId !== '*') {
       dummyEventLogsCopy = dummyEventLogsCopy.filter(
-        eventLog =>
-          eventLog.changedObjectId === filter.changedObjectId
+        eventLog => eventLog.changedObjectId === filter.changedObjectId
       );
     }
 

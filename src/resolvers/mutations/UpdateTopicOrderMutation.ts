@@ -5,12 +5,13 @@ import {
   Int,
   Mutation,
   ObjectType,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Response } from "../Decorators";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ObjectType()
 class UpdateTopicOrderResponseWrap extends ResponseWrapBase<number[]> {
@@ -23,7 +24,7 @@ class UpdateTopicOrderResponseWrap extends ResponseWrapBase<number[]> {
 export class UpdateTopicOrderMutation {
   @Mutation(() => UpdateTopicOrderResponseWrap)
   updateTopicOrder(
-    @Arg("topicOrder", () => [Int]) topicOrder: number[],
+    @Arg('topicOrder', () => [Int]) topicOrder: number[],
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(

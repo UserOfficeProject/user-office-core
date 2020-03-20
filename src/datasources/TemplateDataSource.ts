@@ -1,11 +1,11 @@
-import { FieldDependencyInput } from "./../resolvers/mutations/UpdateProposalTemplateFieldMutation";
+/* eslint-disable @typescript-eslint/camelcase */
 import {
   ProposalTemplate,
   Topic,
   ProposalTemplateField,
-  FieldDependency,
-  DataType
-} from "../models/ProposalModel";
+  DataType,
+} from '../models/ProposalModel';
+import { FieldDependencyInput } from './../resolvers/mutations/UpdateProposalTemplateFieldMutation';
 
 export interface TemplateDataSource {
   getProposalTemplate(): Promise<ProposalTemplate>;
@@ -44,5 +44,5 @@ export interface TemplateDataSource {
 
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
-  isNaturalKeyPresent(natural_key: string): Promise<Boolean>;
+  isNaturalKeyPresent(natural_key: string): Promise<boolean>;
 }

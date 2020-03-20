@@ -1,18 +1,18 @@
-import { ReviewDataSource } from "../datasources/ReviewDataSource";
-import { User } from "../models/User";
-import { EventBus } from "../events/eventBus";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { rejection, Rejection } from "../rejection";
-import { Review } from "../models/Review";
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { ApplicationEvent } from '../events/applicationEvents';
+import { EventBus } from '../events/eventBus';
+import { Review } from '../models/Review';
 import {
   TechnicalReview,
-  TechnicalReviewStatus
-} from "../models/TechnicalReview";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { logger } from "../utils/Logger";
-import { AddTechnicalReviewArgs } from "../resolvers/mutations/AddTechnicalReviewMutation";
-import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
-import { AddUserForReviewArgs } from "../resolvers/mutations/AddUserForReviewMutation";
+  TechnicalReviewStatus,
+} from '../models/TechnicalReview';
+import { User } from '../models/User';
+import { rejection, Rejection } from '../rejection';
+import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
+import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
+import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewMutations {
   constructor(
@@ -31,20 +31,23 @@ export default class ReviewMutations {
       review &&
       !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
     ) {
-      logger.logWarn("Blocked submitting review", { agent, args });
-      return rejection("NOT_REVIEWER_OF_PROPOSAL");
+      logger.logWarn('Blocked submitting review', { agent, args });
+
+      return rejection('NOT_REVIEWER_OF_PROPOSAL');
     }
+
     return this.dataSource
       .submitReview(args)
       .then(review => review)
       .catch(err => {
-        logger.logException("Could not submit review", err, {
+        logger.logException('Could not submit review', err, {
           agent,
           reviewID,
           comment,
-          grade
+          grade,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
@@ -55,19 +58,21 @@ export default class ReviewMutations {
     const { proposalID, comment, status, timeAllocation } = args;
 
     if (!agent) {
-      return rejection("NOT_LOGGED_IN");
+      return rejection('NOT_LOGGED_IN');
     }
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
+      return rejection('NOT_USER_OFFICER');
     }
+
     return this.dataSource
       .setTechnicalReview(proposalID, comment, status, timeAllocation)
       .then(review => review)
       .catch(err => {
-        logger.logException("Could not set technicalReview", err, {
-          agent
+        logger.logException('Could not set technicalReview', err, {
+          agent,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
@@ -76,20 +81,22 @@ export default class ReviewMutations {
     id: number
   ): Promise<Review | Rejection> {
     if (!agent) {
-      return rejection("NOT_LOGGED_IN");
+      return rejection('NOT_LOGGED_IN');
     }
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
+      return rejection('NOT_USER_OFFICER');
     }
+
     return this.dataSource
       .removeUserForReview(id)
       .then(review => review)
       .catch(err => {
-        logger.logException("Could not remove user for review", err, {
+        logger.logException('Could not remove user for review', err, {
           agent,
-          id
+          id,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
@@ -98,23 +105,25 @@ export default class ReviewMutations {
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
     if (agent == null) {
-      return rejection("NOT_LOGGED_IN");
+      return rejection('NOT_LOGGED_IN');
     }
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_USER_OFFICER");
+      return rejection('NOT_USER_OFFICER');
     }
 
     const { proposalID, userID } = args;
+
     return this.dataSource
       .addUserForReview(args)
       .then(review => review)
       .catch(err => {
-        logger.logException("Failed to add user for review", err, {
+        logger.logException('Failed to add user for review', err, {
           agent,
           userID,
-          proposalID
+          proposalID,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 }

@@ -1,15 +1,15 @@
-import { ProposalDataSource } from "../datasources/ProposalDataSource";
-import { User } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalStatus, ProposalEndStatus } from "../models/ProposalModel";
-import { Proposal } from "../models/Proposal";
-import { ILogger } from "../utils/Logger";
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { Proposal } from '../models/Proposal';
+import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
+import { User } from '../models/User';
+import { Logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
     private userAuth: UserAuthorization,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
   async get(agent: User | null, id: number) {
@@ -48,6 +48,7 @@ export default class ProposalQueries {
     if (proposal == null) {
       return true;
     }
+
     return (
       (await this.userAuth.isUserOfficer(agent)) ||
       (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
@@ -82,16 +83,17 @@ export default class ProposalQueries {
 
     const blankProposal = new Proposal(
       0,
-      "",
-      "",
+      '',
+      '',
       agent.id,
       ProposalStatus.BLANK,
       new Date(),
       new Date(),
-      "",
+      '',
       0,
       ProposalEndStatus.UNSET
     );
+
     return blankProposal;
   }
 }

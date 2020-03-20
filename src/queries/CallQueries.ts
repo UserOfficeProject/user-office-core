@@ -1,7 +1,7 @@
-import { CallDataSource } from "../datasources/CallDataSource";
-import { User } from "../models/User";
-import { Call } from "../models/Call";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import { CallDataSource } from '../datasources/CallDataSource';
+import { Call } from '../models/Call';
+import { User } from '../models/User';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class CallQueries {
   constructor(
@@ -14,6 +14,7 @@ export default class CallQueries {
       return null;
     }
     const call = await this.dataSource.get(id);
+
     return call;
   }
 
@@ -22,6 +23,7 @@ export default class CallQueries {
       return null;
     }
     const calls = await this.dataSource.getCalls();
+
     return calls;
   }
 }

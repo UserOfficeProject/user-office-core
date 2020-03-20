@@ -1,6 +1,6 @@
-import { ApplicationEvent } from "../events/applicationEvents";
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { RabbitMQMessageBroker } from "../messageBroker";
+import { RabbitMQMessageBroker } from '../messageBroker';
 
 export default function createHandler() {
   // Handler to notify the SDM system that a proposal has been accepted

@@ -1,9 +1,9 @@
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { IFileDataSource } from "../datasources/IFileDataSource";
+import { FileDataSource } from '../datasources/IFileDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class FileQueries {
   constructor(
-    private fileDataSource: IFileDataSource,
+    private fileDataSource: FileDataSource,
     private userAuth: UserAuthorization
   ) {}
 

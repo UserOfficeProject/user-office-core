@@ -1,11 +1,12 @@
-const {
+import {
   verticalMax,
   verticalMargin,
   lineSpacing,
-  leftMarginEnd
-} = require("./config");
-const createLink = require("./createLink");
-const annotationArrayKey = "Annots";
+  leftMarginEnd,
+} from './config';
+import createLink from './createLink';
+
+const annotationArrayKey = 'Annots';
 
 const isFirstLineOnSubsequentPage = (pageSize, pageIndex, idx) =>
   pageIndex > 0 && (idx + 1) % pageSize === 0;
@@ -19,6 +20,7 @@ const getLinks = (
   pageSize
 ) => {
   let myPage = 0;
+
   return tocText.reduce((acc, { page }, idx) => {
     const verticalTextStart = verticalMax - verticalMargin;
     const verticalOffset = lineSpacing * (idx % pageSize);
@@ -37,10 +39,11 @@ const getLinks = (
           leftMarginEnd,
           vertStart,
           505,
-          vertStart + lineSpacing
+          vertStart + lineSpacing,
         ])
       );
     }
+
     return acc;
   }, []);
 };

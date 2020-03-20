@@ -1,4 +1,4 @@
-import { Page } from "../models/Admin";
+import { Page } from '../models/Admin';
 
 export interface AdminDataSource {
   getInstitution(id: number): Promise<string | null>;

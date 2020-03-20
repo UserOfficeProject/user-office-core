@@ -1,23 +1,23 @@
 import 'reflect-metadata';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import {
-  eventLogsDataSource,
+  EventLogsDataSourceMock,
   dummyEventLogUserUpdated,
   dummyEventLogs,
   dummyEventLogProposalCreated,
 } from '../datasources/mockups/EventLogsDataSource';
-import { reviewDataSource } from '../datasources/mockups/ReviewDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import EventLogQueries from './EventLogQueries';
 
-const dummyEventLogDataSource = new eventLogsDataSource();
+const dummyEventLogDataSource = new EventLogsDataSourceMock();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const eventLogQueries = new EventLogQueries(
   dummyEventLogDataSource,

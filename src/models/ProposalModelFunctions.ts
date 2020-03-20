@@ -1,4 +1,9 @@
-import { ConditionEvaluator } from "./ConditionEvaluator";
+import {
+  TextInputConfig,
+  SelectionFromOptionsConfig,
+} from '../resolvers/types/FieldConfig';
+import JSDict from '../utils/Dictionary';
+import { ConditionEvaluator } from './ConditionEvaluator';
 import {
   ProposalTemplateField,
   QuestionaryField,
@@ -6,13 +11,8 @@ import {
   Questionary,
   DataType,
   DataTypeSpec,
-  FieldDependency
-} from "./ProposalModel";
-import JSDict from "../utils/Dictionary";
-import {
-  TextInputConfig,
-  SelectionFromOptionsConfig
-} from "../resolvers/types/FieldConfig";
+  FieldDependency,
+} from './ProposalModel';
 type AbstractField = ProposalTemplateField | QuestionaryField;
 type AbstractCollection = ProposalTemplate | Questionary;
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -25,6 +25,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   const step = collection.steps.find(step => step.topic.topic_id === topicId);
+
   return step ? step.topic : undefined;
 }
 export function getQuestionaryStepByTopicId(
@@ -42,8 +43,10 @@ export function getFieldById(
     needle = step.fields.find(
       field => field.proposal_question_id === questionId
     );
+
     return needle === undefined;
   });
+
   return needle;
 }
 export function getAllFields(collection: AbstractCollection) {
@@ -51,6 +54,7 @@ export function getAllFields(collection: AbstractCollection) {
   collection.steps.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
+
   return allFields;
 }
 export function isDependencySatisfied(
@@ -65,10 +69,12 @@ export function isDependencySatisfied(
   if (!field) {
     return true;
   }
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const isParentSattisfied = areDependenciesSatisfied(
     collection,
     dependency.dependency_id
   );
+
   return (
     isParentSattisfied &&
     new ConditionEvaluator()
@@ -84,36 +90,26 @@ export function areDependenciesSatisfied(
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissasisfied = field.dependencies!.some(dep => {
-    let result = isDependencySatisfied(questionary, dep) === false;
+  const isAtLeastOneDissasisfied = field.dependencies?.some(dep => {
+    const result = isDependencySatisfied(questionary, dep) === false;
+
     return result;
   });
+
   return isAtLeastOneDissasisfied === false;
 }
 
-export function isMatchingConstraints(
-  value: any,
-  field: ProposalTemplateField
-): boolean {
-  const val = JSON.parse(value).value;
-  const validator = validatorMap.get(field.data_type) || new BaseValidator();
-  return validator.validate(val, field);
-}
-
-interface IConstraintValidator {
-  validate(value: any, field: ProposalTemplateField): boolean;
-}
-
-class BaseValidator implements IConstraintValidator {
+class BaseValidator implements ConstraintValidator {
   constructor(private dataType?: DataType | undefined) {}
 
   validate(value: any, field: QuestionaryField) {
     if (this.dataType && field.data_type !== this.dataType) {
-      throw new Error("Field validator ");
+      throw new Error('Field validator ');
     }
     if (field.config.required && !value) {
       return false;
     }
+
     return true;
   }
 }
@@ -133,6 +129,7 @@ class TextInputValidator extends BaseValidator {
     if (config.max && value && value.length > config.max) {
       return false;
     }
+
     return true;
   }
 }
@@ -155,9 +152,23 @@ class SelectFromOptionsInputValidator extends BaseValidator {
   }
 }
 
-const validatorMap = JSDict.Create<DataType, IConstraintValidator>();
+const validatorMap = JSDict.Create<DataType, ConstraintValidator>();
 validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
 validatorMap.put(
   DataType.SELECTION_FROM_OPTIONS,
   new SelectFromOptionsInputValidator()
 );
+
+export function isMatchingConstraints(
+  value: any,
+  field: ProposalTemplateField
+): boolean {
+  const val = JSON.parse(value).value;
+  const validator = validatorMap.get(field.data_type) || new BaseValidator();
+
+  return validator.validate(val, field);
+}
+
+interface ConstraintValidator {
+  validate(value: any, field: ProposalTemplateField): boolean;
+}

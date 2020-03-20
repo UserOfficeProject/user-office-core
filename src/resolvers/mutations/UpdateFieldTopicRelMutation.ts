@@ -6,12 +6,13 @@ import {
   Int,
   Mutation,
   ObjectType,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Response } from "../Decorators";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 class UpdateFieldTopicRelArgs {

@@ -1,7 +1,7 @@
-import { Review } from "../models/Review";
-import { TechnicalReview } from "../models/TechnicalReview";
-import { AddReviewArgs } from "../resolvers/mutations/AddReviewMutation";
-import { AddUserForReviewArgs } from "../resolvers/mutations/AddUserForReviewMutation";
+import { Review } from '../models/Review';
+import { TechnicalReview } from '../models/TechnicalReview';
+import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
+import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 
 export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;

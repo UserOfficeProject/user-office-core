@@ -5,13 +5,14 @@ import {
   Int,
   ObjectType,
   Resolver,
-  Root
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { ReviewStatus } from "../../models/Review";
-import { Review as ReviewOrigin } from "../../models/Review";
-import { Proposal } from "../types/Proposal";
-import { User } from "../types/User";
+  Root,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { ReviewStatus } from '../../models/Review';
+import { Review as ReviewOrigin } from '../../models/Review';
+import { Proposal } from '../types/Proposal';
+import { User } from '../types/User';
 
 @ObjectType()
 export class Review implements Partial<ReviewOrigin> {

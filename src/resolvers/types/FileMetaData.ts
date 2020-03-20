@@ -1,5 +1,6 @@
-import { FileMetadata as FileMetaDataOrigin } from "../../models//Blob";
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from 'type-graphql';
+
+import { FileMetadata as FileMetaDataOrigin } from '../../models//Blob';
 @ObjectType()
 export class FileMetadata implements Partial<FileMetaDataOrigin> {
   @Field()

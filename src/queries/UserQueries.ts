@@ -1,11 +1,14 @@
-import { UserDataSource } from "../datasources/UserDataSource";
-import { User, BasicUserDetails } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { logger } from "../utils/Logger";
+/* eslint-disable @typescript-eslint/camelcase */
+import * as bcrypt from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
+// TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
+import { CoreOptions, UriOptions } from 'request';
+import rp from 'request-promise';
 
-var rp = require("request-promise");
-const jsonwebtoken = require("jsonwebtoken");
-import * as bcrypt from "bcryptjs";
+import { UserDataSource } from '../datasources/UserDataSource';
+import { User, BasicUserDetails } from '../models/User';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserQueries {
   constructor(
@@ -36,6 +39,7 @@ export default class UserQueries {
     if (!user) {
       return null;
     }
+
     return new BasicUserDetails(
       user.id,
       user.firstname,
@@ -50,41 +54,43 @@ export default class UserQueries {
   }
 
   async getOrcIDAccessToken(authorizationCode: string) {
-    var options = {
-      method: "POST",
-      uri: process.env.ORCID_TOKEN_URL,
+    const options: CoreOptions & UriOptions = {
+      method: 'POST',
+      uri: process.env.ORCID_TOKEN_URL as string,
       qs: {
         client_id: process.env.ORCID_CLIENT_ID,
         client_secret: process.env.ORCID_CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code: authorizationCode
+        grant_type: 'authorization_code',
+        code: authorizationCode,
       },
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        'content-type': 'application/x-www-form-urlencoded',
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
+
     return rp(options)
       .then(function(resp: any) {
         return {
-          ...resp
+          ...resp,
         };
       })
       .catch(function(err: any) {
-        logger.logException("Could not get getOrcIDAccessToken", err);
+        logger.logException('Could not get getOrcIDAccessToken', err);
+
         return null;
       });
   }
 
   async getOrcIDInformation(authorizationCode: string) {
     // If in development fake response
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       return {
-        orcid: "0000-0000-0000-0000",
-        orcidHash: "asdadgiuerervnaofhioa",
-        refreshToken: "asdadgiuerervnaofhioa",
-        firstname: "Kalle",
-        lastname: "Kallesson"
+        orcid: '0000-0000-0000-0000',
+        orcidHash: 'asdadgiuerervnaofhioa',
+        refreshToken: 'asdadgiuerervnaofhioa',
+        firstname: 'Kalle',
+        lastname: 'Kallesson',
       };
     }
 
@@ -96,39 +102,43 @@ export default class UserQueries {
     const user = await this.dataSource.getByOrcID(orcData.orcid);
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
-      const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-        expiresIn: process.env.tokenLife
+      const secret = process.env.secret as string;
+      const token = jsonwebtoken.sign({ user, roles }, secret, {
+        expiresIn: process.env.tokenLife,
       });
+
       return { token };
     }
-    var options = {
+    const options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
-        Accept: "application/vnd.orcid+json",
-        Authorization: `Bearer ${orcData.access_token}`
+        Accept: 'application/vnd.orcid+json',
+        Authorization: `Bearer ${orcData.access_token}`,
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
 
     return rp(options)
       .then(function(resp: any) {
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
-        const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+        const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
         const hash = bcrypt.hashSync(resp.name.path, salt);
+
         return {
           orcid: resp.name.path,
           orcidHash: hash,
           refreshToken: orcData.refresh_token,
-          firstname: resp.name["given-names"]
-            ? resp.name["given-names"].value
+          firstname: resp.name['given-names']
+            ? resp.name['given-names'].value
             : null,
-          lastname: resp.name["family-name"]
-            ? resp.name["family-name"].value
-            : null
+          lastname: resp.name['family-name']
+            ? resp.name['family-name'].value
+            : null,
         };
       })
       .catch(function(err: any) {
-        logger.logException("Could not get getOrcIDInformation", err);
+        logger.logException('Could not get getOrcIDInformation', err);
+
         return null;
       });
   }
@@ -144,6 +154,7 @@ export default class UserQueries {
     if (agent == null) {
       return null;
     }
+
     return this.dataSource.getUsers(
       filter,
       first,

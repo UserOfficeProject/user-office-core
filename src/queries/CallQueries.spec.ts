@@ -1,38 +1,39 @@
-import "reflect-metadata";
-import CallQueries from "./CallQueries";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { reviewDataSource } from "../datasources/mockups/ReviewDataSource";
-
+import 'reflect-metadata';
 import {
-  callDataSource,
-  dummyCall
-} from "../datasources/mockups/CallDataSource";
-
+  CallDataSourceMock,
+  dummyCall,
+} from '../datasources/mockups/CallDataSource';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
-  dummyUser
-} from "../datasources/mockups/UserDataSource";
+  UserDataSourceMock,
+  dummyUser,
+} from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import CallQueries from './CallQueries';
 
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
-const callMutations = new CallQueries(new callDataSource(), userAuthorization);
+const callMutations = new CallQueries(
+  new CallDataSourceMock(),
+  userAuthorization
+);
 
-test("A user can get a call", () => {
+test('A user can get a call', () => {
   return expect(callMutations.get(dummyUser, 1)).resolves.toBe(dummyCall);
 });
 
-test("A not logged in user can't get a call", () => {
+test('A not logged in user can not get a call', () => {
   return expect(callMutations.get(null, 1)).resolves.toBe(null);
 });
 
-test("A user can get all calls", () => {
+test('A user can get all calls', () => {
   return expect(callMutations.getAll(dummyUser)).resolves.toStrictEqual([
-    dummyCall
+    dummyCall,
   ]);
 });
 
-test("A not logged in user can't get all calls", () => {
+test('A not logged in user can not get all calls', () => {
   return expect(callMutations.getAll(null)).resolves.toBe(null);
 });

@@ -5,13 +5,13 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
+  Resolver,
+} from 'type-graphql';
 
-import { ReviewResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { Review } from "../types/Review";
+import { ResolverContext } from '../../context';
+import { ReviewResponseWrap } from '../types/CommonWrappers';
+import { Review } from '../types/Review';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class AddReviewArgs {

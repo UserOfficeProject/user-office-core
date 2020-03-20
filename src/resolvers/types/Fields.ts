@@ -4,9 +4,10 @@ import {
   FieldResolver,
   Int,
   ObjectType,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
 
 @ObjectType()
 export class Fields {}
@@ -17,7 +18,7 @@ class Entry {
   id: number;
 
   @Field()
-  value: String;
+  value: string;
 }
 
 @Resolver(of => Fields)

@@ -1,7 +1,8 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
-import { ResolverContext } from "../../context";
-import { SuccessResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { SuccessResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
 export class PrepareDBMutationMutation {

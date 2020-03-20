@@ -6,12 +6,13 @@ import {
   Field,
   Int,
   ArgsType,
-  Args
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { Response } from "../Decorators";
+  Args,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class AddUserRoleArgs {
@@ -24,6 +25,7 @@ export class AddUserRoleArgs {
 
 @ObjectType()
 class AddUserRoleResponseWrap extends ResponseWrapBase<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   @Response()
   @Field({ nullable: true })
   public success: boolean = false;

@@ -6,14 +6,15 @@ import {
   Int,
   Mutation,
   ObjectType,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Response } from "../Decorators";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { UserRole } from "../../models/User";
-import { isRejection } from "../../rejection";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { UserRole } from '../../models/User';
+import { isRejection } from '../../rejection';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUserByEmailInviteArgs {

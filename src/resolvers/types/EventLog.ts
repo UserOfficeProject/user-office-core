@@ -8,9 +8,9 @@ import {
   Ctx,
 } from 'type-graphql';
 
-import { User } from './User';
 import { ResolverContext } from '../../context';
-import { EventLog as EventLogOrigin } from "../../models/EventLog";
+import { EventLog as EventLogOrigin } from '../../models/EventLog';
+import { User } from './User';
 
 @ObjectType()
 export class EventLog {
@@ -21,13 +21,13 @@ export class EventLog {
   public eventType: string;
 
   @Field(() => String)
-  public rowData: String;
+  public rowData: string;
 
   @Field(() => Date)
   public eventTStamp: Date;
 
   @Field(() => String)
-  public changedObjectId: String;
+  public changedObjectId: string;
 }
 
 @Resolver(of => EventLog)
@@ -37,8 +37,6 @@ export class EventLogResolver {
     @Root() eventLog: EventLogOrigin,
     @Ctx() context: ResolverContext
   ): Promise<User | null> {
-    return await context.queries.user.getUser(
-      eventLog.changedBy
-    );
+    return await context.queries.user.getUser(eventLog.changedBy);
   }
 }

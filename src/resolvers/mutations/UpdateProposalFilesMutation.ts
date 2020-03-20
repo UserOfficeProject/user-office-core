@@ -6,12 +6,13 @@ import {
   Int,
   Mutation,
   ObjectType,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { Response } from "../Decorators";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateProposalFilesArgs {

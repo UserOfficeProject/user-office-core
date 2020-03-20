@@ -1,16 +1,16 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, ObjectType } from 'type-graphql';
 
-import { Response } from "../Decorators";
-import { User } from "./User";
-import { Page } from "./Admin";
-import { Call } from "./Call";
-import { Proposal } from "./Proposal";
-import { Topic } from "./Topic";
-import { ProposalTemplateField } from "./ProposalTemplateField";
-import { ProposalTemplate } from "./ProposalTemplate";
-import { Review } from "./Review";
-import { TechnicalReview } from "./TechnicalReview";
-import { BasicUserDetails } from "./BasicUserDetails";
+import { Response } from '../Decorators';
+import { Page } from './Admin';
+import { BasicUserDetails } from './BasicUserDetails';
+import { Call } from './Call';
+import { Proposal } from './Proposal';
+import { ProposalTemplate } from './ProposalTemplate';
+import { ProposalTemplateField } from './ProposalTemplateField';
+import { Review } from './Review';
+import { TechnicalReview } from './TechnicalReview';
+import { Topic } from './Topic';
+import { User } from './User';
 
 @ObjectType()
 export class ResponseWrapBase<T> {

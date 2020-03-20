@@ -1,10 +1,11 @@
-import { Questionary } from "../models/ProposalModel";
-import { Proposal } from "../models/Proposal";
+/* eslint-disable @typescript-eslint/camelcase */
+import { Proposal } from '../models/Proposal';
+import { Questionary } from '../models/ProposalModel';
 
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(): Promise<Boolean>;
+  checkActiveCall(): Promise<boolean>;
   getProposals(
     filter?: string,
     first?: number,

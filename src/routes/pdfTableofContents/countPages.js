@@ -1,6 +1,6 @@
-const { verticalMax, verticalMargin, lineSpacing } = require("./config");
+import { verticalMax, verticalMargin, lineSpacing } from './config';
 
-module.exports = itemCount => {
+export default itemCount => {
   const verticalTextStart = verticalMax - verticalMargin;
 
   let pageSize = 0;

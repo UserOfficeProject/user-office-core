@@ -1,6 +1,6 @@
-import { Event } from "./event.enum";
-import { Proposal } from "../models/Proposal";
-import { User, UserRole } from "../models/User";
+import { Proposal } from '../models/Proposal';
+import { User, UserRole } from '../models/User';
+import { Event } from './event.enum';
 
 interface ProposalAcceptedEvent {
   type: Event.PROPOSAL_ACCEPTED;

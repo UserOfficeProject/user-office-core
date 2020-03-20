@@ -3,5 +3,5 @@ export enum PageName {
   HELPPAGE = 2,
   PRIVACYPAGE = 3,
   COOKIEPAGE = 4,
-  REVIEWPAGE = 5
+  REVIEWPAGE = 5,
 }
