@@ -76,7 +76,8 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
-        logger.logException("Could not get getOrcIDAccessToken", err);
+        logger.logException('Could not get getOrcIDAccessToken', err);
+
         return null;
       });
   }
@@ -136,7 +137,8 @@ export default class UserQueries {
         };
       })
       .catch(function(err: any) {
-        logger.logException("Could not get getOrcIDInformation", err);
+        logger.logException('Could not get getOrcIDInformation', err);
+
         return null;
       });
   }
