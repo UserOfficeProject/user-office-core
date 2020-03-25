@@ -7,12 +7,11 @@ import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router';
 import * as Yup from 'yup';
-
 import { useDataApi } from '../../hooks/useDataApi';
-import { useProposalData } from '../../hooks/useProposalData';
 import { useReviewData } from '../../hooks/useReviewData';
 import { StyledPaper } from '../../styles/StyledComponents';
-import ProposalQuestionaryReview from './ProposalQuestionaryReview';
+import { useSnackbar } from 'notistack';
+import { ButtonContainer } from '../../styles/StyledComponents';
 
 const useStyles = makeStyles(theme => ({
   buttons: {
@@ -20,36 +19,23 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-end',
   },
   button: {
-    marginTop: '25px',
     marginLeft: '10px',
   },
 }));
 
-export default function ProposalGrade({ match }) {
+export default function ProposalGrade(props: {reviewID: number}) {
   const classes = useStyles();
-  const { loading, reviewData } = useReviewData(parseInt(match.params.id));
+  const { loading, reviewData } = useReviewData(props.reviewID);
   const [submitted, setSubmitted] = useState(false);
-  const { proposalData } = useProposalData(reviewData?.proposal?.id);
   const api = useDataApi();
+  const { enqueueSnackbar } = useSnackbar();
 
-  if (submitted) {
-    return <Redirect push to={`/ProposalTableReviewer/`} />;
-  }
-
-  if (loading) {
-    return <p>Loading</p>;
-  }
-
-  if (!proposalData) {
+  if (!reviewData) {
     return <p>Loading</p>;
   }
 
   return (
-    <Container maxWidth="lg" className={classes.container}>
-      <StyledPaper>
-        <ProposalQuestionaryReview data={proposalData} />
-      </StyledPaper>
-
+    <Container maxWidth="lg">
       <StyledPaper>
         <Formik
           initialValues={{
@@ -58,11 +44,12 @@ export default function ProposalGrade({ match }) {
           }}
           onSubmit={async (values, actions) => {
             await api().addReview({
-              reviewID: parseInt(match.params.id),
-              grade: values.grade,
-              comment: values.comment,
+              reviewID: props.reviewID,
+              //This should be taken care of in validationSchema
+              grade: values.grade ? values.grade : 0,
+              comment: values.comment ? values.comment: ""
             });
-            setSubmitted(true);
+            enqueueSnackbar('Updated', { variant: 'success' })
             actions.setSubmitting(false);
           }}
           validationSchema={Yup.object().shape({
@@ -76,9 +63,9 @@ export default function ProposalGrade({ match }) {
               .required('Set grade between 0-10'),
           })}
         >
+          {({ isSubmitting, handleSubmit }) => (
           <Form>
             <CssBaseline />
-            <div className={classes.paper}>
               <Field
                 name="comment"
                 label="Comment"
@@ -97,18 +84,27 @@ export default function ProposalGrade({ match }) {
                 fullWidth
                 disabled={reviewData.status === 'SUBMITTED'}
               />
+            <ButtonContainer>
               <Button
                 type="submit"
-                fullWidth
+                disabled={isSubmitting}
                 variant="contained"
                 color="primary"
-                className={classes.submit}
-                disabled={reviewData.status === 'SUBMITTED'}
+              >
+                Save
+              </Button>
+              <Button
+                className={classes.button}
+                disabled={isSubmitting}
+                type="submit"
+                variant="contained"
+                color="primary"
               >
                 Submit
               </Button>
-            </div>
+            </ButtonContainer>
           </Form>
+          )}
         </Formik>
       </StyledPaper>
     </Container>

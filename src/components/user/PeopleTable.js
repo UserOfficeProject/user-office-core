@@ -20,7 +20,7 @@ function sendUserRequest(
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
     first: searchQuery.pageSize,
-    subtractUsers: selectedUsers ? selectedUsers.map(user => user.id) : [],
+    subtractUsers: selectedUsers ? selectedUsers : [],
   };
   if (userRole) {
     variables.userRole = userRole;
@@ -68,10 +68,12 @@ function PeopleTable(props) {
   if (sendUserEmail) {
     return (
       <InviteUserForm
-        title="Invite User"
+        title={
+          props.userRole === UserRole.USER ? 'Invite User' : 'Invite Reviewer'
+        }
         action={props.action}
         close={() => setSendUserEmail(false)}
-        userRole={UserRole.USER}
+        userRole={props.userRole}
       />
     );
   }
@@ -88,7 +90,7 @@ function PeopleTable(props) {
     actionArray.push({
       icon: () => <Email />,
       isFreeAction: true,
-      tooltip: 'Add user by email',
+      tooltip: 'Add by email',
       onClick: () => setSendUserEmail(true),
     });
 

@@ -2,12 +2,12 @@ import { Edit, Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
-import { Redirect } from 'react-router';
 
 import { UserContext } from '../../context/UserContextProvider';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useUserWithReviewsData } from '../../hooks/useUserData';
 import { tableIcons } from '../../utils/tableIcons';
+import ProposalGrade from './ProposalGrade';
 
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
@@ -24,7 +24,7 @@ export default function ProposalTableReviewer() {
   const [editReviewID, setEditReviewID] = useState(0);
 
   if (editReviewID) {
-    return <Redirect push to={`/ProposalGrade/${editReviewID}`} />;
+    return <ProposalGrade reviewID={editReviewID} />;
   }
 
   if (loading) {
