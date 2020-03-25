@@ -18,7 +18,7 @@ export default function ProposalReview({ match }: { match: any }) {
     <Container maxWidth="lg">
       <SimpleTabs tabNames={['Information', 'Grade']}>
         <ProposalQuestionaryReview data={proposalData} />
-        <ProposalGrade onChange={""} reviewID={reviewData.id} />
+        <ProposalGrade onChange={() => console.log("updated")} reviewID={reviewData.id} />
       </SimpleTabs>
     </Container>
   );
