@@ -5,7 +5,7 @@ import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class PrepareDBMutationMutation1 {
+export class PrepareDBMutationMutation {
   @Mutation(() => SuccessResponseWrap)
   prepareDB(@Ctx() context: ResolverContext) {
     return wrapResponse(context.mutations.admin.resetDB(), SuccessResponseWrap);
