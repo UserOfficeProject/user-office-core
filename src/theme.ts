@@ -24,7 +24,7 @@ const createDevelopTheme = (): Theme =>
     palette: {
       primary: {
         dark: '#b33739',
-        main: '#FF4E50',
+        main: '#0F4E50',
         light: '#FC913A',
       },
       secondary: {
