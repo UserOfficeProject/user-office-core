@@ -4,6 +4,7 @@ stages:
   - test
   - build-test
   - build
+  - autodeploy
 
 test:
   stage: test
