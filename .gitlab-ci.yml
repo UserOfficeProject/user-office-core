@@ -48,7 +48,7 @@ autodeploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY_GEN")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/backend/duo-backend/autodeploy.sh dev"
+    - ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/backend/autodeploy.sh dev"
   tags:
     - docker
   only:
