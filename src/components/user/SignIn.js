@@ -158,7 +158,7 @@ export default function SignInSide() {
               </Grid>
               <Grid item>
                 <Link to="/SignUp/" data-cy="create-account">
-                  Don&apos;t have an account? Sign Up.
+                  Don&apos;t have an account? Sign Up!
                 </Link>
               </Grid>
               <Grid item xs={12}>
