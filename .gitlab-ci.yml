@@ -62,6 +62,7 @@ autodeploy:
     - docker
   only:
     - develop
+    - Autodeploy
 
 
 
