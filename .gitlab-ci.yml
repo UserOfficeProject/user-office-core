@@ -4,6 +4,7 @@ stages:
   - test
   - build-test
   - build
+  - autodeploy
 
 test:
   stage: test
@@ -31,6 +32,23 @@ docker build:
     - docker build . -t dmsc/duo-backend
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     - docker push dmsc/duo-backend
+  tags:
+    - docker
+  only:
+    - develop
+
+autodeploy:
+  image: ubuntu:latest
+  stage: autodeploy
+  script:
+    - echo $CI_COMMIT_SHA
+    - apt-get update -qq
+    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_GEN")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/backend/autodeploy.sh dev"
   tags:
     - docker
   only:
