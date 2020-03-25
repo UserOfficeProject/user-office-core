@@ -5,7 +5,7 @@ import { IconButton } from '@material-ui/core';
 import { Visibility, People, ArrowBack } from '@material-ui/icons';
 import { Review } from '../../generated/sdk';
 import ProposalGrade from './ProposalGrade'
-export default function ReviewTable(props: {data: Review[], addReviewer: any, removeReview: any}) {
+export default function ReviewTable(props: {data: Review[], addReviewer: any, removeReview: any, onChange: any}) {
 
   // const reviewAverage =
   //   props.reviews.reduce((acc, curr) => acc + curr.grade, 0) /
@@ -27,7 +27,7 @@ export default function ReviewTable(props: {data: Review[], addReviewer: any, re
     <IconButton aria-label="back" onClick={() => setEditReviewID(0)}>
       <ArrowBack />
     </IconButton>
-    <ProposalGrade reviewID={editReviewID}/>
+    <ProposalGrade reviewID={editReviewID} onChange={props.onChange}/>
     </>
     );
   }

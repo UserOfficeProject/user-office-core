@@ -1,17 +1,16 @@
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { useState } from 'react';
-import { Redirect } from 'react-router';
+import React, {useState, useEffect} from 'react';
 import * as Yup from 'yup';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useReviewData } from '../../hooks/useReviewData';
-import { StyledPaper } from '../../styles/StyledComponents';
 import { useSnackbar } from 'notistack';
 import { ButtonContainer } from '../../styles/StyledComponents';
+import { ReviewStatus, Review } from '../../generated/sdk';
+
 
 const useStyles = makeStyles(theme => ({
   buttons: {
@@ -23,47 +22,54 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function ProposalGrade(props: {reviewID: number}) {
+export default function ProposalGrade(props: {reviewID: number, onChange: any}) {
   const classes = useStyles();
-  const { loading, reviewData } = useReviewData(props.reviewID);
-  const [submitted, setSubmitted] = useState(false);
+  const { reviewData } = useReviewData(props.reviewID);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [review, setReview] = useState<Review | null>(null);
 
-  if (!reviewData) {
+  useEffect(() => {
+    setReview(reviewData)
+  }, [reviewData]);
+
+  if (!review) {
     return <p>Loading</p>;
   }
-
   return (
-    <Container maxWidth="lg">
-      <StyledPaper>
         <Formik
           initialValues={{
-            grade: reviewData.grade,
-            comment: reviewData.comment,
+            grade: review.grade,
+            comment: review.comment,
+            saveOnly: true
           }}
           onSubmit={async (values, actions) => {
-            await api().addReview({
+            await api().updateReview({
               reviewID: props.reviewID,
               //This should be taken care of in validationSchema
               grade: values.grade ? values.grade : 0,
-              comment: values.comment ? values.comment: ""
-            });
-            enqueueSnackbar('Updated', { variant: 'success' })
-            actions.setSubmitting(false);
+              comment: values.comment ? values.comment: "",
+              status: values.saveOnly ? ReviewStatus.DRAFT : ReviewStatus.SUBMITTED
+            }).then(data => {
+              if(data.addReview.error){
+                enqueueSnackbar(data.addReview.error, { variant: 'error' })
+              }else{
+                enqueueSnackbar('Updated', { variant: 'success' })
+                setReview(data.addReview.review)
+              }
+              props.onChange()
+              actions.setSubmitting(false);
+            })
           }}
           validationSchema={Yup.object().shape({
             comment: Yup.string()
-              .min(10, 'Too short comment')
-              .max(500, 'Too long comment')
-              .required('Comment to be between 10-500 characters'),
+              .max(500, 'Too long comment').nullable(),
             grade: Yup.number()
               .min(0, 'Lowest grade is 0')
-              .max(10, 'Highest grade is 10')
-              .required('Set grade between 0-10'),
+              .max(10, 'Highest grade is 10').nullable()
           })}
         >
-          {({ isSubmitting, handleSubmit }) => (
+          {({ isSubmitting, setFieldValue, handleSubmit }) => (
           <Form>
             <CssBaseline />
               <Field
@@ -73,7 +79,10 @@ export default function ProposalGrade(props: {reviewID: number}) {
                 component={TextField}
                 margin="normal"
                 fullWidth
-                disabled={reviewData.status === 'SUBMITTED'}
+                multiline
+                rowsMax="16"
+                rows="4"
+                disabled={review.status === 'SUBMITTED'}
               />
               <Field
                 name="grade"
@@ -82,23 +91,29 @@ export default function ProposalGrade(props: {reviewID: number}) {
                 component={TextField}
                 margin="normal"
                 fullWidth
-                disabled={reviewData.status === 'SUBMITTED'}
+                disabled={review.status === 'SUBMITTED'}
               />
             <ButtonContainer>
               <Button
-                type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || (review.status === 'SUBMITTED')}
                 variant="contained"
                 color="primary"
+                onClick={() => {
+                  setFieldValue('saveOnly', true, false)
+                  handleSubmit()
+                }}
               >
                 Save
               </Button>
               <Button
                 className={classes.button}
-                disabled={isSubmitting}
-                type="submit"
+                disabled={isSubmitting || review.status === 'SUBMITTED'}
                 variant="contained"
-                color="primary"
+                color="secondary"
+                onClick={() => {
+                  setFieldValue('saveOnly', false, false)
+                  handleSubmit()
+                }}
               >
                 Submit
               </Button>
@@ -106,7 +121,5 @@ export default function ProposalGrade(props: {reviewID: number}) {
           </Form>
           )}
         </Formik>
-      </StyledPaper>
-    </Container>
   );
 }

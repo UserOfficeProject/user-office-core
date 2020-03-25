@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Proposal } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useProposalData(id: number | null) {
+export function useProposalData(id: number | null | undefined) {
   const [proposalData, setProposalData] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
 

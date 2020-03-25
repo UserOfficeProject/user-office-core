@@ -20,16 +20,20 @@ export default function ProposalReview({ match }: { match: any }) {
   const api = useDataApi();
   
   useEffect(() => {
-    api()
-      .getProposal({ id: parseInt(match.params.id) })
-      .then(data => {
-        setProposal(data.proposal)
-        if (data.proposal) {
-          setTechReview(data.proposal.technicalReview)
-          setReviews(data.proposal.reviews)
-        }
-      });
-  }, [api, match.params.id, modalOpen]);
+    loadProposal()
+  }, [api, match.params.id]);
+
+
+  const loadProposal = () => 
+  api()
+    .getProposal({ id: parseInt(match.params.id) })
+    .then(data => {
+      setProposal(data.proposal)
+      if (data.proposal) {
+        setTechReview(data.proposal.technicalReview)
+        setReviews(data.proposal.reviews)
+      }
+    });
 
   const addUser = async (user: any) => {
     await api().addUserForReview({
@@ -37,6 +41,7 @@ export default function ProposalReview({ match }: { match: any }) {
       proposalID: parseInt(match.params.id)
     });
     setOpen(false)
+    loadProposal()
   };
 
   const removeReview = async (reviewID: number) => {
@@ -70,6 +75,7 @@ export default function ProposalReview({ match }: { match: any }) {
           data={reviews}
           addReviewer={setOpen}
           removeReview={removeReview}
+          onChange={loadProposal}
         />
         </>
         <ProposalTechnicalReview
