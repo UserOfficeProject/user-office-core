@@ -129,7 +129,7 @@ export function useNaturalKeySchema(initialValue: string): any {
               reject();
             } else {
               console.log(response);
-              resolve(response);
+              resolve(!response);
             }
           });
       });
