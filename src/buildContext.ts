@@ -6,6 +6,7 @@ import PostgresEventLogsDataSource from './datasources/postgres/EventLogsDataSou
 import PostgresFileDataSource from './datasources/postgres/FileDataSource';
 import PostgresProposalDataSource from './datasources/postgres/ProposalDataSource';
 import PostgresReviewDataSource from './datasources/postgres/ReviewDataSource';
+import PostgresSEPDataSource from './datasources/postgres/SEPDataSource';
 import TemplateDataSource from './datasources/postgres/TemplateDataSource';
 import PostgresUserDataSource from './datasources/postgres/UserDataSource';
 import createEventHandlers from './eventHandlers';
@@ -16,6 +17,7 @@ import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import SEPMutations from './mutations/SEPMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
 import AdminQueries from './queries/AdminQueries';
@@ -38,6 +40,7 @@ const fileDataSource = new PostgresFileDataSource();
 const adminDataSource = new PostgresAdminDataSource();
 const templateDataSource = new TemplateDataSource();
 const eventLogsDataSource = new PostgresEventLogsDataSource();
+const sepDataSource = new PostgresSEPDataSource();
 
 const userAuthorization = new UserAuthorization(
   userDataSource,
@@ -113,6 +116,12 @@ const eventLogQueries = new EventLogQueries(
   userAuthorization
 );
 
+const sepMutations = new SEPMutations(
+  sepDataSource,
+  userAuthorization,
+  eventBus
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -132,6 +141,7 @@ const context: BasicResolverContext = {
     call: callMutations,
     file: fileMutations,
     admin: adminMutations,
+    sep: sepMutations,
     template: templateMutations,
   },
 };

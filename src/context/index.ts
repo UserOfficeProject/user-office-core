@@ -4,6 +4,7 @@ import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
+import SEPMutations from '../mutations/SEPMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UserMutations from '../mutations/UserMutations';
 import AdminQueries from '../queries/AdminQueries';
@@ -35,6 +36,7 @@ interface ResolverContextMutations {
   file: FileMutations;
   admin: AdminMutations;
   template: TemplateMutations;
+  sep: SEPMutations;
 }
 
 export interface BasicResolverContext {

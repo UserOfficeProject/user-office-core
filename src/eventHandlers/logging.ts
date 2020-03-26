@@ -36,6 +36,14 @@ export default function createHandler(
           event.user.id.toString()
         );
         break;
+      case Event.SEP_CREATED:
+        await eventLogsDataSource.set(
+          event.loggedInUserId,
+          event.type,
+          json,
+          event.sep.id.toString()
+        );
+        break;
       default:
         break;
     }

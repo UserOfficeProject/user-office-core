@@ -1,4 +1,5 @@
 import { Proposal } from '../models/Proposal';
+import { SEP } from '../models/SEP';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -61,6 +62,12 @@ interface EmailInvite {
   loggedInUserId: number | null;
 }
 
+interface SEPCreatedEvent {
+  type: Event.SEP_CREATED;
+  sep: SEP;
+  loggedInUserId: number | null;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -70,4 +77,5 @@ export type ApplicationEvent =
   | UserCreateEvent
   | EmailInvite
   | UserResetPasswordEmailEvent
-  | UserUpdateEvent;
+  | UserUpdateEvent
+  | SEPCreatedEvent;
