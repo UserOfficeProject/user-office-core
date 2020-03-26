@@ -122,6 +122,29 @@ context('Proposal tests', () => {
       });
     /* --- */
 
+
+    /* Update question */
+    const newKey = faker
+    .random
+    .word()
+    .toLowerCase()
+    .split(" ").join('_');
+
+    cy.contains(textQuestion)
+      .click();
+
+    cy.get("[data-cy='natural_key']")
+      .clear()
+      .type(newKey);
+    
+    cy.contains("Save")
+       .click();
+
+    cy.wait(500)
+
+    cy.contains(newKey);
+    /* --- */
+
     cy.contains(booleanQuestion);
     cy.contains(textQuestion);
     cy.contains(dateQuestion);
