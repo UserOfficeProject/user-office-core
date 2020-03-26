@@ -21,15 +21,18 @@ export default class ReviewMutations {
     private eventBus: EventBus<ApplicationEvent>
   ) {}
 
-  async submitReview(
+  async updateReview(
     agent: User | null,
     args: AddReviewArgs
   ): Promise<Review | Rejection> {
-    const { reviewID, comment, grade } = args;
+    const { reviewID, comment, grade, status } = args;
     const review = await this.dataSource.get(reviewID);
     if (
       review &&
-      !(await this.userAuth.isReviewerOfProposal(agent, review.proposalID))
+      !(
+        (await this.userAuth.isReviewerOfProposal(agent, review.proposalID)) ||
+        (await this.userAuth.isUserOfficer(agent))
+      )
     ) {
       logger.logWarn('Blocked submitting review', { agent, args });
 
@@ -37,7 +40,7 @@ export default class ReviewMutations {
     }
 
     return this.dataSource
-      .submitReview(args)
+      .updateReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not submit review', err, {

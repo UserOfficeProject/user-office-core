@@ -98,15 +98,15 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((record: ReviewRecord[]) => this.createReviewObject(record[0]));
   }
 
-  async submitReview(args: AddReviewArgs): Promise<Review> {
-    const { reviewID, comment, grade } = args;
+  async updateReview(args: AddReviewArgs): Promise<Review> {
+    const { reviewID, comment, grade, status } = args;
 
     return database
       .update(
         {
           comment,
           grade,
-          status: ReviewStatus.SUBMITTED,
+          status,
         },
         ['*']
       )
@@ -119,7 +119,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           review[0].user_id,
           comment,
           grade,
-          0
+          status
         );
       });
   }

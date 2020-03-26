@@ -11,7 +11,7 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
-import { Review } from '../models/Review';
+import { Review, ReviewStatus } from '../models/Review';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewMutations from './ReviewMutations';
 
@@ -30,20 +30,22 @@ const reviewMutations = new ReviewMutations(
 
 test('A reviewer can submit a review on a proposal he is on', () => {
   return expect(
-    reviewMutations.submitReview(dummyUser, {
+    reviewMutations.updateReview(dummyUser, {
       reviewID: 10,
       comment: 'Good proposal',
       grade: 9,
+      status: ReviewStatus.DRAFT,
     })
   ).resolves.toBe(dummyReview);
 });
 
 test('A user can not submit a review on a proposal', () => {
   return expect(
-    reviewMutations.submitReview(dummyUserNotOnProposal, {
+    reviewMutations.updateReview(dummyUserNotOnProposal, {
       reviewID: 1,
       comment: 'Good proposal',
       grade: 9,
+      status: ReviewStatus.DRAFT,
     })
   ).resolves.toHaveProperty('reason', 'NOT_REVIEWER_OF_PROPOSAL');
 });
