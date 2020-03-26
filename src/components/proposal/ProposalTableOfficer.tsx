@@ -25,7 +25,6 @@ export default function ProposalTableOfficer() {
     { title: 'Time(Days)', field: 'technicalReview.timeAllocation' },
     {
       title: 'Technical status',
-      field: 'technicalReview.status',
       render: (rowData: any) =>
         rowData.technicalReview
           ? getTranslation(rowData.technicalReview.status)

@@ -29,7 +29,7 @@ import PageEditor from './pages/PageEditor';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
 import ProposalSubmission from './proposal/ProposalSubmission';
-import ProposalGrade from './review/ProposalGrade';
+import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import QuestionaryEditor from './template/QuestionaryEditor';
@@ -207,7 +207,7 @@ export default function Dashboard({ match }) {
           <Route path="/CallPage" component={CallPage} />
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
-          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}

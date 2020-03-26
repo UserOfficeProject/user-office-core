@@ -1,0 +1,8 @@
+mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!) {
+  addReview(reviewID: $reviewID, grade: $grade, comment: $comment, status: $status) {
+    error
+    review {
+      ...coreReview
+    }
+  }
+}
