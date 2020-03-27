@@ -26,7 +26,7 @@ export default class SEPMutations {
           return rejection('NOT_LOGGED_IN');
         }
 
-        // Check if there is an open call, if not reject
+        // Check if user officer, if not reject
         if (!(await this.userAuth.isUserOfficer(agent))) {
           return rejection('NOT_ALLOWED');
         }

@@ -18,7 +18,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   async create(
     code: string,
     description: string,
-    numberRatingsRequired: number | null,
+    numberRatingsRequired: number,
     active: boolean
   ) {
     return database
@@ -35,12 +35,14 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .then((resultSet: SEPRecord[]) => this.createSEPObject(resultSet[0]));
   }
 
-  async get() {
+  async get(id: number) {
     return database
       .select()
       .from('SEPs')
-      .then((seps: SEPRecord[]) => {
-        return seps.map(sep => this.createSEPObject(sep));
+      .where('sep_id', id)
+      .first()
+      .then((sep: SEPRecord) => {
+        return sep ? this.createSEPObject(sep) : null;
       });
   }
 }

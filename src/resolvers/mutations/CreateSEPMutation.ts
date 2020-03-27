@@ -20,7 +20,7 @@ export class CreateSEPArgs {
   @Field(() => String)
   public description: string;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int, { defaultValue: 2 })
   public numberRatingsRequired: number;
 
   @Field(() => Boolean)

@@ -4,8 +4,8 @@ export interface SEPDataSource {
   create(
     code: string,
     description: string,
-    numberRatingsRequired: number | null,
+    numberRatingsRequired: number,
     active: boolean
   ): Promise<SEP>;
-  get(): Promise<SEP[] | null>;
+  get(id: number): Promise<SEP | null>;
 }

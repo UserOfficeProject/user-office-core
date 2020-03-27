@@ -15,13 +15,21 @@ export class SEPDataSourceMock implements SEPDataSource {
   async create(
     code: string,
     description: string,
-    numberRatingsRequired: number | null,
+    numberRatingsRequired: number,
     active: boolean
   ) {
-    return dummySEP;
+    const id = 2;
+
+    return new SEP(id, code, description, numberRatingsRequired, active);
   }
 
-  async get() {
-    return dummySEPs;
+  async get(id: number) {
+    if (id && id > 0) {
+      if (id == dummySEP.id) {
+        return dummySEP;
+      }
+    }
+
+    return null;
   }
 }
