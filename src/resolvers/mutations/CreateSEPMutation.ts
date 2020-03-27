@@ -7,8 +7,10 @@ import {
   Resolver,
   Int,
 } from 'type-graphql';
+import * as yup from 'yup';
 
 import { ResolverContext } from '../../context';
+import { ValidateArgs } from '../../utils/ValidateArgs';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -27,8 +29,15 @@ export class CreateSEPArgs {
   public active: boolean;
 }
 
+const createSEPSchema = yup.object().shape({
+  code: yup.string().required(),
+  description: yup.string().required(),
+  numberRatingsRequired: yup.number().min(2),
+});
+
 @Resolver()
 export class CreateSEPMutation {
+  @ValidateArgs(createSEPSchema)
   @Mutation(() => SEPResponseWrap)
   async createSEP(
     @Args() args: CreateSEPArgs,
