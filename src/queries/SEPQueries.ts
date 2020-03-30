@@ -21,4 +21,17 @@ export default class SEPQueries {
       return null;
     }
   }
+
+  async getAll(
+    agent: User | null,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ) {
+    if (await this.userAuth.isUserOfficer(agent)) {
+      return this.dataSource.getAll(filter, first, offset);
+    } else {
+      return null;
+    }
+  }
 }

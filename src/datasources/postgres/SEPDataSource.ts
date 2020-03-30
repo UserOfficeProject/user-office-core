@@ -35,6 +35,34 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .then((resultSet: SEPRecord[]) => this.createSEPObject(resultSet[0]));
   }
 
+  async update(
+    id: number,
+    code: string,
+    description: string,
+    numberRatingsRequired: number,
+    active: boolean
+  ) {
+    return database
+      .update(
+        {
+          code,
+          description,
+          number_ratings_required: numberRatingsRequired,
+          active,
+        },
+        ['*']
+      )
+      .from('SEPs')
+      .where('sep_id', id)
+      .then((records: SEPRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new Error(`SEP not found ${id}`);
+        }
+
+        return this.createSEPObject(records[0]);
+      });
+  }
+
   async get(id: number) {
     return database
       .select()
@@ -43,6 +71,38 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       .first()
       .then((sep: SEPRecord) => {
         return sep ? this.createSEPObject(sep) : null;
+      });
+  }
+
+  async getAll(
+    filter?: string,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; seps: SEP[] }> {
+    return database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('SEPs')
+      .orderBy('sep_id', 'desc')
+      .modify(query => {
+        if (filter) {
+          query
+            .where('code', 'ilike', `%${filter}%`)
+            .orWhere('description', 'ilike', `%${filter}%`);
+        }
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((allSeps: SEPRecord[]) => {
+        const seps = allSeps.map(sep => this.createSEPObject(sep));
+
+        return {
+          totalCount: allSeps[0] ? allSeps[0].full_count : 0,
+          seps,
+        };
       });
   }
 }

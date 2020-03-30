@@ -37,6 +37,7 @@ export default function createHandler(
         );
         break;
       case Event.SEP_CREATED:
+      case Event.SEP_UPDATED:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,

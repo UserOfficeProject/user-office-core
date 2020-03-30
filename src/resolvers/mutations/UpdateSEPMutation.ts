@@ -15,7 +15,10 @@ import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class CreateSEPArgs {
+export class UpdateSEPArgs {
+  @Field(() => Int)
+  public id: number;
+
   @Field(() => String)
   public code: string;
 
@@ -29,22 +32,23 @@ export class CreateSEPArgs {
   public active: boolean;
 }
 
-const createSEPValidationSchema = yup.object().shape({
+const upcateSEPValidationSchema = yup.object().shape({
+  id: yup.number().required(),
   code: yup.string().required(),
   description: yup.string().required(),
   numberRatingsRequired: yup.number().min(2),
 });
 
 @Resolver()
-export class CreateSEPMutation {
-  @ValidateArgs(createSEPValidationSchema)
+export class UpdateSEPMutation {
+  @ValidateArgs(upcateSEPValidationSchema)
   @Mutation(() => SEPResponseWrap)
-  async createSEP(
-    @Args() args: CreateSEPArgs,
+  async updateSEP(
+    @Args() args: UpdateSEPArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.create(context.user, args),
+      context.mutations.sep.update(context.user, args),
       SEPResponseWrap
     );
   }

@@ -4,7 +4,7 @@ import { ResolverContext } from '../../context';
 import { SEP } from '../types/SEP';
 
 @Resolver()
-export class ProposalQuery {
+export class SEPQuery {
   @Query(() => SEP, { nullable: true })
   async sep(
     @Arg('id', () => Int) id: number,

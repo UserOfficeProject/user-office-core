@@ -243,7 +243,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposals')
       .orderBy('proposal_id', 'desc')
-      .modify((query: any) => {
+      .modify(query => {
         if (filter) {
           query
             .where('title', 'ilike', `%${filter}%`)

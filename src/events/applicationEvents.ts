@@ -68,6 +68,12 @@ interface SEPCreatedEvent {
   loggedInUserId: number | null;
 }
 
+interface SEPUpdatedEvent {
+  type: Event.SEP_UPDATED;
+  sep: SEP;
+  loggedInUserId: number | null;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -78,4 +84,5 @@ export type ApplicationEvent =
   | EmailInvite
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
-  | SEPCreatedEvent;
+  | SEPCreatedEvent
+  | SEPUpdatedEvent;

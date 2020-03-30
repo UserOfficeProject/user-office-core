@@ -170,6 +170,7 @@ export interface SEPRecord {
   readonly description: string;
   readonly number_ratings_required: number;
   readonly active: boolean;
+  readonly full_count: number;
 }
 
 export const createPageObject = (record: PagetextRecord) => {

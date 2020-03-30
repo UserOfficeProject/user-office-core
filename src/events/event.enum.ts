@@ -13,4 +13,5 @@ export enum Event {
   EMAIL_INVITE = 'EMAIL_INVITE',
 
   SEP_CREATED = 'SEP_CREATED',
+  SEP_UPDATED = 'SEP_UPDATED',
 }
