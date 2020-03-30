@@ -164,6 +164,15 @@ export interface EventLogRecord {
   readonly changed_object_id: string;
 }
 
+export interface SEPRecord {
+  readonly sep_id: number;
+  readonly code: string;
+  readonly description: string;
+  readonly number_ratings_required: number;
+  readonly active: boolean;
+  readonly full_count: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

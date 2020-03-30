@@ -8,6 +8,7 @@ import { Proposal } from './Proposal';
 import { ProposalTemplate } from './ProposalTemplate';
 import { ProposalTemplateField } from './ProposalTemplateField';
 import { Review } from './Review';
+import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 import { Topic } from './Topic';
 import { User } from './User';
@@ -39,6 +40,13 @@ export class ReviewResponseWrap extends ResponseWrapBase<Review> {
   @Response()
   @Field(() => Review, { nullable: true })
   public review: Review;
+}
+
+@ObjectType()
+export class SEPResponseWrap extends ResponseWrapBase<SEP> {
+  @Response()
+  @Field(() => SEP, { nullable: true })
+  public sep: SEP;
 }
 
 @ObjectType()
