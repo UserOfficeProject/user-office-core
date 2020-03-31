@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import { Review } from "../generated/sdk";
-import { useDataApi } from "./useDataApi";
+import { useEffect, useState } from 'react';
+
+import { Review } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
 
 export function useReviewData(id: number) {
   const [reviewData, setReviewData] = useState<Review | null>(null);

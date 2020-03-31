@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
-import { useDataApi } from "./useDataApi";
+import { useCallback, useState } from 'react';
+
+import { useDataApi } from './useDataApi';
 
 export function useUpdateProposalFiles() {
   const sendRequest = useDataApi();
@@ -16,6 +17,7 @@ export function useUpdateProposalFiles() {
         .updateProposalFiles(parameters)
         .then(resp => resp);
       setLoading(false);
+
       return result;
     },
     [sendRequest]

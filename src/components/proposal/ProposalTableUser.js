@@ -1,7 +1,9 @@
-import React from "react";
-import { useDataApi } from "../../hooks/useDataApi";
-import { timeAgo } from "../../utils/Time";
-import ProposalTable from "./ProposalTable";
+import React from 'react';
+
+import { ProposalStatus } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { timeAgo } from '../../utils/Time';
+import ProposalTable from './ProposalTable';
 
 export default function ProposalTableUser(props) {
   const api = useDataApi();
@@ -23,11 +25,14 @@ export default function ProposalTableUser(props) {
               return {
                 id: proposal.id,
                 title: proposal.title,
-                status: proposal.status === 0 ? "Open" : "Submitted",
+                status:
+                  proposal.status === ProposalStatus.DRAFT
+                    ? 'Open'
+                    : 'Submitted',
                 shortCode: proposal.shortCode,
-                created: timeAgo(proposal.created)
+                created: timeAgo(proposal.created),
               };
-            })
+            }),
         };
       });
   };

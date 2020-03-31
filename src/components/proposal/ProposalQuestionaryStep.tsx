@@ -1,38 +1,73 @@
-import { makeStyles } from "@material-ui/core";
-import { Formik } from "formik";
-import React, { useContext, SyntheticEvent } from "react";
-import * as Yup from "yup";
+import { makeStyles } from '@material-ui/core';
+import { Formik } from 'formik';
+import React, { useContext, SyntheticEvent } from 'react';
+import * as Yup from 'yup';
+
 import {
   DataType,
   QuestionaryField,
-  QuestionaryStep
-} from "../../generated/sdk";
-import { useUpdateProposal } from "../../hooks/useUpdateProposal";
-import { ProposalAnswer } from "../../models/ProposalModel";
+  QuestionaryStep,
+} from '../../generated/sdk';
+import { useUpdateProposal } from '../../hooks/useUpdateProposal';
+import { ProposalAnswer } from '../../models/ProposalModel';
 import {
   areDependenciesSatisfied,
-  getQuestionaryStepByTopicId as getStepByTopicId
-} from "../../models/ProposalModelFunctions";
+  getQuestionaryStepByTopicId as getStepByTopicId,
+} from '../../models/ProposalModelFunctions';
 import {
   EventType,
-  IProposalSubmissionModelState
-} from "../../models/ProposalSubmissionModel";
-import JSDict from "../../utils/Dictionary";
-import submitFormAsync from "../../utils/FormikAsyncFormHandler";
-import { ErrorFocus } from "../common/ErrorFocus";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalComponentBoolean } from "./ProposalComponentBoolean";
-import { ProposalComponentDatePicker } from "./ProposalComponentDatePicker";
-import { ProposalComponentEmbellishment } from "./ProposalComponentEmbellishment";
-import { ProposalComponentFileUpload } from "./ProposalComponentFileUpload";
-import { ProposalComponentMultipleChoice } from "./ProposalComponentMultipleChoice";
-import { ProposalComponentTextInput } from "./ProposalComponentTextInput";
-import { ProposalSubmissionContext } from "./ProposalContainer";
-import ProposalNavigationFragment from "./ProposalNavigationFragment";
-import { createFormikConfigObjects } from "./createFormikConfigObjects";
+  ProposalSubmissionModelState,
+} from '../../models/ProposalSubmissionModel';
+import JSDict from '../../utils/Dictionary';
+import submitFormAsync from '../../utils/FormikAsyncFormHandler';
+import { ErrorFocus } from '../common/ErrorFocus';
+import { createFormikConfigObjects } from './createFormikConfigObjects';
+import { BasicComponentProps } from './IBasicComponentProps';
+import { ProposalComponentBoolean } from './ProposalComponentBoolean';
+import { ProposalComponentDatePicker } from './ProposalComponentDatePicker';
+import { ProposalComponentEmbellishment } from './ProposalComponentEmbellishment';
+import { ProposalComponentFileUpload } from './ProposalComponentFileUpload';
+import { ProposalComponentMultipleChoice } from './ProposalComponentMultipleChoice';
+import { ProposalComponentTextInput } from './ProposalComponentTextInput';
+import { ProposalSubmissionContext } from './ProposalContainer';
+import ProposalNavigationFragment from './ProposalNavigationFragment';
+
+class ComponentFactory {
+  private componentMap = JSDict.Create<string, any>();
+
+  constructor() {
+    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
+    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
+    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
+    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
+    this.componentMap.put(
+      DataType.SELECTION_FROM_OPTIONS,
+      ProposalComponentMultipleChoice
+    );
+    this.componentMap.put(
+      DataType.EMBELLISHMENT,
+      ProposalComponentEmbellishment
+    );
+  }
+  createComponent(
+    field: QuestionaryField,
+    props: any
+  ): React.ComponentElement<BasicComponentProps, any> {
+    props.templateField = field;
+    props.key = field.proposal_question_id;
+
+    const component = this.componentMap.get(field.data_type);
+
+    if (!component) {
+      throw new Error(`Could not create component for type ${field.data_type}`);
+    }
+
+    return React.createElement(component, props);
+  }
+}
 
 export default function ProposalQuestionaryStep(props: {
-  data: IProposalSubmissionModelState;
+  data: ProposalSubmissionModelState;
   topicId: number;
   readonly: boolean;
 }) {
@@ -41,12 +76,12 @@ export default function ProposalQuestionaryStep(props: {
   const { loading: formSaving } = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {
-      margin: "10px 0"
+      margin: '10px 0',
     },
     disabled: {
-      pointerEvents: "none",
-      opacity: 0.7
-    }
+      pointerEvents: 'none',
+      opacity: 0.7,
+    },
   })();
   const { dispatch } = useContext(ProposalSubmissionContext)!;
 
@@ -80,7 +115,7 @@ export default function ProposalQuestionaryStep(props: {
       return (({ proposal_question_id, data_type, value }) => ({
         proposal_question_id,
         data_type,
-        value
+        value,
       }))(field); // convert field to answer object
     });
 
@@ -90,8 +125,8 @@ export default function ProposalQuestionaryStep(props: {
         : EventType.SAVE_STEP_CLICKED,
       payload: {
         answers: answers,
-        topicId: props.topicId
-      }
+        topicId: props.topicId,
+      },
     });
   };
 
@@ -119,12 +154,12 @@ export default function ProposalQuestionaryStep(props: {
                         type: EventType.FIELD_CHANGED,
                         payload: {
                           id: field.proposal_question_id,
-                          newValue: newValue
-                        }
+                          newValue: newValue,
+                        },
                       });
                       handleChange(evt);
                     }
-                  } // for formik
+                  }, // for formik
                 })}
               </div>
             );
@@ -134,11 +169,11 @@ export default function ProposalQuestionaryStep(props: {
             back={{
               callback: () => {
                 dispatch({ type: EventType.BACK_CLICKED });
-              }
+              },
             }}
             reset={{
               callback: () => dispatch({ type: EventType.RESET_CLICKED }),
-              disabled: !props.data.isDirty
+              disabled: !props.data.isDirty,
             }}
             save={
               questionaryStep.isCompleted
@@ -147,7 +182,7 @@ export default function ProposalQuestionaryStep(props: {
                     callback: () => {
                       saveStepData(false);
                     },
-                    disabled: !props.data.isDirty
+                    disabled: !props.data.isDirty,
                   }
             }
             saveAndNext={{
@@ -159,7 +194,7 @@ export default function ProposalQuestionaryStep(props: {
                     }
                   }
                 );
-              }
+              },
             }}
             isLoading={formSaving}
           />
@@ -168,38 +203,4 @@ export default function ProposalQuestionaryStep(props: {
       )}
     </Formik>
   );
-}
-
-class ComponentFactory {
-  private componentMap = JSDict.Create<string, any>();
-
-  constructor() {
-    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
-    this.componentMap.put(
-      DataType.SELECTION_FROM_OPTIONS,
-      ProposalComponentMultipleChoice
-    );
-    this.componentMap.put(
-      DataType.EMBELLISHMENT,
-      ProposalComponentEmbellishment
-    );
-  }
-  createComponent(
-    field: QuestionaryField,
-    props: any
-  ): React.ComponentElement<IBasicComponentProps, any> {
-    props.templateField = field;
-    props.key = field.proposal_question_id;
-
-    const component = this.componentMap.get(field.data_type);
-
-    if (!component) {
-      throw new Error(`Could not create component for type ${field.data_type}`);
-    }
-
-    return React.createElement(component, props);
-  }
 }

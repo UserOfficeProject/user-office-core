@@ -118,6 +118,16 @@ export enum EvaluatorOperator {
   NEQ = 'NEQ'
 }
 
+export type EventLog = {
+   __typename?: 'EventLog',
+  id: Scalars['Int'],
+  eventType: Scalars['String'],
+  rowData: Scalars['String'],
+  eventTStamp: Scalars['DateTime'],
+  changedObjectId: Scalars['String'],
+  changedBy: User,
+};
+
 export type FieldCondition = {
    __typename?: 'FieldCondition',
   condition: EvaluatorOperator,
@@ -216,15 +226,16 @@ export type MutationAddClientLogArgs = {
 export type MutationAddReviewArgs = {
   reviewID: Scalars['Int'],
   comment: Scalars['String'],
-  grade: Scalars['Int']
+  grade: Scalars['Int'],
+  status: ReviewStatus
 };
 
 
 export type MutationAddTechnicalReviewArgs = {
   proposalID: Scalars['Int'],
-  comment: Scalars['String'],
-  timeAllocation: Scalars['Int'],
-  status: TechnicalReviewStatus
+  comment?: Maybe<Scalars['String']>,
+  timeAllocation?: Maybe<Scalars['Int']>,
+  status?: Maybe<TechnicalReviewStatus>
 };
 
 
@@ -267,7 +278,8 @@ export type MutationCreateTopicArgs = {
 export type MutationCreateUserByEmailInviteArgs = {
   firstname: Scalars['String'],
   lastname: Scalars['String'],
-  email: Scalars['String']
+  email: Scalars['String'],
+  userRole: UserRole
 };
 
 
@@ -455,7 +467,8 @@ export enum PageName {
   HOMEPAGE = 'HOMEPAGE',
   HELPPAGE = 'HELPPAGE',
   PRIVACYPAGE = 'PRIVACYPAGE',
-  COOKIEPAGE = 'COOKIEPAGE'
+  COOKIEPAGE = 'COOKIEPAGE',
+  REVIEWPAGE = 'REVIEWPAGE'
 }
 
 export type PageResponseWrap = {
@@ -543,6 +556,7 @@ export type Query = {
   call?: Maybe<Call>,
   calls?: Maybe<Array<Call>>,
   checkEmailExist?: Maybe<Scalars['Boolean']>,
+  eventLogs?: Maybe<Array<EventLog>>,
   fileMetadata?: Maybe<Array<FileMetadata>>,
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
@@ -570,6 +584,12 @@ export type QueryCallArgs = {
 
 export type QueryCheckEmailExistArgs = {
   email: Scalars['String']
+};
+
+
+export type QueryEventLogsArgs = {
+  changedObjectId: Scalars['String'],
+  eventType: Scalars['String']
 };
 
 
@@ -707,9 +727,9 @@ export type TechnicalReview = {
    __typename?: 'TechnicalReview',
   id: Scalars['Int'],
   proposalID: Scalars['Int'],
-  comment: Scalars['String'],
-  timeAllocation: Scalars['Int'],
-  status: TechnicalReviewStatus,
+  comment?: Maybe<Scalars['String']>,
+  timeAllocation?: Maybe<Scalars['Int']>,
+  status?: Maybe<TechnicalReviewStatus>,
   proposal?: Maybe<Proposal>,
 };
 
@@ -752,7 +772,7 @@ export type TextInputConfig = {
 export type TokenResponseWrap = {
    __typename?: 'TokenResponseWrap',
   error?: Maybe<Scalars['String']>,
-  token: Scalars['String'],
+  token?: Maybe<Scalars['String']>,
 };
 
 export type Topic = {
@@ -799,7 +819,7 @@ export type User = {
   orcid: Scalars['String'],
   refreshToken: Scalars['String'],
   gender: Scalars['String'],
-  nationality: Scalars['Int'],
+  nationality?: Maybe<Scalars['Int']>,
   birthdate: Scalars['String'],
   organisation: Scalars['Int'],
   department: Scalars['String'],
@@ -908,6 +928,24 @@ export type GetCallsQuery = (
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall'>
+  )>> }
+);
+
+export type GetEventLogsQueryVariables = {
+  eventType: Scalars['String'],
+  changedObjectId: Scalars['String']
+};
+
+
+export type GetEventLogsQuery = (
+  { __typename?: 'Query' }
+  & { eventLogs: Maybe<Array<(
+    { __typename?: 'EventLog' }
+    & Pick<EventLog, 'id' | 'eventType' | 'eventTStamp' | 'rowData' | 'changedObjectId'>
+    & { changedBy: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'firstname' | 'lastname' | 'email'>
+    ) }
   )>> }
 );
 
@@ -1412,30 +1450,11 @@ export type UpdateTopicOrderMutation = (
   ) }
 );
 
-export type AddReviewMutationVariables = {
-  reviewID: Scalars['Int'],
-  grade: Scalars['Int'],
-  comment: Scalars['String']
-};
-
-
-export type AddReviewMutation = (
-  { __typename?: 'Mutation' }
-  & { addReview: (
-    { __typename?: 'ReviewResponseWrap' }
-    & Pick<ReviewResponseWrap, 'error'>
-    & { review: Maybe<(
-      { __typename?: 'Review' }
-      & CoreReviewFragment
-    )> }
-  ) }
-);
-
 export type AddTechnicalReviewMutationVariables = {
   proposalID: Scalars['Int'],
-  timeAllocation: Scalars['Int'],
-  comment: Scalars['String'],
-  status: TechnicalReviewStatus
+  timeAllocation?: Maybe<Scalars['Int']>,
+  comment?: Maybe<Scalars['String']>,
+  status?: Maybe<TechnicalReviewStatus>
 };
 
 
@@ -1504,6 +1523,26 @@ export type RemoveUserForReviewMutation = (
   ) }
 );
 
+export type UpdateReviewMutationVariables = {
+  reviewID: Scalars['Int'],
+  grade: Scalars['Int'],
+  comment: Scalars['String'],
+  status: ReviewStatus
+};
+
+
+export type UpdateReviewMutation = (
+  { __typename?: 'Mutation' }
+  & { addReview: (
+    { __typename?: 'ReviewResponseWrap' }
+    & Pick<ReviewResponseWrap, 'error'>
+    & { review: Maybe<(
+      { __typename?: 'Review' }
+      & CoreReviewFragment
+    )> }
+  ) }
+);
+
 export type UserWithReviewsQueryVariables = {
   id: Scalars['Int']
 };
@@ -1563,7 +1602,8 @@ export type CreateUserMutation = (
 export type CreateUserByEmailInviteMutationVariables = {
   firstname: Scalars['String'],
   lastname: Scalars['String'],
-  email: Scalars['String']
+  email: Scalars['String'],
+  userRole: UserRole
 };
 
 
@@ -2022,6 +2062,23 @@ export const GetCallsDocument = gql`
   }
 }
     `;
+export const GetEventLogsDocument = gql`
+    query getEventLogs($eventType: String!, $changedObjectId: String!) {
+  eventLogs(eventType: $eventType, changedObjectId: $changedObjectId) {
+    id
+    eventType
+    changedBy {
+      id
+      firstname
+      lastname
+      email
+    }
+    eventTStamp
+    rowData
+    changedObjectId
+  }
+}
+    `;
 export const CreateProposalDocument = gql`
     mutation createProposal {
   createProposal {
@@ -2324,18 +2381,8 @@ export const UpdateTopicOrderDocument = gql`
   }
 }
     `;
-export const AddReviewDocument = gql`
-    mutation addReview($reviewID: Int!, $grade: Int!, $comment: String!) {
-  addReview(reviewID: $reviewID, grade: $grade, comment: $comment) {
-    error
-    review {
-      ...coreReview
-    }
-  }
-}
-    ${CoreReviewFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int!, $comment: String!, $status: TechnicalReviewStatus!) {
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $status: TechnicalReviewStatus) {
   addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, status: $status) {
     error
     technicalReview {
@@ -2373,6 +2420,16 @@ export const RemoveUserForReviewDocument = gql`
   }
 }
     `;
+export const UpdateReviewDocument = gql`
+    mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!) {
+  addReview(reviewID: $reviewID, grade: $grade, comment: $comment, status: $status) {
+    error
+    review {
+      ...coreReview
+    }
+  }
+}
+    ${CoreReviewFragmentDoc}`;
 export const UserWithReviewsDocument = gql`
     query userWithReviews($id: Int!) {
   user(id: $id) {
@@ -2405,8 +2462,8 @@ export const CreateUserDocument = gql`
 }
     `;
 export const CreateUserByEmailInviteDocument = gql`
-    mutation createUserByEmailInvite($firstname: String!, $lastname: String!, $email: String!) {
-  createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email) {
+    mutation createUserByEmailInvite($firstname: String!, $lastname: String!, $email: String!, $userRole: UserRole!) {
+  createUserByEmailInvite(firstname: $firstname, lastname: $lastname, email: $email, userRole: $userRole) {
     error
     id
   }
@@ -2603,6 +2660,9 @@ export function getSdk(client: GraphQLClient) {
     getCalls(variables?: GetCallsQueryVariables): Promise<GetCallsQuery> {
       return client.request<GetCallsQuery>(print(GetCallsDocument), variables);
     },
+    getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
+      return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
+    },
     createProposal(variables?: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);
     },
@@ -2660,9 +2720,6 @@ export function getSdk(client: GraphQLClient) {
     updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
       return client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables);
     },
-    addReview(variables: AddReviewMutationVariables): Promise<AddReviewMutation> {
-      return client.request<AddReviewMutation>(print(AddReviewDocument), variables);
-    },
     addTechnicalReview(variables: AddTechnicalReviewMutationVariables): Promise<AddTechnicalReviewMutation> {
       return client.request<AddTechnicalReviewMutation>(print(AddTechnicalReviewDocument), variables);
     },
@@ -2674,6 +2731,9 @@ export function getSdk(client: GraphQLClient) {
     },
     removeUserForReview(variables: RemoveUserForReviewMutationVariables): Promise<RemoveUserForReviewMutation> {
       return client.request<RemoveUserForReviewMutation>(print(RemoveUserForReviewDocument), variables);
+    },
+    updateReview(variables: UpdateReviewMutationVariables): Promise<UpdateReviewMutation> {
+      return client.request<UpdateReviewMutation>(print(UpdateReviewDocument), variables);
     },
     userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);

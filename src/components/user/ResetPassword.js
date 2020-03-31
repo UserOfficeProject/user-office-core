@@ -1,37 +1,38 @@
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { getUnauthorizedApi } from "../../hooks/useDataApi";
-import { userPasswordFieldSchema } from "../../utils/userFieldValidationSchema";
-import PhotoInSide from "./PhotoInSide";
-import { FormWrapper } from "../../styles/StyledComponents";
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { getUnauthorizedApi } from '../../hooks/useDataApi';
+import { FormWrapper } from '../../styles/StyledComponents';
+import { userPasswordFieldSchema } from '../../utils/userFieldValidationSchema';
+import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1)
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
+    margin: theme.spacing(3, 0, 2),
   },
   sentMessage: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   },
   errorMessage: {
-    color: theme.palette.error.main
-  }
+    color: theme.palette.error.main,
+  },
 }));
 
 export default function ResetPassword({ match }) {
@@ -44,7 +45,7 @@ export default function ResetPassword({ match }) {
     getUnauthorizedApi()
       .resetPassword({
         token: match.params.token,
-        password
+        password,
       })
       .then(data =>
         data.resetPassword.error
@@ -56,7 +57,7 @@ export default function ResetPassword({ match }) {
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ password: "" }}
+        initialValues={{ password: '' }}
         onSubmit={async (values, actions) => {
           await requestResetPassword(values);
           actions.setSubmitting(false);

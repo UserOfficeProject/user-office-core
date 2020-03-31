@@ -1,18 +1,19 @@
-import React from "react";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import NoteAdd from "@material-ui/icons/NoteAdd";
-import People from "@material-ui/icons/People";
-import Help from "@material-ui/icons/Help";
-import FolderOpen from "@material-ui/icons/FolderOpen";
-import ExitToApp from "@material-ui/icons/ExitToApp";
-import CalendarToday from "@material-ui/icons/CalendarToday";
-import SettingsApplications from "@material-ui/icons/SettingsApplications";
-import { Link } from "react-router-dom";
-import { useCallsData } from "../hooks/useCallsData";
-import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import CalendarToday from '@material-ui/icons/CalendarToday';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ExitToApp from '@material-ui/icons/ExitToApp';
+import FolderOpen from '@material-ui/icons/FolderOpen';
+import Help from '@material-ui/icons/Help';
+import NoteAdd from '@material-ui/icons/NoteAdd';
+import People from '@material-ui/icons/People';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import SettingsApplications from '@material-ui/icons/SettingsApplications';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { useCallsData } from '../hooks/useCallsData';
 
 export default function MenuItems({ role }) {
   const { loading, callsData } = useCallsData();
@@ -106,7 +107,7 @@ export default function MenuItems({ role }) {
   );
   const reviewer = (
     <div>
-      <ListItem component={Link} to="/ProposalTableReviewer" button>
+      <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
@@ -122,11 +123,11 @@ export default function MenuItems({ role }) {
   );
 
   switch (role) {
-    case "user":
+    case 'user':
       return user;
-    case "user_officer":
+    case 'user_officer':
       return user_officer;
-    case "reviewer":
+    case 'reviewer':
       return reviewer;
     default:
       return null;

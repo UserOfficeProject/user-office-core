@@ -1,0 +1,10 @@
+node_modules
+.next
+build
+dist
+public
+cypress
+
+src/serviceWorker.js
+src/setupProxy.js
+server.js

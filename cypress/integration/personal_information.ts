@@ -1,13 +1,13 @@
 /// <reference types="Cypress" />
-var faker = require("faker");
+/// <reference types="../types" />
+var faker = require('faker');
 
-context("Personal information tests", () => {
+context('Personal information tests', () => {
   before(() => {
-    //@ts-ignore
     cy.resetDB();
   });
   beforeEach(() => {
-    cy.visit("/");
+    cy.visit('/');
     cy.viewport(1100, 1100);
   });
 
@@ -16,12 +16,11 @@ context("Personal information tests", () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
-  const newPosition = faker.random.word().split(" ")[0];
+  const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber();
 
-  it("Should be able update personal information", () => {
-    //@ts-ignore
-    cy.login("user");
+  it('Should be able update personal information', () => {
+    cy.login('user');
 
     cy.get("[data-cy='profile-page-btn']").click();
 
@@ -53,36 +52,36 @@ context("Personal information tests", () => {
       .clear()
       .type(newTelephone);
 
-    cy.contains("Update Profile").click();
+    cy.contains('Update Profile').click();
 
     cy.reload();
 
     cy.get("[name='firstname']")
-      .invoke("val")
-      .should("eq", newFirstName);
+      .invoke('val')
+      .should('eq', newFirstName);
 
     cy.get("[name='middlename']")
-      .invoke("val")
-      .should("eq", newMiddleName);
+      .invoke('val')
+      .should('eq', newMiddleName);
 
     cy.get("[name='lastname']")
-      .invoke("val")
-      .should("eq", newLastName);
+      .invoke('val')
+      .should('eq', newLastName);
 
     cy.get("[name='preferredname']")
-      .invoke("val")
-      .should("eq", newPreferredName);
+      .invoke('val')
+      .should('eq', newPreferredName);
 
     cy.get("[name='position']")
-      .invoke("val")
-      .should("eq", newPosition);
+      .invoke('val')
+      .should('eq', newPosition);
 
     cy.get("[name='department']")
-      .invoke("val")
-      .should("eq", newDepartment);
+      .invoke('val')
+      .should('eq', newDepartment);
 
     cy.get("[name='telephone']")
-      .invoke("val")
-      .should("eq", newTelephone);
+      .invoke('val')
+      .should('eq', newTelephone);
   });
 });

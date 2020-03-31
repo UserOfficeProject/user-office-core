@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 export const Query = <T extends unknown>(props: {
   children: MyQueryChildrenType<T>;
@@ -31,7 +31,7 @@ export const Query = <T extends unknown>(props: {
 type MyQueryChildrenType<T> = ({
   loading,
   error,
-  data
+  data,
 }: {
   loading: boolean;
   error: boolean;

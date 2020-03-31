@@ -1,14 +1,15 @@
-import React from "react";
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import { AdminComponentShell } from "./AdminComponentShell";
-import TitledContainer from "../common/TitledContainer";
-import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { EventType } from '../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
@@ -21,17 +22,17 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
-          }
+            field: { ...field, ...vals },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
         natural_key: naturalKeySchema,
-        question: Yup.string().required("Question is required"),
+        question: Yup.string().required('Question is required'),
         config: Yup.object({
-          required: Yup.bool()
-        })
+          required: Yup.bool(),
+        }),
       })}
     >
       {formikProps => (
@@ -44,7 +45,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "natural_key" }}
+              inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
               name="question"
@@ -53,7 +54,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "question" }}
+              inputProps={{ 'data-cy': 'question' }}
             />
 
             <TitledContainer label="Constraints">

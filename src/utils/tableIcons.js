@@ -13,8 +13,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Remove,
-  SaveAlt
-} from "@material-ui/icons";
+  SaveAlt,
+} from '@material-ui/icons';
 
 export const tableIcons = {
   Add: AddBox,
@@ -33,5 +33,5 @@ export const tableIcons = {
   Search: Search,
   SortArrow: ArrowUpward,
   ThirdStateCheck: Remove,
-  ViewColumn: ViewColumn
+  ViewColumn: ViewColumn,
 };

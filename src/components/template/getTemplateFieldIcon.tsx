@@ -1,11 +1,12 @@
-import React from "react";
-import ShortTextIcon from "@material-ui/icons/ShortText";
-import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import TextFieldsIcon from "@material-ui/icons/TextFields";
-import { DataType } from "../../generated/sdk";
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import ShortTextIcon from '@material-ui/icons/ShortText';
+import TextFieldsIcon from '@material-ui/icons/TextFields';
+import React from 'react';
+
+import { DataType } from '../../generated/sdk';
 
 const getTemplateFieldIcon = (dataType: DataType) => {
   switch (dataType) {

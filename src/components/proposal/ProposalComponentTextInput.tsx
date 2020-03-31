@@ -1,19 +1,20 @@
-import { makeStyles } from "@material-ui/core";
-import { getIn } from "formik";
-import React, { ChangeEvent, useState, useEffect } from "react";
-import { TextInputConfig } from "../../generated/sdk";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import TextFieldWithCounter from "../common/TextFieldWithCounter";
+import { makeStyles } from '@material-ui/core';
+import { getIn } from 'formik';
+import React, { ChangeEvent, useState, useEffect } from 'react';
 
-export function ProposalComponentTextInput(props: IBasicComponentProps) {
+import { TextInputConfig } from '../../generated/sdk';
+import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import { BasicComponentProps } from './IBasicComponentProps';
+
+export function ProposalComponentTextInput(props: BasicComponentProps) {
   const classes = makeStyles({
     textField: {
-      margin: "15px 0 10px 0"
-    }
+      margin: '15px 0 10px 0',
+    },
   })();
-  let { templateField, touched, errors, onComplete } = props;
-  let { proposal_question_id, question, value } = templateField;
-  let [stateValue, setStateValue] = useState(value);
+  const { templateField, touched, errors, onComplete } = props;
+  const { proposal_question_id, question, value } = templateField;
+  const [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposal_question_id);
   const isError = getIn(touched, proposal_question_id) && !!fieldError;
   const config = templateField.config as TextInputConfig;
@@ -27,7 +28,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
       {config.htmlQuestion && (
         <div
           dangerouslySetInnerHTML={{
-            __html: config.htmlQuestion!
+            __html: config.htmlQuestion!,
           }}
         ></div>
       )}
@@ -37,7 +38,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         name={proposal_question_id}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? "" : question}
+        label={config.htmlQuestion ? '' : question}
         value={stateValue}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
@@ -53,7 +54,7 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         rowsMax={config.multiline ? 16 : undefined}
         className={classes.textField}
         InputLabelProps={{
-          shrink: true
+          shrink: true,
         }}
         maxLen={config.max || undefined}
       />

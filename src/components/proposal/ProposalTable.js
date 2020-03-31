@@ -1,18 +1,19 @@
-import React, { useState } from "react";
-import { Redirect } from "react-router";
-import MaterialTable from "material-table";
-import { tableIcons } from "../../utils/tableIcons";
-import { Edit, Visibility } from "@material-ui/icons";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import { useDownloadPDFProposal } from "../../hooks/useDownloadPDFProposal";
+import { Edit, Visibility } from '@material-ui/icons';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import MaterialTable from 'material-table';
+import React, { useState } from 'react';
+import { Redirect } from 'react-router';
+
+import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
+import { tableIcons } from '../../utils/tableIcons';
 
 export default function ProposalTable(props) {
   const downloadPDFProposal = useDownloadPDFProposal();
   const columns = [
-    { title: "Proposal ID", field: "shortCode" },
-    { title: "Title", field: "title" },
-    { title: "Status", field: "status" },
-    { title: "Created", field: "created" }
+    { title: 'Proposal ID', field: 'shortCode' },
+    { title: 'Title', field: 'title' },
+    { title: 'Status', field: 'status' },
+    { title: 'Created', field: 'created' },
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -29,27 +30,27 @@ export default function ProposalTable(props) {
       data={query => props.searchQuery(query)}
       options={{
         search: props.search,
-        debounceInterval: 400
+        debounceInterval: 400,
       }}
       actions={[
         rowData => {
           return {
             icon:
-              rowData.status === "Submitted"
+              rowData.status === 'Submitted'
                 ? () => <Visibility />
                 : () => <Edit />,
             tooltip:
-              rowData.status === "Submitted"
-                ? "View proposal"
-                : "Edit proposal",
-            onClick: (event, rowData) => setEditProposalID(rowData.id)
+              rowData.status === 'Submitted'
+                ? 'View proposal'
+                : 'Edit proposal',
+            onClick: (event, rowData) => setEditProposalID(rowData.id),
           };
         },
         {
           icon: () => <GetAppIcon />,
-          tooltip: "Download proposal",
-          onClick: (event, rowData) => downloadPDFProposal(rowData.id)
-        }
+          tooltip: 'Download proposal',
+          onClick: (event, rowData) => downloadPDFProposal(rowData.id),
+        },
       ]}
     />
   );
