@@ -27,31 +27,31 @@ context("Personal information tests", () => {
 
     cy.get("[name='firstname']")
       .clear()
-      .type(newFirstName, { force: true });
+      .type(newFirstName);
 
     cy.get("[name='middlename']")
       .clear()
-      .type(newMiddleName, { force: true });
+      .type(newMiddleName);
 
     cy.get("[name='lastname']")
       .clear()
-      .type(newLastName, { force: true });
+      .type(newLastName);
 
     cy.get("[name='preferredname']")
       .clear()
-      .type(newPreferredName, { force: true });
+      .type(newPreferredName);
 
     cy.get("[name='position']")
       .clear()
-      .type(newPosition, { force: true });
+      .type(newPosition);
 
     cy.get("[name='department']")
       .clear()
-      .type(newDepartment, { force: true });
+      .type(newDepartment);
 
     cy.get("[name='telephone']")
       .clear()
-      .type(newTelephone, { force: true });
+      .type(newTelephone);
 
     cy.contains("Update Profile").click();
 
