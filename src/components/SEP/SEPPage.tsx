@@ -31,7 +31,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
 
   useEffect(() => {
     loadSEP();
-  }, [api, loadSEP, match.params.id]);
+  }, [loadSEP]);
 
   if (!sep) {
     return <p>Loading...</p>;
