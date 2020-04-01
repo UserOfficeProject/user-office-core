@@ -1,6 +1,4 @@
-// FIXME: This should be fixed for sure. It produces compile errors and ts-ignore should never be used.
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
-import { getTranslation } from '@esss-swap/duo-localisation';
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { Visibility, Delete } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
@@ -9,14 +7,17 @@ import { Redirect } from 'react-router';
 
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useProposalsData } from '../../hooks/useProposalsData';
+import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
 import DialogConfirmation from '../common/DialogConfirmation';
 
-export default function ProposalTableOfficer() {
+const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
-  const [selectedProposals, setSelectedProposals] = React.useState([]);
+  const initalSelectedProposals: number[] = [];
+  const [selectedProposals, setSelectedProposals] = React.useState(
+    initalSelectedProposals
+  );
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const columns = [
@@ -25,9 +26,9 @@ export default function ProposalTableOfficer() {
     { title: 'Time(Days)', field: 'technicalReview.timeAllocation' },
     {
       title: 'Technical status',
-      render: (rowData: any) =>
+      render: (rowData: ProposalData): string =>
         rowData.technicalReview
-          ? getTranslation(rowData.technicalReview.status)
+          ? getTranslation(rowData.technicalReview.status as ResourceId)
           : '',
     },
     { title: 'Status', field: 'status' },
@@ -35,7 +36,7 @@ export default function ProposalTableOfficer() {
 
   const [editProposalID, setEditProposalID] = useState(0);
 
-  const deleteProposals = () => {
+  const deleteProposals = (): void => {
     selectedProposals.forEach(id => {
       new Promise(async resolve => {
         await api().deleteProposal({ id });
@@ -59,6 +60,10 @@ export default function ProposalTableOfficer() {
     return <p>Loading</p>;
   }
 
+  const VisibilityIcon = (): JSX.Element => <Visibility />;
+  const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
+  const DeleteIcon = (): JSX.Element => <Delete />;
+
   return (
     <>
       <DialogConfirmation
@@ -80,41 +85,38 @@ export default function ProposalTableOfficer() {
         }}
         actions={[
           {
-            icon: () => <Visibility />,
+            icon: VisibilityIcon,
             tooltip: 'View proposal',
-            // @ts-ignore
-            onClick: (event, rowData) => setEditProposalID(rowData.id),
+            onClick: (event, rowData): void =>
+              setEditProposalID((rowData as ProposalData).id),
             position: 'row',
           },
           {
-            icon: () => <GetAppIcon />,
+            icon: GetAppIconComponent,
             tooltip: 'Download proposals',
-            onClick: (event, rowData) => {
-              downloadPDFProposal(
-                // @ts-ignore
-                rowData.id
-              );
+            onClick: (event, rowData): void => {
+              downloadPDFProposal((rowData as ProposalData).id);
             },
             position: 'row',
           },
           {
-            icon: () => <GetAppIcon />,
+            icon: GetAppIconComponent,
             tooltip: 'Download proposals',
-            onClick: (event, rowData) => {
+            onClick: (event, rowData): void => {
               downloadPDFProposal(
-                // @ts-ignore
-                rowData.map(row => row.id).join(',')
+                (rowData as ProposalData[]).map(row => row.id).join(',')
               );
             },
             position: 'toolbarOnSelect',
           },
           {
-            icon: () => <Delete />,
+            icon: DeleteIcon,
             tooltip: 'Delete proposals',
-            onClick: (event, rowData) => {
+            onClick: (event, rowData): void => {
               setOpen(true);
-              // @ts-ignore
-              setSelectedProposals(rowData.map(row => row.id));
+              setSelectedProposals(
+                (rowData as ProposalData[]).map((row: ProposalData) => row.id)
+              );
             },
             position: 'toolbarOnSelect',
           },
@@ -122,4 +124,6 @@ export default function ProposalTableOfficer() {
       />
     </>
   );
-}
+};
+
+export default ProposalTableOfficer;
