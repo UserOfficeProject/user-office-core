@@ -33,7 +33,7 @@ export default function MenuItems({ role }) {
       : false;
   }
   const user = (
-    <div>
+    <div data-cy="user-menu-items">
       <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <DashboardIcon />
@@ -67,7 +67,7 @@ export default function MenuItems({ role }) {
   );
 
   const user_officer = (
-    <div>
+    <div data-cy="officer-menu-items">
       <ListItem component={Link} to="/ProposalPage" button>
         <ListItemIcon>
           <FolderOpen />
@@ -113,7 +113,7 @@ export default function MenuItems({ role }) {
     </div>
   );
   const reviewer = (
-    <div>
+    <div data-cy="reviewer-menu-items">
       <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <FolderOpen />

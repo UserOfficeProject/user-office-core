@@ -55,36 +55,38 @@ const SEPsTableOfficer: React.FC = () => {
           <AddSEP close={(): void => setShow(false)} />
         </DialogContent>
       </Dialog>
-      <MaterialTable
-        icons={tableIcons}
-        title={'Scientific evaluation panels'}
-        columns={columns}
-        data={SEPsData}
-        options={{
-          search: true,
-          debounceInterval: 400,
-        }}
-        actions={[
-          {
-            icon: EditIcon,
-            tooltip: 'Edit SEP',
-            onClick: (event, rowData): void =>
-              setEditSEPID((rowData as Sep).id),
-            position: 'row',
-          },
-        ]}
-      />
-      <ButtonContainer>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={(): void => setShow(true)}
-        >
-          Create SEP
-        </Button>
-      </ButtonContainer>
+      <div data-cy="SEPs-table">
+        <MaterialTable
+          icons={tableIcons}
+          title={'Scientific evaluation panels'}
+          columns={columns}
+          data={SEPsData}
+          options={{
+            search: true,
+            debounceInterval: 400,
+          }}
+          actions={[
+            {
+              icon: EditIcon,
+              tooltip: 'Edit SEP',
+              onClick: (event, rowData): void =>
+                setEditSEPID((rowData as Sep).id),
+              position: 'row',
+            },
+          ]}
+        />
+        <ButtonContainer>
+          <Button
+            type="button"
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={(): void => setShow(true)}
+          >
+            Create SEP
+          </Button>
+        </ButtonContainer>
+      </div>
     </>
   );
 };
