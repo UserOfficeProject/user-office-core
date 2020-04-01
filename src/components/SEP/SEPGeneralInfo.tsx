@@ -11,11 +11,11 @@ import { Formik, Form, Field } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
-import * as yup from 'yup';
 
 import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ButtonContainer } from '../../styles/StyledComponents';
+import SEPValidationSchema from './SEPValidationSchema';
 
 type SEPPageProps = {
   /** SEP data to be shown */
@@ -29,14 +29,6 @@ const useStyles = makeStyles({
     marginTop: '25px',
     marginLeft: '10px',
   },
-});
-
-const SEPValidationSchema = yup.object().shape({
-  code: yup.string().required('Code can not be blank'),
-  description: yup.string().required('Description can not be blank'),
-  numberRatingsRequired: yup
-    .number()
-    .min(2, 'Ratings required can not be lower than 2'),
 });
 
 const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {

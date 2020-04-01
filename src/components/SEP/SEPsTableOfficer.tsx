@@ -1,3 +1,4 @@
+import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
@@ -5,10 +6,21 @@ import { Redirect } from 'react-router';
 
 import { Sep } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';
+import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import AddSEP from './AddSEP';
+
+const useStyles = makeStyles({
+  button: {
+    marginTop: '25px',
+    marginLeft: '10px',
+  },
+});
 
 const SEPsTableOfficer: React.FC = () => {
-  const { loading, SEPsData } = useSEPsData('');
+  const [show, setShow] = useState(false);
+  const { loading, SEPsData } = useSEPsData(show, '');
+  const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
@@ -33,6 +45,16 @@ const SEPsTableOfficer: React.FC = () => {
 
   return (
     <>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={show}
+        onClose={(): void => setShow(false)}
+      >
+        <DialogContent>
+          <AddSEP close={(): void => setShow(false)} />
+        </DialogContent>
+      </Dialog>
       <MaterialTable
         icons={tableIcons}
         title={'Scientific evaluation panels'}
@@ -52,6 +74,17 @@ const SEPsTableOfficer: React.FC = () => {
           },
         ]}
       />
+      <ButtonContainer>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={(): void => setShow(true)}
+        >
+          Create SEP
+        </Button>
+      </ButtonContainer>
     </>
   );
 };

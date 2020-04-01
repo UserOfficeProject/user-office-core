@@ -4,6 +4,7 @@ import { Sep } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPsData(
+  show: boolean,
   filter: string
 ): {
   loading: boolean;
@@ -30,7 +31,7 @@ export function useSEPsData(
         }
         setLoading(false);
       });
-  }, [filter, api]);
+  }, [filter, show, api]);
 
   return { loading, SEPsData, setSEPsData };
 }
