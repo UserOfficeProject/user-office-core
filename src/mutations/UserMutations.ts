@@ -3,9 +3,6 @@ import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { Event } from '../events/event.enum';
-import { EventBus } from '../events/eventBus';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -19,8 +16,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 export default class UserMutations {
   constructor(
     private dataSource: UserDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
   private secret = process.env.secret as string;
@@ -42,226 +38,192 @@ export default class UserMutations {
   ): Promise<
     { userId: number; inviterId: number; role: UserRole } | Rejection
   > {
-    return this.eventBus.wrap(
-      async () => {
-        if (!agent) {
-          return rejection('NOT_LOGGED');
-        }
-        // Check if email exist in database and if user has been invited before
-        const user = await this.dataSource.getByEmail(args.email);
-        if (user && user.placeholder) {
-          return {
-            userId: user.id,
-            inviterId: agent.id,
-            role: args.userRole,
-          };
-        } else if (user) {
-          return rejection('ACCOUNT_EXIST');
-        }
+    if (!agent) {
+      return rejection('NOT_LOGGED');
+    }
+    // Check if email exist in database and if user has been invited before
+    const user = await this.dataSource.getByEmail(args.email);
+    if (user && user.placeholder) {
+      return {
+        userId: user.id,
+        inviterId: agent.id,
+        role: args.userRole,
+      };
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
+    }
 
-        if (
-          args.userRole === UserRole.REVIEWER &&
-          (await this.userAuth.isUserOfficer(agent))
-        ) {
-          const userId = await this.dataSource.createInviteUser(args);
-          await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
+    if (
+      args.userRole === UserRole.REVIEWER &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      const userId = await this.dataSource.createInviteUser(args);
+      await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
 
-          return {
-            userId,
-            inviterId: agent.id,
-            role: UserRole.REVIEWER,
-          };
-        } else if (args.userRole === UserRole.USER) {
-          const userId = await this.dataSource.createInviteUser(args);
-          await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+      return {
+        userId,
+        inviterId: agent.id,
+        role: UserRole.REVIEWER,
+      };
+    } else if (args.userRole === UserRole.USER) {
+      const userId = await this.dataSource.createInviteUser(args);
+      await this.dataSource.setUserRoles(userId, [UserRole.USER]);
 
-          return {
-            userId,
-            inviterId: agent.id,
-            role: UserRole.USER,
-          };
-        }
+      return {
+        userId,
+        inviterId: agent.id,
+        role: UserRole.USER,
+      };
+    }
 
-        return rejection('NOT_ALLOWED');
-      },
-      res => {
-        return {
-          type: Event.EMAIL_INVITE,
-          userId: res.userId,
-          inviterId: res.inviterId,
-          role: res.role,
-          loggedInUserId: res.inviterId,
-        };
-      }
-    );
+    return rejection('NOT_ALLOWED');
   }
 
   async create(
     args: CreateUserArgs
   ): Promise<{ user: User; link: string } | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (
-          this.createHash(args.orcid) !== args.orcidHash &&
-          !(process.env.NODE_ENV === 'development')
-        ) {
-          logger.logError('ORCID hash mismatch', { args });
+    if (
+      this.createHash(args.orcid) !== args.orcidHash &&
+      !(process.env.NODE_ENV === 'development')
+    ) {
+      logger.logError('ORCID hash mismatch', { args });
 
-          return rejection('ORCID_HASH_MISMATCH');
-        }
+      return rejection('ORCID_HASH_MISMATCH');
+    }
 
-        const hash = this.createHash(args.password);
-        let organisationId = args.organisation;
-        // Check if user has other org and if so create it
-        if (args.otherOrganisation) {
-          organisationId = await this.dataSource.createOrganisation(
-            args.otherOrganisation,
-            false
-          );
-        }
+    const hash = this.createHash(args.password);
+    let organisationId = args.organisation;
+    // Check if user has other org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false
+      );
+    }
 
-        //Check if email exist in database and if user has been invited
-        let user = await this.dataSource.getByEmail(args.email);
+    //Check if email exist in database and if user has been invited
+    let user = await this.dataSource.getByEmail(args.email);
 
-        if (user && user.placeholder) {
-          const changePassword = await this.updatePassword(
-            user,
-            user.id,
-            args.password
-          );
-          const updatedUser = await this.update(user, {
-            id: user.id,
-            placeholder: false,
-            password: hash,
-            ...args,
-          });
+    if (user && user.placeholder) {
+      const changePassword = await this.updatePassword(
+        user,
+        user.id,
+        args.password
+      );
+      const updatedUser = await this.update(user, {
+        id: user.id,
+        placeholder: false,
+        password: hash,
+        ...args,
+      });
 
-          if (isRejection(updatedUser) || !changePassword) {
-            logger.logError('Could not create user', {
-              updatedUser,
-              changePassword,
-            });
+      if (isRejection(updatedUser) || !changePassword) {
+        logger.logError('Could not create user', {
+          updatedUser,
+          changePassword,
+        });
 
-            return rejection('INTERNAL_ERROR');
-          }
-          user = updatedUser;
-        } else {
-          user = await this.dataSource.create(
-            args.user_title,
-            args.firstname,
-            args.middlename,
-            args.lastname,
-            `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
-            hash,
-            args.preferredname,
-            args.orcid,
-            args.refreshToken,
-            args.gender,
-            args.nationality,
-            args.birthdate,
-            organisationId,
-            args.department,
-            args.position,
-            args.email,
-            args.telephone,
-            args.telephone_alt
-          );
-        }
+        return rejection('INTERNAL_ERROR');
+      }
+      user = updatedUser;
+    } else {
+      user = await this.dataSource.create(
+        args.user_title,
+        args.firstname,
+        args.middlename,
+        args.lastname,
+        `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+        hash,
+        args.preferredname,
+        args.orcid,
+        args.refreshToken,
+        args.gender,
+        args.nationality,
+        args.birthdate,
+        organisationId,
+        args.department,
+        args.position,
+        args.email,
+        args.telephone,
+        args.telephone_alt
+      );
+    }
 
-        const roles = await this.dataSource.getUserRoles(user.id);
+    const roles = await this.dataSource.getUserRoles(user.id);
 
-        //If user has no role assign it the user role
-        if (!roles.length) {
-          this.dataSource.setUserRoles(user.id, [UserRole.USER]);
-        }
+    //If user has no role assign it the user role
+    if (!roles.length) {
+      this.dataSource.setUserRoles(user.id, [UserRole.USER]);
+    }
 
-        if (!user) {
-          logger.logError('Could not create user', { args });
+    if (!user) {
+      logger.logError('Could not create user', { args });
 
-          return rejection('INTERNAL_ERROR');
-        }
+      return rejection('INTERNAL_ERROR');
+    }
 
-        const token = jsonwebtoken.sign(
-          {
-            id: user.id,
-            type: 'emailVerification',
-            updated: user.updated,
-          },
-          this.secret,
-          { expiresIn: '24h' }
-        );
-
-        // Email verification link
-        const link = process.env.baseURL + '/emailVerification/' + token;
-
-        return { user, link };
+    const token = jsonwebtoken.sign(
+      {
+        id: user.id,
+        type: 'emailVerification',
+        updated: user.updated,
       },
-      res => ({
-        type: Event.USER_CREATED,
-        user: res.user,
-        link: res.link,
-        loggedInUserId: res.user.id,
-      })
+      this.secret,
+      { expiresIn: '24h' }
     );
+
+    // Email verification link
+    const link = process.env.baseURL + '/emailVerification/' + token;
+
+    return { user, link };
   }
 
   async update(
     agent: User | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (
-          !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.userAuth.isUser(agent, args.id))
-        ) {
-          return rejection('INSUFFICIENT_PERMISSIONS');
-        }
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUser(agent, args.id))
+    ) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
 
-        const checkArgs = checkUserArgs(args);
-        if (isRejection(checkArgs)) {
-          return checkArgs;
-        }
+    const checkArgs = checkUserArgs(args);
+    if (isRejection(checkArgs)) {
+      return checkArgs;
+    }
 
-        let user = await this.dataSource.get(args.id); //Hacky
+    let user = await this.dataSource.get(args.id); //Hacky
 
-        if (!user) {
-          return rejection('INTERNAL_ERROR');
-        }
-        user = {
-          ...user,
-          ...args,
-        };
+    if (!user) {
+      return rejection('INTERNAL_ERROR');
+    }
+    user = {
+      ...user,
+      ...args,
+    };
 
-        if (args.roles !== undefined) {
-          if (!(await this.userAuth.isUserOfficer(agent))) {
-            return rejection('INSUFFICIENT_PERMISSIONS');
-          }
-          const [err] = await to(
-            this.dataSource.setUserRoles(args.id, args.roles)
-          );
-          if (err) {
-            logger.logError('Could not set user roles', { err });
+    if (args.roles !== undefined) {
+      if (!(await this.userAuth.isUserOfficer(agent))) {
+        return rejection('INSUFFICIENT_PERMISSIONS');
+      }
+      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
+      if (err) {
+        logger.logError('Could not set user roles', { err });
 
-            return rejection('INTERNAL_ERROR');
-          }
-        }
+        return rejection('INTERNAL_ERROR');
+      }
+    }
 
-        return this.dataSource
-          .update(user)
-          .then(user => user)
-          .catch(err => {
-            logger.logException('Could not create user', err, { user });
+    return this.dataSource
+      .update(user)
+      .then(user => user)
+      .catch(err => {
+        logger.logException('Could not create user', err, { user });
 
-            return rejection('INTERNAL_ERROR');
-          });
-      },
-      user => ({
-        type: Event.USER_UPDATED,
-        user,
-        loggedInUserId: agent ? agent.id : null,
-      })
-    );
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   async login(email: string, password: string): Promise<string | Rejection> {
@@ -337,40 +299,28 @@ export default class UserMutations {
   async resetPasswordEmail(
     email: string
   ): Promise<{ user: User; link: string } | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        const user = await this.dataSource.getByEmail(email);
+    const user = await this.dataSource.getByEmail(email);
 
-        if (!user) {
-          logger.logInfo('Could not find user by email', { email });
+    if (!user) {
+      logger.logInfo('Could not find user by email', { email });
 
-          return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
-        }
+      return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
+    }
 
-        const token = jsonwebtoken.sign(
-          {
-            id: user.id,
-            type: 'passwordReset',
-            updated: user.updated,
-          },
-          this.secret,
-          { expiresIn: '24h' }
-        );
-
-        const link = process.env.baseURL + '/resetPassword/' + token;
-
-        // Send reset email with link
-        return { user, link };
+    const token = jsonwebtoken.sign(
+      {
+        id: user.id,
+        type: 'passwordReset',
+        updated: user.updated,
       },
-      res => {
-        return {
-          type: Event.USER_PASSWORD_RESET_EMAIL,
-          user: res.user,
-          link: res.link,
-          loggedInUserId: res.user.id,
-        };
-      }
+      this.secret,
+      { expiresIn: '24h' }
     );
+
+    const link = process.env.baseURL + '/resetPassword/' + token;
+
+    // Send reset email with link
+    return { user, link };
   }
 
   async emailVerification(token: string) {

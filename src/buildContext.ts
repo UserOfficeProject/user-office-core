@@ -51,14 +51,11 @@ const userAuthorization = new UserAuthorization(
 const eventHandlers = createEventHandlers(userDataSource, eventLogsDataSource);
 
 // From this point nothing is site-specific
-const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
+export const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
 
 const userQueries = new UserQueries(userDataSource, userAuthorization);
-const userMutations = new UserMutations(
-  userDataSource,
-  userAuthorization,
-  eventBus
-);
+const userMutations = new UserMutations(userDataSource, userAuthorization);
+
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
   userAuthorization,
@@ -68,7 +65,6 @@ const proposalMutations = new ProposalMutations(
   proposalDataSource,
   templateDataSource,
   userAuthorization,
-  eventBus,
   logger
 );
 
@@ -118,12 +114,7 @@ const eventLogQueries = new EventLogQueries(
 );
 
 const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
-
-const sepMutations = new SEPMutations(
-  sepDataSource,
-  userAuthorization,
-  eventBus
-);
+const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
 const context: BasicResolverContext = {
   userAuthorization,

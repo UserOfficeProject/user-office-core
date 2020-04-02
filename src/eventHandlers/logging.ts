@@ -45,6 +45,14 @@ export default function createHandler(
           event.sep.id.toString()
         );
         break;
+      case Event.EMAIL_INVITE:
+        await eventLogsDataSource.set(
+          event.loggedInUserId,
+          event.type,
+          json,
+          event.userId.toString()
+        );
+        break;
       default:
         break;
     }
