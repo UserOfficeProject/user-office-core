@@ -175,6 +175,15 @@ export class FieldCondition {
   }
 }
 
+export class ProposalTemplateMetadata {
+  constructor(
+    public templateId: number,
+    public name: string,
+    public description: string,
+    public isArchived: boolean
+  ) {}
+}
+
 export enum ProposalStatus {
   BLANK = -1,
   DRAFT = 0,

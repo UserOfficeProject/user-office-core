@@ -12,8 +12,7 @@ import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { Logger } from '../utils/Logger';
-import { logger } from '../utils/Logger';
+import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ProposalMutations {

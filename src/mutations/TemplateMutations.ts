@@ -22,6 +22,7 @@ import {
 } from '../resolvers/types/FieldConfig';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalTemplateMetadata } from './../models/ProposalModel';
 
 export default class TemplateMutations {
   constructor(
@@ -30,6 +31,40 @@ export default class TemplateMutations {
     private eventBus: EventBus<ApplicationEvent>,
     private logger: Logger
   ) {}
+
+  async createTemplate(
+    agent: User | null,
+    name: string,
+    description?: string
+  ): Promise<ProposalTemplateMetadata | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection('NOT_AUTHORIZED');
+    }
+
+    const result = await this.dataSource
+      .createTemplate(name, description)
+      .then(result => result);
+
+    return result;
+  }
+
+  async deleteTemplate(
+    user: User | null,
+    id: number
+  ): Promise<ProposalTemplateMetadata | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(user))) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
+    return this.dataSource
+      .deleteTemplate(id)
+      .then(template => template)
+      .catch(err => {
+        logger.logException('Could not delete proposal', err, { id, user });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
 
   async createTopic(
     agent: User | null,

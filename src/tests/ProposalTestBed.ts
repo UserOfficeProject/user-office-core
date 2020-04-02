@@ -19,6 +19,7 @@ import {
   TextInputConfig,
   FieldConfigType,
 } from '../resolvers/types/FieldConfig';
+import { ProposalTemplateMetadata } from './../models/ProposalModel';
 
 export const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
@@ -137,6 +138,22 @@ export const createDummyTemplate = () => {
       linksToField,
     ]),
   ]);
+};
+
+export const createDummyProposalTemplateMetadata = (values?: {
+  id?: number;
+  name?: string;
+  description?: string;
+  isArchived?: boolean;
+}) => {
+  values = values || {};
+
+  return new ProposalTemplateMetadata(
+    values.id || 1,
+    values.name || 'Industrial template',
+    values.description || 'Industrial template description',
+    values.isArchived || false
+  );
 };
 
 export const createDummyTopic = (

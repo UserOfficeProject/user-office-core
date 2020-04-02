@@ -22,14 +22,18 @@ export default class TemplateQueries {
   }
 
   async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
-    if (!agent) {
-      return null;
-    }
-
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return null;
     }
 
     return await this.dataSource.isNaturalKeyPresent(naturalKey);
+  }
+
+  async getProposalTemplatesMetadata(agent: User | null, isArchived: boolean) {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return [];
+    }
+
+    return await this.dataSource.getProposalTemplatesMetadata(isArchived);
   }
 }

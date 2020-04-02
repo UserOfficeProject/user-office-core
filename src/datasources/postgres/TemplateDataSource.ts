@@ -2,25 +2,79 @@
 import to from 'await-to-js';
 
 import {
+  DataType,
   ProposalTemplate,
   ProposalTemplateField,
-  Topic,
-  DataType,
+  ProposalTemplateMetadata,
   TemplateStep,
+  Topic,
 } from '../../models/ProposalModel';
 import { FieldDependencyInput } from '../../resolvers/mutations/UpdateProposalTemplateFieldMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
 import database from './database';
 import {
-  TopicRecord,
-  ProposalQuestionRecord,
-  createTopicObject,
-  createProposalTemplateFieldObject,
   createFieldDependencyObject,
+  createProposalTemplateFieldObject,
+  createProposalTemplateMetadataObject,
+  createTopicObject,
   FieldDependencyRecord,
+  ProposalQuestionRecord,
+  ProposalTemplateMetadataRecord,
+  TopicRecord,
 } from './records';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
+  async createTemplate(
+    name: string,
+    description?: string
+  ): Promise<ProposalTemplateMetadata> {
+    return database('proposal_templates')
+      .insert({
+        name,
+        description,
+      })
+      .returning('*')
+      .then((rows: ProposalTemplateMetadataRecord[]) => {
+        if (rows.length !== 1) {
+          throw new Error(
+            `createTemplate expected 1 result got ${rows.length}. ${name} ${description}`
+          );
+        }
+
+        return createProposalTemplateMetadataObject(rows[0]);
+      });
+  }
+
+  async deleteTemplate(id: number): Promise<ProposalTemplateMetadata> {
+    return database('proposal_templates')
+      .delete()
+      .where({ template_id: id })
+      .returning('*')
+      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+        if (!resultSet || resultSet.length == 0) {
+          throw new Error(`DeleteTemplate template does not exist. ID: ${id}`);
+        }
+
+        return createProposalTemplateMetadataObject(resultSet[0]);
+      });
+  }
+
+  async getProposalTemplatesMetadata(
+    isArchived: boolean
+  ): Promise<ProposalTemplateMetadata[]> {
+    return database('proposal_templates')
+      .select('*')
+      .where({ is_archived: isArchived })
+      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+        if (!resultSet) {
+          return [];
+        }
+
+        return resultSet.map(value =>
+          createProposalTemplateMetadataObject(value)
+        );
+      });
+  }
   async getProposalTemplate(): Promise<ProposalTemplate> {
     const dependenciesRecord: (FieldDependencyRecord & {
       natural_key: string;

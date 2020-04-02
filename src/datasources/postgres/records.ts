@@ -11,6 +11,7 @@ import {
   Topic,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
+import { ProposalTemplateMetadata } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -58,6 +59,13 @@ export interface ProposalQuestionRecord {
   readonly sort_order: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+}
+
+export interface ProposalTemplateMetadataRecord {
+  readonly template_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly is_archived: boolean;
 }
 
 export interface UserRecord {
@@ -198,6 +206,17 @@ export const createProposalTemplateFieldObject = (
     createConfigByType(question.data_type as DataType, question.config),
     question.topic_id,
     null
+  );
+};
+
+export const createProposalTemplateMetadataObject = (
+  template: ProposalTemplateMetadataRecord
+) => {
+  return new ProposalTemplateMetadata(
+    template.template_id,
+    template.name,
+    template.description,
+    template.is_archived
   );
 };
 

@@ -7,6 +7,7 @@ import { Call } from './Call';
 import { Proposal } from './Proposal';
 import { ProposalTemplate } from './ProposalTemplate';
 import { ProposalTemplateField } from './ProposalTemplateField';
+import { ProposalTemplateMetadata } from './ProposalTemplateMetadata';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
@@ -33,6 +34,15 @@ export class UserResponseWrap extends ResponseWrapBase<User> {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
+}
+
+@ObjectType()
+export class ProposalTemplateMetadataResponseWrap extends ResponseWrapBase<
+  ProposalTemplateMetadata
+> {
+  @Response()
+  @Field(() => ProposalTemplateMetadata, { nullable: true })
+  public templateMetadata: ProposalTemplateMetadata;
 }
 
 @ObjectType()

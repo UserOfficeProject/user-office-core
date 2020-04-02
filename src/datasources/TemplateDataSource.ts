@@ -4,10 +4,18 @@ import {
   Topic,
   ProposalTemplateField,
   DataType,
+  ProposalTemplateMetadata,
 } from '../models/ProposalModel';
 import { FieldDependencyInput } from './../resolvers/mutations/UpdateProposalTemplateFieldMutation';
 
 export interface TemplateDataSource {
+  createTemplate(
+    name: string,
+    description?: string
+  ): Promise<ProposalTemplateMetadata>;
+  getProposalTemplatesMetadata(
+    isArchived: boolean
+  ): Promise<ProposalTemplateMetadata[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
 
   // TemplateField
@@ -45,4 +53,6 @@ export interface TemplateDataSource {
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
   isNaturalKeyPresent(natural_key: string): Promise<boolean>;
+
+  deleteTemplate(id: number): Promise<ProposalTemplateMetadata>;
 }

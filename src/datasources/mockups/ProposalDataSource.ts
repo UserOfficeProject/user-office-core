@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { Proposal } from '../../models/Proposal';
 import {
-  ProposalTemplate,
   DataType,
   ProposalAnswer,
-  Questionary,
   ProposalStatus,
+  ProposalTemplate,
+  Questionary,
 } from '../../models/ProposalModel';
 import { create1Topic3FieldWithDependenciesQuestionary } from '../../tests/ProposalTestBed';
 import { ProposalDataSource } from '../ProposalDataSource';

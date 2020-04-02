@@ -10,6 +10,7 @@ import {
   ProposalAnswer,
   TemplateStep,
   Questionary,
+  ProposalTemplateMetadata,
 } from '../../models/ProposalModel';
 import {
   createDummyTemplate,
@@ -17,14 +18,37 @@ import {
   createDummyTopic,
 } from '../../tests/ProposalTestBed';
 import { TemplateDataSource } from '../TemplateDataSource';
+import { createDummyProposalTemplateMetadata } from './../../tests/ProposalTestBed';
 
 export let dummyTemplate: ProposalTemplate;
+export let dummyProposalTemplateMedatata: ProposalTemplateMetadata;
 export let dummyQuestionary: Questionary;
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
 export let dummyAnswers: ProposalAnswer[];
 
 export class TemplateDataSourceMock implements TemplateDataSource {
+  async createTemplate(
+    name: string,
+    description?: string
+  ): Promise<ProposalTemplateMetadata> {
+    return createDummyProposalTemplateMetadata({ name, description });
+  }
+  async deleteTemplate(id: number): Promise<ProposalTemplateMetadata> {
+    return createDummyProposalTemplateMetadata({ id });
+  }
+  async getProposalTemplatesMetadata(
+    isArchived: boolean
+  ): Promise<ProposalTemplateMetadata[]> {
+    return [
+      new ProposalTemplateMetadata(
+        1,
+        'Industrial',
+        'Industrial proposal template',
+        isArchived
+      ),
+    ];
+  }
   async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
     return true;
   }
