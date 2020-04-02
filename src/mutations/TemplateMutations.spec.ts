@@ -3,20 +3,21 @@ import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficer,
-  dummyUser,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
 import {
-  Topic,
-  ProposalTemplate,
   DataType,
+  ProposalTemplate,
   ProposalTemplateField,
+  Topic,
 } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { dummyUser } from './../datasources/mockups/UserDataSource';
+import { ProposalTemplateMetadata } from './../models/ProposalModel';
 import TemplateMutations from './TemplateMutations';
 
 // TODO: it is here much of the logic reside
@@ -39,7 +40,7 @@ beforeEach(() => {
   dummyTemplateDataSource.init();
 });
 
-test('A userofficer can update topic', async () => {
+test('An userofficer can update topic', async () => {
   const newTopicTitle = 'new topic title';
   const topicEnabled = false;
   const topic = await templateMutations.updateTopic(dummyUserOfficer, {
@@ -50,6 +51,50 @@ test('A userofficer can update topic', async () => {
   expect(topic instanceof Topic).toBe(true);
   expect((topic as Topic).topic_title).toEqual(newTopicTitle);
   expect((topic as Topic).is_enabled).toEqual(topicEnabled);
+});
+
+test('An userofficer can create template', async () => {
+  const name = 'The name';
+  const description = 'The description';
+  const templateMetadata = await templateMutations.createTemplate(
+    dummyUserOfficer,
+    name,
+    description
+  );
+  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(true);
+  expect((templateMetadata as ProposalTemplateMetadata).name).toEqual(name);
+  expect((templateMetadata as ProposalTemplateMetadata).description).toEqual(
+    description
+  );
+});
+test('An user cannot create template', async () => {
+  const name = 'The name';
+  const description = 'The description';
+  const templateMetadata = await templateMutations.createTemplate(
+    dummyUser,
+    name,
+    description
+  );
+  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(false);
+});
+
+test('An userofficer can delete template', async () => {
+  const id = 1;
+  const templateMetadata = await templateMutations.deleteTemplate(
+    dummyUserOfficer,
+    id
+  );
+  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(true);
+  expect((templateMetadata as ProposalTemplateMetadata).templateId).toEqual(id);
+});
+
+test('An user can not delete template', async () => {
+  const id = 1;
+  const templateMetadata = await templateMutations.deleteTemplate(
+    dummyUser,
+    id
+  );
+  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(false);
 });
 
 test('A user can not update topic', async () => {
