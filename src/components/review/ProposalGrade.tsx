@@ -5,11 +5,12 @@ import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
 import React, {useState, useEffect} from 'react';
 import * as Yup from 'yup';
+import { useSnackbar } from 'notistack';
+
+import { ReviewStatus, Review } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useReviewData } from '../../hooks/useReviewData';
-import { useSnackbar } from 'notistack';
 import { ButtonContainer } from '../../styles/StyledComponents';
-import { ReviewStatus, Review } from '../../generated/sdk';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
@@ -24,7 +25,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function ProposalGrade(props: {reviewID: number, onChange: any}) {
+export default function ProposalGrade(props: {
+  reviewID: number;
+  onChange: any;
+}) {
   const classes = useStyles();
   const { reviewData } = useReviewData(props.reviewID);
   const api = useDataApi();
@@ -32,12 +36,13 @@ export default function ProposalGrade(props: {reviewID: number, onChange: any}) 
   const [review, setReview] = useState<Review | null>(null);
 
   useEffect(() => {
-    setReview(reviewData)
+    setReview(reviewData);
   }, [reviewData]);
 
   if (!review) {
     return <p>Loading</p>;
   }
+
   return (
         <Formik
           initialValues={{
