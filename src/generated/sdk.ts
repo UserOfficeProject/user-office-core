@@ -236,6 +236,7 @@ export type MutationAddReviewArgs = {
 export type MutationAddTechnicalReviewArgs = {
   proposalID: Scalars['Int'],
   comment?: Maybe<Scalars['String']>,
+  publicComment?: Maybe<Scalars['String']>,
   timeAllocation?: Maybe<Scalars['Int']>,
   status?: Maybe<TechnicalReviewStatus>
 };
@@ -782,6 +783,7 @@ export type TechnicalReview = {
   id: Scalars['Int'],
   proposalID: Scalars['Int'],
   comment?: Maybe<Scalars['String']>,
+  publicComment?: Maybe<Scalars['String']>,
   timeAllocation?: Maybe<Scalars['Int']>,
   status?: Maybe<TechnicalReviewStatus>,
   proposal?: Maybe<Proposal>,
@@ -1374,7 +1376,7 @@ export type GetProposalQuery = (
       & QuestionaryFragment
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
-      & Pick<TechnicalReview, 'id' | 'comment' | 'timeAllocation' | 'status' | 'proposalID'>
+      & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
     )>, reviews: Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
@@ -1579,6 +1581,7 @@ export type AddTechnicalReviewMutationVariables = {
   proposalID: Scalars['Int'],
   timeAllocation?: Maybe<Scalars['Int']>,
   comment?: Maybe<Scalars['String']>,
+  publicComment?: Maybe<Scalars['String']>,
   status?: Maybe<TechnicalReviewStatus>
 };
 
@@ -2401,6 +2404,7 @@ export const GetProposalDocument = gql`
     technicalReview {
       id
       comment
+      publicComment
       timeAllocation
       status
       proposalID
@@ -2552,8 +2556,8 @@ export const UpdateTopicOrderDocument = gql`
 }
     `;
 export const AddTechnicalReviewDocument = gql`
-    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $status: TechnicalReviewStatus) {
-  addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, status: $status) {
+    mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus) {
+  addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status) {
     error
     technicalReview {
       id
