@@ -2,10 +2,7 @@ import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
 import { Review } from '../models/Review';
-import {
-  TechnicalReview,
-  TechnicalReviewStatus,
-} from '../models/TechnicalReview';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
@@ -58,8 +55,6 @@ export default class ReviewMutations {
     agent: User | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
-    const { proposalID, comment, status, timeAllocation } = args;
-
     if (!agent) {
       return rejection('NOT_LOGGED_IN');
     }
@@ -68,7 +63,7 @@ export default class ReviewMutations {
     }
 
     return this.dataSource
-      .setTechnicalReview(proposalID, comment, status, timeAllocation)
+      .setTechnicalReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not set technicalReview', err, {

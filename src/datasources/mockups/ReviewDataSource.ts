@@ -1,6 +1,7 @@
 import { Review } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
+import { AddTechnicalReviewArgs } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 
@@ -12,12 +13,7 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null> {
     throw new Error('Method not implemented.');
   }
-  setTechnicalReview(
-    proposalID: number,
-    comment: string,
-    timeAllocation: number,
-    status: number
-  ): Promise<TechnicalReview> {
+  setTechnicalReview(args: AddTechnicalReviewArgs): Promise<TechnicalReview> {
     throw new Error('Method not implemented.');
   }
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
