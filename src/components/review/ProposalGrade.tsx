@@ -2,7 +2,7 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { TextField, Select } from 'formik-material-ui';
 import React, {useState, useEffect} from 'react';
 import * as Yup from 'yup';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -10,6 +10,8 @@ import { useReviewData } from '../../hooks/useReviewData';
 import { useSnackbar } from 'notistack';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { ReviewStatus, Review } from '../../generated/sdk';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 
 
 const useStyles = makeStyles(theme => ({
@@ -84,15 +86,18 @@ export default function ProposalGrade(props: {reviewID: number, onChange: any}) 
                 rows="4"
                 disabled={review.status === 'SUBMITTED'}
               />
+              <InputLabel htmlFor="grade-proposal">Grade</InputLabel>
               <Field
                 name="grade"
-                label="Grade"
-                type="number"
-                component={TextField}
+                inputProps={{
+                  id: 'grade-proposal',
+                }}
+                component={Select}
                 margin="normal"
-                fullWidth
                 disabled={review.status === 'SUBMITTED'}
-              />
+              >
+                {[...Array(11)].map((e, i) => <MenuItem value={i}>{i}</MenuItem>)}
+              </Field>
             <ButtonContainer>
               <Button
                 disabled={isSubmitting || (review.status === 'SUBMITTED')}
