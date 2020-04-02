@@ -8,8 +8,6 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -36,15 +34,13 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const userMutations = new UserMutations(
   new UserDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 test('A user can invite another user by email', () => {
