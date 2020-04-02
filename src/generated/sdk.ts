@@ -190,6 +190,7 @@ export type Mutation = {
   addUserRole: AddUserRoleResponseWrap,
   createCall: CallResponseWrap,
   createProposal: ProposalResponseWrap,
+  createSEP: SepResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
   createTopic: ProposalTemplateResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
@@ -212,6 +213,7 @@ export type Mutation = {
   updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   updateProposalTemplateField: ProposalTemplateResponseWrap,
+  updateSEP: SepResponseWrap,
   updateTopic: TopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
   updateUser: UserResponseWrap,
@@ -261,6 +263,14 @@ export type MutationCreateCallArgs = {
   endNotify: Scalars['String'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String']
+};
+
+
+export type MutationCreateSepArgs = {
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired?: Maybe<Scalars['Int']>,
+  active: Scalars['Boolean']
 };
 
 
@@ -409,6 +419,15 @@ export type MutationUpdateProposalTemplateFieldArgs = {
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
   dependencies: Array<FieldDependencyInput>
+};
+
+
+export type MutationUpdateSepArgs = {
+  id: Scalars['Int'],
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired?: Maybe<Scalars['Int']>,
+  active: Scalars['Boolean']
 };
 
 
@@ -567,6 +586,8 @@ export type Query = {
   proposalTemplate?: Maybe<ProposalTemplate>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
+  sep?: Maybe<Sep>,
+  seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
   users?: Maybe<UserQueryResult>,
 };
@@ -627,6 +648,18 @@ export type QueryProposalsArgs = {
 
 export type QueryReviewArgs = {
   id: Scalars['Int']
+};
+
+
+export type QuerySepArgs = {
+  id: Scalars['Int']
+};
+
+
+export type QuerySepsArgs = {
+  filter?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -715,6 +748,27 @@ export type SelectionFromOptionsConfig = {
   tooltip: Scalars['String'],
   variant: Scalars['String'],
   options: Array<Scalars['String']>,
+};
+
+export type Sep = {
+   __typename?: 'SEP',
+  id: Scalars['Int'],
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired: Scalars['Float'],
+  active: Scalars['Boolean'],
+};
+
+export type SepResponseWrap = {
+   __typename?: 'SEPResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  sep?: Maybe<Sep>,
+};
+
+export type SePsQueryResult = {
+   __typename?: 'SEPsQueryResult',
+  totalCount: Scalars['Int'],
+  seps: Array<Sep>,
 };
 
 export type SuccessResponseWrap = {
@@ -853,6 +907,77 @@ export enum UserRole {
   USEROFFICER = 'USEROFFICER',
   REVIEWER = 'REVIEWER'
 }
+
+export type CreateSepMutationVariables = {
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired: Scalars['Int'],
+  active: Scalars['Boolean']
+};
+
+
+export type CreateSepMutation = (
+  { __typename?: 'Mutation' }
+  & { createSEP: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
+export type GetSepQueryVariables = {
+  id: Scalars['Int']
+};
+
+
+export type GetSepQuery = (
+  { __typename?: 'Query' }
+  & { sep: Maybe<(
+    { __typename?: 'SEP' }
+    & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
+  )> }
+);
+
+export type GetSePsQueryVariables = {
+  filter: Scalars['String']
+};
+
+
+export type GetSePsQuery = (
+  { __typename?: 'Query' }
+  & { seps: Maybe<(
+    { __typename?: 'SEPsQueryResult' }
+    & Pick<SePsQueryResult, 'totalCount'>
+    & { seps: Array<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
+    )> }
+  )> }
+);
+
+export type UpdateSepMutationVariables = {
+  id: Scalars['Int'],
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired: Scalars['Int'],
+  active: Scalars['Boolean']
+};
+
+
+export type UpdateSepMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSEP: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
 
 export type AddClientLogMutationVariables = {
   error: Scalars['String']
@@ -2018,6 +2143,51 @@ export const BasicUserDetailsFragmentDoc = gql`
   position
 }
     `;
+export const CreateSepDocument = gql`
+    mutation createSEP($code: String!, $description: String!, $numberRatingsRequired: Int!, $active: Boolean!) {
+  createSEP(code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
+    sep {
+      id
+    }
+    error
+  }
+}
+    `;
+export const GetSepDocument = gql`
+    query getSEP($id: Int!) {
+  sep(id: $id) {
+    id
+    code
+    description
+    numberRatingsRequired
+    active
+  }
+}
+    `;
+export const GetSePsDocument = gql`
+    query getSEPs($filter: String!) {
+  seps(filter: $filter) {
+    seps {
+      id
+      code
+      description
+      numberRatingsRequired
+      active
+    }
+    totalCount
+  }
+}
+    `;
+export const UpdateSepDocument = gql`
+    mutation updateSEP($id: Int!, $code: String!, $description: String!, $numberRatingsRequired: Int!, $active: Boolean!) {
+  updateSEP(id: $id, code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
+    sep {
+      id
+    }
+    error
+  }
+}
+    `;
 export const AddClientLogDocument = gql`
     mutation addClientLog($error: String!) {
   addClientLog(error: $error) {
@@ -2645,6 +2815,18 @@ export const VerifyEmailDocument = gql`
     `;
 export function getSdk(client: GraphQLClient) {
   return {
+    createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
+      return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
+    },
+    getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
+      return client.request<GetSepQuery>(print(GetSepDocument), variables);
+    },
+    getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
+      return client.request<GetSePsQuery>(print(GetSePsDocument), variables);
+    },
+    updateSEP(variables: UpdateSepMutationVariables): Promise<UpdateSepMutation> {
+      return client.request<UpdateSepMutation>(print(UpdateSepDocument), variables);
+    },
     addClientLog(variables: AddClientLogMutationVariables): Promise<AddClientLogMutation> {
       return client.request<AddClientLogMutation>(print(AddClientLogDocument), variables);
     },

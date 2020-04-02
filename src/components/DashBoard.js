@@ -32,6 +32,8 @@ import ProposalSubmission from './proposal/ProposalSubmission';
 import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
+import SEPPage from './SEP/SEPPage';
+import SEPsPage from './SEP/SEPsPage';
 import QuestionaryEditor from './template/QuestionaryEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
@@ -206,6 +208,8 @@ export default function Dashboard({ match }) {
           <Route path="/PageEditor" component={PageEditor} />
           <Route path="/CallPage" component={CallPage} />
           <Route path="/HelpPage" component={HelpPage} />
+          <Route path="/SEPPage/:id" component={SEPPage} />
+          <Route path="/SEPPage" component={SEPsPage} />
           <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route
