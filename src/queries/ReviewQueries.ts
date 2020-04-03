@@ -43,6 +43,13 @@ export default class ReviewQueries {
   ): Promise<TechnicalReview | null> {
     if (await this.userAuth.isUserOfficer(user)) {
       return this.dataSource.getTechnicalReview(proposalID);
+    } else if (await this.userAuth.isReviewerOfProposal(user, proposalID)) {
+      const review = await this.dataSource.getTechnicalReview(proposalID);
+      if (review) {
+        review.comment = '';
+      }
+
+      return review;
     } else {
       return null;
     }

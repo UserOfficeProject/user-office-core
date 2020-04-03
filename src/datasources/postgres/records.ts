@@ -116,6 +116,7 @@ export interface TechnicalReviewRecord {
   readonly technical_review_id: number;
   readonly proposal_id: number;
   readonly comment: string;
+  readonly public_comment: string;
   readonly time_allocation: number;
   readonly status: number;
 }

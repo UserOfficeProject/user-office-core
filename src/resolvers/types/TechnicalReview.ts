@@ -26,6 +26,9 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   @Field(() => String, { nullable: true })
   public comment: string;
 
+  @Field(() => String, { nullable: true })
+  public publicComment: string;
+
   @Field(() => Int, { nullable: true })
   public timeAllocation: number;
 

@@ -1,5 +1,6 @@
 import fs, { existsSync, unlink } from 'fs';
 
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import express from 'express';
 import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
@@ -14,6 +15,7 @@ import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
+import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { User } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
@@ -214,6 +216,44 @@ const createProposalPDF = async (
         doc.moveDown(0.5);
       });
     });
+
+    //if reviewer is downloading add technical review page
+
+    if (UserAuthorization.isReviewerOfProposal(user, proposal.id)) {
+      const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
+        user,
+        proposal.id
+      );
+      if (technicalReview) {
+        doc.addPage();
+        doc.image('./images/ESS.png', 15, 15, { width: 100 });
+
+        writeHeading('Technical Review');
+        doc.moveDown();
+
+        writeBold('Status');
+        write(
+          getTranslation(
+            TechnicalReviewStatus[technicalReview.status] as ResourceId
+          )
+        );
+        doc.moveDown();
+
+        writeBold('Time Allocation');
+        write(technicalReview.timeAllocation.toString() + ' Days');
+        doc.moveDown();
+
+        writeBold('Comment');
+        write(technicalReview.publicComment);
+
+        toc.push({
+          title: 'Technical Review',
+          page: pageNumber,
+          children: [],
+        });
+      }
+    }
+
     doc.end();
     pageNumber++;
 
