@@ -2,6 +2,7 @@
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddReviewArgs } from '../../resolvers/mutations/AddReviewMutation';
+import { AddTechnicalReviewArgs } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
@@ -24,22 +25,23 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       technicalReview.technical_review_id,
       technicalReview.proposal_id,
       technicalReview.comment,
+      technicalReview.public_comment,
       technicalReview.time_allocation,
       technicalReview.status
     );
   }
 
   async setTechnicalReview(
-    proposalID: number,
-    comment: string,
-    status: number,
-    timeAllocation: number
+    args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview> {
+    const { proposalID, comment, publicComment, timeAllocation, status } = args;
+
     if (await this.getTechnicalReview(proposalID)) {
       return database
         .update({
           proposal_id: proposalID,
           comment,
+          public_comment: publicComment,
           time_allocation: timeAllocation,
           status,
         })
@@ -55,6 +57,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .insert({
         proposal_id: proposalID,
         comment,
+        public_comment: publicComment,
         time_allocation: timeAllocation,
         status,
       })

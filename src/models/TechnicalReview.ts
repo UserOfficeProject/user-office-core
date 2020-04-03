@@ -3,6 +3,7 @@ export class TechnicalReview {
     public id: number,
     public proposalID: number,
     public comment: string,
+    public publicComment: string,
     public timeAllocation: number,
     public status: number
   ) {}
