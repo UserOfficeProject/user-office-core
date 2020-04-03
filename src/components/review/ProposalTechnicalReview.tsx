@@ -24,6 +24,7 @@ export default function ProposalTechnicalReview(props: {
     status: props?.data?.status || '',
     timeAllocation: props?.data?.timeAllocation,
     comment: props?.data?.comment,
+    publicComment: props?.data?.publicComment
   };
 
   return (
@@ -37,6 +38,7 @@ export default function ProposalTechnicalReview(props: {
           status: Yup.string().nullable(),
           timeAllocation: Yup.number().nullable(),
           comment: Yup.string().nullable(),
+          publicComment: Yup.string().nullable()
         })}
         onSubmit={async (values, actions) => {
           await api()
@@ -44,6 +46,7 @@ export default function ProposalTechnicalReview(props: {
               proposalID: props.id,
               timeAllocation: values.timeAllocation!,
               comment: values.comment!,
+              publicComment: values.publicComment,
               status:
                 TechnicalReviewStatus[values.status as TechnicalReviewStatus],
             })
@@ -97,13 +100,28 @@ export default function ProposalTechnicalReview(props: {
               <Grid item xs={12}>
                 <Field
                   name="comment"
-                  label="Comment"
+                  label="Internal comment"
                   type="text"
                   component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="comment"
+                  multiline
+                  rowsMax="16"
+                  rows="4"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Field
+                  name="publicComment"
+                  label="Public comment"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                  autoComplete="off"
+                  data-cy="publicComment"
                   multiline
                   rowsMax="16"
                   rows="4"

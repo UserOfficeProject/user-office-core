@@ -5,7 +5,9 @@ import { useProposalData } from '../../hooks/useProposalData';
 import { useReviewData } from '../../hooks/useReviewData';
 import SimpleTabs from '../common/TabPanel';
 import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
+import TechnicalReviewInformation from './TechnicalReviewInformation';
 import ProposalGrade from './ProposalGrade';
+
 
 export default function ProposalReview({ match }: { match: any }) {
   const { reviewData } = useReviewData(parseInt(match.params.id));
@@ -17,12 +19,10 @@ export default function ProposalReview({ match }: { match: any }) {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={['Information', 'Grade']}>
+      <SimpleTabs tabNames={['Proposal Information', 'Technical Review',  'Grade']}>
         <ProposalQuestionaryReview data={proposalData} />
-        <ProposalGrade
-          onChange={() => console.log('updated')}
-          reviewID={reviewData.id}
-        />
+        <TechnicalReviewInformation data={proposalData.technicalReview} />
+        <ProposalGrade onChange={() => console.log("updated")} reviewID={reviewData.id} />
       </SimpleTabs>
     </Container>
   );
