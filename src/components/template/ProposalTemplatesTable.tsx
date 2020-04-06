@@ -1,8 +1,9 @@
-import { Delete, Edit, Email, FileCopy, Archive } from '@material-ui/icons';
+import { Delete, Edit, Email, FileCopy } from '@material-ui/icons';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+
 import {
   GetProposalTemplatesMetadataQuery,
   ProposalTemplateMetadata,
@@ -62,7 +63,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                     variant: 'error',
                   });
                 } else {
-                  let newTemplates = [...templates];
+                  const newTemplates = [...templates];
                   newTemplates.push(templateMetadata!);
                   setTemplates(newTemplates);
                 }
@@ -152,6 +153,4 @@ interface IProposalTemplatesTableProps {
   confirm: WithConfirmType;
 }
 
-export default withConfirm<IProposalTemplatesTableProps>(
-  ProposalTemplatesTable
-);
+export default withConfirm(ProposalTemplatesTable);
