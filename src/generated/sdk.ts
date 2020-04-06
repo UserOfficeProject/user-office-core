@@ -190,11 +190,14 @@ export type Mutation = {
   addUserRole: AddUserRoleResponseWrap,
   createCall: CallResponseWrap,
   createProposal: ProposalResponseWrap,
+  createProposalTemplate: ProposalTemplateMetadataResponseWrap,
+  createSEP: SepResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
   createTopic: ProposalTemplateResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
   deleteProposal: ProposalResponseWrap,
+  deleteProposalTemplate: ProposalTemplateMetadataResponseWrap,
   deleteTemplateField: ProposalTemplateResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
@@ -212,6 +215,7 @@ export type Mutation = {
   updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   updateProposalTemplateField: ProposalTemplateResponseWrap,
+  updateSEP: SepResponseWrap,
   updateTopic: TopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
   updateUser: UserResponseWrap,
@@ -264,6 +268,20 @@ export type MutationCreateCallArgs = {
 };
 
 
+export type MutationCreateProposalTemplateArgs = {
+  description?: Maybe<Scalars['String']>,
+  name: Scalars['String']
+};
+
+
+export type MutationCreateSepArgs = {
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired?: Maybe<Scalars['Int']>,
+  active: Scalars['Boolean']
+};
+
+
 export type MutationCreateTemplateFieldArgs = {
   topicId: Scalars['Int'],
   dataType: DataType
@@ -307,6 +325,11 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationDeleteProposalArgs = {
+  id: Scalars['Int']
+};
+
+
+export type MutationDeleteProposalTemplateArgs = {
   id: Scalars['Int']
 };
 
@@ -409,6 +432,15 @@ export type MutationUpdateProposalTemplateFieldArgs = {
   config?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>,
   dependencies: Array<FieldDependencyInput>
+};
+
+
+export type MutationUpdateSepArgs = {
+  id: Scalars['Int'],
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired?: Maybe<Scalars['Int']>,
+  active: Scalars['Boolean']
 };
 
 
@@ -543,6 +575,20 @@ export type ProposalTemplateField = {
   dependencies?: Maybe<Array<FieldDependency>>,
 };
 
+export type ProposalTemplateMetadata = {
+   __typename?: 'ProposalTemplateMetadata',
+  templateId: Scalars['Int'],
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>,
+  isArchived: Scalars['Boolean'],
+};
+
+export type ProposalTemplateMetadataResponseWrap = {
+   __typename?: 'ProposalTemplateMetadataResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  templateMetadata?: Maybe<ProposalTemplateMetadata>,
+};
+
 export type ProposalTemplateResponseWrap = {
    __typename?: 'ProposalTemplateResponseWrap',
   error?: Maybe<Scalars['String']>,
@@ -565,8 +611,11 @@ export type Query = {
   proposal?: Maybe<Proposal>,
   proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplate?: Maybe<ProposalTemplate>,
+  proposalTemplatesMetadata: Array<ProposalTemplateMetadata>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
+  sep?: Maybe<Sep>,
+  seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
   users?: Maybe<UserQueryResult>,
 };
@@ -625,8 +674,25 @@ export type QueryProposalsArgs = {
 };
 
 
+export type QueryProposalTemplatesMetadataArgs = {
+  isArchived?: Maybe<Scalars['Boolean']>
+};
+
+
 export type QueryReviewArgs = {
   id: Scalars['Int']
+};
+
+
+export type QuerySepArgs = {
+  id: Scalars['Int']
+};
+
+
+export type QuerySepsArgs = {
+  filter?: Maybe<Scalars['String']>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -715,6 +781,27 @@ export type SelectionFromOptionsConfig = {
   tooltip: Scalars['String'],
   variant: Scalars['String'],
   options: Array<Scalars['String']>,
+};
+
+export type Sep = {
+   __typename?: 'SEP',
+  id: Scalars['Int'],
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired: Scalars['Float'],
+  active: Scalars['Boolean'],
+};
+
+export type SepResponseWrap = {
+   __typename?: 'SEPResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  sep?: Maybe<Sep>,
+};
+
+export type SePsQueryResult = {
+   __typename?: 'SEPsQueryResult',
+  totalCount: Scalars['Int'],
+  seps: Array<Sep>,
 };
 
 export type SuccessResponseWrap = {
@@ -964,6 +1051,24 @@ export type CreateProposalMutation = (
   ) }
 );
 
+export type CreateProposalTemplateMutationVariables = {
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>
+};
+
+
+export type CreateProposalTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { createProposalTemplate: (
+    { __typename?: 'ProposalTemplateMetadataResponseWrap' }
+    & Pick<ProposalTemplateMetadataResponseWrap, 'error'>
+    & { templateMetadata: Maybe<(
+      { __typename?: 'ProposalTemplateMetadata' }
+      & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived'>
+    )> }
+  ) }
+);
+
 export type CreateTemplateFieldMutationVariables = {
   topicId: Scalars['Int'],
   dataType: DataType
@@ -1020,6 +1125,23 @@ export type DeleteProposalMutation = (
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
+    )> }
+  ) }
+);
+
+export type DeleteProposalTemplateMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type DeleteProposalTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteProposalTemplate: (
+    { __typename?: 'ProposalTemplateMetadataResponseWrap' }
+    & Pick<ProposalTemplateMetadataResponseWrap, 'error'>
+    & { templateMetadata: Maybe<(
+      { __typename?: 'ProposalTemplateMetadata' }
+      & Pick<ProposalTemplateMetadata, 'templateId' | 'name'>
     )> }
   ) }
 );
@@ -1278,6 +1400,19 @@ export type GetProposalTemplateQuery = (
         & ProposalTemplateFieldFragment
       )> }
     )> }
+  )> }
+);
+
+export type GetProposalTemplatesMetadataQueryVariables = {
+  isArchived?: Maybe<Scalars['Boolean']>
+};
+
+
+export type GetProposalTemplatesMetadataQuery = (
+  { __typename?: 'Query' }
+  & { proposalTemplatesMetadata: Array<(
+    { __typename?: 'ProposalTemplateMetadata' }
+    & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived'>
   )> }
 );
 
@@ -2091,6 +2226,19 @@ export const CreateProposalDocument = gql`
   }
 }
     `;
+export const CreateProposalTemplateDocument = gql`
+    mutation createProposalTemplate($name: String!, $description: String) {
+  createProposalTemplate(name: $name, description: $description) {
+    templateMetadata {
+      templateId
+      name
+      description
+      isArchived
+    }
+    error
+  }
+}
+    `;
 export const CreateTemplateFieldDocument = gql`
     mutation createTemplateField($topicId: Int!, $dataType: DataType!) {
   createTemplateField(topicId: $topicId, dataType: $dataType) {
@@ -2125,6 +2273,17 @@ export const DeleteProposalDocument = gql`
     proposal {
       id
     }
+  }
+}
+    `;
+export const DeleteProposalTemplateDocument = gql`
+    mutation deleteProposalTemplate($id: Int!) {
+  deleteProposalTemplate(id: $id) {
+    templateMetadata {
+      templateId
+      name
+    }
+    error
   }
 }
     `;
@@ -2267,6 +2426,16 @@ export const GetProposalTemplateDocument = gql`
   }
 }
     ${ProposalTemplateFieldFragmentDoc}`;
+export const GetProposalTemplatesMetadataDocument = gql`
+    query getProposalTemplatesMetadata($isArchived: Boolean) {
+  proposalTemplatesMetadata(isArchived: $isArchived) {
+    templateId
+    name
+    description
+    isArchived
+  }
+}
+    `;
 export const GetProposalsDocument = gql`
     query getProposals($filter: String!) {
   proposals(filter: $filter) {
@@ -2666,6 +2835,9 @@ export function getSdk(client: GraphQLClient) {
     createProposal(variables?: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);
     },
+    createProposalTemplate(variables: CreateProposalTemplateMutationVariables): Promise<CreateProposalTemplateMutation> {
+      return client.request<CreateProposalTemplateMutation>(print(CreateProposalTemplateDocument), variables);
+    },
     createTemplateField(variables: CreateTemplateFieldMutationVariables): Promise<CreateTemplateFieldMutation> {
       return client.request<CreateTemplateFieldMutation>(print(CreateTemplateFieldDocument), variables);
     },
@@ -2674,6 +2846,9 @@ export function getSdk(client: GraphQLClient) {
     },
     deleteProposal(variables: DeleteProposalMutationVariables): Promise<DeleteProposalMutation> {
       return client.request<DeleteProposalMutation>(print(DeleteProposalDocument), variables);
+    },
+    deleteProposalTemplate(variables: DeleteProposalTemplateMutationVariables): Promise<DeleteProposalTemplateMutation> {
+      return client.request<DeleteProposalTemplateMutation>(print(DeleteProposalTemplateDocument), variables);
     },
     deleteTemplateField(variables: DeleteTemplateFieldMutationVariables): Promise<DeleteTemplateFieldMutation> {
       return client.request<DeleteTemplateFieldMutation>(print(DeleteTemplateFieldDocument), variables);
@@ -2695,6 +2870,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getProposalTemplate(variables?: GetProposalTemplateQueryVariables): Promise<GetProposalTemplateQuery> {
       return client.request<GetProposalTemplateQuery>(print(GetProposalTemplateDocument), variables);
+    },
+    getProposalTemplatesMetadata(variables?: GetProposalTemplatesMetadataQueryVariables): Promise<GetProposalTemplatesMetadataQuery> {
+      return client.request<GetProposalTemplatesMetadataQuery>(print(GetProposalTemplatesMetadataDocument), variables);
     },
     getProposals(variables: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return client.request<GetProposalsQuery>(print(GetProposalsDocument), variables);
