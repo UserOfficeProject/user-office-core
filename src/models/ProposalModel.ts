@@ -21,8 +21,8 @@ export class FieldDependency {
 
   static fromObject(obj: any) {
     return new FieldDependency(
-      obj.proposal_question_id,
-      obj.proposal_question_dependency,
+      obj.question_id,
+      obj.dependency_id,
       obj.dependency_natural_key,
       typeof obj.condition == 'string'
         ? JSON.parse(obj.condition)
