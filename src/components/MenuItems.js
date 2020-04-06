@@ -91,11 +91,11 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
-      <ListItem component={Link} to="/QuestionaryEditor" button>
+      <ListItem component={Link} to="/Questionaries" button>
         <ListItemIcon>
           <QuestionAnswerIcon />
         </ListItemIcon>
-        <ListItemText primary="Edit Questionary" />
+        <ListItemText primary="Questionaries" />
       </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>

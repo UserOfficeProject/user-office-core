@@ -14,9 +14,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import React, { useContext } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
+import { Link, Route, Switch } from 'react-router-dom';
 import { UserContext } from '../context/UserContextProvider';
 import { UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
@@ -29,9 +27,10 @@ import PageEditor from './pages/PageEditor';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
 import ProposalSubmission from './proposal/ProposalSubmission';
-import ProposalReviewReviewer from './review/ProposalReviewReviewer';
+import ProposalGrade from './review/ProposalGrade';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
+import ProposalTemplates from './template/ProposalTemplates';
 import QuestionaryEditor from './template/QuestionaryEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
@@ -207,7 +206,8 @@ export default function Dashboard({ match }) {
           <Route path="/CallPage" component={CallPage} />
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
-          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
+          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
