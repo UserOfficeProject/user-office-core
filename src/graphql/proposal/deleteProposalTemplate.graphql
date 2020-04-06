@@ -1,0 +1,9 @@
+mutation deleteProposalTemplate($id: Int!) {
+  deleteProposalTemplate(id: $id) {
+    templateMetadata {
+      templateId
+      name
+    }
+    error
+  }
+}

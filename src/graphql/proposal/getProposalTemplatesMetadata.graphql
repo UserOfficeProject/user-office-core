@@ -1,0 +1,8 @@
+query getProposalTemplatesMetadata($isArchived: Boolean) {
+  proposalTemplatesMetadata(isArchived: $isArchived) {
+    templateId
+    name
+    description
+    isArchived
+  }
+}

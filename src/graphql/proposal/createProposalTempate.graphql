@@ -1,0 +1,11 @@
+mutation createProposalTemplate($name: String!, $description: String) {
+  createProposalTemplate(name: $name, description: $description) {
+    templateMetadata {
+      templateId
+      name
+      description
+      isArchived
+    }
+    error
+  }
+}
