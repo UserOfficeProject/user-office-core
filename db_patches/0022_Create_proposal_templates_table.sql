@@ -12,6 +12,12 @@ BEGIN
     , description TEXT NULL
     , is_archived BOOLEAN DEFAULT FALSE);
 
+	INSERT INTO 
+        proposal_templates(name, description, is_archived)
+    VALUES 
+        ('default template', 'original template', false);
+
+
 
 
 
