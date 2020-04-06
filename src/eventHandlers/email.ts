@@ -58,9 +58,9 @@ export default function createHandler(userDataSource: UserDataSource) {
             substitution_data: {
               title: 'ESS User reset account password',
               buttonText: 'Click to reset',
-              link: event.resetpasswordresponse.link,
+              link: event.userlinkresponse.link,
             },
-            recipients: [{ address: event.resetpasswordresponse.user.email }],
+            recipients: [{ address: event.userlinkresponse.user.email }],
           })
           .then((res: any) => {
             logger.logInfo('Emai send on for password reset:', {
@@ -171,7 +171,9 @@ export default function createHandler(userDataSource: UserDataSource) {
 
       case Event.USER_CREATED: {
         if (process.env.NODE_ENV === 'development') {
-          await userDataSource.setUserEmailVerified(event.user.id);
+          await userDataSource.setUserEmailVerified(
+            event.userlinkresponse.user.id
+          );
           console.log('verify user without email in development');
         } else {
           client.transmissions
@@ -182,9 +184,9 @@ export default function createHandler(userDataSource: UserDataSource) {
               substitution_data: {
                 title: 'ESS User portal verify account',
                 buttonText: 'Click to verify',
-                link: event.link,
+                link: event.userlinkresponse.link,
               },
-              recipients: [{ address: event.user.email }],
+              recipients: [{ address: event.userlinkresponse.user.email }],
             })
             .then((res: any) => {
               logger.logInfo('Email sent on user creation:', {

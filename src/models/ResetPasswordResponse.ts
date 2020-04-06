@@ -1,5 +1,5 @@
 import { User } from './User';
 
-export class ResetPasswordResponse {
+export class UserLinkResponse {
   constructor(public user: User, public link: string) {}
 }

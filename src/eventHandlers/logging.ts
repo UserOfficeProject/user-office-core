@@ -37,8 +37,6 @@ export default function createHandler(
           event.proposal.id.toString()
         );
         break;
-
-      case Event.USER_CREATED:
       case Event.USER_UPDATED:
         await eventLogsDataSource.set(
           event.loggedInUserId,
@@ -47,12 +45,13 @@ export default function createHandler(
           event.user.id.toString()
         );
         break;
+      case Event.USER_CREATED:
       case Event.USER_PASSWORD_RESET_EMAIL:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,
           json,
-          event.resetpasswordresponse.user.id.toString()
+          event.userlinkresponse.user.id.toString()
         );
         break;
       case Event.SEP_CREATED:

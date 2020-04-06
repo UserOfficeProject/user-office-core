@@ -1,17 +1,16 @@
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
-import PostgresAdminDataSource from './datasources/postgres/AdminDataSource';
-import PostgresCallDataSource from './datasources/postgres/CallDataSource';
-import PostgresEventLogsDataSource from './datasources/postgres/EventLogsDataSource';
-import PostgresFileDataSource from './datasources/postgres/FileDataSource';
-import PostgresProposalDataSource from './datasources/postgres/ProposalDataSource';
-import PostgresReviewDataSource from './datasources/postgres/ReviewDataSource';
-import PostgresSEPDataSource from './datasources/postgres/SEPDataSource';
-import TemplateDataSource from './datasources/postgres/TemplateDataSource';
-import PostgresUserDataSource from './datasources/postgres/UserDataSource';
-import createEventHandlers from './eventHandlers';
-import { ApplicationEvent } from './events/applicationEvents';
-import { EventBus } from './events/eventBus';
+import {
+  userDataSource,
+  reviewDataSource,
+  eventLogsDataSource,
+  proposalDataSource,
+  templateDataSource,
+  callDataSource,
+  fileDataSource,
+  adminDataSource,
+  sepDataSource,
+} from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
@@ -33,26 +32,12 @@ import { logger } from './utils/Logger';
 import { UserAuthorization } from './utils/UserAuthorization';
 
 // Site specific data sources and event handlers (only ESS atm)
-const userDataSource = new PostgresUserDataSource();
-const proposalDataSource = new PostgresProposalDataSource();
-const reviewDataSource = new PostgresReviewDataSource();
-const callDataSource = new PostgresCallDataSource();
-const fileDataSource = new PostgresFileDataSource();
-const adminDataSource = new PostgresAdminDataSource();
-const templateDataSource = new TemplateDataSource();
-const eventLogsDataSource = new PostgresEventLogsDataSource();
-const sepDataSource = new PostgresSEPDataSource();
-
 const userAuthorization = new UserAuthorization(
   userDataSource,
   reviewDataSource
 );
 
-const eventHandlers = createEventHandlers(userDataSource, eventLogsDataSource);
-
 // From this point nothing is site-specific
-export const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
-
 const userQueries = new UserQueries(userDataSource, userAuthorization);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 

@@ -37,7 +37,7 @@ interface ProposalCreatedEvent extends GeneralEvent {
 
 interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
-  resetpasswordresponse: {
+  userlinkresponse: {
     user: User;
     link: string;
   };
@@ -50,8 +50,10 @@ interface UserUpdateEvent extends GeneralEvent {
 
 interface UserCreateEvent extends GeneralEvent {
   type: Event.USER_CREATED;
-  user: User;
-  link: string;
+  userlinkresponse: {
+    user: User;
+    link: string;
+  };
 }
 
 interface EmailInvite extends GeneralEvent {

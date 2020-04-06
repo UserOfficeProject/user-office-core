@@ -5,7 +5,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Event } from '../events/event.enum';
 import { EventBusDecorator } from '../events/EventBusDecorator';
-import { ResetPasswordResponse } from '../models/ResetPasswordResponse';
+import { UserLinkResponse } from '../models/ResetPasswordResponse';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -87,7 +87,7 @@ export default class UserMutations {
   async create(
     agent: User | null,
     args: CreateUserArgs
-  ): Promise<{ user: User; link: string } | Rejection> {
+  ): Promise<UserLinkResponse | Rejection> {
     if (
       this.createHash(args.orcid) !== args.orcidHash &&
       !(process.env.NODE_ENV === 'development')
@@ -181,7 +181,10 @@ export default class UserMutations {
     // Email verification link
     const link = process.env.baseURL + '/emailVerification/' + token;
 
-    return { user, link };
+    // NOTE: This uses UserLinkResponse class because output should be standardized for all events where we use EventBusDecorator.
+    const userLinkResponse = new UserLinkResponse(user, link);
+
+    return userLinkResponse;
   }
 
   @EventBusDecorator(Event.USER_UPDATED)
@@ -307,7 +310,7 @@ export default class UserMutations {
   async resetPasswordEmail(
     agent: User | null,
     email: string
-  ): Promise<{ user: User; link: string } | Rejection> {
+  ): Promise<UserLinkResponse | Rejection> {
     const user = await this.dataSource.getByEmail(email);
 
     if (!user) {
@@ -328,10 +331,10 @@ export default class UserMutations {
 
     const link = process.env.baseURL + '/resetPassword/' + token;
 
-    const resetPassResponse = new ResetPasswordResponse(user, link);
+    const userLinkResponse = new UserLinkResponse(user, link);
 
     // Send reset email with link
-    return resetPassResponse;
+    return userLinkResponse;
   }
 
   async emailVerification(token: string) {

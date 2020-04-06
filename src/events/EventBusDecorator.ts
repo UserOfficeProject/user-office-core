@@ -1,8 +1,9 @@
-import { eventBus } from '../buildContext';
 import { Rejection, isRejection } from '../rejection';
 import { User } from '../resolvers/types/User';
 import { ApplicationEvent } from './applicationEvents';
 import { Event } from './event.enum';
+
+import { eventBus } from '.';
 
 export const EventBusDecorator = (eventType: Event) => {
   return (
@@ -30,14 +31,17 @@ export const EventBusDecorator = (eventType: Event) => {
       const event = {
         type: eventType,
         [resultKey]: result,
-        loggedInUserId: loggedInUser.id,
+        loggedInUserId: loggedInUser ? loggedInUser.id : null,
         userId: result.userId || null,
         inviterId: result.inviterId || null,
         role: result.role || null,
         isRejection: isRejection(result),
       } as ApplicationEvent;
 
-      eventBus.publish(event);
+      // NOTE: Do not log the event in testing environment.
+      if (process.env.NODE_ENV !== 'test') {
+        eventBus.publish(event);
+      }
 
       return result;
     };
