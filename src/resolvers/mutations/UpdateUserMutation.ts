@@ -9,8 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/EventBusDecorator';
 import { UserResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -79,7 +77,6 @@ export class UpdateUserArgs {
 
 @Resolver()
 export class UpdateUserMutation {
-  @EventBus(Event.USER_UPDATED)
   @Mutation(() => UserResponseWrap)
   updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(

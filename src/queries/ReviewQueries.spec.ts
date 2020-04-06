@@ -8,8 +8,6 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-// import { ApplicationEvent } from '../events/applicationEvents';
-// import { EventBus } from '../events/eventBus';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewQueries from './ReviewQueries';
 
@@ -22,8 +20,6 @@ const reviewQueries = new ReviewQueries(
   new ReviewDataSourceMock(),
   userAuthorization
 );
-
-//Update
 
 test('A userofficer can get a review', () => {
   return expect(reviewQueries.get(dummyUserOfficer, 10)).resolves.toBe(

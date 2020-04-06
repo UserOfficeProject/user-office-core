@@ -9,20 +9,16 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import CallMutations from './CallMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const callMutations = new CallMutations(
   new CallDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 test('A user can not create a call', () => {

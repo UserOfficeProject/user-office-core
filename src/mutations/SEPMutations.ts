@@ -1,4 +1,6 @@
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { Event } from '../events/event.enum';
+import { EventBusDecorator } from '../events/EventBusDecorator';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -13,6 +15,7 @@ export default class SEPMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @EventBusDecorator(Event.SEP_CREATED)
   async create(
     agent: User | null,
     args: CreateSEPArgs
@@ -45,6 +48,7 @@ export default class SEPMutations {
       });
   }
 
+  @EventBusDecorator(Event.SEP_UPDATED)
   async update(
     agent: User | null,
     args: UpdateSEPArgs

@@ -9,8 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/EventBusDecorator';
 import { isRejection } from '../../rejection';
 import { UserResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
@@ -77,13 +75,12 @@ export class CreateUserArgs {
 
 @Resolver()
 export class CreateUserMutation {
-  @EventBus(Event.USER_CREATED)
   @Mutation(() => UserResponseWrap)
   async createUser(
     @Args() args: CreateUserArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.user.create(args);
+    const res = await context.mutations.user.create(context.user, args);
 
     return wrapResponse(
       isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user),

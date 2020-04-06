@@ -1,17 +1,15 @@
 import { CallDataSource } from '../datasources/CallDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Call } from '../models/Call';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
 import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class CallMutations {
   constructor(
     private dataSource: CallDataSource,
-    private userAuth: any,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
   async create(

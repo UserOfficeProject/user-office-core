@@ -9,21 +9,17 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Review, ReviewStatus } from '../models/Review';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewMutations from './ReviewMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
   new ReviewDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 //Update

@@ -216,13 +216,13 @@ test('A user should be able to update a token if valid', () => {
 
 test('A user can reset its password by providing a valid email', () => {
   return expect(
-    userMutations.resetPasswordEmail(dummyUser.email)
+    userMutations.resetPasswordEmail(null, dummyUser.email)
   ).resolves.toHaveProperty('user');
 });
 
 test('A user gets an error if providing a email not attached to a account', () => {
   return expect(
-    userMutations.resetPasswordEmail('dummyemail@ess.se')
+    userMutations.resetPasswordEmail(null, 'dummyemail@ess.se')
   ).resolves.toHaveProperty('reason', 'COULD_NOT_FIND_USER_BY_EMAIL');
 });
 

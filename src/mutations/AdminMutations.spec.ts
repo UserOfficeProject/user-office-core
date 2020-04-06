@@ -5,21 +5,17 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Page } from '../models/Admin';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import AdminMutations from './AdminMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const adminMutations = new AdminMutations(
   new AdminDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 test('A user can not set page text', () => {

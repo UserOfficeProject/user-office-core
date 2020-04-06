@@ -10,8 +10,6 @@ import {
 import * as yup from 'yup';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/EventBusDecorator';
 import { ValidateArgs } from '../../utils/ValidateArgs';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
@@ -44,7 +42,6 @@ const updateSEPValidationSchema = yup.object().shape({
 @Resolver()
 export class UpdateSEPMutation {
   @ValidateArgs(updateSEPValidationSchema)
-  @EventBus(Event.SEP_UPDATED)
   @Mutation(() => SEPResponseWrap)
   async updateSEP(
     @Args() args: UpdateSEPArgs,

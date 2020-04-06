@@ -10,8 +10,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/EventBusDecorator';
 import { UserRole } from '../../models/User';
 import { isRejection } from '../../rejection';
 import { Response } from '../Decorators';
@@ -42,7 +40,6 @@ class CreateUserByEmailInviteResponseWrap extends ResponseWrapBase<number> {
 
 @Resolver()
 export class CreateUserByEmailInviteMutation {
-  @EventBus(Event.EMAIL_INVITE)
   @Mutation(() => CreateUserByEmailInviteResponseWrap)
   createUserByEmailInvite(
     @Args() args: CreateUserByEmailInviteArgs,

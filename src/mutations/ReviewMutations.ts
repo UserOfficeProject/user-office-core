@@ -1,11 +1,6 @@
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Review } from '../models/Review';
-import {
-  TechnicalReview,
-  TechnicalReviewStatus,
-} from '../models/TechnicalReview';
+import { TechnicalReview } from '../models/TechnicalReview';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
@@ -17,15 +12,14 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 export default class ReviewMutations {
   constructor(
     private dataSource: ReviewDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
   async updateReview(
     agent: User | null,
     args: AddReviewArgs
   ): Promise<Review | Rejection> {
-    const { reviewID, comment, grade, status } = args;
+    const { reviewID, comment, grade } = args;
     const review = await this.dataSource.get(reviewID);
     if (
       review &&

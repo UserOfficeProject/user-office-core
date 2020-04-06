@@ -3,6 +3,9 @@ import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
+import { Event } from '../events/event.enum';
+import { EventBusDecorator } from '../events/EventBusDecorator';
+import { ResetPasswordResponse } from '../models/ResetPasswordResponse';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -32,6 +35,7 @@ export default class UserMutations {
     return hash;
   }
 
+  @EventBusDecorator(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
@@ -79,7 +83,9 @@ export default class UserMutations {
     return rejection('NOT_ALLOWED');
   }
 
+  @EventBusDecorator(Event.USER_CREATED)
   async create(
+    agent: User | null,
     args: CreateUserArgs
   ): Promise<{ user: User; link: string } | Rejection> {
     if (
@@ -178,6 +184,7 @@ export default class UserMutations {
     return { user, link };
   }
 
+  @EventBusDecorator(Event.USER_UPDATED)
   async update(
     agent: User | null,
     args: UpdateUserArgs
@@ -296,7 +303,9 @@ export default class UserMutations {
     }
   }
 
+  @EventBusDecorator(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
+    agent: User | null,
     email: string
   ): Promise<{ user: User; link: string } | Rejection> {
     const user = await this.dataSource.getByEmail(email);
@@ -319,8 +328,10 @@ export default class UserMutations {
 
     const link = process.env.baseURL + '/resetPassword/' + token;
 
+    const resetPassResponse = new ResetPasswordResponse(user, link);
+
     // Send reset email with link
-    return { user, link };
+    return resetPassResponse;
   }
 
   async emailVerification(token: string) {

@@ -1,6 +1,4 @@
 import { FileDataSource } from '../datasources/IFileDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../rejection';
 import { logger } from '../utils/Logger';
@@ -9,8 +7,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 export default class FileMutations {
   constructor(
     private dataSource: FileDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
   async put(

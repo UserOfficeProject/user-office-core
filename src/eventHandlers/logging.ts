@@ -11,6 +11,18 @@ export default function createHandler(
     const timestamp = new Date().toLocaleString();
     console.log(`${timestamp} -- ${json}`);
 
+    // NOTE: If the event is rejection than log that in the database as well. Later we will be able to see all errors that happened.
+    if (event.isRejection) {
+      await eventLogsDataSource.set(
+        event.loggedInUserId,
+        event.type,
+        json,
+        'error'
+      );
+
+      return;
+    }
+
     switch (event.type) {
       case Event.PROPOSAL_CREATED:
       // NOTE: For now we are skipping the PROPOSAL_UPDATED event.
@@ -28,12 +40,19 @@ export default function createHandler(
 
       case Event.USER_CREATED:
       case Event.USER_UPDATED:
-      case Event.USER_PASSWORD_RESET_EMAIL:
         await eventLogsDataSource.set(
           event.loggedInUserId,
           event.type,
           json,
           event.user.id.toString()
+        );
+        break;
+      case Event.USER_PASSWORD_RESET_EMAIL:
+        await eventLogsDataSource.set(
+          event.loggedInUserId,
+          event.type,
+          json,
+          event.resetpasswordresponse.user.id.toString()
         );
         break;
       case Event.SEP_CREATED:

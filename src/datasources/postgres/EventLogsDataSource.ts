@@ -46,8 +46,24 @@ export default class PostgresEventLogsDataSource
           queryBuilder.where('changed_object_id', filter.changedObjectId);
         }
 
+        /**
+         * NOTE: Like this with '|' we can support query against multiple eventTypes.
+         * This is needed in scenarios like get all USER events and EMAIL_INVITE on the user logs.
+         */
+        const eventTypes = filter.eventType.split('|');
+
         if (filter.eventType && filter.eventType !== '*') {
-          queryBuilder.where('event_type', 'like', `${filter.eventType}%`);
+          eventTypes.forEach((element, index) => {
+            if (index === 0) {
+              queryBuilder.where(
+                'event_type',
+                'like',
+                `${eventTypes[0].trim()}%`
+              );
+            } else {
+              queryBuilder.orWhere('event_type', 'like', `${element.trim()}%`);
+            }
+          });
         }
       })
       .then((eventLogs: EventLogRecord[]) => {

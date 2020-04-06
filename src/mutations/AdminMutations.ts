@@ -1,6 +1,4 @@
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Page } from '../models/Admin';
 import { User } from '../models/User';
 import { Rejection, rejection } from '../rejection';
@@ -19,8 +17,7 @@ export default class AdminMutations {
   }
   constructor(
     private dataSource: AdminDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
   async setPageText(

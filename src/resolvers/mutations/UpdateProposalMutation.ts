@@ -10,8 +10,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Event } from '../../events/event.enum';
-import { EventBus } from '../../events/EventBusDecorator';
 import { DataType } from '../../models/ProposalModel';
 import { ProposalEndStatus } from '../../models/ProposalModel';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
@@ -64,7 +62,6 @@ export class UpdateProposalArgs {
 
 @Resolver()
 export class UpdateProposalMutation {
-  @EventBus(Event.PROPOSAL_UPDATED)
   @Mutation(() => ProposalResponseWrap)
   updateProposal(
     @Args()

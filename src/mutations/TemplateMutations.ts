@@ -1,6 +1,4 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import {
   createConfig,
   DataType,
@@ -27,7 +25,6 @@ export default class TemplateMutations {
   constructor(
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>,
     private logger: Logger
   ) {}
 

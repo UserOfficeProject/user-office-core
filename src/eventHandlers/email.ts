@@ -58,9 +58,9 @@ export default function createHandler(userDataSource: UserDataSource) {
             substitution_data: {
               title: 'ESS User reset account password',
               buttonText: 'Click to reset',
-              link: event.link,
+              link: event.resetpasswordresponse.link,
             },
-            recipients: [{ address: event.user.email }],
+            recipients: [{ address: event.resetpasswordresponse.user.email }],
           })
           .then((res: any) => {
             logger.logInfo('Emai send on for password reset:', {

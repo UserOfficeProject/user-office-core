@@ -71,30 +71,17 @@ const proposalMutations = new ProposalMutations(
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
-  userAuthorization,
-  eventBus
+  userAuthorization
 );
 
 const callQueries = new CallQueries(callDataSource, userAuthorization);
-const callMutations = new CallMutations(
-  callDataSource,
-  userAuthorization,
-  eventBus
-);
+const callMutations = new CallMutations(callDataSource, userAuthorization);
 
 const fileQueries = new FileQueries(fileDataSource, userAuthorization);
-const fileMutations = new FileMutations(
-  fileDataSource,
-  userAuthorization,
-  eventBus
-);
+const fileMutations = new FileMutations(fileDataSource, userAuthorization);
 
 const adminQueries = new AdminQueries(adminDataSource, userAuthorization);
-const adminMutations = new AdminMutations(
-  adminDataSource,
-  userAuthorization,
-  eventBus
-);
+const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
 
 const templateQueries = new TemplateQueries(
   templateDataSource,
@@ -104,7 +91,6 @@ const templateQueries = new TemplateQueries(
 const templateMutations = new TemplateMutations(
   templateDataSource,
   userAuthorization,
-  eventBus,
   logger
 );
 
