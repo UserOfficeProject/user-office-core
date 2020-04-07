@@ -52,8 +52,6 @@ export default class ReviewMutations {
     agent: User | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
-    const { proposalID, comment, status, timeAllocation } = args;
-
     if (!agent) {
       return rejection('NOT_LOGGED_IN');
     }
@@ -62,7 +60,7 @@ export default class ReviewMutations {
     }
 
     return this.dataSource
-      .setTechnicalReview(proposalID, comment, status, timeAllocation)
+      .setTechnicalReview(args)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not set technicalReview', err, {

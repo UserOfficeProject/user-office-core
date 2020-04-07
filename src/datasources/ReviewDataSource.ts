@@ -1,6 +1,7 @@
 import { Review } from '../models/Review';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
+import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 
 export interface ReviewDataSource {
@@ -10,12 +11,7 @@ export interface ReviewDataSource {
 
   getProposalReviews(id: number): Promise<Review[]>;
   getUserReviews(id: number): Promise<Review[]>;
-  setTechnicalReview(
-    proposalID: number,
-    comment: string,
-    status: number,
-    timeAllocation: number
-  ): Promise<TechnicalReview>;
+  setTechnicalReview(args: AddTechnicalReviewArgs): Promise<TechnicalReview>;
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null>;
   addUserForReview(args: AddUserForReviewArgs): Promise<Review>;
 }

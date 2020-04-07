@@ -1,5 +1,6 @@
 import fs, { existsSync, unlink } from 'fs';
 
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import express from 'express';
 import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
@@ -14,6 +15,7 @@ import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
+import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { User } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
@@ -24,6 +26,28 @@ import { createToC } from './pdfTableofContents/index';
 const hummus = require('hummus');
 
 const router = express.Router();
+
+//Helper functions
+const write = (text: string, doc: PDFKit.PDFDocument) => {
+  return doc
+    .font('fonts/Calibri_Regular.ttf')
+    .fontSize(11)
+    .text(text);
+};
+
+const writeBold = (text: string, doc: PDFKit.PDFDocument) => {
+  return doc
+    .font('fonts/Calibri_Bold.ttf')
+    .fontSize(11)
+    .text(text);
+};
+
+const writeHeading = (text: string, doc: PDFKit.PDFDocument) => {
+  return doc
+    .font('fonts/Calibri_Bold.ttf')
+    .fontSize(14)
+    .text(text);
+};
 
 const getAttachments = async (attachmentId: string) => {
   await baseContext.mutations.file.prepare(attachmentId);
@@ -95,62 +119,42 @@ const createProposalPDF = async (
     );
 
     doc.pipe(writeStream);
-    //Helper functions
-
-    const write = (text: string) => {
-      return doc
-        .font('fonts/Calibri_Regular.ttf')
-        .fontSize(11)
-        .text(text);
-    };
-
-    const writeBold = (text: string) => {
-      return doc
-        .font('fonts/Calibri_Bold.ttf')
-        .fontSize(11)
-        .text(text);
-    };
-
-    const writeHeading = (text: string) => {
-      return doc
-        .font('fonts/Calibri_Bold.ttf')
-        .fontSize(14)
-        .text(text);
-    };
 
     // General information
     let attachmentIds: string[] = []; // Save attachments for appendix
     doc.image('./images/ESS.png', 15, 15, { width: 100 });
 
-    writeHeading(`Proposal: ${proposal.title}`);
+    writeHeading(`Proposal: ${proposal.title}`, doc);
     doc.moveDown();
 
-    writeBold('Proposal ID:');
-    write(proposal.shortCode);
-
-    doc.moveDown();
-
-    writeBold('Brief summary:');
-    write(proposal.abstract);
+    writeBold('Proposal ID:', doc);
+    write(proposal.shortCode, doc);
 
     doc.moveDown();
 
-    writeBold('Proposal Team');
+    writeBold('Brief summary:', doc);
+    write(proposal.abstract, doc);
+
     doc.moveDown();
-    writeBold('Principal Investigator:');
+
+    writeBold('Proposal Team', doc);
+    doc.moveDown();
+    writeBold('Principal Investigator:', doc);
     write(
-      `${principalInvestigator.firstname} ${principalInvestigator.lastname}`
+      `${principalInvestigator.firstname} ${principalInvestigator.lastname}`,
+      doc
     );
 
-    write(principalInvestigator.organisation);
-    write(principalInvestigator.position);
+    write(principalInvestigator.organisation, doc);
+    write(principalInvestigator.position, doc);
 
     doc.moveDown();
 
-    writeBold('Co-proposer:');
+    writeBold('Co-proposer:', doc);
     coProposers.forEach(coProposer => {
       write(
-        `${coProposer.firstname} ${coProposer.lastname}, ${coProposer.organisation}`
+        `${coProposer.firstname} ${coProposer.lastname}, ${coProposer.organisation}`,
+        doc
       );
     });
 
@@ -170,7 +174,7 @@ const createProposalPDF = async (
       if (!step) {
         throw 'Could not download generated PDF';
       }
-      writeBold(step.topic.topic_title);
+      writeBold(step.topic.topic_title, doc);
       toc.push({
         title: step.topic.topic_title,
         page: pageNumber,
@@ -181,39 +185,41 @@ const createProposalPDF = async (
         if (field.data_type === DataType.EMBELLISHMENT) {
           const conf = field.config as EmbellishmentConfig;
           if (!conf.omitFromPdf) {
-            writeBold(conf.plain!);
+            writeBold(conf.plain!, doc);
           }
         } else if (field.data_type === DataType.FILE_UPLOAD) {
-          writeBold(field.question);
+          writeBold(field.question, doc);
           if (field.value) {
             const fieldAttachmentArray: string[] = field.value.split(',');
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
-            write('This document has been appended to the proposal');
+            write('This document has been appended to the proposal', doc);
           } else {
-            write(notAnswered);
+            write(notAnswered, doc);
           }
           // Default case, a ordinary question type
         } else if (field.data_type === DataType.DATE) {
-          writeBold(field.question);
+          writeBold(field.question, doc);
           write(
             field.value
               ? new Date(field.value).toISOString().split('T')[0]
-              : notAnswered
+              : notAnswered,
+            doc
           );
         } else if (field.data_type === DataType.BOOLEAN) {
-          writeBold(field.question);
+          writeBold(field.question, doc);
           if (field.value) {
-            write('Yes');
+            write('Yes', doc);
           } else {
-            write('No');
+            write('No', doc);
           }
         } else {
-          writeBold(field.question);
-          write(field.value ? field.value : notAnswered);
+          writeBold(field.question, doc);
+          write(field.value ? field.value : notAnswered, doc);
         }
         doc.moveDown(0.5);
       });
     });
+
     doc.end();
     pageNumber++;
 
@@ -259,8 +265,61 @@ const createProposalPDF = async (
         fs.unlink(`downloads/proposal-${proposalId}.pdf`, () => {
           // Do something here if needed.
         });
-        pdfWriter.end();
-        resolve({ toc, pageNumber, metaData });
+
+        //if reviewer is downloading add technical review page
+        const docTech = new PDFDocument();
+        const writeStreamTech = fs.createWriteStream(
+          `downloads/proposal-${proposalId}-techreview`
+        );
+
+        docTech.pipe(writeStreamTech);
+
+        if (UserAuthorization.isReviewerOfProposal(user, proposal.id)) {
+          const technicalReview = await baseContext.queries.review.technicalReviewForProposal(
+            user,
+            proposal.id
+          );
+          if (technicalReview) {
+            docTech.image('./images/ESS.png', 15, 15, { width: 100 });
+
+            writeHeading('Technical Review', docTech);
+            docTech.moveDown();
+
+            writeBold('Status', docTech);
+            write(
+              getTranslation(
+                TechnicalReviewStatus[technicalReview.status] as ResourceId
+              ),
+              docTech
+            );
+            docTech.moveDown();
+
+            writeBold('Time Allocation', docTech);
+            write(technicalReview.timeAllocation.toString() + ' Days', docTech);
+            docTech.moveDown();
+
+            writeBold('Comment', docTech);
+            write(technicalReview.publicComment, docTech);
+
+            toc.push({
+              title: 'Technical Review',
+              page: pageNumber,
+              children: [],
+            });
+            pageNumber++;
+          }
+          docTech.end();
+          writeStreamTech.on('finish', async function() {
+            pdfWriter.appendPDFPagesFromPDF(
+              `downloads/proposal-${proposalId}-techreview`
+            );
+            pdfWriter.end();
+            resolve({ toc, pageNumber, metaData });
+          });
+        } else {
+          pdfWriter.end();
+          resolve({ toc, pageNumber, metaData });
+        }
       });
     });
   } catch (e) {
