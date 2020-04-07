@@ -80,7 +80,7 @@ export class CreateUserMutation {
     @Args() args: CreateUserArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.user.create(args);
+    const res = await context.mutations.user.create(context.user, args);
 
     return wrapResponse(
       isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user),

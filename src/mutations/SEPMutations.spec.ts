@@ -10,22 +10,18 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Rejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPMutations from './SEPMutations';
 
 const dummySEPDataSource = new SEPDataSourceMock();
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const SEPMutationsInstance = new SEPMutations(
   dummySEPDataSource,
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 describe('Test SEPMutations', () => {

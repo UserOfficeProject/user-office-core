@@ -32,7 +32,7 @@ export class UpdateSEPArgs {
   public active: boolean;
 }
 
-const upcateSEPValidationSchema = yup.object().shape({
+const updateSEPValidationSchema = yup.object().shape({
   id: yup.number().required(),
   code: yup.string().required(),
   description: yup.string().required(),
@@ -41,7 +41,7 @@ const upcateSEPValidationSchema = yup.object().shape({
 
 @Resolver()
 export class UpdateSEPMutation {
-  @ValidateArgs(upcateSEPValidationSchema)
+  @ValidateArgs(updateSEPValidationSchema)
   @Mutation(() => SEPResponseWrap)
   async updateSEP(
     @Args() args: UpdateSEPArgs,
