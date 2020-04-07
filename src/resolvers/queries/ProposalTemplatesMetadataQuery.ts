@@ -7,12 +7,12 @@ import { ProposalTemplateMetadata } from '../types/ProposalTemplateMetadata';
 export class ProposalTemplateQuery {
   @Query(() => [ProposalTemplateMetadata])
   proposalTemplatesMetadata(
-    @Arg('isArchived', { nullable: true }) isArchived: boolean,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('isArchived', { nullable: true }) isArchived?: boolean
   ) {
     return context.queries.template.getProposalTemplatesMetadata(
       context.user,
-      isArchived
+      isArchived || false
     );
   }
 }

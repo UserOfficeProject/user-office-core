@@ -60,11 +60,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async getProposalTemplatesMetadata(
-    isArchived: boolean
+    isArchived?: boolean
   ): Promise<ProposalTemplateMetadata[]> {
     return database('proposal_templates')
       .select('*')
-      .where({ is_archived: isArchived })
+      .where({ is_archived: isArchived || false })
       .then((resultSet: ProposalTemplateMetadataRecord[]) => {
         if (!resultSet) {
           return [];

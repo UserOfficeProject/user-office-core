@@ -9,6 +9,7 @@ import {
 } from '../../models/ProposalModel';
 import { create1Topic3FieldWithDependenciesQuestionary } from '../../tests/ProposalTestBed';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
 export let dummyTemplate: ProposalTemplate;
 export let dummyQuestionary: Questionary;
@@ -155,7 +156,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getProposals(
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {

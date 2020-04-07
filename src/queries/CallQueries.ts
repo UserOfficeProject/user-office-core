@@ -2,6 +2,7 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { Call } from '../models/Call';
 import { User } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
 export default class CallQueries {
   constructor(
@@ -18,11 +19,11 @@ export default class CallQueries {
     return call;
   }
 
-  async getAll(agent: User | null) {
+  async getAll(agent: User | null, filter?: CallsFilter) {
     if (agent == null) {
       return null;
     }
-    const calls = await this.dataSource.getCalls();
+    const calls = await this.dataSource.getCalls(filter);
 
     return calls;
   }

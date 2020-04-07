@@ -1,6 +1,7 @@
 import { Call } from '../../models/Call';
 import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
 import { CallDataSource } from '../CallDataSource';
+import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 
 export const dummyCall = new Call(
   1,
@@ -20,7 +21,7 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCall;
   }
 
-  async getCalls(): Promise<Call[]> {
+  async getCalls(filter?: CallsFilter): Promise<Call[]> {
     return [dummyCall];
   }
   async create(args: CreateCallArgs) {

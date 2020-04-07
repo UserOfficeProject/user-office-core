@@ -38,14 +38,14 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return createDummyProposalTemplateMetadata({ id });
   }
   async getProposalTemplatesMetadata(
-    isArchived: boolean
+    isArchived?: boolean
   ): Promise<ProposalTemplateMetadata[]> {
     return [
       new ProposalTemplateMetadata(
         1,
         'Industrial',
         'Industrial proposal template',
-        isArchived
+        isArchived || false
       ),
     ];
   }

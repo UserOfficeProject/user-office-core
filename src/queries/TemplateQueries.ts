@@ -29,7 +29,7 @@ export default class TemplateQueries {
     return await this.dataSource.isNaturalKeyPresent(naturalKey);
   }
 
-  async getProposalTemplatesMetadata(agent: User | null, isArchived: boolean) {
+  async getProposalTemplatesMetadata(agent: User | null, isArchived?: boolean) {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return [];
     }

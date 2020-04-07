@@ -4,6 +4,7 @@ import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { Logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export default class ProposalQueries {
   constructor(
@@ -58,7 +59,7 @@ export default class ProposalQueries {
 
   async getAll(
     agent: User | null,
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ) {

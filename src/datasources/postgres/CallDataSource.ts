@@ -2,6 +2,7 @@
 import { Call } from '../../models/Call';
 import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
 import { CallDataSource } from '../CallDataSource';
+import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
 import { CallRecord } from './records';
 
@@ -32,13 +33,15 @@ export default class PostgresCallDataSource implements CallDataSource {
       );
   }
 
-  async getCalls(): Promise<Call[]> {
-    return database
-      .select(['*'])
-      .from('call')
-      .then((callDB: CallRecord[]) =>
-        callDB.map(call => this.createCallObject(call))
-      );
+  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+    const query = database('call').select(['*']);
+    if (filter?.templateIds) {
+      query.whereIn('template_id', filter.templateIds);
+    }
+
+    return query.then((callDB: CallRecord[]) =>
+      callDB.map(call => this.createCallObject(call))
+    );
   }
 
   async create(args: CreateCallArgs): Promise<Call> {

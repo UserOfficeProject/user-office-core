@@ -14,7 +14,7 @@ export interface TemplateDataSource {
     description?: string
   ): Promise<ProposalTemplateMetadata>;
   getProposalTemplatesMetadata(
-    isArchived: boolean
+    isArchived?: boolean
   ): Promise<ProposalTemplateMetadata[]>;
   getProposalTemplate(): Promise<ProposalTemplate>;
 

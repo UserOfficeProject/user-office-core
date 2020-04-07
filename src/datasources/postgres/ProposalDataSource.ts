@@ -4,21 +4,23 @@ import { Transaction } from 'knex';
 
 import { Proposal } from '../../models/Proposal';
 import {
-  QuestionaryStep,
-  Questionary,
   ProposalStatus,
+  Questionary,
+  QuestionaryStep,
 } from '../../models/ProposalModel';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
+  CallRecord,
+  createFieldDependencyObject,
+  createProposalObject,
+  createQuestionaryFieldObject,
+  createTopicObject,
+  FieldDependencyRecord,
+  ProposalQuestionRecord,
   ProposalRecord,
   TopicRecord,
-  ProposalQuestionRecord,
-  FieldDependencyRecord,
-  createProposalObject,
-  createFieldDependencyObject,
-  createTopicObject,
-  createQuestionaryFieldObject,
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
@@ -31,7 +33,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where('start_call', '<=', currentDate)
       .andWhere('end_call', '>=', currentDate)
       .first()
-      .then((call: any) => (call ? true : false));
+      .then((call: CallRecord) => (call ? true : false));
   }
 
   async setStatusProposal(id: number, status: number): Promise<Proposal> {
@@ -235,7 +237,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async getProposals(
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
@@ -244,10 +246,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from('proposals')
       .orderBy('proposal_id', 'desc')
       .modify(query => {
-        if (filter) {
+        if (filter?.text) {
           query
-            .where('title', 'ilike', `%${filter}%`)
-            .orWhere('abstract', 'ilike', `%${filter}%`);
+            .where('title', 'ilike', `%${filter.text}%`)
+            .orWhere('abstract', 'ilike', `%${filter.text}%`);
+        }
+        if (filter?.templateIds) {
+          query.whereIn('template_id', filter.templateIds);
         }
         if (first) {
           query.limit(first);

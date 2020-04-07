@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../models/Proposal';
 import { Questionary } from '../models/ProposalModel';
+import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
   checkActiveCall(): Promise<boolean>;
   getProposals(
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
