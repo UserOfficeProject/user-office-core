@@ -79,8 +79,10 @@ export default function createHandler(userDataSource: UserDataSource) {
       }
 
       case Event.EMAIL_INVITE: {
-        const user = await userDataSource.get(event.userId);
-        const inviter = await userDataSource.getBasicUserInfo(event.inviterId);
+        const user = await userDataSource.get(event.emailinviteresponse.userId);
+        const inviter = await userDataSource.getBasicUserInfo(
+          event.emailinviteresponse.inviterId
+        );
 
         if (!user || !inviter) {
           logger.logError('Failed email invite', { user, inviter, event });
@@ -92,7 +94,7 @@ export default function createHandler(userDataSource: UserDataSource) {
           .send({
             content: {
               template_id:
-                event.role === UserRole.USER
+                event.emailinviteresponse.role === UserRole.USER
                   ? 'user-office-registration-invitation'
                   : 'user-office-registration-invitation-reviewer',
             },

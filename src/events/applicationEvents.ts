@@ -58,9 +58,11 @@ interface UserCreateEvent extends GeneralEvent {
 
 interface EmailInvite extends GeneralEvent {
   type: Event.EMAIL_INVITE;
-  userId: number;
-  inviterId: number;
-  role: UserRole;
+  emailinviteresponse: {
+    userId: number;
+    inviterId: number;
+    role: UserRole;
+  };
 }
 
 interface SEPCreatedEvent extends GeneralEvent {

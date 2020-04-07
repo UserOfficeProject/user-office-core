@@ -8,6 +8,7 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
+import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -44,6 +45,12 @@ const userMutations = new UserMutations(
 );
 
 test('A user can invite another user by email', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    5,
+    dummyUser.id,
+    UserRole.USER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: 'firstname',
@@ -51,11 +58,7 @@ test('A user can invite another user by email', () => {
       email: 'email@google.com',
       userRole: UserRole.USER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUser.id,
-    userId: 5,
-    role: UserRole.USER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user must be logged in to invite another user by email', () => {
@@ -81,6 +84,12 @@ test('A user cannot invite another user by email if the user already has an acco
 });
 
 test('A user can reinvite another user by email if the user has not created an account', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    dummyPlaceHolderUser.id,
+    dummyUser.id,
+    UserRole.USER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: 'firstname',
@@ -88,14 +97,16 @@ test('A user can reinvite another user by email if the user has not created an a
       email: dummyPlaceHolderUser.email,
       userRole: UserRole.USER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUser.id,
-    userId: dummyPlaceHolderUser.id,
-    role: UserRole.USER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user officer can invite a reviewer by email', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    dummyPlaceHolderUser.id,
+    dummyUserOfficer.id,
+    UserRole.REVIEWER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUserOfficer, {
       firstname: 'firstname',
@@ -103,11 +114,7 @@ test('A user officer can invite a reviewer by email', () => {
       email: dummyPlaceHolderUser.email,
       userRole: UserRole.REVIEWER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUserOfficer.id,
-    userId: dummyPlaceHolderUser.id,
-    role: UserRole.REVIEWER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user cannot invite a reviewer by email', () => {

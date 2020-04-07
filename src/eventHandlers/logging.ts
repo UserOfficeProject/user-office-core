@@ -68,7 +68,7 @@ export default function createHandler(
           event.loggedInUserId,
           event.type,
           json,
-          event.userId.toString()
+          event.emailinviteresponse.userId.toString()
         );
         break;
       default:

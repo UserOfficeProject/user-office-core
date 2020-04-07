@@ -5,6 +5,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Event } from '../events/event.enum';
 import { EventBusDecorator } from '../events/EventBusDecorator';
+import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
@@ -35,24 +36,26 @@ export default class UserMutations {
     return hash;
   }
 
+  createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
+    return new EmailInviteResponse(userId, agentId, role);
+  }
+
   @EventBusDecorator(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
-  ): Promise<
-    { userId: number; inviterId: number; role: UserRole } | Rejection
-  > {
+  ): Promise<EmailInviteResponse | Rejection> {
     if (!agent) {
       return rejection('NOT_LOGGED');
     }
+    let userId: number | null = null;
+    let role: UserRole = args.userRole;
     // Check if email exist in database and if user has been invited before
     const user = await this.dataSource.getByEmail(args.email);
     if (user && user.placeholder) {
-      return {
-        userId: user.id,
-        inviterId: agent.id,
-        role: args.userRole,
-      };
+      userId = user.id;
+
+      return this.createEmailInviteResponse(userId, agent.id, role);
     } else if (user) {
       return rejection('ACCOUNT_EXIST');
     }
@@ -61,26 +64,20 @@ export default class UserMutations {
       args.userRole === UserRole.REVIEWER &&
       (await this.userAuth.isUserOfficer(agent))
     ) {
-      const userId = await this.dataSource.createInviteUser(args);
+      userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
-
-      return {
-        userId,
-        inviterId: agent.id,
-        role: UserRole.REVIEWER,
-      };
+      role = UserRole.REVIEWER;
     } else if (args.userRole === UserRole.USER) {
-      const userId = await this.dataSource.createInviteUser(args);
+      userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.USER]);
-
-      return {
-        userId,
-        inviterId: agent.id,
-        role: UserRole.USER,
-      };
+      role = UserRole.USER;
     }
 
-    return rejection('NOT_ALLOWED');
+    if (!userId) {
+      return rejection('NOT_ALLOWED');
+    } else {
+      return this.createEmailInviteResponse(userId, agent.id, role);
+    }
   }
 
   @EventBusDecorator(Event.USER_CREATED)

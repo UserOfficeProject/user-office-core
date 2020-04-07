@@ -32,9 +32,6 @@ export const EventBusDecorator = (eventType: Event) => {
         type: eventType,
         [resultKey]: result,
         loggedInUserId: loggedInUser ? loggedInUser.id : null,
-        userId: result.userId || null,
-        inviterId: result.inviterId || null,
-        role: result.role || null,
         isRejection: isRejection(result),
       } as ApplicationEvent;
 
