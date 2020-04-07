@@ -61,6 +61,16 @@ context('Event log tests', () => {
 
     cy.contains('View People').click();
 
+    cy.wait(2000);
+
+    let peopleTable = cy.get('[data-cy="co-proposers"]');
+
+    const lastPeoplePageButtonElement = peopleTable.find(
+      'span[title="Last Page"] > button'
+    );
+
+    lastPeoplePageButtonElement.click({ force: true });
+
     cy.get('button[title="Edit user"]')
       .last()
       .click();
