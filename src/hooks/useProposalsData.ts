@@ -11,7 +11,7 @@ export function useProposalsData(filter: string) {
   useEffect(() => {
     api()
       .getProposals({
-        filter: filter,
+        filter: { text: filter },
       })
       .then(data => {
         if (data.proposals) {

@@ -4,5 +4,7 @@ query getProposalTemplatesMetadata($isArchived: Boolean) {
     name
     description
     isArchived
+    proposalCount
+    callCount
   }
 }

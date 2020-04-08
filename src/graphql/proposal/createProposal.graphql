@@ -1,5 +1,5 @@
-mutation createProposal {
-  createProposal {
+mutation createProposal($callId: Int!) {
+  createProposal(callId: $callId) {
     proposal {
       id
       status

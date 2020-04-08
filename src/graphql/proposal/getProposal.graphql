@@ -9,6 +9,8 @@ query getProposal($id: Int!) {
     finalStatus
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }
@@ -18,7 +20,7 @@ query getProposal($id: Int!) {
     questionary {
       ...questionary
     }
-    technicalReview{
+    technicalReview {
       id
       comment
       timeAllocation

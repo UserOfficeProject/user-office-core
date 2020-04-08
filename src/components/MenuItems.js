@@ -41,7 +41,7 @@ export default function MenuItems({ role }) {
       </ListItem>
       <ListItem
         component={Link}
-        to="/ProposalSubmission"
+        to="/ProposalSelectType"
         button
         disabled={proposalDisabled}
       >

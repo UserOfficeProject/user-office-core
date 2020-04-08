@@ -27,7 +27,7 @@ context('Proposal tests', () => {
   it('Should be able to modify proposal', () => {
     cy.login('officer');
 
-    cy.contains('Edit Questionary').click();
+    cy.contains('Questionaries').click();
 
     cy.contains('Add topic').click();
 
@@ -122,25 +122,22 @@ context('Proposal tests', () => {
       });
     /* --- */
 
-
     /* Update question */
-    const newKey = faker
-    .random
-    .word()
-    .toLowerCase()
-    .split(" ").join('_');
+    const newKey = faker.random
+      .word()
+      .toLowerCase()
+      .split(' ')
+      .join('_');
 
-    cy.contains(textQuestion)
-      .click();
+    cy.contains(textQuestion).click();
 
     cy.get("[data-cy='natural_key']")
       .clear()
       .type(newKey);
-    
-    cy.contains("Save")
-       .click();
 
-    cy.wait(500)
+    cy.contains('Save').click();
+
+    cy.wait(500);
 
     cy.contains(newKey);
     /* --- */

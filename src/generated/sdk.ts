@@ -53,12 +53,18 @@ export type Call = {
   endNotify: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>,
 };
 
 export type CallResponseWrap = {
    __typename?: 'CallResponseWrap',
   error?: Maybe<Scalars['String']>,
   call?: Maybe<Call>,
+};
+
+export type CallsFilter = {
+  templateIds?: Maybe<Array<Scalars['Int']>>,
+  isActive?: Maybe<Scalars['Boolean']>,
 };
 
 export type ConfigBase = {
@@ -238,6 +244,7 @@ export type MutationAddReviewArgs = {
 export type MutationAddTechnicalReviewArgs = {
   proposalID: Scalars['Int'],
   comment?: Maybe<Scalars['String']>,
+  publicComment?: Maybe<Scalars['String']>,
   timeAllocation?: Maybe<Scalars['Int']>,
   status?: Maybe<TechnicalReviewStatus>
 };
@@ -265,6 +272,11 @@ export type MutationCreateCallArgs = {
   endNotify: Scalars['String'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String']
+};
+
+
+export type MutationCreateProposalArgs = {
+  callId: Scalars['Int']
 };
 
 
@@ -520,6 +532,8 @@ export type Proposal = {
   shortCode: Scalars['String'],
   rankOrder?: Maybe<Scalars['Int']>,
   finalStatus?: Maybe<ProposalEndStatus>,
+  callId: Scalars['Int'],
+  templateId: Scalars['Int'],
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews: Array<Review>,
@@ -544,6 +558,11 @@ export type ProposalResponseWrap = {
    __typename?: 'ProposalResponseWrap',
   error?: Maybe<Scalars['String']>,
   proposal?: Maybe<Proposal>,
+};
+
+export type ProposalsFilter = {
+  text?: Maybe<Scalars['String']>,
+  templateIds?: Maybe<Array<Scalars['Int']>>,
 };
 
 export type ProposalsQueryResult = {
@@ -581,6 +600,8 @@ export type ProposalTemplateMetadata = {
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   isArchived: Scalars['Boolean'],
+  proposalCount: Scalars['Int'],
+  callCount: Scalars['Int'],
 };
 
 export type ProposalTemplateMetadataResponseWrap = {
@@ -626,8 +647,18 @@ export type QueryBasicUserDetailsArgs = {
 };
 
 
+export type QueryBlankProposalArgs = {
+  callId: Scalars['Int']
+};
+
+
 export type QueryCallArgs = {
   id: Scalars['Int']
+};
+
+
+export type QueryCallsArgs = {
+  filter?: Maybe<CallsFilter>
 };
 
 
@@ -668,7 +699,7 @@ export type QueryProposalArgs = {
 
 
 export type QueryProposalsArgs = {
-  filter?: Maybe<Scalars['String']>,
+  filter?: Maybe<ProposalsFilter>,
   first?: Maybe<Scalars['Int']>,
   offset?: Maybe<Scalars['Int']>
 };
@@ -815,6 +846,7 @@ export type TechnicalReview = {
   id: Scalars['Int'],
   proposalID: Scalars['Int'],
   comment?: Maybe<Scalars['String']>,
+  publicComment?: Maybe<Scalars['String']>,
   timeAllocation?: Maybe<Scalars['Int']>,
   status?: Maybe<TechnicalReviewStatus>,
   proposal?: Maybe<Proposal>,
@@ -1007,14 +1039,16 @@ export type CreateCallMutation = (
   ) }
 );
 
-export type GetCallsQueryVariables = {};
+export type GetCallsQueryVariables = {
+  filter?: Maybe<CallsFilter>
+};
 
 
 export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall'>
+    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'templateId'>
   )>> }
 );
 
@@ -1036,7 +1070,9 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
-export type CreateProposalMutationVariables = {};
+export type CreateProposalMutationVariables = {
+  callId: Scalars['Int']
+};
 
 
 export type CreateProposalMutation = (
@@ -1064,7 +1100,7 @@ export type CreateProposalTemplateMutation = (
     & Pick<ProposalTemplateMetadataResponseWrap, 'error'>
     & { templateMetadata: Maybe<(
       { __typename?: 'ProposalTemplateMetadata' }
-      & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived'>
+      & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
     )> }
   ) }
 );
@@ -1299,14 +1335,16 @@ export type TopicFragment = (
   & Pick<Topic, 'topic_title' | 'topic_id' | 'sort_order' | 'is_enabled'>
 );
 
-export type GetBlankProposalQueryVariables = {};
+export type GetBlankProposalQueryVariables = {
+  callId: Scalars['Int']
+};
 
 
 export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
   & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1359,7 +1397,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1412,12 +1450,12 @@ export type GetProposalTemplatesMetadataQuery = (
   { __typename?: 'Query' }
   & { proposalTemplatesMetadata: Array<(
     { __typename?: 'ProposalTemplateMetadata' }
-    & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived'>
+    & Pick<ProposalTemplateMetadata, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
   )> }
 );
 
 export type GetProposalsQueryVariables = {
-  filter: Scalars['String']
+  filter?: Maybe<ProposalsFilter>
 };
 
 
@@ -1428,7 +1466,7 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2188,12 +2226,13 @@ export const CreateCallDocument = gql`
 }
     `;
 export const GetCallsDocument = gql`
-    query getCalls {
-  calls {
+    query getCalls($filter: CallsFilter) {
+  calls(filter: $filter) {
     id
     shortCode
     startCall
     endCall
+    templateId
   }
 }
     `;
@@ -2215,8 +2254,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const CreateProposalDocument = gql`
-    mutation createProposal {
-  createProposal {
+    mutation createProposal($callId: Int!) {
+  createProposal(callId: $callId) {
     proposal {
       id
       status
@@ -2234,6 +2273,8 @@ export const CreateProposalTemplateDocument = gql`
       name
       description
       isArchived
+      proposalCount
+      callCount
     }
     error
   }
@@ -2313,8 +2354,8 @@ export const DeleteTopicDocument = gql`
 }
     `;
 export const GetBlankProposalDocument = gql`
-    query getBlankProposal {
-  blankProposal {
+    query getBlankProposal($callId: Int!) {
+  blankProposal(callId: $callId) {
     id
     status
     shortCode
@@ -2324,6 +2365,8 @@ export const GetBlankProposalDocument = gql`
     abstract
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }
@@ -2378,6 +2421,8 @@ export const GetProposalDocument = gql`
     finalStatus
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }
@@ -2433,11 +2478,13 @@ export const GetProposalTemplatesMetadataDocument = gql`
     name
     description
     isArchived
+    proposalCount
+    callCount
   }
 }
     `;
 export const GetProposalsDocument = gql`
-    query getProposals($filter: String!) {
+    query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
     proposals {
       id
@@ -2449,6 +2496,8 @@ export const GetProposalsDocument = gql`
       finalStatus
       created
       updated
+      callId
+      templateId
       proposer {
         ...basicUserDetails
       }
@@ -2832,7 +2881,7 @@ export function getSdk(client: GraphQLClient) {
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
     },
-    createProposal(variables?: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
+    createProposal(variables: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);
     },
     createProposalTemplate(variables: CreateProposalTemplateMutationVariables): Promise<CreateProposalTemplateMutation> {
@@ -2856,7 +2905,7 @@ export function getSdk(client: GraphQLClient) {
     deleteTopic(variables: DeleteTopicMutationVariables): Promise<DeleteTopicMutation> {
       return client.request<DeleteTopicMutation>(print(DeleteTopicDocument), variables);
     },
-    getBlankProposal(variables?: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
+    getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
       return client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables);
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
@@ -2874,7 +2923,7 @@ export function getSdk(client: GraphQLClient) {
     getProposalTemplatesMetadata(variables?: GetProposalTemplatesMetadataQueryVariables): Promise<GetProposalTemplatesMetadataQuery> {
       return client.request<GetProposalTemplatesMetadataQuery>(print(GetProposalTemplatesMetadataDocument), variables);
     },
-    getProposals(variables: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
+    getProposals(variables?: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return client.request<GetProposalsQuery>(print(GetProposalsDocument), variables);
     },
     submitProposal(variables: SubmitProposalMutationVariables): Promise<SubmitProposalMutation> {

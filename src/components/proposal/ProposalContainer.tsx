@@ -195,11 +195,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
           let { id, status, shortCode } = state.proposal;
+          const { callId } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
               () =>
                 api()
-                  .createProposal()
+                  .createProposal({ callId })
                   // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
                   .then(data => data.createProposal.proposal!),
               'Saved'

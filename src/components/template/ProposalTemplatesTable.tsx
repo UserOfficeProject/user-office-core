@@ -26,6 +26,8 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
     { title: 'Template ID', field: 'templateId', editable: 'never' },
     { title: 'Name', field: 'name', editable: 'always' },
     { title: 'Description', field: 'description', editable: 'always' },
+    { title: '# proposals', field: 'proposalCount', editable: 'never' },
+    { title: '# calls', field: 'callCount', editable: 'never' },
   ];
 
   const actionArray = [];

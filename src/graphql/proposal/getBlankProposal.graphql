@@ -1,5 +1,5 @@
-query getBlankProposal {
-  blankProposal {
+query getBlankProposal($callId: Int!) {
+  blankProposal(callId: $callId) {
     id
     status
     shortCode
@@ -9,6 +9,8 @@ query getBlankProposal {
     abstract
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }

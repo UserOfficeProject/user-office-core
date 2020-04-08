@@ -5,6 +5,8 @@ mutation createProposalTemplate($name: String!, $description: String) {
       name
       description
       isArchived
+      proposalCount
+      callCount
     }
     error
   }
