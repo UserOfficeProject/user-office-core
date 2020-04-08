@@ -38,34 +38,34 @@ export default class PostgresEventLogsDataSource
   }
 
   async get(filter: EventLogFilter) {
+    let whereRawQuery = '';
+
+    if (filter.changedObjectId && filter.changedObjectId !== '*') {
+      whereRawQuery += `changed_object_id = '${filter.changedObjectId}'`;
+    }
+
+    /** NOTE: This should make OR operator possible in eventTypes.
+     * For example we can have something like this in the end:
+     * select * from event_logs where changed_object_id = '3' and (event_type like 'USER%' or event_type like 'EMAIL_INVITE%')
+     */
+    if (filter.eventType && filter.eventType !== '*') {
+      const eventTypes = filter.eventType.split('|');
+      eventTypes.forEach((element, index) => {
+        if (index === 0) {
+          whereRawQuery += ` and (event_type like '${element.trim()}%')`;
+        } else {
+          whereRawQuery = whereRawQuery.replace(
+            ')',
+            ` or event_type like '${element.trim()}%')`
+          );
+        }
+      });
+    }
+
     return database
-      .select()
+      .select('*')
       .from('event_logs')
-      .modify(queryBuilder => {
-        if (filter.changedObjectId && filter.changedObjectId !== '*') {
-          queryBuilder.where('changed_object_id', filter.changedObjectId);
-        }
-
-        /**
-         * NOTE: Like this with '|' we can support query against multiple eventTypes.
-         * This is needed in scenarios like get all USER events and EMAIL_INVITE on the user logs.
-         */
-        const eventTypes = filter.eventType.split('|');
-
-        if (filter.eventType && filter.eventType !== '*') {
-          eventTypes.forEach((element, index) => {
-            if (index === 0) {
-              queryBuilder.where(
-                'event_type',
-                'like',
-                `${eventTypes[0].trim()}%`
-              );
-            } else {
-              queryBuilder.orWhere('event_type', 'like', `${element.trim()}%`);
-            }
-          });
-        }
-      })
+      .whereRaw(whereRawQuery)
       .then((eventLogs: EventLogRecord[]) => {
         return eventLogs.map(eventLog => this.createEventLogObject(eventLog));
       });

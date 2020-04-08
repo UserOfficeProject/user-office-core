@@ -2,8 +2,8 @@ import { to } from 'await-to-js';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { EventBusDecorator } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EventBusDecorator } from '../events/EventBusDecorator';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
 import { isMatchingConstraints } from '../models/ProposalModelFunctions';

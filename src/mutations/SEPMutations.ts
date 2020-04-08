@@ -1,6 +1,8 @@
+import * as yup from 'yup';
+
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { EventBusDecorator, ValidateArgsDecorator } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EventBusDecorator } from '../events/EventBusDecorator';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -9,12 +11,26 @@ import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+const createSEPValidationSchema = yup.object().shape({
+  code: yup.string().required(),
+  description: yup.string().required(),
+  numberRatingsRequired: yup.number().min(2),
+});
+
+const updateSEPValidationSchema = yup.object().shape({
+  id: yup.number().required(),
+  code: yup.string().required(),
+  description: yup.string().required(),
+  numberRatingsRequired: yup.number().min(2),
+});
+
 export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
     private userAuth: UserAuthorization
   ) {}
 
+  @ValidateArgsDecorator(createSEPValidationSchema)
   @EventBusDecorator(Event.SEP_CREATED)
   async create(
     agent: User | null,
@@ -48,6 +64,7 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgsDecorator(updateSEPValidationSchema)
   @EventBusDecorator(Event.SEP_UPDATED)
   async update(
     agent: User | null,

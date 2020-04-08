@@ -7,10 +7,8 @@ import {
   Resolver,
   Int,
 } from 'type-graphql';
-import * as yup from 'yup';
 
 import { ResolverContext } from '../../context';
-import { ValidateArgs } from '../../utils/ValidateArgs';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -32,16 +30,8 @@ export class UpdateSEPArgs {
   public active: boolean;
 }
 
-const updateSEPValidationSchema = yup.object().shape({
-  id: yup.number().required(),
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
 @Resolver()
 export class UpdateSEPMutation {
-  @ValidateArgs(updateSEPValidationSchema)
   @Mutation(() => SEPResponseWrap)
   async updateSEP(
     @Args() args: UpdateSEPArgs,

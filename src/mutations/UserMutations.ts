@@ -3,8 +3,8 @@ import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
+import { EventBusDecorator } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EventBusDecorator } from '../events/EventBusDecorator';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
