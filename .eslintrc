@@ -71,6 +71,7 @@
     "@typescript-eslint/camelcase": "warn",
     "react/display-name": "warn",
     "react/prop-types": "warn",
-    "interface-name": ["never"]
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/interface-name-prefix": "off"
   }
 }

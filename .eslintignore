@@ -8,3 +8,4 @@ cypress
 src/serviceWorker.js
 src/setupProxy.js
 server.js
+src/generated/**/*.*
