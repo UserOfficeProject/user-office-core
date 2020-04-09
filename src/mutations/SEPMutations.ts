@@ -1,15 +1,15 @@
 import * as yup from 'yup';
 
 import { SEPDataSource } from '../datasources/SEPDataSource';
-import { EventBusDecorator, ValidateArgsDecorator } from '../decorators';
+import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
+import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 const createSEPValidationSchema = yup.object().shape({
   code: yup.string().required(),
@@ -25,26 +25,15 @@ const updateSEPValidationSchema = yup.object().shape({
 });
 
 export default class SEPMutations {
-  constructor(
-    private dataSource: SEPDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: SEPDataSource) {}
 
-  @ValidateArgsDecorator(createSEPValidationSchema)
-  @EventBusDecorator(Event.SEP_CREATED)
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(createSEPValidationSchema)
+  @EventBus(Event.SEP_CREATED)
   async create(
     agent: User | null,
     args: CreateSEPArgs
   ): Promise<SEP | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
-    // Check if user officer, if not reject
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     return this.dataSource
       .create(
         args.code,
@@ -64,21 +53,13 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgsDecorator(updateSEPValidationSchema)
-  @EventBusDecorator(Event.SEP_UPDATED)
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(updateSEPValidationSchema)
+  @EventBus(Event.SEP_UPDATED)
   async update(
     agent: User | null,
     args: UpdateSEPArgs
   ): Promise<SEP | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
-    // Check if user officer, if not reject
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     return this.dataSource
       .update(
         args.id,

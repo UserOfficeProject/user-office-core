@@ -29,13 +29,7 @@ import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
-import { UserAuthorization } from './utils/UserAuthorization';
-
-// Site specific data sources and event handlers (only ESS atm)
-const userAuthorization = new UserAuthorization(
-  userDataSource,
-  reviewDataSource
-);
+import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource, userAuthorization);
@@ -84,8 +78,8 @@ const eventLogQueries = new EventLogQueries(
   userAuthorization
 );
 
-const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
-const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
+const sepQueries = new SEPQueries(sepDataSource);
+const sepMutations = new SEPMutations(sepDataSource);
 
 const context: BasicResolverContext = {
   userAuthorization,

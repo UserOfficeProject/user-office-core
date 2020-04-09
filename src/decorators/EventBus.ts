@@ -4,7 +4,7 @@ import { Event } from '../events/event.enum';
 import { Rejection, isRejection } from '../rejection';
 import { User } from '../resolvers/types/User';
 
-export const EventBusDecorator = (eventType: Event) => {
+const EventBusDecorator = (eventType: Event) => {
   return (
     target: object,
     name: string,
@@ -44,3 +44,5 @@ export const EventBusDecorator = (eventType: Event) => {
     };
   };
 };
+
+export default EventBusDecorator;

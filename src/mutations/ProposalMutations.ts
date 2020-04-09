@@ -2,7 +2,7 @@ import { to } from 'await-to-js';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBusDecorator } from '../decorators';
+import { EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -28,7 +28,7 @@ export default class ProposalMutations {
    ** This is not the way we should test if user is logged in or not.
    ** There should be an auth checker that handles those cases.
    */
-  @EventBusDecorator(Event.PROPOSAL_CREATED)
+  @EventBus(Event.PROPOSAL_CREATED)
   async create(agent: User | null): Promise<Proposal | Rejection> {
     if (agent == null) {
       return rejection('NOT_LOGGED_IN');
@@ -52,7 +52,7 @@ export default class ProposalMutations {
       });
   }
 
-  @EventBusDecorator(Event.PROPOSAL_UPDATED)
+  @EventBus(Event.PROPOSAL_UPDATED)
   async update(
     agent: User | null,
     args: UpdateProposalArgs
@@ -217,7 +217,7 @@ export default class ProposalMutations {
       });
   }
 
-  @EventBusDecorator(Event.PROPOSAL_SUBMITTED)
+  @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
     agent: User | null,
     proposalId: number

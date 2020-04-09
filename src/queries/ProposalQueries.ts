@@ -1,4 +1,5 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
 import { User } from '../models/User';
@@ -69,11 +70,8 @@ export default class ProposalQueries {
     }
   }
 
+  @Authorized()
   async getBlank(agent: User | null) {
-    if (agent == null) {
-      return null;
-    }
-
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.dataSource.checkActiveCall())
@@ -85,7 +83,7 @@ export default class ProposalQueries {
       0,
       '',
       '',
-      agent.id,
+      (agent as User).id,
       ProposalStatus.BLANK,
       new Date(),
       new Date(),

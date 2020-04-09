@@ -3,9 +3,10 @@ import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
-import { EventBusDecorator } from '../decorators';
+import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { Roles } from '../models/Role';
 import { User, checkUserArgs, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
@@ -40,14 +41,12 @@ export default class UserMutations {
     return new EmailInviteResponse(userId, agentId, role);
   }
 
-  @EventBusDecorator(Event.EMAIL_INVITE)
+  @Authorized()
+  @EventBus(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
   ): Promise<EmailInviteResponse | Rejection> {
-    if (!agent) {
-      return rejection('NOT_LOGGED');
-    }
     let userId: number | null = null;
     let role: UserRole = args.userRole;
     // Check if email exist in database and if user has been invited before
@@ -55,7 +54,7 @@ export default class UserMutations {
     if (user && user.placeholder) {
       userId = user.id;
 
-      return this.createEmailInviteResponse(userId, agent.id, role);
+      return this.createEmailInviteResponse(userId, (agent as User).id, role);
     } else if (user) {
       return rejection('ACCOUNT_EXIST');
     }
@@ -76,11 +75,11 @@ export default class UserMutations {
     if (!userId) {
       return rejection('NOT_ALLOWED');
     } else {
-      return this.createEmailInviteResponse(userId, agent.id, role);
+      return this.createEmailInviteResponse(userId, (agent as User).id, role);
     }
   }
 
-  @EventBusDecorator(Event.USER_CREATED)
+  @EventBus(Event.USER_CREATED)
   async create(
     agent: User | null,
     args: CreateUserArgs
@@ -108,11 +107,10 @@ export default class UserMutations {
     let user = await this.dataSource.getByEmail(args.email);
 
     if (user && user.placeholder) {
-      const changePassword = await this.updatePassword(
-        user,
-        user.id,
-        args.password
-      );
+      const changePassword = await this.updatePassword(user, {
+        id: user.id,
+        password: args.password,
+      });
       const updatedUser = await this.update(user, {
         id: user.id,
         placeholder: false,
@@ -184,18 +182,13 @@ export default class UserMutations {
     return userLinkResponse;
   }
 
-  @EventBusDecorator(Event.USER_UPDATED)
+  // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @EventBus(Event.USER_UPDATED)
   async update(
     agent: User | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, args.id))
-    ) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     const checkArgs = checkUserArgs(args);
     if (isRejection(checkArgs)) {
       return checkArgs;
@@ -227,7 +220,7 @@ export default class UserMutations {
       .update(user)
       .then(user => user)
       .catch(err => {
-        logger.logException('Could not create user', err, { user });
+        logger.logException('Could not update user', err, { user });
 
         return rejection('INTERNAL_ERROR');
       });
@@ -262,14 +255,11 @@ export default class UserMutations {
     return token;
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getTokenForUser(
     agent: User | null,
     userId: number
   ): Promise<string | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     const user = await this.dataSource.get(userId);
 
     if (!user) {
@@ -303,7 +293,7 @@ export default class UserMutations {
     }
   }
 
-  @EventBusDecorator(Event.USER_PASSWORD_RESET_EMAIL)
+  @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
     agent: User | null,
     email: string
@@ -358,11 +348,8 @@ export default class UserMutations {
     }
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: User | null, args: AddUserRoleArgs) {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
@@ -372,17 +359,12 @@ export default class UserMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
   async updatePassword(
     agent: User | null,
-    id: number,
-    password: string
+    { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isUser(agent, id))
-    ) {
-      return rejection('NOT_ALLOWED');
-    }
     try {
       const hash = this.createHash(password);
       const user = await this.dataSource.get(id);
@@ -402,6 +384,7 @@ export default class UserMutations {
       return rejection('INTERNAL_ERROR');
     }
   }
+
   async resetPassword(
     token: string,
     password: string

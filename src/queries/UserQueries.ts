@@ -6,6 +6,8 @@ import { CoreOptions, UriOptions } from 'request';
 import rp from 'request-promise';
 
 import { UserDataSource } from '../datasources/UserDataSource';
+import { Authorized } from '../decorators';
+import { Roles } from '../models/Role';
 import { User, BasicUserDetails } from '../models/User';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -20,21 +22,14 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
+  // TODO: Maybe we should have another endpoint for getting logged in user data. Something like `me()` or `userMe()`
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
   async get(agent: User | null, id: number) {
-    if (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isUser(agent, id))
-    ) {
-      return this.dataSource.get(id);
-    } else {
-      return null;
-    }
+    return this.dataSource.get(id);
   }
 
+  @Authorized()
   async getBasic(agent: User | null, id: number) {
-    if (!agent) {
-      return null;
-    }
     const user = await this.dataSource.getBasicUserInfo(id);
     if (!user) {
       return null;
@@ -143,6 +138,7 @@ export default class UserQueries {
       });
   }
 
+  @Authorized()
   async getAll(
     agent: User | null,
     filter?: string,
@@ -151,10 +147,6 @@ export default class UserQueries {
     userRole?: number,
     subtractUsers?: [number]
   ) {
-    if (agent == null) {
-      return null;
-    }
-
     return this.dataSource.getUsers(
       filter,
       first,
@@ -164,12 +156,9 @@ export default class UserQueries {
     );
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: User | null) {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getRoles();
-    } else {
-      return null;
-    }
+    return this.dataSource.getRoles();
   }
 
   async getUser(id: number) {

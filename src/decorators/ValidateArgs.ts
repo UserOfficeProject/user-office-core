@@ -14,7 +14,7 @@ const schemaValidation = async (schema: yup.ObjectSchema, inputArgs: any) => {
   return null;
 };
 
-export const ValidateArgsDecorator = (schema: yup.ObjectSchema) => {
+const ValidateArgs = (schema: yup.ObjectSchema) => {
   return (
     target: object,
     name: string,
@@ -40,3 +40,5 @@ export const ValidateArgsDecorator = (schema: yup.ObjectSchema) => {
     };
   };
 };
+
+export default ValidateArgs;
