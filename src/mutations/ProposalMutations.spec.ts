@@ -1,3 +1,4 @@
+import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
 
@@ -27,6 +28,7 @@ const dummyLogger = new MutedLogger();
 const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
+const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
@@ -34,6 +36,7 @@ const userAuthorization = new UserAuthorization(
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
   dummyTemplateDataSource,
+  dummyCallDataSource,
   userAuthorization,
   dummyEventBus,
   dummyLogger
@@ -62,11 +65,11 @@ function tryUpdateProposal(user: User, proposalId: number) {
 }
 /* eslint-enable @typescript-eslint/camelcase */
 
-test('A user on the proposal can update it\'s title if it is in edit mode', () => {
+test("A user on the proposal can update it's title if it is in edit mode", () => {
   return expect(tryUpdateProposal(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
-test('A user on the proposal can\'t update it\'s title if it is not in edit mode', () => {
+test("A user on the proposal can't update it's title if it is not in edit mode", () => {
   return expect(tryUpdateProposal(dummyUser, 2)).resolves.toHaveProperty(
     'reason',
     'NOT_ALLOWED_PROPOSAL_SUBMITTED'
@@ -195,13 +198,13 @@ test('User cannot delete a proposal', () => {
 });
 
 test('Has to be logged in to create proposal', () => {
-  return expect(proposalMutations.create(null)).resolves.not.toBeInstanceOf(
+  return expect(proposalMutations.create(null, 1)).resolves.not.toBeInstanceOf(
     Proposal
   );
 });
 
 test('Can create a proposal', () => {
-  return expect(proposalMutations.create(dummyUser)).resolves.toBeInstanceOf(
+  return expect(proposalMutations.create(dummyUser, 1)).resolves.toBeInstanceOf(
     Proposal
   );
 });
