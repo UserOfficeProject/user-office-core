@@ -47,6 +47,12 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
 
+  @Field(() => Int)
+  public callId?: number;
+
+  @Field(() => Int)
+  public templateId?: number;
+
   public proposerId: number;
 }
 

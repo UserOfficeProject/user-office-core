@@ -1,5 +1,6 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
+import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import {
   createConfigByType,
@@ -34,6 +35,8 @@ export interface ProposalRecord {
   readonly excellence_score: number;
   readonly safety_score: number;
   readonly technical_score: number;
+  readonly call_id: number;
+  readonly template_id: number;
 }
 
 export interface TopicRecord {
@@ -132,6 +135,7 @@ export interface CallRecord {
   readonly end_notify: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly template_id: number;
 }
 
 export interface PagetextRecord {
@@ -232,7 +236,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.updated_at,
     proposal.short_code,
     proposal.rank_order,
-    proposal.final_status
+    proposal.final_status,
+    proposal.call_id,
+    proposal.template_id
   );
 };
 
@@ -306,5 +312,21 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.lastname,
     user.institution,
     user.position
+  );
+};
+
+export const createCallObject = (call: CallRecord) => {
+  return new Call(
+    call.call_id,
+    call.call_short_code,
+    call.start_call,
+    call.end_call,
+    call.start_review,
+    call.end_review,
+    call.start_notify,
+    call.end_notify,
+    call.cycle_comment,
+    call.survey_comment,
+    call.template_id
   );
 };

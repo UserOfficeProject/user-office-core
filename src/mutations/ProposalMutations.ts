@@ -14,11 +14,13 @@ import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFi
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSource } from './../datasources/CallDataSource';
 
 export default class ProposalMutations {
   constructor(
     private dataSource: ProposalDataSource,
     private templateDataSource: TemplateDataSource,
+    private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private eventBus: EventBus<ApplicationEvent>,
     private logger: Logger
@@ -29,23 +31,33 @@ export default class ProposalMutations {
    ** This is not the way we should test if user is logged in or not.
    ** There should be an auth checker that handles those cases.
    */
-  async create(agent: User | null): Promise<Proposal | Rejection> {
+  async create(
+    agent: User | null,
+    callId: number
+  ): Promise<Proposal | Rejection> {
     return this.eventBus.wrap(
       async () => {
         if (agent == null) {
           return rejection('NOT_LOGGED_IN');
         }
 
-        // Check if there is an open call, if not reject
-        if (
-          !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.dataSource.checkActiveCall())
-        ) {
+        // Check if there is an open call
+        if (!(await this.dataSource.checkActiveCall(callId))) {
           return rejection('NO_ACTIVE_CALL_FOUND');
         }
 
+        const call = await this.callDataSource.get(callId);
+
+        if (!call || !call.templateId) {
+          logger.logError('User tried to create proposal on bad call', {
+            call,
+          });
+
+          return rejection('NOT_FOUND');
+        }
+
         return this.dataSource
-          .create(agent.id)
+          .create(agent.id, callId, call.templateId)
           .then(proposal => proposal)
           .catch(err => {
             logger.logException('Could not create proposal', err, { agent });
@@ -89,10 +101,14 @@ export default class ProposalMutations {
         // Get proposal information
         const proposal = await this.dataSource.get(id); //Hacky
 
+        if (!proposal) {
+          return rejection('NOT_FOUND');
+        }
+
         // Check if there is an open call, if not reject
         if (
           !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.dataSource.checkActiveCall())
+          !(await this.dataSource.checkActiveCall(proposal.callId))
         ) {
           return rejection('NO_ACTIVE_CALL_FOUND');
         }

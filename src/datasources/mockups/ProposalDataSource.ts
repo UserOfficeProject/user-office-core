@@ -31,6 +31,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
       1,
+      1,
+      1,
       1
     );
 
@@ -43,6 +45,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       new Date('2019-07-17 08:25:12.23043+00'),
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
+      1,
+      1,
       1,
       1
     );
@@ -99,7 +103,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return questionId;
   }
 
-  async checkActiveCall(): Promise<boolean> {
+  async checkActiveCall(callId: number): Promise<boolean> {
     return true;
   }
 
@@ -151,7 +155,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return null;
   }
 
-  async create(proposerID: number) {
+  async create(proposerID: number, callID: number, templateId: number) {
+    dummyProposal.proposerId = proposerID;
+    dummyProposal.callId = callID;
+    dummyProposal.templateId = templateId;
+
     return dummyProposal;
   }
 

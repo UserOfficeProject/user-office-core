@@ -61,12 +61,14 @@ const userMutations = new UserMutations(
 );
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
+  callDataSource,
   userAuthorization,
   logger
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   templateDataSource,
+  callDataSource,
   userAuthorization,
   eventBus,
   logger

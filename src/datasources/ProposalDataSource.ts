@@ -6,7 +6,7 @@ import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 export interface ProposalDataSource {
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(): Promise<boolean>;
+  checkActiveCall(callId: number): Promise<boolean>;
   getProposals(
     filter?: ProposalsFilter,
     first?: number,
@@ -16,7 +16,11 @@ export interface ProposalDataSource {
   getQuestionary(proposalId: number): Promise<Questionary>;
 
   // Write
-  create(id: number): Promise<Proposal>;
+  create(
+    proposerId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;

@@ -364,6 +364,92 @@
 			"response": []
 		},
 		{
+			"name": "obtainTokenForUser [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa6257ef-b799-4e64-8cb2-5b3b83c329ff",
+						"exec": [
+							"pm.test(\"Should be able to renew token\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.token.error).to.eql(null)",
+							"    pm.expect(jsonData.data.token.token).to.not.eql(null)",
+							"});",
+							"",
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"NEW_USER_TOKEN\", jsonData.data.token.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{NEW_USER_TOKEN}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDEwMDc5NywiZXhwIjoxNTcwNzA1NTk3fQ.VGrhlvv4eA8RqnHVEPLWRlFegdsG1IXygWJPoeJGCXA"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission/11"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation ($token: String!) {\n  token(token:$token) {\n    token\n    error\n  }\n}\n\n",
+						"variables": "{\n\t\"token\": \"{{NEW_USER_TOKEN}}\"\n}"
+					}
+				},
+				"url": "http://localhost:4000/graphql"
+			},
+			"response": []
+		},
+		{
 			"name": "updateUser [Mutation]",
 			"event": [
 				{
@@ -849,6 +935,9 @@
 					"graphql": {
 						"query": "mutation($id:String!, $question:String, $config:String, $isEnabled:Boolean, $dependencies:[FieldDependencyInput!]!) {\n  updateProposalTemplateField(id:$id, question:$question, config:$config, isEnabled:$isEnabled, dependencies:$dependencies) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n          dependencies {\n            question_id\n            dependency_id\n            dependency_natural_key\n            condition {\n                  condition\n                  params\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"id\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"isEnabled\": true,\n\"dependencies\": []\n}"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -1018,8 +1107,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query {\nblankProposal {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        topic_title\n        topic_id\n      }\n      isCompleted\n      fields {\n        proposal_question_id\n        data_type\n        question\n        config\n        {\n          ... on BooleanConfig {\n            required\n          }\n        }\n        value\n        dependencies {\n          question_id\n            dependency_id\n            dependency_natural_key\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
+						"query": "query {\nblankProposal(callId:1) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        topic_title\n        topic_id\n      }\n      isCompleted\n      fields {\n        proposal_question_id\n        data_type\n        question\n        config\n        {\n          ... on BooleanConfig {\n            required\n          }\n        }\n        value\n        dependencies {\n          question_id\n            dependency_id\n            dependency_natural_key\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
 						"variables": ""
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -1105,8 +1197,11 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation {\n  createProposal {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            {\n              ... on BooleanConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on DateConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on EmbellishmentConfig {\n                html\n                plain\n            \n                small_label\n                required\n                tooltip\n                omitFromPdf\n              }\n              ... on FileUploadConfig {\n                file_type\n                max_files\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on SelectionFromOptionsConfig {\n                variant\n                options\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on TextInputConfig {\n                min\n                max\n                multiline\n                placeholder\n            \n                small_label\n                required\n                tooltip\n              }\n            }\n            value\n            dependencies {\n              question_id\n                dependency_id\n                dependency_natural_key\n                condition {\n                      condition\n                      params\n                }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation {\n  createProposal(callId:1) {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            proposal_question_id\n            data_type\n            question\n            config\n            {\n              ... on BooleanConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on DateConfig {\n                small_label\n                required\n                tooltip\n              }\n              ... on EmbellishmentConfig {\n                html\n                plain\n            \n                small_label\n                required\n                tooltip\n                omitFromPdf\n              }\n              ... on FileUploadConfig {\n                file_type\n                max_files\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on SelectionFromOptionsConfig {\n                variant\n                options\n            \n                small_label\n                required\n                tooltip\n              }\n              ... on TextInputConfig {\n                min\n                max\n                multiline\n                placeholder\n            \n                small_label\n                required\n                tooltip\n              }\n            }\n            value\n            dependencies {\n              question_id\n                dependency_id\n                dependency_natural_key\n                condition {\n                      condition\n                      params\n                }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": ""
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -1189,6 +1284,9 @@
 					"graphql": {
 						"query": "query($id: Int!) {\n            proposal(id: $id) {\n              id\n              title\n              abstract\n              status\n              users{\n                firstname\n                lastname\n                id\n              }\n              questionary {\n                steps {\n                  topic {\n                    topic_title\n                    topic_id\n                  }\n                  fields {\n                    proposal_question_id\n                    data_type\n                    question\n                    config\n                    {\n                        ... on TextInputConfig {\n                            required\n                        }\n                    }\n                    value\n                    dependencies {\n                      question_id\n                      dependency_id\n                      dependency_natural_key\n                      condition {\n                          condition\n                          params\n                      }\n                    }\n                  }\n                }\n              }\n              reviews{\n                id\n                comment\n                status\n                reviewer{\n                  firstname\n                  lastname\n                  id\n                }\n              }\n            }\n          }",
 						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -1930,7 +2028,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($reviewID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    error\n  }\n}\n",
+						"query": "mutation($reviewID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}}\n}"
 					}
 				},
@@ -2279,7 +2377,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($filter: String!) {\n  proposals(filter: $filter) {\n    proposals{\n      id\n      shortCode\n      title\n      status\n      }\n    totalCount\n    }\n  }",
+						"query": "query {\n  proposals {\n    proposals{\n      id\n      shortCode\n      title\n      status\n      }\n    totalCount\n    }\n  }",
 						"variables": "{\n    \"filter\": \"\"\n}"
 					}
 				},
@@ -2592,6 +2690,9 @@
 					"graphql": {
 						"query": "mutation ($id: String!) {\n  deleteTemplateField(id: $id) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          proposal_question_id\n          data_type\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n          \n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"id\": \"{{NEW_FIELD_ID}}\"\n}"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"
@@ -2657,6 +2758,9 @@
 					"graphql": {
 						"query": "mutation($id: Int!) {\n    deleteTopic(id: $id){\n    error\n  }\n}",
 						"variables": "{\n\t\"id\":{{NEW_TOPIC_ID}}\n}"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": "http://localhost:4000/graphql"

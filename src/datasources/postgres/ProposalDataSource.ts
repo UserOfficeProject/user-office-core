@@ -24,7 +24,7 @@ import {
 } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  public async checkActiveCall(): Promise<boolean> {
+  public async checkActiveCall(callId: number): Promise<boolean> {
     const currentDate = new Date().toISOString();
 
     return database
@@ -32,6 +32,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from('call')
       .where('start_call', '<=', currentDate)
       .andWhere('end_call', '>=', currentDate)
+      .andWhere('call_id', '=', callId)
       .first()
       .then((call: CallRecord) => (call ? true : false));
   }
@@ -227,9 +228,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async create(proposerID: number): Promise<Proposal> {
+  async create(
+    proposerId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal> {
     return database
-      .insert({ proposer_id: proposerID }, ['*'])
+      .insert(
+        { proposer_id: proposerId, call_id: callId, template_id: templateId },
+        ['*']
+      )
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);

@@ -1,14 +1,16 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
+import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
 import { User } from '../models/User';
-import { Logger } from '../utils/Logger';
+import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
+    private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
   ) {}
@@ -70,15 +72,31 @@ export default class ProposalQueries {
     }
   }
 
-  async getBlank(agent: User | null) {
+  async getBlank(agent: User | null, callId: number) {
     if (agent == null) {
       return null;
     }
 
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall())
+      !(await this.dataSource.checkActiveCall(callId))
     ) {
+      return null;
+    }
+
+    const call = await this.callDataSource.get(callId);
+    if (!call) {
+      logger.logError('User tried accessing non existing call', {
+        callId,
+        agent,
+      });
+
+      return null;
+    }
+
+    if (!call.templateId) {
+      logger.logError('Use tried to getBlank for misconfigured call', { call });
+
       return null;
     }
 
@@ -92,7 +110,9 @@ export default class ProposalQueries {
       new Date(),
       '',
       0,
-      ProposalEndStatus.UNSET
+      ProposalEndStatus.UNSET,
+      call?.id,
+      call?.templateId
     );
 
     return blankProposal;

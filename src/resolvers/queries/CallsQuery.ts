@@ -5,8 +5,11 @@ import { Call } from '../types/Call';
 
 @InputType()
 export class CallsFilter {
-  @Field(() => [Int])
+  @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
+
+  @Field(() => Boolean, { nullable: true })
+  public isActive?: boolean;
 }
 
 @Resolver()
