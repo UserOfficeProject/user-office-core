@@ -35,6 +35,16 @@ export class UserAuthorization {
     return true;
   }
 
+  async hasRole(agent: User | null, role: string): Promise<boolean> {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.userDataSource.getUserRoles(agent.id).then(roles => {
+      return roles.some(roleItem => roleItem.shortCode === role);
+    });
+  }
+
   async isMemberOfProposal(agent: User | null, proposal: Proposal | null) {
     if (agent == null || proposal == null) {
       return false;
@@ -57,6 +67,7 @@ export class UserAuthorization {
       return reviews.some(review => review.proposalID === proposalID);
     });
   }
+
   async hasAccessRights(
     agent: User | null,
     proposal: Proposal

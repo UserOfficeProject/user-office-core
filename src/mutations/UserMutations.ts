@@ -1,13 +1,14 @@
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
+import * as yup from 'yup';
 
 import { UserDataSource } from '../datasources/UserDataSource';
-import { EventBus, Authorized } from '../decorators';
+import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { Roles } from '../models/Role';
-import { User, checkUserArgs, BasicUserDetails } from '../models/User';
+import { User, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -17,6 +18,28 @@ import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
 import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+
+const createUserValidationSchema = yup.object().shape({
+  firstname: yup
+    .string()
+    .required()
+    .min(2),
+  lastname: yup
+    .string()
+    .required()
+    .min(2),
+});
+
+const updateUserValidationSchema = yup.object().shape({
+  firstname: yup
+    .string()
+    .required()
+    .min(2),
+  lastname: yup
+    .string()
+    .required()
+    .min(2),
+});
 
 export default class UserMutations {
   constructor(
@@ -79,6 +102,7 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(createUserValidationSchema)
   @EventBus(Event.USER_CREATED)
   async create(
     agent: User | null,
@@ -184,14 +208,17 @@ export default class UserMutations {
 
   // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
   @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @ValidateArgs(updateUserValidationSchema)
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: User | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
-    const checkArgs = checkUserArgs(args);
-    if (isRejection(checkArgs)) {
-      return checkArgs;
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUser(agent, args.id))
+    ) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
     let user = await this.dataSource.get(args.id); //Hacky
@@ -365,6 +392,13 @@ export default class UserMutations {
     agent: User | null,
     { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isUser(agent, id))
+    ) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     try {
       const hash = this.createHash(password);
       const user = await this.dataSource.get(id);

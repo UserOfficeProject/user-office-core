@@ -199,6 +199,10 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
+  async me(id: number) {
+    return dummyUser;
+  }
+
   async get(id: number) {
     return dummyUser;
   }

@@ -3,6 +3,12 @@ import { Rejection, rejection } from '../rejection';
 import { User } from '../resolvers/types/User';
 import { userAuthorization } from '../utils/UserAuthorization';
 
+async function asyncForEach(array: Roles[], callback: Function) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
 const Authorized = (roles: Roles[] = []) => {
   return (
     target: object,
@@ -14,7 +20,7 @@ const Authorized = (roles: Roles[] = []) => {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function(...args) {
-      const [agent, inputArgs] = args;
+      const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
 
       if (!agent) {
@@ -29,15 +35,10 @@ const Authorized = (roles: Roles[] = []) => {
 
       let hasAccessRights = false;
 
-      if (roles.includes(Roles.USER_OFFICER)) {
-        hasAccessRights = await userAuthorization.isUserOfficer(agent);
-      }
-
-      // NOTE: This is not a good check if it is a user or not. It should do the same check as isUserOfficer.
-      if (roles.includes(Roles.USER) && !hasAccessRights) {
-        const userId = inputArgs.id ? inputArgs.id : inputArgs;
-        hasAccessRights = await userAuthorization.isUser(agent, userId);
-      }
+      await asyncForEach(roles, async (role: string) => {
+        hasAccessRights =
+          hasAccessRights || (await userAuthorization.hasRole(agent, role));
+      });
 
       if (hasAccessRights) {
         return result;
