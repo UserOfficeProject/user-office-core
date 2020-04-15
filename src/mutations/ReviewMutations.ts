@@ -1,5 +1,7 @@
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
+import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -15,6 +17,7 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @Authorized()
   async updateReview(
     agent: User | null,
     args: AddReviewArgs
@@ -48,17 +51,11 @@ export default class ReviewMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async setTechnicalReview(
     agent: User | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
-    if (!agent) {
-      return rejection('NOT_LOGGED_IN');
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_USER_OFFICER');
-    }
-
     return this.dataSource
       .setTechnicalReview(args)
       .then(review => review)
@@ -71,17 +68,11 @@ export default class ReviewMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async removeUserForReview(
     agent: User | null,
     id: number
   ): Promise<Review | Rejection> {
-    if (!agent) {
-      return rejection('NOT_LOGGED_IN');
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_USER_OFFICER');
-    }
-
     return this.dataSource
       .removeUserForReview(id)
       .then(review => review)
@@ -95,17 +86,11 @@ export default class ReviewMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async addUserForReview(
     agent: User | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_USER_OFFICER');
-    }
-
     const { proposalID, userID } = args;
 
     return this.dataSource

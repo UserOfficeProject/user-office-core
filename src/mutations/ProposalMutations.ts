@@ -2,7 +2,7 @@ import { to } from 'await-to-js';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus } from '../decorators';
+import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -23,17 +23,9 @@ export default class ProposalMutations {
     private logger: Logger
   ) {}
 
-  /* NOTE: User | null??? This should be solved differently.
-   ** We are sending null from the tests to simulate not logged in user.
-   ** This is not the way we should test if user is logged in or not.
-   ** There should be an auth checker that handles those cases.
-   */
+  @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
   async create(agent: User | null): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
     // Check if there is an open call, if not reject
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
@@ -43,7 +35,7 @@ export default class ProposalMutations {
     }
 
     return this.dataSource
-      .create(agent.id)
+      .create((agent as User).id)
       .then(proposal => proposal)
       .catch(err => {
         logger.logException('Could not create proposal', err, { agent });
@@ -52,6 +44,7 @@ export default class ProposalMutations {
       });
   }
 
+  @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
     agent: User | null,
@@ -69,9 +62,6 @@ export default class ProposalMutations {
       rankOrder,
       finalStatus,
     } = args;
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
 
     // Get proposal information
     const proposal = await this.dataSource.get(id); //Hacky
@@ -183,13 +173,11 @@ export default class ProposalMutations {
       });
   }
 
+  @Authorized()
   async updateFiles(
     agent: User | null,
     args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
     const { proposalId, questionId, files } = args;
     const proposal = await this.dataSource.get(proposalId);
 
@@ -217,15 +205,12 @@ export default class ProposalMutations {
       });
   }
 
+  @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
     const proposal = await this.dataSource.get(proposalId);
 
     if (!proposal) {
@@ -252,14 +237,11 @@ export default class ProposalMutations {
       });
   }
 
+  @Authorized()
   async delete(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
     const proposal = await this.dataSource.get(proposalId);
 
     if (!proposal) {

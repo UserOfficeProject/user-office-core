@@ -4,14 +4,12 @@ import { Proposal } from '../models/Proposal';
 import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
-import { Logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
+    private userAuth: UserAuthorization
   ) {}
 
   @Authorized()

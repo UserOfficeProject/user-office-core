@@ -3,6 +3,7 @@ import {
   SEPDataSourceMock,
   dummySEP,
   anotherDummySEP,
+  dummySEPWithoutCode,
 } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUser,
@@ -28,6 +29,12 @@ describe('Test SEPMutations', () => {
     return expect(
       SEPMutationsInstance.create(dummyUserOfficer, anotherDummySEP)
     ).resolves.toStrictEqual(anotherDummySEP);
+  });
+
+  test('A userofficer can not create SEP with bad input arguments', () => {
+    return expect(
+      SEPMutationsInstance.create(dummyUserOfficer, dummySEPWithoutCode)
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
   });
 
   test('A user cannot update SEP', async () => {

@@ -1,4 +1,5 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { Authorized } from '../decorators';
 import {
   createConfig,
   DataType,
@@ -6,6 +7,7 @@ import {
   ProposalTemplateField,
   Topic,
 } from '../models/ProposalModel';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateTemplateFieldArgs } from '../resolvers/mutations/CreateTemplateFieldMutation';
@@ -28,14 +30,11 @@ export default class TemplateMutations {
     private logger: Logger
   ) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async createTopic(
     agent: User | null,
     sortOrder: number
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .createTopic(sortOrder)
       .then(template => template)
@@ -49,14 +48,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateTopic(
     agent: User | null,
     args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateTopic(args.id, args)
       .then(topic => topic)
@@ -70,14 +66,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
     agent: User | null,
     topicId: number
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .deleteTopic(topicId)
       .then(topic => topic)
@@ -88,13 +81,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async createTemplateField(
     agent: User | null,
     args: CreateTemplateFieldArgs
   ): Promise<ProposalTemplateField | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
     const { dataType, topicId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
@@ -119,14 +110,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateProposalTemplateField(
     agent: User | null,
     args: UpdateProposalTemplateFieldArgs
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateTemplateField(args.id, args)
       .then(template => template)
@@ -140,14 +128,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteTemplateField(
     agent: User | null,
     id: string
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .deleteTemplateField(id)
       .then(template => template)
@@ -161,14 +146,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
     agent: User | null,
     topicOrder: number[]
   ): Promise<number[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateTopicOrder(topicOrder)
       .then(order => order)
@@ -182,14 +164,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateFieldTopicRel(
     agent: User | null,
-    topicId: number,
-    fieldIds: string[]
+    { topicId, fieldIds }: { topicId: number; fieldIds: string[] }
   ): Promise<string[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
     let isSuccess = true;
     let index = 1;
     for (const field of fieldIds) {

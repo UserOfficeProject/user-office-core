@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   SEPDataSourceMock,
   dummySEP,
@@ -7,11 +6,9 @@ import {
   dummySEPs,
 } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPQueries from './SEPQueries';
 
 const dummySEPDataSource = new SEPDataSourceMock();

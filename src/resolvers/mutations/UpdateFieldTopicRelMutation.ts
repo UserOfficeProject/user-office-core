@@ -38,11 +38,10 @@ export class UpdateFieldTopicRelMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateFieldTopicRel(
-        context.user,
-        args.topic_id,
-        args.field_ids
-      ),
+      context.mutations.template.updateFieldTopicRel(context.user, {
+        topicId: args.topic_id,
+        fieldIds: args.field_ids,
+      }),
       UpdateFieldTopicRelResponseWrap
     );
   }

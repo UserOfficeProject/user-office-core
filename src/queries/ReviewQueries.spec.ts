@@ -37,8 +37,8 @@ test('A userofficer can get reviews for a proposal', () => {
   ).resolves.toStrictEqual([dummyReview]);
 });
 
-test('A user can not reviews for a proposal', () => {
+test('A user can not get reviews for a proposal', () => {
   return expect(
     reviewQueries.reviewsForProposal(dummyUser, 10)
-  ).resolves.toStrictEqual([]);
+  ).resolves.toStrictEqual(null);
 });

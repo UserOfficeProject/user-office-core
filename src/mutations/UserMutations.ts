@@ -19,6 +19,7 @@ import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
+// TODO: Update the validation schemas later when we know all the validation rules.
 const createUserValidationSchema = yup.object().shape({
   firstname: yup
     .string()

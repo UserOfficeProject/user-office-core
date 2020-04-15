@@ -1,27 +1,15 @@
 import 'reflect-metadata';
 
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  UserDataSourceMock,
   dummyUserOfficer,
   dummyUser,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalTemplate } from '../models/ProposalModel';
 import TemplateQueries from '../queries/TemplateQueries';
-import { MutedLogger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const templateQueries = new TemplateQueries(
-  dummyTemplateDataSource,
-  userAuthorization,
-  new MutedLogger()
-);
+const templateQueries = new TemplateQueries(dummyTemplateDataSource);
 beforeEach(() => {
   dummyTemplateDataSource.init();
 });

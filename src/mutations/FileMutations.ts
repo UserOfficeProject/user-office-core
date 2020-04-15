@@ -2,13 +2,9 @@ import { FileDataSource } from '../datasources/IFileDataSource';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../rejection';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class FileMutations {
-  constructor(
-    private dataSource: FileDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: FileDataSource) {}
 
   async put(
     fileName: string,
