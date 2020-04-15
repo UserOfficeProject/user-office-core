@@ -24,7 +24,7 @@ export default function ProposalTechnicalReview(props: {
     status: props?.data?.status || '',
     timeAllocation: props?.data?.timeAllocation,
     comment: props?.data?.comment,
-    publicComment: props?.data?.publicComment
+    publicComment: props?.data?.publicComment,
   };
 
   return (
@@ -38,7 +38,7 @@ export default function ProposalTechnicalReview(props: {
           status: Yup.string().nullable(),
           timeAllocation: Yup.number().nullable(),
           comment: Yup.string().nullable(),
-          publicComment: Yup.string().nullable()
+          publicComment: Yup.string().nullable(),
         })}
         onSubmit={async (values, actions) => {
           await api()

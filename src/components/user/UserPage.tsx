@@ -37,7 +37,10 @@ function UserPage(props: { match: { params: { id: string } } }) {
           <Divider className={classes.divider} />
           <Impersonate id={userId} />
         </React.Fragment>
-        <EventLogList eventType="USER" changedObjectId={userId} />
+        <EventLogList
+          eventType="USER | EMAIL_INVITE"
+          changedObjectId={userId}
+        />
       </SimpleTabs>
     </Container>
   );
