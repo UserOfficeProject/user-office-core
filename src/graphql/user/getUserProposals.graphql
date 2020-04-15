@@ -1,5 +1,5 @@
-query getUserProposals($id: Int!) {
-  user(id: $id) {
+query getUserProposals {
+  me {
     proposals {
       id
       shortCode
