@@ -78,4 +78,8 @@ export class SEPDataSourceMock implements SEPDataSource {
 
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
+
+  async assignMembers(memberIds: number[], sepId: number) {
+    return true;
+  }
 }

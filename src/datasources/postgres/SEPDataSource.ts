@@ -105,4 +105,14 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         };
       });
   }
+
+  async assignMembers(memberIds: number[], sepId: number): Promise<boolean> {
+    const dataToInsert = memberIds.map(memberId => {
+      return { sep_member_user_id: memberId, sep_id: sepId };
+    });
+
+    await database.insert(dataToInsert).from('SEP_Assignments');
+
+    return true;
+  }
 }

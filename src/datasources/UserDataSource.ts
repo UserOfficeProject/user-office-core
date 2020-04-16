@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../models/Role';
 import { User, BasicUserDetails } from '../models/User';
+import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 
 export interface UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
+  addSEPMembersRole(args: AddSEPMembersRole[]): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;

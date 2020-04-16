@@ -1,5 +1,6 @@
 import { Role } from '../../models/Role';
 import { User, BasicUserDetails } from '../../models/User';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -121,6 +122,9 @@ export const dummyUserNotOnProposal = new User(
 
 export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
+    return true;
+  }
+  async addSEPMembersRole(args: AddSEPMembersRole[]): Promise<boolean> {
     return true;
   }
   getByOrcID(orcID: string): Promise<User | null> {

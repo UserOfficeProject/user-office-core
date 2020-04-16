@@ -7,6 +7,7 @@ import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import { AssignMembersSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
@@ -72,6 +73,26 @@ export default class SEPMutations {
       .catch(err => {
         logger.logException(
           'Could not update scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  // @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.SEP_UPDATED)
+  async assignMembers(
+    agent: User | null,
+    args: AssignMembersSEPArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .assignMembers(args.memberIds, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not assign members to scientific evaluation panel',
           err,
           { agent }
         );

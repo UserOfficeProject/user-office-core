@@ -12,6 +12,7 @@ import { User, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
+import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
@@ -376,10 +377,22 @@ export default class UserMutations {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  // @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: User | null, args: AddUserRoleArgs) {
     return this.dataSource
       .addUserRole(args)
+      .then(() => true)
+      .catch(err => {
+        logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  // @Authorized([Roles.USER_OFFICER])
+  async addSEPMembersRole(agent: User | null, args: AddSEPMembersRole[]) {
+    return this.dataSource
+      .addSEPMembersRole(args)
       .then(() => true)
       .catch(err => {
         logger.logException('Could not add user role', err, { agent });

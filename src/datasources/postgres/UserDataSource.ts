@@ -4,6 +4,7 @@ import { Transaction } from 'knex';
 
 import { Role } from '../../models/Role';
 import { User, BasicUserDetails } from '../../models/User';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -24,6 +25,23 @@ export default class PostgresUserDataSource implements UserDataSource {
         return true;
       });
   }
+
+  async addSEPMembersRole(
+    usersWithRoles: AddSEPMembersRole[]
+  ): Promise<boolean> {
+    const rolesToInsert = usersWithRoles.map(userWithRole => {
+      return {
+        user_id: userWithRole.userID,
+        role_id: userWithRole.roleID,
+        sep_id: userWithRole.SEPID,
+      };
+    });
+
+    await database.insert(rolesToInsert).into('role_user');
+
+    return true;
+  }
+
   checkEmailExist(email: string): Promise<boolean> {
     return database
       .select()

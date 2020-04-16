@@ -15,14 +15,14 @@ BEGIN
     );
 
     CREATE TABLE IF NOT EXISTS "SEP_Assignments" (
-      proposal_id int NOT NULL REFERENCES proposals(proposal_id),
+      proposal_id int REFERENCES proposals(proposal_id),
       SEP_member_user_id int REFERENCES users(user_id),
-      sep_id int,
+      sep_id int REFERENCES "SEPs"(sep_id),
       date_assigned TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      reassigned boolean,
+      reassigned boolean DEFAULT false,
       date_reassigned TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      email_sent boolean,
-      PRIMARY KEY (proposal_id, SEP_member_user_id)
+      email_sent boolean DEFAULT false,
+      PRIMARY KEY (sep_id, SEP_member_user_id)
     );
 
     CREATE TABLE IF NOT EXISTS "SEP_Ratings" (
@@ -41,7 +41,10 @@ BEGIN
 
     ALTER TABLE role_user ADD COLUMN sep_id int;
     ALTER TABLE role_user DROP CONSTRAINT IF EXISTS sep_id,
-    ADD CONSTRAINT sep_id FOREIGN KEY (sep_id) REFERENCES "SEPs" (sep_id) ON DELETE CASCADE;
+    ADD CONSTRAINT sep_id FOREIGN KEY (sep_id) REFERENCES "SEPs" (sep_id) ON DELETE CASCADE,
+    ADD CONSTRAINT role_user_sep_unique_idx UNIQUE (role_id, user_id, sep_id);
+
+    CREATE UNIQUE INDEX role_user_unique_idx ON role_user (role_id, user_id) WHERE sep_id IS NULL;
 
     ALTER TABLE "SEP_Assignments" ADD FOREIGN KEY (sep_id) REFERENCES "SEPs" (sep_id);
 
