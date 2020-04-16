@@ -1,11 +1,10 @@
+import { eventBus } from '../events';
+import { ApplicationEvent } from '../events/applicationEvents';
+import { Event } from '../events/event.enum';
 import { Rejection, isRejection } from '../rejection';
 import { User } from '../resolvers/types/User';
-import { ApplicationEvent } from './applicationEvents';
-import { Event } from './event.enum';
 
-import { eventBus } from '.';
-
-export const EventBusDecorator = (eventType: Event) => {
+const EventBusDecorator = (eventType: Event) => {
   return (
     target: object,
     name: string,
@@ -13,12 +12,12 @@ export const EventBusDecorator = (eventType: Event) => {
       value?: (agent: User, args: any) => Promise<Rejection | any>;
     }
   ) => {
-    const inner = descriptor.value;
+    const originalMethod = descriptor.value;
 
     descriptor.value = async function(...args) {
       let [loggedInUser] = args;
 
-      const result = await inner?.apply(this, args);
+      const result = await originalMethod?.apply(this, args);
 
       // NOTE: Get the name of the object or class like: 'SEP', 'USER', 'Proposal' and lowercase it.
       const resultKey = (result.constructor.name as string).toLowerCase();
@@ -31,6 +30,7 @@ export const EventBusDecorator = (eventType: Event) => {
       const event = {
         type: eventType,
         [resultKey]: result,
+        key: resultKey,
         loggedInUserId: loggedInUser ? loggedInUser.id : null,
         isRejection: isRejection(result),
       } as ApplicationEvent;
@@ -44,3 +44,5 @@ export const EventBusDecorator = (eventType: Event) => {
     };
   };
 };
+
+export default EventBusDecorator;

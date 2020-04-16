@@ -5,6 +5,7 @@ import { Event } from './event.enum';
 
 interface GeneralEvent {
   type: Event;
+  key: string;
   loggedInUserId: number | null;
   isRejection: boolean;
 }

@@ -17,6 +17,14 @@ export const anotherDummySEP = new SEP(
   false
 );
 
+export const dummySEPWithoutCode = new SEP(
+  2,
+  '',
+  'Scientific evaluation panel 2',
+  2,
+  false
+);
+
 export const dummySEPs = [dummySEP, anotherDummySEP];
 
 export class SEPDataSourceMock implements SEPDataSource {

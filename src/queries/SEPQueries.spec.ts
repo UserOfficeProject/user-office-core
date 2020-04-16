@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   SEPDataSourceMock,
   dummySEP,
@@ -7,22 +6,13 @@ import {
   dummySEPs,
 } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPQueries from './SEPQueries';
 
 const dummySEPDataSource = new SEPDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const SEPQueriesInstance = new SEPQueries(
-  dummySEPDataSource,
-  userAuthorization
-);
+const SEPQueriesInstance = new SEPQueries(dummySEPDataSource);
 
 describe('Test SEPQueries', () => {
   test('A user cannot query all SEPs', () => {

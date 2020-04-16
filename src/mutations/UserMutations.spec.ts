@@ -69,7 +69,7 @@ test('A user must be logged in to invite another user by email', () => {
       email: 'email@google.com',
       userRole: UserRole.USER,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED');
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A user cannot invite another user by email if the user already has an account', () => {
@@ -155,7 +155,7 @@ test('A not logged in user cannot update another users name', () => {
       firstname: 'klara',
       lastname: 'undefined',
     })
-  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A userofficer can update another users name', () => {
@@ -247,29 +247,37 @@ test('A user can not update its password if it has a bad token', () => {
 
 test('A user can update its password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUser, dummyUser.id, 'Test1234!')
+    userMutations.updatePassword(dummyUser, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test('A user can not update another users password ', () => {
   return expect(
-    userMutations.updatePassword(
-      dummyUserNotOnProposal,
-      dummyUser.id,
-      'Test1234!'
-    )
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+    userMutations.updatePassword(dummyUserNotOnProposal, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A not logged in users can not update passwords ', () => {
   return expect(
-    userMutations.updatePassword(null, dummyUser.id, 'Test1234!')
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+    userMutations.updatePassword(null, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A user officer can update any password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUserOfficer, dummyUser.id, 'Test1234!')
+    userMutations.updatePassword(dummyUserOfficer, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 

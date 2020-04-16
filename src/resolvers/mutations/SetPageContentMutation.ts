@@ -14,7 +14,7 @@ export class SetPageContentMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.admin.setPageText(context.user, id, text),
+      context.mutations.admin.setPageText(context.user, { id, text }),
       PageResponseWrap
     );
   }

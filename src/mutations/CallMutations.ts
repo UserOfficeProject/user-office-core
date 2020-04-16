@@ -1,5 +1,7 @@
 import { CallDataSource } from '../datasources/CallDataSource';
+import { Authorized } from '../decorators';
 import { Call } from '../models/Call';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
@@ -12,17 +14,11 @@ export default class CallMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async create(
     agent: User | null,
     args: CreateCallArgs
   ): Promise<Call | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_USER_OFFICER');
-    }
-
     return this.dataSource
       .create(args)
       .then(result => result)

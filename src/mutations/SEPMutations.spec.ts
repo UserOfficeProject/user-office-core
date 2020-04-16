@@ -1,28 +1,19 @@
 import 'reflect-metadata';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   SEPDataSourceMock,
   dummySEP,
   anotherDummySEP,
+  dummySEPWithoutCode,
 } from '../datasources/mockups/SEPDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
 import { Rejection } from '../rejection';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPMutations from './SEPMutations';
 
 const dummySEPDataSource = new SEPDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const SEPMutationsInstance = new SEPMutations(
-  dummySEPDataSource,
-  userAuthorization
-);
+const SEPMutationsInstance = new SEPMutations(dummySEPDataSource);
 
 describe('Test SEPMutations', () => {
   test('A user cannot create SEP', async () => {
@@ -38,6 +29,12 @@ describe('Test SEPMutations', () => {
     return expect(
       SEPMutationsInstance.create(dummyUserOfficer, anotherDummySEP)
     ).resolves.toStrictEqual(anotherDummySEP);
+  });
+
+  test('A userofficer can not create SEP with bad input arguments', () => {
+    return expect(
+      SEPMutationsInstance.create(dummyUserOfficer, dummySEPWithoutCode)
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
   });
 
   test('A user cannot update SEP', async () => {

@@ -58,7 +58,7 @@ test('A userofficer can add a reviewer for a proposal', () => {
 test('A user can not add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A userofficer can remove a reviewer for a proposal', () => {
@@ -70,5 +70,5 @@ test('A userofficer can remove a reviewer for a proposal', () => {
 test('A user can not remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUser, 1)
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

@@ -5,3 +5,12 @@ export class Role {
     public title: string
   ) {}
 }
+
+export enum Roles {
+  USER = 'user',
+  USER_OFFICER = 'user_officer',
+  REVIEWER = 'reviewer',
+  SEP_CHAIR = 'SEP_Chair',
+  SEP_SECRETARY = 'SEP_Secretary',
+  SEP_MEMBER = 'SEP_Member',
+}

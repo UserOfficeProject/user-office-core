@@ -29,13 +29,7 @@ import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
-import { UserAuthorization } from './utils/UserAuthorization';
-
-// Site specific data sources and event handlers (only ESS atm)
-const userAuthorization = new UserAuthorization(
-  userDataSource,
-  reviewDataSource
-);
+import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource, userAuthorization);
@@ -43,8 +37,7 @@ const userMutations = new UserMutations(userDataSource, userAuthorization);
 
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
-  userAuthorization,
-  logger
+  userAuthorization
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
@@ -59,33 +52,26 @@ const reviewMutations = new ReviewMutations(
   userAuthorization
 );
 
-const callQueries = new CallQueries(callDataSource, userAuthorization);
+const callQueries = new CallQueries(callDataSource);
 const callMutations = new CallMutations(callDataSource, userAuthorization);
 
-const fileQueries = new FileQueries(fileDataSource, userAuthorization);
-const fileMutations = new FileMutations(fileDataSource, userAuthorization);
+const fileQueries = new FileQueries(fileDataSource);
+const fileMutations = new FileMutations(fileDataSource);
 
-const adminQueries = new AdminQueries(adminDataSource, userAuthorization);
+const adminQueries = new AdminQueries(adminDataSource);
 const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
 
-const templateQueries = new TemplateQueries(
-  templateDataSource,
-  userAuthorization,
-  logger
-);
+const templateQueries = new TemplateQueries(templateDataSource);
 const templateMutations = new TemplateMutations(
   templateDataSource,
   userAuthorization,
   logger
 );
 
-const eventLogQueries = new EventLogQueries(
-  eventLogsDataSource,
-  userAuthorization
-);
+const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 
-const sepQueries = new SEPQueries(sepDataSource, userAuthorization);
-const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
+const sepQueries = new SEPQueries(sepDataSource);
+const sepMutations = new SEPMutations(sepDataSource);
 
 const context: BasicResolverContext = {
   userAuthorization,

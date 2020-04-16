@@ -34,7 +34,7 @@ test('A user can not create a call', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     })
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A not logged in user can not create a call', () => {

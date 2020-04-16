@@ -25,9 +25,7 @@ test('A user officer fetch can fetch any user account', () => {
 });
 
 test('A user is allowed to fetch its own account ', () => {
-  return expect(userQueries.get(dummyUser, dummyUser.id)).resolves.toBe(
-    dummyUser
-  );
+  return expect(userQueries.me(dummyUser)).resolves.toBe(dummyUser);
 });
 
 test('A user is not allowed to fetch other peoples account ', () => {

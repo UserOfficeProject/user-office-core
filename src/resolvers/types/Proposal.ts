@@ -80,7 +80,7 @@ export class ProposalResolver {
   async reviews(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Review[]> {
+  ): Promise<Review[] | null> {
     return await context.queries.review.reviewsForProposal(
       context.user,
       proposal.id
