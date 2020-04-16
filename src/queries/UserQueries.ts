@@ -22,7 +22,6 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
-  // TODO: Maybe we should have another endpoint for getting logged in user data. Something like `me()` or `userMe()`
   @Authorized([Roles.USER_OFFICER])
   async get(agent: User | null, id: number) {
     return this.dataSource.get(id);
