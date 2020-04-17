@@ -13,6 +13,18 @@ export type Scalars = {
   IntStringDateBool: any,
 };
 
+export type AddSepMembersRole = {
+  userID: Scalars['Int'],
+  roleID: Scalars['Int'],
+  SEPID: Scalars['Int'],
+};
+
+export type AddSepMembersRoleResponseWrap = {
+   __typename?: 'AddSEPMembersRoleResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['Boolean']>,
+};
+
 export type AddUserRoleResponseWrap = {
    __typename?: 'AddUserRoleResponseWrap',
   error?: Maybe<Scalars['String']>,
@@ -183,18 +195,26 @@ export type FileUploadConfig = {
 
 export type Mutation = {
    __typename?: 'Mutation',
-  addClientLog: SuccessResponseWrap,
+  createCall: CallResponseWrap,
+  updateProposalFiles: UpdateProposalFilesResponseWrap,
+  updateProposal: ProposalResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
-  addUserRole: AddUserRoleResponseWrap,
-  createCall: CallResponseWrap,
-  createProposal: ProposalResponseWrap,
+  assignMembers: SepAssignmentsResponseWrap,
   createSEP: SepResponseWrap,
+  updateSEP: SepResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
-  createTopic: ProposalTemplateResponseWrap,
+  updateProposalTemplateField: ProposalTemplateResponseWrap,
+  updateTopic: TopicResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
+  updateUser: UserResponseWrap,
+  addClientLog: SuccessResponseWrap,
+  addSEPMembersRole: AddSepMembersRoleResponseWrap,
+  addUserRole: AddUserRoleResponseWrap,
+  createProposal: ProposalResponseWrap,
+  createTopic: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteTemplateField: ProposalTemplateResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
@@ -210,18 +230,41 @@ export type Mutation = {
   token: TokenResponseWrap,
   updateFieldTopicRel: UpdateFieldTopicRelResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
-  updateProposalFiles: UpdateProposalFilesResponseWrap,
-  updateProposal: ProposalResponseWrap,
-  updateProposalTemplateField: ProposalTemplateResponseWrap,
-  updateSEP: SepResponseWrap,
-  updateTopic: TopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
-  updateUser: UserResponseWrap,
 };
 
 
-export type MutationAddClientLogArgs = {
-  error: Scalars['String']
+export type MutationCreateCallArgs = {
+  shortCode: Scalars['String'],
+  startCall: Scalars['String'],
+  endCall: Scalars['String'],
+  startReview: Scalars['String'],
+  endReview: Scalars['String'],
+  startNotify: Scalars['String'],
+  endNotify: Scalars['String'],
+  cycleComment: Scalars['String'],
+  surveyComment: Scalars['String']
+};
+
+
+export type MutationUpdateProposalFilesArgs = {
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
+  files: Array<Scalars['String']>
+};
+
+
+export type MutationUpdateProposalArgs = {
+  id: Scalars['Int'],
+  title?: Maybe<Scalars['String']>,
+  abstract?: Maybe<Scalars['String']>,
+  answers?: Maybe<Array<ProposalAnswerInput>>,
+  topicsCompleted?: Maybe<Array<Scalars['Int']>>,
+  users?: Maybe<Array<Scalars['Int']>>,
+  proposerId?: Maybe<Scalars['Int']>,
+  partialSave?: Maybe<Scalars['Boolean']>,
+  rankOrder?: Maybe<Scalars['Int']>,
+  finalStatus?: Maybe<ProposalEndStatus>
 };
 
 
@@ -248,26 +291,22 @@ export type MutationAddUserForReviewArgs = {
 };
 
 
-export type MutationAddUserRoleArgs = {
-  userID: Scalars['Int'],
-  roleID: Scalars['Int']
-};
-
-
-export type MutationCreateCallArgs = {
-  shortCode: Scalars['String'],
-  startCall: Scalars['String'],
-  endCall: Scalars['String'],
-  startReview: Scalars['String'],
-  endReview: Scalars['String'],
-  startNotify: Scalars['String'],
-  endNotify: Scalars['String'],
-  cycleComment: Scalars['String'],
-  surveyComment: Scalars['String']
+export type MutationAssignMembersArgs = {
+  memberIds: Array<Scalars['Int']>,
+  sepId: Scalars['Int']
 };
 
 
 export type MutationCreateSepArgs = {
+  code: Scalars['String'],
+  description: Scalars['String'],
+  numberRatingsRequired?: Maybe<Scalars['Int']>,
+  active: Scalars['Boolean']
+};
+
+
+export type MutationUpdateSepArgs = {
+  id: Scalars['Int'],
   code: Scalars['String'],
   description: Scalars['String'],
   numberRatingsRequired?: Maybe<Scalars['Int']>,
@@ -281,8 +320,20 @@ export type MutationCreateTemplateFieldArgs = {
 };
 
 
-export type MutationCreateTopicArgs = {
-  sortOrder: Scalars['Int']
+export type MutationUpdateProposalTemplateFieldArgs = {
+  id: Scalars['String'],
+  naturalKey?: Maybe<Scalars['String']>,
+  question?: Maybe<Scalars['String']>,
+  config?: Maybe<Scalars['String']>,
+  isEnabled?: Maybe<Scalars['Boolean']>,
+  dependencies: Array<FieldDependencyInput>
+};
+
+
+export type MutationUpdateTopicArgs = {
+  id: Scalars['Int'],
+  title?: Maybe<Scalars['String']>,
+  isEnabled?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -314,6 +365,51 @@ export type MutationCreateUserArgs = {
   telephone: Scalars['String'],
   telephone_alt?: Maybe<Scalars['String']>,
   otherOrganisation?: Maybe<Scalars['String']>
+};
+
+
+export type MutationUpdateUserArgs = {
+  id: Scalars['Int'],
+  user_title?: Maybe<Scalars['String']>,
+  firstname?: Maybe<Scalars['String']>,
+  middlename?: Maybe<Scalars['String']>,
+  lastname?: Maybe<Scalars['String']>,
+  username?: Maybe<Scalars['String']>,
+  preferredname?: Maybe<Scalars['String']>,
+  gender?: Maybe<Scalars['String']>,
+  nationality?: Maybe<Scalars['Int']>,
+  birthdate?: Maybe<Scalars['String']>,
+  organisation?: Maybe<Scalars['Int']>,
+  department?: Maybe<Scalars['String']>,
+  position?: Maybe<Scalars['String']>,
+  email?: Maybe<Scalars['String']>,
+  telephone?: Maybe<Scalars['String']>,
+  telephone_alt?: Maybe<Scalars['String']>,
+  placeholder?: Maybe<Scalars['String']>,
+  roles?: Maybe<Array<Scalars['Int']>>,
+  orcid?: Maybe<Scalars['String']>,
+  refreshToken?: Maybe<Scalars['String']>
+};
+
+
+export type MutationAddClientLogArgs = {
+  error: Scalars['String']
+};
+
+
+export type MutationAddSepMembersRoleArgs = {
+  addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
+};
+
+
+export type MutationAddUserRoleArgs = {
+  userID: Scalars['Int'],
+  roleID: Scalars['Int']
+};
+
+
+export type MutationCreateTopicArgs = {
+  sortOrder: Scalars['Int']
 };
 
 
@@ -392,79 +488,8 @@ export type MutationUpdatePasswordArgs = {
 };
 
 
-export type MutationUpdateProposalFilesArgs = {
-  proposalId: Scalars['Int'],
-  questionId: Scalars['String'],
-  files: Array<Scalars['String']>
-};
-
-
-export type MutationUpdateProposalArgs = {
-  id: Scalars['Int'],
-  title?: Maybe<Scalars['String']>,
-  abstract?: Maybe<Scalars['String']>,
-  answers?: Maybe<Array<ProposalAnswerInput>>,
-  topicsCompleted?: Maybe<Array<Scalars['Int']>>,
-  users?: Maybe<Array<Scalars['Int']>>,
-  proposerId?: Maybe<Scalars['Int']>,
-  partialSave?: Maybe<Scalars['Boolean']>,
-  rankOrder?: Maybe<Scalars['Int']>,
-  finalStatus?: Maybe<ProposalEndStatus>
-};
-
-
-export type MutationUpdateProposalTemplateFieldArgs = {
-  id: Scalars['String'],
-  naturalKey?: Maybe<Scalars['String']>,
-  question?: Maybe<Scalars['String']>,
-  config?: Maybe<Scalars['String']>,
-  isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies: Array<FieldDependencyInput>
-};
-
-
-export type MutationUpdateSepArgs = {
-  id: Scalars['Int'],
-  code: Scalars['String'],
-  description: Scalars['String'],
-  numberRatingsRequired?: Maybe<Scalars['Int']>,
-  active: Scalars['Boolean']
-};
-
-
-export type MutationUpdateTopicArgs = {
-  id: Scalars['Int'],
-  title?: Maybe<Scalars['String']>,
-  isEnabled?: Maybe<Scalars['Boolean']>
-};
-
-
 export type MutationUpdateTopicOrderArgs = {
   topicOrder: Array<Scalars['Int']>
-};
-
-
-export type MutationUpdateUserArgs = {
-  id: Scalars['Int'],
-  user_title?: Maybe<Scalars['String']>,
-  firstname?: Maybe<Scalars['String']>,
-  middlename?: Maybe<Scalars['String']>,
-  lastname?: Maybe<Scalars['String']>,
-  username?: Maybe<Scalars['String']>,
-  preferredname?: Maybe<Scalars['String']>,
-  gender?: Maybe<Scalars['String']>,
-  nationality?: Maybe<Scalars['Int']>,
-  birthdate?: Maybe<Scalars['String']>,
-  organisation?: Maybe<Scalars['Int']>,
-  department?: Maybe<Scalars['String']>,
-  position?: Maybe<Scalars['String']>,
-  email?: Maybe<Scalars['String']>,
-  telephone?: Maybe<Scalars['String']>,
-  telephone_alt?: Maybe<Scalars['String']>,
-  placeholder?: Maybe<Scalars['String']>,
-  roles?: Maybe<Array<Scalars['Int']>>,
-  orcid?: Maybe<Scalars['String']>,
-  refreshToken?: Maybe<Scalars['String']>
 };
 
 export type OrcIdInformation = {
@@ -590,6 +615,7 @@ export type Query = {
   sep?: Maybe<Sep>,
   seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
+  me?: Maybe<User>,
   users?: Maybe<UserQueryResult>,
 };
 
@@ -758,6 +784,12 @@ export type Sep = {
   description: Scalars['String'],
   numberRatingsRequired: Scalars['Float'],
   active: Scalars['Boolean'],
+};
+
+export type SepAssignmentsResponseWrap = {
+   __typename?: 'SEPAssignmentsResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['Boolean']>,
 };
 
 export type SepResponseWrap = {
