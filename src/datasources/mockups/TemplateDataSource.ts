@@ -1,33 +1,177 @@
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 // TODO: Check if we can go only with camelcase.
 // For now it is fine because of database fields.
 /* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../../models/Proposal';
 import {
-  ProposalTemplate,
-  ProposalTemplateField,
+  Answer,
   DataType,
-  Topic,
-  ProposalAnswer,
-  TemplateStep,
-  Questionary,
+  FieldCondition,
+  FieldDependency,
+  ProposalTemplate,
   ProposalTemplateMetadata,
+  Question,
+  Questionary,
+  QuestionRel,
+  TemplateStep,
+  Topic,
 } from '../../models/ProposalModel';
-import {
-  createDummyTemplate,
-  createDummyField,
-  createDummyTopic,
-} from '../../tests/ProposalTestBed';
+import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
-import { createDummyProposalTemplateMetadata } from './../../tests/ProposalTestBed';
 
 export let dummyTemplate: ProposalTemplate;
 export let dummyProposalTemplateMedatata: ProposalTemplateMetadata;
 export let dummyQuestionary: Questionary;
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
-export let dummyAnswers: ProposalAnswer[];
+export let dummyAnswers: Answer[];
+
+const createDummyQuestion = (values?: Partial<Question>): Question => {
+  return new Question(
+    values?.proposalQuestionId || 'random_field_name_' + Math.random(),
+    values?.naturalKey || 'is_dangerous',
+    values?.dataType || DataType.TEXT_INPUT,
+    values?.question || 'Some random question',
+    values?.config || { required: false, tooltip: '', small_label: '' }
+  );
+};
+
+const create1TopicFieldlessTemplate = () => {
+  return new ProposalTemplate([
+    new TemplateStep(new Topic(0, 'General information', 0, true), []),
+  ]);
+};
+
+const createDummyQuestionRel = (values: {
+  question?: Partial<Question>;
+  sortOrder?: number;
+  topicId?: number;
+  dependency?: FieldDependency;
+}): QuestionRel => {
+  return new QuestionRel(
+    createDummyQuestion(values.question),
+    values.sortOrder || Math.round(Math.random() * 100),
+    values.topicId || Math.round(Math.random() * 10),
+    values.dependency || undefined
+  );
+};
+
+const createDummyTemplate = () => {
+  const hasLinksToField = createDummyQuestionRel({
+    question: createDummyQuestion({
+      proposalQuestionId: 'hasLinksToField',
+      dataType: DataType.SELECTION_FROM_OPTIONS,
+    }),
+  });
+  const linksToField = createDummyQuestionRel({
+    question: createDummyQuestion({
+      proposalQuestionId: 'linksToField',
+      dataType: DataType.TEXT_INPUT,
+    }),
+    dependency: new FieldDependency(
+      'linksToField',
+      'hasLinksToField',
+      'hasLinksToField',
+      new FieldCondition(EvaluatorOperator.EQ, 'yes')
+    ),
+  });
+
+  return new ProposalTemplate([
+    new TemplateStep(new Topic(1, 'General information', 1, true), [
+      hasLinksToField,
+      linksToField,
+    ]),
+  ]);
+};
+
+const createDummyProposalTemplateMetadata = (values?: {
+  id?: number;
+  name?: string;
+  description?: string;
+  isArchived?: boolean;
+}) => {
+  values = values || {};
+
+  return new ProposalTemplateMetadata(
+    values.id || 1,
+    values.name || 'Industrial template',
+    values.description || 'Industrial template description',
+    values.isArchived || false
+  );
+};
+
+const createDummyTopic = (
+  id: number,
+  values: {
+    title?: string;
+    sortOrder?: number;
+    isEnabled?: boolean;
+  }
+) => {
+  return new Topic(
+    id,
+    values.title || 'General information',
+    values.sortOrder || 0,
+    values.isEnabled || true
+  );
+};
 
 export class TemplateDataSourceMock implements TemplateDataSource {
+  async cloneTemplate(templateId: number): Promise<ProposalTemplateMetadata> {
+    return createDummyProposalTemplateMetadata({ id: templateId });
+  }
+  async getProposalTemplateMetadata(
+    templateId: number
+  ): Promise<ProposalTemplateMetadata | null> {
+    return createDummyProposalTemplateMetadata({ id: templateId });
+  }
+  async updateTemplateMetadata(
+    values: UpdateProposalTemplateMetadataArgs
+  ): Promise<ProposalTemplateMetadata | null> {
+    return createDummyProposalTemplateMetadata(values);
+  }
+  async createQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<ProposalTemplate> {
+    return createDummyTemplate();
+  }
+  async getQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<QuestionRel | null> {
+    return createDummyQuestionRel({
+      question: { proposalQuestionId: fieldId },
+    });
+  }
+  async deleteQuestionRel(
+    templateId: number,
+    fieldId: string
+  ): Promise<ProposalTemplate> {
+    return createDummyTemplate();
+  }
+  async createQuestionAndRel(
+    templateId: number,
+    fieldId: string,
+    naturalKey: string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<ProposalTemplate> {
+    return createDummyTemplate();
+  }
+  async updateQuestionRel(
+    questionId: string,
+    templateId: number,
+    values: {
+      topicId?: number | undefined;
+      sortOrder?: number | undefined;
+      dependency?: any;
+    }
+  ): Promise<ProposalTemplate> {
+    return createDummyTemplate();
+  }
   async createTemplate(
     name: string,
     description?: string
@@ -62,54 +206,48 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async deleteTopic(id: number): Promise<Topic> {
     return createDummyTopic(id, {});
   }
-  async createTemplateField(
+  async createQuestion(
     fieldId: string,
     naturalKey: string,
-    topicId: number,
     dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<ProposalTemplateField> {
-    return createDummyField({
-      proposal_question_id: fieldId,
-      natural_key: naturalKey,
-      topic_id: topicId,
-      data_type: dataType,
-      question: question,
-      config: JSON.parse(config || '{}'),
+    question: string
+  ): Promise<Question> {
+    return createDummyQuestion({
+      naturalKey: naturalKey,
+      dataType: dataType,
+      proposalQuestionId: fieldId,
+      question,
     });
   }
 
-  async getTemplateField(
-    fieldId: string
-  ): Promise<ProposalTemplateField | null> {
-    return createDummyField({ proposal_question_id: fieldId });
+  async getQuestion(fieldId: string): Promise<Question | null> {
+    return createDummyQuestion({ proposalQuestionId: fieldId });
   }
 
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
-    return this.getProposalTemplate();
+  async deleteQuestion(fieldId: string): Promise<Question> {
+    return createDummyQuestion({ proposalQuestionId: fieldId });
   }
-  async updateTemplateField(
-    proposal_question_id: string,
+  async updateQuestion(
+    questionId: string,
     values: {
-      natural_key?: string;
-      data_type?: DataType;
+      naturalKey?: string;
+      dataType?: string;
       question?: string;
-      topic?: number;
       config?: string;
-      sort_order: number;
     }
-  ): Promise<ProposalTemplate> {
+  ): Promise<Question> {
     const template = await this.getProposalTemplate();
     template.steps.forEach(topic => {
       topic.fields!.forEach(field => {
-        if (field.proposal_question_id === proposal_question_id) {
+        if (field.question.proposalQuestionId === questionId) {
           Object.assign(field, values);
+
+          return field.question;
         }
       });
     });
 
-    return template;
+    throw new Error('Not found');
   }
 
   async updateTopic(

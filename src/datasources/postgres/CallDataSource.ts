@@ -54,6 +54,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_notify: args.endNotify,
         cycle_comment: args.cycleComment,
         survey_comment: args.surveyComment,
+        template_id: args.templateId,
       })
       .into('call')
       .returning(['*'])

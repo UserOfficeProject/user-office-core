@@ -7,12 +7,12 @@ import {
   DataType,
   FieldCondition,
   FieldDependency,
-  ProposalTemplateField,
-  QuestionaryField,
+  QuestionRel,
   Topic,
+  Question,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
-import { ProposalTemplateMetadata } from './../../models/ProposalModel';
+import { ProposalTemplateMetadata, Answer } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -54,14 +54,23 @@ export interface FieldDependencyRecord {
 
 export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
-  readonly natural_key: string;
   readonly data_type: string;
   readonly question: string;
-  readonly topic_id: number;
   readonly config: string;
   readonly sort_order: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+  readonly natural_key: string;
+}
+
+export interface ProposalQuestionProposalTemplateRelRecord {
+  readonly id: number;
+  readonly proposal_question_id: string;
+  readonly template_id: string;
+  readonly topic_id: number;
+  readonly sort_order: number;
+  readonly dependency_proposal_question_id: string;
+  readonly dependency_condition: string;
 }
 
 export interface ProposalTemplateMetadataRecord {
@@ -199,18 +208,13 @@ export const createTopicObject = (proposal: TopicRecord) => {
   );
 };
 
-export const createProposalTemplateFieldObject = (
-  question: ProposalQuestionRecord
-) => {
-  return new ProposalTemplateField(
+export const createQuestionObject = (question: ProposalQuestionRecord) => {
+  return new Question(
     question.proposal_question_id,
     question.natural_key,
     question.data_type as DataType,
-    question.sort_order,
     question.question,
-    createConfigByType(question.data_type as DataType, question.config),
-    question.topic_id,
-    null
+    createConfigByType(question.data_type as DataType, question.config)
   );
 };
 
@@ -258,15 +262,6 @@ export const createFieldDependencyObject = (
   );
 };
 
-export const createQuestionaryFieldObject = (
-  question: ProposalQuestionRecord & { value: any }
-) => {
-  return new QuestionaryField(
-    createProposalTemplateFieldObject(question),
-    question.value ? JSON.parse(question.value).value : ''
-  );
-};
-
 export const createFileMetadata = (record: FileRecord) => {
   return new FileMetadata(
     record.file_id,
@@ -275,6 +270,30 @@ export const createFileMetadata = (record: FileRecord) => {
     record.mime_type,
     record.size_in_bytes,
     record.created_at
+  );
+};
+
+export const createQuestionRelObject = (
+  record: ProposalQuestionRecord & ProposalQuestionProposalTemplateRelRecord
+) => {
+  return new QuestionRel(
+    new Question(
+      record.proposal_question_id,
+      record.natural_key,
+      record.data_type as DataType,
+      record.question,
+      createConfigByType(record.data_type as DataType, record.config)
+    ),
+    record.topic_id,
+    record.sort_order,
+    record.dependency_proposal_question_id
+      ? new FieldDependency(
+          record.proposal_question_id,
+          record.dependency_proposal_question_id,
+          record.natural_key,
+          FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
+        )
+      : undefined
   );
 };
 

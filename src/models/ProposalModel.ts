@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  FieldConfigType,
   BooleanConfig,
   DateConfig,
   EmbellishmentConfig,
+  FieldConfigType,
   FileUploadConfig,
   SelectionFromOptionsConfig,
   TextInputConfig,
@@ -13,10 +13,10 @@ import { EvaluatorOperator } from './ConditionEvaluator';
 
 export class FieldDependency {
   constructor(
-    public question_id: string,
-    public dependency_id: string,
-    public dependency_natural_key: string,
-    public condition: FieldCondition
+    public questionId: string,
+    public dependencyId: string,
+    public dependencyNaturalKey: string,
+    public condition?: FieldCondition
   ) {}
 
   static fromObject(obj: any) {
@@ -58,55 +58,60 @@ export class Topic {
   }
 }
 
-export class ProposalTemplateField {
+export class Question {
   constructor(
-    public proposal_question_id: string,
-    public natural_key: string,
-    public data_type: DataType,
-    public sort_order: number,
+    public proposalQuestionId: string,
+    public naturalKey: string,
+    public dataType: DataType,
     public question: string,
-    public config: typeof FieldConfigType,
-    public topic_id: number,
-    public dependencies: FieldDependency[] | null
+    public config: typeof FieldConfigType
   ) {}
 
   static fromObject(obj: any) {
-    return new ProposalTemplateField(
+    return new Question(
       obj.proposal_question_id,
       obj.natural_key,
       obj.data_type,
       obj.sort_order,
-      obj.question,
-      obj.config,
-      obj.topic_id,
-      obj.dependencies
-        ? obj.dependencies.map((dep: any) => FieldDependency.fromObject(dep))
-        : null
+      obj.question
     );
   }
 }
 
-export class QuestionaryField extends ProposalTemplateField {
-  constructor(templateField: ProposalTemplateField, public value: any) {
+export class QuestionRel {
+  constructor(
+    public question: Question,
+    public topicId: number,
+    public sortOrder: number,
+    public dependency?: FieldDependency
+  ) {}
+
+  public static fromObject(obj: any) {
+    return new QuestionRel(
+      Question.fromObject(obj.question),
+      obj.topic_id,
+      obj.sort_order,
+      obj.dependency ? FieldDependency.fromObject(obj.dependency) : undefined
+    );
+  }
+}
+export class Answer extends QuestionRel {
+  constructor(templateField: QuestionRel, public value?: any) {
     super(
-      templateField.proposal_question_id,
-      templateField.natural_key,
-      templateField.data_type,
-      templateField.sort_order,
       templateField.question,
-      templateField.config,
-      templateField.topic_id,
-      templateField.dependencies
+      templateField.topicId,
+      templateField.sortOrder,
+      templateField.dependency
     );
   }
   static fromObject(obj: any) {
-    const templateField = ProposalTemplateField.fromObject(obj);
+    const templateField = QuestionRel.fromObject(obj);
 
-    return new QuestionaryField(
+    return new Answer(
       templateField,
       obj.value
         ? obj.value
-        : templateField.data_type === DataType.BOOLEAN
+        : templateField.question.dataType === DataType.BOOLEAN
         ? false
         : ''
     );
@@ -117,16 +122,14 @@ export class QuestionaryStep {
   constructor(
     public topic: Topic,
     public isCompleted: boolean,
-    public fields: QuestionaryField[]
+    public fields: Answer[]
   ) {}
   static fromObject(obj: any): QuestionaryStep | undefined {
     return new QuestionaryStep(
       Topic.fromObject(obj.topic),
       obj.isCompleted,
       obj.fields
-        ? obj.fields.map((fieldObj: any) =>
-            QuestionaryField.fromObject(fieldObj)
-          )
+        ? obj.fields.map((fieldObj: any) => Answer.fromObject(fieldObj))
         : []
     );
   }
@@ -145,12 +148,12 @@ export class Questionary {
 }
 
 export class TemplateStep {
-  constructor(public topic: Topic, public fields: ProposalTemplateField[]) {}
+  constructor(public topic: Topic, public fields: QuestionRel[]) {}
 
   public static fromObject(obj: any) {
     return new TemplateStep(
       Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => ProposalTemplateField.fromObject(field))
+      obj.fields.map((field: any) => QuestionRel.fromObject(field))
     );
   }
 }
@@ -171,7 +174,11 @@ export class FieldCondition {
   constructor(public condition: EvaluatorOperator, public params: any) {}
 
   static fromObject(obj: any) {
-    return new FieldCondition(obj.condition, obj.params);
+    const inpObj = typeof obj === 'string' ? JSON.parse(obj) : obj;
+
+    return inpObj
+      ? new FieldCondition(inpObj.condition, inpObj.params)
+      : undefined;
   }
 }
 
@@ -195,12 +202,6 @@ export enum ProposalEndStatus {
   ACCEPTED = 1,
   RESERVED = 2,
   REJECTED = 3,
-}
-
-export interface ProposalAnswer {
-  proposal_question_id: string;
-  value: string;
-  data_type: DataType;
 }
 
 export interface DataTypeSpec {

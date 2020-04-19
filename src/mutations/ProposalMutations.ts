@@ -169,19 +169,25 @@ export default class ProposalMutations {
         if (answers !== undefined) {
           for (const answer of answers) {
             if (answer.value !== undefined) {
-              const templateField = await this.templateDataSource.getTemplateField(
-                answer.proposal_question_id
+              const questionRel = await this.templateDataSource.getQuestionRel(
+                answer.proposal_question_id,
+                proposal.templateId
               );
-              if (!templateField) {
+              if (!questionRel) {
+                logger.logError('Could not find questionRel', {
+                  proposalQuestionId: answer.proposal_question_id,
+                  templateId: proposal.templateId,
+                });
+
                 return rejection('INTERNAL_ERROR');
               }
               if (
                 !partialSave &&
-                !isMatchingConstraints(answer.value, templateField)
+                !isMatchingConstraints(answer.value, questionRel)
               ) {
                 this.logger.logError(
                   'User provided value not matching constraint',
-                  { answer, templateField }
+                  { answer, templateField: questionRel }
                 );
 
                 return rejection('VALUE_CONSTRAINT_REJECTION');

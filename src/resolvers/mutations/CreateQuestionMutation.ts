@@ -1,33 +1,25 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { DataType } from '../../models/ProposalModel';
 import { QuestionResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class UpdateQuestionArgs {
-  @Field()
-  public id: string;
-
-  @Field({ nullable: true })
-  public naturalKey: string;
-
-  @Field({ nullable: true })
-  public question: string;
-
-  @Field({ nullable: true })
-  public config: string;
+export class CreateQuestionArgs {
+  @Field(() => DataType)
+  dataType: DataType;
 }
 
 @Resolver()
-export class UpdateQuestionMutation {
+export class CreateQuestionMutation {
   @Mutation(() => QuestionResponseWrap)
-  updateQuestion(
-    @Args() args: UpdateQuestionArgs,
+  createQuestion(
+    @Args() args: CreateQuestionArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateQuestion(context.user, args),
+      context.mutations.template.createQuestion(context.user, args),
       QuestionResponseWrap
     );
   }

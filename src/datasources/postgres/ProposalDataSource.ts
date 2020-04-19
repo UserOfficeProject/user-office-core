@@ -9,15 +9,15 @@ import {
   QuestionaryStep,
 } from '../../models/ProposalModel';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { Answer } from './../../models/ProposalModel';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
 import {
   CallRecord,
-  createFieldDependencyObject,
   createProposalObject,
-  createQuestionaryFieldObject,
+  createQuestionRelObject,
   createTopicObject,
-  FieldDependencyRecord,
+  ProposalQuestionProposalTemplateRelRecord,
   ProposalQuestionRecord,
   ProposalRecord,
   TopicRecord,
@@ -294,37 +294,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
-  async getQuestionary(proposalId: number): Promise<Questionary> {
-    const dependencyRecords: (FieldDependencyRecord & {
-      natural_key: string;
-    })[] = await database('proposal_question_dependencies')
-      .join(
-        'proposal_questions',
-        'proposal_question_dependencies.proposal_question_id',
-        'proposal_questions.proposal_question_id'
-      )
-      .select(
-        'proposal_question_dependencies.*',
-        'proposal_questions.natural_key'
-      );
-
-    const fieldRecords: Array<ProposalQuestionRecord & { value: any }> = (
-      await database.raw(`
-          SELECT 
-            proposal_questions.*, proposal_answers.answer as value
-          FROM 
-            proposal_questions
-          LEFT JOIN
-            proposal_answers 
-          ON 
-            proposal_questions.proposal_question_id = 
-            proposal_answers.proposal_question_id
-          AND
-            proposal_answers.proposal_id=${proposalId}
-          ORDER BY
-            proposal_questions.sort_order`)
-    ).rows;
-
+  private async getQuestionaryWithTemplateId(
+    proposalId: number,
+    templateId: number
+  ): Promise<Questionary> {
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
     })[] = (
@@ -338,16 +311,37 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           ON 
             proposal_topics.topic_id = proposal_topic_completenesses.topic_id
             AND proposal_topic_completenesses.proposal_id = ${proposalId}
+          WHERE
+            proposal_topics.template_id = ${templateId}
           ORDER BY
             proposal_topics.sort_order`)
     ).rows;
 
-    const dependencies = dependencyRecords.map(record =>
-      createFieldDependencyObject(record)
-    );
+    const answerRecords: Array<ProposalQuestionRecord &
+      ProposalQuestionProposalTemplateRelRecord & { value: any }> = (
+      await database.raw(`
+            SELECT 
+              proposal_question__proposal_template__rels.*, proposal_questions.*, proposal_answers.answer as value
+            FROM 
+              proposal_question__proposal_template__rels
+            LEFT JOIN
+            proposal_questions 
+            ON 
+              proposal_question__proposal_template__rels.proposal_question_id = 
+              proposal_questions.proposal_question_id
+            LEFT JOIN
+              proposal_answers
+            ON
+              proposal_question__proposal_template__rels.proposal_question_id = 
+              proposal_answers.proposal_question_id
+            AND
+              proposal_answers.proposal_id=${proposalId}
+            ORDER BY
+             proposal_question__proposal_template__rels.sort_order`)
+    ).rows;
 
-    const fields = fieldRecords.map(record =>
-      createQuestionaryFieldObject(record)
+    const fields = answerRecords.map(
+      record => new Answer(createQuestionRelObject(record), record.value)
     );
 
     const steps = Array<QuestionaryStep>();
@@ -356,18 +350,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         new QuestionaryStep(
           createTopicObject(topic),
           topic.is_complete || false,
-          fields.filter(field => field.topic_id === topic.topic_id)
+          fields.filter(field => field.topicId === topic.topic_id)
         )
       );
     });
 
-    fields.forEach(field => {
-      field.dependencies = dependencies.filter(dep => {
-        return dep !== null && dep.question_id === field.proposal_question_id;
-      });
-    });
-
     return new Questionary(steps);
+  }
+
+  async getEmptyQuestionary(templateId: number): Promise<Questionary> {
+    return this.getQuestionaryWithTemplateId(0, templateId);
+  }
+
+  async getQuestionary(proposalId: number): Promise<Questionary> {
+    const proposal = await this.get(proposalId);
+    if (!proposal) {
+      throw new Error(`No proposal with id: ${proposalId}`);
+    }
+
+    return this.getQuestionaryWithTemplateId(
+      proposal.proposerId,
+      proposal.templateId
+    );
   }
 
   async updateTopicCompletenesses(

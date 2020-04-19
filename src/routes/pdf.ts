@@ -6,11 +6,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
-import {
-  DataType,
-  Questionary,
-  QuestionaryField,
-} from '../models/ProposalModel';
+import { Answer, DataType, Questionary } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
@@ -165,9 +161,9 @@ const createProposalPDF = async (
         ? (step.fields.filter(field => {
             return areDependenciesSatisfied(
               questionary,
-              field.proposal_question_id
+              field.question.proposalQuestionId
             );
-          }) as QuestionaryField[])
+          }) as Answer[])
         : [];
       if (!step) {
         throw 'Could not download generated PDF';
@@ -180,13 +176,13 @@ const createProposalPDF = async (
       });
       doc.moveDown();
       activeFields.forEach(field => {
-        if (field.data_type === DataType.EMBELLISHMENT) {
-          const conf = field.config as EmbellishmentConfig;
+        if (field.question.dataType === DataType.EMBELLISHMENT) {
+          const conf = field.question.config as EmbellishmentConfig;
           if (!conf.omitFromPdf) {
             writeBold(conf.plain!);
           }
-        } else if (field.data_type === DataType.FILE_UPLOAD) {
-          writeBold(field.question);
+        } else if (field.question.dataType === DataType.FILE_UPLOAD) {
+          writeBold(field.question.question);
           if (field.value) {
             const fieldAttachmentArray: string[] = field.value.split(',');
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
@@ -195,22 +191,22 @@ const createProposalPDF = async (
             write(notAnswered);
           }
           // Default case, a ordinary question type
-        } else if (field.data_type === DataType.DATE) {
-          writeBold(field.question);
+        } else if (field.question.dataType === DataType.DATE) {
+          writeBold(field.question.question);
           write(
             field.value
               ? new Date(field.value).toISOString().split('T')[0]
               : notAnswered
           );
-        } else if (field.data_type === DataType.BOOLEAN) {
-          writeBold(field.question);
+        } else if (field.question.dataType === DataType.BOOLEAN) {
+          writeBold(field.question.question);
           if (field.value) {
             write('Yes');
           } else {
             write('No');
           }
         } else {
-          writeBold(field.question);
+          writeBold(field.question.question);
           write(field.value ? field.value : notAnswered);
         }
         doc.moveDown(0.5);

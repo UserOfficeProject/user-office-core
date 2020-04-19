@@ -1,22 +1,22 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+import { Arg, Ctx, Mutation, Resolver, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class CreateTopicMutation {
+export class DeleteQuestionRelMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
-  createTopic(
+  deleteQuestionRel(
     @Arg('templateId', () => Int) templateId: number,
-    @Arg('sortOrder', () => Int) sortOrder: number,
+    @Arg('questionId', () => String) questionId: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createTopic(
+      context.mutations.template.deleteQuestionRel(
         context.user,
         templateId,
-        sortOrder
+        questionId
       ),
       ProposalTemplateResponseWrap
     );

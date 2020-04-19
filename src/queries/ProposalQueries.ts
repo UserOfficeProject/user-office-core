@@ -22,7 +22,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    //If not a user officer remove excellence, tehnical and safety score
+    //If not a user officer remove excellence, technical and safety score
     if (!(await this.userAuth.isUserOfficer(agent))) {
       delete proposal.rankOrder;
       delete proposal.finalStatus;
@@ -34,14 +34,18 @@ export default class ProposalQueries {
     }
   }
 
-  async getQuestionary(agent: User | null, id: number) {
-    const proposal = await this.dataSource.get(id);
+  async getQuestionary(agent: User | null, proposalId: number) {
+    const proposal = await this.dataSource.get(proposalId);
 
     if ((await this.hasAccessRights(agent, proposal)) === false) {
       return null;
     }
 
-    return await this.dataSource.getQuestionary(id);
+    return await this.dataSource.getQuestionary(proposalId);
+  }
+
+  async getEmptyQuestionary(user: User | null, callId: number) {
+    return await this.dataSource.getEmptyQuestionary(callId);
   }
 
   private async hasAccessRights(
@@ -95,7 +99,9 @@ export default class ProposalQueries {
     }
 
     if (!call.templateId) {
-      logger.logError('Use tried to getBlank for misconfigured call', { call });
+      logger.logError('User tried to getBlank for misconfigured call', {
+        call,
+      });
 
       return null;
     }

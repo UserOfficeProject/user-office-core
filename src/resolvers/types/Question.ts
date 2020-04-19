@@ -7,13 +7,13 @@ import { FieldConfigType } from './FieldConfig';
 @ObjectType()
 export class Question implements Partial<QuestionOrigin> {
   @Field()
-  public proposal_question_id: string;
+  public proposalQuestionId: string;
 
   @Field()
-  public natural_key: string;
+  public naturalKey: string;
 
   @Field(() => DataType)
-  public data_type: DataType;
+  public dataType: DataType;
 
   @Field()
   public question: string;

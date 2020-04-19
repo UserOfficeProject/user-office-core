@@ -109,11 +109,20 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
-    const questionary = await context.queries.proposal.getQuestionary(
-      context.user,
-      proposal.id
-    );
+    if (proposal.status === ProposalStatus.BLANK) {
+      const questionary = await context.queries.proposal.getEmptyQuestionary(
+        context.user,
+        proposal.callId!
+      );
 
-    return isRejection(questionary) ? null : questionary;
+      return isRejection(questionary) ? null : questionary;
+    } else {
+      const questionary = await context.queries.proposal.getQuestionary(
+        context.user,
+        proposal.id
+      );
+
+      return isRejection(questionary) ? null : questionary;
+    }
   }
 }

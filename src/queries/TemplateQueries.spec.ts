@@ -28,19 +28,20 @@ beforeEach(() => {
 
 test('Non authentificated user can not get the template', () => {
   return expect(
-    templateQueries.getProposalTemplate(null)
+    templateQueries.getProposalTemplate(null, 1)
   ).resolves.not.toBeInstanceOf(ProposalTemplate);
 });
 
 test('User officer user can get the template', () => {
   return expect(
-    templateQueries.getProposalTemplate(dummyUserOfficer)
+    templateQueries.getProposalTemplate(dummyUserOfficer, 1)
   ).resolves.toBeInstanceOf(ProposalTemplate);
 });
 
 test('Proposal template should have fields', async () => {
   const template = (await templateQueries.getProposalTemplate(
-    dummyUserOfficer
+    dummyUserOfficer,
+    1
   )) as ProposalTemplate;
 
   return expect(template.steps[0].fields.length).toBeGreaterThan(0);

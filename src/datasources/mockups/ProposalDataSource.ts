@@ -1,13 +1,29 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
 import {
-  DataType,
-  ProposalAnswer,
+  Answer,
   ProposalStatus,
   ProposalTemplate,
   Questionary,
+  QuestionaryStep,
+  Topic,
+  DataType,
+  createConfig,
+  FieldDependency,
+  FieldCondition,
+  Question,
+  TemplateStep,
+  QuestionRel,
+  ProposalTemplateMetadata,
 } from '../../models/ProposalModel';
-import { create1Topic3FieldWithDependenciesQuestionary } from '../../tests/ProposalTestBed';
+import {
+  EmbellishmentConfig,
+  SelectionFromOptionsConfig,
+  TextInputConfig,
+  FieldConfigType,
+} from '../../resolvers/types/FieldConfig';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
@@ -15,9 +31,104 @@ export let dummyTemplate: ProposalTemplate;
 export let dummyQuestionary: Questionary;
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
-export let dummyAnswers: ProposalAnswer[];
+export let dummyAnswers: Answer[];
 
+const createDummyQuestion = (values: {
+  proposal_question_id?: string;
+  natural_key?: string;
+  data_type?: DataType;
+  question?: string;
+  config?: typeof FieldConfigType;
+}): Question => {
+  return new Question(
+    values.proposal_question_id || 'random_field_name_' + Math.random(),
+    values.natural_key || 'is_dangerous',
+    values.data_type || DataType.TEXT_INPUT,
+    values.question || 'Some random question',
+    values.config || { required: false, tooltip: '', small_label: '' }
+  );
+};
+
+const createDummyQuestionRel = (values: {
+  question?: Question;
+  sort_order?: number;
+  topic_id?: number;
+  dependency?: FieldDependency;
+}): QuestionRel => {
+  return new QuestionRel(
+    values.question || createDummyQuestion({}),
+    values.sort_order || Math.round(Math.random() * 100),
+    values.topic_id || Math.round(Math.random() * 10),
+    values.dependency || undefined
+  );
+};
+
+const create1Topic3FieldWithDependenciesQuestionary = () => {
+  return new Questionary([
+    new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
+      new Answer(
+        createDummyQuestionRel({
+          question: createDummyQuestion({
+            proposal_question_id: 'ttl_general',
+            natural_key: 'ttl_general',
+            data_type: DataType.EMBELLISHMENT,
+            config: createConfig<EmbellishmentConfig>(
+              new EmbellishmentConfig(),
+              {
+                plain: 'General information',
+                html: '<h1>General information</h1>',
+              }
+            ),
+          }),
+        }),
+        null
+      ),
+
+      new Answer(
+        createDummyQuestionRel({
+          question: createDummyQuestion({
+            proposal_question_id: 'has_links_with_industry',
+            natural_key: 'has_links_with_industry',
+            data_type: DataType.SELECTION_FROM_OPTIONS,
+            config: createConfig<SelectionFromOptionsConfig>(
+              new SelectionFromOptionsConfig(),
+              {
+                options: ['yes', 'no'],
+                variant: 'radio',
+              }
+            ),
+          }),
+        }),
+        'yes'
+      ),
+
+      new Answer(
+        createDummyQuestionRel({
+          question: createDummyQuestion({
+            proposal_question_id: 'links_with_industry',
+            natural_key: 'links_with_industry',
+            data_type: DataType.TEXT_INPUT,
+            config: createConfig<TextInputConfig>(new TextInputConfig(), {
+              placeholder: 'Please specify links with industry',
+              multiline: true,
+            }),
+          }),
+          dependency: new FieldDependency(
+            'links_with_industry',
+            'has_links_with_industry',
+            'has_links_with_industry',
+            new FieldCondition(EvaluatorOperator.EQ, 'yes')
+          ),
+        }),
+        'https://example.com'
+      ),
+    ]),
+  ]);
+};
 export class ProposalDataSourceMock implements ProposalDataSource {
+  getEmptyQuestionary(callId: number): Promise<Questionary> {
+    throw new Error('Method not implemented.');
+  }
   public init() {
     dummyQuestionary = create1Topic3FieldWithDependenciesQuestionary();
 
@@ -50,22 +161,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1
     );
-
-    // TODO: Check if this can be done in camelcase.
-    /* eslint-disable @typescript-eslint/camelcase */
-    dummyAnswers = [
-      {
-        proposal_question_id: 'has_references',
-        data_type: DataType.BOOLEAN,
-        value: 'true',
-      },
-      {
-        proposal_question_id: 'fasta_seq',
-        data_type: DataType.TEXT_INPUT,
-        value: 'ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*',
-      },
-    ];
-    /* eslint-enable @typescript-eslint/camelcase */
   }
 
   async deleteProposal(id: number): Promise<Proposal> {

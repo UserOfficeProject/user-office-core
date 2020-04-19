@@ -1,49 +1,92 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  ProposalTemplate,
-  Topic,
-  ProposalTemplateField,
   DataType,
+  ProposalTemplate,
   ProposalTemplateMetadata,
+  Question,
+  Topic,
 } from '../models/ProposalModel';
-import { FieldDependencyInput } from './../resolvers/mutations/UpdateProposalTemplateFieldMutation';
+import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { QuestionRel } from './../models/ProposalModel';
 
 export interface TemplateDataSource {
+  // Template
   createTemplate(
     name: string,
     description?: string
   ): Promise<ProposalTemplateMetadata>;
+  cloneTemplate(templateId: number): Promise<ProposalTemplateMetadata>;
   getProposalTemplatesMetadata(
     isArchived?: boolean
   ): Promise<ProposalTemplateMetadata[]>;
-  getProposalTemplate(): Promise<ProposalTemplate>;
+  getProposalTemplateMetadata(
+    templateId: number
+  ): Promise<ProposalTemplateMetadata | null>;
+  getProposalTemplate(templateId: number): Promise<ProposalTemplate>;
+  updateTemplateMetadata(
+    values: UpdateProposalTemplateMetadataArgs
+  ): Promise<ProposalTemplateMetadata | null>;
 
   // TemplateField
-  createTemplateField(
+  createQuestion(
+    fieldId: string,
+    naturalKey: string,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<Question>;
+
+  getQuestion(fieldId: string): Promise<Question | null>;
+  updateQuestion(
+    questionId: string,
+    values: {
+      naturalKey?: string;
+      dataType?: string;
+      question?: string;
+      config?: string;
+    }
+  ): Promise<Question>;
+  deleteQuestion(fieldId: string): Promise<Question>;
+
+  // TemplateField rel
+  createQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<ProposalTemplate>;
+
+  getQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<QuestionRel | null>;
+
+  deleteQuestionRel(
+    templateId: number,
+    fieldId: string
+  ): Promise<ProposalTemplate>;
+
+  createQuestionAndRel(
+    templateId: number,
     fieldId: string,
     naturalKey: string,
     topicId: number,
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField>;
-  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
-  updateTemplateField(
-    proposal_question_id: string,
+  ): Promise<ProposalTemplate>;
+
+  updateQuestionRel(
+    questionId: string,
+    templateId: number,
     values: {
-      natural_key?: string;
-      dataType?: string;
-      question?: string;
       topicId?: number;
-      config?: string;
       sortOrder?: number;
-      dependencies?: FieldDependencyInput[];
+      dependency?: FieldDependencyInput;
     }
   ): Promise<ProposalTemplate>;
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplate>;
 
   // Topic
-  createTopic(sortOrder: number): Promise<ProposalTemplate>;
+  createTopic(templateId: number, sortOrder: number): Promise<ProposalTemplate>;
   updateTopic(
     id: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }

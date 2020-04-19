@@ -1,19 +1,17 @@
-import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
-
 import {
-  dummyProposalSubmitted,
   dummyProposal,
+  dummyProposalSubmitted,
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
@@ -22,6 +20,7 @@ import { DataType } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
 
 const dummyLogger = new MutedLogger();
@@ -65,11 +64,11 @@ function tryUpdateProposal(user: User, proposalId: number) {
 }
 /* eslint-enable @typescript-eslint/camelcase */
 
-test("A user on the proposal can update it's title if it is in edit mode", () => {
+test('A user on the proposal can update it title if it is in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
-test("A user on the proposal can't update it's title if it is not in edit mode", () => {
+test('A user on the proposal cant update its title if it is not in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 2)).resolves.toHaveProperty(
     'reason',
     'NOT_ALLOWED_PROPOSAL_SUBMITTED'

@@ -28,10 +28,7 @@ class FieldConditionInput implements Partial<FieldCondition> {
 @InputType()
 export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
   @Field(() => String)
-  public dependency_id: string;
-
-  @Field(() => String)
-  public question_id: string;
+  public dependencyId: string;
 
   @Field(() => FieldConditionInput)
   public condition: FieldConditionInput;
@@ -45,14 +42,14 @@ export class UpdateQuestionRelArgs {
   @Field(() => Int)
   public templateId: number;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   public topicId?: number;
 
   @Field(() => Int, { nullable: true })
-  public sortOrder: number;
+  public sortOrder?: number;
 
-  @Field(() => FieldDependencyInput)
-  public dependencies: FieldDependencyInput[];
+  @Field(() => FieldDependencyInput, { nullable: true })
+  public dependency?: FieldDependencyInput;
 }
 
 @Resolver()
@@ -62,7 +59,7 @@ export class UpdateQuestionRelMutation {
     @Args() args: UpdateQuestionRelArgs,
     @Ctx() context: ResolverContext
   ) {
-    args.dependencies = this.unpackDependencies(args.dependencies);
+    args.dependency = this.unpackDependency(args.dependency);
 
     return wrapResponse(
       context.mutations.template.updateQuestionRel(context.user, args),
@@ -72,15 +69,17 @@ export class UpdateQuestionRelMutation {
 
   // Have this until GQL accepts Union types
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  unpackDependencies(dependencies: FieldDependencyInput[]) {
-    return dependencies.map(dependency => {
-      return {
-        ...dependency,
-        condition: {
-          ...dependency.condition,
-          params: JSON.parse(dependency.condition.params).value,
-        },
-      };
-    });
+  unpackDependency(dependency?: FieldDependencyInput) {
+    if (!dependency) {
+      return undefined;
+    }
+
+    return {
+      ...dependency,
+      condition: {
+        ...dependency.condition,
+        params: JSON.parse(dependency.condition.params).value,
+      },
+    };
   }
 }

@@ -12,13 +12,14 @@ export default class TemplateQueries {
   ) {}
 
   async getProposalTemplate(
-    agent: User | null
+    agent: User | null,
+    templateId: number
   ): Promise<ProposalTemplate | null> {
     if (!agent) {
       return null;
     }
 
-    return await this.dataSource.getProposalTemplate();
+    return await this.dataSource.getProposalTemplate(templateId);
   }
 
   async isNaturalKeyPresent(agent: User | null, naturalKey: string) {

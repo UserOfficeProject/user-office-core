@@ -17,10 +17,13 @@ import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 class UpdateFieldTopicRelArgs {
   @Field(() => Int)
-  public topic_id: number;
+  public templateId: number;
+
+  @Field(() => Int)
+  public topicId: number;
 
   @Field(() => [String], { nullable: true })
-  public field_ids: string[];
+  public fieldIds: string[];
 }
 
 @ObjectType()
@@ -40,8 +43,9 @@ export class UpdateFieldTopicRelMutation {
     return wrapResponse(
       context.mutations.template.updateFieldTopicRel(
         context.user,
-        args.topic_id,
-        args.field_ids
+        args.templateId,
+        args.topicId,
+        args.fieldIds
       ),
       UpdateFieldTopicRelResponseWrap
     );

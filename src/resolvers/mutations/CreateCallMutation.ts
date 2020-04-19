@@ -1,4 +1,12 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Mutation,
+  Resolver,
+  Int,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { CallResponseWrap } from '../types/CommonWrappers';
@@ -32,6 +40,9 @@ export class CreateCallArgs {
 
   @Field()
   public surveyComment: string;
+
+  @Field(() => Int, { nullable: true })
+  public templateId?: number;
 }
 
 @Resolver()

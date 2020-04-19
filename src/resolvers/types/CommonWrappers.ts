@@ -6,8 +6,9 @@ import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Proposal } from './Proposal';
 import { ProposalTemplate } from './ProposalTemplate';
-import { ProposalTemplateField } from './ProposalTemplateField';
 import { ProposalTemplateMetadata } from './ProposalTemplateMetadata';
+import { Question } from './Question';
+import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
@@ -92,12 +93,17 @@ export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
 }
 
 @ObjectType()
-export class TemplateFieldResponseWrap extends ResponseWrapBase<
-  ProposalTemplateField
-> {
+export class QuestionRelResponseWrap extends ResponseWrapBase<QuestionRel> {
   @Response()
-  @Field(() => ProposalTemplateField, { nullable: true })
-  public field: ProposalTemplateField;
+  @Field(() => QuestionRel, { nullable: true })
+  public questionRel: QuestionRel;
+}
+
+@ObjectType()
+export class QuestionResponseWrap extends ResponseWrapBase<QuestionRel> {
+  @Response()
+  @Field(() => Question, { nullable: true })
+  public question: Question;
 }
 
 @ObjectType()

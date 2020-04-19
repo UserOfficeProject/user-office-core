@@ -5,13 +5,14 @@ import {
   createConfig,
   DataType,
   ProposalTemplate,
-  ProposalTemplateField,
   Topic,
 } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { CreateTemplateFieldArgs } from '../resolvers/mutations/CreateTemplateFieldMutation';
-import { UpdateProposalTemplateFieldArgs } from '../resolvers/mutations/UpdateProposalTemplateFieldMutation';
+import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
+import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
+import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
   ConfigBase,
@@ -22,7 +23,7 @@ import {
 } from '../resolvers/types/FieldConfig';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { ProposalTemplateMetadata } from './../models/ProposalModel';
+import { ProposalTemplateMetadata, Question } from './../models/ProposalModel';
 
 export default class TemplateMutations {
   constructor(
@@ -68,15 +69,20 @@ export default class TemplateMutations {
 
   async createTopic(
     agent: User | null,
+    templateId: number,
     sortOrder: number
   ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_AUTHORIZED');
     }
 
-    return this.dataSource
-      .createTopic(sortOrder)
-      .then(template => template)
+    return await this.dataSource
+      .createTopic(templateId, sortOrder)
+      .then(template => {
+        console.log(template);
+
+        return template;
+      })
       .catch(err => {
         logger.logException('Could not create topic', err, {
           agent,
@@ -126,30 +132,28 @@ export default class TemplateMutations {
       });
   }
 
-  async createTemplateField(
+  async createQuestion(
     agent: User | null,
-    args: CreateTemplateFieldArgs
-  ): Promise<ProposalTemplateField | Rejection> {
+    args: CreateQuestionArgs
+  ): Promise<Question | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_AUTHORIZED');
     }
-    const { dataType, topicId } = args;
+    const { dataType } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
-      .createTemplateField(
+      .createQuestion(
         newFieldId,
         newFieldId, // natural key defaults to id
-        topicId,
         dataType,
         'New question',
         JSON.stringify(this.createBlankConfig(dataType))
       )
-      .then(template => template)
+      .then(question => question)
       .catch(err => {
         logger.logException('Could not create template field', err, {
           agent,
-          topicId,
           dataType,
         });
 
@@ -157,19 +161,19 @@ export default class TemplateMutations {
       });
   }
 
-  async updateProposalTemplateField(
+  async updateQuestion(
     agent: User | null,
-    args: UpdateProposalTemplateFieldArgs
-  ): Promise<ProposalTemplate | Rejection> {
+    args: UpdateQuestionArgs
+  ): Promise<Question | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_AUTHORIZED');
     }
 
     return this.dataSource
-      .updateTemplateField(args.id, args)
-      .then(template => template)
+      .updateQuestion(args.id, args)
+      .then(question => question)
       .catch(err => {
-        logger.logException('Could not update template field', err, {
+        logger.logException('Could not update question', err, {
           agent,
           args,
         });
@@ -178,21 +182,65 @@ export default class TemplateMutations {
       });
   }
 
-  async deleteTemplateField(
+  async updateQuestionRel(
     agent: User | null,
-    id: string
+    args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_AUTHORIZED');
     }
 
     return this.dataSource
-      .deleteTemplateField(id)
+      .updateQuestionRel(args.questionId, args.templateId, args)
       .then(template => template)
       .catch(err => {
-        logger.logException('Could not delete template field', err, {
+        logger.logException('Could not update question rel', err, {
           agent,
-          id,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  async deleteQuestion(
+    agent: User | null,
+    questionId: string
+  ): Promise<Question | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection('NOT_AUTHORIZED');
+    }
+
+    return this.dataSource
+      .deleteQuestion(questionId)
+      .then(template => template)
+      .catch(err => {
+        logger.logException('Could not delete question', err, {
+          agent,
+          id: questionId,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  async deleteQuestionRel(
+    agent: User | null,
+    templateId: number,
+    questionId: string
+  ): Promise<ProposalTemplate | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(agent))) {
+      return rejection('NOT_AUTHORIZED');
+    }
+
+    return this.dataSource
+      .deleteQuestionRel(templateId, questionId)
+      .then(template => template)
+      .catch(err => {
+        logger.logException('Could not delete question rel', err, {
+          agent,
+          id: questionId,
+          templateId,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -222,6 +270,7 @@ export default class TemplateMutations {
 
   async updateFieldTopicRel(
     agent: User | null,
+    templateId: number,
     topicId: number,
     fieldIds: string[]
   ): Promise<string[] | Rejection> {
@@ -231,10 +280,14 @@ export default class TemplateMutations {
     let isSuccess = true;
     let index = 1;
     for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateTemplateField(field, {
-        topicId,
-        sortOrder: index,
-      });
+      const updatedField = await this.dataSource.updateQuestionRel(
+        field,
+        templateId,
+        {
+          topicId,
+          sortOrder: index,
+        }
+      );
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -261,5 +314,21 @@ export default class TemplateMutations {
       default:
         return new ConfigBase();
     }
+  }
+
+  updateProposalTemplateMetadata(
+    user: User | null,
+    args: UpdateProposalTemplateMetadataArgs
+  ) {
+    return this.dataSource
+      .updateTemplateMetadata(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not update topic order', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 }

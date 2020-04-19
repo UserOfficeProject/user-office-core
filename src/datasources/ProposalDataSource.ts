@@ -4,6 +4,7 @@ import { Questionary } from '../models/ProposalModel';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
+  getEmptyQuestionary(callId: number): Promise<Questionary>;
   // Read
   get(id: number): Promise<Proposal | null>;
   checkActiveCall(callId: number): Promise<boolean>;

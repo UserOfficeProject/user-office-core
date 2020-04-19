@@ -15,6 +15,6 @@ export class QuestionRel implements Partial<QuestionRelOrign> {
   @Field(() => Int)
   public topicId: number;
 
-  @Field(() => [FieldDependency], { nullable: true })
+  @Field(() => FieldDependency, { nullable: true })
   public dependency?: FieldDependency;
 }

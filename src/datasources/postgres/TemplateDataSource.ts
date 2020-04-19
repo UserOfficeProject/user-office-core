@@ -4,20 +4,22 @@ import to from 'await-to-js';
 import {
   DataType,
   ProposalTemplate,
-  ProposalTemplateField,
   ProposalTemplateMetadata,
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
-import { FieldDependencyInput } from '../../resolvers/mutations/UpdateProposalTemplateFieldMutation';
+import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
+import { Question, QuestionRel } from './../../models/ProposalModel';
+import { logger } from './../../utils/Logger';
 import database from './database';
 import {
-  createFieldDependencyObject,
-  createProposalTemplateFieldObject,
   createProposalTemplateMetadataObject,
+  createQuestionObject,
+  createQuestionRelObject,
   createTopicObject,
-  FieldDependencyRecord,
+  ProposalQuestionProposalTemplateRelRecord,
   ProposalQuestionRecord,
   ProposalTemplateMetadataRecord,
   TopicRecord,
@@ -45,14 +47,16 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async deleteTemplate(id: number): Promise<ProposalTemplateMetadata> {
+  async deleteTemplate(templateId: number): Promise<ProposalTemplateMetadata> {
     return database('proposal_templates')
       .delete()
-      .where({ template_id: id })
+      .where({ template_id: templateId })
       .returning('*')
       .then((resultSet: ProposalTemplateMetadataRecord[]) => {
         if (!resultSet || resultSet.length == 0) {
-          throw new Error(`DeleteTemplate template does not exist. ID: ${id}`);
+          throw new Error(
+            `DeleteTemplate template does not exist. ID: ${templateId}`
+          );
         }
 
         return createProposalTemplateMetadataObject(resultSet[0]);
@@ -75,59 +79,67 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         );
       });
   }
-  async getProposalTemplate(): Promise<ProposalTemplate> {
-    const dependenciesRecord: (FieldDependencyRecord & {
-      natural_key: string;
-    })[] = await database('proposal_question_dependencies')
-      .join(
-        'proposal_questions',
-        'proposal_question_dependencies.proposal_question_dependency',
-        'proposal_questions.proposal_question_id'
-      )
-      .select(
-        'proposal_question_dependencies.*',
-        'proposal_questions.natural_key'
-      );
 
-    const fieldRecords: ProposalQuestionRecord[] = await database
+  async getProposalTemplateMetadata(
+    templateId: number
+  ): Promise<ProposalTemplateMetadata | null> {
+    return database('proposal_templates')
       .select('*')
-      .from('proposal_questions')
-      .orderBy('sort_order');
+      .where({ template_id: templateId })
+      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+        if (resultSet.length !== 1) {
+          return null;
+        }
 
+        return createProposalTemplateMetadataObject(resultSet[0]);
+      });
+  }
+
+  async getProposalTemplate(templateId: number): Promise<ProposalTemplate> {
     const topicRecords: TopicRecord[] = await database
-      .select('p.*')
-      .from('proposal_topics as p')
-      .where('p.is_enabled', true)
+      .select('*')
+      .from('proposal_topics')
+      .where('template_id', templateId)
+      .andWhere('is_enabled', true)
       .orderBy('sort_order');
 
-    const topics = topicRecords.map(record => createTopicObject(record));
-    const fields = fieldRecords.map(record =>
-      createProposalTemplateFieldObject(record)
-    );
-    const dependencies = dependenciesRecord.map(record =>
-      createFieldDependencyObject(record)
+    const questionRecords: Array<ProposalQuestionRecord &
+      ProposalQuestionProposalTemplateRelRecord> = (
+      await database.raw(`
+      SELECT 
+        proposal_question__proposal_template__rels.*, proposal_questions.*
+      FROM 
+        proposal_question__proposal_template__rels
+      LEFT JOIN
+        proposal_questions 
+      ON 
+        proposal_question__proposal_template__rels.proposal_question_id = 
+        proposal_questions.proposal_question_id
+      ORDER BY
+       proposal_question__proposal_template__rels.sort_order`)
+    ).rows;
+
+    const fields = questionRecords.map(record =>
+      createQuestionRelObject(record)
     );
 
     const steps = Array<TemplateStep>();
-    topics.forEach(topic => {
+    topicRecords.forEach(topic => {
       steps.push(
         new TemplateStep(
-          topic,
-          fields.filter(field => field.topic_id === topic.topic_id)
+          createTopicObject(topic),
+          fields.filter(field => field.topicId === topic.topic_id)
         )
-      );
-    });
-
-    fields.forEach(field => {
-      field.dependencies = dependencies.filter(
-        dep => dep.question_id === field.proposal_question_id
       );
     });
 
     return new ProposalTemplate(steps);
   }
 
-  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
+  async createTopic(
+    templateId: number,
+    sortOrder: number
+  ): Promise<ProposalTemplate> {
     await database('proposal_topics')
       .update({ sort_order: sortOrder + 1 })
       .where('sort_order', '>=', sortOrder);
@@ -136,13 +148,14 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       topic_title: 'New Topic',
       sort_order: sortOrder,
       is_enabled: true,
+      template_id: templateId,
     });
 
-    return this.getProposalTemplate();
+    return this.getProposalTemplate(templateId);
   }
 
   async updateTopic(
-    id: number,
+    topicId: number,
     values: {
       title?: string;
       isEnabled?: boolean;
@@ -159,7 +172,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         ['*']
       )
       .from('proposal_topics')
-      .where({ topic_id: id });
+      .where({ topic_id: topicId });
 
     if (!resultSet || resultSet.length != 1) {
       throw new Error('INSERT Topic resultSet must contain exactly 1 row');
@@ -168,62 +181,111 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return createTopicObject(resultSet[0]);
   }
 
-  async updateTemplateField(
-    proposal_question_id: string,
+  async updateQuestion(
+    fieldId: string,
     values: {
       naturalKey?: string;
       dataType?: string;
       question?: string;
-      topicId?: number;
       config?: string;
-      sortOrder?: number;
-      dependencies?: FieldDependencyInput[];
     }
-  ): Promise<ProposalTemplate> {
+  ): Promise<Question> {
     const rows = {
       natural_key: values.naturalKey,
       data_type: values.dataType,
       question: values.question,
-      topic_id: values.topicId,
       config: values.config,
-      sort_order: values.sortOrder,
     };
 
-    if (values.dependencies) {
-      await database('proposal_question_dependencies')
-        .where('proposal_question_id', proposal_question_id)
-        .del();
-
-      for (const dependency of values.dependencies) {
-        await database('proposal_question_dependencies').insert({
-          proposal_question_id: dependency.question_id,
-          proposal_question_dependency: dependency.dependency_id,
-          condition: dependency.condition,
-        });
-      }
-    }
-
-    return database
+    await database
       .update(rows, ['*'])
       .from('proposal_questions')
-      .where('proposal_question_id', proposal_question_id)
-      .then(async () => await this.getProposalTemplate());
+      .where('proposal_question_id', fieldId);
+
+    const question = await this.getQuestion(fieldId);
+    if (!question) {
+      throw new Error('Could not update field');
+    }
+
+    return question;
   }
 
-  async createTemplateField(
+  async updateQuestionRel(
+    questionId: string,
+    templateId: number,
+    values: {
+      topicId?: number;
+      sortOrder?: number;
+      dependency?: FieldDependencyInput;
+    }
+  ): Promise<ProposalTemplate> {
+    await to(
+      database('proposal_question__proposal_template__rels')
+        .where({ proposal_question_id: questionId, template_id: templateId })
+        .del()
+    );
+
+    await database('proposal_question__proposal_template__rels').insert({
+      proposal_question_id: questionId,
+      template_id: templateId,
+      topic_id: values.topicId,
+      sort_order: values.sortOrder,
+      dependency_proposal_question_id: values.dependency?.dependencyId,
+      dependency_condition: values.dependency?.condition,
+    });
+
+    return this.getProposalTemplate(templateId);
+  }
+
+  async updateTemplateMetadata(
+    values: UpdateProposalTemplateMetadataArgs
+  ): Promise<ProposalTemplateMetadata | null> {
+    await database('proposal_templates')
+      .update({
+        name: values.name,
+        description: values.description,
+        is_archived: values.isArchived,
+      })
+      .where({ template_id: values.templateId });
+
+    return this.getProposalTemplateMetadata(values.templateId);
+  }
+
+  async createQuestionAndRel(
+    templateId: number,
     fieldId: string,
     naturalKey: string,
     topicId: number,
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField> {
+  ) {
+    await this.createQuestion(fieldId, naturalKey, dataType, question, config);
+
+    await database('proposal_question__proposal_template__rels').insert(
+      {
+        proposal_question_id: fieldId,
+        template_id: templateId,
+        topic_id: topicId,
+      },
+      ['*']
+    );
+
+    return this.getProposalTemplate(templateId);
+  }
+
+  async createQuestion(
+    fieldId: string,
+    naturalKey: string,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<Question> {
     const resultSet: ProposalQuestionRecord[] = await database
       .insert(
         {
           proposal_question_id: fieldId,
           natural_key: naturalKey,
-          topic_id: topicId,
           data_type: dataType,
           question: question,
           config: config,
@@ -236,12 +298,22 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('INSERT field resultSet must contain exactly 1 row');
     }
 
-    return createProposalTemplateFieldObject(resultSet[0]);
+    return createQuestionObject(resultSet[0]);
   }
 
-  async getTemplateField(
-    fieldId: string
-  ): Promise<ProposalTemplateField | null> {
+  async createQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<ProposalTemplate> {
+    await database('proposal_question__proposal_template__rels').insert({
+      proposal_question_id: fieldId,
+      template_id: templateId,
+    });
+
+    return this.getProposalTemplate(templateId);
+  }
+
+  async getQuestion(fieldId: string): Promise<Question | null> {
     return database('proposal_questions')
       .where({ proposal_question_id: fieldId })
       .select('*')
@@ -250,21 +322,77 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
 
-        return createProposalTemplateFieldObject(resultSet[0]);
+        return createQuestionObject(resultSet[0]);
       });
   }
 
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
-    const [, rowsAffected] = await to(
+  async getQuestionRel(
+    fieldId: string,
+    templateId: number
+  ): Promise<QuestionRel | null> {
+    return database('proposal_question__proposal_template__rels')
+      .where({
+        'proposal_question__proposal_template__rels.proposal_question_id': fieldId,
+      })
+      .andWhere({
+        'proposal_question__proposal_template__rels.template_id': templateId,
+      })
+      .leftJoin(
+        'proposal_questions',
+        'proposal_question__proposal_template__rels.proposal_question_id',
+        'proposal_questions.proposal_question_id'
+      )
+      .select('*')
+      .then(
+        (
+          resultSet: Array<
+            ProposalQuestionProposalTemplateRelRecord & ProposalQuestionRecord
+          >
+        ) => {
+          if (!resultSet || resultSet.length !== 1) {
+            return null;
+          }
+
+          return createQuestionRelObject(resultSet[0]);
+        }
+      );
+  }
+
+  async deleteQuestion(fieldId: string): Promise<Question> {
+    const [error, row] = await to(
       database('proposal_questions')
         .where({ proposal_question_id: fieldId })
+        .returning('*')
         .del()
     );
-    if (rowsAffected !== 1) {
-      throw new Error(`Could not delete template field ${fieldId}`);
+    if (error || row?.length !== 1) {
+      logger.logError('Could not delete question', { fieldId });
+      throw new Error(`Could not delete question ${fieldId}`);
     }
 
-    return await this.getProposalTemplate();
+    return createQuestionObject(row[0]);
+  }
+
+  async deleteQuestionRel(
+    templateId: number,
+    fieldId: string
+  ): Promise<ProposalTemplate> {
+    const rowsAffected = await database(
+      'proposal_question__proposal_template__rels'
+    )
+      .where({
+        template_id: templateId,
+        proposal_question_id: fieldId,
+      })
+      .del();
+
+    if (rowsAffected !== 1) {
+      throw new Error(
+        `Could not delete field ${fieldId} in templateId:${templateId}`
+      );
+    }
+
+    return this.getProposalTemplate(templateId);
   }
 
   async deleteTopic(id: number): Promise<Topic> {
@@ -295,5 +423,66 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .where({ natural_key })
       .select('natural_key')
       .then((result: []) => result.length > 0);
+  }
+
+  async cloneTemplate(templateId: number) {
+    const sourceTemplate = await this.getProposalTemplateMetadata(templateId);
+
+    if (!sourceTemplate) {
+      logger.logError(
+        'Could not clone template because source template does not exist',
+        { templateId }
+      );
+
+      throw new Error('Could not clone template');
+    }
+    const newTemplate = await this.createTemplate(
+      sourceTemplate.name,
+      sourceTemplate.description
+    );
+
+    // Clone topics
+    await database.raw(`
+      INSERT INTO proposal_topics(
+            topic_title
+          , is_enabled
+          , sort_order
+          , template_id
+      )
+      SELECT 
+            topic_title
+          , is_enabled
+          , sort_order
+          , ${newTemplate.templateId}
+      FROM 
+          proposal_topics
+      WHERE
+          template_id=${sourceTemplate.templateId}
+    `);
+
+    // Clone proposal_question__proposal_template__rels entries
+    await database.raw(`
+      INSERT INTO proposal_question__proposal_template__rels 
+                  (template_id, 
+                  proposal_question_id, 
+                  sort_order, 
+                  dependency_proposal_question_id, 
+                  dependency_condition, 
+                  topic_id) 
+      SELECT ${newTemplate.templateId}, 
+            proposal_question_id, 
+            sort_order, 
+            dependency_proposal_question_id, 
+            dependency_condition, 
+            (SELECT topic_id 
+              FROM   proposal_topics AS newTopics 
+              WHERE  template_id = ${sourceTemplate.templateId} 
+                    AND sort_order = (SELECT sort_order 
+                                      FROM   proposal_topics 
+                                      WHERE  topic_id = source.topic_id)) 
+      FROM   questions_proposal_template AS source 
+    `);
+
+    return newTemplate;
   }
 }
