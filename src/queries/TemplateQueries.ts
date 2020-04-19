@@ -19,4 +19,9 @@ export default class TemplateQueries {
   async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
     return await this.dataSource.isNaturalKeyPresent(naturalKey);
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getProposalTemplatesMetadata(agent: User | null, isArchived?: boolean) {
+    return await this.dataSource.getProposalTemplatesMetadata(isArchived);
+  }
 }
