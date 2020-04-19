@@ -2,10 +2,9 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
-import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
-import { Logger, logger } from '../utils/Logger';
+import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
@@ -14,8 +13,6 @@ export default class ProposalQueries {
   constructor(
     private dataSource: ProposalDataSource,
     private callDataSource: CallDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
     private userAuth: UserAuthorization
   ) {}
 

@@ -5,15 +5,7 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { DataType, ProposalTemplate, Topic } from '../models/ProposalModel';
-import {
-  Topic,
-  ProposalTemplate,
-  DataType,
-  ProposalTemplateField,
-} from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -126,7 +118,7 @@ test('A user-officer can update fieltTopicRel', async () => {
   const response = await templateMutations.updateFieldTopicRel(
     dummyUserOfficer,
     {
-        templateId: 1,
+      templateId: 1,
       topicId: 1,
       fieldIds: ['has_links_with_industry', 'enable_crystallization'],
     }
@@ -136,7 +128,7 @@ test('A user-officer can update fieltTopicRel', async () => {
 
 test('A user can not update fieltTopicRel', async () => {
   const response = await templateMutations.updateFieldTopicRel(dummyUser, {
-       templateId: 1,
+    templateId: 1,
     topicId: 1,
     fieldIds: ['has_links_with_industry', 'enable_crystallization'],
   });

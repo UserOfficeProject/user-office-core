@@ -142,7 +142,7 @@ test('A user not on the proposal cannot submit a proposal ', () => {
 test('A non-logged in user cannot submit a proposal', () => {
   return expect(proposalMutations.submit(null, 1)).resolves.toHaveProperty(
     'reason',
-    'NOT_LOGGED_IN'
+    'NOT_ALLOWED'
   );
 });
 
@@ -177,7 +177,7 @@ test('User must have valid session to attach files', () => {
       questionId: 'reference_files',
       files: ['1020597501870552'],
     })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
+  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
 });
 
 test('User officer can delete a proposal', () => {
@@ -193,7 +193,7 @@ test('User cannot delete a proposal', () => {
 });
 
 test('Has to be logged in to create proposal', () => {
-  return expect(proposalMutations.create(null, 1)).resolves.not.toBeInstanceOf(
+  return expect(proposalMutations.create(null, 1)).rejects.not.toBeInstanceOf(
     Proposal
   );
 });

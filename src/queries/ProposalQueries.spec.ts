@@ -23,8 +23,7 @@ const userAuthorization = new UserAuthorization(
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,
   dummyCallDataSource,
-  userAuthorization,
-  new MutedLogger()
+  userAuthorization
 );
 beforeEach(() => {
   dummyProposalDataSource.init();

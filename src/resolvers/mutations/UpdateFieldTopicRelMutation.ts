@@ -42,8 +42,8 @@ export class UpdateFieldTopicRelMutation {
   ) {
     return wrapResponse(
       context.mutations.template.updateFieldTopicRel(context.user, {
-        topicId: args.topic_id,
-        fieldIds: args.field_ids,
+        topicId: args.topicId,
+        fieldIds: args.fieldIds,
         templateId: args.templateId,
       }),
       UpdateFieldTopicRelResponseWrap

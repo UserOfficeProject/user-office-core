@@ -38,7 +38,6 @@ export default class TemplateMutations {
     name: string,
     description?: string
   ): Promise<ProposalTemplateMetadata | Rejection> {
- 
     const result = await this.dataSource
       .createTemplate(name, description)
       .then(result => result);
@@ -46,14 +45,11 @@ export default class TemplateMutations {
     return result;
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
     user: User | null,
     id: number
   ): Promise<ProposalTemplateMetadata | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(user))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     return this.dataSource
       .deleteTemplate(id)
       .then(template => template)
@@ -65,23 +61,26 @@ export default class TemplateMutations {
   }
 
   async createTopic(
-    agent: User | null,
+    user: User | null,
     templateId: number,
     sortOrder: number
   ): Promise<ProposalTemplate | Rejection> {
+    if (!(await this.userAuth.isUserOfficer(user))) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     return this.dataSource
-      .createTopic(sortOrder)
+      .createTopic(templateId, sortOrder)
       .then(template => template)
       .catch(err => {
         logger.logException('Could not create topic', err, {
-          agent,
+          user,
           sortOrder,
         });
 
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
   async updateTopic(
     agent: User | null,
@@ -99,7 +98,6 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
     agent: User | null,
@@ -114,13 +112,12 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
-  async createTemplateField(
+  async createQuestion(
     agent: User | null,
-    args: CreateTemplateFieldArgs
-  ): Promise<ProposalTemplateField | Rejection> {
-    const { dataType, topicId } = args;
+    args: CreateQuestionArgs
+  ): Promise<Question | Rejection> {
+    const { dataType } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
@@ -141,7 +138,6 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
   async updateQuestion(
     agent: User | null,
@@ -163,7 +159,7 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
+  @Authorized([Roles.USER_OFFICER])
   async updateQuestionRel(
     agent: User | null,
     args: UpdateQuestionRelArgs
@@ -180,16 +176,11 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestion(
     agent: User | null,
     questionId: string
   ): Promise<Question | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .deleteQuestion(questionId)
       .then(template => template)
@@ -221,7 +212,6 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
     agent: User | null,
@@ -243,16 +233,20 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async updateFieldTopicRel(
     agent: User | null,
-    { topicId, fieldIds, templateId }: { topicId: number; fieldIds: string[], templateId: number }
+    values: {
+      templateId: number;
+      topicId: number;
+      fieldIds: string[];
+    }
   ): Promise<string[] | Rejection> {
     let isSuccess = true;
     let index = 1;
-    for (const field of fieldIds) {
+    for (const field of values.fieldIds) {
       const updatedField = await this.dataSource.updateQuestionRel(
         field,
-        templateId,
+        values.templateId,
         {
-          topicId,
+          topicId: values.topicId,
           sortOrder: index,
         }
       );
@@ -263,7 +257,7 @@ export default class TemplateMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    return fieldIds;
+    return values.fieldIds;
   }
 
   private createBlankConfig(dataType: DataType): typeof FieldConfigType {
@@ -283,7 +277,7 @@ export default class TemplateMutations {
         return new ConfigBase();
     }
   }
-
+  @Authorized([Roles.USER_OFFICER])
   updateProposalTemplateMetadata(
     user: User | null,
     args: UpdateProposalTemplateMetadataArgs

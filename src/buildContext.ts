@@ -38,8 +38,7 @@ const userMutations = new UserMutations(userDataSource, userAuthorization);
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
   callDataSource,
-  userAuthorization,
-  logger
+  userAuthorization
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,

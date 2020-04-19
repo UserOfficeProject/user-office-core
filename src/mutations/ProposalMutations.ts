@@ -1,8 +1,9 @@
 import { to } from 'await-to-js';
+import { Authorized } from 'type-graphql';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus, Authorized } from '../decorators';
+import { EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -26,36 +27,34 @@ export default class ProposalMutations {
 
   @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
-  async create(agent: User | null): Promise<Proposal | Rejection> {
-    // Check if there is an open call, if not reject
-    if (!(await this.userAuth.isUserOfficer(agent)) {
-        return rejection('NOT_AUTHORIZED');
-    }
-    if( !(await this.dataSource.checkActiveCall())
-    {
+  async create(
+    agent: User | null,
+    callId: number
+  ): Promise<Proposal | Rejection> {
+    // Check if there is an open call
+    if (!(await this.dataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
-const call = await this.callDataSource.get(callId);
+    const call = await this.callDataSource.get(callId);
 
-        if (!call || !call.templateId) {
-          logger.logError('User tried to create proposal on bad call', {
-            call,
-          });
+    if (!call || !call.templateId) {
+      logger.logError('User tried to create proposal on bad call', {
+        call,
+      });
 
-          return rejection('NOT_FOUND');
-        }
-return this.dataSource
-          .create(agent.id, callId, call.templateId)
-          .then(proposal => proposal)
-          .catch(err => {
-            logger.logException('Could not create proposal', err, { agent });
+      return rejection('NOT_FOUND');
+    }
 
-  
+    return this.dataSource
+      .create(agent!.id, callId, call.templateId)
+      .then(proposal => proposal)
+      .catch(err => {
+        logger.logException('Could not create proposal', err, { agent });
+
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
@@ -78,25 +77,22 @@ return this.dataSource
     // Get proposal information
     const proposal = await this.dataSource.get(id); //Hacky
 
+    if (!proposal) {
+      return rejection('NOT_FOUND');
+    }
+
     // Check if there is an open call, if not reject
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall())
+      !(await this.dataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
-        if (!proposal) {
-          return rejection('NOT_FOUND');
-        }
-
-        // Check if there is an open call, if not reject
-        if (
-          !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.dataSource.checkActiveCall(proposal.callId))
-        ) {
-          return rejection('NO_ACTIVE_CALL_FOUND');
-        }
+    // Check that proposal exist
+    if (!proposal) {
+      return rejection('INTERNAL_ERROR');
+    }
 
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
@@ -146,57 +142,28 @@ return this.dataSource
     if (answers !== undefined) {
       for (const answer of answers) {
         if (answer.value !== undefined) {
-          const templateField = await this.templateDataSource.getTemplateField(
-            answer.proposal_question_id
+          const questionRel = await this.templateDataSource.getQuestionRel(
+            answer.proposal_question_id,
+            proposal.templateId
           );
-          if (!templateField) {
+          if (!questionRel) {
+            logger.logError('Could not find questionRel', {
+              proposalQuestionId: answer.proposal_question_id,
+              templateId: proposal.templateId,
+            });
+
             return rejection('INTERNAL_ERROR');
           }
           if (
             !partialSave &&
-            !isMatchingConstraints(answer.value, templateField)
+            !isMatchingConstraints(answer.value, questionRel)
           ) {
             this.logger.logError(
               'User provided value not matching constraint',
-              { answer, templateField }
+              { answer, templateField: questionRel }
             );
 
-        if (proposerId !== undefined) {
-          proposal.proposerId = proposerId;
-        }
-
-        if (answers !== undefined) {
-          for (const answer of answers) {
-            if (answer.value !== undefined) {
-              const questionRel = await this.templateDataSource.getQuestionRel(
-                answer.proposal_question_id,
-                proposal.templateId
-              );
-              if (!questionRel) {
-                logger.logError('Could not find questionRel', {
-                  proposalQuestionId: answer.proposal_question_id,
-                  templateId: proposal.templateId,
-                });
-
-                return rejection('INTERNAL_ERROR');
-              }
-              if (
-                !partialSave &&
-                !isMatchingConstraints(answer.value, questionRel)
-              ) {
-                this.logger.logError(
-                  'User provided value not matching constraint',
-                  { answer, templateField: questionRel }
-                );
-
-                return rejection('VALUE_CONSTRAINT_REJECTION');
-              }
-              await this.dataSource.updateAnswer(
-                proposal?.id,
-                answer.proposal_question_id,
-                answer.value
-              );
-            }
+            return rejection('VALUE_CONSTRAINT_REJECTION');
           }
           await this.dataSource.updateAnswer(
             proposal?.id,
@@ -226,7 +193,6 @@ return this.dataSource
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   async updateFiles(
     agent: User | null,
@@ -258,7 +224,6 @@ return this.dataSource
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
@@ -290,7 +255,6 @@ return this.dataSource
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   async delete(
     agent: User | null,
