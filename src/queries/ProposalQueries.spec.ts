@@ -11,7 +11,6 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 

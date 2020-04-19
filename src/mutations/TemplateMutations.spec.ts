@@ -8,6 +8,12 @@ import {
 import { ApplicationEvent } from '../events/applicationEvents';
 import { EventBus } from '../events/eventBus';
 import { DataType, ProposalTemplate, Topic } from '../models/ProposalModel';
+import {
+  Topic,
+  ProposalTemplate,
+  DataType,
+  ProposalTemplateField,
+} from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -18,7 +24,6 @@ import TemplateMutations from './TemplateMutations';
 // TODO: it is here much of the logic reside
 
 const dummyLogger = new MutedLogger();
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
@@ -27,7 +32,6 @@ const userAuthorization = new UserAuthorization(
 const templateMutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
-  dummyEventBus,
   dummyLogger
 );
 
@@ -121,20 +125,21 @@ test('A user can not create topic', async () => {
 test('A user-officer can update fieltTopicRel', async () => {
   const response = await templateMutations.updateFieldTopicRel(
     dummyUserOfficer,
-    1,
-    1,
-    ['has_links_with_industry', 'enable_crystallization']
+    {
+        templateId: 1,
+      topicId: 1,
+      fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+    }
   );
   expect(isRejection(response)).toEqual(false);
 });
 
 test('A user can not update fieltTopicRel', async () => {
-  const response = await templateMutations.updateFieldTopicRel(
-    dummyUser,
-    1,
-    1,
-    ['has_links_with_industry', 'enable_crystallization']
-  );
+  const response = await templateMutations.updateFieldTopicRel(dummyUser, {
+       templateId: 1,
+    topicId: 1,
+    fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+  });
   expect(isRejection(response)).toEqual(true);
 });
 

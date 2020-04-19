@@ -9,20 +9,16 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import CallMutations from './CallMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const callMutations = new CallMutations(
   new CallDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 test('A user can not create a call', () => {
@@ -38,7 +34,7 @@ test('A user can not create a call', () => {
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     })
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A not logged in user can not create a call', () => {

@@ -20,7 +20,7 @@ export class ResetPasswordEmailMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.resetPasswordEmail(email),
+      context.mutations.user.resetPasswordEmail(context.user, email),
       ResetPasswordEmailResponseWrap
     );
   }

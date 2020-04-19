@@ -2,9 +2,8 @@ import { to } from 'await-to-js';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
+import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { EventBus } from '../events/eventBus';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
 import { isMatchingConstraints } from '../models/ProposalModelFunctions';
@@ -22,31 +21,22 @@ export default class ProposalMutations {
     private templateDataSource: TemplateDataSource,
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>,
     private logger: Logger
   ) {}
 
-  /* NOTE: User | null??? This should be solved differently.
-   ** We are sending null from the tests to simulate not logged in user.
-   ** This is not the way we should test if user is logged in or not.
-   ** There should be an auth checker that handles those cases.
-   */
-  async create(
-    agent: User | null,
-    callId: number
-  ): Promise<Proposal | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (agent == null) {
-          return rejection('NOT_LOGGED_IN');
-        }
+  @Authorized()
+  @EventBus(Event.PROPOSAL_CREATED)
+  async create(agent: User | null): Promise<Proposal | Rejection> {
+    // Check if there is an open call, if not reject
+    if (!(await this.userAuth.isUserOfficer(agent)) {
+        return rejection('NOT_AUTHORIZED');
+    }
+    if( !(await this.dataSource.checkActiveCall())
+    {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
 
-        // Check if there is an open call
-        if (!(await this.dataSource.checkActiveCall(callId))) {
-          return rejection('NO_ACTIVE_CALL_FOUND');
-        }
-
-        const call = await this.callDataSource.get(callId);
+const call = await this.callDataSource.get(callId);
 
         if (!call || !call.templateId) {
           logger.logError('User tried to create proposal on bad call', {
@@ -55,26 +45,19 @@ export default class ProposalMutations {
 
           return rejection('NOT_FOUND');
         }
-
-        return this.dataSource
+return this.dataSource
           .create(agent.id, callId, call.templateId)
           .then(proposal => proposal)
           .catch(err => {
             logger.logException('Could not create proposal', err, { agent });
 
-            return rejection('INTERNAL_ERROR');
-          });
-      },
-      proposal => {
-        return {
-          type: Event.PROPOSAL_CREATED,
-          proposal,
-          loggedInUserId: agent ? agent.id : null,
-        };
-      }
-    );
+  
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
+  @Authorized()
+  @EventBus(Event.PROPOSAL_UPDATED)
   async update(
     agent: User | null,
     args: UpdateProposalArgs
@@ -92,14 +75,16 @@ export default class ProposalMutations {
       finalStatus,
     } = args;
 
-    return this.eventBus.wrap<Proposal>(
-      async () => {
-        if (agent == null) {
-          return rejection('NOT_LOGGED_IN');
-        }
+    // Get proposal information
+    const proposal = await this.dataSource.get(id); //Hacky
 
-        // Get proposal information
-        const proposal = await this.dataSource.get(id); //Hacky
+    // Check if there is an open call, if not reject
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.dataSource.checkActiveCall())
+    ) {
+      return rejection('NO_ACTIVE_CALL_FOUND');
+    }
 
         if (!proposal) {
           return rejection('NOT_FOUND');
@@ -113,54 +98,68 @@ export default class ProposalMutations {
           return rejection('NO_ACTIVE_CALL_FOUND');
         }
 
-        // Check that proposal exist
-        if (!proposal) {
-          return rejection('INTERNAL_ERROR');
-        }
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
 
-        if (
-          !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.userAuth.isMemberOfProposal(agent, proposal))
-        ) {
-          return rejection('NOT_ALLOWED');
-        }
+    if (
+      proposal.status !== ProposalStatus.DRAFT &&
+      !(await this.userAuth.isUserOfficer(agent))
+    ) {
+      return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
+    }
 
-        if (
-          proposal.status !== ProposalStatus.DRAFT &&
-          !(await this.userAuth.isUserOfficer(agent))
-        ) {
-          return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
-        }
+    if (title !== undefined) {
+      proposal.title = title;
+    }
 
-        if (title !== undefined) {
-          proposal.title = title;
-        }
+    if (abstract !== undefined) {
+      proposal.abstract = abstract;
+    }
+    if ((await this.userAuth.isUserOfficer(agent)) && rankOrder !== undefined) {
+      proposal.rankOrder = rankOrder;
+    }
 
-        if (abstract !== undefined) {
-          proposal.abstract = abstract;
-        }
-        if (
-          (await this.userAuth.isUserOfficer(agent)) &&
-          rankOrder !== undefined
-        ) {
-          proposal.rankOrder = rankOrder;
-        }
+    if (
+      (await this.userAuth.isUserOfficer(agent)) &&
+      finalStatus !== undefined
+    ) {
+      proposal.finalStatus = finalStatus;
+    }
 
-        if (
-          (await this.userAuth.isUserOfficer(agent)) &&
-          finalStatus !== undefined
-        ) {
-          proposal.finalStatus = finalStatus;
-        }
+    if (users !== undefined) {
+      const [err] = await to(this.dataSource.setProposalUsers(id, users));
+      if (err) {
+        logger.logError('Could not update users', { err, id, agent });
 
-        if (users !== undefined) {
-          const [err] = await to(this.dataSource.setProposalUsers(id, users));
-          if (err) {
-            logger.logError('Could not update users', { err, id, agent });
+        return rejection('INTERNAL_ERROR');
+      }
+    }
 
+    if (proposerId !== undefined) {
+      proposal.proposerId = proposerId;
+    }
+
+    if (answers !== undefined) {
+      for (const answer of answers) {
+        if (answer.value !== undefined) {
+          const templateField = await this.templateDataSource.getTemplateField(
+            answer.proposal_question_id
+          );
+          if (!templateField) {
             return rejection('INTERNAL_ERROR');
           }
-        }
+          if (
+            !partialSave &&
+            !isMatchingConstraints(answer.value, templateField)
+          ) {
+            this.logger.logError(
+              'User provided value not matching constraint',
+              { answer, templateField }
+            );
 
         if (proposerId !== undefined) {
           proposal.proposerId = proposerId;
@@ -199,44 +198,40 @@ export default class ProposalMutations {
               );
             }
           }
-        }
-
-        if (topicsCompleted !== undefined) {
-          await this.dataSource.updateTopicCompletenesses(
-            proposal.id,
-            topicsCompleted
+          await this.dataSource.updateAnswer(
+            proposal?.id,
+            answer.proposal_question_id,
+            answer.value
           );
         }
-
-        return this.dataSource
-          .update(proposal)
-          .then(proposal => proposal)
-          .catch(err => {
-            logger.logException('Could not update proposal', err, {
-              agent,
-              id,
-            });
-
-            return rejection('INTERNAL_ERROR');
-          });
-      },
-      (proposal): ApplicationEvent => {
-        return {
-          type: Event.PROPOSAL_UPDATED,
-          proposal,
-          loggedInUserId: agent ? agent.id : null,
-        };
       }
-    );
+    }
+
+    if (topicsCompleted !== undefined) {
+      await this.dataSource.updateTopicCompletenesses(
+        proposal.id,
+        topicsCompleted
+      );
+    }
+
+    return this.dataSource
+      .update(proposal)
+      .then(proposal => proposal)
+      .catch(err => {
+        logger.logException('Could not update proposal', err, {
+          agent,
+          id,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
+  @Authorized()
   async updateFiles(
     agent: User | null,
     args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
     const { proposalId, questionId, files } = args;
     const proposal = await this.dataSource.get(proposalId);
 
@@ -264,59 +259,43 @@ export default class ProposalMutations {
       });
   }
 
+  @Authorized()
+  @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (agent == null) {
-          return rejection('NOT_LOGGED_IN');
-        }
+    const proposal = await this.dataSource.get(proposalId);
 
-        const proposal = await this.dataSource.get(proposalId);
+    if (!proposal) {
+      return rejection('INTERNAL_ERROR');
+    }
 
-        if (!proposal) {
-          return rejection('INTERNAL_ERROR');
-        }
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isMemberOfProposal(agent, proposal))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
 
-        if (
-          !(await this.userAuth.isUserOfficer(agent)) &&
-          !(await this.userAuth.isMemberOfProposal(agent, proposal))
-        ) {
-          return rejection('NOT_ALLOWED');
-        }
+    return this.dataSource
+      .submitProposal(proposalId)
+      .then(proposal => proposal)
+      .catch(e => {
+        logger.logException('Could not submit proposal', e, {
+          agent,
+          proposalId,
+        });
 
-        return this.dataSource
-          .submitProposal(proposalId)
-          .then(proposal => proposal)
-          .catch(e => {
-            logger.logException('Could not submit proposal', e, {
-              agent,
-              proposalId,
-            });
-
-            return rejection('INTERNAL_ERROR');
-          });
-      },
-      proposal => {
-        return {
-          type: Event.PROPOSAL_SUBMITTED,
-          proposal,
-          loggedInUserId: agent ? agent.id : null,
-        };
-      }
-    );
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
+  @Authorized()
   async delete(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    if (agent == null) {
-      return rejection('NOT_LOGGED_IN');
-    }
-
     const proposal = await this.dataSource.get(proposalId);
 
     if (!proposal) {

@@ -9,21 +9,17 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Review, ReviewStatus } from '../models/Review';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewMutations from './ReviewMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
   new ReviewDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 //Update
@@ -62,7 +58,7 @@ test('A userofficer can add a reviewer for a proposal', () => {
 test('A user can not add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A userofficer can remove a reviewer for a proposal', () => {
@@ -74,5 +70,5 @@ test('A userofficer can remove a reviewer for a proposal', () => {
 test('A user can not remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUser, 1)
-  ).resolves.toHaveProperty('reason', 'NOT_USER_OFFICER');
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

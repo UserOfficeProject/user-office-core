@@ -3,22 +3,10 @@ import {
   CallDataSourceMock,
   dummyCall,
 } from '../datasources/mockups/CallDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import {
-  UserDataSourceMock,
-  dummyUser,
-} from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { dummyUser } from '../datasources/mockups/UserDataSource';
 import CallQueries from './CallQueries';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const callMutations = new CallQueries(
-  new CallDataSourceMock(),
-  userAuthorization
-);
+const callMutations = new CallQueries(new CallDataSourceMock());
 
 test('A user can get a call', () => {
   return expect(callMutations.get(dummyUser, 1)).resolves.toBe(dummyCall);

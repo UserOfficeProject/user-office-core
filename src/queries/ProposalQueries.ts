@@ -1,6 +1,9 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
+import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -13,8 +16,10 @@ export default class ProposalQueries {
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
+    private userAuth: UserAuthorization
   ) {}
 
+  @Authorized()
   async get(agent: User | null, id: number) {
     const proposal = await this.dataSource.get(id);
 
@@ -27,6 +32,7 @@ export default class ProposalQueries {
       delete proposal.rankOrder;
       delete proposal.finalStatus;
     }
+
     if ((await this.hasAccessRights(agent, proposal)) === true) {
       return proposal;
     } else {
@@ -48,6 +54,7 @@ export default class ProposalQueries {
     return await this.dataSource.getEmptyQuestionary(callId);
   }
 
+  // NOTE: Duplicate function! We have this same function under userAuth.
   private async hasAccessRights(
     agent: User | null,
     proposal: Proposal | null
@@ -63,24 +70,18 @@ export default class ProposalQueries {
     );
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: User | null,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ) {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getProposals(filter, first, offset);
-    } else {
-      return null;
-    }
+    return this.dataSource.getProposals(filter, first, offset);
   }
 
+  @Authorized()
   async getBlank(agent: User | null, callId: number) {
-    if (agent == null) {
-      return null;
-    }
-
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.dataSource.checkActiveCall(callId))
@@ -110,7 +111,7 @@ export default class ProposalQueries {
       0,
       '',
       '',
-      agent.id,
+      (agent as User).id,
       ProposalStatus.BLANK,
       new Date(),
       new Date(),

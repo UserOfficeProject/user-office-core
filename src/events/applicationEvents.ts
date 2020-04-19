@@ -3,75 +3,77 @@ import { SEP } from '../models/SEP';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
-interface ProposalAcceptedEvent {
+interface GeneralEvent {
+  type: Event;
+  key: string;
+  loggedInUserId: number | null;
+  isRejection: boolean;
+}
+
+interface ProposalAcceptedEvent extends GeneralEvent {
   type: Event.PROPOSAL_ACCEPTED;
   proposal: Proposal;
-  loggedInUserId: number | null;
 }
 
-interface ProposalSubmittedEvent {
+interface ProposalSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_SUBMITTED;
   proposal: Proposal;
-  loggedInUserId: number | null;
 }
 
-interface ProposalUpdatedEvent {
+interface ProposalUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_UPDATED;
   proposal: Proposal;
-  loggedInUserId: number | null;
 }
 
-interface ProposalRejectedEvent {
+interface ProposalRejectedEvent extends GeneralEvent {
   type: Event.PROPOSAL_REJECTED;
   proposal: Proposal;
   reason: string;
-  loggedInUserId: number | null;
 }
 
-interface ProposalCreatedEvent {
+interface ProposalCreatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CREATED;
   proposal: Proposal;
-  loggedInUserId: number | null;
 }
 
-interface UserResetPasswordEmailEvent {
+interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
-  user: User;
-  link: string;
-  loggedInUserId: number | null;
+  userlinkresponse: {
+    user: User;
+    link: string;
+  };
 }
 
-interface UserUpdateEvent {
+interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
-  loggedInUserId: number | null;
 }
 
-interface UserCreateEvent {
+interface UserCreateEvent extends GeneralEvent {
   type: Event.USER_CREATED;
-  user: User;
-  link: string;
-  loggedInUserId: number | null;
+  userlinkresponse: {
+    user: User;
+    link: string;
+  };
 }
 
-interface EmailInvite {
+interface EmailInvite extends GeneralEvent {
   type: Event.EMAIL_INVITE;
-  userId: number;
-  inviterId: number;
-  role: UserRole;
-  loggedInUserId: number | null;
+  emailinviteresponse: {
+    userId: number;
+    inviterId: number;
+    role: UserRole;
+  };
 }
 
-interface SEPCreatedEvent {
+interface SEPCreatedEvent extends GeneralEvent {
   type: Event.SEP_CREATED;
   sep: SEP;
-  loggedInUserId: number | null;
 }
 
-interface SEPUpdatedEvent {
+interface SEPUpdatedEvent extends GeneralEvent {
   type: Event.SEP_UPDATED;
   sep: SEP;
-  loggedInUserId: number | null;
 }
 
 export type ApplicationEvent =

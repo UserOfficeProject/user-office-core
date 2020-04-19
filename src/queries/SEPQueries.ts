@@ -1,13 +1,12 @@
 import { SEPDataSource } from '../datasources/SEPDataSource';
+import { Authorized } from '../decorators';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class SEPQueries {
-  constructor(
-    private dataSource: SEPDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: SEPDataSource) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async get(agent: User | null, id: number) {
     const sep = await this.dataSource.get(id);
 
@@ -15,23 +14,16 @@ export default class SEPQueries {
       return null;
     }
 
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return sep;
-    } else {
-      return null;
-    }
+    return sep;
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: User | null,
     filter?: string,
     first?: number,
     offset?: number
   ) {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getAll(filter, first, offset);
-    } else {
-      return null;
-    }
+    return this.dataSource.getAll(filter, first, offset);
   }
 }

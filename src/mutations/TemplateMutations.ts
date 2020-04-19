@@ -1,12 +1,12 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
+import { Authorized } from '../decorators';
 import {
   createConfig,
   DataType,
   ProposalTemplate,
   Topic,
 } from '../models/ProposalModel';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
@@ -29,19 +29,16 @@ export default class TemplateMutations {
   constructor(
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>,
     private logger: Logger
   ) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async createTemplate(
     agent: User | null,
     name: string,
     description?: string
   ): Promise<ProposalTemplateMetadata | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
+ 
     const result = await this.dataSource
       .createTemplate(name, description)
       .then(result => result);
@@ -72,17 +69,9 @@ export default class TemplateMutations {
     templateId: number,
     sortOrder: number
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
-    return await this.dataSource
-      .createTopic(templateId, sortOrder)
-      .then(template => {
-        console.log(template);
-
-        return template;
-      })
+    return this.dataSource
+      .createTopic(sortOrder)
+      .then(template => template)
       .catch(err => {
         logger.logException('Could not create topic', err, {
           agent,
@@ -93,14 +82,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateTopic(
     agent: User | null,
     args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateTopic(args.id, args)
       .then(topic => topic)
@@ -114,14 +100,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
     agent: User | null,
     topicId: number
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .deleteTopic(topicId)
       .then(topic => topic)
@@ -132,14 +115,12 @@ export default class TemplateMutations {
       });
   }
 
-  async createQuestion(
+  @Authorized([Roles.USER_OFFICER])
+  async createTemplateField(
     agent: User | null,
-    args: CreateQuestionArgs
-  ): Promise<Question | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-    const { dataType } = args;
+    args: CreateTemplateFieldArgs
+  ): Promise<ProposalTemplateField | Rejection> {
+    const { dataType, topicId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
@@ -161,6 +142,7 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateQuestion(
     agent: User | null,
     args: UpdateQuestionArgs
@@ -186,10 +168,6 @@ export default class TemplateMutations {
     agent: User | null,
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateQuestionRel(args.questionId, args.templateId, args)
       .then(template => template)
@@ -203,6 +181,7 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteQuestion(
     agent: User | null,
     questionId: string
@@ -229,10 +208,6 @@ export default class TemplateMutations {
     templateId: number,
     questionId: string
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .deleteQuestionRel(templateId, questionId)
       .then(template => template)
@@ -247,14 +222,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
     agent: User | null,
     topicOrder: number[]
   ): Promise<number[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateTopicOrder(topicOrder)
       .then(order => order)
@@ -268,15 +240,11 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async updateFieldTopicRel(
     agent: User | null,
-    templateId: number,
-    topicId: number,
-    fieldIds: string[]
+    { topicId, fieldIds, templateId }: { topicId: number; fieldIds: string[], templateId: number }
   ): Promise<string[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
     let isSuccess = true;
     let index = 1;
     for (const field of fieldIds) {
