@@ -76,7 +76,7 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => [Review])
+  @FieldResolver(() => [Review], { nullable: true })
   async reviews(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
