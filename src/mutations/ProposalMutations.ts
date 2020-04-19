@@ -1,9 +1,8 @@
 import { to } from 'await-to-js';
-import { Authorized } from 'type-graphql';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus } from '../decorators';
+import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
