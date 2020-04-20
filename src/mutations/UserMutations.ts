@@ -36,6 +36,25 @@ export default class UserMutations {
     return hash;
   }
 
+  async delete(agent: User | null, id: number): Promise<User | Rejection> {
+    return this.eventBus.wrap(
+      async () => {
+        if (!agent || !(await this.userAuth.isUserOfficer(agent))) {
+          return rejection('NOT_ALLOWED');
+        }
+        const user = await this.dataSource.delete(id);
+        if (!user) {
+          return rejection('INTERNAL_ERROR');
+        }
+
+        return user;
+      },
+      res => {
+        return { user: res, type: Event.USER_DELETED };
+      }
+    );
+  }
+
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs

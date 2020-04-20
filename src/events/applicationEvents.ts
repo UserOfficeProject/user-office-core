@@ -54,6 +54,11 @@ interface UserCreateEvent {
   loggedInUserId: number | null;
 }
 
+interface UserDeletedEvent {
+  type: Event.USER_DELETED;
+  user: User;
+}
+
 interface EmailInvite {
   type: Event.EMAIL_INVITE;
   userId: number;
@@ -85,4 +90,5 @@ export type ApplicationEvent =
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | SEPCreatedEvent
-  | SEPUpdatedEvent;
+  | SEPUpdatedEvent
+  | UserDeletedEvent;

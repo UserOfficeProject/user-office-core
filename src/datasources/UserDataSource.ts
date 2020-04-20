@@ -5,6 +5,7 @@ import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 
 export interface UserDataSource {
+  delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;

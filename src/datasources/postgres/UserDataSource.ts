@@ -11,6 +11,20 @@ import database from './database';
 import { UserRecord, createUserObject, createBasicUserObject } from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
+  delete(id: number): Promise<User | null> {
+    return database('users')
+      .where('users.user_id', id)
+      .del()
+      .from('users')
+      .returning('*')
+      .then((user: UserRecord[]) => {
+        if (user === undefined || user.length !== 1) {
+          throw new Error(`Could not delete user with id:${id}`);
+        }
+
+        return createUserObject(user[0]);
+      });
+  }
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     const { userID, roleID } = args;
 
