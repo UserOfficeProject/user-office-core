@@ -60,8 +60,8 @@ export default class UserMutations {
 
     return hash;
   }
+
   @Authorized([Roles.USER_OFFICER])
-  @Authorized()
   @EventBus(Event.USER_DELETED)
   async delete(agent: User | null, id: number): Promise<User | Rejection> {
     const user = await this.dataSource.delete(id);
