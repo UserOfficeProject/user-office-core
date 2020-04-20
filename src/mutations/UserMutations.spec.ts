@@ -8,8 +8,7 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
+import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -36,18 +35,22 @@ const badToken = jsonwebtoken.sign(
   { expiresIn: '-24h' }
 );
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const userMutations = new UserMutations(
   new UserDataSourceMock(),
-  userAuthorization,
-  dummyEventBus
+  userAuthorization
 );
 
 test('A user can invite another user by email', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    5,
+    dummyUser.id,
+    UserRole.USER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: 'firstname',
@@ -55,11 +58,7 @@ test('A user can invite another user by email', () => {
       email: 'email@google.com',
       userRole: UserRole.USER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUser.id,
-    userId: 5,
-    role: UserRole.USER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user must be logged in to invite another user by email', () => {
@@ -70,7 +69,7 @@ test('A user must be logged in to invite another user by email', () => {
       email: 'email@google.com',
       userRole: UserRole.USER,
     })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED');
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A user cannot invite another user by email if the user already has an account', () => {
@@ -85,6 +84,12 @@ test('A user cannot invite another user by email if the user already has an acco
 });
 
 test('A user can reinvite another user by email if the user has not created an account', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    dummyPlaceHolderUser.id,
+    dummyUser.id,
+    UserRole.USER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUser, {
       firstname: 'firstname',
@@ -92,14 +97,16 @@ test('A user can reinvite another user by email if the user has not created an a
       email: dummyPlaceHolderUser.email,
       userRole: UserRole.USER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUser.id,
-    userId: dummyPlaceHolderUser.id,
-    role: UserRole.USER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user officer can invite a reviewer by email', () => {
+  const emailInviteResponse = new EmailInviteResponse(
+    dummyPlaceHolderUser.id,
+    dummyUserOfficer.id,
+    UserRole.REVIEWER
+  );
+
   return expect(
     userMutations.createUserByEmailInvite(dummyUserOfficer, {
       firstname: 'firstname',
@@ -107,11 +114,7 @@ test('A user officer can invite a reviewer by email', () => {
       email: dummyPlaceHolderUser.email,
       userRole: UserRole.REVIEWER,
     })
-  ).resolves.toStrictEqual({
-    inviterId: dummyUserOfficer.id,
-    userId: dummyPlaceHolderUser.id,
-    role: UserRole.REVIEWER,
-  });
+  ).resolves.toStrictEqual(emailInviteResponse);
 });
 
 test('A user cannot invite a reviewer by email', () => {
@@ -152,7 +155,7 @@ test('A not logged in user cannot update another users name', () => {
       firstname: 'klara',
       lastname: 'undefined',
     })
-  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A userofficer can update another users name', () => {
@@ -220,13 +223,13 @@ test('A user should be able to update a token if valid', () => {
 
 test('A user can reset its password by providing a valid email', () => {
   return expect(
-    userMutations.resetPasswordEmail(dummyUser.email)
+    userMutations.resetPasswordEmail(null, dummyUser.email)
   ).resolves.toHaveProperty('user');
 });
 
 test('A user gets an error if providing a email not attached to a account', () => {
   return expect(
-    userMutations.resetPasswordEmail('dummyemail@ess.se')
+    userMutations.resetPasswordEmail(null, 'dummyemail@ess.se')
   ).resolves.toHaveProperty('reason', 'COULD_NOT_FIND_USER_BY_EMAIL');
 });
 
@@ -244,29 +247,37 @@ test('A user can not update its password if it has a bad token', () => {
 
 test('A user can update its password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUser, dummyUser.id, 'Test1234!')
+    userMutations.updatePassword(dummyUser, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test('A user can not update another users password ', () => {
   return expect(
-    userMutations.updatePassword(
-      dummyUserNotOnProposal,
-      dummyUser.id,
-      'Test1234!'
-    )
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+    userMutations.updatePassword(dummyUserNotOnProposal, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A not logged in users can not update passwords ', () => {
   return expect(
-    userMutations.updatePassword(null, dummyUser.id, 'Test1234!')
-  ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');
+    userMutations.updatePassword(null, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
+  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
 test('A user officer can update any password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUserOfficer, dummyUser.id, 'Test1234!')
+    userMutations.updatePassword(dummyUserOfficer, {
+      id: dummyUser.id,
+      password: 'Test1234!',
+    })
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 

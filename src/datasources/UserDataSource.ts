@@ -12,6 +12,7 @@ export interface UserDataSource {
   checkEmailExist(email: string): Promise<boolean>;
   checkOrcIDExist(orcID: string): Promise<boolean>;
   // Read
+  me(id: number): Promise<User | null>;
   get(id: number): Promise<User | null>;
   getByUsername(username: string): Promise<User | null>;
   getByEmail(email: string): Promise<User | null>;

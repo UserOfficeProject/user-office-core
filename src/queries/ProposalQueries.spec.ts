@@ -10,7 +10,6 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 
@@ -21,8 +20,7 @@ const userAuthorization = new UserAuthorization(
 );
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,
-  userAuthorization,
-  new MutedLogger()
+  userAuthorization
 );
 beforeEach(() => {
   dummyProposalDataSource.init();

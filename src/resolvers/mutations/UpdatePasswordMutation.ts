@@ -28,7 +28,7 @@ export class UpdatePasswordMutations {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.updatePassword(context.user, id, password),
+      context.mutations.user.updatePassword(context.user, { id, password }),
       BasicUserDetailsResponseWrap
     );
   }

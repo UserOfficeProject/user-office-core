@@ -1,8 +1,4 @@
 import 'reflect-metadata';
-
-import { rejection } from '../rejection';
-import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
-
 export class User {
   constructor(
     public id: number,
@@ -44,16 +40,4 @@ export class BasicUserDetails {
     public organisation: string,
     public position: string
   ) {}
-}
-export function checkUserArgs(args: UpdateUserArgs) {
-  const { firstname, lastname } = args;
-  if (firstname && firstname.length < 2) {
-    return rejection('TOO_SHORT_NAME');
-  }
-
-  if (lastname && lastname.length < 2) {
-    return rejection('TOO_SHORT_NAME');
-  }
-
-  return true;
 }

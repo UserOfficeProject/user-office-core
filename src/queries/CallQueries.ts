@@ -1,27 +1,19 @@
 import { CallDataSource } from '../datasources/CallDataSource';
-import { Call } from '../models/Call';
+import { Authorized } from '../decorators';
 import { User } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class CallQueries {
-  constructor(
-    private dataSource: CallDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: CallDataSource) {}
 
+  @Authorized()
   async get(agent: User | null, id: number) {
-    if (agent == null) {
-      return null;
-    }
     const call = await this.dataSource.get(id);
 
     return call;
   }
 
+  @Authorized()
   async getAll(agent: User | null) {
-    if (agent == null) {
-      return null;
-    }
     const calls = await this.dataSource.getCalls();
 
     return calls;

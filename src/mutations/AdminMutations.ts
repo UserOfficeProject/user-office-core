@@ -1,7 +1,7 @@
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
+import { Authorized } from '../decorators';
 import { Page } from '../models/Admin';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { logger } from '../utils/Logger';
@@ -19,19 +19,14 @@ export default class AdminMutations {
   }
   constructor(
     private dataSource: AdminDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: User | null,
-    id: number,
-    text: string
+    { id, text }: { id: number; text: string }
   ): Promise<Page | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .setPageText(id, text)
       .then(page => {

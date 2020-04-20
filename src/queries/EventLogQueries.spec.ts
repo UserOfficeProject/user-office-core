@@ -5,24 +5,14 @@ import {
   dummyEventLogs,
   dummyEventLogProposalCreated,
 } from '../datasources/mockups/EventLogsDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import EventLogQueries from './EventLogQueries';
 
 const dummyEventLogDataSource = new EventLogsDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const eventLogQueries = new EventLogQueries(
-  dummyEventLogDataSource,
-  userAuthorization
-);
+const eventLogQueries = new EventLogQueries(dummyEventLogDataSource);
 
 describe('Test EventLogQueries', () => {
   test('A userofficer can get all event logs if no filter is passed', () => {

@@ -6,8 +6,6 @@ import {
   dummyUser,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import {
   Topic,
   ProposalTemplate,
@@ -22,7 +20,6 @@ import TemplateMutations from './TemplateMutations';
 // TODO: it is here much of the logic reside
 
 const dummyLogger = new MutedLogger();
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
@@ -31,7 +28,6 @@ const userAuthorization = new UserAuthorization(
 const templateMutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
-  dummyEventBus,
   dummyLogger
 );
 
@@ -81,17 +77,19 @@ test('A user can not create topic', async () => {
 test('A user-officer can update fieltTopicRel', async () => {
   const response = await templateMutations.updateFieldTopicRel(
     dummyUserOfficer,
-    1,
-    ['has_links_with_industry', 'enable_crystallization']
+    {
+      topicId: 1,
+      fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+    }
   );
   expect(isRejection(response)).toEqual(false);
 });
 
 test('A user can not update fieltTopicRel', async () => {
-  const response = await templateMutations.updateFieldTopicRel(dummyUser, 1, [
-    'has_links_with_industry',
-    'enable_crystallization',
-  ]);
+  const response = await templateMutations.updateFieldTopicRel(dummyUser, {
+    topicId: 1,
+    fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+  });
   expect(isRejection(response)).toEqual(true);
 });
 

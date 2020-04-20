@@ -14,8 +14,6 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { EventBus } from '../events/eventBus';
 import { Proposal } from '../models/Proposal';
 import { DataType } from '../models/ProposalModel';
 import { User } from '../models/User';
@@ -24,7 +22,6 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalMutations from './ProposalMutations';
 
 const dummyLogger = new MutedLogger();
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const userAuthorization = new UserAuthorization(
@@ -35,7 +32,6 @@ const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
   dummyTemplateDataSource,
   userAuthorization,
-  dummyEventBus,
   dummyLogger
 );
 
@@ -62,11 +58,11 @@ function tryUpdateProposal(user: User, proposalId: number) {
 }
 /* eslint-enable @typescript-eslint/camelcase */
 
-test('A user on the proposal can update it\'s title if it is in edit mode', () => {
+test('A user on the proposal can update its title if it is in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 1)).resolves.toBe(dummyProposal);
 });
 
-test('A user on the proposal can\'t update it\'s title if it is not in edit mode', () => {
+test('A user on the proposal can not update its title if it is not in edit mode', () => {
   return expect(tryUpdateProposal(dummyUser, 2)).resolves.toHaveProperty(
     'reason',
     'NOT_ALLOWED_PROPOSAL_SUBMITTED'
