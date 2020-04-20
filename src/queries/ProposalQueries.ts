@@ -8,7 +8,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ProposalQueries {
   constructor(
-    private dataSource: ProposalDataSource,
+    public dataSource: ProposalDataSource,
     private userAuth: UserAuthorization
   ) {}
 

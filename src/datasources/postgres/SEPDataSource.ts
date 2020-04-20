@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SEP } from '../../models/SEP';
+import { SEP, SEPAssignment } from '../../models/SEP';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
-import { SEPRecord } from './records';
+import { SEPRecord, SEPAssignmentRecord } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
   private createSEPObject(sep: SEPRecord) {
@@ -12,6 +12,18 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       sep.description,
       sep.number_ratings_required,
       sep.active
+    );
+  }
+
+  private createSEPAssignmentObject(sepAssignment: SEPAssignmentRecord) {
+    return new SEPAssignment(
+      sepAssignment.proposal_id,
+      sepAssignment.sep_member_user_id,
+      sepAssignment.sep_id,
+      sepAssignment.date_assigned,
+      sepAssignment.reassigned,
+      sepAssignment.date_reassigned,
+      sepAssignment.email_sent
     );
   }
 
@@ -104,6 +116,16 @@ export default class PostgresSEPDataSource implements SEPDataSource {
           seps,
         };
       });
+  }
+
+  async getAssignments(sepId: number): Promise<SEPAssignment[]> {
+    const sepAssignments: SEPAssignmentRecord[] = await database
+      .from('SEP_Assignments')
+      .where('sep_id', sepId);
+
+    return sepAssignments.map(sepAssignment =>
+      this.createSEPAssignmentObject(sepAssignment)
+    );
   }
 
   async assignMembers(memberIds: number[], sepId: number): Promise<boolean> {

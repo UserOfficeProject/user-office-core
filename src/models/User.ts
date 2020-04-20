@@ -30,6 +30,9 @@ export enum UserRole {
   USER = 1,
   USEROFFICER = 2,
   REVIEWER = 3,
+  SEP_CHAIR = 4,
+  SEP_SECRETARY = 5,
+  SEP_MEMBER = 6,
 }
 
 export class BasicUserDetails {

@@ -9,7 +9,12 @@ import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
-import { UserRecord, createUserObject, createBasicUserObject } from './records';
+import {
+  UserRecord,
+  createUserObject,
+  createBasicUserObject,
+  RoleRecord,
+} from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {
@@ -49,7 +54,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .where('email', 'ilike', email)
       .andWhere('placeholder', false)
       .first()
-      .then((user: any) => (user ? true : false));
+      .then((user: UserRecord) => (user ? true : false));
   }
 
   checkOrcIDExist(orcID: string): Promise<boolean> {
@@ -58,7 +63,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('orcid', orcID)
       .first()
-      .then((user: any) => (user ? true : false));
+      .then((user: UserRecord) => (user ? true : false));
   }
 
   getPasswordByEmail(email: string): Promise<string | null> {
@@ -67,7 +72,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('email', 'ilike', email)
       .first()
-      .then((user: any) => (user ? user.password : null));
+      .then((user: UserRecord) => (user ? user.password : null));
   }
 
   getPasswordByUsername(username: string): Promise<string | null> {
@@ -152,14 +157,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .returning(['user_id'])
       .into('users')
-      .then((user: any[]) => user[0].user_id);
+      .then((user: UserRecord[]) => user[0].user_id);
   }
 
   async getRoles(): Promise<Role[]> {
     return database
       .select()
       .from('roles')
-      .then((roles: any[]) =>
+      .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );
   }
@@ -171,7 +176,20 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
-      .then((roles: any[]) =>
+      .then((roles: RoleRecord[]) =>
+        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+      );
+  }
+
+  async getSEPUserRoles(id: number, sepId: number): Promise<Role[]> {
+    return database
+      .select()
+      .from('roles as r')
+      .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
+      .join('users as u', { 'u.user_id': 'rc.user_id' })
+      .where('u.user_id', id)
+      .andWhere('rc.sep_id', sepId)
+      .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );
   }

@@ -193,12 +193,18 @@ export class UserDataSourceMock implements UserDataSource {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
   }
+
+  async getSEPUserRoles(id: number, sepId: number) {
+    return [{ id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' }];
+  }
+
   async getRoles(): Promise<Role[]> {
     return [
       { id: 1, shortCode: 'user_officer', title: 'User Officer' },
       { id: 2, shortCode: 'user', title: 'User' },
     ];
   }
+
   async update(user: User): Promise<User> {
     return dummyUser;
   }

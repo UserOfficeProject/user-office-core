@@ -25,6 +25,14 @@ const updateSEPValidationSchema = yup.object().shape({
   numberRatingsRequired: yup.number().min(2),
 });
 
+const assignSEPMembersValidationSchema = yup.object().shape({
+  memberIds: yup
+    .array()
+    .required()
+    .min(2),
+  sepId: yup.number().required(),
+});
+
 export default class SEPMutations {
   constructor(private dataSource: SEPDataSource) {}
 
@@ -82,6 +90,7 @@ export default class SEPMutations {
   }
 
   // @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(assignSEPMembersValidationSchema)
   @EventBus(Event.SEP_UPDATED)
   async assignMembers(
     agent: User | null,

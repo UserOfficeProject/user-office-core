@@ -1,4 +1,4 @@
-import { SEP } from '../models/SEP';
+import { SEP, SEPAssignment } from '../models/SEP';
 
 export interface SEPDataSource {
   create(
@@ -20,5 +20,6 @@ export interface SEPDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
+  getAssignments(id: number): Promise<SEPAssignment[]>;
   assignMembers(memberIds: number[], sepId: number): Promise<boolean>;
 }

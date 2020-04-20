@@ -20,7 +20,7 @@ BEGIN
       sep_id int REFERENCES "SEPs"(sep_id),
       date_assigned TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       reassigned boolean DEFAULT false,
-      date_reassigned TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      date_reassigned TIMESTAMPTZ DEFAULT null,
       email_sent boolean DEFAULT false,
       PRIMARY KEY (sep_id, SEP_member_user_id)
     );

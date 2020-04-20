@@ -20,6 +20,7 @@ export interface UserDataSource {
   getByOrcID(orcID: string): Promise<User | null>;
   getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
+  getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   getUsers(
     filter?: string,
     first?: number,

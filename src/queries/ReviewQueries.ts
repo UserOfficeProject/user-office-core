@@ -8,7 +8,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewQueries {
   constructor(
-    private dataSource: ReviewDataSource,
+    public dataSource: ReviewDataSource,
     private userAuth: UserAuthorization
   ) {}
 
