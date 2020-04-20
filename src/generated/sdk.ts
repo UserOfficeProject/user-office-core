@@ -613,6 +613,7 @@ export type Query = {
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
   sep?: Maybe<Sep>,
+  sepAssignments?: Maybe<Array<SepAssignment>>,
   seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
   me?: Maybe<User>,
@@ -679,6 +680,11 @@ export type QueryReviewArgs = {
 
 
 export type QuerySepArgs = {
+  id: Scalars['Int']
+};
+
+
+export type QuerySepAssignmentsArgs = {
   id: Scalars['Int']
 };
 
@@ -784,6 +790,19 @@ export type Sep = {
   description: Scalars['String'],
   numberRatingsRequired: Scalars['Float'],
   active: Scalars['Boolean'],
+};
+
+export type SepAssignment = {
+   __typename?: 'SEPAssignment',
+  proposalId?: Maybe<Scalars['Int']>,
+  sepMemberUserId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  dateAssigned: Scalars['DateTime'],
+  reassigned: Scalars['Boolean'],
+  dateReassigned?: Maybe<Scalars['DateTime']>,
+  emailSent: Scalars['Boolean'],
+  roles: Array<Role>,
+  user: BasicUserDetails,
 };
 
 export type SepAssignmentsResponseWrap = {
@@ -939,7 +958,10 @@ export type UserResponseWrap = {
 export enum UserRole {
   USER = 'USER',
   USEROFFICER = 'USEROFFICER',
-  REVIEWER = 'REVIEWER'
+  REVIEWER = 'REVIEWER',
+  SEP_CHAIR = 'SEP_CHAIR',
+  SEP_SECRETARY = 'SEP_SECRETARY',
+  SEP_MEMBER = 'SEP_MEMBER'
 }
 
 export type CreateSepMutationVariables = {
@@ -973,6 +995,26 @@ export type GetSepQuery = (
     { __typename?: 'SEP' }
     & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
   )> }
+);
+
+export type GetSepAssignmentsQueryVariables = {
+  id: Scalars['Int']
+};
+
+
+export type GetSepAssignmentsQuery = (
+  { __typename?: 'Query' }
+  & { sepAssignments: Maybe<Array<(
+    { __typename?: 'SEPAssignment' }
+    & Pick<SepAssignment, 'proposalId' | 'sepMemberUserId' | 'sepId' | 'dateAssigned' | 'reassigned' | 'dateReassigned' | 'emailSent'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )>, user: (
+      { __typename?: 'BasicUserDetails' }
+      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname'>
+    ) }
+  )>> }
 );
 
 export type GetSePsQueryVariables = {
@@ -2199,6 +2241,29 @@ export const GetSepDocument = gql`
   }
 }
     `;
+export const GetSepAssignmentsDocument = gql`
+    query getSEPAssignments($id: Int!) {
+  sepAssignments(id: $id) {
+    proposalId
+    sepMemberUserId
+    sepId
+    dateAssigned
+    reassigned
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+    }
+    dateReassigned
+    emailSent
+  }
+}
+    `;
 export const GetSePsDocument = gql`
     query getSEPs($filter: String!) {
   seps(filter: $filter) {
@@ -2856,6 +2921,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
       return client.request<GetSepQuery>(print(GetSepDocument), variables);
+    },
+    getSEPAssignments(variables: GetSepAssignmentsQueryVariables): Promise<GetSepAssignmentsQuery> {
+      return client.request<GetSepAssignmentsQuery>(print(GetSepAssignmentsDocument), variables);
     },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return client.request<GetSePsQuery>(print(GetSePsDocument), variables);

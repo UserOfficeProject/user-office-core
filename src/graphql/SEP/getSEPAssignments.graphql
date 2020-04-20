@@ -1,0 +1,21 @@
+query getSEPAssignments($id: Int!) {
+  sepAssignments(id: $id) {
+    proposalId
+    sepMemberUserId
+    sepId
+    dateAssigned
+    reassigned
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+    }
+    dateReassigned
+    emailSent
+  }
+}

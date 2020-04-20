@@ -9,12 +9,12 @@ import {
 import { Add } from '@material-ui/icons';
 import { Formik, Form } from 'formik';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { Sep } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
+import { Sep, SepAssignment } from '../../generated/sdk';
+import { useSEPAssignmentsData } from '../../hooks/useSEPAssignmentsData';
+import { useUsersData } from '../../hooks/useUsersData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
 import FormikDropdown from '../common/FormikDropdown';
@@ -34,10 +34,12 @@ const useStyles = makeStyles({
 
 const SEPMembers: React.FC<SEPMembersProps> = ({ data }) => {
   const [show, setShow] = useState(false);
-  const sep = { ...data };
+  const { loadingAssignments, SEPAssignmentsData } = useSEPAssignmentsData(
+    data.id,
+    show
+  );
+  const { loading, usersData } = useUsersData('');
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
 
   const columns = [
     { title: 'First name', field: 'firstName' },
@@ -51,9 +53,25 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ data }) => {
     },
   ];
 
-  if (!sep) {
+  const getAssignedUserByRole = (
+    assignments: SepAssignment[],
+    role: string
+  ): SepAssignment => {
+    return assignments.find(assignment =>
+      assignment.roles.some(userRole => userRole.shortCode === role)
+    ) as SepAssignment;
+  };
+
+  if (!usersData || loading || loadingAssignments) {
     return <p>Loading...</p>;
   }
+
+  const usersForDropdown = usersData.users.map(user => {
+    return {
+      text: `${user.firstname} ${user.lastname}`,
+      value: user.id.toString(),
+    };
+  });
 
   const AddIcon = (): JSX.Element => <Add data-cy="add-member" />;
 
@@ -72,9 +90,17 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ data }) => {
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
-        initialValues={sep}
+        initialValues={{
+          SEPChair: getAssignedUserByRole(
+            SEPAssignmentsData as SepAssignment[],
+            'SEP_Chair'
+          ).sepMemberUserId,
+          SEPSecretary: getAssignedUserByRole(
+            SEPAssignmentsData as SepAssignment[],
+            'SEP_Secretary'
+          ).sepMemberUserId,
+        }}
         onSubmit={(values, actions): void => {
-          // sendSEPUpdate(values);
           actions.setSubmitting(false);
         }}
         validationSchema={SEPValidationSchema}
@@ -96,7 +122,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ data }) => {
                 <FormikDropdown
                   name="SEPChair"
                   label="SEP Chair"
-                  items={[]}
+                  items={usersForDropdown}
                   required
                 />
               </Grid>
@@ -104,7 +130,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ data }) => {
                 <FormikDropdown
                   name="SEPSecretary"
                   label="SEP Secretary"
-                  items={[]}
+                  items={usersForDropdown}
                   required
                 />
               </Grid>
