@@ -43,7 +43,7 @@ import {
               <TableCell>{props.data.publicComment}</TableCell>
             </TableRow>
             <TableRow key="timeAllocation">
-              <TableCell>Time Allocation</TableCell>
+              <TableCell>Time Allocation(Days)</TableCell>
               <TableCell>{props.data.timeAllocation}</TableCell>
             </TableRow>
           </TableBody>

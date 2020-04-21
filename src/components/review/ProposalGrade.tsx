@@ -101,7 +101,7 @@ export default function ProposalGrade(props: {
                 margin="normal"
                 disabled={review.status === 'SUBMITTED'}
               >
-                {[...Array(11)].map((e, i) => <MenuItem value={i}>{i}</MenuItem>)}
+                {[...Array(10)].map((e, i) => <MenuItem value={i+1}>{i+1}</MenuItem>)}
               </Field>
             <ButtonContainer>
               <Button
