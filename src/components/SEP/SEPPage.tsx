@@ -45,7 +45,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
           data={sep}
           onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
         />
-        <SEPMembers data={sep} />
+        <SEPMembers sepId={sep.id} />
         <EventLogList changedObjectId={sep.id} eventType="SEP" />
       </SimpleTabs>
     </Container>

@@ -1,0 +1,6 @@
+mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
+  assignMembers(memberIds: $memberIds, sepId: $sepId) {
+    error
+    success
+  }
+}

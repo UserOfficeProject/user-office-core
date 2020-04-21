@@ -964,6 +964,33 @@ export enum UserRole {
   SEP_MEMBER = 'SEP_MEMBER'
 }
 
+export type AddSepMembersRoleMutationVariables = {
+  addSEPMembersRole: Array<AddSepMembersRole>
+};
+
+
+export type AddSepMembersRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { addSEPMembersRole: (
+    { __typename?: 'AddSEPMembersRoleResponseWrap' }
+    & Pick<AddSepMembersRoleResponseWrap, 'error' | 'success'>
+  ) }
+);
+
+export type AssignMembersMutationVariables = {
+  memberIds: Array<Scalars['Int']>,
+  sepId: Scalars['Int']
+};
+
+
+export type AssignMembersMutation = (
+  { __typename?: 'Mutation' }
+  & { assignMembers: (
+    { __typename?: 'SEPAssignmentsResponseWrap' }
+    & Pick<SepAssignmentsResponseWrap, 'error' | 'success'>
+  ) }
+);
+
 export type CreateSepMutationVariables = {
   code: Scalars['String'],
   description: Scalars['String'],
@@ -2220,6 +2247,22 @@ export const BasicUserDetailsFragmentDoc = gql`
   position
 }
     `;
+export const AddSepMembersRoleDocument = gql`
+    mutation addSEPMembersRole($addSEPMembersRole: [AddSEPMembersRole!]!) {
+  addSEPMembersRole(addSEPMembersRole: $addSEPMembersRole) {
+    error
+    success
+  }
+}
+    `;
+export const AssignMembersDocument = gql`
+    mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
+  assignMembers(memberIds: $memberIds, sepId: $sepId) {
+    error
+    success
+  }
+}
+    `;
 export const CreateSepDocument = gql`
     mutation createSEP($code: String!, $description: String!, $numberRatingsRequired: Int!, $active: Boolean!) {
   createSEP(code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
@@ -2916,6 +2959,12 @@ export const VerifyEmailDocument = gql`
     `;
 export function getSdk(client: GraphQLClient) {
   return {
+    addSEPMembersRole(variables: AddSepMembersRoleMutationVariables): Promise<AddSepMembersRoleMutation> {
+      return client.request<AddSepMembersRoleMutation>(print(AddSepMembersRoleDocument), variables);
+    },
+    assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
+      return client.request<AssignMembersMutation>(print(AssignMembersDocument), variables);
+    },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
     },
