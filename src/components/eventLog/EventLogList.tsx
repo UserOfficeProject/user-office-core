@@ -12,7 +12,8 @@ type EventLogListProps = {
   changedObjectId?: string | number;
   /** Type of the event we want to list.
    * For example `PROPOSAL`(get all proposal events) or
-   * `PROPOSAL_UPDATED`(get all proposal updated events)
+   * `PROPOSAL_UPDATED`(get all proposal updated events).
+   * There is a support for multiple events like: `USER | EMAIL_INVITE` (get all user events and email invite events on that specific user)
    **/
   eventType?: string;
 };

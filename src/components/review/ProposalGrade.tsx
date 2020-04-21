@@ -1,19 +1,18 @@
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 import { makeStyles } from '@material-ui/core/styles';
 import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
-import React, {useState, useEffect} from 'react';
-import * as Yup from 'yup';
 import { useSnackbar } from 'notistack';
+import React, { useState, useEffect } from 'react';
+import * as Yup from 'yup';
 
 import { ReviewStatus, Review } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useReviewData } from '../../hooks/useReviewData';
 import { ButtonContainer } from '../../styles/StyledComponents';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputLabel from '@material-ui/core/InputLabel';
-
 
 const useStyles = makeStyles(theme => ({
   buttons: {
