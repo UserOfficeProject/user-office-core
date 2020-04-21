@@ -57,6 +57,11 @@ interface UserCreateEvent extends GeneralEvent {
   };
 }
 
+interface UserDeletedEvent extends GeneralEvent {
+  type: Event.USER_DELETED;
+  user: User;
+}
+
 interface EmailInvite extends GeneralEvent {
   type: Event.EMAIL_INVITE;
   emailinviteresponse: {
@@ -87,4 +92,5 @@ export type ApplicationEvent =
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | SEPCreatedEvent
-  | SEPUpdatedEvent;
+  | SEPUpdatedEvent
+  | UserDeletedEvent;

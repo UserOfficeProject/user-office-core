@@ -34,9 +34,7 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
         return rejection('BAD_REQUEST' as ResourceId);
       }
 
-      const result = await originalMethod?.apply(this, args);
-
-      return result;
+      return await originalMethod?.apply(this, args);
     };
   };
 };
