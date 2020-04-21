@@ -29,7 +29,7 @@ const assignSEPMembersValidationSchema = yup.object().shape({
   memberIds: yup
     .array()
     .required()
-    .min(2),
+    .min(1),
   sepId: yup.number().required(),
 });
 
