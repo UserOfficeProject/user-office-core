@@ -1,11 +1,4 @@
-import {
-  makeStyles,
-  Typography,
-  Grid,
-  Button,
-  Dialog,
-  DialogContent,
-} from '@material-ui/core';
+import { makeStyles, Typography, Grid, Button } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import { Formik, Form } from 'formik';
 import MaterialTable from 'material-table';
@@ -13,13 +6,19 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { SepAssignment } from '../../generated/sdk';
+import {
+  SepAssignment,
+  BasicUserDetails,
+  UserRole,
+  AddSepMembersRole,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPAssignmentsData } from '../../hooks/useSEPAssignmentsData';
 import { useUsersData } from '../../hooks/useUsersData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
 import FormikDropdown from '../common/FormikDropdown';
+import ParticipantModal from '../proposal/ParticipantModal';
 
 type SEPMembersProps = {
   /** Id of the SEP we are assigning members to */
@@ -29,7 +28,7 @@ type SEPMembersProps = {
 type SEPMemberAssignments = {
   SEPChair: string;
   SEPSecretary: string;
-  SEPReviewers: string[];
+  SEPReviewers: BasicUserDetails[];
 };
 
 const useStyles = makeStyles({
@@ -40,10 +39,10 @@ const useStyles = makeStyles({
 });
 
 const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
-  const [show, setShow] = useState(false);
+  const [modalOpen, setOpen] = useState(false);
   const { loadingAssignments, SEPAssignmentsData } = useSEPAssignmentsData(
     sepId,
-    show
+    modalOpen
   );
   const { loading, usersData } = useUsersData('');
   const classes = useStyles();
@@ -55,14 +54,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     SEPReviewers: [],
   };
   const columns = [
-    { title: 'First name', field: 'firstName' },
+    { title: 'Name', field: 'firstname' },
     {
-      title: 'Last name',
-      field: 'lastName',
+      title: 'Surname',
+      field: 'lastname',
     },
     {
-      title: 'Email',
-      field: 'email',
+      title: 'Organisation',
+      field: 'organisation',
     },
   ];
 
@@ -76,50 +75,83 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
           case 'SEP_Secretary':
             initialValues.SEPSecretary = assignment.sepMemberUserId.toString();
             break;
+          case 'SEP_Member':
+            initialValues.SEPReviewers.push(assignment.user);
+            break;
           default:
-            initialValues.SEPReviewers.push(
-              assignment.sepMemberUserId.toString()
-            );
             break;
         }
       });
     });
   };
 
+  const assignRolesToSEPMembers = (
+    values: SEPMemberAssignments
+  ): AddSepMembersRole[] => {
+    const roleValues = [];
+
+    if (values.SEPChair) {
+      roleValues.push({ userID: +values.SEPChair, roleID: 4, SEPID: sepId });
+    }
+
+    if (values.SEPSecretary) {
+      roleValues.push({
+        userID: +values.SEPSecretary,
+        roleID: 5,
+        SEPID: sepId,
+      });
+    }
+
+    if (values.SEPReviewers && values.SEPReviewers.length > 0) {
+      values.SEPReviewers.forEach(sepReviewer => {
+        roleValues.push({ userID: sepReviewer.id, roleID: 6, SEPID: sepId });
+      });
+    }
+
+    return roleValues;
+  };
+
+  const assignMembersToSEP = (values: SEPMemberAssignments): number[] => {
+    let memberIds = [];
+
+    if (values.SEPChair) {
+      memberIds.push(+values.SEPChair);
+    }
+
+    if (values.SEPSecretary) {
+      memberIds.push(+values.SEPSecretary);
+    }
+
+    if (values.SEPReviewers && values.SEPReviewers.length > 0) {
+      memberIds = memberIds.concat([
+        ...values.SEPReviewers.map(reviewer => reviewer.id),
+      ]);
+    }
+
+    return memberIds;
+  };
+
   const sendSEPMembersUpdate = (values: SEPMemberAssignments): void => {
-    const newValues = {
-      memberIds: [
-        +values.SEPChair,
-        +values.SEPSecretary,
-        ...values.SEPReviewers.map(Number),
-      ],
-      sepId,
-    };
+    const memberIds = assignMembersToSEP(values);
 
     api()
-      .assignMembers(newValues)
+      .assignMembers({ memberIds, sepId })
       .then(() => {
-        const roleValues = [];
-
-        roleValues.push({ userID: +values.SEPChair, roleID: 4, SEPID: sepId });
-        roleValues.push({
-          userID: +values.SEPSecretary,
-          roleID: 5,
-          SEPID: sepId,
-        });
-
-        values.SEPReviewers.forEach(sepReviewer => {
-          roleValues.push({ userID: +sepReviewer, roleID: 6, SEPID: sepId });
-        });
+        const roleValues = assignRolesToSEPMembers(values);
 
         api()
           .addSEPMembersRole({ addSEPMembersRole: roleValues })
           .then(result => {
+            setOpen(false);
             enqueueSnackbar('Updated Information', {
               variant: result.addSEPMembersRole.error ? 'error' : 'success',
             });
           });
       });
+  };
+
+  const addUser = async (user: BasicUserDetails): Promise<void> => {
+    sendSEPMembersUpdate({ SEPReviewers: [user] } as SEPMemberAssignments);
   };
 
   if (!usersData || loading || loadingAssignments) {
@@ -141,22 +173,19 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
   return (
     <React.Fragment>
-      <Dialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={show}
-        onClose={(): void => setShow(false)}
-      >
-        <DialogContent>
-          <p>Add member</p>
-        </DialogContent>
-      </Dialog>
+      <ParticipantModal
+        show={modalOpen}
+        close={(): void => setOpen(false)}
+        addParticipant={addUser}
+        selectedUsers={initialValues.SEPReviewers.map(reviewer => reviewer.id)}
+        title={'Reviewer'}
+        userRole={UserRole.REVIEWER}
+      />
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
         initialValues={initialValues}
         onSubmit={(values, actions): void => {
-          // Convert all strings to nu
           sendSEPMembersUpdate(values);
           actions.setSubmitting(false);
         }}
@@ -190,7 +219,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   icons={tableIcons}
                   title={'Reviewers'}
                   columns={columns}
-                  data={[]}
+                  data={initialValues.SEPReviewers}
                   options={{
                     search: false,
                   }}
@@ -199,7 +228,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                       icon: AddIcon,
                       isFreeAction: true,
                       tooltip: 'Add Member',
-                      onClick: (): void => setShow(true),
+                      onClick: (): void => setOpen(true),
                     },
                   ]}
                 />

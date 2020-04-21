@@ -218,6 +218,7 @@ export type Mutation = {
   deleteProposal: ProposalResponseWrap,
   deleteTemplateField: ProposalTemplateResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
+  deleteUser: UserResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
   getTokenForUser: TokenResponseWrap,
   login: TokenResponseWrap,
@@ -424,6 +425,11 @@ export type MutationDeleteTemplateFieldArgs = {
 
 
 export type MutationDeleteTopicArgs = {
+  id: Scalars['Int']
+};
+
+
+export type MutationDeleteUserArgs = {
   id: Scalars['Int']
 };
 
@@ -1039,7 +1045,7 @@ export type GetSepAssignmentsQuery = (
       & Pick<Role, 'id' | 'shortCode' | 'title'>
     )>, user: (
       { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname'>
+      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
     ) }
   )>> }
 );
@@ -2301,6 +2307,7 @@ export const GetSepAssignmentsDocument = gql`
       id
       firstname
       lastname
+      organisation
     }
     dateReassigned
     emailSent
