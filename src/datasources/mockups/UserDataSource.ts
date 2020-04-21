@@ -120,6 +120,9 @@ export const dummyUserNotOnProposal = new User(
 );
 
 export class UserDataSourceMock implements UserDataSource {
+  async delete(id: number): Promise<User | null> {
+    return dummyUser;
+  }
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }

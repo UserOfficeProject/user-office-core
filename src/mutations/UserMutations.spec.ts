@@ -288,3 +288,17 @@ test('A user must not be able to obtain token for another user', async () => {
     )
   ).toBe(true);
 });
+
+test('A user must not be able to delete another user', async () => {
+  return expect(
+    isRejection(
+      await userMutations.delete(dummyUser, dummyUserNotOnProposal.id)
+    )
+  ).toBe(true);
+});
+
+test('A user officer can must be able to delete another user', async () => {
+  return expect(
+    userMutations.delete(dummyUserOfficer, dummyUser.id)
+  ).resolves.toBe(dummyUser);
+});
