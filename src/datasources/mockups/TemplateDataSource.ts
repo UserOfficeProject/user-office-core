@@ -19,7 +19,7 @@ import {
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
-import { TemplateDataSource } from '../TemplateDataSource';
+import { ProposalAdminDataSource } from '../ProposalAdminDataSource';
 
 export let dummyTemplate: ProposalTemplate;
 export let dummyProposalTemplateMedatata: ProposalTemplateMetadata;
@@ -118,7 +118,7 @@ const createDummyTopic = (
   );
 };
 
-export class TemplateDataSourceMock implements TemplateDataSource {
+export class ProposalAdminDataSourceMock implements ProposalAdminDataSource {
   async cloneTemplate(templateId: number): Promise<ProposalTemplateMetadata> {
     return createDummyProposalTemplateMetadata({ id: templateId });
   }

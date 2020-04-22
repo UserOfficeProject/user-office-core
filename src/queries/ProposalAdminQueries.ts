@@ -1,11 +1,11 @@
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { ProposalAdminDataSource } from '../datasources/ProposalAdminDataSource';
 import { Authorized } from '../decorators';
 import { ProposalTemplate } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
 
 export default class ProposalAdminQueries {
-  constructor(private dataSource: TemplateDataSource) {}
+  constructor(private dataSource: ProposalAdminDataSource) {}
 
   @Authorized()
   async getProposalTemplate(

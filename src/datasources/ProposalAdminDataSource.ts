@@ -6,13 +6,13 @@ import {
   Question,
   Topic,
 } from '../models/ProposalModel';
+import { QuestionRel } from '../models/ProposalModel';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
-import { QuestionRel } from './../models/ProposalModel';
 
-export interface TemplateDataSource {
+export interface ProposalAdminDataSource {
   // Template
   createTemplate(
     name: string,

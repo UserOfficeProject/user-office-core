@@ -1,7 +1,7 @@
 import { to } from 'await-to-js';
 
+import { ProposalAdminDataSource } from '../datasources/ProposalAdminDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
@@ -17,8 +17,8 @@ import { CallDataSource } from './../datasources/CallDataSource';
 
 export default class ProposalMutations {
   constructor(
-    private dataSource: ProposalDataSource,
-    private templateDataSource: TemplateDataSource,
+    private proposalDataSource: ProposalDataSource,
+    private proposalAdminDataSource: ProposalAdminDataSource,
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
@@ -31,7 +31,7 @@ export default class ProposalMutations {
     callId: number
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
-    if (!(await this.dataSource.checkActiveCall(callId))) {
+    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
@@ -45,7 +45,7 @@ export default class ProposalMutations {
       return rejection('NOT_FOUND');
     }
 
-    return this.dataSource
+    return this.proposalDataSource
       .create(agent!.id, callId, call.templateId)
       .then(proposal => proposal)
       .catch(err => {
@@ -74,7 +74,7 @@ export default class ProposalMutations {
     } = args;
 
     // Get proposal information
-    const proposal = await this.dataSource.get(id); //Hacky
+    const proposal = await this.proposalDataSource.get(id); //Hacky
 
     if (!proposal) {
       return rejection('NOT_FOUND');
@@ -83,7 +83,7 @@ export default class ProposalMutations {
     // Check if there is an open call, if not reject
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall(proposal.callId))
+      !(await this.proposalDataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
@@ -126,7 +126,9 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
-      const [err] = await to(this.dataSource.setProposalUsers(id, users));
+      const [err] = await to(
+        this.proposalDataSource.setProposalUsers(id, users)
+      );
       if (err) {
         logger.logError('Could not update users', { err, id, agent });
 
@@ -141,7 +143,7 @@ export default class ProposalMutations {
     if (answers !== undefined) {
       for (const answer of answers) {
         if (answer.value !== undefined) {
-          const questionRel = await this.templateDataSource.getQuestionRel(
+          const questionRel = await this.proposalAdminDataSource.getQuestionRel(
             answer.proposal_question_id,
             proposal.templateId
           );
@@ -164,7 +166,7 @@ export default class ProposalMutations {
 
             return rejection('VALUE_CONSTRAINT_REJECTION');
           }
-          await this.dataSource.updateAnswer(
+          await this.proposalDataSource.updateAnswer(
             proposal?.id,
             answer.proposal_question_id,
             answer.value
@@ -174,13 +176,13 @@ export default class ProposalMutations {
     }
 
     if (topicsCompleted !== undefined) {
-      await this.dataSource.updateTopicCompletenesses(
+      await this.proposalDataSource.updateTopicCompletenesses(
         proposal.id,
         topicsCompleted
       );
     }
 
-    return this.dataSource
+    return this.proposalDataSource
       .update(proposal)
       .then(proposal => proposal)
       .catch(err => {
@@ -198,7 +200,7 @@ export default class ProposalMutations {
     args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
     const { proposalId, questionId, files } = args;
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
@@ -207,9 +209,9 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    await this.dataSource.deleteFiles(proposalId, questionId);
+    await this.proposalDataSource.deleteFiles(proposalId, questionId);
 
-    return this.dataSource
+    return this.proposalDataSource
       .insertFiles(proposalId, questionId, files)
       .then(result => {
         return result;
@@ -229,7 +231,7 @@ export default class ProposalMutations {
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
@@ -242,7 +244,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.dataSource
+    return this.proposalDataSource
       .submitProposal(proposalId)
       .then(proposal => proposal)
       .catch(e => {
@@ -259,7 +261,7 @@ export default class ProposalMutations {
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
@@ -272,7 +274,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    const result = await this.dataSource.deleteProposal(proposalId);
+    const result = await this.proposalDataSource.deleteProposal(proposalId);
 
     return result || rejection('INTERNAL_ERROR');
   }
