@@ -3319,8 +3319,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $id, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
+						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    }\n    error\n  }\n}\n",
+						"variables": "{\n        \"questionId\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
@@ -3514,7 +3514,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id: Int!) {\n    deleteTopic(id: $id){\n    error\n  }\n}",
+						"query": "mutation($id: Int!) {\n    deleteTopic(topicId: $id){\n    error\n  }\n}",
 						"variables": "{\n\t\"id\":{{NEW_TOPIC_ID}}\n}"
 					},
 					"options": {
