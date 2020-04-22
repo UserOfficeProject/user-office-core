@@ -202,7 +202,7 @@ const createProposalPDF = async (
             doc
           );
         } else if (field.question.dataType === DataType.BOOLEAN) {
-          writeBold(field.question.question,  doc);
+          writeBold(field.question.question, doc);
           if (field.value) {
             write('Yes', doc);
           } else {

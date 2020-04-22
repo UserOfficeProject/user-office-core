@@ -5,12 +5,12 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
+import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { DataType, ProposalTemplate, Topic } from '../models/ProposalModel';
+import { ProposalTemplateMetadata, Question } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { dummyUser } from '../datasources/mockups/UserDataSource';
-import { ProposalTemplateMetadata, Question } from '../models/ProposalModel';
 import ProposalAdminMutations from './ProposalAdminMutations';
 
 const dummyLogger = new MutedLogger();

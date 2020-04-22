@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
+
 import {
   DataType,
   ProposalTemplate,

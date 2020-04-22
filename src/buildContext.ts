@@ -1,23 +1,23 @@
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
-  userDataSource,
-  reviewDataSource,
-  eventLogsDataSource,
-  proposalDataSource,
-  templateDataSource,
-  callDataSource,
-  fileDataSource,
   adminDataSource,
+  callDataSource,
+  eventLogsDataSource,
+  fileDataSource,
+  proposalDataSource,
+  reviewDataSource,
   sepDataSource,
+  templateDataSource,
+  userDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
+import ProposalAdminMutations from './mutations/ProposalAdminMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SEPMutations from './mutations/SEPMutations';
-import ProposalAdminMutations from './mutations/ProposalAdminMutations';
 import UserMutations from './mutations/UserMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
