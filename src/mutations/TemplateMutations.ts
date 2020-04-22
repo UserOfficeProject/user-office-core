@@ -159,23 +159,7 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-  @Authorized([Roles.USER_OFFICER])
-  async updateQuestionRel(
-    agent: User | null,
-    args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
-    return this.dataSource
-      .updateQuestionRel(args.questionId, args.templateId, args)
-      .then(template => template)
-      .catch(err => {
-        logger.logException('Could not update question rel', err, {
-          agent,
-          args,
-        });
 
-        return rejection('INTERNAL_ERROR');
-      });
-  }
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestion(
     agent: User | null,
@@ -188,6 +172,24 @@ export default class TemplateMutations {
         logger.logException('Could not delete question', err, {
           agent,
           id: questionId,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateQuestionRel(
+    agent: User | null,
+    args: UpdateQuestionRelArgs
+  ): Promise<ProposalTemplate | Rejection> {
+    return this.dataSource
+      .updateQuestionRel(args.questionId, args.templateId, args)
+      .then(template => template)
+      .catch(err => {
+        logger.logException('Could not update question rel', err, {
+          agent,
+          args,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -260,6 +262,23 @@ export default class TemplateMutations {
     return values.fieldIds;
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  updateProposalTemplateMetadata(
+    user: User | null,
+    args: UpdateProposalTemplateMetadataArgs
+  ) {
+    return this.dataSource
+      .updateTemplateMetadata(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not update topic order', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
   private createBlankConfig(dataType: DataType): typeof FieldConfigType {
     switch (dataType) {
       case DataType.FILE_UPLOAD:
@@ -276,21 +295,5 @@ export default class TemplateMutations {
       default:
         return new ConfigBase();
     }
-  }
-  @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplateMetadata(
-    user: User | null,
-    args: UpdateProposalTemplateMetadataArgs
-  ) {
-    return this.dataSource
-      .updateTemplateMetadata(args)
-      .then(data => data)
-      .catch(err => {
-        logger.logException('Could not update topic order', err, {
-          user,
-        });
-
-        return rejection('INTERNAL_ERROR');
-      });
   }
 }
