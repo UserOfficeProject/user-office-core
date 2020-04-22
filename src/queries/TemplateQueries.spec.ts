@@ -1,15 +1,14 @@
 import 'reflect-metadata';
-
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  dummyUserOfficer,
   dummyUser,
+  dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalTemplate } from '../models/ProposalModel';
-import TemplateQueries from '../queries/TemplateQueries';
+import ProposalAdminQueries from './ProposalAdminQueries';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
-const templateQueries = new TemplateQueries(dummyTemplateDataSource);
+const templateQueries = new ProposalAdminQueries(dummyTemplateDataSource);
 beforeEach(() => {
   dummyTemplateDataSource.init();
 });

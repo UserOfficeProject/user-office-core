@@ -23,10 +23,10 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
+import ProposalAdminQueries from './queries/ProposalAdminQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SEPQueries from './queries/SEPQueries';
-import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
 import { userAuthorization } from './utils/UserAuthorization';
@@ -63,7 +63,7 @@ const fileMutations = new FileMutations(fileDataSource);
 const adminQueries = new AdminQueries(adminDataSource);
 const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
 
-const templateQueries = new TemplateQueries(templateDataSource);
+const templateQueries = new ProposalAdminQueries(templateDataSource);
 const templateMutations = new ProposalAdminMutations(
   templateDataSource,
   userAuthorization,

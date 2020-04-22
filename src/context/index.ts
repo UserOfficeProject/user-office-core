@@ -11,10 +11,10 @@ import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
+import ProposalAdminQueries from '../queries/ProposalAdminQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SEPQueries from '../queries/SEPQueries';
-import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -25,7 +25,7 @@ interface ResolverContextQueries {
   call: CallQueries;
   file: FileQueries;
   admin: AdminQueries;
-  template: TemplateQueries;
+  template: ProposalAdminQueries;
   eventLogs: EventLogQueries;
   sep: SEPQueries;
 }

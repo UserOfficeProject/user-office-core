@@ -4,7 +4,7 @@ import { ProposalTemplate } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
 
-export default class TemplateQueries {
+export default class ProposalAdminQueries {
   constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized()
