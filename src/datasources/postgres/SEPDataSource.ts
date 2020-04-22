@@ -133,7 +133,12 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       return { sep_member_user_id: memberId, sep_id: sepId };
     });
 
-    await database.insert(dataToInsert).from('SEP_Assignments');
+    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
+    await database.raw(
+      `${database('SEP_Assignments').insert(
+        dataToInsert
+      )} ON CONFLICT (sep_id, SEP_member_user_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
+    );
 
     return true;
   }

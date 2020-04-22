@@ -31,6 +31,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         return createUserObject(user[0]);
       });
   }
+
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     const { userID, roleID } = args;
 
@@ -55,6 +56,10 @@ export default class PostgresUserDataSource implements UserDataSource {
         sep_id: userWithRole.SEPID,
       };
     });
+
+    await database('role_user')
+      .del()
+      .where('sep_id', rolesToInsert[0].sep_id);
 
     await database.insert(rolesToInsert).into('role_user');
 
