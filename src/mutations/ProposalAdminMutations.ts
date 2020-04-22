@@ -4,12 +4,16 @@ import {
   createConfig,
   DataType,
   ProposalTemplate,
+  ProposalTemplateMetadata,
+  Question,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
+import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
@@ -23,9 +27,8 @@ import {
 } from '../resolvers/types/FieldConfig';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { ProposalTemplateMetadata, Question } from './../models/ProposalModel';
 
-export default class TemplateMutations {
+export default class ProposalAdminMutations {
   constructor(
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
@@ -60,22 +63,18 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async createTopic(
     user: User | null,
-    templateId: number,
-    sortOrder: number
+    args: CreateTopicArgs
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(user))) {
-      return rejection('INSUFFICIENT_PERMISSIONS');
-    }
-
     return this.dataSource
-      .createTopic(templateId, sortOrder)
+      .createTopic(args)
       .then(template => template)
       .catch(err => {
         logger.logException('Could not create topic', err, {
           user,
-          sortOrder,
+          args,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -196,19 +195,18 @@ export default class TemplateMutations {
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async deleteQuestionRel(
     agent: User | null,
-    templateId: number,
-    questionId: string
+    args: DeleteQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
-      .deleteQuestionRel(templateId, questionId)
+      .deleteQuestionRel(args)
       .then(template => template)
       .catch(err => {
         logger.logException('Could not delete question rel', err, {
           agent,
-          id: questionId,
-          templateId,
+          args,
         });
 
         return rejection('INTERNAL_ERROR');

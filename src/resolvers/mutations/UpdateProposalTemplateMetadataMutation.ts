@@ -27,7 +27,7 @@ export class UpdateProposalTemplateMetadataMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateProposalTemplateMetadata(
+      context.mutations.proposalAdmin.updateProposalTemplateMetadata(
         context.user,
         args
       ),

@@ -27,7 +27,7 @@ export class UpdateQuestionMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateQuestion(context.user, args),
+      context.mutations.proposalAdmin.updateQuestion(context.user, args),
       QuestionResponseWrap
     );
   }

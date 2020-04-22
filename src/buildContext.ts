@@ -17,7 +17,7 @@ import FileMutations from './mutations/FileMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SEPMutations from './mutations/SEPMutations';
-import TemplateMutations from './mutations/TemplateMutations';
+import ProposalAdminMutations from './mutations/ProposalAdminMutations';
 import UserMutations from './mutations/UserMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
@@ -64,7 +64,7 @@ const adminQueries = new AdminQueries(adminDataSource);
 const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
 
 const templateQueries = new TemplateQueries(templateDataSource);
-const templateMutations = new TemplateMutations(
+const templateMutations = new ProposalAdminMutations(
   templateDataSource,
   userAuthorization,
   logger
@@ -96,7 +96,7 @@ const context: BasicResolverContext = {
     file: fileMutations,
     admin: adminMutations,
     sep: sepMutations,
-    template: templateMutations,
+    proposalAdmin: templateMutations,
   },
 };
 

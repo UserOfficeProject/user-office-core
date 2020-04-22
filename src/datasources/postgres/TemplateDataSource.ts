@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
-
 import {
   DataType,
   ProposalTemplate,
@@ -8,6 +7,8 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
+import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -136,22 +137,19 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return new ProposalTemplate(steps);
   }
 
-  async createTopic(
-    templateId: number,
-    sortOrder: number
-  ): Promise<ProposalTemplate> {
+  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
     await database('proposal_topics')
-      .update({ sort_order: sortOrder + 1 })
-      .where('sort_order', '>=', sortOrder);
+      .update({ sort_order: args.sortOrder + 1 })
+      .where('sort_order', '>=', args.sortOrder);
 
     await database('proposal_topics').insert({
       topic_title: 'New Topic',
-      sort_order: sortOrder,
+      sort_order: args.sortOrder,
       is_enabled: true,
-      template_id: templateId,
+      template_id: args.templateId,
     });
 
-    return this.getProposalTemplate(templateId);
+    return this.getProposalTemplate(args.templateId);
   }
 
   async updateTopic(
@@ -374,25 +372,24 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async deleteQuestionRel(
-    templateId: number,
-    fieldId: string
+    args: DeleteQuestionRelArgs
   ): Promise<ProposalTemplate> {
     const rowsAffected = await database(
       'proposal_question__proposal_template__rels'
     )
       .where({
-        template_id: templateId,
-        proposal_question_id: fieldId,
+        template_id: args.templateId,
+        proposal_question_id: args.questionId,
       })
       .del();
 
     if (rowsAffected !== 1) {
       throw new Error(
-        `Could not delete field ${fieldId} in templateId:${templateId}`
+        `Could not delete questionId ${args.questionId} in templateId:${args.templateId}`
       );
     }
 
-    return this.getProposalTemplate(templateId);
+    return this.getProposalTemplate(args.templateId);
   }
 
   async deleteTopic(id: number): Promise<Topic> {

@@ -1,23 +1,35 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  Int,
+  Mutation,
+  Resolver,
+  ArgsType,
+  Field,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
+@ArgsType()
+export class CreateTopicArgs {
+  @Field(() => Int)
+  templateId: number;
+
+  @Field(() => Int)
+  sortOrder: number;
+}
+
 @Resolver()
 export class CreateTopicMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
   createTopic(
-    @Arg('templateId', () => Int) templateId: number,
-    @Arg('sortOrder', () => Int) sortOrder: number,
+    @Arg('args', () => CreateTopicArgs) args: CreateTopicArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createTopic(
-        context.user,
-        templateId,
-        sortOrder
-      ),
+      context.mutations.proposalAdmin.createTopic(context.user, args),
       ProposalTemplateResponseWrap
     );
   }

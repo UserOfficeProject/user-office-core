@@ -6,6 +6,8 @@ import {
   Question,
   Topic,
 } from '../models/ProposalModel';
+import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { QuestionRel } from './../models/ProposalModel';
@@ -60,10 +62,7 @@ export interface TemplateDataSource {
     templateId: number
   ): Promise<QuestionRel | null>;
 
-  deleteQuestionRel(
-    templateId: number,
-    fieldId: string
-  ): Promise<ProposalTemplate>;
+  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
 
   createQuestionAndRel(
     templateId: number,
@@ -86,7 +85,7 @@ export interface TemplateDataSource {
   ): Promise<ProposalTemplate>;
 
   // Topic
-  createTopic(templateId: number, sortOrder: number): Promise<ProposalTemplate>;
+  createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
   updateTopic(
     id: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }

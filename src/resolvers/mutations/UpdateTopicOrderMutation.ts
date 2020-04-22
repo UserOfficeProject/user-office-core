@@ -28,7 +28,10 @@ export class UpdateTopicOrderMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateTopicOrder(context.user, topicOrder),
+      context.mutations.proposalAdmin.updateTopicOrder(
+        context.user,
+        topicOrder
+      ),
       UpdateTopicOrderResponseWrap
     );
   }

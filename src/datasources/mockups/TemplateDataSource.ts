@@ -16,6 +16,8 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
+import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
 
@@ -145,8 +147,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     });
   }
   async deleteQuestionRel(
-    templateId: number,
-    fieldId: string
+    args: DeleteQuestionRelArgs
   ): Promise<ProposalTemplate> {
     return createDummyTemplate();
   }
@@ -262,11 +263,11 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
   }
 
-  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
+  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
     dummyTemplate.steps.splice(
-      sortOrder,
+      args.sortOrder,
       0,
-      new TemplateStep(new Topic(2, 'New Topic', sortOrder, false), [])
+      new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
     );
 
     return dummyTemplate;

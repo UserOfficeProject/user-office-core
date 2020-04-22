@@ -19,7 +19,7 @@ export class CreateQuestionMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createQuestion(context.user, args),
+      context.mutations.proposalAdmin.createQuestion(context.user, args),
       QuestionResponseWrap
     );
   }

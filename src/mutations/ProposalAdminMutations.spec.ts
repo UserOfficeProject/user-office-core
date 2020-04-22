@@ -9,11 +9,9 @@ import { DataType, ProposalTemplate, Topic } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { dummyUser } from './../datasources/mockups/UserDataSource';
-import { ProposalTemplateMetadata, Question } from './../models/ProposalModel';
-import TemplateMutations from './TemplateMutations';
-
-// TODO: it is here much of the logic reside
+import { dummyUser } from '../datasources/mockups/UserDataSource';
+import { ProposalTemplateMetadata, Question } from '../models/ProposalModel';
+import ProposalAdminMutations from './ProposalAdminMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
@@ -21,7 +19,7 @@ const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
-const templateMutations = new TemplateMutations(
+const mutations = new ProposalAdminMutations(
   dummyTemplateDataSource,
   userAuthorization,
   dummyLogger
@@ -34,7 +32,7 @@ beforeEach(() => {
 test('An userofficer can update topic', async () => {
   const newTopicTitle = 'new topic title';
   const topicEnabled = false;
-  const topic = await templateMutations.updateTopic(dummyUserOfficer, {
+  const topic = await mutations.updateTopic(dummyUserOfficer, {
     id: 1,
     title: newTopicTitle,
     isEnabled: topicEnabled,
@@ -47,7 +45,7 @@ test('An userofficer can update topic', async () => {
 test('An userofficer can create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const templateMetadata = await templateMutations.createTemplate(
+  const templateMetadata = await mutations.createTemplate(
     dummyUserOfficer,
     name,
     description
@@ -61,7 +59,7 @@ test('An userofficer can create template', async () => {
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const templateMetadata = await templateMutations.createTemplate(
+  const templateMetadata = await mutations.createTemplate(
     dummyUser,
     name,
     description
@@ -71,25 +69,19 @@ test('An user cannot create template', async () => {
 
 test('An userofficer can delete template', async () => {
   const id = 1;
-  const templateMetadata = await templateMutations.deleteTemplate(
-    dummyUserOfficer,
-    id
-  );
+  const templateMetadata = await mutations.deleteTemplate(dummyUserOfficer, id);
   expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(true);
   expect((templateMetadata as ProposalTemplateMetadata).templateId).toEqual(id);
 });
 
 test('An user can not delete template', async () => {
   const id = 1;
-  const templateMetadata = await templateMutations.deleteTemplate(
-    dummyUser,
-    id
-  );
+  const templateMetadata = await mutations.deleteTemplate(dummyUser, id);
   expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(false);
 });
 
 test('A user can not update topic', async () => {
-  const topic = await templateMutations.updateTopic(dummyUser, {
+  const topic = await mutations.updateTopic(dummyUser, {
     id: 1,
     title: 'New topic title',
     isEnabled: false,
@@ -99,35 +91,41 @@ test('A user can not update topic', async () => {
 });
 
 test('A user-officer can create topic', async () => {
-  let template = await templateMutations.createTopic(dummyUserOfficer, 1, 0);
+  let template = await mutations.createTopic(dummyUserOfficer, {
+    templateId: 1,
+    sortOrder: 0,
+  });
   expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
   const numberOfTopics = (template as ProposalTemplate).steps.length;
 
-  template = await templateMutations.createTopic(dummyUserOfficer, 1, 1);
+  template = await mutations.createTopic(dummyUserOfficer, {
+    templateId: 1,
+    sortOrder: 1,
+  });
   expect((template as ProposalTemplate).steps.length).toEqual(
     numberOfTopics + 1
   ); // added new one
 });
 
 test('A user can not create topic', async () => {
-  const topic = await templateMutations.createTopic(dummyUser, 1, 0);
+  const topic = await mutations.createTopic(dummyUser, {
+    templateId: 1,
+    sortOrder: 0,
+  });
   expect(topic instanceof ProposalTemplate).toBe(false);
 });
 
 test('A user-officer can update fieltTopicRel', async () => {
-  const response = await templateMutations.updateFieldTopicRel(
-    dummyUserOfficer,
-    {
-      templateId: 1,
-      topicId: 1,
-      fieldIds: ['has_links_with_industry', 'enable_crystallization'],
-    }
-  );
+  const response = await mutations.updateFieldTopicRel(dummyUserOfficer, {
+    templateId: 1,
+    topicId: 1,
+    fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+  });
   expect(isRejection(response)).toEqual(false);
 });
 
 test('A user can not update fieltTopicRel', async () => {
-  const response = await templateMutations.updateFieldTopicRel(dummyUser, {
+  const response = await mutations.updateFieldTopicRel(dummyUser, {
     templateId: 1,
     topicId: 1,
     fieldIds: ['has_links_with_industry', 'enable_crystallization'],
@@ -135,15 +133,15 @@ test('A user can not update fieltTopicRel', async () => {
   expect(isRejection(response)).toEqual(true);
 });
 
-test('User can not create field', async () => {
-  const response = await templateMutations.createQuestion(dummyUser, {
+test('User can not create question', async () => {
+  const response = await mutations.createQuestion(dummyUser, {
     dataType: DataType.EMBELLISHMENT,
   });
   expect(response).not.toBeInstanceOf(ProposalTemplate);
 });
 
-test('User officer can create field', async () => {
-  const response = await templateMutations.createQuestion(dummyUserOfficer, {
+test('User officer can create question', async () => {
+  const response = await mutations.createQuestion(dummyUserOfficer, {
     dataType: DataType.EMBELLISHMENT,
   });
   expect(response).toBeInstanceOf(Question);
@@ -152,36 +150,36 @@ test('User officer can create field', async () => {
   expect(newField.dataType).toEqual(DataType.EMBELLISHMENT);
 });
 
-test('User can not delete field', async () => {
+test('User can not delete question', async () => {
   await expect(
-    templateMutations.deleteQuestion(dummyUser, 'field_id')
+    mutations.deleteQuestion(dummyUser, 'field_id')
   ).resolves.not.toBeInstanceOf(Question);
 });
 
-test('User officer can delete field', async () => {
+test('User officer can delete question', async () => {
   await expect(
-    templateMutations.deleteQuestion(dummyUserOfficer, 'field_id')
+    mutations.deleteQuestion(dummyUserOfficer, 'field_id')
   ).resolves.toBeInstanceOf(Question);
 });
 
 test('Officer can update topic order', async () => {
   return expect(
-    templateMutations.updateTopicOrder(dummyUserOfficer, [1, 3, 2])
+    mutations.updateTopicOrder(dummyUserOfficer, [1, 3, 2])
   ).resolves.toBeTruthy();
 });
 
 test('User can not update topic order', async () => {
-  const result = await templateMutations.updateTopicOrder(dummyUser, [1, 3, 2]);
+  const result = await mutations.updateTopicOrder(dummyUser, [1, 3, 2]);
 
   return expect(isRejection(result)).toBeTruthy();
 });
 
 test('Officer can delete a topic', async () => {
-  const topic = await templateMutations.deleteTopic(dummyUserOfficer, 1);
+  const topic = await mutations.deleteTopic(dummyUserOfficer, 1);
   expect(topic instanceof Topic).toBe(true);
 });
 
 test('Dummy user can not delete a topic', async () => {
-  const topic = await templateMutations.deleteTopic(dummyUser, 1);
+  const topic = await mutations.deleteTopic(dummyUser, 1);
   expect(topic instanceof Topic).toBe(false);
 });

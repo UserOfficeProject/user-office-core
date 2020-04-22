@@ -13,7 +13,7 @@ export class CreateProposalTemplateMutation {
     @Arg('description', () => String, { nullable: true }) description?: string
   ) {
     return wrapResponse(
-      context.mutations.template.createTemplate(
+      context.mutations.proposalAdmin.createTemplate(
         context.user,
         name,
         description
