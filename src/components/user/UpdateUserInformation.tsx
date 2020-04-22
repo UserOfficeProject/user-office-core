@@ -9,8 +9,9 @@ import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import orcid from '../../images/orcid.png';
@@ -38,6 +39,7 @@ const useStyles = makeStyles({
 });
 
 export default function UpdateUserInformation(props: { id: number }) {
+  const { user } = useContext(UserContext);
   const [userData, setUserData] = useState<any>(null);
   const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
@@ -78,14 +80,22 @@ export default function UpdateUserInformation(props: { id: number }) {
   };
   useEffect(() => {
     const getUserInformation = (id: number) => {
-      sendRequest()
-        .getUser({ id })
-        .then(data => {
-          setUserData({ ...data.user });
-        });
+      if (user.id !== props.id) {
+        sendRequest()
+          .getUser({ id })
+          .then(data => {
+            setUserData({ ...data.user });
+          });
+      } else {
+        sendRequest()
+          .getUserMe()
+          .then(data => {
+            setUserData({ ...data.me });
+          });
+      }
     };
     getUserInformation(props.id);
-  }, [props.id, sendRequest]);
+  }, [props.id, user.id, sendRequest]);
 
   const classes = useStyles();
 

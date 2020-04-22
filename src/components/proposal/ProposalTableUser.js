@@ -14,8 +14,8 @@ export default function ProposalTableUser(props) {
       .then(data => {
         return {
           page: 0,
-          totalCount: data.user.proposals.length,
-          data: data.user.proposals
+          totalCount: data.me.proposals.length,
+          data: data.me.proposals
             .sort((a, b) => {
               return (
                 new Date(b.created).getTime() - new Date(a.created).getTime()

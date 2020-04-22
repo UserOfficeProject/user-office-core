@@ -1948,14 +1948,23 @@ export type GetUserQuery = (
   )> }
 );
 
-export type GetUserProposalsQueryVariables = {
-  id: Scalars['Int']
-};
+export type GetUserMeQueryVariables = {};
+
+
+export type GetUserMeQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'user_title' | 'username' | 'firstname' | 'middlename' | 'lastname' | 'preferredname' | 'gender' | 'nationality' | 'birthdate' | 'organisation' | 'department' | 'position' | 'email' | 'telephone' | 'telephone_alt' | 'orcid'>
+  )> }
+);
+
+export type GetUserProposalsQueryVariables = {};
 
 
 export type GetUserProposalsQuery = (
   { __typename?: 'Query' }
-  & { user: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
@@ -2870,9 +2879,31 @@ export const GetUserDocument = gql`
   }
 }
     `;
+export const GetUserMeDocument = gql`
+    query getUserMe {
+  me {
+    user_title
+    username
+    firstname
+    middlename
+    lastname
+    preferredname
+    gender
+    nationality
+    birthdate
+    organisation
+    department
+    position
+    email
+    telephone
+    telephone_alt
+    orcid
+  }
+}
+    `;
 export const GetUserProposalsDocument = gql`
-    query getUserProposals($id: Int!) {
-  user(id: $id) {
+    query getUserProposals {
+  me {
     proposals {
       id
       shortCode
@@ -3107,7 +3138,10 @@ export function getSdk(client: GraphQLClient) {
     getUser(variables: GetUserQueryVariables): Promise<GetUserQuery> {
       return client.request<GetUserQuery>(print(GetUserDocument), variables);
     },
-    getUserProposals(variables: GetUserProposalsQueryVariables): Promise<GetUserProposalsQuery> {
+    getUserMe(variables?: GetUserMeQueryVariables): Promise<GetUserMeQuery> {
+      return client.request<GetUserMeQuery>(print(GetUserMeDocument), variables);
+    },
+    getUserProposals(variables?: GetUserProposalsQueryVariables): Promise<GetUserProposalsQuery> {
       return client.request<GetUserProposalsQuery>(print(GetUserProposalsDocument), variables);
     },
     getUserWithRoles(variables: GetUserWithRolesQueryVariables): Promise<GetUserWithRolesQuery> {
