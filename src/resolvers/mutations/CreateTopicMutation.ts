@@ -1,11 +1,11 @@
 import {
-  Arg,
+  Args,
+  ArgsType,
   Ctx,
+  Field,
   Int,
   Mutation,
   Resolver,
-  ArgsType,
-  Field,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -24,10 +24,7 @@ export class CreateTopicArgs {
 @Resolver()
 export class CreateTopicMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
-  createTopic(
-    @Arg('args', () => CreateTopicArgs) args: CreateTopicArgs,
-    @Ctx() context: ResolverContext
-  ) {
+  createTopic(@Args() args: CreateTopicArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.proposalAdmin.createTopic(context.user, args),
       ProposalTemplateResponseWrap

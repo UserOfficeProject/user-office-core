@@ -1,5 +1,5 @@
 import {
-  Arg,
+  Args,
   ArgsType,
   Ctx,
   Field,
@@ -7,24 +7,25 @@ import {
   Mutation,
   Resolver,
 } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class DeleteQuestionRelArgs {
-  @Field(() => Int)
-  templateId: number;
+  @Field(() => String)
+  questionId: string;
 
   @Field(() => Int)
-  questionId: number;
+  templateId: number;
 }
 
 @Resolver()
 export class DeleteQuestionRelMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
   deleteQuestionRel(
-    @Arg('args', () => DeleteQuestionRelArgs) args: DeleteQuestionRelArgs,
+    @Args() args: DeleteQuestionRelArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
