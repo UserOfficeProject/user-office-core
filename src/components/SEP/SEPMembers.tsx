@@ -151,7 +151,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   };
 
   const addUser = async (user: BasicUserDetails): Promise<void> => {
-    sendSEPMembersUpdate({ SEPReviewers: [user] } as SEPMemberAssignments);
+    initialValues.SEPReviewers.push(user);
+    sendSEPMembersUpdate(initialValues);
   };
 
   if (!usersData || loading || loadingAssignments) {
