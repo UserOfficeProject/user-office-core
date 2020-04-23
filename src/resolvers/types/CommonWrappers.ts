@@ -1,12 +1,12 @@
 import { Field, ObjectType } from 'type-graphql';
 
 import { Response } from '../Decorators';
+import { TemplateStep } from '../types/TemplateStep';
 import { Page } from './Admin';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Proposal } from './Proposal';
 import { ProposalTemplate } from './ProposalTemplate';
-import { ProposalTemplateMetadata } from './ProposalTemplateMetadata';
 import { Question } from './Question';
 import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
@@ -35,15 +35,6 @@ export class UserResponseWrap extends ResponseWrapBase<User> {
   @Response()
   @Field(() => User, { nullable: true })
   public user: User;
-}
-
-@ObjectType()
-export class ProposalTemplateMetadataResponseWrap extends ResponseWrapBase<
-  ProposalTemplateMetadata
-> {
-  @Response()
-  @Field(() => ProposalTemplateMetadata, { nullable: true })
-  public templateMetadata: ProposalTemplateMetadata;
 }
 
 @ObjectType()
@@ -76,6 +67,15 @@ export class ProposalTemplateResponseWrap extends ResponseWrapBase<
   @Response()
   @Field(() => ProposalTemplate, { nullable: true })
   public template: ProposalTemplate;
+}
+
+@ObjectType()
+export class TemplateStepArrayResponseWrap extends ResponseWrapBase<
+  TemplateStep[]
+> {
+  @Response()
+  @Field(() => [TemplateStep])
+  public steps: TemplateStep[];
 }
 
 @ObjectType()

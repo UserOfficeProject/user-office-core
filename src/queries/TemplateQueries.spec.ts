@@ -4,7 +4,7 @@ import {
   dummyUser,
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalTemplate } from '../models/ProposalModel';
+import { ProposalTemplate, TemplateStep } from '../models/ProposalModel';
 import TemplateQueries from './TemplateQueries';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
@@ -26,12 +26,12 @@ test('User officer user can get the template', () => {
 });
 
 test('Proposal template should have fields', async () => {
-  const template = (await templateQueries.getProposalTemplate(
+  let steps = await templateQueries.getProposalTemplateSteps(
     dummyUserOfficer,
     1
-  )) as ProposalTemplate;
-
-  return expect(template.steps[0].fields.length).toBeGreaterThan(0);
+  );
+  steps = steps as TemplateStep[];
+  expect(steps[0].fields.length).toBeGreaterThan(0);
 });
 
 test('User officer should be able to get if natural key exists', async () => {

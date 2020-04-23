@@ -9,7 +9,6 @@ import {
   FieldCondition,
   FieldDependency,
   ProposalTemplate,
-  ProposalTemplateMetadata,
   Question,
   Questionary,
   QuestionRel,
@@ -18,11 +17,11 @@ import {
 } from '../../models/ProposalModel';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
 
-export let dummyTemplate: ProposalTemplate;
-export let dummyProposalTemplateMedatata: ProposalTemplateMetadata;
+export let dummyTemplateSteps: TemplateStep[];
+export let dummyProposalTemplate: ProposalTemplate;
 export let dummyQuestionary: Questionary;
 export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
@@ -36,12 +35,6 @@ const createDummyQuestion = (values?: Partial<Question>): Question => {
     values?.question || 'Some random question',
     values?.config || { required: false, tooltip: '', small_label: '' }
   );
-};
-
-const create1TopicFieldlessTemplate = () => {
-  return new ProposalTemplate([
-    new TemplateStep(new Topic(0, 'General information', 0, true), []),
-  ]);
 };
 
 const createDummyQuestionRel = (values: {
@@ -58,7 +51,7 @@ const createDummyQuestionRel = (values: {
   );
 };
 
-const createDummyTemplate = () => {
+const createDummyTemplateSteps = () => {
   const hasLinksToField = createDummyQuestionRel({
     question: createDummyQuestion({
       proposalQuestionId: 'hasLinksToField',
@@ -78,15 +71,15 @@ const createDummyTemplate = () => {
     ),
   });
 
-  return new ProposalTemplate([
+  return [
     new TemplateStep(new Topic(1, 'General information', 1, true), [
       hasLinksToField,
       linksToField,
     ]),
-  ]);
+  ];
 };
 
-const createDummyProposalTemplateMetadata = (values?: {
+const createDummyProposalTemplate = (values?: {
   id?: number;
   name?: string;
   description?: string;
@@ -94,7 +87,7 @@ const createDummyProposalTemplateMetadata = (values?: {
 }) => {
   values = values || {};
 
-  return new ProposalTemplateMetadata(
+  return new ProposalTemplate(
     values.id || 1,
     values.name || 'Industrial template',
     values.description || 'Industrial template description',
@@ -119,24 +112,24 @@ const createDummyTopic = (
 };
 
 export class TemplateDataSourceMock implements TemplateDataSource {
-  async cloneTemplate(templateId: number): Promise<ProposalTemplateMetadata> {
-    return createDummyProposalTemplateMetadata({ id: templateId });
+  async cloneTemplate(templateId: number): Promise<ProposalTemplate> {
+    return createDummyProposalTemplate({ id: templateId });
   }
-  async getProposalTemplateMetadata(
+  async getProposalTemplate(
     templateId: number
-  ): Promise<ProposalTemplateMetadata | null> {
-    return createDummyProposalTemplateMetadata({ id: templateId });
+  ): Promise<ProposalTemplate | null> {
+    return createDummyProposalTemplate({ id: templateId });
   }
-  async updateTemplateMetadata(
-    values: UpdateProposalTemplateMetadataArgs
-  ): Promise<ProposalTemplateMetadata | null> {
-    return createDummyProposalTemplateMetadata(values);
+  async updateTemplate(
+    values: UpdateProposalTemplateArgs
+  ): Promise<ProposalTemplate | null> {
+    return createDummyProposalTemplate(values);
   }
   async createQuestionRel(
     fieldId: string,
     templateId: number
-  ): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  ): Promise<TemplateStep[]> {
+    return createDummyTemplateSteps();
   }
   async getQuestionRel(
     fieldId: string,
@@ -148,8 +141,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
   async deleteQuestionRel(
     args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  ): Promise<TemplateStep[]> {
+    return createDummyTemplateSteps();
   }
   async createQuestionAndRel(
     templateId: number,
@@ -159,8 +152,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  ): Promise<TemplateStep[]> {
+    return createDummyTemplateSteps();
   }
   async updateQuestionRel(
     questionId: string,
@@ -170,23 +163,23 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       sortOrder?: number | undefined;
       dependency?: any;
     }
-  ): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  ): Promise<TemplateStep[]> {
+    return createDummyTemplateSteps();
   }
   async createTemplate(
     name: string,
     description?: string
-  ): Promise<ProposalTemplateMetadata> {
-    return createDummyProposalTemplateMetadata({ name, description });
+  ): Promise<ProposalTemplate> {
+    return createDummyProposalTemplate({ name, description });
   }
-  async deleteTemplate(id: number): Promise<ProposalTemplateMetadata> {
-    return createDummyProposalTemplateMetadata({ id });
+  async deleteTemplate(id: number): Promise<ProposalTemplate> {
+    return createDummyProposalTemplate({ id });
   }
-  async getProposalTemplatesMetadata(
+  async getProposalTemplates(
     isArchived?: boolean
-  ): Promise<ProposalTemplateMetadata[]> {
+  ): Promise<ProposalTemplate[]> {
     return [
-      new ProposalTemplateMetadata(
+      new ProposalTemplate(
         1,
         'Industrial',
         'Industrial proposal template',
@@ -198,7 +191,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return true;
   }
   public init() {
-    dummyTemplate = createDummyTemplate();
+    dummyTemplateSteps = createDummyTemplateSteps();
   }
 
   async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
@@ -237,8 +230,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       config?: string;
     }
   ): Promise<Question> {
-    const template = await this.getProposalTemplate();
-    template.steps.forEach(topic => {
+    const steps = await this.getProposalTemplateSteps();
+    steps.forEach(topic => {
       topic.fields!.forEach(field => {
         if (field.question.proposalQuestionId === questionId) {
           Object.assign(field, values);
@@ -263,17 +256,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
-    dummyTemplate.steps.splice(
+  async createTopic(args: CreateTopicArgs): Promise<TemplateStep[]> {
+    dummyTemplateSteps.splice(
       args.sortOrder,
       0,
       new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
     );
 
-    return dummyTemplate;
+    return dummyTemplateSteps;
   }
 
-  async getProposalTemplate(): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  async getProposalTemplateSteps(): Promise<TemplateStep[]> {
+    return createDummyTemplateSteps();
   }
 }

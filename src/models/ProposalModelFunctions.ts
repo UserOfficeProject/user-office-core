@@ -1,20 +1,20 @@
 import {
-  TextInputConfig,
   SelectionFromOptionsConfig,
+  TextInputConfig,
 } from '../resolvers/types/FieldConfig';
 import JSDict from '../utils/Dictionary';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import {
-  QuestionRel,
   Answer,
-  ProposalTemplate,
-  Questionary,
   DataType,
   DataTypeSpec,
   FieldDependency,
+  QuestionaryStep,
+  QuestionRel,
+  TemplateStep,
 } from './ProposalModel';
 type AbstractField = QuestionRel | Answer;
-type AbstractCollection = ProposalTemplate | Questionary;
+type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
@@ -24,22 +24,22 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
   }
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  const step = collection.steps.find(step => step.topic.topic_id === topicId);
+  const step = collection.find(step => step.topic.topic_id === topicId);
 
   return step ? step.topic : undefined;
 }
 export function getQuestionaryStepByTopicId(
-  template: AbstractCollection,
+  collection: AbstractCollection,
   topicId: number
 ) {
-  return template.steps.find(step => step.topic.topic_id === topicId);
+  return collection.find(step => step.topic.topic_id === topicId);
 }
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  collection.steps.every(step => {
+  collection.every(step => {
     needle = step.fields.find(
       field => field.question.proposalQuestionId === questionId
     );
@@ -51,14 +51,14 @@ export function getFieldById(
 }
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  collection.steps.forEach(step => {
+  collection.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
 
   return allFields;
 }
 export function isDependencySatisfied(
-  collection: Questionary,
+  collection: QuestionaryStep[],
   dependency: FieldDependency | undefined
 ): boolean {
   if (!dependency?.condition) {
@@ -85,7 +85,7 @@ export function isDependencySatisfied(
   );
 }
 export function areDependenciesSatisfied(
-  questionary: Questionary,
+  questionary: QuestionaryStep[],
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);

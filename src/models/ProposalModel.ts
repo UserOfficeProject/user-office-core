@@ -159,15 +159,12 @@ export class TemplateStep {
 }
 
 export class ProposalTemplate {
-  constructor(public steps: TemplateStep[] = []) {}
-
-  static fromObject(obj: any) {
-    return new ProposalTemplate(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => TemplateStep.fromObject(stepObj))
-        : []
-    );
-  }
+  constructor(
+    public templateId: number,
+    public name: string,
+    public description: string,
+    public isArchived: boolean
+  ) {}
 }
 
 export class FieldCondition {
@@ -180,15 +177,6 @@ export class FieldCondition {
       ? new FieldCondition(inpObj.condition, inpObj.params)
       : undefined;
   }
-}
-
-export class ProposalTemplateMetadata {
-  constructor(
-    public templateId: number,
-    public name: string,
-    public description: string,
-    public isArchived: boolean
-  ) {}
 }
 
 export enum ProposalStatus {

@@ -1,12 +1,12 @@
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateMetadataResponseWrap } from '../types/CommonWrappers';
+import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
 export class CreateProposalTemplateMutation {
-  @Mutation(() => ProposalTemplateMetadataResponseWrap)
+  @Mutation(() => ProposalTemplateResponseWrap)
   createProposalTemplate(
     @Ctx() context: ResolverContext,
     @Arg('name', () => String) name: string,
@@ -18,7 +18,7 @@ export class CreateProposalTemplateMutation {
         name,
         description
       ),
-      ProposalTemplateMetadataResponseWrap
+      ProposalTemplateResponseWrap
     );
   }
 }

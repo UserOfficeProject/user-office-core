@@ -1,35 +1,26 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
   DataType,
-  ProposalTemplate,
-  ProposalTemplateMetadata,
   Question,
   Topic,
+  TemplateStep,
+  ProposalTemplate,
 } from '../models/ProposalModel';
 import { QuestionRel } from '../models/ProposalModel';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { UpdateProposalTemplateArgs as UpdateTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
 import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
 
 export interface TemplateDataSource {
   // Template
-  createTemplate(
-    name: string,
-    description?: string
-  ): Promise<ProposalTemplateMetadata>;
-  cloneTemplate(templateId: number): Promise<ProposalTemplateMetadata>;
-  getProposalTemplatesMetadata(
-    isArchived?: boolean
-  ): Promise<ProposalTemplateMetadata[]>;
-  getProposalTemplateMetadata(
-    templateId: number
-  ): Promise<ProposalTemplateMetadata | null>;
-  getProposalTemplate(templateId: number): Promise<ProposalTemplate>;
-  updateTemplateMetadata(
-    values: UpdateProposalTemplateMetadataArgs
-  ): Promise<ProposalTemplateMetadata | null>;
-
+  createTemplate(name: string, description?: string): Promise<ProposalTemplate>;
+  getProposalTemplate(templateId: number): Promise<ProposalTemplate | null>;
+  getProposalTemplates(isArchived?: boolean): Promise<ProposalTemplate[]>;
+  updateTemplate(values: UpdateTemplateArgs): Promise<ProposalTemplate | null>;
+  deleteTemplate(id: number): Promise<ProposalTemplate>;
+  cloneTemplate(templateId: number): Promise<ProposalTemplate>;
+  getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   // TemplateField
   createQuestion(
     fieldId: string,
@@ -55,24 +46,12 @@ export interface TemplateDataSource {
   createQuestionRel(
     fieldId: string,
     templateId: number
-  ): Promise<ProposalTemplate>;
+  ): Promise<TemplateStep[]>;
 
   getQuestionRel(
     fieldId: string,
     templateId: number
   ): Promise<QuestionRel | null>;
-
-  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
-
-  createQuestionAndRel(
-    templateId: number,
-    fieldId: string,
-    naturalKey: string,
-    topicId: number,
-    dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<ProposalTemplate>;
 
   updateQuestionRel(
     questionId: string,
@@ -82,10 +61,22 @@ export interface TemplateDataSource {
       sortOrder?: number;
       dependency?: FieldDependencyInput;
     }
-  ): Promise<ProposalTemplate>;
+  ): Promise<TemplateStep[]>;
+
+  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<TemplateStep[]>;
+
+  createQuestionAndRel(
+    templateId: number,
+    fieldId: string,
+    naturalKey: string,
+    topicId: number,
+    dataType: DataType,
+    question: string,
+    config: string
+  ): Promise<TemplateStep[]>;
 
   // Topic
-  createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
+  createTopic(args: CreateTopicArgs): Promise<TemplateStep[]>;
   updateTopic(
     id: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
@@ -95,6 +86,4 @@ export interface TemplateDataSource {
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
   isNaturalKeyPresent(natural_key: string): Promise<boolean>;
-
-  deleteTemplate(id: number): Promise<ProposalTemplateMetadata>;
 }

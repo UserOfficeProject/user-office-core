@@ -7,12 +7,12 @@ import {
   DataType,
   FieldCondition,
   FieldDependency,
+  Question,
   QuestionRel,
   Topic,
-  Question,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
-import { ProposalTemplateMetadata, Answer } from './../../models/ProposalModel';
+import { ProposalTemplate } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -73,7 +73,7 @@ export interface ProposalQuestionProposalTemplateRelRecord {
   readonly dependency_condition: string;
 }
 
-export interface ProposalTemplateMetadataRecord {
+export interface ProposalTemplateRecord {
   readonly template_id: number;
   readonly name: string;
   readonly description: string;
@@ -218,10 +218,10 @@ export const createQuestionObject = (question: ProposalQuestionRecord) => {
   );
 };
 
-export const createProposalTemplateMetadataObject = (
-  template: ProposalTemplateMetadataRecord
+export const createProposalTemplateObject = (
+  template: ProposalTemplateRecord
 ) => {
-  return new ProposalTemplateMetadata(
+  return new ProposalTemplate(
     template.template_id,
     template.name,
     template.description,

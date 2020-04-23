@@ -4,8 +4,8 @@ import {
   createConfig,
   DataType,
   ProposalTemplate,
-  ProposalTemplateMetadata,
   Question,
+  TemplateStep,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
@@ -14,7 +14,7 @@ import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
@@ -40,7 +40,7 @@ export default class TemplateMutations {
     agent: User | null,
     name: string,
     description?: string
-  ): Promise<ProposalTemplateMetadata | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     const result = await this.dataSource
       .createTemplate(name, description)
       .then(result => result);
@@ -52,7 +52,7 @@ export default class TemplateMutations {
   async deleteTemplate(
     user: User | null,
     id: number
-  ): Promise<ProposalTemplateMetadata | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
       .deleteTemplate(id)
       .then(template => template)
@@ -67,10 +67,10 @@ export default class TemplateMutations {
   async createTopic(
     user: User | null,
     args: CreateTopicArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<TemplateStep[] | Rejection> {
     return this.dataSource
       .createTopic(args)
-      .then(template => template)
+      .then(steps => steps)
       .catch(err => {
         logger.logException('Could not create topic', err, {
           user,
@@ -181,10 +181,10 @@ export default class TemplateMutations {
   async updateQuestionRel(
     agent: User | null,
     args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<TemplateStep[] | Rejection> {
     return this.dataSource
       .updateQuestionRel(args.questionId, args.templateId, args)
-      .then(template => template)
+      .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
           agent,
@@ -199,10 +199,10 @@ export default class TemplateMutations {
   async deleteQuestionRel(
     agent: User | null,
     args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<TemplateStep[] | Rejection> {
     return this.dataSource
       .deleteQuestionRel(args)
-      .then(template => template)
+      .then(steps => steps)
       .catch(err => {
         logger.logException('Could not delete question rel', err, {
           agent,
@@ -261,12 +261,9 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplateMetadata(
-    user: User | null,
-    args: UpdateProposalTemplateMetadataArgs
-  ) {
+  updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
     return this.dataSource
-      .updateTemplateMetadata(args)
+      .updateTemplate(args)
       .then(data => data)
       .catch(err => {
         logger.logException('Could not update topic order', err, {

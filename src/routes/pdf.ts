@@ -158,11 +158,14 @@ const createProposalPDF = async (
     questionary.steps.forEach(x => {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(questionary, x.topic.topic_id);
+      const step = getQuestionaryStepByTopicId(
+        questionary.steps,
+        x.topic.topic_id
+      );
       const activeFields = step
         ? (step.fields.filter(field => {
             return areDependenciesSatisfied(
-              questionary,
+              questionary.steps,
               field.question.proposalQuestionId
             );
           }) as Answer[])

@@ -1,11 +1,11 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateMetadataResponseWrap } from '../types/CommonWrappers';
+import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class UpdateProposalTemplateMetadataArgs {
+export class UpdateProposalTemplateArgs {
   @Field()
   public templateId: number;
 
@@ -20,18 +20,15 @@ export class UpdateProposalTemplateMetadataArgs {
 }
 
 @Resolver()
-export class UpdateProposalTemplateMetadataMutation {
-  @Mutation(() => ProposalTemplateMetadataResponseWrap)
-  updateProposalTemplateMetadata(
-    @Args() args: UpdateProposalTemplateMetadataArgs,
+export class UpdateProposalTemplateMutation {
+  @Mutation(() => ProposalTemplateResponseWrap)
+  updateProposalTemplate(
+    @Args() args: UpdateProposalTemplateArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateProposalTemplateMetadata(
-        context.user,
-        args
-      ),
-      ProposalTemplateMetadataResponseWrap
+      context.mutations.template.updateProposalTemplate(context.user, args),
+      ProposalTemplateResponseWrap
     );
   }
 }

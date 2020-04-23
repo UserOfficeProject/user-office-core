@@ -4,26 +4,25 @@ import to from 'await-to-js';
 import {
   DataType,
   ProposalTemplate,
-  ProposalTemplateMetadata,
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
+import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
 import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
 import database from './database';
 import {
-  createProposalTemplateMetadataObject,
+  createProposalTemplateObject,
   createQuestionObject,
   createQuestionRelObject,
   createTopicObject,
   ProposalQuestionProposalTemplateRelRecord,
   ProposalQuestionRecord,
-  ProposalTemplateMetadataRecord,
+  ProposalTemplateRecord,
   TopicRecord,
 } from './records';
 
@@ -31,73 +30,69 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createTemplate(
     name: string,
     description?: string
-  ): Promise<ProposalTemplateMetadata> {
+  ): Promise<ProposalTemplate> {
     return database('proposal_templates')
       .insert({
         name,
         description,
       })
       .returning('*')
-      .then((rows: ProposalTemplateMetadataRecord[]) => {
+      .then((rows: ProposalTemplateRecord[]) => {
         if (rows.length !== 1) {
           throw new Error(
             `createTemplate expected 1 result got ${rows.length}. ${name} ${description}`
           );
         }
 
-        return createProposalTemplateMetadataObject(rows[0]);
+        return createProposalTemplateObject(rows[0]);
       });
   }
 
-  async deleteTemplate(templateId: number): Promise<ProposalTemplateMetadata> {
+  async deleteTemplate(templateId: number): Promise<ProposalTemplate> {
     return database('proposal_templates')
       .delete()
       .where({ template_id: templateId })
       .returning('*')
-      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+      .then((resultSet: ProposalTemplateRecord[]) => {
         if (!resultSet || resultSet.length == 0) {
           throw new Error(
             `DeleteTemplate template does not exist. ID: ${templateId}`
           );
         }
 
-        return createProposalTemplateMetadataObject(resultSet[0]);
+        return createProposalTemplateObject(resultSet[0]);
       });
   }
 
-  async getProposalTemplatesMetadata(
+  async getProposalTemplates(
     isArchived?: boolean
-  ): Promise<ProposalTemplateMetadata[]> {
+  ): Promise<ProposalTemplate[]> {
     return database('proposal_templates')
       .select('*')
       .where({ is_archived: isArchived || false })
-      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+      .then((resultSet: ProposalTemplateRecord[]) => {
         if (!resultSet) {
           return [];
         }
 
-        return resultSet.map(value =>
-          createProposalTemplateMetadataObject(value)
-        );
+        return resultSet.map(value => createProposalTemplateObject(value));
       });
   }
 
-  async getProposalTemplateMetadata(
-    templateId: number
-  ): Promise<ProposalTemplateMetadata | null> {
+  async getProposalTemplate(templateId: number) {
     return database('proposal_templates')
       .select('*')
       .where({ template_id: templateId })
-      .then((resultSet: ProposalTemplateMetadataRecord[]) => {
+      .then((resultSet: ProposalTemplateRecord[]) => {
         if (resultSet.length !== 1) {
           return null;
         }
 
-        return createProposalTemplateMetadataObject(resultSet[0]);
+        return createProposalTemplateObject(resultSet[0]);
       });
   }
 
-  async getProposalTemplate(templateId: number): Promise<ProposalTemplate> {
+  async getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]> {
     const topicRecords: TopicRecord[] = await database
       .select('*')
       .from('proposal_topics')
@@ -135,10 +130,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       );
     });
 
-    return new ProposalTemplate(steps);
+    return steps;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
+  async createTopic(args: CreateTopicArgs): Promise<TemplateStep[]> {
     await database('proposal_topics')
       .update({ sort_order: args.sortOrder + 1 })
       .where('sort_order', '>=', args.sortOrder);
@@ -150,7 +145,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       template_id: args.templateId,
     });
 
-    return this.getProposalTemplate(args.templateId);
+    return this.getProposalTemplateSteps(args.templateId);
   }
 
   async updateTopic(
@@ -217,7 +212,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       sortOrder?: number;
       dependency?: FieldDependencyInput;
     }
-  ): Promise<ProposalTemplate> {
+  ): Promise<TemplateStep[]> {
     await to(
       database('proposal_question__proposal_template__rels')
         .where({ proposal_question_id: questionId, template_id: templateId })
@@ -233,12 +228,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       dependency_condition: values.dependency?.condition,
     });
 
-    return this.getProposalTemplate(templateId);
+    return this.getProposalTemplateSteps(templateId);
   }
 
-  async updateTemplateMetadata(
-    values: UpdateProposalTemplateMetadataArgs
-  ): Promise<ProposalTemplateMetadata | null> {
+  async updateTemplate(
+    values: UpdateProposalTemplateArgs
+  ): Promise<ProposalTemplate | null> {
     await database('proposal_templates')
       .update({
         name: values.name,
@@ -247,7 +242,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       })
       .where({ template_id: values.templateId });
 
-    return this.getProposalTemplateMetadata(values.templateId);
+    return this.getProposalTemplate(values.templateId);
   }
 
   async createQuestionAndRel(
@@ -270,7 +265,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       ['*']
     );
 
-    return this.getProposalTemplate(templateId);
+    return this.getProposalTemplateSteps(templateId);
   }
 
   async createQuestion(
@@ -303,13 +298,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createQuestionRel(
     fieldId: string,
     templateId: number
-  ): Promise<ProposalTemplate> {
+  ): Promise<TemplateStep[]> {
     await database('proposal_question__proposal_template__rels').insert({
       proposal_question_id: fieldId,
       template_id: templateId,
     });
 
-    return this.getProposalTemplate(templateId);
+    return this.getProposalTemplateSteps(templateId);
   }
 
   async getQuestion(fieldId: string): Promise<Question | null> {
@@ -374,7 +369,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async deleteQuestionRel(
     args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  ): Promise<TemplateStep[]> {
     const rowsAffected = await database(
       'proposal_question__proposal_template__rels'
     )
@@ -390,7 +385,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       );
     }
 
-    return this.getProposalTemplate(args.templateId);
+    return this.getProposalTemplateSteps(args.templateId);
   }
 
   async deleteTopic(id: number): Promise<Topic> {
@@ -424,7 +419,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async cloneTemplate(templateId: number) {
-    const sourceTemplate = await this.getProposalTemplateMetadata(templateId);
+    const sourceTemplate = await this.getProposalTemplate(templateId);
 
     if (!sourceTemplate) {
       logger.logError(

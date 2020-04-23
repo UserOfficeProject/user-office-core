@@ -1,16 +1,16 @@
 import { Ctx, Query, Resolver, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateMetadata } from '../types/ProposalTemplateMetadata';
+import { ProposalTemplate } from '../types/ProposalTemplate';
 
 @Resolver()
-export class ProposalTemplateQuery {
-  @Query(() => [ProposalTemplateMetadata])
-  proposalTemplatesMetadata(
+export class ProposalTemplatesQuery {
+  @Query(() => [ProposalTemplate])
+  proposalTemplates(
     @Ctx() context: ResolverContext,
     @Arg('isArchived', { nullable: true }) isArchived?: boolean
   ) {
-    return context.queries.template.getProposalTemplatesMetadata(
+    return context.queries.template.getProposalTemplates(
       context.user,
       isArchived || false
     );

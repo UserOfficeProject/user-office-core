@@ -2,12 +2,17 @@ import 'reflect-metadata';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
+  dummyUser,
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import { dummyUser } from '../datasources/mockups/UserDataSource';
-import { DataType, ProposalTemplate, Topic } from '../models/ProposalModel';
-import { ProposalTemplateMetadata, Question } from '../models/ProposalModel';
+import {
+  DataType,
+  ProposalTemplate,
+  Question,
+  TemplateStep,
+  Topic,
+} from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -45,39 +50,33 @@ test('An userofficer can update topic', async () => {
 test('An userofficer can create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const templateMetadata = await mutations.createTemplate(
+  const template = await mutations.createTemplate(
     dummyUserOfficer,
     name,
     description
   );
-  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(true);
-  expect((templateMetadata as ProposalTemplateMetadata).name).toEqual(name);
-  expect((templateMetadata as ProposalTemplateMetadata).description).toEqual(
-    description
-  );
+  expect(template instanceof ProposalTemplate).toBe(true);
+  expect((template as ProposalTemplate).name).toEqual(name);
+  expect((template as ProposalTemplate).description).toEqual(description);
 });
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const templateMetadata = await mutations.createTemplate(
-    dummyUser,
-    name,
-    description
-  );
-  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(false);
+  const template = await mutations.createTemplate(dummyUser, name, description);
+  expect(template instanceof ProposalTemplate).toBe(false);
 });
 
 test('An userofficer can delete template', async () => {
   const id = 1;
-  const templateMetadata = await mutations.deleteTemplate(dummyUserOfficer, id);
-  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(true);
-  expect((templateMetadata as ProposalTemplateMetadata).templateId).toEqual(id);
+  const template = await mutations.deleteTemplate(dummyUserOfficer, id);
+  expect(template instanceof ProposalTemplate).toBe(true);
+  expect((template as ProposalTemplate).templateId).toEqual(id);
 });
 
 test('An user can not delete template', async () => {
   const id = 1;
-  const templateMetadata = await mutations.deleteTemplate(dummyUser, id);
-  expect(templateMetadata instanceof ProposalTemplateMetadata).toBe(false);
+  const template = await mutations.deleteTemplate(dummyUser, id);
+  expect(template instanceof ProposalTemplate).toBe(false);
 });
 
 test('A user can not update topic', async () => {
@@ -91,20 +90,20 @@ test('A user can not update topic', async () => {
 });
 
 test('A user-officer can create topic', async () => {
-  let template = await mutations.createTopic(dummyUserOfficer, {
+  let response = await mutations.createTopic(dummyUserOfficer, {
     templateId: 1,
     sortOrder: 0,
   });
-  expect(template instanceof ProposalTemplate).toBe(true); // getting back new template
-  const numberOfTopics = (template as ProposalTemplate).steps.length;
+  let steps = response as TemplateStep[];
+  expect(isRejection(steps)).toBe(false);
+  const numberOfTopics = steps.length;
 
-  template = await mutations.createTopic(dummyUserOfficer, {
+  response = await mutations.createTopic(dummyUserOfficer, {
     templateId: 1,
     sortOrder: 1,
   });
-  expect((template as ProposalTemplate).steps.length).toEqual(
-    numberOfTopics + 1
-  ); // added new one
+  steps = response as TemplateStep[];
+  expect(steps.length).toEqual(numberOfTopics + 1); // added new one
 });
 
 test('A user can not create topic', async () => {

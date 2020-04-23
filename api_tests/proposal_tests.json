@@ -729,8 +729,8 @@
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createProposalTemplate.error).to.be.eql(null)",
-							"    pm.expect(jsonData.data.createProposalTemplate.templateMetadata.templateId).to.be.above(0)",
-							"    pm.environment.set(\"NEW_TEMPLATE_ID\", jsonData.data.createProposalTemplate.templateMetadata.templateId);",
+							"    pm.expect(jsonData.data.createProposalTemplate.template.templateId).to.be.above(0)",
+							"    pm.environment.set(\"NEW_TEMPLATE_ID\", jsonData.data.createProposalTemplate.template.templateId);",
 							"});",
 							""
 						],
@@ -777,7 +777,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation  ($name: String!, $description: String) {\n  createProposalTemplate(name:$name, description:$description) {\n    templateMetadata {\n      templateId\n      name\n    }\n    error\n  }\n}",
+						"query": "mutation  ($name: String!, $description: String) {\n  createProposalTemplate(name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
 						"variables": "{\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
 					},
 					"options": {
@@ -913,7 +913,7 @@
 							"pm.test(\"Can create topic\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createTopic.error).to.be.eql(null)",
-							"    pm.environment.set(\"NEW_TOPIC_ID\", jsonData.data.createTopic.template.steps[0].topic.topic_id);",
+							"    pm.environment.set(\"NEW_TOPIC_ID\", jsonData.data.createTopic.steps[0].topic.topic_id);",
 							"});",
 							""
 						],
@@ -960,7 +960,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder:0){\n    template {\n      steps {\n        topic {\n            topic_title\n          topic_id\n        }\n      }\n    }\n    error\n  }\n}",
+						"query": "mutation($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder:0){\n      \n      steps {\n          \n        topic {\n            topic_title\n          topic_id\n        }\n      }\n    error\n  }\n}",
 						"variables": "{\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1355,7 +1355,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($questionId:String!, $templateId:Int!, $topicId:Int!, $sortOrder:Int!) {\n  updateQuestionRel(questionId:$questionId, templateId:$templateId, topicId:$topicId, sortOrder:$sortOrder) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question {\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n            }\n          \n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation($questionId:String!, $templateId:Int!, $topicId:Int!, $sortOrder:Int!) {\n  updateQuestionRel(questionId:$questionId, templateId:$templateId, topicId:$topicId, sortOrder:$sortOrder) {\n\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question {\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n            }\n          \n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n          }\n        }\n      }\n       error\n    }\n   \n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"topicId\": {{NEW_TOPIC_ID}},\n\"sortOrder\": 0,\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -3319,7 +3319,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    error\n  }\n}\n",
 						"variables": "{\n        \"questionId\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {

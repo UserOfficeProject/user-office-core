@@ -16,7 +16,6 @@ import {
   Question,
   TemplateStep,
   QuestionRel,
-  ProposalTemplateMetadata,
 } from '../../models/ProposalModel';
 import {
   EmbellishmentConfig,
