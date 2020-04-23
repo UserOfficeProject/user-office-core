@@ -27,7 +27,7 @@ export default class SEPQueries {
     return this.dataSource.getAll(filter, first, offset);
   }
 
-  // @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER])
   async getAssignments(agent: User | null, id: number) {
     return this.dataSource.getAssignments(id);
   }

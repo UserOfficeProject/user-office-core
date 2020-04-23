@@ -9,11 +9,20 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SEPAssignmentsResponseWrap } from '../types/CommonWrappers';
+import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class AssignMembersSEPArgs {
+export class AssignMemberSEPArgs {
+  @Field(() => Int)
+  public memberId: number;
+
+  @Field(() => Int)
+  public sepId: number;
+}
+
+@ArgsType()
+export class AssignSEPChairAndSecretaryArgs {
   @Field(() => [Int])
   public memberIds: number[];
 
@@ -23,14 +32,24 @@ export class AssignMembersSEPArgs {
 
 @Resolver()
 export class AssignMembersToSEPMutation {
-  @Mutation(() => SEPAssignmentsResponseWrap)
-  async assignMembers(
-    @Args() args: AssignMembersSEPArgs,
+  @Mutation(() => SEPResponseWrap)
+  async assignChairAndSecretary(
+    @Args() args: AssignSEPChairAndSecretaryArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignMembers(context.user, args),
-      SEPAssignmentsResponseWrap
+      context.mutations.sep.assignChairAndSecretary(context.user, args),
+      SEPResponseWrap
+    );
+  }
+  @Mutation(() => SEPResponseWrap)
+  async assignMember(
+    @Args() args: AssignMemberSEPArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.sep.assignMember(context.user, args),
+      SEPResponseWrap
     );
   }
 }

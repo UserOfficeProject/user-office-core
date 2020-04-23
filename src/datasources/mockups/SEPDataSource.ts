@@ -108,7 +108,23 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEPAssignments.filter(assignment => assignment.sepId === id);
   }
 
-  async assignMembers(memberIds: number[], sepId: number) {
-    return true;
+  async assignChairAndSecretary(memberIds: number[], sepId: number) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async assignMember(memberId: number, sepId: number) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
   }
 }

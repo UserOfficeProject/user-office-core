@@ -59,7 +59,8 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     await database('role_user')
       .del()
-      .where('sep_id', rolesToInsert[0].sep_id);
+      .where('sep_id', rolesToInsert[0].sep_id)
+      .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
 
     await database.insert(rolesToInsert).into('role_user');
 

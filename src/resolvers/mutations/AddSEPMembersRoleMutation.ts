@@ -10,6 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { UserRole } from '../../models/User';
 import { AddSEPMembersRoleResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
@@ -18,8 +19,8 @@ export class AddSEPMembersRole {
   @Field(() => Int)
   userID: number;
 
-  @Field(() => Int)
-  roleID: number;
+  @Field(() => UserRole)
+  roleID: UserRole;
 
   @Field(() => Int)
   SEPID: number;

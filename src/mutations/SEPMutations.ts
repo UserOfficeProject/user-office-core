@@ -7,7 +7,10 @@ import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AssignMembersSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
+import {
+  AssignMemberSEPArgs,
+  AssignSEPChairAndSecretaryArgs,
+} from '../resolvers/mutations/AssignMembersToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
@@ -25,11 +28,16 @@ const updateSEPValidationSchema = yup.object().shape({
   numberRatingsRequired: yup.number().min(2),
 });
 
-const assignSEPMembersValidationSchema = yup.object().shape({
+const assignSEPChairAndSecretaryValidationSchema = yup.object().shape({
   memberIds: yup
     .array()
     .required()
-    .min(1),
+    .min(2),
+  sepId: yup.number().required(),
+});
+
+const assignSEPMemberValidationSchema = yup.object().shape({
+  memberId: yup.number().required(),
   sepId: yup.number().required(),
 });
 
@@ -89,15 +97,36 @@ export default class SEPMutations {
       });
   }
 
-  // @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPMembersValidationSchema)
-  @EventBus(Event.SEP_UPDATED)
-  async assignMembers(
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(assignSEPChairAndSecretaryValidationSchema)
+  @EventBus(Event.SEP_MEMBERS_ASSIGNED)
+  async assignChairAndSecretary(
     agent: User | null,
-    args: AssignMembersSEPArgs
-  ): Promise<boolean | Rejection> {
+    args: AssignSEPChairAndSecretaryArgs
+  ): Promise<SEP | Rejection> {
     return this.dataSource
-      .assignMembers(args.memberIds, args.sepId)
+      .assignChairAndSecretary(args.memberIds, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not assign members to scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(assignSEPMemberValidationSchema)
+  @EventBus(Event.SEP_MEMBERS_ASSIGNED)
+  async assignMember(
+    agent: User | null,
+    args: AssignMemberSEPArgs
+  ): Promise<SEP | Rejection> {
+    return this.dataSource
+      .assignMember(args.memberId, args.sepId)
       .then(result => result)
       .catch(err => {
         logger.logException(

@@ -388,7 +388,7 @@ export default class UserMutations {
     }
   }
 
-  // @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: User | null, args: AddUserRoleArgs) {
     return this.dataSource
       .addUserRole(args)
@@ -400,7 +400,7 @@ export default class UserMutations {
       });
   }
 
-  // @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER])
   async addSEPMembersRole(agent: User | null, args: AddSEPMembersRole[]) {
     return this.dataSource
       .addSEPMembersRole(args)

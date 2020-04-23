@@ -21,5 +21,6 @@ export interface SEPDataSource {
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getAssignments(id: number): Promise<SEPAssignment[]>;
-  assignMembers(memberIds: number[], sepId: number): Promise<boolean>;
+  assignChairAndSecretary(memberIds: number[], sepId: number): Promise<SEP>;
+  assignMember(memberId: number, sepId: number): Promise<SEP>;
 }
