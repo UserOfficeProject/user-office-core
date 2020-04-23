@@ -62,7 +62,7 @@ export class UpdateQuestionRelMutation {
     args.dependency = this.unpackDependency(args.dependency);
 
     return wrapResponse(
-      context.mutations.proposalAdmin.updateQuestionRel(context.user, args),
+      context.mutations.template.updateQuestionRel(context.user, args),
       ProposalTemplateResponseWrap
     );
   }

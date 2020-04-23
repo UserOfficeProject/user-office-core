@@ -29,7 +29,7 @@ export class DeleteQuestionRelMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposalAdmin.deleteQuestionRel(context.user, args),
+      context.mutations.template.deleteQuestionRel(context.user, args),
       ProposalTemplateResponseWrap
     );
   }

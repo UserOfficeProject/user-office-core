@@ -11,7 +11,7 @@ import { ProposalTemplateMetadata, Question } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import ProposalAdminMutations from './ProposalAdminMutations';
+import TemplateMutations from './TemplateMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
@@ -19,7 +19,7 @@ const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
-const mutations = new ProposalAdminMutations(
+const mutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
   dummyLogger

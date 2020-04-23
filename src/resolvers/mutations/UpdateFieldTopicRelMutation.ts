@@ -41,7 +41,7 @@ export class UpdateFieldTopicRelMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposalAdmin.updateFieldTopicRel(context.user, {
+      context.mutations.template.updateFieldTopicRel(context.user, {
         topicId: args.topicId,
         fieldIds: args.fieldIds,
         templateId: args.templateId,

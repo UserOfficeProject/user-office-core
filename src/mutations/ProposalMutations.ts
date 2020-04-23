@@ -1,7 +1,7 @@
 import { to } from 'await-to-js';
 
-import { ProposalAdminDataSource } from '../datasources/ProposalAdminDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { EventBus, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
@@ -18,7 +18,7 @@ import { CallDataSource } from './../datasources/CallDataSource';
 export default class ProposalMutations {
   constructor(
     private proposalDataSource: ProposalDataSource,
-    private proposalAdminDataSource: ProposalAdminDataSource,
+    private templateDataSource: TemplateDataSource,
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
@@ -143,7 +143,7 @@ export default class ProposalMutations {
     if (answers !== undefined) {
       for (const answer of answers) {
         if (answer.value !== undefined) {
-          const questionRel = await this.proposalAdminDataSource.getQuestionRel(
+          const questionRel = await this.templateDataSource.getQuestionRel(
             answer.proposal_question_id,
             proposal.templateId
           );

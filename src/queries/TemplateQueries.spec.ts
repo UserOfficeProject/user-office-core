@@ -5,10 +5,10 @@ import {
   dummyUserOfficer,
 } from '../datasources/mockups/UserDataSource';
 import { ProposalTemplate } from '../models/ProposalModel';
-import ProposalAdminQueries from './ProposalAdminQueries';
+import TemplateQueries from './TemplateQueries';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
-const templateQueries = new ProposalAdminQueries(dummyTemplateDataSource);
+const templateQueries = new TemplateQueries(dummyTemplateDataSource);
 beforeEach(() => {
   dummyTemplateDataSource.init();
 });

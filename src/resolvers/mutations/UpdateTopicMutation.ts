@@ -29,7 +29,7 @@ export class UpdateTopicMutation {
   @Mutation(() => TopicResponseWrap)
   updateTopic(@Args() args: UpdateTopicArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.proposalAdmin.updateTopic(context.user, args),
+      context.mutations.template.updateTopic(context.user, args),
       TopicResponseWrap
     );
   }

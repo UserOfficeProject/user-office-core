@@ -12,7 +12,7 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateMetadataArgs } from '../../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
-import { ProposalAdminDataSource } from '../ProposalAdminDataSource';
+import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
 import database from './database';
@@ -27,8 +27,7 @@ import {
   TopicRecord,
 } from './records';
 
-export default class PostgresProposalAdminDataSource
-  implements ProposalAdminDataSource {
+export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createTemplate(
     name: string,
     description?: string

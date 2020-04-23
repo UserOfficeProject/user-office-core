@@ -1,4 +1,4 @@
-import { ProposalAdminDataSource } from '../datasources/ProposalAdminDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import {
   createConfig,
@@ -28,9 +28,9 @@ import {
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
-export default class ProposalAdminMutations {
+export default class TemplateMutations {
   constructor(
-    private dataSource: ProposalAdminDataSource,
+    private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
   ) {}

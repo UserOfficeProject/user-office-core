@@ -12,7 +12,7 @@ import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelM
 import { UpdateProposalTemplateMetadataArgs } from '../resolvers/mutations/UpdateProposalTemplateMetadataMutation';
 import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
 
-export interface ProposalAdminDataSource {
+export interface TemplateDataSource {
   // Template
   createTemplate(
     name: string,
