@@ -69,4 +69,104 @@ context('Scientific evaluation panel tests', () => {
     SEPsTable.should('contain', code);
     SEPsTable.should('contain', description);
   });
+
+  it('Officer should be able to assign SEP Chair and SEP Secretary to existing SEP', () => {
+    let selectedChairUser = '';
+    let selectedSecretaryUser = '';
+
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('[id="mui-component-select-SEPChair"]').click();
+
+    cy.get('.MuiMenu-list')
+      .find('[data-value="1"]')
+      .then(element => {
+        selectedChairUser = element.text();
+      });
+
+    cy.get('.MuiMenu-list [data-value="1"]').click();
+
+    cy.get('[id="mui-component-select-SEPSecretary"]').click();
+    cy.get('.MuiMenu-list')
+      .find('[data-value="2"]')
+      .then(element => {
+        selectedSecretaryUser = element.text();
+      });
+    cy.get('.MuiMenu-list [data-value="2"]').click();
+
+    cy.contains('Save SEP Members').click();
+
+    cy.wait(1000);
+
+    cy.contains('Logs').click();
+
+    cy.wait(1000);
+
+    cy.contains('SEP_MEMBERS_ASSIGNED');
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('[id="mui-component-select-SEPChair"]').should(element => {
+      expect(selectedChairUser).to.equal(element.text());
+    });
+
+    cy.get('[id="mui-component-select-SEPSecretary"]').should(element => {
+      expect(selectedSecretaryUser).to.equal(element.text());
+    });
+  });
+
+  it('Officer should be able to assign SEP Reviewers to existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('User Officer').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Add Member"]').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Select user"]').click();
+
+    cy.wait(1000);
+
+    cy.contains('Logs').click();
+
+    cy.wait(1000);
+
+    cy.contains('SEP_MEMBERS_ASSIGNED');
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="sep-reviewers-table"]')
+      .find('tbody td')
+      .should('have.length', 3);
+
+    cy.get('[data-cy="sep-reviewers-table"]')
+      .find('tbody td')
+      .first()
+      .then(element => {
+        expect(element.text()).length.to.be.greaterThan(0);
+      });
+  });
 });

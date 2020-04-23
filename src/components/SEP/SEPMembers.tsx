@@ -68,14 +68,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const initializeValues = (assignments: SepAssignment[]): void => {
     assignments.forEach(assignment => {
       assignment.roles.forEach(role => {
-        switch (role.shortCode) {
-          case 'SEP_Chair':
+        switch (role.shortCode.toUpperCase()) {
+          case UserRole.SEP_CHAIR:
             initialValues.SEPChair = assignment.sepMemberUserId.toString();
             break;
-          case 'SEP_Secretary':
+          case UserRole.SEP_SECRETARY:
             initialValues.SEPSecretary = assignment.sepMemberUserId.toString();
             break;
-          case 'SEP_Member':
+          case UserRole.SEP_MEMBER:
             initialValues.SEPReviewers.push(assignment.user);
             break;
           default:
@@ -85,74 +85,84 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     });
   };
 
-  const assignRolesToSEPMembers = (
+  const assignChairAndSecretaryToSEP = (
     values: SEPMemberAssignments
-  ): AddSepMembersRole[] => {
+  ): [number[], AddSepMembersRole[]] => {
+    const memberIds = [];
     const roleValues = [];
 
     if (values.SEPChair) {
-      roleValues.push({ userID: +values.SEPChair, roleID: 4, SEPID: sepId });
-    }
+      memberIds.push(+values.SEPChair);
 
-    if (values.SEPSecretary) {
       roleValues.push({
-        userID: +values.SEPSecretary,
-        roleID: 5,
+        userID: +values.SEPChair,
+        roleID: UserRole.SEP_CHAIR,
         SEPID: sepId,
       });
     }
 
-    if (values.SEPReviewers && values.SEPReviewers.length > 0) {
-      values.SEPReviewers.forEach(sepReviewer => {
-        roleValues.push({ userID: sepReviewer.id, roleID: 6, SEPID: sepId });
-      });
-    }
-
-    return roleValues;
-  };
-
-  const assignMembersToSEP = (values: SEPMemberAssignments): number[] => {
-    let memberIds = [];
-
-    if (values.SEPChair) {
-      memberIds.push(+values.SEPChair);
-    }
-
     if (values.SEPSecretary) {
       memberIds.push(+values.SEPSecretary);
-    }
 
-    if (values.SEPReviewers && values.SEPReviewers.length > 0) {
-      memberIds = memberIds.concat([
-        ...values.SEPReviewers.map(reviewer => reviewer.id),
-      ]);
-    }
-
-    return memberIds;
-  };
-
-  const sendSEPMembersUpdate = (values: SEPMemberAssignments): void => {
-    const memberIds = assignMembersToSEP(values);
-
-    api()
-      .assignMembers({ memberIds, sepId })
-      .then(() => {
-        const roleValues = assignRolesToSEPMembers(values);
-
-        api()
-          .addSEPMembersRole({ addSEPMembersRole: roleValues })
-          .then(result => {
-            setOpen(false);
-            enqueueSnackbar('Updated Information', {
-              variant: result.addSEPMembersRole.error ? 'error' : 'success',
-            });
-          });
+      roleValues.push({
+        userID: +values.SEPSecretary,
+        roleID: UserRole.SEP_SECRETARY,
+        SEPID: sepId,
       });
+    }
+
+    return [memberIds, roleValues];
   };
 
-  const addUser = async (user: BasicUserDetails): Promise<void> => {
+  const showNotification = (isError: boolean): void => {
+    setOpen(false);
+    enqueueSnackbar('Updated Information', {
+      variant: isError ? 'error' : 'success',
+    });
+  };
+
+  const sendSEPChairAndSecretaryUpdate = async (
+    values: SEPMemberAssignments
+  ): Promise<void> => {
+    const [memberIds, roleValues] = assignChairAndSecretaryToSEP(values);
+
+    const assignChairAndSecretaryResult = await api().assignChairAndSecretary({
+      memberIds,
+      sepId,
+    });
+
+    const SEPMembersRoleResult = await api().addSEPMembersRole({
+      addSEPMembersRole: roleValues,
+    });
+
+    showNotification(
+      !!assignChairAndSecretaryResult.assignChairAndSecretary.error ||
+        !!SEPMembersRoleResult.addSEPMembersRole.error
+    );
+  };
+
+  const addMember = async (user: BasicUserDetails): Promise<void> => {
     initialValues.SEPReviewers.push(user);
-    sendSEPMembersUpdate(initialValues);
+
+    const assignedMembersResult = await api().assignMember({
+      memberId: user.id,
+      sepId,
+    });
+
+    const SEPMembersRoleResult = await api().addSEPMembersRole({
+      addSEPMembersRole: [
+        {
+          userID: user.id,
+          roleID: UserRole.SEP_MEMBER,
+          SEPID: sepId,
+        },
+      ],
+    });
+
+    showNotification(
+      !!assignedMembersResult.assignMember.error ||
+        !!SEPMembersRoleResult.addSEPMembersRole.error
+    );
   };
 
   if (!usersData || loading || loadingAssignments) {
@@ -177,7 +187,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       <ParticipantModal
         show={modalOpen}
         close={(): void => setOpen(false)}
-        addParticipant={addUser}
+        addParticipant={addMember}
         selectedUsers={initialValues.SEPReviewers.map(reviewer => reviewer.id)}
         title={'Reviewer'}
         userRole={UserRole.REVIEWER}
@@ -187,11 +197,11 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         validateOnBlur={false}
         initialValues={initialValues}
         onSubmit={(values, actions): void => {
-          sendSEPMembersUpdate(values);
+          sendSEPChairAndSecretaryUpdate(values);
           actions.setSubmitting(false);
         }}
       >
-        {({ isSubmitting }): JSX.Element => (
+        {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography variant="h6" gutterBottom>
               SEP Members
@@ -203,6 +213,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   label="SEP Chair"
                   items={usersForDropdown}
                   required
+                  data-cy="sep-chair"
                 />
               </Grid>
               <Grid item xs={6}>
@@ -215,7 +226,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
               </Grid>
             </Grid>
             <Grid container spacing={3}>
-              <div data-cy="sep-reviewers-table" style={{ width: '100%' }}>
+              <Grid data-cy="sep-reviewers-table" item xs={12}>
                 <MaterialTable
                   icons={tableIcons}
                   title={'Reviewers'}
@@ -233,11 +244,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                     },
                   ]}
                 />
-              </div>
+              </Grid>
             </Grid>
             <ButtonContainer>
               <Button
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  JSON.stringify(values) === JSON.stringify(initialValues)
+                }
                 type="submit"
                 variant="contained"
                 color="primary"

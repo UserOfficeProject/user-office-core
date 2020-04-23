@@ -15,7 +15,7 @@ export type Scalars = {
 
 export type AddSepMembersRole = {
   userID: Scalars['Int'],
-  roleID: Scalars['Int'],
+  roleID: UserRole,
   SEPID: Scalars['Int'],
 };
 
@@ -201,18 +201,19 @@ export type Mutation = {
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
-  assignMembers: SepAssignmentsResponseWrap,
+  assignChairAndSecretary: SepResponseWrap,
+  assignMember: SepResponseWrap,
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
   updateProposalTemplateField: ProposalTemplateResponseWrap,
   updateTopic: TopicResponseWrap,
+  addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
   addSEPMembersRole: AddSepMembersRoleResponseWrap,
-  addUserRole: AddUserRoleResponseWrap,
   createProposal: ProposalResponseWrap,
   createTopic: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
@@ -292,8 +293,14 @@ export type MutationAddUserForReviewArgs = {
 };
 
 
-export type MutationAssignMembersArgs = {
+export type MutationAssignChairAndSecretaryArgs = {
   memberIds: Array<Scalars['Int']>,
+  sepId: Scalars['Int']
+};
+
+
+export type MutationAssignMemberArgs = {
+  memberId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -335,6 +342,12 @@ export type MutationUpdateTopicArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>
+};
+
+
+export type MutationAddUserRoleArgs = {
+  userID: Scalars['Int'],
+  roleID: Scalars['Int']
 };
 
 
@@ -400,12 +413,6 @@ export type MutationAddClientLogArgs = {
 
 export type MutationAddSepMembersRoleArgs = {
   addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
-};
-
-
-export type MutationAddUserRoleArgs = {
-  userID: Scalars['Int'],
-  roleID: Scalars['Int']
 };
 
 
@@ -811,12 +818,6 @@ export type SepAssignment = {
   user: BasicUserDetails,
 };
 
-export type SepAssignmentsResponseWrap = {
-   __typename?: 'SEPAssignmentsResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  success?: Maybe<Scalars['Boolean']>,
-};
-
 export type SepResponseWrap = {
    __typename?: 'SEPResponseWrap',
   error?: Maybe<Scalars['String']>,
@@ -983,17 +984,39 @@ export type AddSepMembersRoleMutation = (
   ) }
 );
 
-export type AssignMembersMutationVariables = {
+export type AssignMemberMutationVariables = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type AssignMemberMutation = (
+  { __typename?: 'Mutation' }
+  & { assignMember: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
+export type AssignChairAndSecretaryMutationVariables = {
   memberIds: Array<Scalars['Int']>,
   sepId: Scalars['Int']
 };
 
 
-export type AssignMembersMutation = (
+export type AssignChairAndSecretaryMutation = (
   { __typename?: 'Mutation' }
-  & { assignMembers: (
-    { __typename?: 'SEPAssignmentsResponseWrap' }
-    & Pick<SepAssignmentsResponseWrap, 'error' | 'success'>
+  & { assignChairAndSecretary: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
   ) }
 );
 
@@ -2270,11 +2293,23 @@ export const AddSepMembersRoleDocument = gql`
   }
 }
     `;
-export const AssignMembersDocument = gql`
-    mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
-  assignMembers(memberIds: $memberIds, sepId: $sepId) {
+export const AssignMemberDocument = gql`
+    mutation assignMember($memberId: Int!, $sepId: Int!) {
+  assignMember(memberId: $memberId, sepId: $sepId) {
     error
-    success
+    sep {
+      id
+    }
+  }
+}
+    `;
+export const AssignChairAndSecretaryDocument = gql`
+    mutation assignChairAndSecretary($memberIds: [Int!]!, $sepId: Int!) {
+  assignChairAndSecretary(memberIds: $memberIds, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
   }
 }
     `;
@@ -3000,8 +3035,11 @@ export function getSdk(client: GraphQLClient) {
     addSEPMembersRole(variables: AddSepMembersRoleMutationVariables): Promise<AddSepMembersRoleMutation> {
       return client.request<AddSepMembersRoleMutation>(print(AddSepMembersRoleDocument), variables);
     },
-    assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
-      return client.request<AssignMembersMutation>(print(AssignMembersDocument), variables);
+    assignMember(variables: AssignMemberMutationVariables): Promise<AssignMemberMutation> {
+      return client.request<AssignMemberMutation>(print(AssignMemberDocument), variables);
+    },
+    assignChairAndSecretary(variables: AssignChairAndSecretaryMutationVariables): Promise<AssignChairAndSecretaryMutation> {
+      return client.request<AssignChairAndSecretaryMutation>(print(AssignChairAndSecretaryDocument), variables);
     },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
