@@ -177,7 +177,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async updateQuestion(
-    fieldId: string,
+    questionId: string,
     values: {
       naturalKey?: string;
       dataType?: string;
@@ -195,9 +195,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     await database
       .update(rows, ['*'])
       .from('proposal_questions')
-      .where('proposal_question_id', fieldId);
+      .where('proposal_question_id', questionId);
 
-    const question = await this.getQuestion(fieldId);
+    const question = await this.getQuestion(questionId);
     if (!question) {
       throw new Error('Could not update field');
     }
@@ -297,20 +297,20 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async createQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<TemplateStep[]> {
     await database('proposal_question__proposal_template__rels').insert({
-      proposal_question_id: fieldId,
+      proposal_question_id: questionId,
       template_id: templateId,
     });
 
     return this.getProposalTemplateSteps(templateId);
   }
 
-  async getQuestion(fieldId: string): Promise<Question | null> {
+  async getQuestion(questionId: string): Promise<Question | null> {
     return database('proposal_questions')
-      .where({ proposal_question_id: fieldId })
+      .where({ proposal_question_id: questionId })
       .select('*')
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length === 0) {
@@ -322,12 +322,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async getQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<QuestionRel | null> {
     return database('proposal_question__proposal_template__rels')
       .where({
-        'proposal_question__proposal_template__rels.proposal_question_id': fieldId,
+        'proposal_question__proposal_template__rels.proposal_question_id': questionId,
       })
       .andWhere({
         'proposal_question__proposal_template__rels.template_id': templateId,
@@ -353,16 +353,16 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       );
   }
 
-  async deleteQuestion(fieldId: string): Promise<Question> {
+  async deleteQuestion(questionId: string): Promise<Question> {
     const [error, row] = await to(
       database('proposal_questions')
-        .where({ proposal_question_id: fieldId })
+        .where({ proposal_question_id: questionId })
         .returning('*')
         .del()
     );
     if (error || row?.length !== 1) {
-      logger.logError('Could not delete question', { fieldId });
-      throw new Error(`Could not delete question ${fieldId}`);
+      logger.logError('Could not delete question', { fieldId: questionId });
+      throw new Error(`Could not delete question ${questionId}`);
     }
 
     return createQuestionObject(row[0]);
@@ -389,13 +389,13 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return this.getProposalTemplateSteps(args.templateId);
   }
 
-  async deleteTopic(id: number): Promise<Topic> {
+  async deleteTopic(topicId: number): Promise<Topic> {
     return database('proposal_topics')
-      .where({ topic_id: id })
+      .where({ topic_id: topicId })
       .del(['*'])
       .then((result: TopicRecord[]) => {
         if (!result || result.length !== 1) {
-          throw new Error(`Could not delete topic ${id}`);
+          throw new Error(`Could not delete topic ${topicId}`);
         }
 
         return createTopicObject(result[0]);
@@ -412,9 +412,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return topicOrder;
   }
 
-  isNaturalKeyPresent(natural_key: string): Promise<boolean> {
+  isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
     return database('proposal_questions')
-      .where({ natural_key })
+      .where({ natural_key: naturalKey })
       .select('natural_key')
       .then((result: []) => result.length > 0);
   }

@@ -26,14 +26,14 @@ export interface TemplateDataSource {
   getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   // TemplateField
   createQuestion(
-    fieldId: string,
+    questionId: string,
     naturalKey: string,
     dataType: DataType,
     question: string,
     config: string
   ): Promise<Question>;
 
-  getQuestion(fieldId: string): Promise<Question | null>;
+  getQuestion(questionId: string): Promise<Question | null>;
   updateQuestion(
     questionId: string,
     values: {
@@ -43,16 +43,16 @@ export interface TemplateDataSource {
       config?: string;
     }
   ): Promise<Question>;
-  deleteQuestion(fieldId: string): Promise<Question>;
+  deleteQuestion(questionId: string): Promise<Question>;
 
   // TemplateField rel
   createQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<TemplateStep[]>;
 
   getQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<QuestionRel | null>;
 
@@ -70,7 +70,7 @@ export interface TemplateDataSource {
 
   createQuestionAndRel(
     templateId: number,
-    fieldId: string,
+    questionId: string,
     naturalKey: string,
     topicId: number,
     dataType: DataType,
@@ -81,12 +81,12 @@ export interface TemplateDataSource {
   // Topic
   createTopic(args: CreateTopicArgs): Promise<TemplateStep[]>;
   updateTopic(
-    id: number,
+    topicId: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
   ): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
 
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
-  isNaturalKeyPresent(natural_key: string): Promise<boolean>;
+  isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
 }

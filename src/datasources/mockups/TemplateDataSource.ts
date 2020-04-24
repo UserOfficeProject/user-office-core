@@ -127,17 +127,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return createDummyProposalTemplate(values);
   }
   async createQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<TemplateStep[]> {
     return createDummyTemplateSteps();
   }
   async getQuestionRel(
-    fieldId: string,
+    questionId: string,
     templateId: number
   ): Promise<QuestionRel | null> {
     return createDummyQuestionRel({
-      question: { proposalQuestionId: fieldId },
+      question: { proposalQuestionId: questionId },
     });
   }
   async deleteQuestionRel(
@@ -147,7 +147,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
   async createQuestionAndRel(
     templateId: number,
-    fieldId: string,
+    questionId: string,
     naturalKey: string,
     topicId: number,
     dataType: DataType,
@@ -202,7 +202,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return createDummyTopic(id, {});
   }
   async createQuestion(
-    fieldId: string,
+    questionId: string,
     naturalKey: string,
     dataType: DataType,
     question: string
@@ -210,17 +210,17 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return createDummyQuestion({
       naturalKey: naturalKey,
       dataType: dataType,
-      proposalQuestionId: fieldId,
+      proposalQuestionId: questionId,
       question,
     });
   }
 
-  async getQuestion(fieldId: string): Promise<Question | null> {
-    return createDummyQuestion({ proposalQuestionId: fieldId });
+  async getQuestion(questionId: string): Promise<Question | null> {
+    return createDummyQuestion({ proposalQuestionId: questionId });
   }
 
-  async deleteQuestion(fieldId: string): Promise<Question> {
-    return createDummyQuestion({ proposalQuestionId: fieldId });
+  async deleteQuestion(questionId: string): Promise<Question> {
+    return createDummyQuestion({ proposalQuestionId: questionId });
   }
   async updateQuestion(
     questionId: string,
@@ -246,11 +246,11 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async updateTopic(
-    id: number,
+    topicId: number,
     values: { title?: string; isEnabled?: boolean }
   ): Promise<Topic> {
     return new Topic(
-      id,
+      topicId,
       values.title || 'Topic title',
       3,
       values.isEnabled !== undefined ? values.isEnabled : true
