@@ -43,8 +43,8 @@ test('An userofficer can update topic', async () => {
     isEnabled: topicEnabled,
   });
   expect(topic instanceof Topic).toBe(true);
-  expect((topic as Topic).topic_title).toEqual(newTopicTitle);
-  expect((topic as Topic).is_enabled).toEqual(topicEnabled);
+  expect((topic as Topic).title).toEqual(newTopicTitle);
+  expect((topic as Topic).isEnabled).toEqual(topicEnabled);
 });
 
 test('An userofficer can create template', async () => {

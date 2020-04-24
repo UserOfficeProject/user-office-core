@@ -51,8 +51,8 @@ function tryUpdateProposal(user: User, proposalId: number) {
       'Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.',
     answers: [
       {
-        proposal_question_id: 'fasta_seq',
-        data_type: DataType.TEXT_INPUT,
+        proposalQuestionId: 'fasta_seq',
+        dataType: DataType.TEXT_INPUT,
         value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}',
       },
     ],

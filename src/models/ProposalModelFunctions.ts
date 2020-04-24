@@ -24,7 +24,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
   }
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  const step = collection.find(step => step.topic.topic_id === topicId);
+  const step = collection.find(step => step.topic.id === topicId);
 
   return step ? step.topic : undefined;
 }
@@ -32,7 +32,7 @@ export function getQuestionaryStepByTopicId(
   collection: AbstractCollection,
   topicId: number
 ) {
-  return collection.find(step => step.topic.topic_id === topicId);
+  return collection.find(step => step.topic.id === topicId);
 }
 export function getFieldById(
   collection: AbstractCollection,

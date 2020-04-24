@@ -42,10 +42,10 @@ export enum DataType {
 
 export class Topic {
   constructor(
-    public topic_id: number,
-    public topic_title: string,
-    public sort_order: number,
-    public is_enabled: boolean
+    public id: number,
+    public title: string,
+    public sortOrder: number,
+    public isEnabled: boolean
   ) {}
 
   public static fromObject(obj: any) {

@@ -913,7 +913,7 @@
 							"pm.test(\"Can create topic\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createTopic.error).to.be.eql(null)",
-							"    pm.environment.set(\"NEW_TOPIC_ID\", jsonData.data.createTopic.steps[0].topic.topic_id);",
+							"    pm.environment.set(\"NEW_TOPIC_ID\", jsonData.data.createTopic.steps[0].topic.id);",
 							"});",
 							""
 						],
@@ -960,7 +960,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder:0){\n      \n      steps {\n          \n        topic {\n            topic_title\n          topic_id\n        }\n      }\n    error\n  }\n}",
+						"query": "mutation($templateId: Int!) {\n  createTopic(templateId: $templateId, sortOrder:0){\n      \n      steps {\n          \n        topic {\n            title\n          id\n        }\n      }\n    error\n  }\n}",
 						"variables": "{\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1042,7 +1042,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {\n    topic {\n      topic_title\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {\n    topic {\n      title\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"title\": \"{{$randomWord}}\",\n        \"topicId\": {{NEW_TOPIC_ID}}\n    }"
 					}
 				},
@@ -1355,7 +1355,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($questionId:String!, $templateId:Int!, $topicId:Int!, $sortOrder:Int!) {\n  updateQuestionRel(questionId:$questionId, templateId:$templateId, topicId:$topicId, sortOrder:$sortOrder) {\n\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question {\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n            }\n          \n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n          }\n        }\n      }\n       error\n    }\n   \n}\n",
+						"query": "mutation($questionId:String!, $templateId:Int!, $topicId:Int!, $sortOrder:Int!) {\n  updateQuestionRel(questionId:$questionId, templateId:$templateId, topicId:$topicId, sortOrder:$sortOrder) {\n\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n            question {\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n            }\n          \n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n          }\n        }\n      }\n       error\n    }\n   \n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"topicId\": {{NEW_TOPIC_ID}},\n\"sortOrder\": 0,\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1560,7 +1560,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($callId:Int!) {\nblankProposal(callId:$callId) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        topic_title\n        topic_id\n      }\n      isCompleted\n      fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config\n            {\n              ... on BooleanConfig {\n                required\n              }\n            }\n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
+						"query": "query($callId:Int!) {\nblankProposal(callId:$callId) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        title\n        id\n      }\n      isCompleted\n      fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config\n            {\n              ... on BooleanConfig {\n                required\n              }\n            }\n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
@@ -1664,7 +1664,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            topic_title\n            topic_id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
@@ -1763,7 +1763,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
+						"query": "query ($id: Int!) {\n  proposal(id: $id) {\n    id\n    title\n    abstract\n    status\n    users {\n      firstname\n      lastname\n      id\n    }\n    questionary {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          value\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    reviews {\n      id\n      comment\n      status\n      reviewer {\n        firstname\n        lastname\n        id\n      }\n    }\n  }\n}\n",
 						"variables": "{\n\t\"id\":{{NEW_PROPOSAL_ID}}\n}"
 					},
 					"options": {
@@ -1864,7 +1864,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "mutation ($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $users: [Int!]) {\n      updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\",\n        \"answers\": [{\"proposal_question_id\": \"{{NEW_FIELD_ID}}\", \"data_type\": \"FILE_UPLOAD\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
+						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\",\n        \"answers\": [{\"proposalQuestionId\": \"{{NEW_FIELD_ID}}\", \"dataType\": \"FILE_UPLOAD\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
 					},
 					"options": {
 						"graphql": {}
@@ -3319,7 +3319,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n\n      steps {\n        topic {\n          topic_title\n          topic_id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n            question{\n                proposalQuestionId\n          dataType\n          question\n          config\n          {\n            ... on TextInputConfig {\n                required\n            }\n          }\n            }\n          \n          \n        }\n      }\n    error\n  }\n}\n",
 						"variables": "{\n        \"questionId\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {

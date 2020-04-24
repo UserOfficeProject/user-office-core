@@ -158,10 +158,7 @@ const createProposalPDF = async (
     questionary.steps.forEach(x => {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(
-        questionary.steps,
-        x.topic.topic_id
-      );
+      const step = getQuestionaryStepByTopicId(questionary.steps, x.topic.id);
       const activeFields = step
         ? (step.fields.filter(field => {
             return areDependenciesSatisfied(
@@ -173,9 +170,9 @@ const createProposalPDF = async (
       if (!step) {
         throw 'Could not download generated PDF';
       }
-      writeBold(step.topic.topic_title, doc);
+      writeBold(step.topic.title, doc);
       toc.push({
-        title: step.topic.topic_title,
+        title: step.topic.title,
         page: pageNumber,
         children: [],
       });

@@ -144,12 +144,12 @@ export default class ProposalMutations {
       for (const answer of answers) {
         if (answer.value !== undefined) {
           const questionRel = await this.templateDataSource.getQuestionRel(
-            answer.proposal_question_id,
+            answer.proposalQuestionId,
             proposal.templateId
           );
           if (!questionRel) {
             logger.logError('Could not find questionRel', {
-              proposalQuestionId: answer.proposal_question_id,
+              proposalQuestionId: answer.proposalQuestionId,
               templateId: proposal.templateId,
             });
 
@@ -168,7 +168,7 @@ export default class ProposalMutations {
           }
           await this.proposalDataSource.updateAnswer(
             proposal?.id,
-            answer.proposal_question_id,
+            answer.proposalQuestionId,
             answer.value
           );
         }
