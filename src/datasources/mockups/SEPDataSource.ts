@@ -1,4 +1,4 @@
-import { SEP } from '../../models/SEP';
+import { SEP, SEPAssignment } from '../../models/SEP';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -26,6 +26,31 @@ export const dummySEPWithoutCode = new SEP(
 );
 
 export const dummySEPs = [dummySEP, anotherDummySEP];
+
+export const dummySEPAssignment = new SEPAssignment(
+  null,
+  2,
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false
+);
+
+export const anotherDummySEPAssignment = new SEPAssignment(
+  null,
+  3,
+  2,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false
+);
+
+export const dummySEPAssignments = [
+  dummySEPAssignment,
+  anotherDummySEPAssignment,
+];
 
 export class SEPDataSourceMock implements SEPDataSource {
   async create(
@@ -77,5 +102,39 @@ export class SEPDataSourceMock implements SEPDataSource {
     }
 
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
+  }
+
+  async getAssignments(id: number) {
+    return dummySEPAssignments.filter(assignment => assignment.sepId === id);
+  }
+
+  async assignChairAndSecretary(memberIds: number[], sepId: number) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async assignMember(memberId: number, sepId: number) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeMember(memberId: number, sepId: number) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
   }
 }

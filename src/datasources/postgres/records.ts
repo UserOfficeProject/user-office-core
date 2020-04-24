@@ -174,6 +174,16 @@ export interface SEPRecord {
   readonly full_count: number;
 }
 
+export interface SEPAssignmentRecord {
+  readonly proposal_id: number;
+  readonly sep_member_user_id: number;
+  readonly sep_id: number;
+  readonly date_assigned: Date;
+  readonly reassigned: boolean;
+  readonly date_reassigned: Date;
+  readonly email_sent: boolean;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

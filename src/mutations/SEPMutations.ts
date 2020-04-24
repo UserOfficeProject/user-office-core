@@ -7,6 +7,10 @@ import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import {
+  UpdateMemberSEPArgs,
+  AssignSEPChairAndSecretaryArgs,
+} from '../resolvers/mutations/AssignMembersToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
@@ -22,6 +26,19 @@ const updateSEPValidationSchema = yup.object().shape({
   code: yup.string().required(),
   description: yup.string().required(),
   numberRatingsRequired: yup.number().min(2),
+});
+
+const assignSEPChairAndSecretaryValidationSchema = yup.object().shape({
+  memberIds: yup
+    .array()
+    .required()
+    .min(2),
+  sepId: yup.number().required(),
+});
+
+const updateSEPMemberValidationSchema = yup.object().shape({
+  memberId: yup.number().required(),
+  sepId: yup.number().required(),
 });
 
 export default class SEPMutations {
@@ -72,6 +89,69 @@ export default class SEPMutations {
       .catch(err => {
         logger.logException(
           'Could not update scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(assignSEPChairAndSecretaryValidationSchema)
+  @EventBus(Event.SEP_MEMBERS_ASSIGNED)
+  async assignChairAndSecretary(
+    agent: User | null,
+    args: AssignSEPChairAndSecretaryArgs
+  ): Promise<SEP | Rejection> {
+    return this.dataSource
+      .assignChairAndSecretary(args.memberIds, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not assign members to scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(updateSEPMemberValidationSchema)
+  @EventBus(Event.SEP_MEMBERS_ASSIGNED)
+  async assignMember(
+    agent: User | null,
+    args: UpdateMemberSEPArgs
+  ): Promise<SEP | Rejection> {
+    return this.dataSource
+      .assignMember(args.memberId, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not assign member to scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(updateSEPMemberValidationSchema)
+  @EventBus(Event.SEP_MEMBER_REMOVED)
+  async removeMember(
+    agent: User | null,
+    args: UpdateMemberSEPArgs
+  ): Promise<SEP | Rejection> {
+    return this.dataSource
+      .removeMember(args.memberId, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not remove member from scientific evaluation panel',
           err,
           { agent }
         );

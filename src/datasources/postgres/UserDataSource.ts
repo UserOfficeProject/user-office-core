@@ -4,11 +4,18 @@ import { Transaction } from 'knex';
 
 import { Role } from '../../models/Role';
 import { User, BasicUserDetails } from '../../models/User';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { RemoveSEPMemberRole } from '../../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
-import { UserRecord, createUserObject, createBasicUserObject } from './records';
+import {
+  UserRecord,
+  createUserObject,
+  createBasicUserObject,
+  RoleRecord,
+} from './records';
 
 export default class PostgresUserDataSource implements UserDataSource {
   delete(id: number): Promise<User | null> {
@@ -25,6 +32,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         return createUserObject(user[0]);
       });
   }
+
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     const { userID, roleID } = args;
 
@@ -38,6 +46,37 @@ export default class PostgresUserDataSource implements UserDataSource {
         return true;
       });
   }
+
+  async addSEPMembersRole(
+    usersWithRoles: AddSEPMembersRole[]
+  ): Promise<boolean> {
+    const rolesToInsert = usersWithRoles.map(userWithRole => {
+      return {
+        user_id: userWithRole.userID,
+        role_id: userWithRole.roleID,
+        sep_id: userWithRole.SEPID,
+      };
+    });
+
+    await database('role_user')
+      .del()
+      .where('sep_id', rolesToInsert[0].sep_id)
+      .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
+
+    await database.insert(rolesToInsert).into('role_user');
+
+    return true;
+  }
+
+  async removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean> {
+    await database('role_user')
+      .del()
+      .where('sep_id', args.sepId)
+      .andWhere('user_id', args.memberId);
+
+    return true;
+  }
+
   checkEmailExist(email: string): Promise<boolean> {
     return database
       .select()
@@ -45,7 +84,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .where('email', 'ilike', email)
       .andWhere('placeholder', false)
       .first()
-      .then((user: any) => (user ? true : false));
+      .then((user: UserRecord) => (user ? true : false));
   }
 
   checkOrcIDExist(orcID: string): Promise<boolean> {
@@ -54,7 +93,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('orcid', orcID)
       .first()
-      .then((user: any) => (user ? true : false));
+      .then((user: UserRecord) => (user ? true : false));
   }
 
   getPasswordByEmail(email: string): Promise<string | null> {
@@ -63,7 +102,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .from('users')
       .where('email', 'ilike', email)
       .first()
-      .then((user: any) => (user ? user.password : null));
+      .then((user: UserRecord) => (user ? user.password : null));
   }
 
   getPasswordByUsername(username: string): Promise<string | null> {
@@ -148,14 +187,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       })
       .returning(['user_id'])
       .into('users')
-      .then((user: any[]) => user[0].user_id);
+      .then((user: UserRecord[]) => user[0].user_id);
   }
 
   async getRoles(): Promise<Role[]> {
     return database
       .select()
       .from('roles')
-      .then((roles: any[]) =>
+      .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );
   }
@@ -167,7 +206,20 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
-      .then((roles: any[]) =>
+      .then((roles: RoleRecord[]) =>
+        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+      );
+  }
+
+  async getSEPUserRoles(id: number, sepId: number): Promise<Role[]> {
+    return database
+      .select()
+      .from('roles as r')
+      .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
+      .join('users as u', { 'u.user_id': 'rc.user_id' })
+      .where('u.user_id', id)
+      .andWhere('rc.sep_id', sepId)
+      .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );
   }

@@ -4,6 +4,7 @@ import {
   dummySEP,
   anotherDummySEP,
   dummySEPs,
+  dummySEPAssignment,
 } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUser,
@@ -41,5 +42,11 @@ describe('Test SEPQueries', () => {
     return expect(
       SEPQueriesInstance.get(dummyUserOfficer, 1)
     ).resolves.toStrictEqual(dummySEP);
+  });
+
+  test('A userofficer can get SEP Assignments by SEP id', () => {
+    return expect(
+      SEPQueriesInstance.getAssignments(dummyUserOfficer, 1)
+    ).resolves.toStrictEqual([dummySEPAssignment]);
   });
 });

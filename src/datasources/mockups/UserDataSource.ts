@@ -1,7 +1,9 @@
 import { Role } from '../../models/Role';
 import { User, BasicUserDetails } from '../../models/User';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { RemoveSEPMemberRole } from '../../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -126,6 +128,12 @@ export class UserDataSourceMock implements UserDataSource {
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
+  async addSEPMembersRole(args: AddSEPMembersRole[]): Promise<boolean> {
+    return true;
+  }
+  async removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean> {
+    return true;
+  }
   getByOrcID(orcID: string): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
@@ -192,12 +200,18 @@ export class UserDataSourceMock implements UserDataSource {
       return [{ id: 2, shortCode: 'user', title: 'User' }];
     }
   }
+
+  async getSEPUserRoles(id: number, sepId: number) {
+    return [{ id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' }];
+  }
+
   async getRoles(): Promise<Role[]> {
     return [
       { id: 1, shortCode: 'user_officer', title: 'User Officer' },
       { id: 2, shortCode: 'user', title: 'User' },
     ];
   }
+
   async update(user: User): Promise<User> {
     return dummyUser;
   }

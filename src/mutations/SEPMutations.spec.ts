@@ -51,4 +51,40 @@ describe('Test SEPMutations', () => {
       SEPMutationsInstance.update(dummyUserOfficer, dummySEP)
     ).resolves.toStrictEqual(dummySEP);
   });
+
+  test('A user can not assign members to SEP', async () => {
+    const result = (await SEPMutationsInstance.assignMember(dummyUser, {
+      memberId: 1,
+      sepId: 1,
+    })) as Rejection;
+
+    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A userofficer can assign members to SEP', () => {
+    return expect(
+      SEPMutationsInstance.assignMember(dummyUserOfficer, {
+        memberId: 1,
+        sepId: 1,
+      })
+    ).resolves.toStrictEqual(dummySEP);
+  });
+
+  test('A userofficer can remove members from SEP', () => {
+    return expect(
+      SEPMutationsInstance.removeMember(dummyUserOfficer, {
+        memberId: 1,
+        sepId: 1,
+      })
+    ).resolves.toStrictEqual(dummySEP);
+  });
+
+  test('A userofficer can assign chair and secretary to SEP', () => {
+    return expect(
+      SEPMutationsInstance.assignChairAndSecretary(dummyUserOfficer, {
+        memberIds: [1, 2],
+        sepId: 1,
+      })
+    ).resolves.toStrictEqual(dummySEP);
+  });
 });
