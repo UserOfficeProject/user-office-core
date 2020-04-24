@@ -142,10 +142,6 @@ export default class TemplateMutations {
     agent: User | null,
     args: UpdateQuestionArgs
   ): Promise<Question | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection('NOT_AUTHORIZED');
-    }
-
     return this.dataSource
       .updateQuestion(args.id, args)
       .then(question => question)

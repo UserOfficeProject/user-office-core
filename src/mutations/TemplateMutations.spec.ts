@@ -13,6 +13,7 @@ import {
   TemplateStep,
   Topic,
 } from '../models/ProposalModel';
+import { getFieldById } from '../models/ProposalModelFunctions';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -182,4 +183,30 @@ test('Officer can delete a topic', async () => {
 test('Dummy user can not delete a topic', async () => {
   const topic = await mutations.deleteTopic(dummyUser, 1);
   expect(topic instanceof Topic).toBe(false);
+});
+
+test('User can not update question rel', async () => {
+  const steps = await mutations.updateQuestionRel(dummyUser, {
+    templateId: 1,
+    questionId: 'linksToField',
+    sortOrder: 2,
+    topicId: 1,
+  });
+  expect(isRejection(steps)).toBe(true);
+});
+
+test('User officer can update question rel', async () => {
+  const questionId = 'linksToField';
+  const newTopicId = 2;
+  const newSortOrder = 2;
+  let steps = await mutations.updateQuestionRel(dummyUserOfficer, {
+    templateId: 1,
+    questionId: questionId,
+    sortOrder: newSortOrder,
+    topicId: newTopicId,
+  });
+  expect(isRejection(steps)).toBe(false);
+  steps = steps as TemplateStep[];
+  expect(getFieldById(steps, questionId)?.topicId).toEqual(newTopicId);
+  expect(getFieldById(steps, questionId)?.sortOrder).toEqual(newSortOrder);
 });

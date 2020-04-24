@@ -15,6 +15,7 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
+import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
@@ -72,10 +73,30 @@ const createDummyTemplateSteps = () => {
     ),
   });
 
+  const enableCrystallization = createDummyQuestionRel({
+    question: createDummyQuestion({
+      proposalQuestionId: 'enable_crystallization',
+      dataType: DataType.BOOLEAN,
+      question: 'Is crystallization aplicable',
+      naturalKey: 'enable_crystallization',
+    }),
+  });
+
+  const hasLinksWithIndustry = createDummyQuestionRel({
+    question: createDummyQuestion({
+      proposalQuestionId: 'has_links_with_industry',
+      dataType: DataType.BOOLEAN,
+      question: 'Has links with industry',
+      naturalKey: 'has_links_with_industry',
+    }),
+  });
+
   return [
     new TemplateStep(new Topic(1, 'General information', 1, true), [
       hasLinksToField,
       linksToField,
+      hasLinksWithIndustry,
+      enableCrystallization,
     ]),
   ];
 };
@@ -165,7 +186,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       dependency?: any;
     }
   ): Promise<TemplateStep[]> {
-    return createDummyTemplateSteps();
+    const steps = createDummyTemplateSteps();
+    const question = getFieldById(steps, questionId) as QuestionRel;
+    question.dependency = values.dependency || question.dependency;
+    question.sortOrder = values.sortOrder || question.sortOrder;
+    question.topicId = values.topicId || question.topicId;
+
+    return steps;
   }
   async createTemplate(
     name: string,
