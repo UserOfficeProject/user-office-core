@@ -14,6 +14,7 @@ import {
   Topic,
 } from '../models/ProposalModel';
 import { getFieldById } from '../models/ProposalModelFunctions';
+import TemplateQueries from '../queries/TemplateQueries';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -25,6 +26,8 @@ const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
+
+const queries = new TemplateQueries(dummyTemplateDataSource);
 const mutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
@@ -188,7 +191,7 @@ test('Dummy user can not delete a topic', async () => {
 test('User can not update question rel', async () => {
   const steps = await mutations.updateQuestionRel(dummyUser, {
     templateId: 1,
-    questionId: 'linksToField',
+    questionId: 'links_to_field',
     sortOrder: 2,
     topicId: 1,
   });
@@ -196,7 +199,7 @@ test('User can not update question rel', async () => {
 });
 
 test('User officer can update question rel', async () => {
-  const questionId = 'linksToField';
+  const questionId = 'links_to_field';
   const newTopicId = 2;
   const newSortOrder = 2;
   let steps = await mutations.updateQuestionRel(dummyUserOfficer, {
@@ -209,4 +212,66 @@ test('User officer can update question rel', async () => {
   steps = steps as TemplateStep[];
   expect(getFieldById(steps, questionId)?.topicId).toEqual(newTopicId);
   expect(getFieldById(steps, questionId)?.sortOrder).toEqual(newSortOrder);
+});
+
+test('User can not delete question rel', async () => {
+  const steps = await mutations.deleteQuestionRel(dummyUser, {
+    templateId: 1,
+    questionId: 'links_to_field',
+  });
+  expect(isRejection(steps)).toBe(true);
+});
+
+test('User officer can delete question rel', async () => {
+  const questionId = 'links_to_field';
+  const stepsBefore = (await queries.getProposalTemplateSteps(
+    dummyUserOfficer,
+    1
+  )) as TemplateStep[];
+
+  expect(getFieldById(stepsBefore, questionId)).not.toEqual(undefined);
+
+  const stepsAfter = await mutations.deleteQuestionRel(dummyUserOfficer, {
+    templateId: 1,
+    questionId: 'links_to_field',
+  });
+  expect(isRejection(stepsAfter)).toBe(false);
+  expect(getFieldById(stepsAfter as TemplateStep[], 'links_to_field')).toBe(
+    undefined
+  );
+});
+
+test('User can not update proposal template', async () => {
+  const steps = await mutations.updateProposalTemplate(dummyUser, {
+    templateId: 1,
+    description: 'New descsription',
+    isArchived: false,
+    name: 'New name',
+  });
+  expect(isRejection(steps)).toBe(true);
+});
+
+test('User officer can update proposal template', async () => {
+  const newDescription = 'new description';
+  const newName = 'new name';
+  const newIsArchived = true;
+  let template = await mutations.updateProposalTemplate(dummyUserOfficer, {
+    templateId: 1,
+    description: newDescription,
+    isArchived: newIsArchived,
+    name: newName,
+  });
+  expect(isRejection(template)).toBe(false);
+  template = template as ProposalTemplate;
+  expect(template.description).toEqual(newDescription);
+  expect(template.isArchived).toEqual(newIsArchived);
+  expect(template.name).toEqual(newName);
+});
+
+test('User can not update question template', async () => {
+  const steps = await mutations.updateQuestion(dummyUser, {
+    id: 'links_to_field',
+    question: 'new text',
+  });
+  expect(isRejection(steps)).toBe(true);
 });

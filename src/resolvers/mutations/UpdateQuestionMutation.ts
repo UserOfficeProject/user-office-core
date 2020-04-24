@@ -10,13 +10,13 @@ export class UpdateQuestionArgs {
   public id: string;
 
   @Field({ nullable: true })
-  public naturalKey: string;
+  public naturalKey?: string;
 
   @Field({ nullable: true })
-  public question: string;
+  public question?: string;
 
   @Field({ nullable: true })
-  public config: string;
+  public config?: string;
 }
 
 @Resolver()

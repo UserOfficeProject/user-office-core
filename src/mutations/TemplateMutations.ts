@@ -146,6 +146,7 @@ export default class TemplateMutations {
       .updateQuestion(args.id, args)
       .then(question => question)
       .catch(err => {
+        console.log(err);
         logger.logException('Could not update question', err, {
           agent,
           args,

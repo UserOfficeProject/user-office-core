@@ -56,19 +56,19 @@ const createDummyQuestionRel = (values: {
 const createDummyTemplateSteps = () => {
   const hasLinksToField = createDummyQuestionRel({
     question: createDummyQuestion({
-      proposalQuestionId: 'hasLinksToField',
+      proposalQuestionId: 'has_links_to_field',
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }),
   });
   const linksToField = createDummyQuestionRel({
     question: createDummyQuestion({
-      proposalQuestionId: 'linksToField',
+      proposalQuestionId: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
     }),
     dependency: new FieldDependency(
-      'linksToField',
-      'hasLinksToField',
-      'hasLinksToField',
+      'links_to_field',
+      'has_links_to_field',
+      'has_links_to_field',
       new FieldCondition(EvaluatorOperator.EQ, 'yes')
     ),
   });
@@ -135,23 +135,25 @@ const createDummyTopic = (
 
 export class TemplateDataSourceMock implements TemplateDataSource {
   async cloneTemplate(templateId: number): Promise<ProposalTemplate> {
-    return createDummyProposalTemplate({ id: templateId });
+    return createDummyProposalTemplate({ id: 2 });
   }
   async getProposalTemplate(
     templateId: number
   ): Promise<ProposalTemplate | null> {
-    return createDummyProposalTemplate({ id: templateId });
+    return dummyProposalTemplate;
   }
   async updateTemplate(
     values: UpdateProposalTemplateArgs
   ): Promise<ProposalTemplate | null> {
-    return createDummyProposalTemplate(values);
+    dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
+
+    return dummyProposalTemplate;
   }
   async createQuestionRel(
     questionId: string,
     templateId: number
   ): Promise<TemplateStep[]> {
-    return createDummyTemplateSteps();
+    return dummyTemplateSteps;
   }
   async getQuestionRel(
     questionId: string,
@@ -164,7 +166,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async deleteQuestionRel(
     args: DeleteQuestionRelArgs
   ): Promise<TemplateStep[]> {
-    return createDummyTemplateSteps();
+    dummyTemplateSteps.forEach(function(step) {
+      step.fields = step.fields.filter(field => {
+        return field.question.proposalQuestionId !== args.questionId;
+      });
+    });
+
+    return dummyTemplateSteps;
   }
   async createQuestionAndRel(
     templateId: number,
@@ -175,7 +183,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     question: string,
     config: string
   ): Promise<TemplateStep[]> {
-    return createDummyTemplateSteps();
+    return dummyTemplateSteps;
   }
   async updateQuestionRel(
     questionId: string,
@@ -186,13 +194,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       dependency?: any;
     }
   ): Promise<TemplateStep[]> {
-    const steps = createDummyTemplateSteps();
-    const question = getFieldById(steps, questionId) as QuestionRel;
+    const question = getFieldById(
+      dummyTemplateSteps,
+      questionId
+    ) as QuestionRel;
     question.dependency = values.dependency || question.dependency;
     question.sortOrder = values.sortOrder || question.sortOrder;
     question.topicId = values.topicId || question.topicId;
 
-    return steps;
+    return dummyTemplateSteps;
   }
   async createTemplate(
     name: string,
@@ -220,6 +230,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
   public init() {
     dummyTemplateSteps = createDummyTemplateSteps();
+    dummyProposalTemplate = createDummyProposalTemplate();
   }
 
   async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
@@ -262,6 +273,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     steps.forEach(topic => {
       topic.fields!.forEach(field => {
         if (field.question.proposalQuestionId === questionId) {
+          console.log(field);
           Object.assign(field, values);
 
           return field.question;
@@ -295,6 +307,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async getProposalTemplateSteps(): Promise<TemplateStep[]> {
-    return createDummyTemplateSteps();
+    return dummyTemplateSteps;
   }
 }
