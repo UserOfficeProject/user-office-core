@@ -10,22 +10,22 @@ export class CreateCallArgs {
   public shortCode: string;
 
   @Field()
-  public startCall: string;
+  public startCall: Date;
 
   @Field()
-  public endCall: string;
+  public endCall: Date;
 
   @Field()
-  public startReview: string;
+  public startReview: Date;
 
   @Field()
-  public endReview: string;
+  public endReview: Date;
 
   @Field()
-  public startNotify: string;
+  public startNotify: Date;
 
   @Field()
-  public endNotify: string;
+  public endNotify: Date;
 
   @Field()
   public cycleComment: string;
