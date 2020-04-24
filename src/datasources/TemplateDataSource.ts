@@ -11,12 +11,15 @@ import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs as UpdateTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
 import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export interface TemplateDataSource {
   // Template
   createTemplate(name: string, description?: string): Promise<ProposalTemplate>;
   getProposalTemplate(templateId: number): Promise<ProposalTemplate | null>;
-  getProposalTemplates(isArchived?: boolean): Promise<ProposalTemplate[]>;
+  getProposalTemplates(
+    args?: ProposalTemplatesArgs
+  ): Promise<ProposalTemplate[]>;
   updateTemplate(values: UpdateTemplateArgs): Promise<ProposalTemplate | null>;
   deleteTemplate(id: number): Promise<ProposalTemplate>;
   cloneTemplate(templateId: number): Promise<ProposalTemplate>;

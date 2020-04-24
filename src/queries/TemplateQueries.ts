@@ -3,6 +3,7 @@ import { Authorized } from '../decorators';
 import { TemplateStep } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
+import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
@@ -21,8 +22,8 @@ export default class TemplateQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getProposalTemplates(agent: User | null, isArchived?: boolean) {
-    return this.dataSource.getProposalTemplates(isArchived);
+  async getProposalTemplates(agent: User | null, args?: ProposalTemplatesArgs) {
+    return this.dataSource.getProposalTemplates(args);
   }
 
   @Authorized()

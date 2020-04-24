@@ -18,6 +18,7 @@ import {
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
+import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 
 export let dummyTemplateSteps: TemplateStep[];
@@ -176,14 +177,14 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return createDummyProposalTemplate({ id });
   }
   async getProposalTemplates(
-    isArchived?: boolean
+    args?: ProposalTemplatesArgs
   ): Promise<ProposalTemplate[]> {
     return [
       new ProposalTemplate(
         1,
         'Industrial',
         'Industrial proposal template',
-        isArchived || false
+        args?.filter?.isArchived || false
       ),
     ];
   }

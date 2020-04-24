@@ -11,6 +11,7 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
 import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
@@ -65,11 +66,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async getProposalTemplates(
-    isArchived?: boolean
+    args: ProposalTemplatesArgs
   ): Promise<ProposalTemplate[]> {
     return database('proposal_templates')
       .select('*')
-      .where({ is_archived: isArchived || false })
+      .where({ is_archived: args.filter?.isArchived || false })
       .then((resultSet: ProposalTemplateRecord[]) => {
         if (!resultSet) {
           return [];

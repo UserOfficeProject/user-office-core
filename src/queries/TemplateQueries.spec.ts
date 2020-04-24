@@ -31,7 +31,8 @@ test('Proposal template should have fields', async () => {
     1
   );
   steps = steps as TemplateStep[];
-  expect(steps[0].fields.length).toBeGreaterThan(0);
+
+  return expect(steps[0].fields.length).toBeGreaterThan(0);
 });
 
 test('User officer should be able to get if natural key exists', async () => {
@@ -50,4 +51,16 @@ test('User should not be able to get if natural key exists', async () => {
   );
 
   return expect(exists).toBe(null);
+});
+
+test('User officer should get a list of templates', async () => {
+  const templates = await templateQueries.getProposalTemplates(
+    dummyUserOfficer,
+    {
+      filter: { isArchived: false },
+    }
+  );
+
+  expect(templates.length).toBeGreaterThan(0);
+  expect(templates[0].isArchived).toEqual(false);
 });

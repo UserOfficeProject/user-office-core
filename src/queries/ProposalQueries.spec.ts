@@ -60,7 +60,10 @@ test('Get questionary should not succeed for unauthorized user', () => {
 test('A userofficer can get all proposal', () => {
   return expect(
     proposalQueries.getAll(dummyUserOfficer)
-  ).resolves.toStrictEqual({ totalCount: 1, proposals: [dummyProposal] });
+  ).resolves.toStrictEqual({
+    totalCount: 1,
+    proposals: [dummyProposal],
+  });
 });
 
 test('A user cannot query all proposals', () => {
