@@ -1,12 +1,12 @@
-query getProposalTemplate {
-  proposalTemplate {
+query getProposalTemplate($templateId: Int!) {
+  proposalTemplate(templateId: $templateId) {
     steps {
       topic {
-        topic_title
-        topic_id
+        title
+        id
       }
       fields {
-        ...proposalTemplateField
+        ...questionRel
       }
     }
   }

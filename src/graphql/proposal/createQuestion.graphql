@@ -1,0 +1,8 @@
+mutation createQuestion($dataType: DataType!) {
+  createQuestion(dataType: $dataType) {
+    question {
+      ...question
+    }
+    error
+  }
+}

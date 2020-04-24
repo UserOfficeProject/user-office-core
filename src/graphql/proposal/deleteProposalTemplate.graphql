@@ -1,6 +1,6 @@
 mutation deleteProposalTemplate($id: Int!) {
   deleteProposalTemplate(id: $id) {
-    templateMetadata {
+    template {
       templateId
       name
     }

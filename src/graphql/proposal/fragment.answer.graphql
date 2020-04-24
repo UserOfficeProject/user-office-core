@@ -1,0 +1,6 @@
+fragment answer on Answer {
+  question {
+    ...question
+  }
+  value
+}
