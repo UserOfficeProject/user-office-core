@@ -220,7 +220,6 @@ export default class UserMutations {
 
   // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
   @Authorized([Roles.USER_OFFICER, Roles.USER])
-  @ValidateArgs(updateUserValidationSchema)
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: User | null,
