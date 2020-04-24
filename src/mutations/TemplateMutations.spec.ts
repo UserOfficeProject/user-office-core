@@ -114,17 +114,18 @@ test('A user can not create topic', async () => {
   expect(topic instanceof ProposalTemplate).toBe(false);
 });
 
-test('A user-officer can update fieltTopicRel', async () => {
-  const response = await mutations.updateFieldTopicRel(dummyUserOfficer, {
+test('A user-officer can update question topic rel', async () => {
+  const response = await mutations.updateQuestionsTopicRels(dummyUserOfficer, {
     templateId: 1,
     topicId: 1,
     fieldIds: ['has_links_with_industry', 'enable_crystallization'],
   });
   expect(isRejection(response)).toEqual(false);
+  expect((response as string[])[0]).toEqual('has_links_with_industry');
 });
 
-test('A user can not update fieltTopicRel', async () => {
-  const response = await mutations.updateFieldTopicRel(dummyUser, {
+test('A user can not update question topic rel', async () => {
+  const response = await mutations.updateQuestionsTopicRels(dummyUser, {
     templateId: 1,
     topicId: 1,
     fieldIds: ['has_links_with_industry', 'enable_crystallization'],

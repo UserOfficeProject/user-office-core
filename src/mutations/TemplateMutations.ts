@@ -231,7 +231,7 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async updateFieldTopicRel(
+  async updateQuestionsTopicRels(
     agent: User | null,
     values: {
       templateId: number;

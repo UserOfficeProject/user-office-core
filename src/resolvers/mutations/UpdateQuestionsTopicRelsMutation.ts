@@ -15,7 +15,7 @@ import { ResponseWrapBase } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-class UpdateFieldTopicRelArgs {
+class UpdateQuestionsTopicRelsArgs {
   @Field(() => Int)
   public templateId: number;
 
@@ -27,26 +27,26 @@ class UpdateFieldTopicRelArgs {
 }
 
 @ObjectType()
-class UpdateFieldTopicRelResponseWrap extends ResponseWrapBase<string[]> {
+class UpdateQuestionsTopicRelsResponseWrap extends ResponseWrapBase<string[]> {
   @Response()
   @Field(() => [String], { nullable: true })
   public result: string[];
 }
 
 @Resolver()
-export class UpdateFieldTopicRelMutation {
-  @Mutation(() => UpdateFieldTopicRelResponseWrap)
+export class UpdateQuestionsTopicRelsMutation {
+  @Mutation(() => UpdateQuestionsTopicRelsResponseWrap)
   updateFieldTopicRel(
-    @Args() args: UpdateFieldTopicRelArgs,
+    @Args() args: UpdateQuestionsTopicRelsArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateFieldTopicRel(context.user, {
+      context.mutations.template.updateQuestionsTopicRels(context.user, {
         topicId: args.topicId,
         fieldIds: args.fieldIds,
         templateId: args.templateId,
       }),
-      UpdateFieldTopicRelResponseWrap
+      UpdateQuestionsTopicRelsResponseWrap
     );
   }
 }
