@@ -11,7 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
-import { AddSEPMembersRoleResponseWrap } from '../types/CommonWrappers';
+import { SEPMembersRoleResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @InputType()
@@ -34,7 +34,7 @@ export class AddSEPMembersRoleArgs {
 
 @Resolver()
 export class AddSEPMembersRoleMutation {
-  @Mutation(() => AddSEPMembersRoleResponseWrap)
+  @Mutation(() => SEPMembersRoleResponseWrap)
   addSEPMembersRole(
     @Args() args: AddSEPMembersRoleArgs,
     @Ctx() context: ResolverContext
@@ -44,7 +44,7 @@ export class AddSEPMembersRoleMutation {
         context.user,
         args.addSEPMembersRole
       ),
-      AddSEPMembersRoleResponseWrap
+      SEPMembersRoleResponseWrap
     );
   }
 }

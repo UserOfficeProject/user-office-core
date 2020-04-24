@@ -7,6 +7,7 @@ import { User, BasicUserDetails } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { RemoveSEPMemberRole } from '../../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
@@ -63,6 +64,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
 
     await database.insert(rolesToInsert).into('role_user');
+
+    return true;
+  }
+
+  async removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean> {
+    await database('role_user')
+      .del()
+      .where('sep_id', args.sepId)
+      .andWhere('user_id', args.memberId);
 
     return true;
   }

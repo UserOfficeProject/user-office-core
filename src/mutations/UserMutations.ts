@@ -16,6 +16,7 @@ import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutat
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
+import { RemoveSEPMemberRole } from '../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -407,6 +408,18 @@ export default class UserMutations {
       .then(() => true)
       .catch(err => {
         logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async removeSEPMemberRole(agent: User | null, args: RemoveSEPMemberRole) {
+    return this.dataSource
+      .removeSEPMemberRole(args)
+      .then(() => true)
+      .catch(err => {
+        logger.logException('Could not remove user role', err, { agent });
 
         return rejection('INTERNAL_ERROR');
       });

@@ -50,7 +50,7 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
 }
 
 @ObjectType()
-export class AddSEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
+export class SEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
   @Response()
   @Field(() => Boolean, { nullable: true })
   public success = false;

@@ -3,6 +3,7 @@ import { User, BasicUserDetails } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { RemoveSEPMemberRole } from '../../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UserDataSource } from '../UserDataSource';
 
 export const basicDummyUser = new BasicUserDetails(
@@ -128,6 +129,9 @@ export class UserDataSourceMock implements UserDataSource {
     return true;
   }
   async addSEPMembersRole(args: AddSEPMembersRole[]): Promise<boolean> {
+    return true;
+  }
+  async removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean> {
     return true;
   }
   getByOrcID(orcID: string): Promise<User | null> {

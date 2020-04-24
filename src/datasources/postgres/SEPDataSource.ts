@@ -155,12 +155,27 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       `${database('SEP_Assignments').insert({
         sep_member_user_id: memberId,
         sep_id: sepId,
-      })} ON CONFLICT (sep_id, SEP_member_user_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
+      })} ON CONFLICT (sep_id, sep_member_user_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
     );
 
     const sepUpdated = await this.get(sepId);
 
     if (sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeMember(memberId: number, sepId: number) {
+    const memberRemoved = await database('SEP_Assignments')
+      .del()
+      .where('sep_member_user_id', memberId)
+      .andWhere('sep_id', sepId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (memberRemoved && sepUpdated) {
       return sepUpdated;
     }
 

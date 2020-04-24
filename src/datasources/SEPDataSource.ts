@@ -23,4 +23,5 @@ export interface SEPDataSource {
   getAssignments(id: number): Promise<SEPAssignment[]>;
   assignChairAndSecretary(memberIds: number[], sepId: number): Promise<SEP>;
   assignMember(memberId: number, sepId: number): Promise<SEP>;
+  removeMember(memberId: number, sepId: number): Promise<SEP>;
 }

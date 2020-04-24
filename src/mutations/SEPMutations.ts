@@ -8,7 +8,7 @@ import { SEP } from '../models/SEP';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import {
-  AssignMemberSEPArgs,
+  UpdateMemberSEPArgs,
   AssignSEPChairAndSecretaryArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
@@ -36,7 +36,7 @@ const assignSEPChairAndSecretaryValidationSchema = yup.object().shape({
   sepId: yup.number().required(),
 });
 
-const assignSEPMemberValidationSchema = yup.object().shape({
+const updateSEPMemberValidationSchema = yup.object().shape({
   memberId: yup.number().required(),
   sepId: yup.number().required(),
 });
@@ -119,18 +119,39 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPMemberValidationSchema)
+  @ValidateArgs(updateSEPMemberValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMember(
     agent: User | null,
-    args: AssignMemberSEPArgs
+    args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .assignMember(args.memberId, args.sepId)
       .then(result => result)
       .catch(err => {
         logger.logException(
-          'Could not assign members to scientific evaluation panel',
+          'Could not assign member to scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @ValidateArgs(updateSEPMemberValidationSchema)
+  @EventBus(Event.SEP_MEMBER_REMOVED)
+  async removeMember(
+    agent: User | null,
+    args: UpdateMemberSEPArgs
+  ): Promise<SEP | Rejection> {
+    return this.dataSource
+      .removeMember(args.memberId, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not remove member from scientific evaluation panel',
           err,
           { agent }
         );

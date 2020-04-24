@@ -70,6 +70,15 @@ describe('Test SEPMutations', () => {
     ).resolves.toStrictEqual(dummySEP);
   });
 
+  test('A userofficer can remove members from SEP', () => {
+    return expect(
+      SEPMutationsInstance.removeMember(dummyUserOfficer, {
+        memberId: 1,
+        sepId: 1,
+      })
+    ).resolves.toStrictEqual(dummySEP);
+  });
+
   test('A userofficer can assign chair and secretary to SEP', () => {
     return expect(
       SEPMutationsInstance.assignChairAndSecretary(dummyUserOfficer, {

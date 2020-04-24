@@ -13,7 +13,7 @@ import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class AssignMemberSEPArgs {
+export class UpdateMemberSEPArgs {
   @Field(() => Int)
   public memberId: number;
 
@@ -44,11 +44,22 @@ export class AssignMembersToSEPMutation {
   }
   @Mutation(() => SEPResponseWrap)
   async assignMember(
-    @Args() args: AssignMemberSEPArgs,
+    @Args() args: UpdateMemberSEPArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.sep.assignMember(context.user, args),
+      SEPResponseWrap
+    );
+  }
+
+  @Mutation(() => SEPResponseWrap)
+  async removeMember(
+    @Args() args: UpdateMemberSEPArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.sep.removeMember(context.user, args),
       SEPResponseWrap
     );
   }
