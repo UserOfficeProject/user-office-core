@@ -1,9 +1,16 @@
-import { Ctx, Query, Resolver, Arg, ArgsType, Field, Args } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Query,
+  Resolver,
+  InputType,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplate } from '../types/ProposalTemplate';
-import { ProposalsFilter } from './ProposalsQuery';
-
+@InputType()
 class ProposalTemplatesFilter {
   @Field()
   public isArchived?: boolean;
@@ -11,7 +18,7 @@ class ProposalTemplatesFilter {
 
 @ArgsType()
 export class ProposalTemplatesArgs {
-  @Field(() => ProposalsFilter, { nullable: true })
+  @Field(() => ProposalTemplatesFilter, { nullable: true })
   public filter?: ProposalTemplatesFilter;
 }
 @Resolver()

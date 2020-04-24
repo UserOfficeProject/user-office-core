@@ -36,7 +36,7 @@ class UpdateQuestionsTopicRelsResponseWrap extends ResponseWrapBase<string[]> {
 @Resolver()
 export class UpdateQuestionsTopicRelsMutation {
   @Mutation(() => UpdateQuestionsTopicRelsResponseWrap)
-  updateFieldTopicRel(
+  updateQuestionsTopicRels(
     @Args() args: UpdateQuestionsTopicRelsArgs,
     @Ctx() context: ResolverContext
   ) {
