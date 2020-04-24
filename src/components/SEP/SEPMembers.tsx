@@ -40,10 +40,11 @@ const useStyles = makeStyles({
 
 const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
-  const { loadingAssignments, SEPAssignmentsData } = useSEPAssignmentsData(
-    sepId,
-    modalOpen
-  );
+  const {
+    loadingAssignments,
+    SEPAssignmentsData,
+    setSEPAssignmentsData,
+  } = useSEPAssignmentsData(sepId, modalOpen);
   const { loading, usersData } = useUsersData('');
   const classes = useStyles();
   const api = useDataApi();
@@ -165,6 +166,31 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     );
   };
 
+  const removeMember = async (user: BasicUserDetails): Promise<void> => {
+    const removedMembersResult = await api().removeMember({
+      memberId: user.id,
+      sepId,
+    });
+
+    const SEPMembersRoleResult = await api().removeSEPMemberRole({
+      memberId: user.id,
+      sepId: sepId,
+    });
+
+    if (SEPAssignmentsData) {
+      setSEPAssignmentsData(
+        SEPAssignmentsData.filter(
+          assignment => assignment.sepMemberUserId !== user.id
+        )
+      );
+    }
+
+    showNotification(
+      !!removedMembersResult.removeMember.error ||
+        !!SEPMembersRoleResult.removeSEPMemberRole.error
+    );
+  };
+
   if (!usersData || loading || loadingAssignments) {
     return <p>Loading...</p>;
   }
@@ -232,6 +258,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   title={'Reviewers'}
                   columns={columns}
                   data={initialValues.SEPReviewers}
+                  editable={{
+                    onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
+                      removeMember(rowData),
+                  }}
                   options={{
                     search: false,
                   }}
