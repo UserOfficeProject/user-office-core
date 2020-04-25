@@ -14,14 +14,14 @@ export default function ProposalTemplates() {
         <ProposalTemplatesTable
           dataProvider={() =>
             api()
-              .getProposalTemplatesMetadata({ isArchived: false })
+              .getProposalTemplates({ filter: { isArchived: false } })
               .then(data => data)
           }
         />
         <ProposalTemplatesTable
           dataProvider={() =>
             api()
-              .getProposalTemplatesMetadata({ isArchived: true })
+              .getProposalTemplates({ filter: { isArchived: true } })
               .then(data => data)
           }
         />

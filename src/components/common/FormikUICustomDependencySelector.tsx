@@ -15,8 +15,8 @@ import {
   DataType,
   EvaluatorOperator,
   ProposalTemplate,
-  ProposalTemplateField,
   SelectionFromOptionsConfig,
+  QuestionRel,
 } from '../../generated/sdk';
 import {
   getAllFields,
@@ -32,7 +32,7 @@ const FormikUICustomDependencySelector = ({
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
   template: ProposalTemplate;
-  templateField: ProposalTemplateField;
+  templateField: QuestionRel;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(
@@ -58,9 +58,9 @@ const FormikUICustomDependencySelector = ({
     if (!templateField) {
       return;
     }
-    if (templateField.dependencies && templateField.dependencies.length > 0) {
-      const dependency = templateField.dependencies[0]; // currently only 1 supported
-      setDependencyId(dependency.dependency_id);
+    if (templateField.dependency) {
+      const dependency = templateField.dependency;
+      setDependencyId(dependency.dependencyId);
       setOperator(dependency.condition.condition);
       setDependencyValue(dependency.condition.params);
     }
@@ -70,7 +70,7 @@ const FormikUICustomDependencySelector = ({
     const dependencies = [];
     if (dependencyId && dependencyValue && operator) {
       dependencies.push({
-        question_id: templateField.proposal_question_id,
+        question_id: templateField.question.proposalQuestionId,
         dependency_id: dependencyId,
         condition: {
           condition: operator,
