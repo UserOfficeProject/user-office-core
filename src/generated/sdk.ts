@@ -1243,11 +1243,18 @@ export type DeleteTopicMutation = (
 
 export type AnswerFragment = (
   { __typename?: 'Answer' }
-  & Pick<Answer, 'value'>
+  & Pick<Answer, 'sortOrder' | 'topicId' | 'value'>
   & { question: (
     { __typename?: 'Question' }
     & QuestionFragment
-  ) }
+  ), dependency: Maybe<(
+    { __typename?: 'FieldDependency' }
+    & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
+    & { condition: (
+      { __typename?: 'FieldCondition' }
+      & FieldConditionFragment
+    ) }
+  )> }
 );
 
 export type FieldConditionFragment = (
@@ -1316,26 +1323,7 @@ export type QuestionRelFragment = (
   & Pick<QuestionRel, 'sortOrder' | 'topicId'>
   & { question: (
     { __typename?: 'Question' }
-    & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType'>
-    & { config: (
-      { __typename?: 'BooleanConfig' }
-      & FieldConfigBooleanConfigFragment
-    ) | (
-      { __typename?: 'DateConfig' }
-      & FieldConfigDateConfigFragment
-    ) | (
-      { __typename?: 'EmbellishmentConfig' }
-      & FieldConfigEmbellishmentConfigFragment
-    ) | (
-      { __typename?: 'FileUploadConfig' }
-      & FieldConfigFileUploadConfigFragment
-    ) | (
-      { __typename?: 'SelectionFromOptionsConfig' }
-      & FieldConfigSelectionFromOptionsConfigFragment
-    ) | (
-      { __typename?: 'TextInputConfig' }
-      & FieldConfigTextInputConfigFragment
-    ) }
+    & QuestionFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -2172,14 +2160,31 @@ export const QuestionFragmentDoc = gql`
   }
 }
     ${FieldConfigFragmentDoc}`;
+export const FieldConditionFragmentDoc = gql`
+    fragment fieldCondition on FieldCondition {
+  condition
+  params
+}
+    `;
 export const AnswerFragmentDoc = gql`
     fragment answer on Answer {
   question {
     ...question
   }
+  sortOrder
+  topicId
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
   value
 }
-    ${QuestionFragmentDoc}`;
+    ${QuestionFragmentDoc}
+${FieldConditionFragmentDoc}`;
 export const QuestionaryStepFragmentDoc = gql`
     fragment questionaryStep on QuestionaryStep {
   topic {
@@ -2194,22 +2199,10 @@ export const QuestionaryStepFragmentDoc = gql`
   }
 }
     ${AnswerFragmentDoc}`;
-export const FieldConditionFragmentDoc = gql`
-    fragment fieldCondition on FieldCondition {
-  condition
-  params
-}
-    `;
 export const QuestionRelFragmentDoc = gql`
     fragment questionRel on QuestionRel {
   question {
-    question
-    proposalQuestionId
-    naturalKey
-    dataType
-    config {
-      ...fieldConfig
-    }
+    ...question
   }
   sortOrder
   topicId
@@ -2222,7 +2215,7 @@ export const QuestionRelFragmentDoc = gql`
     }
   }
 }
-    ${FieldConfigFragmentDoc}
+    ${QuestionFragmentDoc}
 ${FieldConditionFragmentDoc}`;
 export const TemplateStepFragmentDoc = gql`
     fragment templateStep on TemplateStep {

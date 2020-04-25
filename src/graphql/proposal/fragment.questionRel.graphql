@@ -1,12 +1,6 @@
 fragment questionRel on QuestionRel {
   question {
-    question
-    proposalQuestionId
-    naturalKey
-    dataType
-    config {
-      ...fieldConfig
-    }
+    ...question
   }
   sortOrder
   topicId

@@ -2,5 +2,15 @@ fragment answer on Answer {
   question {
     ...question
   }
+  sortOrder
+  topicId
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
   value
 }
