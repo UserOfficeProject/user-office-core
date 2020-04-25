@@ -1377,7 +1377,7 @@
 			"response": []
 		},
 		{
-			"name": "updateFieldTopicRel [Mutation]",
+			"name": "updateQuestionsTopicRels [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -1386,7 +1386,7 @@
 						"exec": [
 							"pm.test(\"Should update field topic relation\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateFieldTopicRel.error).to.eql(null)",
+							"    pm.expect(jsonData.data.updateQuestionsTopicRels.error).to.eql(null)",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1456,8 +1456,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($topicId:Int!, $fieldIds:[String!], $templateId:Int!) {\n    updateFieldTopicRel(topicId:$topicId, templateId:$templateId, fieldIds:$fieldIds) {\n        result\n        error\n    }\n}\n",
-						"variables": "{\n    \"topicId\": {{NEW_TOPIC_ID}},\n    \"fieldIds\": [],\n    \"templateId\":{{NEW_TEMPLATE_ID}}\n}\n"
+						"query": "mutation($topicId:Int!, $fieldIds:[String!], $templateId:Int!) {\n    updateQuestionsTopicRels(topicId:$topicId, templateId:$templateId, fieldIds:$fieldIds) {\n        result\n        error\n    }\n}\n",
+						"variables": "{\n    \"topicId\": {{NEW_TOPIC_ID}},\n    \"fieldIds\": [\"{{NEW_FIELD_ID}}\"],\n    \"templateId\":{{NEW_TEMPLATE_ID}}\n}\n"
 					},
 					"options": {
 						"graphql": {}
