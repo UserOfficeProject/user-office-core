@@ -11,7 +11,7 @@ import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export default class ProposalQueries {
   constructor(
-    private dataSource: ProposalDataSource,
+    public dataSource: ProposalDataSource,
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization
   ) {}
