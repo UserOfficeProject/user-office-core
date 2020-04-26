@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import { IconButton } from '@material-ui/core';
 import { Visibility, People, ArrowBack } from '@material-ui/icons';
 import MaterialTable from 'material-table';
@@ -59,9 +58,8 @@ export default function ReviewTable(props: {
         {
           icon: () => <Visibility />,
           tooltip: 'View review',
-          // @ts-ignore
-          onClick: (event, rowData: review) => {
-            setEditReviewID(rowData.id);
+          onClick: (event, rowData) => {
+            setEditReviewID((rowData as Review).id);
           },
           position: 'row',
         },

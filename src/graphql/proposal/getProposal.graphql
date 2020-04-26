@@ -25,6 +25,7 @@ query getProposal($id: Int!) {
     technicalReview {
       id
       comment
+      publicComment
       timeAllocation
       status
       proposalID

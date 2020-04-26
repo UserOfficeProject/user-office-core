@@ -1,11 +1,13 @@
 import Container from '@material-ui/core/Container';
-import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import {
   Proposal,
   TechnicalReview,
   UserRole,
   Review,
+  BasicUserDetails,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import SimpleTabs from '../common/TabPanel';
@@ -15,7 +17,17 @@ import ParticipantModal from '../proposal/ParticipantModal';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ReviewTable from './ReviewTable';
 
-export default function ProposalReview({ match }: { match: any }) {
+const ProposalReviewPropTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
+
+type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
+
+const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   const [modalOpen, setOpen] = useState(false);
   const [techReview, setTechReview] = useState<
     TechnicalReview | null | undefined
@@ -24,9 +36,8 @@ export default function ProposalReview({ match }: { match: any }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const api = useDataApi();
-
-  const loadProposal = () =>
-    api()
+  const loadProposal = useCallback(async () => {
+    return api()
       .getProposal({ id: parseInt(match.params.id) })
       .then(data => {
         setProposal(data.proposal);
@@ -35,12 +46,13 @@ export default function ProposalReview({ match }: { match: any }) {
           setReviews(data.proposal.reviews);
         }
       });
+  }, [api, match.params.id]);
 
   useEffect(() => {
     loadProposal();
-  }, [api, match.params.id]);
+  }, [loadProposal]);
 
-  const addUser = async (user: any) => {
+  const addUser = async (user: BasicUserDetails): Promise<void> => {
     await api().addUserForReview({
       userID: user.id,
       proposalID: parseInt(match.params.id),
@@ -49,7 +61,7 @@ export default function ProposalReview({ match }: { match: any }) {
     loadProposal();
   };
 
-  const removeReview = async (reviewID: number) => {
+  const removeReview = async (reviewID: number): Promise<void> => {
     await api().removeUserForReview({
       reviewID,
     });
@@ -65,7 +77,7 @@ export default function ProposalReview({ match }: { match: any }) {
       <SimpleTabs tabNames={['General', 'Excellence', 'Technical', 'Logs']}>
         <GeneralInformation
           data={proposal}
-          onProposalChanged={newProposal => setProposal(newProposal)}
+          onProposalChanged={(newProposal): void => setProposal(newProposal)}
         />
         <>
           <ParticipantModal
@@ -92,4 +104,8 @@ export default function ProposalReview({ match }: { match: any }) {
       </SimpleTabs>
     </Container>
   );
-}
+};
+
+ProposalReview.propTypes = ProposalReviewPropTypes;
+
+export default ProposalReview;

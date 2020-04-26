@@ -1,8 +1,13 @@
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 import { makeStyles } from '@material-ui/core/styles';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
+import React, { useState, useEffect } from 'react';
+import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
@@ -94,15 +99,22 @@ export default function ProposalGrade(props: {
             rows="4"
             disabled={review.status === 'SUBMITTED'}
           />
+          <InputLabel htmlFor="grade-proposal">Grade</InputLabel>
           <Field
             name="grade"
-            label="Grade"
-            type="number"
-            component={TextField}
+            inputProps={{
+              id: 'grade-proposal',
+            }}
+            component={Select}
             margin="normal"
-            fullWidth
             disabled={review.status === 'SUBMITTED'}
-          />
+          >
+            {[...Array(11)].map((e, i) => (
+              <MenuItem key={i} value={i}>
+                {i}
+              </MenuItem>
+            ))}
+          </Field>
           <ButtonContainer>
             <Button
               disabled={isSubmitting || review.status === 'SUBMITTED'}

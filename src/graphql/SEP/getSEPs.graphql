@@ -1,0 +1,12 @@
+query getSEPs($filter: String!) {
+  seps(filter: $filter) {
+    seps {
+      id
+      code
+      description
+      numberRatingsRequired
+      active
+    }
+    totalCount
+  }
+}
