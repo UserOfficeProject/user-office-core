@@ -14,7 +14,7 @@ import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserQueries {
   constructor(
-    private dataSource: UserDataSource,
+    public dataSource: UserDataSource,
     private userAuth: UserAuthorization
   ) {}
 

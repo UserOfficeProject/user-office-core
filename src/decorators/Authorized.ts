@@ -27,10 +27,8 @@ const Authorized = (roles: Roles[] = []) => {
         return isMutation ? rejection('NOT_LOGGED_IN') : null;
       }
 
-      const result = await originalMethod?.apply(this, args);
-
       if (roles.length === 0) {
-        return result;
+        return await originalMethod?.apply(this, args);
       }
 
       let hasAccessRights = false;
@@ -41,7 +39,7 @@ const Authorized = (roles: Roles[] = []) => {
       });
 
       if (hasAccessRights) {
-        return result;
+        return await originalMethod?.apply(this, args);
       } else {
         return isMutation ? rejection('INSUFFICIENT_PERMISSIONS') : null;
       }

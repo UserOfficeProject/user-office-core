@@ -12,9 +12,11 @@ import { User, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
+import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
+import { RemoveSEPMemberRole } from '../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -53,6 +55,17 @@ export default class UserMutations {
     const hash = bcrypt.hashSync(password, salt);
 
     return hash;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_DELETED)
+  async delete(agent: User | null, id: number): Promise<User | Rejection> {
+    const user = await this.dataSource.delete(id);
+    if (!user) {
+      return rejection('INTERNAL_ERROR');
+    }
+
+    return user;
   }
 
   createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
@@ -203,7 +216,6 @@ export default class UserMutations {
 
   // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
   @Authorized([Roles.USER_OFFICER, Roles.USER])
-  @ValidateArgs(updateUserValidationSchema)
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: User | null,
@@ -377,6 +389,30 @@ export default class UserMutations {
       .then(() => true)
       .catch(err => {
         logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async addSEPMembersRole(agent: User | null, args: AddSEPMembersRole[]) {
+    return this.dataSource
+      .addSEPMembersRole(args)
+      .then(() => true)
+      .catch(err => {
+        logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async removeSEPMemberRole(agent: User | null, args: RemoveSEPMemberRole) {
+    return this.dataSource
+      .removeSEPMemberRole(args)
+      .then(() => true)
+      .catch(err => {
+        logger.logException('Could not remove user role', err, { agent });
 
         return rejection('INTERNAL_ERROR');
       });

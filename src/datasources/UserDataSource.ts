@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../models/Role';
 import { User, BasicUserDetails } from '../models/User';
+import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { RemoveSEPMemberRole } from '../resolvers/mutations/RemoveSEPMemberRoleMutation';
 
 export interface UserDataSource {
+  delete(id: number): Promise<User | null>;
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
+  addSEPMembersRole(args: AddSEPMembersRole[]): Promise<boolean>;
+  removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
   checkEmailExist(email: string): Promise<boolean>;
@@ -18,6 +23,7 @@ export interface UserDataSource {
   getByOrcID(orcID: string): Promise<User | null>;
   getPasswordByEmail(email: string): Promise<string | null>;
   getUserRoles(id: number): Promise<Role[]>;
+  getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   getUsers(
     filter?: string,
     first?: number,

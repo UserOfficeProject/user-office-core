@@ -57,6 +57,11 @@ interface UserCreateEvent extends GeneralEvent {
   };
 }
 
+interface UserDeletedEvent extends GeneralEvent {
+  type: Event.USER_DELETED;
+  user: User;
+}
+
 interface EmailInvite extends GeneralEvent {
   type: Event.EMAIL_INVITE;
   emailinviteresponse: {
@@ -76,6 +81,16 @@ interface SEPUpdatedEvent extends GeneralEvent {
   sep: SEP;
 }
 
+interface SEPMembersAssignedEvent extends GeneralEvent {
+  type: Event.SEP_MEMBERS_ASSIGNED;
+  sep: SEP;
+}
+
+interface SEPMemberRemovedEvent extends GeneralEvent {
+  type: Event.SEP_MEMBER_REMOVED;
+  sep: SEP;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -87,4 +102,7 @@ export type ApplicationEvent =
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
   | SEPCreatedEvent
-  | SEPUpdatedEvent;
+  | SEPUpdatedEvent
+  | SEPMembersAssignedEvent
+  | SEPMemberRemovedEvent
+  | UserDeletedEvent;

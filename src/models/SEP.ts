@@ -7,3 +7,15 @@ export class SEP {
     public active: boolean
   ) {}
 }
+
+export class SEPAssignment {
+  constructor(
+    public proposalId: number | null,
+    public sepMemberUserId: number,
+    public sepId: number,
+    public dateAssigned: Date,
+    public reassigned: boolean,
+    public dateReassigned: Date | null,
+    public emailSent: boolean
+  ) {}
+}

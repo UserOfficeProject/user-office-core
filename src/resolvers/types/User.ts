@@ -83,22 +83,20 @@ export class User implements Partial<UserOrigin> {
   public updated: string;
 }
 
-@Resolver(of => User)
+@Resolver(() => User)
 export class UserResolver {
   @FieldResolver(() => [Role])
   async roles(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.user as any).dataSource.getUserRoles(user.id);
+    return context.queries.user.dataSource.getUserRoles(user.id);
   }
 
   @FieldResolver(() => [Review])
   async reviews(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.review as any).dataSource.getUserReviews(user.id);
+    return context.queries.review.dataSource.getUserReviews(user.id);
   }
 
   @FieldResolver(() => [Proposal])
   async proposals(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.proposal as any).dataSource.getUserProposals(
-      user.id
-    );
+    return context.queries.proposal.dataSource.getUserProposals(user.id);
   }
 }
