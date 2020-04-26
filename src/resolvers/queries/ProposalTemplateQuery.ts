@@ -10,7 +10,7 @@ export class ProposalTemplateQuery {
     @Ctx() context: ResolverContext,
     @Arg('templateId', () => Int) templateId: number
   ) {
-    return context.queries.template.getProposalTemplateSteps(
+    return context.queries.template.getProposalTemplate(
       context.user,
       templateId
     );
