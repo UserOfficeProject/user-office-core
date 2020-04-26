@@ -15,7 +15,7 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   return (
     <Formik
@@ -64,7 +64,7 @@ export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
               <Field
                 name="config.required"
                 label="Is required"
-                checked={formikProps.values.config.required}
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 margin="normal"
                 fullWidth

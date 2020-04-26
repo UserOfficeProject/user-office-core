@@ -10,9 +10,12 @@ export function ProposalComponentFileUpload(
   props: BasicComponentProps & { files: string[] }
 ) {
   const { templateField, errors, onComplete } = props;
-  const { proposal_question_id, value } = templateField;
-  const isError = errors[proposal_question_id] ? true : false;
-  const config = templateField.config as FileUploadConfig;
+  const {
+    question: { proposalQuestionId },
+    value,
+  } = templateField;
+  const isError = errors[proposalQuestionId] ? true : false;
+  const config = templateField.question.config as FileUploadConfig;
   const [stateValue, setStateValue] = useState(value);
 
   useEffect(() => {
@@ -22,10 +25,10 @@ export function ProposalComponentFileUpload(
   return (
     <FormControl error={isError} required={config.required ? true : false}>
       <FormLabel error={isError}>{templateField.question}</FormLabel>
-      <span>{templateField.config.small_label}</span>
+      <span>{templateField.question.config.small_label}</span>
       <FileUploadComponent
         maxFiles={config.max_files}
-        id={templateField.proposal_question_id}
+        id={templateField.question.proposalQuestionId}
         fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
@@ -34,7 +37,7 @@ export function ProposalComponentFileUpload(
         value={stateValue}
       />
       {isError && (
-        <ProposalErrorLabel>{errors[proposal_question_id]}</ProposalErrorLabel>
+        <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
       )}
     </FormControl>
   );

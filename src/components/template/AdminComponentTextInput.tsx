@@ -17,11 +17,11 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
-  const config = field.config as TextInputConfig;
+  const config = field.question.config as TextInputConfig;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     config.htmlQuestion !== null
   );
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   /**
    * NOTE: The console warning "Warning: `value` prop on `input` should not be null." is a bit complicated for now.
@@ -41,9 +41,9 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               ...field,
               ...vals,
               config: {
-                ...vals.config,
+                ...vals.question.config,
                 htmlQuestion: isRichQuestion
-                  ? (vals.config as TextInputConfig).htmlQuestion
+                  ? (vals.question.config as TextInputConfig).htmlQuestion
                   : null,
               },
             },
@@ -117,7 +117,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"
-                checked={formikProps.values.config.required}
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 label="Is required"
                 margin="normal"
@@ -160,7 +160,8 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               <Field
                 name="config.multiline"
                 checked={
-                  (formikProps.values.config as TextInputConfig).multiline
+                  (formikProps.values.question.config as TextInputConfig)
+                    .multiline
                 }
                 component={FormikUICustomCheckbox}
                 label="Multiple line"

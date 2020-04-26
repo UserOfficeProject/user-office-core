@@ -1,0 +1,8 @@
+mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
+  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
+    steps {
+      ...templateStep
+    }
+    error
+  }
+}

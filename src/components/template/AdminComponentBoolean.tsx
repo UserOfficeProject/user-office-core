@@ -13,7 +13,7 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   return (
     <Formik
@@ -60,7 +60,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"
-                checked={formikProps.values.config.required}
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 label="User must check it to continue"
                 margin="normal"

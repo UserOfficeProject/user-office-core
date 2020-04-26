@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   DataType,
   ProposalTemplate,
-  ProposalTemplateField,
+  QuestionRel,
   FieldDependency,
 } from '../generated/sdk';
 import { EventType, Event } from '../models/QuestionaryEditorModel';
@@ -16,11 +16,12 @@ export function usePersistModel() {
 
   const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
     return api()
-      .updateFieldTopicRel({
+      .updateQuestionsTopicRels({
+        templateId: 1,
         topicId,
         fieldIds,
       })
-      .then(data => data.updateFieldTopicRel);
+      .then(data => data.updateQuestionsTopicRels);
   };
 
   const updateTopic = async (
@@ -47,47 +48,63 @@ export function usePersistModel() {
 
   // Have this until GQL accepts Union types
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  const prepareDependencies = (dependencies: FieldDependency[]) => {
-    return dependencies.map(dependency => {
-      return {
-        ...dependency,
-        condition: {
-          ...dependency.condition,
-          params: JSON.stringify({ value: dependency.condition.params }),
-        },
-      };
-    });
+  const prepareDependencies = (dependency: FieldDependency) => {
+    return {
+      ...dependency,
+      condition: {
+        ...dependency.condition,
+        params: JSON.stringify({ value: dependency.condition.params }),
+      },
+    };
   };
 
-  const updateItem = async (field: ProposalTemplateField) => {
+  const updateItem = async (field: QuestionRel) => {
     return api()
-      .updateProposalTemplateField({
-        id: field.proposal_question_id,
-        naturalKey: field.natural_key,
-        question: field.question,
-        config: field.config ? JSON.stringify(field.config) : undefined,
-        isEnabled: true, // TODO implement UI for this toggle
-        dependencies: field.dependencies
-          ? prepareDependencies(field.dependencies)
-          : [],
+      .updateQuestion({
+        id: field.question.proposalQuestionId,
+        naturalKey: field.question.naturalKey,
+        question: field.question.question,
+        config: field.question.config
+          ? JSON.stringify(field.question.config)
+          : undefined,
       })
       .then(data => {
-        return data.updateProposalTemplateField;
+        return api()
+          .updateQuestionRel({
+            templateId: 1,
+            questionId: field.question.proposalQuestionId,
+            dependency: field.dependency
+              ? prepareDependencies(field.dependency)
+              : undefined,
+          })
+          .then(data => {
+            return data.updateQuestionRel;
+          });
       });
   };
 
-  const createTemplateField = async (topicId: number, dataType: DataType) => {
+  const createQuestion = async (topicId: number, dataType: DataType) => {
     setIsLoading(true);
 
     return api()
-      .createTemplateField({
-        topicId: topicId,
+      .createQuestion({
         dataType: dataType,
       })
-      .then(data => {
-        setIsLoading(false);
+      .then(questionResponse => {
+        const questionId = questionResponse.createQuestion.question
+          ?.proposalQuestionId as string;
 
-        return data.createTemplateField;
+        return api()
+          .updateQuestionRel({
+            questionId,
+            templateId: 1,
+            topicId,
+          })
+          .then(questionRelResponse => {
+            setIsLoading(false);
+
+            return questionResponse.createQuestion;
+          });
       });
   };
 
@@ -95,27 +112,28 @@ export function usePersistModel() {
     setIsLoading(true);
 
     return api()
-      .deleteTemplateField({
-        id,
+      .deleteQuestionRel({
+        templateId: 1,
+        questionId: id,
       })
       .then(data => {
         setIsLoading(false);
 
-        return data.deleteTemplateField;
+        return data.deleteQuestionRel;
       });
   };
 
-  const deleteTopic = async (id: number) => {
+  const deleteTopic = async (topicId: number) => {
     return api()
       .deleteTopic({
-        id,
+        topicId,
       })
       .then(data => data.deleteTopic);
   };
 
   const createTopic = async (sortOrder: number) => {
     return api()
-      .createTopic({ sortOrder })
+      .createTopic({ templateId: 1, sortOrder })
       .then(data => {
         return data.createTopic;
       });
@@ -156,29 +174,33 @@ export function usePersistModel() {
             action.payload.destination.droppableId
           );
           const reducedTopic = state.steps.find(
-            step => step.topic.topic_id === reducedTopicId
+            step => step.topic.id === reducedTopicId
           );
           const extendedTopic = state.steps.find(
-            step => step.topic.topic_id === extendedTopicId
+            step => step.topic.id === extendedTopicId
           );
 
           executeAndMonitorCall(() =>
             updateFieldTopicRel(
-              reducedTopic!.topic.topic_id,
-              reducedTopic!.fields.map(field => field.proposal_question_id)
+              reducedTopic!.topic.id,
+              reducedTopic!.fields.map(
+                field => field.question.proposalQuestionId
+              )
             )
           );
           if (reducedTopicId !== extendedTopicId) {
             executeAndMonitorCall(() =>
               updateFieldTopicRel(
-                extendedTopic!.topic.topic_id,
-                extendedTopic!.fields.map(field => field.proposal_question_id)
+                extendedTopic!.topic.id,
+                extendedTopic!.fields.map(
+                  field => field.question.proposalQuestionId
+                )
               )
             );
           }
           break;
         case EventType.REORDER_TOPIC_REQUESTED:
-          const topicOrder = state.steps.map(step => step.topic.topic_id);
+          const topicOrder = state.steps.map(step => step.topic.id);
           executeAndMonitorCall(() => updateTopicOrder(topicOrder));
           break;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
@@ -190,11 +212,11 @@ export function usePersistModel() {
           break;
         case EventType.UPDATE_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
-            const field = action.payload.field as ProposalTemplateField;
+            const field = action.payload.field as QuestionRel;
             const result = await updateItem(field);
             dispatch({
               type: EventType.FIELD_UPDATED,
-              payload: result.template,
+              payload: result.steps,
             });
 
             return result;
@@ -202,14 +224,14 @@ export function usePersistModel() {
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await createTemplateField(
+            const result = await createQuestion(
               action.payload.topicId,
               action.payload.dataType
             );
-            if (result.field) {
+            if (result.question) {
               dispatch({
                 type: EventType.FIELD_CREATED,
-                payload: { ...result.field },
+                payload: { ...result.question },
               });
             }
 
@@ -219,10 +241,10 @@ export function usePersistModel() {
         case EventType.DELETE_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await deleteField(action.payload.fieldId);
-            if (result.template) {
+            if (result.steps) {
               dispatch({
                 type: EventType.FIELD_DELETED,
-                payload: result.template,
+                payload: result.steps,
               });
             }
 
@@ -235,10 +257,10 @@ export function usePersistModel() {
         case EventType.CREATE_TOPIC_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createTopic(action.payload.sortOrder);
-            if (result.template) {
+            if (result.steps) {
               dispatch({
                 type: EventType.TOPIC_CREATED,
-                payload: result.template,
+                payload: result.steps,
               });
             }
 

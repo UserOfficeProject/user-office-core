@@ -83,18 +83,20 @@ const FormikUICustomDependencySelector = ({
 
   useEffect(() => {
     if (dependencyId) {
-      const depField = getFieldById(template, dependencyId);
+      const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
         return;
       }
-      if (depField.data_type === DataType.BOOLEAN) {
+      if (depField.question.dataType === DataType.BOOLEAN) {
         setAvailableValues([
           { label: 'true', value: true },
           { label: 'false', value: false },
         ]);
-      } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
+      } else if (
+        depField.question.dataType === DataType.SELECTION_FROM_OPTIONS
+      ) {
         setAvailableValues(
-          (depField.config as SelectionFromOptionsConfig).options.map(
+          (depField.question.config as SelectionFromOptionsConfig).options.map(
             option => {
               return { value: option, label: option };
             }
@@ -129,20 +131,20 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {getAllFields(template)
+            {getAllFields(template.steps)
               .filter(option =>
                 [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-                  option.data_type
+                  option.question.dataType
                 )
               )
               .map(option => {
                 return (
                   <MenuItem
-                    value={option.proposal_question_id}
+                    value={option.question.proposalQuestionId}
                     className={classes.menuItem}
-                    key={option.proposal_question_id}
+                    key={option.question.proposalQuestionId}
                   >
-                    {/* {getTemplateFieldIcon(option.data_type)}  */}
+                    {/* {getTemplateFieldIcon(option.question.dataType)}  */}
                     {option.question}
                   </MenuItem>
                 );

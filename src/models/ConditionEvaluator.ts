@@ -1,14 +1,14 @@
-import { EvaluatorOperator, QuestionaryField } from '../generated/sdk';
+import { EvaluatorOperator, Answer } from '../generated/sdk';
 import JSDict from '../utils/Dictionary';
 
 export class EqualityValidator implements FieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: string): boolean {
+  isSatisfied(field: Answer, params: string): boolean {
     return field.value === params;
   }
 }
 
 export class InequalityValidator implements FieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: string): boolean {
+  isSatisfied(field: Answer, params: string): boolean {
     return field.value !== params;
   }
 }
@@ -36,5 +36,5 @@ export class ConditionEvaluator {
 }
 
 export interface FieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: string): boolean;
+  isSatisfied(field: Answer, params: string): boolean;
 }

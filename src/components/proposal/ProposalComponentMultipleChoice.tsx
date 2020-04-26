@@ -33,11 +33,14 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
   })();
 
   const { templateField, touched, errors, onComplete } = props;
-  const { proposal_question_id, value } = templateField;
+  const {
+    question: { proposalQuestionId, question },
+    value,
+  } = templateField;
   const [stateValue, setStateValue] = useState(value);
-  const fieldError = getIn(errors, proposal_question_id);
-  const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const config = templateField.config as SelectionFromOptionsConfig;
+  const fieldError = getIn(errors, proposalQuestionId);
+  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const config = templateField.question.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -53,8 +56,8 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
       return (
         <FormControl fullWidth>
           <TextField
-            id={proposal_question_id}
-            name={proposal_question_id}
+            id={proposalQuestionId}
+            name={proposalQuestionId}
             value={stateValue}
             label={templateField.question}
             select
@@ -90,10 +93,10 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
           <FormLabel className={classes.label}>
             {templateField.question}
           </FormLabel>
-          <span>{templateField.config.small_label}</span>
+          <span>{templateField.question.config.small_label}</span>
           <RadioGroup
-            id={templateField.proposal_question_id}
-            name={templateField.proposal_question_id}
+            id={templateField.question.proposalQuestionId}
+            name={templateField.question.proposalQuestionId}
             value={stateValue}
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)

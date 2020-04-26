@@ -3,11 +3,7 @@ import { Formik } from 'formik';
 import React, { useContext, SyntheticEvent } from 'react';
 import * as Yup from 'yup';
 
-import {
-  DataType,
-  QuestionaryField,
-  QuestionaryStep,
-} from '../../generated/sdk';
+import { DataType, Answer, QuestionaryStep } from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
 import { ProposalAnswer } from '../../models/ProposalModel';
 import {
@@ -50,16 +46,18 @@ class ComponentFactory {
     );
   }
   createComponent(
-    field: QuestionaryField,
+    field: Answer,
     props: any
   ): React.ComponentElement<BasicComponentProps, any> {
     props.templateField = field;
-    props.key = field.proposal_question_id;
+    props.key = field.question.proposalQuestionId;
 
-    const component = this.componentMap.get(field.data_type);
+    const component = this.componentMap.get(field.question.dataType);
 
     if (!component) {
-      throw new Error(`Could not create component for type ${field.data_type}`);
+      throw new Error(
+        `Could not create component for type ${field.question.dataType}`
+      );
     }
 
     return React.createElement(component, props);
@@ -90,7 +88,7 @@ export default function ProposalQuestionaryStep(props: {
   }
 
   const questionary = data.proposal.questionary!;
-  const questionaryStep = getStepByTopicId(questionary, topicId) as
+  const questionaryStep = getStepByTopicId(questionary.steps, topicId) as
     | QuestionaryStep
     | undefined;
   if (!questionaryStep) {
@@ -100,8 +98,8 @@ export default function ProposalQuestionaryStep(props: {
   const activeFields = questionaryStep
     ? questionaryStep.fields.filter(field => {
         return areDependenciesSatisfied(
-          questionary,
-          field.proposal_question_id
+          questionary.steps,
+          field.question.proposalQuestionId
         );
       })
     : [];
@@ -112,9 +110,9 @@ export default function ProposalQuestionaryStep(props: {
 
   const saveStepData = async (markAsComplete: boolean) => {
     const answers: ProposalAnswer[] = activeFields.map(field => {
-      return (({ proposal_question_id, data_type, value }) => ({
-        proposal_question_id,
-        data_type,
+      return (({ question, value }) => ({
+        proposalQuestionId: question.proposalQuestionId,
+        dataType: question.dataType,
         value,
       }))(field); // convert field to answer object
     });
@@ -143,7 +141,7 @@ export default function ProposalQuestionaryStep(props: {
             return (
               <div
                 className={classes.componentWrapper}
-                key={field.proposal_question_id}
+                key={field.question.proposalQuestionId}
               >
                 {componentFactory.createComponent(field, {
                   touched: touched, // for formik
@@ -153,7 +151,7 @@ export default function ProposalQuestionaryStep(props: {
                       dispatch({
                         type: EventType.FIELD_CHANGED,
                         payload: {
-                          id: field.proposal_question_id,
+                          id: field.question.proposalQuestionId,
                           newValue: newValue,
                         },
                       });

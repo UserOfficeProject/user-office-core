@@ -13,7 +13,7 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentFileUpload: AdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   return (
     <Formik

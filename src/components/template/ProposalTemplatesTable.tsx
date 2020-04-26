@@ -5,24 +5,33 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import {
-  GetProposalTemplatesMetadataQuery,
-  ProposalTemplateMetadata,
+  GetProposalTemplatesQuery,
+  ProposalTemplate,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
 
 function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
+  type RowDataType = Pick<
+    ProposalTemplate,
+    | 'templateId'
+    | 'name'
+    | 'description'
+    | 'isArchived'
+    | 'proposalCount'
+    | 'callCount'
+  >;
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const [templates, setTemplates] = useState<ProposalTemplateMetadata[]>([]);
+  const [templates, setTemplates] = useState<RowDataType[]>([]);
   const history = useHistory();
   useEffect(() => {
     props.dataProvider().then(data => {
-      setTemplates(data.proposalTemplatesMetadata);
+      setTemplates(data.proposalTemplates);
     });
   }, [props]);
-  const columns: Column<ProposalTemplateMetadata>[] = [
+  const columns: Column<RowDataType>[] = [
     { title: 'Template ID', field: 'templateId', editable: 'never' },
     { title: 'Name', field: 'name', editable: 'always' },
     { title: 'Description', field: 'description', editable: 'always' },
@@ -35,7 +44,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
     icon: () => <Email />,
     isFreeAction: true,
     tooltip: 'Edit template',
-    onClick: (event: any, rowData: ProposalTemplateMetadata) => {
+    onClick: (event: any, rowData: RowDataType) => {
       history.push(`/QuestionaryEditor/${rowData.templateId}`);
     },
   });
@@ -55,18 +64,15 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                 description: data.description,
               })
               .then(result => {
-                const {
-                  templateMetadata,
-                  error,
-                } = result.createProposalTemplate;
+                const { template, error } = result.createProposalTemplate;
 
-                if (!templateMetadata) {
+                if (!template) {
                   enqueueSnackbar(error || 'Error ocurred', {
                     variant: 'error',
                   });
                 } else {
                   const newTemplates = [...templates];
-                  newTemplates.push(templateMetadata!);
+                  newTemplates.push(template!);
                   setTemplates(newTemplates);
                 }
                 resolve();
@@ -77,14 +83,9 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         {
           icon: () => <Edit />,
           tooltip: 'Edit',
-          onClick: (
-            event: any,
-            data: ProposalTemplateMetadata | ProposalTemplateMetadata[]
-          ) => {
+          onClick: (event: any, data: RowDataType | RowDataType[]) => {
             history.push(
-              `/QuestionaryEditor/${
-                (data as ProposalTemplateMetadata).templateId
-              }`
+              `/QuestionaryEditor/${(data as RowDataType).templateId}`
             );
           },
         },
@@ -92,10 +93,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
           icon: () => <FileCopy />,
           hidden: false,
           tooltip: 'Clone',
-          onClick: (
-            event: any,
-            data: ProposalTemplateMetadata | ProposalTemplateMetadata[]
-          ) => {
+          onClick: (event: any, data: RowDataType | RowDataType[]) => {
             props.confirm(
               () => {
                 console.log('Confirmed');
@@ -103,7 +101,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
               {
                 title: 'Are you sure?',
                 description: `Are you sure you want to clone ${
-                  (data as ProposalTemplateMetadata).name
+                  (data as RowDataType).name
                 }`,
               }
             )();
@@ -112,15 +110,12 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         rowData => ({
           icon: () => <Delete />,
           tooltip: 'Delete',
-          onClick: (
-            event: any,
-            data: ProposalTemplateMetadata | ProposalTemplateMetadata[]
-          ) => {
+          onClick: (event: any, data: RowDataType | RowDataType[]) => {
             props.confirm(
               () => {
                 api()
                   .deleteProposalTemplate({
-                    id: (data as ProposalTemplateMetadata).templateId,
+                    id: (data as RowDataType).templateId,
                   })
                   .then(response => {
                     const data = [...templates];
@@ -128,8 +123,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                       templates.findIndex(
                         elem =>
                           elem.templateId ===
-                          response.deleteProposalTemplate.templateMetadata
-                            ?.templateId
+                          response.deleteProposalTemplate.template?.templateId
                       ),
                       1
                     );
@@ -139,7 +133,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
               {
                 title: 'Are you sure?',
                 description: `Are you sure you want to delete ${
-                  (data as ProposalTemplateMetadata).name
+                  (data as RowDataType).name
                 }`,
               }
             )();
@@ -151,7 +145,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 }
 
 interface IProposalTemplatesTableProps {
-  dataProvider: () => Promise<GetProposalTemplatesMetadataQuery>;
+  dataProvider: () => Promise<GetProposalTemplatesQuery>;
   confirm: WithConfirmType;
 }
 

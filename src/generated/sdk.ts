@@ -1228,6 +1228,24 @@ export type DeleteQuestionMutation = (
   ) }
 );
 
+export type DeleteQuestionRelMutationVariables = {
+  questionId: Scalars['String'],
+  templateId: Scalars['Int']
+};
+
+
+export type DeleteQuestionRelMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteQuestionRel: (
+    { __typename?: 'TemplateStepArrayResponseWrap' }
+    & Pick<TemplateStepArrayResponseWrap, 'error'>
+    & { steps: Array<(
+      { __typename?: 'TemplateStep' }
+      & TemplateStepFragment
+    )> }
+  ) }
+);
+
 export type DeleteTopicMutationVariables = {
   topicId: Scalars['Int']
 };
@@ -2395,6 +2413,16 @@ export const DeleteQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
+export const DeleteQuestionRelDocument = gql`
+    mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
+  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
+    steps {
+      ...templateStep
+    }
+    error
+  }
+}
+    ${TemplateStepFragmentDoc}`;
 export const DeleteTopicDocument = gql`
     mutation deleteTopic($topicId: Int!) {
   deleteTopic(topicId: $topicId) {
@@ -2956,6 +2984,9 @@ export function getSdk(client: GraphQLClient) {
     },
     deleteQuestion(variables: DeleteQuestionMutationVariables): Promise<DeleteQuestionMutation> {
       return client.request<DeleteQuestionMutation>(print(DeleteQuestionDocument), variables);
+    },
+    deleteQuestionRel(variables: DeleteQuestionRelMutationVariables): Promise<DeleteQuestionRelMutation> {
+      return client.request<DeleteQuestionRelMutation>(print(DeleteQuestionRelDocument), variables);
     },
     deleteTopic(variables: DeleteTopicMutationVariables): Promise<DeleteTopicMutation> {
       return client.request<DeleteTopicMutation>(print(DeleteTopicDocument), variables);

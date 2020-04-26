@@ -66,7 +66,8 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
             <Field
               name="config.omitFromPdf"
               checked={
-                (formikProps.values.config as EmbellishmentConfig).omitFromPdf
+                (formikProps.values.question.config as EmbellishmentConfig)
+                  .omitFromPdf
               }
               component={FormikUICustomCheckbox}
               label="Omit from PDF"

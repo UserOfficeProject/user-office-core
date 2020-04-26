@@ -49,7 +49,7 @@ enum StepType {
 const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
   if (answers) {
     answers = answers.filter(
-      answer => getDataTypeSpec(answer.data_type).readonly === false // filter out read only fields
+      answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
     );
     answers = answers.map(answer => {
       return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
@@ -308,14 +308,14 @@ export default function ProposalContainer(props: { data: Proposal }) {
 
           return new QuestionaryUIStep(
             StepType.QUESTIONARY,
-            step.topic.topic_title,
+            step.topic.title,
             step.isCompleted,
             (
               <ProposalQuestionaryStep
-                topicId={step.topic.topic_id}
+                topicId={step.topic.id}
                 data={state}
                 readonly={(!editable || isSubmitted) && isNonOfficer}
-                key={step.topic.topic_id}
+                key={step.topic.id}
               />
             )
           );
