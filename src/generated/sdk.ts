@@ -209,6 +209,9 @@ export type Mutation = {
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
+  assignChairAndSecretary: SepResponseWrap,
+  assignMember: SepResponseWrap,
+  removeMember: SepResponseWrap,
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
@@ -221,8 +224,10 @@ export type Mutation = {
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
+  removeSEPMemberRole: SepMembersRoleResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
+  addSEPMembersRole: SepMembersRoleResponseWrap,
   createProposal: ProposalResponseWrap,
   createProposalTemplate: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
@@ -301,6 +306,24 @@ export type MutationAddTechnicalReviewArgs = {
 export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'],
   proposalID: Scalars['Int']
+};
+
+
+export type MutationAssignChairAndSecretaryArgs = {
+  memberIds: Array<Scalars['Int']>,
+  sepId: Scalars['Int']
+};
+
+
+export type MutationAssignMemberArgs = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type MutationRemoveMemberArgs = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int']
 };
 
 
@@ -407,6 +430,12 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationRemoveSepMemberRoleArgs = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
 export type MutationUpdateUserArgs = {
   id: Scalars['Int'],
   user_title?: Maybe<Scalars['String']>,
@@ -433,6 +462,11 @@ export type MutationUpdateUserArgs = {
 
 export type MutationAddClientLogArgs = {
   error: Scalars['String']
+};
+
+
+export type MutationAddSepMembersRoleArgs = {
+  addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
 };
 
 
@@ -582,7 +616,7 @@ export type Proposal = {
   templateId: Scalars['Int'],
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
-  reviews: Array<Review>,
+  reviews?: Maybe<Array<Review>>,
   technicalReview?: Maybe<TechnicalReview>,
   questionary: Questionary,
 };
@@ -664,6 +698,7 @@ export type Query = {
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
   sep?: Maybe<Sep>,
+  sepAssignments?: Maybe<Array<SepAssignment>>,
   seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
   me?: Maybe<User>,
@@ -750,6 +785,11 @@ export type QueryReviewArgs = {
 
 
 export type QuerySepArgs = {
+  id: Scalars['Int']
+};
+
+
+export type QuerySepAssignmentsArgs = {
   id: Scalars['Int']
 };
 
@@ -871,6 +911,25 @@ export type Sep = {
   description: Scalars['String'],
   numberRatingsRequired: Scalars['Float'],
   active: Scalars['Boolean'],
+};
+
+export type SepAssignment = {
+   __typename?: 'SEPAssignment',
+  proposalId?: Maybe<Scalars['Int']>,
+  sepMemberUserId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  dateAssigned: Scalars['DateTime'],
+  reassigned: Scalars['Boolean'],
+  dateReassigned?: Maybe<Scalars['DateTime']>,
+  emailSent: Scalars['Boolean'],
+  roles: Array<Role>,
+  user: BasicUserDetails,
+};
+
+export type SepMembersRoleResponseWrap = {
+   __typename?: 'SEPMembersRoleResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  success?: Maybe<Scalars['Boolean']>,
 };
 
 export type SepResponseWrap = {
@@ -1589,14 +1648,14 @@ export type GetBlankProposalQuery = (
     ), users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
-    )>, reviews: Array<(
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )> }
+    )>> }
   )> }
 );
 
@@ -1648,14 +1707,14 @@ export type GetProposalQuery = (
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
-    )>, reviews: Array<(
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )> }
+    )>> }
   )> }
 );
 
@@ -1710,14 +1769,14 @@ export type GetProposalsQuery = (
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      ), reviews: Array<(
+      ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
         & { reviewer: Maybe<(
           { __typename?: 'User' }
           & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
         )> }
-      )>, users: Array<(
+      )>>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(

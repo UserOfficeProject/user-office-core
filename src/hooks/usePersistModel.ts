@@ -99,6 +99,7 @@ export function usePersistModel() {
             questionId,
             templateId: 1,
             topicId,
+            sortOrder: 0,
           })
           .then(questionRelResponse => {
             setIsLoading(false);
