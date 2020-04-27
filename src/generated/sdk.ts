@@ -556,7 +556,7 @@ export type Proposal = {
   finalStatus?: Maybe<ProposalEndStatus>,
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
-  reviews: Array<Review>,
+  reviews?: Maybe<Array<Review>>,
   technicalReview?: Maybe<TechnicalReview>,
   questionary: Questionary,
 };
@@ -1497,14 +1497,14 @@ export type GetBlankProposalQuery = (
     ), users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
-    )>, reviews: Array<(
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )> }
+    )>> }
   )> }
 );
 
@@ -1553,14 +1553,14 @@ export type GetProposalQuery = (
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
-    )>, reviews: Array<(
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )> }
+    )>> }
   )> }
 );
 
@@ -1600,14 +1600,14 @@ export type GetProposalsQuery = (
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      ), reviews: Array<(
+      ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
         & { reviewer: Maybe<(
           { __typename?: 'User' }
           & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
         )> }
-      )>, users: Array<(
+      )>>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(
@@ -1916,6 +1916,23 @@ export type CreateUserByEmailInviteMutation = (
   & { createUserByEmailInvite: (
     { __typename?: 'CreateUserByEmailInviteResponseWrap' }
     & Pick<CreateUserByEmailInviteResponseWrap, 'error' | 'id'>
+  ) }
+);
+
+export type DeleteUserMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type DeleteUserMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUser: (
+    { __typename?: 'UserResponseWrap' }
+    & Pick<UserResponseWrap, 'error'>
+    & { user: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id'>
+    )> }
   ) }
 );
 
@@ -2898,6 +2915,16 @@ export const CreateUserByEmailInviteDocument = gql`
   }
 }
     `;
+export const DeleteUserDocument = gql`
+    mutation deleteUser($id: Int!) {
+  deleteUser(id: $id) {
+    user {
+      id
+    }
+    error
+  }
+}
+    `;
 export const GetBasicUserDetailsDocument = gql`
     query getBasicUserDetails($id: Int!) {
   basicUserDetails(id: $id) {
@@ -3224,6 +3251,9 @@ export function getSdk(client: GraphQLClient) {
     },
     createUserByEmailInvite(variables: CreateUserByEmailInviteMutationVariables): Promise<CreateUserByEmailInviteMutation> {
       return client.request<CreateUserByEmailInviteMutation>(print(CreateUserByEmailInviteDocument), variables);
+    },
+    deleteUser(variables: DeleteUserMutationVariables): Promise<DeleteUserMutation> {
+      return client.request<DeleteUserMutation>(print(DeleteUserDocument), variables);
     },
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables): Promise<GetBasicUserDetailsQuery> {
       return client.request<GetBasicUserDetailsQuery>(print(GetBasicUserDetailsDocument), variables);
