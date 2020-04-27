@@ -1,0 +1,17 @@
+mutation assignMember($memberId: Int!, $sepId: Int!) {
+  assignMember(memberId: $memberId, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}
+
+mutation assignChairAndSecretary($memberIds: [Int!]!, $sepId: Int!) {
+  assignChairAndSecretary(memberIds: $memberIds, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}
