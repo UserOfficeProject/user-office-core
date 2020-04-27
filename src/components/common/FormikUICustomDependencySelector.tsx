@@ -17,6 +17,7 @@ import {
   ProposalTemplate,
   SelectionFromOptionsConfig,
   QuestionRel,
+  FieldDependency,
 } from '../../generated/sdk';
 import {
   getAllFields,
@@ -67,18 +68,16 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = (): void => {
-    const dependencies = [];
     if (dependencyId && dependencyValue && operator) {
-      dependencies.push({
-        question_id: templateField.question.proposalQuestionId,
-        dependency_id: dependencyId,
+      const dependency = {
+        dependencyId,
         condition: {
           condition: operator,
           params: dependencyValue,
         },
-      });
+      };
+      form.setFieldValue(field.name, dependency);
     }
-    form.setFieldValue(field.name, dependencies);
   };
 
   useEffect(() => {
@@ -145,7 +144,7 @@ const FormikUICustomDependencySelector = ({
                     key={option.question.proposalQuestionId}
                   >
                     {/* {getTemplateFieldIcon(option.question.dataType)}  */}
-                    {option.question}
+                    {option.question.question}
                   </MenuItem>
                 );
               })}

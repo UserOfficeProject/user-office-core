@@ -94,7 +94,7 @@ export default function ProposalQuestionaryReview(
           </TableRow>
           {completedFields.map((row: Answer) => (
             <TableRow key={row.question.proposalQuestionId}>
-              <TableCell>{row.question}</TableCell>
+              <TableCell>{row.question.question}</TableCell>
               <TableCell>
                 {row.question.dataType === DataType.FILE_UPLOAD
                   ? row.value

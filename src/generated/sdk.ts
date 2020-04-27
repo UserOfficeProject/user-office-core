@@ -215,11 +215,11 @@ export type Mutation = {
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
-  createTopic: TemplateStepArrayResponseWrap,
-  deleteQuestionRel: TemplateStepArrayResponseWrap,
+  createTopic: ProposalTemplateResponseWrap,
+  deleteQuestionRel: ProposalTemplateResponseWrap,
   updateProposalTemplate: ProposalTemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
-  updateQuestionRel: TemplateStepArrayResponseWrap,
+  updateQuestionRel: ProposalTemplateResponseWrap,
   updateTopic: TopicResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
@@ -979,12 +979,6 @@ export type TemplateStep = {
   fields: Array<QuestionRel>,
 };
 
-export type TemplateStepArrayResponseWrap = {
-   __typename?: 'TemplateStepArrayResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  steps: Array<TemplateStep>,
-};
-
 export type TextInputConfig = {
    __typename?: 'TextInputConfig',
   small_label: Scalars['String'],
@@ -1415,11 +1409,14 @@ export type CreateTopicMutationVariables = {
 export type CreateTopicMutation = (
   { __typename?: 'Mutation' }
   & { createTopic: (
-    { __typename?: 'TemplateStepArrayResponseWrap' }
-    & Pick<TemplateStepArrayResponseWrap, 'error'>
-    & { steps: Array<(
-      { __typename?: 'TemplateStep' }
-      & TemplateStepFragment
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & { steps: Array<(
+        { __typename?: 'TemplateStep' }
+        & TemplateStepFragment
+      )> }
     )> }
   ) }
 );
@@ -1483,11 +1480,14 @@ export type DeleteQuestionRelMutationVariables = {
 export type DeleteQuestionRelMutation = (
   { __typename?: 'Mutation' }
   & { deleteQuestionRel: (
-    { __typename?: 'TemplateStepArrayResponseWrap' }
-    & Pick<TemplateStepArrayResponseWrap, 'error'>
-    & { steps: Array<(
-      { __typename?: 'TemplateStep' }
-      & TemplateStepFragment
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & { steps: Array<(
+        { __typename?: 'TemplateStep' }
+        & TemplateStepFragment
+      )> }
     )> }
   ) }
 );
@@ -1877,11 +1877,14 @@ export type UpdateQuestionRelMutationVariables = {
 export type UpdateQuestionRelMutation = (
   { __typename?: 'Mutation' }
   & { updateQuestionRel: (
-    { __typename?: 'TemplateStepArrayResponseWrap' }
-    & Pick<TemplateStepArrayResponseWrap, 'error'>
-    & { steps: Array<(
-      { __typename?: 'TemplateStep' }
-      & TemplateStepFragment
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & { steps: Array<(
+        { __typename?: 'TemplateStep' }
+        & TemplateStepFragment
+      )> }
     )> }
   ) }
 );
@@ -2747,8 +2750,10 @@ export const CreateQuestionDocument = gql`
 export const CreateTopicDocument = gql`
     mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
-    steps {
-      ...templateStep
+    template {
+      steps {
+        ...templateStep
+      }
     }
     error
   }
@@ -2787,8 +2792,10 @@ export const DeleteQuestionDocument = gql`
 export const DeleteQuestionRelDocument = gql`
     mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
   deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
-    steps {
-      ...templateStep
+    template {
+      steps {
+        ...templateStep
+      }
     }
     error
   }
@@ -3023,8 +3030,10 @@ export const UpdateQuestionDocument = gql`
 export const UpdateQuestionRelDocument = gql`
     mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $dependency: FieldDependencyInput) {
   updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
-    steps {
-      ...templateStep
+    template {
+      steps {
+        ...templateStep
+      }
     }
     error
   }

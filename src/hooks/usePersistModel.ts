@@ -6,6 +6,7 @@ import {
   QuestionRel,
   FieldDependency,
 } from '../generated/sdk';
+import { getFieldById } from '../models/ProposalModelFunctions';
 import { EventType, Event } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
 
@@ -72,6 +73,8 @@ export function usePersistModel() {
         return api()
           .updateQuestionRel({
             templateId: 1,
+            topicId: 1,
+            sortOrder: 0,
             questionId: field.question.proposalQuestionId,
             dependency: field.dependency
               ? prepareDependencies(field.dependency)
@@ -83,6 +86,7 @@ export function usePersistModel() {
       });
   };
 
+  // TODO Use this method again after using new UI
   const createQuestion = async (topicId: number, dataType: DataType) => {
     setIsLoading(true);
 
@@ -104,7 +108,7 @@ export function usePersistModel() {
           .then(questionRelResponse => {
             setIsLoading(false);
 
-            return questionResponse.createQuestion;
+            return questionRelResponse.updateQuestionRel;
           });
       });
   };
@@ -217,7 +221,7 @@ export function usePersistModel() {
             const result = await updateItem(field);
             dispatch({
               type: EventType.FIELD_UPDATED,
-              payload: result.steps,
+              payload: result.template,
             });
 
             return result;
@@ -225,27 +229,46 @@ export function usePersistModel() {
           break;
         case EventType.CREATE_NEW_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await createQuestion(
-              action.payload.topicId,
-              action.payload.dataType
-            );
-            if (result.question) {
-              dispatch({
-                type: EventType.FIELD_CREATED,
-                payload: { ...result.question },
-              });
-            }
+            setIsLoading(true);
 
-            return result;
+            return api()
+              .createQuestion({
+                dataType: action.payload.dataType,
+              })
+              .then(questionResponse => {
+                const questionId = questionResponse.createQuestion.question
+                  ?.proposalQuestionId as string;
+
+                return api()
+                  .updateQuestionRel({
+                    questionId,
+                    templateId: 1,
+                    topicId: action.payload.topicId,
+                    sortOrder: 0,
+                  })
+                  .then(questionRelResponse => {
+                    setIsLoading(false);
+                    const template =
+                      questionRelResponse.updateQuestionRel.template;
+                    if (template) {
+                      dispatch({
+                        type: EventType.FIELD_CREATED,
+                        payload: getFieldById(template.steps, questionId),
+                      });
+                    }
+
+                    return questionRelResponse.updateQuestionRel;
+                  });
+              });
           });
           break;
         case EventType.DELETE_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await deleteField(action.payload.fieldId);
-            if (result.steps) {
+            if (result.template) {
               dispatch({
                 type: EventType.FIELD_DELETED,
-                payload: result.steps,
+                payload: result.template,
               });
             }
 
@@ -258,10 +281,10 @@ export function usePersistModel() {
         case EventType.CREATE_TOPIC_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createTopic(action.payload.sortOrder);
-            if (result.steps) {
+            if (result.template) {
               dispatch({
                 type: EventType.TOPIC_CREATED,
-                payload: result.steps,
+                payload: result.template,
               });
             }
 

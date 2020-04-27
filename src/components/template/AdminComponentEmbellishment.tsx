@@ -28,9 +28,11 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        config: Yup.object({
-          html: Yup.string().required('Content is required'),
-          plain: Yup.string().required('Plain description is required'),
+        question: Yup.object({
+          config: Yup.object({
+            html: Yup.string().required('Content is required'),
+            plain: Yup.string().required('Plain description is required'),
+          }),
         }),
       })}
     >
@@ -38,7 +40,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Embellishment">
             <Field
-              name="config.html"
+              name="question.config.html"
               type="text"
               component={FormikUICustomEditor}
               margin="normal"
@@ -54,7 +56,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
             />
 
             <Field
-              name="config.plain"
+              name="question.config.plain"
               label="Plain description"
               type="text"
               component={TextField}
@@ -64,7 +66,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
             />
 
             <Field
-              name="config.omitFromPdf"
+              name="question.config.omitFromPdf"
               checked={
                 (formikProps.values.question.config as EmbellishmentConfig)
                   .omitFromPdf
@@ -78,7 +80,7 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
 
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

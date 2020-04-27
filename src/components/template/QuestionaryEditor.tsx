@@ -100,7 +100,7 @@ export default function QuestionaryEditor() {
   };
 
   const progressJsx = isLoading ? <LinearProgress /> : null;
-
+  console.log(state);
   const addNewTopicFallbackButton =
     state.steps.length === 0 ? (
       <Button

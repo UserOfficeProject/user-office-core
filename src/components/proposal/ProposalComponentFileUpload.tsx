@@ -24,7 +24,7 @@ export function ProposalComponentFileUpload(
 
   return (
     <FormControl error={isError} required={config.required ? true : false}>
-      <FormLabel error={isError}>{templateField.question}</FormLabel>
+      <FormLabel error={isError}>{templateField.question.question}</FormLabel>
       <span>{templateField.question.config.small_label}</span>
       <FileUploadComponent
         maxFiles={config.max_files}

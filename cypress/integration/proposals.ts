@@ -1,216 +1,224 @@
-// /// <reference types="Cypress" />
-// /// <reference types="../types" />
-// var faker = require('faker');
+/// <reference types="Cypress" />
+/// <reference types="../types" />
+var faker = require('faker');
 
-// context('Proposal tests', () => {
-//   before(() => {
-//     cy.resetDB();
-//   });
-//   beforeEach(() => {
-//     cy.viewport(1100, 800);
-//     cy.visit('/');
-//   });
+context('Proposal tests', () => {
+  before(() => {
+    cy.resetDB();
+  });
+  beforeEach(() => {
+    cy.viewport(1100, 800);
+    cy.visit('/');
+  });
 
-//   let boolId;
-//   let textId;
-//   let dateId;
-//   const booleanQuestion = faker.random.words(2);
-//   const textQuestion = faker.random.words(2);
-//   const dateQuestion = faker.random.words(2);
-//   const fileQuestion = faker.random.words(2);
+  let boolId;
+  let textId;
+  let dateId;
+  const booleanQuestion = faker.random.words(2);
+  const textQuestion = faker.random.words(2);
+  const dateQuestion = faker.random.words(2);
+  const fileQuestion = faker.random.words(2);
 
-//   const topic = faker.random.words(1);
-//   const title = faker.random.words(3);
-//   const abstract = faker.random.words(8);
-//   const textAnswer = faker.random.words(5);
+  const topic = faker.random.words(1);
+  const title = faker.random.words(3);
+  const abstract = faker.random.words(8);
+  const textAnswer = faker.random.words(5);
 
-//   it('Should be able to modify proposal', () => {
-//     cy.login('officer');
+  it('User officer can modify proposal template', () => {
+    cy.login('officer');
 
-//     cy.contains('Questionaries').click();
+    cy.contains('Questionaries').click();
 
-//     cy.contains('Add topic').click();
+    cy.get("[title='Edit']")
+      .first()
+      .click();
 
-//     cy.get('[data-cy=topic-title]').click();
+    cy.contains('Add topic').click();
 
-//     cy.get('[data-cy=topic-title-input]')
-//       .clear()
-//       .type(`${topic}{enter}`);
+    cy.get('[data-cy=topic-title]').click();
 
-//     /* Select from options */
-//     cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=topic-title-input]')
+      .clear()
+      .type(`${topic}{enter}`);
 
-//     cy.contains('Add Boolean').click();
+    /* Select from options */
+    cy.get('[data-cy=show-more-button]').click();
 
-//     cy.get('[data-cy=question]')
-//       .clear()
-//       .type(booleanQuestion);
+    cy.contains('Add Boolean').click();
 
-//     cy.contains('Save').click();
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(booleanQuestion);
 
-//     cy.contains(booleanQuestion)
-//       .siblings("[data-cy='proposal-question-id']")
-//       .invoke('html')
-//       .then(fieldId => {
-//         boolId = fieldId;
-//       });
-//     /* --- */
+    cy.contains('Save').click();
 
-//     /* Text input */
-//     cy.get('[data-cy=show-more-button]').click();
+    cy.contains(booleanQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        boolId = fieldId;
+      });
+    /* --- */
 
-//     cy.contains('Add Text input').click();
+    /* Text input */
+    cy.get('[data-cy=show-more-button]').click();
 
-//     cy.get('[data-cy=question]')
-//       .clear()
-//       .type(textQuestion);
+    cy.contains('Add Text input').click();
 
-//     cy.get('#dependency-id').click();
-//     cy.get('#menu- > .MuiPaper-root > .MuiList-root').click(); // Get first answer from dropdown
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(textQuestion);
 
-//     cy.get('#dependencyValue').click();
-//     cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
+    cy.get('#dependency-id').click();
+    cy.get('#menu- > .MuiPaper-root > .MuiList-root').click(); // Get first answer from dropdown
 
-//     cy.contains('Is required').click();
+    cy.get('#dependencyValue').click();
+    cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
 
-//     cy.contains('Save').click();
+    cy.contains('Is required').click();
 
-//     cy.contains(textQuestion)
-//       .siblings("[data-cy='proposal-question-id']")
-//       .invoke('html')
-//       .then(fieldId => {
-//         textId = fieldId;
-//       });
+    cy.contains('Save').click();
 
-//     /* Date */
-//     cy.get('[data-cy=show-more-button]').click();
+    cy.contains(textQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        textId = fieldId;
+      });
 
-//     cy.contains('Add Date').click();
+    /* Date */
+    cy.get('[data-cy=show-more-button]').click();
 
-//     cy.get('[data-cy=question]')
-//       .clear()
-//       .type(dateQuestion);
+    cy.contains('Add Date').click();
 
-//     cy.contains('Is required').click();
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(dateQuestion);
 
-//     cy.contains('Save').click();
+    cy.contains('Is required').click();
 
-//     cy.contains(dateQuestion)
-//       .siblings("[data-cy='proposal-question-id']")
-//       .invoke('html')
-//       .then(fieldId => {
-//         dateId = fieldId;
-//       });
-//     /* --- */
+    cy.contains('Save').click();
 
-//     /* File */
-//     cy.get('[data-cy=show-more-button]').click();
+    cy.contains(dateQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        dateId = fieldId;
+      });
+    /* --- */
 
-//     cy.contains('Add File upload').click();
+    /* File */
+    cy.get('[data-cy=show-more-button]').click();
 
-//     cy.get('[data-cy=question]')
-//       .clear()
-//       .type(fileQuestion);
+    cy.contains('Add File upload').click();
 
-//     cy.contains('Save').click();
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(fileQuestion);
 
-//     cy.contains(dateQuestion)
-//       .siblings("[data-cy='proposal-question-id']")
-//       .invoke('html')
-//       .then(fieldId => {
-//         dateId = fieldId;
-//       });
-//     /* --- */
+    cy.contains('Save').click();
 
-//     /* Update question */
-//     const newKey = faker.random
-//       .word()
-//       .toLowerCase()
-//       .split(' ')
-//       .join('_');
+    cy.contains(dateQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        dateId = fieldId;
+      });
+    /* --- */
 
-//     cy.contains(textQuestion).click();
+    /* Update question */
+    const newKey = faker.random
+      .word()
+      .toLowerCase()
+      .split(/\s|-/) // replace spaces and dashes
+      .join('_');
 
-//     cy.get("[data-cy='natural_key']")
-//       .clear()
-//       .type(newKey);
+    cy.contains(textQuestion).click();
 
-//     cy.contains('Save').click();
+    cy.get("[data-cy='natural_key']")
+      .clear()
+      .type(newKey);
 
-//     cy.wait(500);
+    cy.contains('Save').click();
 
-//     cy.contains(newKey);
-//     /* --- */
+    cy.wait(500);
 
-//     cy.contains(booleanQuestion);
-//     cy.contains(textQuestion);
-//     cy.contains(dateQuestion);
-//   });
+    cy.contains(newKey);
+    /* --- */
 
-//   it('User should be able to create proposal', () => {
-//     cy.login('user');
+    cy.contains(booleanQuestion);
+    cy.contains(textQuestion);
+    cy.contains(dateQuestion);
+  });
 
-//     cy.contains('New Proposal').click();
+  it('User can create proposal', () => {
+    cy.login('user');
 
-//     cy.get('#title').type(title);
+    cy.contains('New Proposal').click();
 
-//     cy.get('#abstract').type(abstract);
+    cy.get('#title').type(title);
 
-//     cy.contains('Save and continue').click();
-//     cy.get(`#${boolId}`).click();
-//     cy.get(`#${textId}`).type(textAnswer);
-//     cy.get(`[data-cy='${dateId}_field'] button`).click();
-//     cy.wait(300);
-//     cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
-//     cy.contains('15').click();
-//     cy.contains('OK').click();
+    cy.get('#abstract').type(abstract);
 
-//     cy.contains('Save and continue').click();
+    cy.contains('Save and continue').click();
+    cy.get(`#${boolId}`).click();
+    cy.get(`#${textId}`).type(textAnswer);
+    cy.get(`[data-cy='${dateId}_field'] button`).click();
+    cy.wait(300);
+    cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
+    cy.contains('15').click({ force: true });
+    cy.contains('OK').click();
 
-//     cy.contains('Submit').click();
+    cy.contains('Save and continue').click();
 
-//     cy.contains('OK').click();
+    cy.contains('Submit').click();
 
-//     cy.contains(title);
-//     cy.contains(abstract);
-//     cy.contains(textAnswer);
+    cy.contains('OK').click();
 
-//     cy.contains('Dashboard').click();
-//     cy.contains(title);
-//     cy.contains('Submitted');
-//   });
+    cy.contains(title);
+    cy.contains(abstract);
+    cy.contains(textAnswer);
 
-//   it('Office should be able to delete proposal', () => {
-//     cy.login('officer');
+    cy.contains('Dashboard').click();
+    cy.contains(title);
+    cy.contains('Submitted');
+  });
 
-//     cy.contains('View Proposals').click();
-//     cy.get('[type="checkbox"]')
-//       .first()
-//       .check();
-//     cy.get("[title='Delete proposals']")
-//       .first()
-//       .click();
-//     cy.contains('Yes').click();
-//   });
+  it('Officer can delete proposal', () => {
+    cy.login('officer');
 
-//   it('Office should be able to delete proposal questions', () => {
-//     cy.login('officer');
+    cy.contains('View Proposals').click();
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+    cy.get("[title='Delete proposals']")
+      .first()
+      .click();
+    cy.contains('Yes').click();
+  });
 
-//     cy.contains('Edit Questionary').click();
+  it('Officer can delete proposal questions', () => {
+    cy.login('officer');
 
-//     cy.contains(textQuestion).click();
-//     cy.get("[data-cy='delete']").click();
+    cy.contains('Questionaries').click();
 
-//     cy.contains(booleanQuestion).click();
-//     cy.get("[data-cy='delete']").click();
+    cy.get("[title='Edit']")
+      .first()
+      .click();
 
-//     cy.contains(dateQuestion).click();
-//     cy.get("[data-cy='delete']").click();
+    cy.contains(textQuestion).click();
+    cy.get("[data-cy='delete']").click();
 
-//     cy.contains(fileQuestion).click();
-//     cy.get("[data-cy='delete']").click();
+    cy.contains(booleanQuestion).click();
+    cy.get("[data-cy='delete']").click();
 
-//     cy.get('[data-cy=show-more-button]').click();
-//     cy.contains('Delete topic').click();
-//   });
-// });
+    cy.contains(dateQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.contains(fileQuestion).click();
+    cy.get("[data-cy='delete']").click();
+
+    cy.get('[data-cy=show-more-button]').click();
+    cy.contains('Delete topic').click();
+  });
+});

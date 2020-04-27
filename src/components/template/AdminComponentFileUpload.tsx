@@ -28,12 +28,14 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        natural_key: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
-        config: Yup.object({
-          file_type: Yup.array(),
-          small_label: Yup.string(),
-          max_files: Yup.number(),
+        question: Yup.object({
+          naturalKey: naturalKeySchema,
+          question: Yup.string().required('Question is required'),
+          config: Yup.object({
+            file_type: Yup.array(),
+            small_label: Yup.string(),
+            max_files: Yup.number(),
+          }),
         }),
       })}
     >
@@ -41,7 +43,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="File upload">
             <Field
-              name="natural_key"
+              name="question.naturalKey"
               label="Key"
               type="text"
               component={TextField}
@@ -50,7 +52,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
-              name="question"
+              name="question.question"
               label="Question"
               type="text"
               component={TextField}
@@ -60,7 +62,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
             />
             <TitledContainer label="Options">
               <Field
-                name="config.small_label"
+                name="question.config.small_label"
                 label="Helper text"
                 placeholder="(e.g. only PDF accepted)"
                 type="text"
@@ -73,7 +75,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
 
             <TitledContainer label="Constraints">
               <Field
-                name="config.file_type"
+                name="question.config.file_type"
                 label="Accepted file types (leave empty for any)"
                 id="fileType"
                 component={FormikUICustomSelect}
@@ -90,7 +92,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
                 data-cy="file_type"
               />
               <Field
-                name="config.max_files"
+                name="question.config.max_files"
                 label="Max number of files"
                 type="text"
                 component={TextField}
@@ -102,7 +104,7 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
 
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

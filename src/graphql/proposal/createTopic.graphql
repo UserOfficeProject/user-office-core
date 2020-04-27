@@ -1,7 +1,9 @@
 mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
-    steps {
-      ...templateStep
+    template {
+      steps {
+        ...templateStep
+      }
     }
     error
   }

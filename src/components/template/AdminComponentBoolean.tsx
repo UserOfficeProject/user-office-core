@@ -28,10 +28,12 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        natural_key: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
-        config: Yup.object({
-          required: Yup.bool(),
+        question: Yup.object({
+          naturalKey: naturalKeySchema,
+          question: Yup.string().required('Question is required'),
+          config: Yup.object({
+            required: Yup.bool(),
+          }),
         }),
       })}
     >
@@ -39,7 +41,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Checkbox">
             <Field
-              name="natural_key"
+              name="question.naturalKey"
               label="Key"
               type="text"
               component={TextField}
@@ -48,7 +50,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
-              name="question"
+              name="question.question"
               label="Question"
               type="text"
               component={TextField}
@@ -59,7 +61,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
 
             <TitledContainer label="Constraints">
               <Field
-                name="config.required"
+                name="question.config.required"
                 checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 label="User must check it to continue"
@@ -70,7 +72,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
             </TitledContainer>
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

@@ -12,8 +12,10 @@ mutation updateQuestionRel(
     sortOrder: $sortOrder
     dependency: $dependency
   ) {
-    steps {
-      ...templateStep
+    template {
+      steps {
+        ...templateStep
+      }
     }
     error
   }

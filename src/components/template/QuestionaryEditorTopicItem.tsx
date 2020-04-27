@@ -124,7 +124,7 @@ export default function QuestionaryEditorTopicItem(props: {
           <Grid item xs={10} className={classes.question}>
             {props.data.question.dataType === DataType.EMBELLISHMENT
               ? (props.data.question.config as EmbellishmentConfig).plain
-              : props.data.question}
+              : props.data.question.question}
           </Grid>
 
           <Grid item xs={12} className={classes.dependencies}>

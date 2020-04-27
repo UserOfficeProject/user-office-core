@@ -42,7 +42,7 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
         name={proposalQuestionId}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? '' : question}
+        label={config.htmlQuestion ? '' : question.question}
         value={stateValue}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
