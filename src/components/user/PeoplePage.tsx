@@ -2,18 +2,22 @@ import Grid from '@material-ui/core/Grid';
 import { Edit } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-
+import { useDataApi } from '../../hooks/useDataApi';
 import { UserRole } from '../../generated/sdk';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { InviteUserForm } from './InviteUserForm';
 import PeopleTable from './PeopleTable';
+import { useSnackbar } from 'notistack';
 
-export default function PeoplePage({ match }) {
-  const [userData, setUserData] = useState(null);
+export default function PeoplePage() {
+  const [userData, setUserData] = useState<{id: number} | null>(null);
   const [sendUserEmail, setSendUserEmail] = useState({
     show: false,
     title: '',
+    userRole: UserRole.USER
   });
+  const api = useDataApi();
+  const { enqueueSnackbar } = useSnackbar();
 
   if (userData) {
     return <Redirect to={`/PeoplePage/${userData.id}`} />;
@@ -23,7 +27,7 @@ export default function PeoplePage({ match }) {
 
   menyItems.push({
     title: 'Invite User',
-    action: (event, rowData) =>
+    action: () =>
       setSendUserEmail({
         show: true,
         title: 'Invite User',
@@ -33,7 +37,7 @@ export default function PeoplePage({ match }) {
 
   menyItems.push({
     title: 'Invite Reviewer',
-    action: (event, rowData) =>
+    action: () =>
       setSendUserEmail({
         show: true,
         title: 'Invite Reviewer',
@@ -54,6 +58,8 @@ export default function PeoplePage({ match }) {
                   close={() =>
                     setSendUserEmail({
                       show: false,
+                      title: '',
+                      userRole: UserRole.USER
                     })
                   }
                   action={() => console.log()}
@@ -65,6 +71,7 @@ export default function PeoplePage({ match }) {
                   actionIcon={<Edit />}
                   action={setUserData}
                   menyItems={menyItems}
+                  onRemove={(user: {id: number}) => api().deleteUser({id: user.id}).then(data => data.deleteUser.error && enqueueSnackbar(data.deleteUser.error, { variant: 'error' }))}
                 />
               )}
             </StyledPaper>

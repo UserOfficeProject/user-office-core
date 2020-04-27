@@ -43,7 +43,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
         setProposal(data.proposal);
         if (data.proposal) {
           setTechReview(data.proposal.technicalReview);
-          setReviews(data.proposal.reviews);
+          setReviews(data.proposal.reviews || []);
         }
       });
   }, [api, match.params.id]);
