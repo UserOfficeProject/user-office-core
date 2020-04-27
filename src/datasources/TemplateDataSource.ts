@@ -64,9 +64,9 @@ export interface TemplateDataSource {
       sortOrder?: number;
       dependency?: FieldDependencyInput;
     }
-  ): Promise<TemplateStep[]>;
+  ): Promise<ProposalTemplate>;
 
-  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<TemplateStep[]>;
+  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
 
   createQuestionAndRel(
     templateId: number,
@@ -79,7 +79,7 @@ export interface TemplateDataSource {
   ): Promise<TemplateStep[]>;
 
   // Topic
-  createTopic(args: CreateTopicArgs): Promise<TemplateStep[]>;
+  createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
   updateTopic(
     topicId: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }

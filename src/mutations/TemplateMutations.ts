@@ -5,7 +5,6 @@ import {
   DataType,
   ProposalTemplate,
   Question,
-  TemplateStep,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
@@ -67,10 +66,10 @@ export default class TemplateMutations {
   async createTopic(
     user: User | null,
     args: CreateTopicArgs
-  ): Promise<TemplateStep[] | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
       .createTopic(args)
-      .then(steps => steps)
+      .then(response => response)
       .catch(err => {
         logger.logException('Could not create topic', err, {
           user,
@@ -177,7 +176,7 @@ export default class TemplateMutations {
   async updateQuestionRel(
     agent: User | null,
     args: UpdateQuestionRelArgs
-  ): Promise<TemplateStep[] | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
       .updateQuestionRel(args.questionId, args.templateId, args)
       .then(steps => steps)
@@ -195,7 +194,7 @@ export default class TemplateMutations {
   async deleteQuestionRel(
     agent: User | null,
     args: DeleteQuestionRelArgs
-  ): Promise<TemplateStep[] | Rejection> {
+  ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
       .deleteQuestionRel(args)
       .then(steps => steps)

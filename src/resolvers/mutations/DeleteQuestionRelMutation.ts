@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { TemplateStepArrayResponseWrap } from '../types/CommonWrappers';
+import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -23,14 +23,14 @@ export class DeleteQuestionRelArgs {
 
 @Resolver()
 export class DeleteQuestionRelMutation {
-  @Mutation(() => TemplateStepArrayResponseWrap)
+  @Mutation(() => ProposalTemplateResponseWrap)
   deleteQuestionRel(
     @Args() args: DeleteQuestionRelArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.template.deleteQuestionRel(context.user, args),
-      TemplateStepArrayResponseWrap
+      ProposalTemplateResponseWrap
     );
   }
 }

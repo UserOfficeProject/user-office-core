@@ -134,7 +134,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return steps;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<TemplateStep[]> {
+  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
     await database('proposal_topics')
       .update({ sort_order: args.sortOrder + 1 })
       .where('sort_order', '>=', args.sortOrder);
@@ -146,7 +146,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       template_id: args.templateId,
     });
 
-    return this.getProposalTemplateSteps(args.templateId);
+    const response = await this.getProposalTemplate(args.templateId);
+    if (!response) {
+      throw new Error('Could not find template');
+    }
+
+    return response;
   }
 
   async updateTopic(
@@ -213,7 +218,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       sortOrder?: number;
       dependency?: FieldDependencyInput;
     }
-  ): Promise<TemplateStep[]> {
+  ): Promise<ProposalTemplate> {
     await to(
       database('proposal_question__proposal_template__rels')
         .where({ proposal_question_id: questionId, template_id: templateId })
@@ -229,7 +234,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       dependency_condition: values.dependency?.condition,
     });
 
-    return this.getProposalTemplateSteps(templateId);
+    const returnValue = await this.getProposalTemplate(templateId);
+    if (!returnValue) {
+      throw new Error('Could not get template');
+    }
+
+    return returnValue;
   }
 
   async updateTemplate(
@@ -370,7 +380,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async deleteQuestionRel(
     args: DeleteQuestionRelArgs
-  ): Promise<TemplateStep[]> {
+  ): Promise<ProposalTemplate> {
     const rowsAffected = await database(
       'proposal_question__proposal_template__rels'
     )
@@ -385,8 +395,12 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         `Could not delete questionId ${args.questionId} in templateId:${args.templateId}`
       );
     }
+    const returnValue = await this.getProposalTemplate(args.templateId);
+    if (!returnValue) {
+      throw new Error('Could not find template');
+    }
 
-    return this.getProposalTemplateSteps(args.templateId);
+    return returnValue;
   }
 
   async deleteTopic(topicId: number): Promise<Topic> {

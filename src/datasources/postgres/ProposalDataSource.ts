@@ -341,7 +341,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     ).rows;
 
     const fields = answerRecords.map(
-      record => new Answer(createQuestionRelObject(record), record.value)
+      record => new Answer(createQuestionRelObject(record), record.value || '')
     );
 
     const steps = Array<QuestionaryStep>();

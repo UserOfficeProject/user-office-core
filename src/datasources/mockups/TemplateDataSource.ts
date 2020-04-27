@@ -165,14 +165,14 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
   async deleteQuestionRel(
     args: DeleteQuestionRelArgs
-  ): Promise<TemplateStep[]> {
+  ): Promise<ProposalTemplate> {
     dummyTemplateSteps.forEach(function(step) {
       step.fields = step.fields.filter(field => {
         return field.question.proposalQuestionId !== args.questionId;
       });
     });
 
-    return dummyTemplateSteps;
+    return dummyProposalTemplate;
   }
   async createQuestionAndRel(
     templateId: number,
@@ -193,7 +193,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       sortOrder?: number | undefined;
       dependency?: any;
     }
-  ): Promise<TemplateStep[]> {
+  ): Promise<ProposalTemplate> {
     const question = getFieldById(
       dummyTemplateSteps,
       questionId
@@ -202,7 +202,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     question.sortOrder = values.sortOrder || question.sortOrder;
     question.topicId = values.topicId || question.topicId;
 
-    return dummyTemplateSteps;
+    return dummyProposalTemplate;
   }
   async createTemplate(
     name: string,
@@ -296,14 +296,14 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<TemplateStep[]> {
+  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
     dummyTemplateSteps.splice(
       args.sortOrder,
       0,
       new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
     );
 
-    return dummyTemplateSteps;
+    return dummyProposalTemplate;
   }
 
   async getProposalTemplateSteps(): Promise<TemplateStep[]> {

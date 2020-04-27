@@ -1,7 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
 
 import { Response } from '../Decorators';
-import { TemplateStep } from '../types/TemplateStep';
 import { Page } from './Admin';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
@@ -74,15 +73,6 @@ export class ProposalTemplateResponseWrap extends ResponseWrapBase<
   @Response()
   @Field(() => ProposalTemplate, { nullable: true })
   public template: ProposalTemplate;
-}
-
-@ObjectType()
-export class TemplateStepArrayResponseWrap extends ResponseWrapBase<
-  TemplateStep[]
-> {
-  @Response()
-  @Field(() => [TemplateStep])
-  public steps: TemplateStep[];
 }
 
 @ObjectType()
