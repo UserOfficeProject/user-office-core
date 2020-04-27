@@ -1,30 +1,8 @@
 /* CLEANUP */
-DROP TABLE IF EXISTS event_logs;
-DROP TABLE IF EXISTS pagetext;
-DROP TABLE IF EXISTS proposal_answers_files;
-DROP TABLE IF EXISTS files;
-DROP TABLE IF EXISTS proposal_answers;
-DROP TABLE IF EXISTS proposal_question_dependencies;
-DROP TABLE IF EXISTS proposal_topic_completenesses;
-DROP TABLE IF EXISTS proposal_user;
-DROP TABLE IF EXISTS technical_review;
-DROP TABLE IF EXISTS reviews;
-DROP TABLE IF EXISTS "SEP_Ratings";
-DROP TABLE IF EXISTS "SEP_Assignments";
-DROP TABLE IF EXISTS proposals;
-DROP TABLE IF EXISTS call;
-DROP TABLE IF EXISTS db_patches;
-DROP TABLE IF EXISTS proposal_question__proposal_template__rels;
-DROP TABLE IF EXISTS proposal_questions;
-DROP TABLE IF EXISTS proposal_topics;
-DROP TABLE IF EXISTS proposal_templates;
-DROP TABLE IF EXISTS role_user;
-DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS "SEPs";
-DROP TABLE IF EXISTS proposal_question_datatypes;
-DROP TABLE IF EXISTS institutions;
-DROP TABLE IF EXISTS nationalities;
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO duouser;
+GRANT ALL ON SCHEMA public TO public;
 
 DROP SEQUENCE IF EXISTS proposals_short_code_seq;
 
