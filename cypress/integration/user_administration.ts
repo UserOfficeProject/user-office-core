@@ -89,4 +89,20 @@ context('User administration tests', () => {
       .invoke('val')
       .should('eq', newTelephone);
   });
+
+  it('Should be able to delete user user information', () => {
+    cy.login('officer');
+
+    cy.contains('View People').click();
+
+    cy.get("[title='Delete']")
+      .first()
+      .click();
+
+    cy.get("[title='Save']")
+      .first()
+      .click();
+
+    cy.contains('1-2 of 2');
+  });
 });

@@ -2102,6 +2102,23 @@ export type CreateUserByEmailInviteMutation = (
   ) }
 );
 
+export type DeleteUserMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type DeleteUserMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUser: (
+    { __typename?: 'UserResponseWrap' }
+    & Pick<UserResponseWrap, 'error'>
+    & { user: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id'>
+    )> }
+  ) }
+);
+
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
   & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
@@ -3151,6 +3168,16 @@ export const CreateUserByEmailInviteDocument = gql`
   }
 }
     `;
+export const DeleteUserDocument = gql`
+    mutation deleteUser($id: Int!) {
+  deleteUser(id: $id) {
+    user {
+      id
+    }
+    error
+  }
+}
+    `;
 export const GetBasicUserDetailsDocument = gql`
     query getBasicUserDetails($id: Int!) {
   basicUserDetails(id: $id) {
@@ -3492,6 +3519,9 @@ export function getSdk(client: GraphQLClient) {
     },
     createUserByEmailInvite(variables: CreateUserByEmailInviteMutationVariables): Promise<CreateUserByEmailInviteMutation> {
       return client.request<CreateUserByEmailInviteMutation>(print(CreateUserByEmailInviteDocument), variables);
+    },
+    deleteUser(variables: DeleteUserMutationVariables): Promise<DeleteUserMutation> {
+      return client.request<DeleteUserMutation>(print(DeleteUserDocument), variables);
     },
     getBasicUserDetails(variables: GetBasicUserDetailsQueryVariables): Promise<GetBasicUserDetailsQuery> {
       return client.request<GetBasicUserDetailsQuery>(print(GetBasicUserDetailsDocument), variables);
