@@ -195,12 +195,9 @@ export type Mutation = {
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
-<<<<<<< HEAD
-=======
   assignChairAndSecretary: SepResponseWrap,
   assignMember: SepResponseWrap,
   removeMember: SepResponseWrap,
->>>>>>> dd71593ee0508c0e4cf9eb6ea5febb80455f44e6
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createTemplateField: TemplateFieldResponseWrap,
@@ -212,10 +209,7 @@ export type Mutation = {
   removeSEPMemberRole: SepMembersRoleResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
-<<<<<<< HEAD
-=======
   addSEPMembersRole: SepMembersRoleResponseWrap,
->>>>>>> dd71593ee0508c0e4cf9eb6ea5febb80455f44e6
   createProposal: ProposalResponseWrap,
   createTopic: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
@@ -295,8 +289,6 @@ export type MutationAddUserForReviewArgs = {
 };
 
 
-<<<<<<< HEAD
-=======
 export type MutationAssignChairAndSecretaryArgs = {
   memberIds: Array<Scalars['Int']>,
   sepId: Scalars['Int']
@@ -315,7 +307,6 @@ export type MutationRemoveMemberArgs = {
 };
 
 
->>>>>>> dd71593ee0508c0e4cf9eb6ea5febb80455f44e6
 export type MutationCreateSepArgs = {
   code: Scalars['String'],
   description: Scalars['String'],
@@ -428,14 +419,11 @@ export type MutationAddClientLogArgs = {
 };
 
 
-<<<<<<< HEAD
-=======
 export type MutationAddSepMembersRoleArgs = {
   addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
 };
 
 
->>>>>>> dd71593ee0508c0e4cf9eb6ea5febb80455f44e6
 export type MutationCreateTopicArgs = {
   sortOrder: Scalars['Int']
 };
