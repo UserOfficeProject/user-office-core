@@ -1,0 +1,8 @@
+mutation removeMember($memberId: Int!, $sepId: Int!) {
+  removeMember(memberId: $memberId, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}

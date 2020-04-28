@@ -11,17 +11,18 @@ import {
 
 test('Can parse object', () => {
   const template = create1Topic3FieldWithDependenciesQuestionary();
-  expect(getAllFields(template).length).toBe(3);
-  expect(getFieldById(template, 'links_with_industry')!.dependencies).not.toBe(
-    null
-  );
+  expect(getAllFields(template.steps).length).toBe(3);
   expect(
-    getFieldById(template, 'links_with_industry')!.dependencies!.length
-  ).toBe(1);
+    getFieldById(template.steps, 'links_with_industry')!.dependency
+  ).not.toBe(null);
+  expect(
+    getFieldById(template.steps, 'links_with_industry')!.dependency
+      ?.dependencyId
+  ).toBe('has_links_with_industry');
 
   const fieldlessTemplate = create1TopicFieldlessTemplate();
-  expect(getQuestionaryStepByTopicId(fieldlessTemplate, 0)!.fields.length).toBe(
-    0
-  );
-  expect(getTopicById(fieldlessTemplate, 1)).toBe(undefined);
+  expect(
+    getQuestionaryStepByTopicId(fieldlessTemplate.steps, 0)!.fields.length
+  ).toBe(0);
+  expect(getTopicById(fieldlessTemplate.steps, 1)).toBe(undefined);
 });

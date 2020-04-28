@@ -7,6 +7,7 @@ import { useDataApi } from '../../hooks/useDataApi';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
 import SEPGeneralInfo from './SEPGeneralInfo';
+import SEPMembers from './SEPMembers';
 
 const SEPPagePropTypes = {
   match: PropTypes.shape({
@@ -39,11 +40,12 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={['General', 'Logs']}>
+      <SimpleTabs tabNames={['General', 'Members', 'Logs']}>
         <SEPGeneralInfo
           data={sep}
           onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
         />
+        <SEPMembers sepId={sep.id} />
         <EventLogList changedObjectId={sep.id} eventType="SEP" />
       </SimpleTabs>
     </Container>

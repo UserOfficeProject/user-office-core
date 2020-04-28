@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import React, { FunctionComponent } from 'react';
 
 import { DataType } from '../../generated/sdk';
-import { ProposalTemplateField, ProposalTemplate } from '../../generated/sdk';
+import { QuestionRel, ProposalTemplate } from '../../generated/sdk';
 import { Event } from '../../models/QuestionaryEditorModel';
 import JSDict from '../../utils/Dictionary';
 import { AdminComponentBoolean } from './AdminComponentBoolean';
@@ -14,7 +14,7 @@ import { AdminComponentMultipleChoice } from './AdminComponentMultipleChoice';
 import { AdminComponentTextInput } from './AdminComponentTextInput';
 
 export default function QuestionaryFieldEditor(props: {
-  field: ProposalTemplateField | null;
+  field: QuestionRel | null;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
   template: ProposalTemplate;
@@ -48,7 +48,7 @@ export default function QuestionaryFieldEditor(props: {
   if (props.field === null) {
     return null;
   }
-  if (componentMap.get(props.field.data_type) === null) {
+  if (componentMap.get(props.field.question.dataType) === null) {
     return <span>Error ocurred</span>;
   }
 
@@ -67,12 +67,15 @@ export default function QuestionaryFieldEditor(props: {
     >
       <Fade in={props.field != null}>
         <Grid container className={classes.container}>
-          {React.createElement(componentMap.get(props.field.data_type)!, {
-            field: props.field,
-            dispatch: props.dispatch,
-            closeMe: props.closeMe,
-            template: props.template,
-          })}
+          {React.createElement(
+            componentMap.get(props.field.question.dataType)!,
+            {
+              field: props.field,
+              dispatch: props.dispatch,
+              closeMe: props.closeMe,
+              template: props.template,
+            }
+          )}
         </Grid>
       </Fade>
     </Modal>
@@ -80,7 +83,7 @@ export default function QuestionaryFieldEditor(props: {
 }
 
 interface AdminComponentProps {
-  field: ProposalTemplateField;
+  field: QuestionRel;
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;

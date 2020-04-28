@@ -13,11 +13,15 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
     },
   })();
   const { templateField, touched, errors, onComplete } = props;
-  const { proposal_question_id, question, value } = templateField;
+  const {
+    question: { proposalQuestionId },
+    question,
+    value,
+  } = templateField;
   const [stateValue, setStateValue] = useState(value);
-  const fieldError = getIn(errors, proposal_question_id);
-  const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const config = templateField.config as TextInputConfig;
+  const fieldError = getIn(errors, proposalQuestionId);
+  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const config = templateField.question.config as TextInputConfig;
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -34,11 +38,11 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
       )}
       <TextFieldWithCounter
         variant="standard"
-        id={proposal_question_id}
-        name={proposal_question_id}
+        id={proposalQuestionId}
+        name={proposalQuestionId}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? '' : question}
+        label={config.htmlQuestion ? '' : question.question}
         value={stateValue}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
@@ -48,7 +52,7 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
         }}
         placeholder={config.placeholder}
         error={isError}
-        helperText={isError && errors[proposal_question_id]}
+        helperText={isError && errors[proposalQuestionId]}
         multiline={config.multiline}
         rows={config.multiline ? 2 : 1}
         rowsMax={config.multiline ? 16 : undefined}

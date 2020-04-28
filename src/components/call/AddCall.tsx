@@ -13,6 +13,7 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import { useDataApi } from '../../hooks/useDataApi';
+import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
 import FormikDropdown from '../common/FormikDropdown';
 import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
 

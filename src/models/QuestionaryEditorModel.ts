@@ -1,11 +1,7 @@
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 
-import {
-  ProposalTemplate,
-  ProposalTemplateField,
-  TemplateStep,
-} from '../generated/sdk';
+import { ProposalTemplate, TemplateStep, QuestionRel } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
@@ -38,7 +34,14 @@ export interface Event {
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
-  const blankInitTemplate: ProposalTemplate = { steps: [] };
+  const blankInitTemplate: ProposalTemplate = {
+    steps: [],
+    templateId: 1,
+    callCount: 0,
+    isArchived: false,
+    name: 'blank',
+    proposalCount: 0,
+  };
 
   function reducer(state: ProposalTemplate, action: Event): ProposalTemplate {
     return produce(state, draft => {
@@ -52,14 +55,13 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           const from = draft.steps.find(step => {
             return (
-              step.topic.topic_id.toString() ===
-              action.payload.source.droppableId
+              step.topic.id.toString() === action.payload.source.droppableId
             );
           })!;
 
           const to = draft.steps.find(step => {
             return (
-              step.topic.topic_id.toString() ===
+              step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
           })!;
@@ -84,13 +86,16 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft, action.payload.topicId).topic_title =
+          getTopicById(draft.steps, action.payload.topicId).topic_title =
             action.payload.title;
 
           return draft;
         case EventType.UPDATE_FIELD_REQUESTED:
-          const field: ProposalTemplateField = action.payload.field;
-          const fieldToUpdate = getFieldById(draft, field.proposal_question_id);
+          const field: QuestionRel = action.payload.field;
+          const fieldToUpdate = getFieldById(
+            draft.steps,
+            field.question.proposalQuestionId
+          );
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
           } else {
@@ -99,10 +104,10 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.FIELD_CREATED:
-          const newField: ProposalTemplateField = action.payload;
+          const newField: QuestionRel = action.payload;
           const stepToExtend = getQuestionaryStepByTopicId(
-            draft,
-            newField.topic_id
+            draft.steps,
+            newField.topicId
           ) as TemplateStep;
           if (stepToExtend) {
             stepToExtend.fields.push(newField);
@@ -111,7 +116,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           return draft;
         case EventType.DELETE_TOPIC_REQUESTED:
           const stepToDelete = getQuestionaryStepByTopicId(
-            draft,
+            draft.steps,
             action.payload
           );
           if (!stepToDelete) {
@@ -137,7 +142,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
   useEffect(() => {
     api()
-      .getProposalTemplate()
+      .getProposalTemplate({ templateId: 1 })
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,

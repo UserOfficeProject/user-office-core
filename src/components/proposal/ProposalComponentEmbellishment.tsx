@@ -7,7 +7,8 @@ export function ProposalComponentEmbellishment(props: BasicComponentProps) {
   return (
     <div
       dangerouslySetInnerHTML={{
-        __html: (props.templateField.config as EmbellishmentConfig).html!,
+        __html: (props.templateField.question.config as EmbellishmentConfig)
+          .html!,
       }}
     ></div>
   );

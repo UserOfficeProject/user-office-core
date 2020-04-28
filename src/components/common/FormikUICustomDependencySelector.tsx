@@ -15,8 +15,9 @@ import {
   DataType,
   EvaluatorOperator,
   ProposalTemplate,
-  ProposalTemplateField,
   SelectionFromOptionsConfig,
+  QuestionRel,
+  FieldDependency,
 } from '../../generated/sdk';
 import {
   getAllFields,
@@ -32,7 +33,7 @@ const FormikUICustomDependencySelector = ({
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
   template: ProposalTemplate;
-  templateField: ProposalTemplateField;
+  templateField: QuestionRel;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(
@@ -58,43 +59,43 @@ const FormikUICustomDependencySelector = ({
     if (!templateField) {
       return;
     }
-    if (templateField.dependencies && templateField.dependencies.length > 0) {
-      const dependency = templateField.dependencies[0]; // currently only 1 supported
-      setDependencyId(dependency.dependency_id);
+    if (templateField.dependency) {
+      const dependency = templateField.dependency;
+      setDependencyId(dependency.dependencyId);
       setOperator(dependency.condition.condition);
       setDependencyValue(dependency.condition.params);
     }
   }, [templateField]);
 
   const updateFormik = (): void => {
-    const dependencies = [];
     if (dependencyId && dependencyValue && operator) {
-      dependencies.push({
-        question_id: templateField.proposal_question_id,
-        dependency_id: dependencyId,
+      const dependency = {
+        dependencyId,
         condition: {
           condition: operator,
           params: dependencyValue,
         },
-      });
+      };
+      form.setFieldValue(field.name, dependency);
     }
-    form.setFieldValue(field.name, dependencies);
   };
 
   useEffect(() => {
     if (dependencyId) {
-      const depField = getFieldById(template, dependencyId);
+      const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
         return;
       }
-      if (depField.data_type === DataType.BOOLEAN) {
+      if (depField.question.dataType === DataType.BOOLEAN) {
         setAvailableValues([
           { label: 'true', value: true },
           { label: 'false', value: false },
         ]);
-      } else if (depField.data_type === DataType.SELECTION_FROM_OPTIONS) {
+      } else if (
+        depField.question.dataType === DataType.SELECTION_FROM_OPTIONS
+      ) {
         setAvailableValues(
-          (depField.config as SelectionFromOptionsConfig).options.map(
+          (depField.question.config as SelectionFromOptionsConfig).options.map(
             option => {
               return { value: option, label: option };
             }
@@ -129,21 +130,21 @@ const FormikUICustomDependencySelector = ({
               setDependencyId(depFieldId);
             }}
           >
-            {getAllFields(template)
+            {getAllFields(template.steps)
               .filter(option =>
                 [DataType.BOOLEAN, DataType.SELECTION_FROM_OPTIONS].includes(
-                  option.data_type
+                  option.question.dataType
                 )
               )
               .map(option => {
                 return (
                   <MenuItem
-                    value={option.proposal_question_id}
+                    value={option.question.proposalQuestionId}
                     className={classes.menuItem}
-                    key={option.proposal_question_id}
+                    key={option.question.proposalQuestionId}
                   >
-                    {/* {getTemplateFieldIcon(option.data_type)}  */}
-                    {option.question}
+                    {/* {getTemplateFieldIcon(option.question.dataType)}  */}
+                    {option.question.question}
                   </MenuItem>
                 );
               })}

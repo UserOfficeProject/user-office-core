@@ -30,7 +30,7 @@ export const AdminComponentShell: AdminComponentShellSignature = props => {
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
-        {getTemplateFieldIcon(props.field.data_type)}
+        {getTemplateFieldIcon(props.field.question.dataType)}
         {props.label}
       </Typography>
       {props.children}
@@ -43,7 +43,7 @@ export const AdminComponentShell: AdminComponentShellSignature = props => {
           onClick={() => {
             props.dispatch({
               type: EventType.DELETE_FIELD_REQUESTED,
-              payload: { fieldId: props.field.proposal_question_id },
+              payload: { fieldId: props.field.question.proposalQuestionId },
             });
             props.closeMe();
           }}

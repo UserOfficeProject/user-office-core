@@ -1,0 +1,13 @@
+mutation updateQuestionsTopicRels(
+  $templateId: Int!
+  $topicId: Int!
+  $fieldIds: [String!]
+) {
+  updateQuestionsTopicRels(
+    templateId: $templateId
+    topicId: $topicId
+    fieldIds: $fieldIds
+  ) {
+    error
+  }
+}

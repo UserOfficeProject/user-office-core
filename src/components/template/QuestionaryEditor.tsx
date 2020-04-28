@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
-import { ProposalTemplateField } from '../../generated/sdk';
+import { QuestionRel } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   EventType,
@@ -24,10 +24,7 @@ import QuestionaryFieldEditor from './QuestionaryFieldEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
-  const [
-    selectedField,
-    setSelectedField,
-  ] = useState<ProposalTemplateField | null>(null);
+  const [selectedField, setSelectedField] = useState<QuestionRel | null>(null);
   const reducerMiddleware = () => {
     return (next: Function) => (action: Event) => {
       next(action);
@@ -84,7 +81,7 @@ export default function QuestionaryEditor() {
     }
   };
 
-  const onClick = (data: ProposalTemplateField): void => {
+  const onClick = (data: QuestionRel): void => {
     setSelectedField(data);
   };
 
@@ -103,7 +100,7 @@ export default function QuestionaryEditor() {
   };
 
   const progressJsx = isLoading ? <LinearProgress /> : null;
-
+  console.log(state);
   const addNewTopicFallbackButton =
     state.steps.length === 0 ? (
       <Button
@@ -159,7 +156,7 @@ export default function QuestionaryEditor() {
                     data={step}
                     dispatch={dispatch}
                     index={index}
-                    key={step.topic.topic_id}
+                    key={step.topic.id}
                     onItemClick={onClick}
                     dragMode={isTopicReorderMode}
                   />

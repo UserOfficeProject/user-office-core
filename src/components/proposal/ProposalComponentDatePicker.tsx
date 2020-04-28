@@ -11,9 +11,10 @@ import { BasicComponentProps } from './IBasicComponentProps';
 
 export function ProposalComponentDatePicker(props: BasicComponentProps) {
   const { templateField, touched, errors, onComplete } = props;
-  const { proposal_question_id, config, question, value } = templateField;
-  const fieldError = getIn(errors, proposal_question_id);
-  const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const { proposalQuestionId, config, question } = templateField.question;
+  const value = templateField.value;
+  const fieldError = getIn(errors, proposalQuestionId);
+  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const [stateValue, setStateValue] = useState(value || '');
 
   useEffect(() => {
@@ -24,8 +25,8 @@ export function ProposalComponentDatePicker(props: BasicComponentProps) {
     <FormControl error={isError}>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Field
-          data-cy={proposal_question_id + '_field'}
-          name={proposal_question_id}
+          data-cy={proposalQuestionId + '_field'}
+          name={proposalQuestionId}
           label={question}
           component={({ field, form, ...other }: { field: any; form: any }) => {
             return (
@@ -35,7 +36,7 @@ export function ProposalComponentDatePicker(props: BasicComponentProps) {
                   clearable={true}
                   error={isError}
                   name={field.name}
-                  helperText={isError && errors[proposal_question_id]}
+                  helperText={isError && errors[proposalQuestionId]}
                   label={question}
                   value={stateValue}
                   format="yyyy-MM-dd"

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useDataApi } from './useDataApi';
 
-export function useCreateProposal() {
+export function useCreateProposal(callId: number) {
   const [loading, setLoading] = useState(false);
 
   const api = useDataApi();
@@ -11,7 +11,7 @@ export function useCreateProposal() {
     setLoading(true);
 
     return api()
-      .createProposal()
+      .createProposal({ callId })
       .then(data => {
         setLoading(false);
 

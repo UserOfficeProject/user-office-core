@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetBlankProposalQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useBlankProposal() {
+export function useBlankProposal(callId: number) {
   const [proposal, setProposal] = useState<
     GetBlankProposalQuery['blankProposal']
   >();
@@ -12,11 +12,11 @@ export function useBlankProposal() {
 
   useEffect(() => {
     api()
-      .getBlankProposal()
+      .getBlankProposal({ callId })
       .then(data => {
         setProposal(data.blankProposal);
       });
-  }, [api]);
+  }, [api, callId]);
 
   return { proposal };
 }

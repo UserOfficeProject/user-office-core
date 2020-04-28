@@ -70,6 +70,8 @@
     // TODO: Switch to default "error" and fix them all
     "@typescript-eslint/camelcase": "warn",
     "react/display-name": "warn",
-    "react/prop-types": "warn"
+    "react/prop-types": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/interface-name-prefix": "off"
   }
 }

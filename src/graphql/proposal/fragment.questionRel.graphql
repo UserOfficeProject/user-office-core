@@ -1,0 +1,15 @@
+fragment questionRel on QuestionRel {
+  question {
+    ...question
+  }
+  sortOrder
+  topicId
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
+}

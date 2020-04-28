@@ -8,6 +8,7 @@ mutation createCall(
   $endNotify: DateTime!
   $cycleComment: String!
   $surveyComment: String!
+  $templateId: Int!
 ) {
   createCall(
     shortCode: $shortCode
@@ -19,6 +20,7 @@ mutation createCall(
     endNotify: $endNotify
     cycleComment: $cycleComment
     surveyComment: $surveyComment
+    templateId: $templateId
   ) {
     error
     call {

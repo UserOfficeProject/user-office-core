@@ -4,7 +4,7 @@ import { Reducer, Dispatch } from 'react';
 import {
   Proposal,
   ProposalStatus,
-  QuestionaryField,
+  Answer,
   QuestionaryStep,
 } from '../generated/sdk';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
@@ -51,9 +51,9 @@ export function ProposalSubmissionModel(
       switch (action.type) {
         case EventType.FIELD_CHANGED:
           const field = getFieldById(
-            draftState.proposal.questionary,
+            draftState.proposal.questionary.steps,
             action.payload.id
-          ) as QuestionaryField;
+          ) as Answer;
           field.value = action.payload.newValue;
           draftState.isDirty = true;
 
@@ -82,7 +82,7 @@ export function ProposalSubmissionModel(
             ...action.payload.proposal,
           };
           (getQuestionaryStepByTopicId(
-            draftState.proposal.questionary,
+            draftState.proposal.questionary.steps,
             action.payload.topicId
           ) as QuestionaryStep).isCompleted = true;
           draftState.isDirty = false;

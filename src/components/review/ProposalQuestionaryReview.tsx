@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
 
-import { Proposal, QuestionaryField } from '../../generated/sdk';
+import { Proposal, Answer } from '../../generated/sdk';
 import { DataType } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { FileMetaData } from '../../models/FileUpload';
@@ -29,14 +29,14 @@ export default function ProposalQuestionaryReview(
     },
   }))();
 
-  const allFields = getAllFields(questionary) as QuestionaryField[];
+  const allFields = getAllFields(questionary.steps) as Answer[];
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
 
   // Get all questions with a file upload and create a string with fileid comma separated
   const fileIds = completedFields
-    .filter(field => field.data_type === DataType.FILE_UPLOAD)
+    .filter(field => field.question.dataType === DataType.FILE_UPLOAD)
     .map(fileId => fileId.value)
     .join(',');
 
@@ -92,11 +92,11 @@ export default function ProposalQuestionaryReview(
                 .toString()}
             </TableCell>
           </TableRow>
-          {completedFields.map((row: QuestionaryField) => (
-            <TableRow key={row.proposal_question_id}>
-              <TableCell>{row.question}</TableCell>
+          {completedFields.map((row: Answer) => (
+            <TableRow key={row.question.proposalQuestionId}>
+              <TableCell>{row.question.question}</TableCell>
               <TableCell>
-                {row.data_type === DataType.FILE_UPLOAD
+                {row.question.dataType === DataType.FILE_UPLOAD
                   ? row.value
                       .split(',')
                       .map((value: string) =>
