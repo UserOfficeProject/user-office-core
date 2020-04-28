@@ -1,16 +1,18 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
+import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import {
   createConfigByType,
   DataType,
   FieldCondition,
   FieldDependency,
-  ProposalTemplateField,
-  QuestionaryField,
+  Question,
+  QuestionRel,
   Topic,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
+import { ProposalTemplate } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -33,6 +35,8 @@ export interface ProposalRecord {
   readonly excellence_score: number;
   readonly safety_score: number;
   readonly technical_score: number;
+  readonly call_id: number;
+  readonly template_id: number;
 }
 
 export interface TopicRecord {
@@ -50,14 +54,30 @@ export interface FieldDependencyRecord {
 
 export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
-  readonly natural_key: string;
   readonly data_type: string;
   readonly question: string;
-  readonly topic_id: number;
   readonly config: string;
   readonly sort_order: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+  readonly natural_key: string;
+}
+
+export interface ProposalQuestionProposalTemplateRelRecord {
+  readonly id: number;
+  readonly proposal_question_id: string;
+  readonly template_id: string;
+  readonly topic_id: number;
+  readonly sort_order: number;
+  readonly dependency_proposal_question_id: string;
+  readonly dependency_condition: string;
+}
+
+export interface ProposalTemplateRecord {
+  readonly template_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly is_archived: boolean;
 }
 
 export interface UserRecord {
@@ -124,6 +144,7 @@ export interface CallRecord {
   readonly end_notify: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly template_id: number;
 }
 
 export interface PagetextRecord {
@@ -197,18 +218,24 @@ export const createTopicObject = (proposal: TopicRecord) => {
   );
 };
 
-export const createProposalTemplateFieldObject = (
-  question: ProposalQuestionRecord
-) => {
-  return new ProposalTemplateField(
+export const createQuestionObject = (question: ProposalQuestionRecord) => {
+  return new Question(
     question.proposal_question_id,
     question.natural_key,
     question.data_type as DataType,
-    question.sort_order,
     question.question,
-    createConfigByType(question.data_type as DataType, question.config),
-    question.topic_id,
-    null
+    createConfigByType(question.data_type as DataType, question.config)
+  );
+};
+
+export const createProposalTemplateObject = (
+  template: ProposalTemplateRecord
+) => {
+  return new ProposalTemplate(
+    template.template_id,
+    template.name,
+    template.description,
+    template.is_archived
   );
 };
 
@@ -223,7 +250,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.updated_at,
     proposal.short_code,
     proposal.rank_order,
-    proposal.final_status
+    proposal.final_status,
+    proposal.call_id,
+    proposal.template_id
   );
 };
 
@@ -243,15 +272,6 @@ export const createFieldDependencyObject = (
   );
 };
 
-export const createQuestionaryFieldObject = (
-  question: ProposalQuestionRecord & { value: any }
-) => {
-  return new QuestionaryField(
-    createProposalTemplateFieldObject(question),
-    question.value ? JSON.parse(question.value).value : ''
-  );
-};
-
 export const createFileMetadata = (record: FileRecord) => {
   return new FileMetadata(
     record.file_id,
@@ -260,6 +280,30 @@ export const createFileMetadata = (record: FileRecord) => {
     record.mime_type,
     record.size_in_bytes,
     record.created_at
+  );
+};
+
+export const createQuestionRelObject = (
+  record: ProposalQuestionRecord & ProposalQuestionProposalTemplateRelRecord
+) => {
+  return new QuestionRel(
+    new Question(
+      record.proposal_question_id,
+      record.natural_key,
+      record.data_type as DataType,
+      record.question,
+      createConfigByType(record.data_type as DataType, record.config)
+    ),
+    record.topic_id,
+    record.sort_order,
+    record.dependency_proposal_question_id
+      ? new FieldDependency(
+          record.proposal_question_id,
+          record.dependency_proposal_question_id,
+          record.natural_key,
+          FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
+        )
+      : undefined
   );
 };
 
@@ -297,5 +341,21 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.lastname,
     user.institution,
     user.position
+  );
+};
+
+export const createCallObject = (call: CallRecord) => {
+  return new Call(
+    call.call_id,
+    call.call_short_code,
+    call.start_call,
+    call.end_call,
+    call.start_review,
+    call.end_review,
+    call.start_notify,
+    call.end_notify,
+    call.cycle_comment,
+    call.survey_comment,
+    call.template_id
   );
 };

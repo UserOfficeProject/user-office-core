@@ -1,20 +1,20 @@
 import {
-  TextInputConfig,
   SelectionFromOptionsConfig,
+  TextInputConfig,
 } from '../resolvers/types/FieldConfig';
 import JSDict from '../utils/Dictionary';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import {
-  ProposalTemplateField,
-  QuestionaryField,
-  ProposalTemplate,
-  Questionary,
+  Answer,
   DataType,
   DataTypeSpec,
   FieldDependency,
+  QuestionaryStep,
+  QuestionRel,
+  TemplateStep,
 } from './ProposalModel';
-type AbstractField = ProposalTemplateField | QuestionaryField;
-type AbstractCollection = ProposalTemplate | Questionary;
+type AbstractField = QuestionRel | Answer;
+type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
@@ -24,24 +24,24 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
   }
 }
 export function getTopicById(collection: AbstractCollection, topicId: number) {
-  const step = collection.steps.find(step => step.topic.topic_id === topicId);
+  const step = collection.find(step => step.topic.id === topicId);
 
   return step ? step.topic : undefined;
 }
 export function getQuestionaryStepByTopicId(
-  template: AbstractCollection,
+  collection: AbstractCollection,
   topicId: number
 ) {
-  return template.steps.find(step => step.topic.topic_id === topicId);
+  return collection.find(step => step.topic.id === topicId);
 }
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-  collection.steps.every(step => {
+  collection.every(step => {
     needle = step.fields.find(
-      field => field.proposal_question_id === questionId
+      field => field.question.proposalQuestionId === questionId
     );
 
     return needle === undefined;
@@ -51,62 +51,59 @@ export function getFieldById(
 }
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  collection.steps.forEach(step => {
+  collection.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
 
   return allFields;
 }
 export function isDependencySatisfied(
-  collection: Questionary,
-  dependency: FieldDependency
+  collection: QuestionaryStep[],
+  dependency: FieldDependency | undefined
 ): boolean {
-  //const { condition, params } = dependency.condition;
+  if (!dependency?.condition) {
+    return true;
+  }
   const { condition, params } = dependency.condition;
-  const field = getFieldById(collection, dependency.dependency_id) as
-    | QuestionaryField
+  const field = getFieldById(collection, dependency.dependencyId) as
+    | Answer
     | undefined;
   if (!field) {
     return true;
   }
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  const isParentSattisfied = areDependenciesSatisfied(
+  const isParentSatisfied = areDependenciesSatisfied(
     collection,
-    dependency.dependency_id
+    dependency.dependencyId
   );
 
   return (
-    isParentSattisfied &&
+    isParentSatisfied &&
     new ConditionEvaluator()
       .getConditionEvaluator(condition)
       .isSatisfied(field, params)
   );
 }
 export function areDependenciesSatisfied(
-  questionary: Questionary,
+  questionary: QuestionaryStep[],
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissasisfied = field.dependencies?.some(dep => {
-    const result = isDependencySatisfied(questionary, dep) === false;
 
-    return result;
-  });
-
-  return isAtLeastOneDissasisfied === false;
+  return isDependencySatisfied(questionary, field.dependency);
 }
 
 class BaseValidator implements ConstraintValidator {
   constructor(private dataType?: DataType | undefined) {}
 
-  validate(value: any, field: QuestionaryField) {
-    if (this.dataType && field.data_type !== this.dataType) {
+  validate(value: any, field: Answer) {
+    if (this.dataType && field.question.dataType !== this.dataType) {
       throw new Error('Field validator ');
     }
-    if (field.config.required && !value) {
+    if (field.question.config.required && !value) {
       return false;
     }
 
@@ -118,11 +115,11 @@ class TextInputValidator extends BaseValidator {
   constructor() {
     super(DataType.TEXT_INPUT);
   }
-  validate(value: any, field: QuestionaryField) {
+  validate(value: any, field: Answer) {
     if (!super.validate(value, field)) {
       return false;
     }
-    const config = field.config as TextInputConfig;
+    const config = field.question.config as TextInputConfig;
     if (config.min && value && value.length < config.min) {
       return false;
     }
@@ -138,8 +135,8 @@ class SelectFromOptionsInputValidator extends BaseValidator {
   constructor() {
     super(DataType.SELECTION_FROM_OPTIONS);
   }
-  validate(value: any, field: QuestionaryField) {
-    const config = field.config as SelectionFromOptionsConfig;
+  validate(value: any, field: Answer) {
+    const config = field.question.config as SelectionFromOptionsConfig;
     if (!super.validate(value, field)) {
       return false;
     }
@@ -159,16 +156,14 @@ validatorMap.put(
   new SelectFromOptionsInputValidator()
 );
 
-export function isMatchingConstraints(
-  value: any,
-  field: ProposalTemplateField
-): boolean {
+export function isMatchingConstraints(value: any, field: QuestionRel): boolean {
   const val = JSON.parse(value).value;
-  const validator = validatorMap.get(field.data_type) || new BaseValidator();
+  const validator =
+    validatorMap.get(field.question.dataType) || new BaseValidator();
 
   return validator.validate(val, field);
 }
 
 interface ConstraintValidator {
-  validate(value: any, field: ProposalTemplateField): boolean;
+  validate(value: any, field: QuestionRel): boolean;
 }

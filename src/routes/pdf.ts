@@ -6,11 +6,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
-import {
-  DataType,
-  Questionary,
-  QuestionaryField,
-} from '../models/ProposalModel';
+import { Answer, DataType, Questionary } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
@@ -162,33 +158,33 @@ const createProposalPDF = async (
     questionary.steps.forEach(x => {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(questionary, x.topic.topic_id);
+      const step = getQuestionaryStepByTopicId(questionary.steps, x.topic.id);
       const activeFields = step
         ? (step.fields.filter(field => {
             return areDependenciesSatisfied(
-              questionary,
-              field.proposal_question_id
+              questionary.steps,
+              field.question.proposalQuestionId
             );
-          }) as QuestionaryField[])
+          }) as Answer[])
         : [];
       if (!step) {
         throw 'Could not download generated PDF';
       }
-      writeBold(step.topic.topic_title, doc);
+      writeBold(step.topic.title, doc);
       toc.push({
-        title: step.topic.topic_title,
+        title: step.topic.title,
         page: pageNumber,
         children: [],
       });
       doc.moveDown();
       activeFields.forEach(field => {
-        if (field.data_type === DataType.EMBELLISHMENT) {
-          const conf = field.config as EmbellishmentConfig;
+        if (field.question.dataType === DataType.EMBELLISHMENT) {
+          const conf = field.question.config as EmbellishmentConfig;
           if (!conf.omitFromPdf) {
             writeBold(conf.plain!, doc);
           }
-        } else if (field.data_type === DataType.FILE_UPLOAD) {
-          writeBold(field.question, doc);
+        } else if (field.question.dataType === DataType.FILE_UPLOAD) {
+          writeBold(field.question.question, doc);
           if (field.value) {
             const fieldAttachmentArray: string[] = field.value.split(',');
             attachmentIds = attachmentIds.concat(fieldAttachmentArray);
@@ -197,23 +193,23 @@ const createProposalPDF = async (
             write(notAnswered, doc);
           }
           // Default case, a ordinary question type
-        } else if (field.data_type === DataType.DATE) {
-          writeBold(field.question, doc);
+        } else if (field.question.dataType === DataType.DATE) {
+          writeBold(field.question.question, doc);
           write(
             field.value
               ? new Date(field.value).toISOString().split('T')[0]
               : notAnswered,
             doc
           );
-        } else if (field.data_type === DataType.BOOLEAN) {
-          writeBold(field.question, doc);
+        } else if (field.question.dataType === DataType.BOOLEAN) {
+          writeBold(field.question.question, doc);
           if (field.value) {
             write('Yes', doc);
           } else {
             write('No', doc);
           }
         } else {
-          writeBold(field.question, doc);
+          writeBold(field.question.question, doc);
           write(field.value ? field.value : notAnswered, doc);
         }
         doc.moveDown(0.5);

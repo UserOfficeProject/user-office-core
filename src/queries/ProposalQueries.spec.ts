@@ -1,25 +1,28 @@
 import 'reflect-metadata';
+import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import {
   dummyProposal,
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 
 const dummyProposalDataSource = new ProposalDataSourceMock();
+const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
 );
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,
+  dummyCallDataSource,
   userAuthorization
 );
 beforeEach(() => {
@@ -57,7 +60,10 @@ test('Get questionary should not succeed for unauthorized user', () => {
 test('A userofficer can get all proposal', () => {
   return expect(
     proposalQueries.getAll(dummyUserOfficer)
-  ).resolves.toStrictEqual({ totalCount: 1, proposals: [dummyProposal] });
+  ).resolves.toStrictEqual({
+    totalCount: 1,
+    proposals: [dummyProposal],
+  });
 });
 
 test('A user cannot query all proposals', () => {

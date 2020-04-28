@@ -18,10 +18,10 @@ import { wrapResponse } from '../wrapResponse';
 @InputType()
 class ProposalAnswerInput {
   @Field()
-  proposal_question_id: string;
+  proposalQuestionId: string;
 
   @Field(() => DataType, { nullable: true })
-  data_type: DataType;
+  dataType: DataType;
 
   @Field(() => String, { nullable: true })
   value: string;

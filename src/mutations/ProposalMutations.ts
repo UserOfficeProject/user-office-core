@@ -11,31 +11,42 @@ import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { Logger } from '../utils/Logger';
-import { logger } from '../utils/Logger';
+import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSource } from './../datasources/CallDataSource';
 
 export default class ProposalMutations {
   constructor(
-    private dataSource: ProposalDataSource,
+    private proposalDataSource: ProposalDataSource,
     private templateDataSource: TemplateDataSource,
+    private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
   ) {}
 
   @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
-  async create(agent: User | null): Promise<Proposal | Rejection> {
-    // Check if there is an open call, if not reject
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall())
-    ) {
+  async create(
+    agent: User | null,
+    callId: number
+  ): Promise<Proposal | Rejection> {
+    // Check if there is an open call
+    if (!(await this.proposalDataSource.checkActiveCall(callId))) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
 
-    return this.dataSource
-      .create((agent as User).id)
+    const call = await this.callDataSource.get(callId);
+
+    if (!call || !call.templateId) {
+      logger.logError('User tried to create proposal on bad call', {
+        call,
+      });
+
+      return rejection('NOT_FOUND');
+    }
+
+    return this.proposalDataSource
+      .create(agent!.id, callId, call.templateId)
       .then(proposal => proposal)
       .catch(err => {
         logger.logException('Could not create proposal', err, { agent });
@@ -43,7 +54,6 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
@@ -64,12 +74,16 @@ export default class ProposalMutations {
     } = args;
 
     // Get proposal information
-    const proposal = await this.dataSource.get(id); //Hacky
+    const proposal = await this.proposalDataSource.get(id); //Hacky
+
+    if (!proposal) {
+      return rejection('NOT_FOUND');
+    }
 
     // Check if there is an open call, if not reject
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall())
+      !(await this.proposalDataSource.checkActiveCall(proposal.callId))
     ) {
       return rejection('NO_ACTIVE_CALL_FOUND');
     }
@@ -112,7 +126,9 @@ export default class ProposalMutations {
     }
 
     if (users !== undefined) {
-      const [err] = await to(this.dataSource.setProposalUsers(id, users));
+      const [err] = await to(
+        this.proposalDataSource.setProposalUsers(id, users)
+      );
       if (err) {
         logger.logError('Could not update users', { err, id, agent });
 
@@ -127,26 +143,32 @@ export default class ProposalMutations {
     if (answers !== undefined) {
       for (const answer of answers) {
         if (answer.value !== undefined) {
-          const templateField = await this.templateDataSource.getTemplateField(
-            answer.proposal_question_id
+          const questionRel = await this.templateDataSource.getQuestionRel(
+            answer.proposalQuestionId,
+            proposal.templateId
           );
-          if (!templateField) {
+          if (!questionRel) {
+            logger.logError('Could not find questionRel', {
+              proposalQuestionId: answer.proposalQuestionId,
+              templateId: proposal.templateId,
+            });
+
             return rejection('INTERNAL_ERROR');
           }
           if (
             !partialSave &&
-            !isMatchingConstraints(answer.value, templateField)
+            !isMatchingConstraints(answer.value, questionRel)
           ) {
             this.logger.logError(
               'User provided value not matching constraint',
-              { answer, templateField }
+              { answer, templateField: questionRel }
             );
 
             return rejection('VALUE_CONSTRAINT_REJECTION');
           }
-          await this.dataSource.updateAnswer(
+          await this.proposalDataSource.updateAnswer(
             proposal?.id,
-            answer.proposal_question_id,
+            answer.proposalQuestionId,
             answer.value
           );
         }
@@ -154,13 +176,13 @@ export default class ProposalMutations {
     }
 
     if (topicsCompleted !== undefined) {
-      await this.dataSource.updateTopicCompletenesses(
+      await this.proposalDataSource.updateTopicCompletenesses(
         proposal.id,
         topicsCompleted
       );
     }
 
-    return this.dataSource
+    return this.proposalDataSource
       .update(proposal)
       .then(proposal => proposal)
       .catch(err => {
@@ -172,14 +194,13 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   async updateFiles(
     agent: User | null,
     args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
     const { proposalId, questionId, files } = args;
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
@@ -188,9 +209,9 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    await this.dataSource.deleteFiles(proposalId, questionId);
+    await this.proposalDataSource.deleteFiles(proposalId, questionId);
 
-    return this.dataSource
+    return this.proposalDataSource
       .insertFiles(proposalId, questionId, files)
       .then(result => {
         return result;
@@ -204,14 +225,13 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
@@ -224,7 +244,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    return this.dataSource
+    return this.proposalDataSource
       .submitProposal(proposalId)
       .then(proposal => proposal)
       .catch(e => {
@@ -236,13 +256,12 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-
   @Authorized()
   async delete(
     agent: User | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
-    const proposal = await this.dataSource.get(proposalId);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal) {
       return rejection('INTERNAL_ERROR');
@@ -255,7 +274,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    const result = await this.dataSource.deleteProposal(proposalId);
+    const result = await this.proposalDataSource.deleteProposal(proposalId);
 
     return result || rejection('INTERNAL_ERROR');
   }

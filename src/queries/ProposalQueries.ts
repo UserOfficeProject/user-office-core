@@ -1,14 +1,18 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus, ProposalEndStatus } from '../models/ProposalModel';
+import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
+import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSource } from './../datasources/CallDataSource';
+import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export default class ProposalQueries {
   constructor(
     public dataSource: ProposalDataSource,
+    private callDataSource: CallDataSource,
     private userAuth: UserAuthorization
   ) {}
 
@@ -20,7 +24,7 @@ export default class ProposalQueries {
       return null;
     }
 
-    //If not a user officer remove excellence, tehnical and safety score
+    //If not a user officer remove excellence, technical and safety score
     if (!(await this.userAuth.isUserOfficer(agent))) {
       delete proposal.rankOrder;
       delete proposal.finalStatus;
@@ -33,14 +37,18 @@ export default class ProposalQueries {
     }
   }
 
-  async getQuestionary(agent: User | null, id: number) {
-    const proposal = await this.dataSource.get(id);
+  async getQuestionary(agent: User | null, proposalId: number) {
+    const proposal = await this.dataSource.get(proposalId);
 
     if ((await this.hasAccessRights(agent, proposal)) === false) {
       return null;
     }
 
-    return await this.dataSource.getQuestionary(id);
+    return await this.dataSource.getQuestionary(proposalId);
+  }
+
+  async getEmptyQuestionary(user: User | null, callId: number) {
+    return await this.dataSource.getEmptyQuestionary(callId);
   }
 
   // NOTE: Duplicate function! We have this same function under userAuth.
@@ -62,7 +70,7 @@ export default class ProposalQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: User | null,
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ) {
@@ -70,11 +78,29 @@ export default class ProposalQueries {
   }
 
   @Authorized()
-  async getBlank(agent: User | null) {
+  async getBlank(agent: User | null, callId: number) {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.dataSource.checkActiveCall())
+      !(await this.dataSource.checkActiveCall(callId))
     ) {
+      return null;
+    }
+
+    const call = await this.callDataSource.get(callId);
+    if (!call) {
+      logger.logError('User tried accessing non existing call', {
+        callId,
+        agent,
+      });
+
+      return null;
+    }
+
+    if (!call.templateId) {
+      logger.logError('User tried to getBlank for misconfigured call', {
+        call,
+      });
+
       return null;
     }
 
@@ -88,7 +114,9 @@ export default class ProposalQueries {
       new Date(),
       '',
       0,
-      ProposalEndStatus.UNSET
+      ProposalEndStatus.UNSET,
+      call?.id,
+      call?.templateId
     );
 
     return blankProposal;
