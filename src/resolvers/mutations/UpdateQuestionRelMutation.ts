@@ -4,6 +4,7 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   Resolver,
 } from 'type-graphql';
@@ -27,65 +28,58 @@ class FieldConditionInput implements Partial<FieldCondition> {
 @InputType()
 export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
   @Field(() => String)
-  public dependency_id: string;
-
-  @Field(() => String)
-  public question_id: string;
+  public dependencyId: string;
 
   @Field(() => FieldConditionInput)
   public condition: FieldConditionInput;
 }
 
 @ArgsType()
-export class UpdateProposalTemplateFieldArgs {
+export class UpdateQuestionRelArgs {
   @Field()
-  public id: string;
+  public questionId: string;
 
-  @Field({ nullable: true })
-  public naturalKey: string;
+  @Field(() => Int)
+  public templateId: number;
 
-  @Field({ nullable: true })
-  public question: string;
+  @Field(() => Int, { nullable: true })
+  public topicId?: number;
 
-  @Field({ nullable: true })
-  public config: string;
+  @Field(() => Int, { nullable: true })
+  public sortOrder?: number;
 
-  @Field({ nullable: true })
-  public isEnabled: boolean;
-
-  @Field(() => FieldDependencyInput)
-  public dependencies: FieldDependencyInput[];
+  @Field(() => FieldDependencyInput, { nullable: true })
+  public dependency?: FieldDependencyInput;
 }
 
 @Resolver()
-export class UpdateProposalTemplateFieldMutation {
+export class UpdateQuestionRelMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
-  updateProposalTemplateField(
-    @Args() args: UpdateProposalTemplateFieldArgs,
+  updateQuestionRel(
+    @Args() args: UpdateQuestionRelArgs,
     @Ctx() context: ResolverContext
   ) {
-    args.dependencies = this.unpackDependencies(args.dependencies);
+    args.dependency = this.unpackDependency(args.dependency);
 
     return wrapResponse(
-      context.mutations.template.updateProposalTemplateField(
-        context.user,
-        args
-      ),
+      context.mutations.template.updateQuestionRel(context.user, args),
       ProposalTemplateResponseWrap
     );
   }
 
   // Have this until GQL accepts Union types
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
-  unpackDependencies(dependencies: FieldDependencyInput[]) {
-    return dependencies.map(dependency => {
-      return {
-        ...dependency,
-        condition: {
-          ...dependency.condition,
-          params: JSON.parse(dependency.condition.params).value,
-        },
-      };
-    });
+  unpackDependency(dependency?: FieldDependencyInput) {
+    if (!dependency) {
+      return undefined;
+    }
+
+    return {
+      ...dependency,
+      condition: {
+        ...dependency.condition,
+        params: JSON.parse(dependency.condition.params).value,
+      },
+    };
   }
 }

@@ -13,20 +13,23 @@ import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class CreateTopicArgs {
-  @Field(() => Int)
-  templateId: number;
+export class DeleteQuestionRelArgs {
+  @Field(() => String)
+  questionId: string;
 
   @Field(() => Int)
-  sortOrder: number;
+  templateId: number;
 }
 
 @Resolver()
-export class CreateTopicMutation {
+export class DeleteQuestionRelMutation {
   @Mutation(() => ProposalTemplateResponseWrap)
-  createTopic(@Args() args: CreateTopicArgs, @Ctx() context: ResolverContext) {
+  deleteQuestionRel(
+    @Args() args: DeleteQuestionRelArgs,
+    @Ctx() context: ResolverContext
+  ) {
     return wrapResponse(
-      context.mutations.template.createTopic(context.user, args),
+      context.mutations.template.deleteQuestionRel(context.user, args),
       ProposalTemplateResponseWrap
     );
   }

@@ -1,21 +1,33 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { ProposalTemplate } from '../models/ProposalModel';
+import { TemplateStep } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
+import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized()
-  async getProposalTemplate(
-    agent: User | null
-  ): Promise<ProposalTemplate | null> {
-    return await this.dataSource.getProposalTemplate();
+  async getProposalTemplateSteps(
+    agent: User | null,
+    templateId: number
+  ): Promise<TemplateStep[] | null> {
+    return this.dataSource.getProposalTemplateSteps(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
   async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
-    return await this.dataSource.isNaturalKeyPresent(naturalKey);
+    return this.dataSource.isNaturalKeyPresent(naturalKey);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getProposalTemplates(agent: User | null, args?: ProposalTemplatesArgs) {
+    return this.dataSource.getProposalTemplates(args);
+  }
+
+  @Authorized()
+  async getProposalTemplate(agent: User | null, templateId: number) {
+    return this.dataSource.getProposalTemplate(templateId);
   }
 }

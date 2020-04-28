@@ -85,19 +85,27 @@ export default class PostgresAdminDataSource implements AdminDataSource {
   }
 
   async resetDB() {
-    const directoryPath = './db_patches';
-    fs.readdir(directoryPath, async function(err, files) {
-      if (err) {
-        logger.logError(err.message, err);
+    return new Promise<boolean>((resolve, reject) => {
+      const directoryPath = './db_patches';
+      fs.readdir(directoryPath, async function(err, files) {
+        if (err) {
+          logger.logError(err.message, err);
 
-        return false;
-      }
-      for await (const file of files) {
-        const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
-        await database.raw(contents);
-      }
+          return false;
+        }
+        for await (const file of files) {
+          const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
+          await database
+            .raw(contents)
+            .then(() => console.log(`${file} executed`))
+            .catch(err => {
+              console.error(`${file} failed. ${err}`);
+              resolve(false);
+            });
+        }
+
+        resolve(true);
+      });
     });
-
-    return true;
   }
 }

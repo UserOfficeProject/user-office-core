@@ -9,6 +9,7 @@ export class Call {
     public startNotify: Date,
     public endNotify: Date,
     public cycleComment: string,
-    public surveyComment: string
+    public surveyComment: string,
+    public templateId?: number
   ) {}
 }

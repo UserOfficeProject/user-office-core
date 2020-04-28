@@ -33,4 +33,7 @@ export class Call implements Partial<CallOrigin> {
 
   @Field()
   public surveyComment: string;
+
+  @Field(() => Int, { nullable: true })
+  public templateId?: number;
 }

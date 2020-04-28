@@ -34,14 +34,8 @@ const createUserValidationSchema = yup.object().shape({
 });
 
 const updateUserValidationSchema = yup.object().shape({
-  firstname: yup
-    .string()
-    .required()
-    .min(2),
-  lastname: yup
-    .string()
-    .required()
-    .min(2),
+  firstname: yup.string().min(2),
+  lastname: yup.string().min(2),
 });
 
 export default class UserMutations {

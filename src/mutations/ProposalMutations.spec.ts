@@ -1,29 +1,30 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
-
 import {
-  dummyProposalSubmitted,
   dummyProposal,
+  dummyProposalSubmitted,
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
   dummyUserOfficer,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { DataType } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
+const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
   new ReviewDataSourceMock()
@@ -31,6 +32,7 @@ const userAuthorization = new UserAuthorization(
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
   dummyTemplateDataSource,
+  dummyCallDataSource,
   userAuthorization,
   dummyLogger
 );
@@ -49,8 +51,8 @@ function tryUpdateProposal(user: User, proposalId: number) {
       'Project abstract descriptionPellentesque lacinia, orci at feugiat pretium, purus quam feugiat nisl, aliquet ultrices lectus lectus sed mauris.',
     answers: [
       {
-        proposal_question_id: 'fasta_seq',
-        data_type: DataType.TEXT_INPUT,
+        proposalQuestionId: 'fasta_seq',
+        dataType: DataType.TEXT_INPUT,
         value: '{"value": "ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELG*"}',
       },
     ],
@@ -191,13 +193,13 @@ test('User cannot delete a proposal', () => {
 });
 
 test('Has to be logged in to create proposal', () => {
-  return expect(proposalMutations.create(null)).resolves.not.toBeInstanceOf(
+  return expect(proposalMutations.create(null, 1)).resolves.not.toBeInstanceOf(
     Proposal
   );
 });
 
 test('Can create a proposal', () => {
-  return expect(proposalMutations.create(dummyUser)).resolves.toBeInstanceOf(
+  return expect(proposalMutations.create(dummyUser, 1)).resolves.toBeInstanceOf(
     Proposal
   );
 });

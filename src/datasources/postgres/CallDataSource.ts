@@ -2,25 +2,11 @@
 import { Call } from '../../models/Call';
 import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
 import { CallDataSource } from '../CallDataSource';
+import { CallsFilter } from './../../resolvers/queries/CallsQuery';
 import database from './database';
-import { CallRecord } from './records';
+import { CallRecord, createCallObject } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
-  private createCallObject(call: CallRecord) {
-    return new Call(
-      call.call_id,
-      call.call_short_code,
-      call.start_call,
-      call.end_call,
-      call.start_review,
-      call.end_review,
-      call.start_notify,
-      call.end_notify,
-      call.cycle_comment,
-      call.survey_comment
-    );
-  }
-
   async get(id: number): Promise<Call | null> {
     return database
       .select()
@@ -28,17 +14,32 @@ export default class PostgresCallDataSource implements CallDataSource {
       .where('call_id', id)
       .first()
       .then((call: CallRecord | null) =>
-        call ? this.createCallObject(call) : null
+        call ? createCallObject(call) : null
       );
   }
 
-  async getCalls(): Promise<Call[]> {
-    return database
-      .select(['*'])
-      .from('call')
-      .then((callDB: CallRecord[]) =>
-        callDB.map(call => this.createCallObject(call))
-      );
+  async getCalls(filter?: CallsFilter): Promise<Call[]> {
+    const query = database('call').select(['*']);
+    if (filter?.templateIds) {
+      query.whereIn('template_id', filter.templateIds);
+    }
+
+    // if filter is explicitly set to true or false
+    if (filter?.isActive === true) {
+      const currentDate = new Date().toISOString();
+      query
+        .where('start_call', '<=', currentDate)
+        .andWhere('end_call', '>=', currentDate);
+    } else if (filter?.isActive === false) {
+      const currentDate = new Date().toISOString();
+      query
+        .where('start_call', '>=', currentDate)
+        .orWhere('end_call', '<=', currentDate);
+    }
+
+    return query.then((callDB: CallRecord[]) =>
+      callDB.map(call => createCallObject(call))
+    );
   }
 
   async create(args: CreateCallArgs): Promise<Call> {
@@ -53,6 +54,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_notify: args.endNotify,
         cycle_comment: args.cycleComment,
         survey_comment: args.surveyComment,
+        template_id: args.templateId,
       })
       .into('call')
       .returning(['*'])
@@ -61,7 +63,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           throw new Error('Could not create call');
         }
 
-        return this.createCallObject(call[0]);
+        return createCallObject(call[0]);
       });
   }
 }

@@ -1,15 +1,15 @@
 import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
 import {
-  userDataSource,
-  reviewDataSource,
-  eventLogsDataSource,
-  proposalDataSource,
-  templateDataSource,
-  callDataSource,
-  fileDataSource,
   adminDataSource,
+  callDataSource,
+  eventLogsDataSource,
+  fileDataSource,
+  proposalDataSource,
+  reviewDataSource,
   sepDataSource,
+  templateDataSource,
+  userDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
@@ -37,11 +37,13 @@ const userMutations = new UserMutations(userDataSource, userAuthorization);
 
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
+  callDataSource,
   userAuthorization
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   templateDataSource,
+  callDataSource,
   userAuthorization,
   logger
 );
