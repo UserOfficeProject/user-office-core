@@ -59,7 +59,7 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
             id={proposalQuestionId}
             name={proposalQuestionId}
             value={stateValue}
-            label={templateField.question}
+            label={templateField.question.question}
             select
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
@@ -91,7 +91,7 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
           error={isError}
         >
           <FormLabel className={classes.label}>
-            {templateField.question}
+            {templateField.question.question}
           </FormLabel>
           <span>{templateField.question.config.small_label}</span>
           <RadioGroup
