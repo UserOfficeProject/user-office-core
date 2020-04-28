@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { ThemeProvider } from '@material-ui/styles';
 import { SnackbarProvider } from 'notistack';
 import React from 'react';
@@ -7,6 +8,7 @@ import {
   Redirect,
   Route,
   Switch,
+  RouteProps,
 } from 'react-router-dom';
 
 import {
@@ -23,37 +25,47 @@ import RoleSelectionPage from './user/RoleSelectionPage';
 import SignIn from './user/SignIn';
 import SignUp from './user/SignUp';
 
-const PrivateRoute = ({ component: Component, ...rest }) => (
-  <UserContext.Consumer>
-    {({ token, currentRole }) => (
-      <Route
-        {...rest}
-        render={props => {
-          if (!token) {
-            return <Redirect to="/SignIn" />;
-          } else if (token && !currentRole) {
-            return <Redirect to="/RoleSelectionPage" />;
-          } else {
-            return <Component {...props} />;
-          }
-        }}
-      />
-    )}
-  </UserContext.Consumer>
-);
+const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
+  if (!component) {
+    throw Error('component is undefined');
+  }
+
+  const Component = component; // JSX Elements have to be uppercase.
+
+  return (
+    <UserContext.Consumer>
+      {({ token, currentRole }): JSX.Element => (
+        <Route
+          {...rest}
+          render={(props): JSX.Element => {
+            if (!token) {
+              return <Redirect to="/SignIn" />;
+            } else if (token && !currentRole) {
+              return <Redirect to="/RoleSelectionPage" />;
+            } else {
+              return <Component {...props} />;
+            }
+          }}
+        />
+      )}
+    </UserContext.Consumer>
+  );
+};
 
 class App extends React.Component {
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(): void {
     // Update state so the next render will show the fallback UI.
     localStorage.removeItem('token');
     localStorage.removeItem('currentRole');
     localStorage.removeItem('user');
     localStorage.removeItem('expToken');
   }
-  componentDidCatch(error, info) {
+
+  componentDidCatch(error: any): void {
     getUnauthorizedApi().addClientLog(error);
   }
-  render() {
+
+  render(): JSX.Element {
     return (
       <ThemeProvider theme={getTheme()}>
         <CookiesProvider>
@@ -81,9 +93,9 @@ class App extends React.Component {
                     />
                     <Route
                       path="/LogOut"
-                      render={() => (
+                      render={(): JSX.Element => (
                         <UserContext.Consumer>
-                          {({ handleLogout }) => {
+                          {({ handleLogout }): JSX.Element => {
                             handleLogout();
 
                             return <Redirect to="/" />;
