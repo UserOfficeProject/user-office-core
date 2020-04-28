@@ -13,7 +13,7 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentDate: AdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   return (
     <Formik
@@ -28,15 +28,17 @@ export const AdminComponentDate: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        natural_key: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
+        question: Yup.object({
+          naturalKey: naturalKeySchema,
+          question: Yup.string().required('Question is required'),
+        }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Date">
             <Field
-              name="natural_key"
+              name="question.naturalKey"
               label="Key"
               type="text"
               component={TextField}
@@ -45,7 +47,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
-              name="question"
+              name="question.question"
               label="Question"
               type="text"
               component={TextField}
@@ -54,7 +56,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
             <Field
-              name="config.tooltip"
+              name="question.config.tooltip"
               label="Tooltip"
               type="text"
               component={TextField}
@@ -64,9 +66,9 @@ export const AdminComponentDate: AdminComponentSignature = props => {
             />
             <TitledContainer label="Constraints">
               <Field
-                name="config.required"
+                name="question.config.required"
                 label="Is required"
-                checked={formikProps.values.config.required}
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 margin="normal"
                 fullWidth
@@ -75,7 +77,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
             </TitledContainer>
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

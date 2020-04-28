@@ -16,7 +16,7 @@ import React, { useState } from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 import { DataType } from '../../generated/sdk';
-import { TemplateStep, ProposalTemplateField } from '../../generated/sdk';
+import { TemplateStep, QuestionRel } from '../../generated/sdk';
 import { EventType, Event } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
@@ -25,7 +25,7 @@ export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
   dispatch: React.Dispatch<Event>;
   index: number;
-  onItemClick: { (data: ProposalTemplateField): void };
+  onItemClick: { (data: QuestionRel): void };
   dragMode: boolean;
 }) {
   const theme = useTheme();
@@ -76,7 +76,7 @@ export default function QuestionaryEditorTopic(props: {
   }))();
 
   const { data, dispatch, index } = props;
-  const [title, setTitle] = useState<string>(data.topic.topic_title);
+  const [title, setTitle] = useState<string>(data.topic.title);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
@@ -84,7 +84,7 @@ export default function QuestionaryEditorTopic(props: {
   const onCreateNewFieldClicked = (dataType: DataType) => {
     dispatch({
       type: EventType.CREATE_NEW_FIELD_REQUESTED,
-      payload: { topicId: props.data.topic.topic_id, dataType: dataType },
+      payload: { topicId: props.data.topic.id, dataType: dataType },
     });
     setAnchorEl(null);
   };
@@ -112,7 +112,7 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(false);
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
-          payload: { topicId: data.topic.topic_id, title: title },
+          payload: { topicId: data.topic.id, title: title },
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -128,7 +128,7 @@ export default function QuestionaryEditorTopic(props: {
       }}
       data-cy="topic-title"
     >
-      {index + 2}. {props.data.topic.topic_title}
+      {index + 2}. {props.data.topic.title}
     </span>
   );
 
@@ -142,7 +142,7 @@ export default function QuestionaryEditorTopic(props: {
           data={item}
           dispatch={dispatch}
           onClick={props.onItemClick}
-          key={item.proposal_question_id.toString()}
+          key={item.question.proposalQuestionId.toString()}
         />
       ));
     }
@@ -150,8 +150,8 @@ export default function QuestionaryEditorTopic(props: {
 
   return (
     <Draggable
-      key={data.topic.topic_id.toString()}
-      draggableId={data.topic.topic_id.toString()}
+      key={data.topic.id.toString()}
+      draggableId={data.topic.id.toString()}
       index={index}
       isDragDisabled={!props.dragMode}
     >
@@ -254,7 +254,7 @@ export default function QuestionaryEditorTopic(props: {
                 onClick={() =>
                   dispatch({
                     type: EventType.DELETE_TOPIC_REQUESTED,
-                    payload: data.topic.topic_id,
+                    payload: data.topic.id,
                   })
                 }
               >
@@ -282,7 +282,7 @@ export default function QuestionaryEditorTopic(props: {
             </Menu>
           </Grid>
 
-          <Droppable droppableId={data.topic.topic_id.toString()} type="field">
+          <Droppable droppableId={data.topic.id.toString()} type="field">
             {(provided, snapshot) => (
               <Grid
                 item

@@ -1,0 +1,12 @@
+fragment questionaryStep on QuestionaryStep {
+  topic {
+    title
+    id
+    sortOrder
+    isEnabled
+  }
+  isCompleted
+  fields {
+    ...answer
+  }
+}

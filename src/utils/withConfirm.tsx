@@ -16,10 +16,10 @@ const defaultOptions = {
   onClose: (): void => {},
   onCancel: (): void => {},
 };
-
-const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
-  props: any
-): JSX.Element => {
+//
+const withConfirm = <T extends unknown>(
+  WrappedComponent: (props: T) => JSX.Element
+) => (props: Omit<T, 'confirm'>): JSX.Element => {
   const classes = makeStyles(() => ({
     title: {
       marginTop: '12px',
@@ -62,8 +62,11 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
     []
   );
 
+  // @ts
   return (
     <Fragment>
+      {/* 
+      // @ts-ignore-line */}
       <WrappedComponent {...props} confirm={confirm} />
       <Dialog
         fullWidth
@@ -97,5 +100,10 @@ interface Options {
   onClose?: () => void;
   onCancel?: () => void;
 }
+
+export type WithConfirmType = (
+  callback: () => void,
+  params: { title: string; description: string }
+) => Function;
 
 export default withConfirm;

@@ -1,13 +1,8 @@
-mutation createTopic($sortOrder: Int!) {
-  createTopic(sortOrder: $sortOrder) {
+mutation createTopic($templateId: Int!, $sortOrder: Int!) {
+  createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
       steps {
-        topic {
-          ...topic
-        }
-        fields {
-          ...proposalTemplateField
-        }
+        ...templateStep
       }
     }
     error

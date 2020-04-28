@@ -12,9 +12,11 @@ import { ProposalErrorLabel } from './ProposalErrorLabel';
 
 export function ProposalComponentBoolean(props: BasicComponentProps) {
   const { templateField, errors, onComplete, touched } = props;
-  const { proposal_question_id, config, question } = templateField;
-  const fieldError = getIn(errors, proposal_question_id);
-  const isError = getIn(touched, proposal_question_id) && !!fieldError;
+  const {
+    question: { proposalQuestionId, config, question },
+  } = templateField;
+  const fieldError = getIn(errors, proposalQuestionId);
+  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const [stateValue, setStateValue] = useState<boolean>(
     templateField.value || false
   );
@@ -34,8 +36,8 @@ export function ProposalComponentBoolean(props: BasicComponentProps) {
       <FormControlLabel
         control={
           <Checkbox
-            id={proposal_question_id}
-            name={proposal_question_id}
+            id={proposalQuestionId}
+            name={proposalQuestionId}
             onChange={(evt: ChangeEvent<HTMLInputElement>) => {
               onComplete(evt, evt.target.checked);
             }}
@@ -52,7 +54,7 @@ export function ProposalComponentBoolean(props: BasicComponentProps) {
       />
       <span>{config.small_label}</span>
       {isError && (
-        <ProposalErrorLabel>{errors[proposal_question_id]}</ProposalErrorLabel>
+        <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
       )}
     </FormControl>
   );

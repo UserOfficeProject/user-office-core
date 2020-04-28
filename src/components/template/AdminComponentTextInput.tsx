@@ -17,11 +17,11 @@ import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentTextInput: AdminComponentSignature = props => {
   const field = props.field;
-  const config = field.config as TextInputConfig;
+  const config = field.question.config as TextInputConfig;
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     config.htmlQuestion !== null
   );
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
   /**
    * NOTE: The console warning "Warning: `value` prop on `input` should not be null." is a bit complicated for now.
@@ -41,9 +41,9 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               ...field,
               ...vals,
               config: {
-                ...vals.config,
+                ...vals.question.config,
                 htmlQuestion: isRichQuestion
-                  ? (vals.config as TextInputConfig).htmlQuestion
+                  ? (vals.question.config as TextInputConfig).htmlQuestion
                   : null,
               },
             },
@@ -52,14 +52,16 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        natural_key: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
-        config: Yup.object({
-          min: Yup.number().nullable(),
-          max: Yup.number().nullable(),
-          required: Yup.bool(),
-          placeholder: Yup.string(),
-          multiline: Yup.boolean(),
+        question: Yup.object({
+          naturalKey: naturalKeySchema,
+          question: Yup.string().required('Question is required'),
+          config: Yup.object({
+            min: Yup.number().nullable(),
+            max: Yup.number().nullable(),
+            required: Yup.bool(),
+            placeholder: Yup.string(),
+            multiline: Yup.boolean(),
+          }),
         }),
       })}
     >
@@ -67,7 +69,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Text input">
             <Field
-              name="natural_key"
+              name="question.naturalKey"
               label="Key"
               type="text"
               component={TextField}
@@ -77,7 +79,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
             />
 
             <Field
-              name="question"
+              name="question.question"
               label="Question"
               type="text"
               component={TextField}
@@ -99,7 +101,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
             <Collapse in={isRichQuestion}>
               <Field
                 visible={isRichQuestion}
-                name="config.htmlQuestion"
+                name="question.config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}
                 margin="normal"
@@ -116,8 +118,8 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
             </Collapse>
             <TitledContainer label="Constraints">
               <Field
-                name="config.required"
-                checked={formikProps.values.config.required}
+                name="question.config.required"
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 label="Is required"
                 margin="normal"
@@ -126,7 +128,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               />
 
               <Field
-                name="config.min"
+                name="question.config.min"
                 label="Min"
                 type="text"
                 component={TextField}
@@ -136,7 +138,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               />
 
               <Field
-                name="config.max"
+                name="question.config.max"
                 label="Max"
                 type="text"
                 component={TextField}
@@ -148,7 +150,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
 
             <TitledContainer label="Options">
               <Field
-                name="config.placeholder"
+                name="question.config.placeholder"
                 label="Placeholder text"
                 type="text"
                 component={TextField}
@@ -158,9 +160,10 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
               />
 
               <Field
-                name="config.multiline"
+                name="question.config.multiline"
                 checked={
-                  (formikProps.values.config as TextInputConfig).multiline
+                  (formikProps.values.question.config as TextInputConfig)
+                    .multiline
                 }
                 component={FormikUICustomCheckbox}
                 label="Multiple line"
@@ -172,7 +175,7 @@ export const AdminComponentTextInput: AdminComponentSignature = props => {
 
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

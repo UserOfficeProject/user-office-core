@@ -25,6 +25,15 @@ export type AddUserRoleResponseWrap = {
   success?: Maybe<Scalars['Boolean']>,
 };
 
+export type Answer = {
+   __typename?: 'Answer',
+  question: Question,
+  sortOrder: Scalars['Int'],
+  topicId: Scalars['Int'],
+  dependency?: Maybe<FieldDependency>,
+  value?: Maybe<Scalars['IntStringDateBool']>,
+};
+
 export type BasicUserDetails = {
    __typename?: 'BasicUserDetails',
   id: Scalars['Int'],
@@ -59,12 +68,18 @@ export type Call = {
   endNotify: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>,
 };
 
 export type CallResponseWrap = {
    __typename?: 'CallResponseWrap',
   error?: Maybe<Scalars['String']>,
   call?: Maybe<Call>,
+};
+
+export type CallsFilter = {
+  templateIds?: Maybe<Array<Scalars['Int']>>,
+  isActive?: Maybe<Scalars['Boolean']>,
 };
 
 export type ConfigBase = {
@@ -149,15 +164,14 @@ export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | Fil
 
 export type FieldDependency = {
    __typename?: 'FieldDependency',
-  question_id: Scalars['String'],
-  dependency_id: Scalars['String'],
-  dependency_natural_key: Scalars['String'],
+  questionId: Scalars['String'],
+  dependencyId: Scalars['String'],
+  dependencyNaturalKey: Scalars['String'],
   condition: FieldCondition,
 };
 
 export type FieldDependencyInput = {
-  dependency_id: Scalars['String'],
-  question_id: Scalars['String'],
+  dependencyId: Scalars['String'],
   condition: FieldConditionInput,
 };
 
@@ -200,8 +214,12 @@ export type Mutation = {
   removeMember: SepResponseWrap,
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
-  createTemplateField: TemplateFieldResponseWrap,
-  updateProposalTemplateField: ProposalTemplateResponseWrap,
+  createQuestion: QuestionResponseWrap,
+  createTopic: ProposalTemplateResponseWrap,
+  deleteQuestionRel: ProposalTemplateResponseWrap,
+  updateProposalTemplate: ProposalTemplateResponseWrap,
+  updateQuestion: QuestionResponseWrap,
+  updateQuestionRel: ProposalTemplateResponseWrap,
   updateTopic: TopicResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
@@ -211,9 +229,10 @@ export type Mutation = {
   addClientLog: SuccessResponseWrap,
   addSEPMembersRole: SepMembersRoleResponseWrap,
   createProposal: ProposalResponseWrap,
-  createTopic: ProposalTemplateResponseWrap,
+  createProposalTemplate: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
-  deleteTemplateField: ProposalTemplateResponseWrap,
+  deleteProposalTemplate: ProposalTemplateResponseWrap,
+  deleteQuestion: QuestionResponseWrap,
   deleteTopic: ProposalTemplateResponseWrap,
   deleteUser: UserResponseWrap,
   emailVerification: EmailVerificationResponseWrap,
@@ -226,8 +245,8 @@ export type Mutation = {
   setPageContent: PageResponseWrap,
   submitProposal: ProposalResponseWrap,
   token: TokenResponseWrap,
-  updateFieldTopicRel: UpdateFieldTopicRelResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
+  updateQuestionsTopicRels: UpdateQuestionsTopicRelsResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
 };
 
@@ -241,7 +260,8 @@ export type MutationCreateCallArgs = {
   startNotify: Scalars['String'],
   endNotify: Scalars['String'],
   cycleComment: Scalars['String'],
-  surveyComment: Scalars['String']
+  surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>
 };
 
 
@@ -324,19 +344,45 @@ export type MutationUpdateSepArgs = {
 };
 
 
-export type MutationCreateTemplateFieldArgs = {
-  topicId: Scalars['Int'],
+export type MutationCreateQuestionArgs = {
   dataType: DataType
 };
 
 
-export type MutationUpdateProposalTemplateFieldArgs = {
+export type MutationCreateTopicArgs = {
+  templateId: Scalars['Int'],
+  sortOrder: Scalars['Int']
+};
+
+
+export type MutationDeleteQuestionRelArgs = {
+  questionId: Scalars['String'],
+  templateId: Scalars['Int']
+};
+
+
+export type MutationUpdateProposalTemplateArgs = {
+  templateId: Scalars['Float'],
+  name?: Maybe<Scalars['String']>,
+  description?: Maybe<Scalars['String']>,
+  isArchived?: Maybe<Scalars['Boolean']>
+};
+
+
+export type MutationUpdateQuestionArgs = {
   id: Scalars['String'],
   naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
-  config?: Maybe<Scalars['String']>,
-  isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies: Array<FieldDependencyInput>
+  config?: Maybe<Scalars['String']>
+};
+
+
+export type MutationUpdateQuestionRelArgs = {
+  questionId: Scalars['String'],
+  templateId: Scalars['Int'],
+  topicId?: Maybe<Scalars['Int']>,
+  sortOrder?: Maybe<Scalars['Int']>,
+  dependency?: Maybe<FieldDependencyInput>
 };
 
 
@@ -424,8 +470,14 @@ export type MutationAddSepMembersRoleArgs = {
 };
 
 
-export type MutationCreateTopicArgs = {
-  sortOrder: Scalars['Int']
+export type MutationCreateProposalArgs = {
+  callId: Scalars['Int']
+};
+
+
+export type MutationCreateProposalTemplateArgs = {
+  description?: Maybe<Scalars['String']>,
+  name: Scalars['String']
 };
 
 
@@ -434,13 +486,18 @@ export type MutationDeleteProposalArgs = {
 };
 
 
-export type MutationDeleteTemplateFieldArgs = {
-  id: Scalars['String']
+export type MutationDeleteProposalTemplateArgs = {
+  id: Scalars['Int']
+};
+
+
+export type MutationDeleteQuestionArgs = {
+  questionId: Scalars['String']
 };
 
 
 export type MutationDeleteTopicArgs = {
-  id: Scalars['Int']
+  topicId: Scalars['Int']
 };
 
 
@@ -497,15 +554,16 @@ export type MutationTokenArgs = {
 };
 
 
-export type MutationUpdateFieldTopicRelArgs = {
-  topic_id: Scalars['Int'],
-  field_ids?: Maybe<Array<Scalars['String']>>
-};
-
-
 export type MutationUpdatePasswordArgs = {
   id: Scalars['Int'],
   password: Scalars['String']
+};
+
+
+export type MutationUpdateQuestionsTopicRelsArgs = {
+  templateId: Scalars['Int'],
+  topicId: Scalars['Int'],
+  fieldIds?: Maybe<Array<Scalars['String']>>
 };
 
 
@@ -554,6 +612,8 @@ export type Proposal = {
   shortCode: Scalars['String'],
   rankOrder?: Maybe<Scalars['Int']>,
   finalStatus?: Maybe<ProposalEndStatus>,
+  callId: Scalars['Int'],
+  templateId: Scalars['Int'],
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews?: Maybe<Array<Review>>,
@@ -562,8 +622,8 @@ export type Proposal = {
 };
 
 export type ProposalAnswerInput = {
-  proposal_question_id: Scalars['String'],
-  data_type?: Maybe<DataType>,
+  proposalQuestionId: Scalars['String'],
+  dataType?: Maybe<DataType>,
   value?: Maybe<Scalars['String']>,
 };
 
@@ -580,6 +640,11 @@ export type ProposalResponseWrap = {
   proposal?: Maybe<Proposal>,
 };
 
+export type ProposalsFilter = {
+  text?: Maybe<Scalars['String']>,
+  templateIds?: Maybe<Array<Scalars['Int']>>,
+};
+
 export type ProposalsQueryResult = {
    __typename?: 'ProposalsQueryResult',
   totalCount: Scalars['Int'],
@@ -594,19 +659,13 @@ export enum ProposalStatus {
 
 export type ProposalTemplate = {
    __typename?: 'ProposalTemplate',
+  templateId: Scalars['Int'],
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>,
+  isArchived: Scalars['Boolean'],
+  proposalCount: Scalars['Int'],
+  callCount: Scalars['Int'],
   steps: Array<TemplateStep>,
-};
-
-export type ProposalTemplateField = {
-   __typename?: 'ProposalTemplateField',
-  proposal_question_id: Scalars['String'],
-  natural_key: Scalars['String'],
-  data_type: DataType,
-  sort_order: Scalars['Int'],
-  question: Scalars['String'],
-  config: FieldConfig,
-  topic_id: Scalars['Int'],
-  dependencies?: Maybe<Array<FieldDependency>>,
 };
 
 export type ProposalTemplateResponseWrap = {
@@ -615,12 +674,18 @@ export type ProposalTemplateResponseWrap = {
   template?: Maybe<ProposalTemplate>,
 };
 
+export type ProposalTemplatesFilter = {
+  isArchived: Scalars['Boolean'],
+};
+
 export type Query = {
    __typename?: 'Query',
+  calls?: Maybe<Array<Call>>,
+  proposals?: Maybe<ProposalsQueryResult>,
+  proposalTemplates: Array<ProposalTemplate>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
   call?: Maybe<Call>,
-  calls?: Maybe<Array<Call>>,
   checkEmailExist?: Maybe<Scalars['Boolean']>,
   eventLogs?: Maybe<Array<EventLog>>,
   fileMetadata?: Maybe<Array<FileMetadata>>,
@@ -629,7 +694,6 @@ export type Query = {
   getPageContent?: Maybe<Scalars['String']>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
-  proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplate?: Maybe<ProposalTemplate>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
@@ -642,8 +706,30 @@ export type Query = {
 };
 
 
+export type QueryCallsArgs = {
+  filter?: Maybe<CallsFilter>
+};
+
+
+export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
+};
+
+
+export type QueryProposalTemplatesArgs = {
+  filter?: Maybe<ProposalTemplatesFilter>
+};
+
+
 export type QueryBasicUserDetailsArgs = {
   id: Scalars['Int']
+};
+
+
+export type QueryBlankProposalArgs = {
+  callId: Scalars['Int']
 };
 
 
@@ -688,10 +774,8 @@ export type QueryProposalArgs = {
 };
 
 
-export type QueryProposalsArgs = {
-  filter?: Maybe<Scalars['String']>,
-  first?: Maybe<Scalars['Int']>,
-  offset?: Maybe<Scalars['Int']>
+export type QueryProposalTemplateArgs = {
+  templateId: Scalars['Int']
 };
 
 
@@ -730,29 +814,45 @@ export type QueryUsersArgs = {
   subtractUsers?: Maybe<Array<Maybe<Scalars['Int']>>>
 };
 
+export type Question = {
+   __typename?: 'Question',
+  proposalQuestionId: Scalars['String'],
+  naturalKey: Scalars['String'],
+  dataType: DataType,
+  question: Scalars['String'],
+  config: FieldConfig,
+};
+
 export type Questionary = {
    __typename?: 'Questionary',
   steps: Array<QuestionaryStep>,
-};
-
-export type QuestionaryField = {
-   __typename?: 'QuestionaryField',
-  proposal_question_id: Scalars['String'],
-  natural_key: Scalars['String'],
-  data_type: DataType,
-  sort_order: Scalars['Int'],
-  question: Scalars['String'],
-  config: FieldConfig,
-  topic_id: Scalars['Int'],
-  dependencies?: Maybe<Array<FieldDependency>>,
-  value: Scalars['IntStringDateBool'],
 };
 
 export type QuestionaryStep = {
    __typename?: 'QuestionaryStep',
   topic: Topic,
   isCompleted: Scalars['Boolean'],
-  fields: Array<QuestionaryField>,
+  fields: Array<Answer>,
+};
+
+export type QuestionRel = {
+   __typename?: 'QuestionRel',
+  question: Question,
+  sortOrder: Scalars['Int'],
+  topicId: Scalars['Int'],
+  dependency?: Maybe<FieldDependency>,
+};
+
+export type QuestionRelResponseWrap = {
+   __typename?: 'QuestionRelResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  questionRel?: Maybe<QuestionRel>,
+};
+
+export type QuestionResponseWrap = {
+   __typename?: 'QuestionResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  question?: Maybe<Question>,
 };
 
 export type ResetPasswordEmailResponseWrap = {
@@ -873,16 +973,10 @@ export enum TechnicalReviewStatus {
   UNFEASIBLE = 'UNFEASIBLE'
 }
 
-export type TemplateFieldResponseWrap = {
-   __typename?: 'TemplateFieldResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  field?: Maybe<ProposalTemplateField>,
-};
-
 export type TemplateStep = {
    __typename?: 'TemplateStep',
   topic: Topic,
-  fields: Array<ProposalTemplateField>,
+  fields: Array<QuestionRel>,
 };
 
 export type TextInputConfig = {
@@ -905,10 +999,10 @@ export type TokenResponseWrap = {
 
 export type Topic = {
    __typename?: 'Topic',
-  topic_id: Scalars['Int'],
-  topic_title: Scalars['String'],
-  sort_order: Scalars['Int'],
-  is_enabled: Scalars['Boolean'],
+  id: Scalars['Int'],
+  title: Scalars['String'],
+  sortOrder: Scalars['Int'],
+  isEnabled: Scalars['Boolean'],
 };
 
 export type TopicResponseWrap = {
@@ -917,16 +1011,16 @@ export type TopicResponseWrap = {
   topic?: Maybe<Topic>,
 };
 
-export type UpdateFieldTopicRelResponseWrap = {
-   __typename?: 'UpdateFieldTopicRelResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  result?: Maybe<Array<Scalars['String']>>,
-};
-
 export type UpdateProposalFilesResponseWrap = {
    __typename?: 'UpdateProposalFilesResponseWrap',
   error?: Maybe<Scalars['String']>,
   files: Array<Scalars['String']>,
+};
+
+export type UpdateQuestionsTopicRelsResponseWrap = {
+   __typename?: 'UpdateQuestionsTopicRelsResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  result?: Maybe<Array<Scalars['String']>>,
 };
 
 export type UpdateTopicOrderResponseWrap = {
@@ -1223,14 +1317,16 @@ export type CreateCallMutation = (
   ) }
 );
 
-export type GetCallsQueryVariables = {};
+export type GetCallsQueryVariables = {
+  filter?: Maybe<CallsFilter>
+};
 
 
 export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall'>
+    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'templateId'>
   )>> }
 );
 
@@ -1252,7 +1348,9 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
-export type CreateProposalMutationVariables = {};
+export type CreateProposalMutationVariables = {
+  callId: Scalars['Int']
+};
 
 
 export type CreateProposalMutation = (
@@ -1267,25 +1365,43 @@ export type CreateProposalMutation = (
   ) }
 );
 
-export type CreateTemplateFieldMutationVariables = {
-  topicId: Scalars['Int'],
+export type CreateProposalTemplateMutationVariables = {
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>
+};
+
+
+export type CreateProposalTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { createProposalTemplate: (
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+    )> }
+  ) }
+);
+
+export type CreateQuestionMutationVariables = {
   dataType: DataType
 };
 
 
-export type CreateTemplateFieldMutation = (
+export type CreateQuestionMutation = (
   { __typename?: 'Mutation' }
-  & { createTemplateField: (
-    { __typename?: 'TemplateFieldResponseWrap' }
-    & Pick<TemplateFieldResponseWrap, 'error'>
-    & { field: Maybe<(
-      { __typename?: 'ProposalTemplateField' }
-      & ProposalTemplateFieldFragment
+  & { createQuestion: (
+    { __typename?: 'QuestionResponseWrap' }
+    & Pick<QuestionResponseWrap, 'error'>
+    & { question: Maybe<(
+      { __typename?: 'Question' }
+      & QuestionFragment
     )> }
   ) }
 );
 
 export type CreateTopicMutationVariables = {
+  templateId: Scalars['Int'],
   sortOrder: Scalars['Int']
 };
 
@@ -1299,13 +1415,7 @@ export type CreateTopicMutation = (
       { __typename?: 'ProposalTemplate' }
       & { steps: Array<(
         { __typename?: 'TemplateStep' }
-        & { topic: (
-          { __typename?: 'Topic' }
-          & TopicFragment
-        ), fields: Array<(
-          { __typename?: 'ProposalTemplateField' }
-          & ProposalTemplateFieldFragment
-        )> }
+        & TemplateStepFragment
       )> }
     )> }
   ) }
@@ -1327,34 +1437,63 @@ export type DeleteProposalMutation = (
   ) }
 );
 
-export type DeleteTemplateFieldMutationVariables = {
-  id: Scalars['String']
+export type DeleteProposalTemplateMutationVariables = {
+  id: Scalars['Int']
 };
 
 
-export type DeleteTemplateFieldMutation = (
+export type DeleteProposalTemplateMutation = (
   { __typename?: 'Mutation' }
-  & { deleteTemplateField: (
+  & { deleteProposalTemplate: (
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & Pick<ProposalTemplate, 'templateId' | 'name'>
+    )> }
+  ) }
+);
+
+export type DeleteQuestionMutationVariables = {
+  questionId: Scalars['String']
+};
+
+
+export type DeleteQuestionMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteQuestion: (
+    { __typename?: 'QuestionResponseWrap' }
+    & Pick<QuestionResponseWrap, 'error'>
+    & { question: Maybe<(
+      { __typename?: 'Question' }
+      & QuestionFragment
+    )> }
+  ) }
+);
+
+export type DeleteQuestionRelMutationVariables = {
+  questionId: Scalars['String'],
+  templateId: Scalars['Int']
+};
+
+
+export type DeleteQuestionRelMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteQuestionRel: (
     { __typename?: 'ProposalTemplateResponseWrap' }
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
       & { steps: Array<(
         { __typename?: 'TemplateStep' }
-        & { topic: (
-          { __typename?: 'Topic' }
-          & TopicFragment
-        ), fields: Array<(
-          { __typename?: 'ProposalTemplateField' }
-          & ProposalTemplateFieldFragment
-        )> }
+        & TemplateStepFragment
       )> }
     )> }
   ) }
 );
 
 export type DeleteTopicMutationVariables = {
-  id: Scalars['Int']
+  topicId: Scalars['Int']
 };
 
 
@@ -1364,6 +1503,22 @@ export type DeleteTopicMutation = (
     { __typename?: 'ProposalTemplateResponseWrap' }
     & Pick<ProposalTemplateResponseWrap, 'error'>
   ) }
+);
+
+export type AnswerFragment = (
+  { __typename?: 'Answer' }
+  & Pick<Answer, 'sortOrder' | 'topicId' | 'value'>
+  & { question: (
+    { __typename?: 'Question' }
+    & QuestionFragment
+  ), dependency: Maybe<(
+    { __typename?: 'FieldDependency' }
+    & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
+    & { condition: (
+      { __typename?: 'FieldCondition' }
+      & FieldConditionFragment
+    ) }
+  )> }
 );
 
 export type FieldConditionFragment = (
@@ -1403,9 +1558,9 @@ type FieldConfigTextInputConfigFragment = (
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment;
 
-export type ProposalTemplateFieldFragment = (
-  { __typename?: 'ProposalTemplateField' }
-  & Pick<ProposalTemplateField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id'>
+export type QuestionFragment = (
+  { __typename?: 'Question' }
+  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -1424,76 +1579,72 @@ export type ProposalTemplateFieldFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
-  ), dependencies: Maybe<Array<(
+  ) }
+);
+
+export type QuestionRelFragment = (
+  { __typename?: 'QuestionRel' }
+  & Pick<QuestionRel, 'sortOrder' | 'topicId'>
+  & { question: (
+    { __typename?: 'Question' }
+    & QuestionFragment
+  ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
-    & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
+    & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
     & { condition: (
       { __typename?: 'FieldCondition' }
       & FieldConditionFragment
     ) }
-  )>> }
+  )> }
 );
 
-export type QuestionaryFragment = (
-  { __typename?: 'Questionary' }
-  & { steps: Array<(
-    { __typename?: 'QuestionaryStep' }
-    & Pick<QuestionaryStep, 'isCompleted'>
-    & { topic: (
-      { __typename?: 'Topic' }
-      & Pick<Topic, 'topic_title' | 'topic_id' | 'sort_order' | 'is_enabled'>
-    ), fields: Array<(
-      { __typename?: 'QuestionaryField' }
-      & Pick<QuestionaryField, 'proposal_question_id' | 'natural_key' | 'data_type' | 'sort_order' | 'question' | 'topic_id' | 'value'>
-      & { config: (
-        { __typename?: 'BooleanConfig' }
-        & FieldConfigBooleanConfigFragment
-      ) | (
-        { __typename?: 'DateConfig' }
-        & FieldConfigDateConfigFragment
-      ) | (
-        { __typename?: 'EmbellishmentConfig' }
-        & FieldConfigEmbellishmentConfigFragment
-      ) | (
-        { __typename?: 'FileUploadConfig' }
-        & FieldConfigFileUploadConfigFragment
-      ) | (
-        { __typename?: 'SelectionFromOptionsConfig' }
-        & FieldConfigSelectionFromOptionsConfigFragment
-      ) | (
-        { __typename?: 'TextInputConfig' }
-        & FieldConfigTextInputConfigFragment
-      ), dependencies: Maybe<Array<(
-        { __typename?: 'FieldDependency' }
-        & Pick<FieldDependency, 'question_id' | 'dependency_id' | 'dependency_natural_key'>
-        & { condition: (
-          { __typename?: 'FieldCondition' }
-          & FieldConditionFragment
-        ) }
-      )>> }
-    )> }
+export type QuestionaryStepFragment = (
+  { __typename?: 'QuestionaryStep' }
+  & Pick<QuestionaryStep, 'isCompleted'>
+  & { topic: (
+    { __typename?: 'Topic' }
+    & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
+  ), fields: Array<(
+    { __typename?: 'Answer' }
+    & AnswerFragment
+  )> }
+);
+
+export type TemplateStepFragment = (
+  { __typename?: 'TemplateStep' }
+  & { topic: (
+    { __typename?: 'Topic' }
+    & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
+  ), fields: Array<(
+    { __typename?: 'QuestionRel' }
+    & QuestionRelFragment
   )> }
 );
 
 export type TopicFragment = (
   { __typename?: 'Topic' }
-  & Pick<Topic, 'topic_title' | 'topic_id' | 'sort_order' | 'is_enabled'>
+  & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
 );
 
-export type GetBlankProposalQueryVariables = {};
+export type GetBlankProposalQueryVariables = {
+  callId: Scalars['Int']
+};
 
 
 export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
   & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
     ), questionary: (
       { __typename?: 'Questionary' }
-      & QuestionaryFragment
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & QuestionaryStepFragment
+      )> }
     ), users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1540,7 +1691,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1549,7 +1700,10 @@ export type GetProposalQuery = (
       & BasicUserDetailsFragment
     )>, questionary: (
       { __typename?: 'Questionary' }
-      & QuestionaryFragment
+      & { steps: Array<(
+        { __typename?: 'QuestionaryStep' }
+        & QuestionaryStepFragment
+      )> }
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
@@ -1564,7 +1718,9 @@ export type GetProposalQuery = (
   )> }
 );
 
-export type GetProposalTemplateQueryVariables = {};
+export type GetProposalTemplateQueryVariables = {
+  templateId: Scalars['Int']
+};
 
 
 export type GetProposalTemplateQuery = (
@@ -1575,17 +1731,30 @@ export type GetProposalTemplateQuery = (
       { __typename?: 'TemplateStep' }
       & { topic: (
         { __typename?: 'Topic' }
-        & Pick<Topic, 'topic_title' | 'topic_id'>
+        & Pick<Topic, 'title' | 'id'>
       ), fields: Array<(
-        { __typename?: 'ProposalTemplateField' }
-        & ProposalTemplateFieldFragment
+        { __typename?: 'QuestionRel' }
+        & QuestionRelFragment
       )> }
     )> }
   )> }
 );
 
+export type GetProposalTemplatesQueryVariables = {
+  filter?: Maybe<ProposalTemplatesFilter>
+};
+
+
+export type GetProposalTemplatesQuery = (
+  { __typename?: 'Query' }
+  & { proposalTemplates: Array<(
+    { __typename?: 'ProposalTemplate' }
+    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+  )> }
+);
+
 export type GetProposalsQueryVariables = {
-  filter: Scalars['String']
+  filter?: Maybe<ProposalsFilter>
 };
 
 
@@ -1596,7 +1765,7 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -1632,20 +1801,6 @@ export type SubmitProposalMutation = (
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
-  ) }
-);
-
-export type UpdateFieldTopicRelMutationVariables = {
-  topicId: Scalars['Int'],
-  fieldIds?: Maybe<Array<Scalars['String']>>
-};
-
-
-export type UpdateFieldTopicRelMutation = (
-  { __typename?: 'Mutation' }
-  & { updateFieldTopicRel: (
-    { __typename?: 'UpdateFieldTopicRelResponseWrap' }
-    & Pick<UpdateFieldTopicRelResponseWrap, 'error'>
   ) }
 );
 
@@ -1690,34 +1845,62 @@ export type UpdateProposalFilesMutation = (
   ) }
 );
 
-export type UpdateProposalTemplateFieldMutationVariables = {
+export type UpdateQuestionMutationVariables = {
   id: Scalars['String'],
   naturalKey?: Maybe<Scalars['String']>,
   question?: Maybe<Scalars['String']>,
-  config?: Maybe<Scalars['String']>,
-  isEnabled?: Maybe<Scalars['Boolean']>,
-  dependencies: Array<FieldDependencyInput>
+  config?: Maybe<Scalars['String']>
 };
 
 
-export type UpdateProposalTemplateFieldMutation = (
+export type UpdateQuestionMutation = (
   { __typename?: 'Mutation' }
-  & { updateProposalTemplateField: (
+  & { updateQuestion: (
+    { __typename?: 'QuestionResponseWrap' }
+    & Pick<QuestionResponseWrap, 'error'>
+    & { question: Maybe<(
+      { __typename?: 'Question' }
+      & QuestionFragment
+    )> }
+  ) }
+);
+
+export type UpdateQuestionRelMutationVariables = {
+  questionId: Scalars['String'],
+  templateId: Scalars['Int'],
+  topicId?: Maybe<Scalars['Int']>,
+  sortOrder?: Maybe<Scalars['Int']>,
+  dependency?: Maybe<FieldDependencyInput>
+};
+
+
+export type UpdateQuestionRelMutation = (
+  { __typename?: 'Mutation' }
+  & { updateQuestionRel: (
     { __typename?: 'ProposalTemplateResponseWrap' }
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
       & { steps: Array<(
         { __typename?: 'TemplateStep' }
-        & { topic: (
-          { __typename?: 'Topic' }
-          & TopicFragment
-        ), fields: Array<(
-          { __typename?: 'ProposalTemplateField' }
-          & ProposalTemplateFieldFragment
-        )> }
+        & TemplateStepFragment
       )> }
     )> }
+  ) }
+);
+
+export type UpdateQuestionsTopicRelsMutationVariables = {
+  templateId: Scalars['Int'],
+  topicId: Scalars['Int'],
+  fieldIds?: Maybe<Array<Scalars['String']>>
+};
+
+
+export type UpdateQuestionsTopicRelsMutation = (
+  { __typename?: 'Mutation' }
+  & { updateQuestionsTopicRels: (
+    { __typename?: 'UpdateQuestionsTopicRelsResponseWrap' }
+    & Pick<UpdateQuestionsTopicRelsResponseWrap, 'error'>
   ) }
 );
 
@@ -2260,74 +2443,93 @@ export const FieldConfigFragmentDoc = gql`
   }
 }
     `;
+export const QuestionFragmentDoc = gql`
+    fragment question on Question {
+  question
+  proposalQuestionId
+  naturalKey
+  dataType
+  config {
+    ...fieldConfig
+  }
+}
+    ${FieldConfigFragmentDoc}`;
 export const FieldConditionFragmentDoc = gql`
     fragment fieldCondition on FieldCondition {
   condition
   params
 }
     `;
-export const ProposalTemplateFieldFragmentDoc = gql`
-    fragment proposalTemplateField on ProposalTemplateField {
-  proposal_question_id
-  natural_key
-  data_type
-  sort_order
-  question
-  config {
-    ...fieldConfig
+export const AnswerFragmentDoc = gql`
+    fragment answer on Answer {
+  question {
+    ...question
   }
-  topic_id
-  dependencies {
-    question_id
-    dependency_id
-    dependency_natural_key
+  sortOrder
+  topicId
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
+  value
+}
+    ${QuestionFragmentDoc}
+${FieldConditionFragmentDoc}`;
+export const QuestionaryStepFragmentDoc = gql`
+    fragment questionaryStep on QuestionaryStep {
+  topic {
+    title
+    id
+    sortOrder
+    isEnabled
+  }
+  isCompleted
+  fields {
+    ...answer
+  }
+}
+    ${AnswerFragmentDoc}`;
+export const QuestionRelFragmentDoc = gql`
+    fragment questionRel on QuestionRel {
+  question {
+    ...question
+  }
+  sortOrder
+  topicId
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
     condition {
       ...fieldCondition
     }
   }
 }
-    ${FieldConfigFragmentDoc}
+    ${QuestionFragmentDoc}
 ${FieldConditionFragmentDoc}`;
-export const QuestionaryFragmentDoc = gql`
-    fragment questionary on Questionary {
-  steps {
-    topic {
-      topic_title
-      topic_id
-      sort_order
-      is_enabled
-    }
-    isCompleted
-    fields {
-      proposal_question_id
-      natural_key
-      data_type
-      sort_order
-      question
-      config {
-        ...fieldConfig
-      }
-      topic_id
-      dependencies {
-        question_id
-        dependency_id
-        dependency_natural_key
-        condition {
-          ...fieldCondition
-        }
-      }
-      value
-    }
+export const TemplateStepFragmentDoc = gql`
+    fragment templateStep on TemplateStep {
+  topic {
+    title
+    id
+    sortOrder
+    isEnabled
+  }
+  fields {
+    ...questionRel
   }
 }
-    ${FieldConfigFragmentDoc}
-${FieldConditionFragmentDoc}`;
+    ${QuestionRelFragmentDoc}`;
 export const TopicFragmentDoc = gql`
     fragment topic on Topic {
-  topic_title
-  topic_id
-  sort_order
-  is_enabled
+  title
+  id
+  sortOrder
+  isEnabled
 }
     `;
 export const CoreReviewFragmentDoc = gql`
@@ -2498,12 +2700,13 @@ export const CreateCallDocument = gql`
 }
     `;
 export const GetCallsDocument = gql`
-    query getCalls {
-  calls {
+    query getCalls($filter: CallsFilter) {
+  calls(filter: $filter) {
     id
     shortCode
     startCall
     endCall
+    templateId
   }
 }
     `;
@@ -2525,8 +2728,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const CreateProposalDocument = gql`
-    mutation createProposal {
-  createProposal {
+    mutation createProposal($callId: Int!) {
+  createProposal(callId: $callId) {
     proposal {
       id
       status
@@ -2536,34 +2739,43 @@ export const CreateProposalDocument = gql`
   }
 }
     `;
-export const CreateTemplateFieldDocument = gql`
-    mutation createTemplateField($topicId: Int!, $dataType: DataType!) {
-  createTemplateField(topicId: $topicId, dataType: $dataType) {
-    field {
-      ...proposalTemplateField
+export const CreateProposalTemplateDocument = gql`
+    mutation createProposalTemplate($name: String!, $description: String) {
+  createProposalTemplate(name: $name, description: $description) {
+    template {
+      templateId
+      name
+      description
+      isArchived
+      proposalCount
+      callCount
     }
     error
   }
 }
-    ${ProposalTemplateFieldFragmentDoc}`;
+    `;
+export const CreateQuestionDocument = gql`
+    mutation createQuestion($dataType: DataType!) {
+  createQuestion(dataType: $dataType) {
+    question {
+      ...question
+    }
+    error
+  }
+}
+    ${QuestionFragmentDoc}`;
 export const CreateTopicDocument = gql`
-    mutation createTopic($sortOrder: Int!) {
-  createTopic(sortOrder: $sortOrder) {
+    mutation createTopic($templateId: Int!, $sortOrder: Int!) {
+  createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
       steps {
-        topic {
-          ...topic
-        }
-        fields {
-          ...proposalTemplateField
-        }
+        ...templateStep
       }
     }
     error
   }
 }
-    ${TopicFragmentDoc}
-${ProposalTemplateFieldFragmentDoc}`;
+    ${TemplateStepFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
@@ -2573,34 +2785,49 @@ export const DeleteProposalDocument = gql`
   }
 }
     `;
-export const DeleteTemplateFieldDocument = gql`
-    mutation deleteTemplateField($id: String!) {
-  deleteTemplateField(id: $id) {
+export const DeleteProposalTemplateDocument = gql`
+    mutation deleteProposalTemplate($id: Int!) {
+  deleteProposalTemplate(id: $id) {
+    template {
+      templateId
+      name
+    }
+    error
+  }
+}
+    `;
+export const DeleteQuestionDocument = gql`
+    mutation deleteQuestion($questionId: String!) {
+  deleteQuestion(questionId: $questionId) {
+    question {
+      ...question
+    }
+    error
+  }
+}
+    ${QuestionFragmentDoc}`;
+export const DeleteQuestionRelDocument = gql`
+    mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
+  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
     template {
       steps {
-        topic {
-          ...topic
-        }
-        fields {
-          ...proposalTemplateField
-        }
+        ...templateStep
       }
     }
     error
   }
 }
-    ${TopicFragmentDoc}
-${ProposalTemplateFieldFragmentDoc}`;
+    ${TemplateStepFragmentDoc}`;
 export const DeleteTopicDocument = gql`
-    mutation deleteTopic($id: Int!) {
-  deleteTopic(id: $id) {
+    mutation deleteTopic($topicId: Int!) {
+  deleteTopic(topicId: $topicId) {
     error
   }
 }
     `;
 export const GetBlankProposalDocument = gql`
-    query getBlankProposal {
-  blankProposal {
+    query getBlankProposal($callId: Int!) {
+  blankProposal(callId: $callId) {
     id
     status
     shortCode
@@ -2610,11 +2837,15 @@ export const GetBlankProposalDocument = gql`
     abstract
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }
     questionary {
-      ...questionary
+      steps {
+        ...questionaryStep
+      }
     }
     users {
       ...basicUserDetails
@@ -2635,7 +2866,7 @@ export const GetBlankProposalDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
+${QuestionaryStepFragmentDoc}`;
 export const GetFileMetadataDocument = gql`
     query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
@@ -2664,6 +2895,8 @@ export const GetProposalDocument = gql`
     finalStatus
     created
     updated
+    callId
+    templateId
     proposer {
       ...basicUserDetails
     }
@@ -2671,7 +2904,9 @@ export const GetProposalDocument = gql`
       ...basicUserDetails
     }
     questionary {
-      ...questionary
+      steps {
+        ...questionaryStep
+      }
     }
     technicalReview {
       id
@@ -2697,24 +2932,36 @@ export const GetProposalDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
+${QuestionaryStepFragmentDoc}`;
 export const GetProposalTemplateDocument = gql`
-    query getProposalTemplate {
-  proposalTemplate {
+    query getProposalTemplate($templateId: Int!) {
+  proposalTemplate(templateId: $templateId) {
     steps {
       topic {
-        topic_title
-        topic_id
+        title
+        id
       }
       fields {
-        ...proposalTemplateField
+        ...questionRel
       }
     }
   }
 }
-    ${ProposalTemplateFieldFragmentDoc}`;
+    ${QuestionRelFragmentDoc}`;
+export const GetProposalTemplatesDocument = gql`
+    query getProposalTemplates($filter: ProposalTemplatesFilter) {
+  proposalTemplates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    proposalCount
+    callCount
+  }
+}
+    `;
 export const GetProposalsDocument = gql`
-    query getProposals($filter: String!) {
+    query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
     proposals {
       id
@@ -2726,6 +2973,8 @@ export const GetProposalsDocument = gql`
       finalStatus
       created
       updated
+      callId
+      templateId
       proposer {
         ...basicUserDetails
       }
@@ -2767,13 +3016,6 @@ export const SubmitProposalDocument = gql`
   }
 }
     `;
-export const UpdateFieldTopicRelDocument = gql`
-    mutation updateFieldTopicRel($topicId: Int!, $fieldIds: [String!]) {
-  updateFieldTopicRel(topic_id: $topicId, field_ids: $fieldIds) {
-    error
-  }
-}
-    `;
 export const UpdateProposalDocument = gql`
     mutation updateProposal($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $topicsCompleted: [Int!], $users: [Int!], $proposerId: Int, $partialSave: Boolean, $rankOrder: Int, $finalStatus: ProposalEndStatus) {
   updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, topicsCompleted: $topicsCompleted, users: $users, proposerId: $proposerId, partialSave: $partialSave, rankOrder: $rankOrder, finalStatus: $finalStatus) {
@@ -2792,24 +3034,35 @@ export const UpdateProposalFilesDocument = gql`
   }
 }
     `;
-export const UpdateProposalTemplateFieldDocument = gql`
-    mutation updateProposalTemplateField($id: String!, $naturalKey: String, $question: String, $config: String, $isEnabled: Boolean, $dependencies: [FieldDependencyInput!]!) {
-  updateProposalTemplateField(id: $id, naturalKey: $naturalKey, question: $question, config: $config, isEnabled: $isEnabled, dependencies: $dependencies) {
+export const UpdateQuestionDocument = gql`
+    mutation updateQuestion($id: String!, $naturalKey: String, $question: String, $config: String) {
+  updateQuestion(id: $id, naturalKey: $naturalKey, question: $question, config: $config) {
+    question {
+      ...question
+    }
+    error
+  }
+}
+    ${QuestionFragmentDoc}`;
+export const UpdateQuestionRelDocument = gql`
+    mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $dependency: FieldDependencyInput) {
+  updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
     template {
       steps {
-        topic {
-          ...topic
-        }
-        fields {
-          ...proposalTemplateField
-        }
+        ...templateStep
       }
     }
     error
   }
 }
-    ${TopicFragmentDoc}
-${ProposalTemplateFieldFragmentDoc}`;
+    ${TemplateStepFragmentDoc}`;
+export const UpdateQuestionsTopicRelsDocument = gql`
+    mutation updateQuestionsTopicRels($templateId: Int!, $topicId: Int!, $fieldIds: [String!]) {
+  updateQuestionsTopicRels(templateId: $templateId, topicId: $topicId, fieldIds: $fieldIds) {
+    error
+  }
+}
+    `;
 export const UpdateTopicDocument = gql`
     mutation updateTopic($topicId: Int!, $title: String, $isEnabled: Boolean) {
   updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {
@@ -3171,11 +3424,14 @@ export function getSdk(client: GraphQLClient) {
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
     },
-    createProposal(variables?: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
+    createProposal(variables: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);
     },
-    createTemplateField(variables: CreateTemplateFieldMutationVariables): Promise<CreateTemplateFieldMutation> {
-      return client.request<CreateTemplateFieldMutation>(print(CreateTemplateFieldDocument), variables);
+    createProposalTemplate(variables: CreateProposalTemplateMutationVariables): Promise<CreateProposalTemplateMutation> {
+      return client.request<CreateProposalTemplateMutation>(print(CreateProposalTemplateDocument), variables);
+    },
+    createQuestion(variables: CreateQuestionMutationVariables): Promise<CreateQuestionMutation> {
+      return client.request<CreateQuestionMutation>(print(CreateQuestionDocument), variables);
     },
     createTopic(variables: CreateTopicMutationVariables): Promise<CreateTopicMutation> {
       return client.request<CreateTopicMutation>(print(CreateTopicDocument), variables);
@@ -3183,13 +3439,19 @@ export function getSdk(client: GraphQLClient) {
     deleteProposal(variables: DeleteProposalMutationVariables): Promise<DeleteProposalMutation> {
       return client.request<DeleteProposalMutation>(print(DeleteProposalDocument), variables);
     },
-    deleteTemplateField(variables: DeleteTemplateFieldMutationVariables): Promise<DeleteTemplateFieldMutation> {
-      return client.request<DeleteTemplateFieldMutation>(print(DeleteTemplateFieldDocument), variables);
+    deleteProposalTemplate(variables: DeleteProposalTemplateMutationVariables): Promise<DeleteProposalTemplateMutation> {
+      return client.request<DeleteProposalTemplateMutation>(print(DeleteProposalTemplateDocument), variables);
+    },
+    deleteQuestion(variables: DeleteQuestionMutationVariables): Promise<DeleteQuestionMutation> {
+      return client.request<DeleteQuestionMutation>(print(DeleteQuestionDocument), variables);
+    },
+    deleteQuestionRel(variables: DeleteQuestionRelMutationVariables): Promise<DeleteQuestionRelMutation> {
+      return client.request<DeleteQuestionRelMutation>(print(DeleteQuestionRelDocument), variables);
     },
     deleteTopic(variables: DeleteTopicMutationVariables): Promise<DeleteTopicMutation> {
       return client.request<DeleteTopicMutation>(print(DeleteTopicDocument), variables);
     },
-    getBlankProposal(variables?: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
+    getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
       return client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables);
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
@@ -3201,17 +3463,17 @@ export function getSdk(client: GraphQLClient) {
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return client.request<GetProposalQuery>(print(GetProposalDocument), variables);
     },
-    getProposalTemplate(variables?: GetProposalTemplateQueryVariables): Promise<GetProposalTemplateQuery> {
+    getProposalTemplate(variables: GetProposalTemplateQueryVariables): Promise<GetProposalTemplateQuery> {
       return client.request<GetProposalTemplateQuery>(print(GetProposalTemplateDocument), variables);
     },
-    getProposals(variables: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
+    getProposalTemplates(variables?: GetProposalTemplatesQueryVariables): Promise<GetProposalTemplatesQuery> {
+      return client.request<GetProposalTemplatesQuery>(print(GetProposalTemplatesDocument), variables);
+    },
+    getProposals(variables?: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return client.request<GetProposalsQuery>(print(GetProposalsDocument), variables);
     },
     submitProposal(variables: SubmitProposalMutationVariables): Promise<SubmitProposalMutation> {
       return client.request<SubmitProposalMutation>(print(SubmitProposalDocument), variables);
-    },
-    updateFieldTopicRel(variables: UpdateFieldTopicRelMutationVariables): Promise<UpdateFieldTopicRelMutation> {
-      return client.request<UpdateFieldTopicRelMutation>(print(UpdateFieldTopicRelDocument), variables);
     },
     updateProposal(variables: UpdateProposalMutationVariables): Promise<UpdateProposalMutation> {
       return client.request<UpdateProposalMutation>(print(UpdateProposalDocument), variables);
@@ -3219,8 +3481,14 @@ export function getSdk(client: GraphQLClient) {
     updateProposalFiles(variables: UpdateProposalFilesMutationVariables): Promise<UpdateProposalFilesMutation> {
       return client.request<UpdateProposalFilesMutation>(print(UpdateProposalFilesDocument), variables);
     },
-    updateProposalTemplateField(variables: UpdateProposalTemplateFieldMutationVariables): Promise<UpdateProposalTemplateFieldMutation> {
-      return client.request<UpdateProposalTemplateFieldMutation>(print(UpdateProposalTemplateFieldDocument), variables);
+    updateQuestion(variables: UpdateQuestionMutationVariables): Promise<UpdateQuestionMutation> {
+      return client.request<UpdateQuestionMutation>(print(UpdateQuestionDocument), variables);
+    },
+    updateQuestionRel(variables: UpdateQuestionRelMutationVariables): Promise<UpdateQuestionRelMutation> {
+      return client.request<UpdateQuestionRelMutation>(print(UpdateQuestionRelDocument), variables);
+    },
+    updateQuestionsTopicRels(variables: UpdateQuestionsTopicRelsMutationVariables): Promise<UpdateQuestionsTopicRelsMutation> {
+      return client.request<UpdateQuestionsTopicRelsMutation>(print(UpdateQuestionsTopicRelsDocument), variables);
     },
     updateTopic(variables: UpdateTopicMutationVariables): Promise<UpdateTopicMutation> {
       return client.request<UpdateTopicMutation>(print(UpdateTopicDocument), variables);

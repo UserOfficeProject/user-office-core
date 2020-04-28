@@ -1,8 +1,9 @@
-query getCalls {
-  calls {
+query getCalls($filter: CallsFilter) {
+  calls(filter: $filter) {
     id
     shortCode
     startCall
     endCall
+    templateId
   }
 }

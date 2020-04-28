@@ -4,17 +4,17 @@ import {
   DataType,
   FieldDependency,
   ProposalTemplate,
-  ProposalTemplateField,
+  QuestionRel,
   Questionary,
-  QuestionaryField,
+  Answer,
   TemplateStep,
   QuestionaryStep,
 } from '../generated/sdk';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { DataTypeSpec } from './ProposalModel';
 
-type AbstractField = ProposalTemplateField | QuestionaryField;
-type AbstractCollection = ProposalTemplate | Questionary;
+type AbstractField = QuestionRel | Answer;
+type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
@@ -26,27 +26,29 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
 
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   // @ts-ignore-line
-  const step = collection.steps.find(step => step.topic.topic_id === topicId);
+  const step = collection.find(step => step.topic.id === topicId);
 
   return step ? step.topic : undefined;
 }
+
 export function getQuestionaryStepByTopicId(
-  template: AbstractCollection,
+  collection: AbstractCollection,
   topicId: number
-): any {
+) {
   // @ts-ignore-line
-  return template.steps.find(step => step.topic.topic_id === topicId);
+  return collection.find(step => step.topic.id === topicId);
 }
 
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
-): ProposalTemplateField | QuestionaryField | undefined {
+) {
   let needle: AbstractField | undefined;
-
-  collection.steps.every((step: any) => {
+  // @ts-ignore-line
+  collection.every(step => {
     needle = step.fields.find(
-      (field: any) => field.proposal_question_id === questionId
+      // @ts-ignore-line
+      field => field.question.proposalQuestionId === questionId
     );
 
     return needle === undefined;
@@ -55,9 +57,10 @@ export function getFieldById(
   return needle;
 }
 
-export function getAllFields(collection: AbstractCollection): AbstractField[] {
+export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
-  collection.steps.forEach((step: TemplateStep | QuestionaryStep) => {
+  // @ts-ignore-line
+  collection.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
 
@@ -65,12 +68,15 @@ export function getAllFields(collection: AbstractCollection): AbstractField[] {
 }
 
 export function isDependencySatisfied(
-  collection: Questionary,
-  dependency: FieldDependency
+  collection: QuestionaryStep[],
+  dependency: FieldDependency | undefined | null
 ): boolean {
+  if (!dependency?.condition) {
+    return true;
+  }
   const { condition, params } = dependency.condition;
-  const field = getFieldById(collection, dependency.dependency_id) as
-    | QuestionaryField
+  const field = getFieldById(collection, dependency.dependencyId) as
+    | Answer
     | undefined;
   if (!field) {
     return true;
@@ -78,7 +84,7 @@ export function isDependencySatisfied(
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const isParentSatisfied = areDependenciesSatisfied(
     collection,
-    dependency.dependency_id
+    dependency.dependencyId
   );
 
   return (
@@ -90,18 +96,13 @@ export function isDependencySatisfied(
 }
 
 export function areDependenciesSatisfied(
-  questionary: Questionary,
+  questionary: QuestionaryStep[],
   fieldId: string
-): boolean {
+) {
   const field = getFieldById(questionary, fieldId);
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissatisfied = field.dependencies?.some(dep => {
-    const result = isDependencySatisfied(questionary, dep) === false;
 
-    return result;
-  });
-
-  return isAtLeastOneDissatisfied === false;
+  return isDependencySatisfied(questionary, field.dependency);
 }

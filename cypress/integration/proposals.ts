@@ -24,10 +24,14 @@ context('Proposal tests', () => {
   const abstract = faker.random.words(8);
   const textAnswer = faker.random.words(5);
 
-  it('Should be able to modify proposal', () => {
+  it('User officer can modify proposal template', () => {
     cy.login('officer');
 
-    cy.contains('Edit Questionary').click();
+    cy.contains('Questionaries').click();
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
 
     cy.contains('Add topic').click();
 
@@ -122,25 +126,22 @@ context('Proposal tests', () => {
       });
     /* --- */
 
-
     /* Update question */
-    const newKey = faker
-    .random
-    .word()
-    .toLowerCase()
-    .split(" ").join('_');
+    const newKey = faker.random
+      .word()
+      .toLowerCase()
+      .split(/\s|-/) // replace spaces and dashes
+      .join('_');
 
-    cy.contains(textQuestion)
-      .click();
+    cy.contains(textQuestion).click();
 
     cy.get("[data-cy='natural_key']")
       .clear()
       .type(newKey);
-    
-    cy.contains("Save")
-       .click();
 
-    cy.wait(500)
+    cy.contains('Save').click();
+
+    cy.wait(500);
 
     cy.contains(newKey);
     /* --- */
@@ -150,7 +151,7 @@ context('Proposal tests', () => {
     cy.contains(dateQuestion);
   });
 
-  it('User should be able to create proposal', () => {
+  it('User can create proposal', () => {
     cy.login('user');
 
     cy.contains('New Proposal').click();
@@ -165,7 +166,7 @@ context('Proposal tests', () => {
     cy.get(`[data-cy='${dateId}_field'] button`).click();
     cy.wait(300);
     cy.get(`[data-cy='${dateId}_field'] button`).click({ force: true }); // click twice because ui hangs sometimes
-    cy.contains('15').click();
+    cy.contains('15').click({ force: true });
     cy.contains('OK').click();
 
     cy.contains('Save and continue').click();
@@ -183,7 +184,7 @@ context('Proposal tests', () => {
     cy.contains('Submitted');
   });
 
-  it('Office should be able to delete proposal', () => {
+  it('Officer can delete proposal', () => {
     cy.login('officer');
 
     cy.contains('View Proposals').click();
@@ -196,10 +197,14 @@ context('Proposal tests', () => {
     cy.contains('Yes').click();
   });
 
-  it('Office should be able to delete proposal questions', () => {
+  it('Officer can delete proposal questions', () => {
     cy.login('officer');
 
-    cy.contains('Edit Questionary').click();
+    cy.contains('Questionaries').click();
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
 
     cy.contains(textQuestion).click();
     cy.get("[data-cy='delete']").click();

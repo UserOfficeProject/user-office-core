@@ -13,15 +13,7 @@ import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 
-function ProposalReview({
-  data,
-  readonly,
-  confirm,
-}: {
-  data: ProposalSubmissionModelState;
-  readonly: boolean;
-  confirm: Function;
-}) {
+function ProposalReview({ data, readonly, confirm }: IProposalSummaryProps) {
   const { dispatch } = useContext(ProposalSubmissionContext)!;
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -103,4 +95,9 @@ function ProposalReview({
   );
 }
 
+interface IProposalSummaryProps {
+  data: ProposalSubmissionModelState;
+  readonly: boolean;
+  confirm: Function;
+}
 export default withConfirm(ProposalReview);

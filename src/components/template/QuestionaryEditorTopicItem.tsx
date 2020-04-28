@@ -3,19 +3,16 @@ import LockIcon from '@material-ui/icons/Lock';
 import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
-import { DataType } from '../../generated/sdk';
-import {
-  ProposalTemplateField,
-  EmbellishmentConfig,
-} from '../../generated/sdk';
+import { DataType, QuestionRel } from '../../generated/sdk';
+import { EmbellishmentConfig } from '../../generated/sdk';
 import { Event } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 
 export default function QuestionaryEditorTopicItem(props: {
-  data: ProposalTemplateField;
+  data: QuestionRel;
   dispatch: React.Dispatch<Event>;
   index: number;
-  onClick: { (data: ProposalTemplateField): void };
+  onClick: { (data: QuestionRel): void };
 }) {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
@@ -75,27 +72,24 @@ export default function QuestionaryEditorTopicItem(props: {
     ...draggableStyle,
   });
 
-  const dependencies = props.data.dependencies;
-  const dependenciesJsx =
-    dependencies && dependencies.length > 0 ? (
-      <>
-        <LockIcon className={classes.lockIcon} />
-        <ul>
-          {dependencies.map(dep => {
-            return (
-              <li key={dep.question_id + dep.dependency_id}>
-                {dep.dependency_natural_key}
-              </li>
-            );
-          })}
-        </ul>
-      </>
-    ) : null;
+  const dependency = props.data.dependency;
+  const dependencyJsx = dependency ? (
+    <>
+      <LockIcon className={classes.lockIcon} />
+      <ul>
+        return (
+        <li key={dependency.dependencyId + dependency.questionId}>
+          {dependency.dependencyNaturalKey}
+        </li>
+        );
+      </ul>
+    </>
+  ) : null;
 
   return (
     <Draggable
-      key={props.data.proposal_question_id}
-      draggableId={props.data.proposal_question_id}
+      key={props.data.question.proposalQuestionId}
+      draggableId={props.data.question.proposalQuestionId}
       index={props.index}
     >
       {(provided, snapshot) => (
@@ -121,20 +115,20 @@ export default function QuestionaryEditorTopicItem(props: {
             className={classes.questionId}
             data-cy="proposal-question-id"
           >
-            {props.data.natural_key}
+            {props.data.question.naturalKey}
           </Grid>
           <Grid item xs={2} className={classes.icon}>
-            {getTemplateFieldIcon(props.data.data_type)}
+            {getTemplateFieldIcon(props.data.question.dataType)}
           </Grid>
 
           <Grid item xs={10} className={classes.question}>
-            {props.data.data_type === DataType.EMBELLISHMENT
-              ? (props.data.config as EmbellishmentConfig).plain
-              : props.data.question}
+            {props.data.question.dataType === DataType.EMBELLISHMENT
+              ? (props.data.question.config as EmbellishmentConfig).plain
+              : props.data.question.question}
           </Grid>
 
           <Grid item xs={12} className={classes.dependencies}>
-            {dependenciesJsx}
+            {dependencyJsx}
           </Grid>
         </Grid>
       )}
