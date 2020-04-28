@@ -25,12 +25,12 @@ test('A user can not create a call', () => {
   return expect(
     callMutations.create(dummyUser, {
       shortCode: '2019-02-19',
-      startCall: '2019-02-19',
-      endCall: '2019-02-19',
-      startReview: '2019-02-19',
-      endReview: '2019-02-19',
-      startNotify: '2019-02-19',
-      endNotify: '2019-02-19',
+      startCall: new Date('2019-02-19'),
+      endCall: new Date('2019-02-19'),
+      startReview: new Date('2019-02-19'),
+      endReview: new Date('2019-02-19'),
+      startNotify: new Date('2019-02-19'),
+      endNotify: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     })
@@ -41,12 +41,12 @@ test('A not logged in user can not create a call', () => {
   return expect(
     callMutations.create(null, {
       shortCode: '2019-02-19',
-      startCall: '2019-02-19',
-      endCall: '2019-02-19',
-      startReview: '2019-02-19',
-      endReview: '2019-02-19',
-      startNotify: '2019-02-19',
-      endNotify: '2019-02-19',
+      startCall: new Date('2019-02-19'),
+      endCall: new Date('2019-02-19'),
+      startReview: new Date('2019-02-19'),
+      endReview: new Date('2019-02-19'),
+      startNotify: new Date('2019-02-19'),
+      endNotify: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     })
@@ -57,12 +57,12 @@ test('A logged in user officer can create a call', () => {
   return expect(
     callMutations.create(dummyUserOfficer, {
       shortCode: '2019-02-19',
-      startCall: '2019-02-19',
-      endCall: '2019-02-19',
-      startReview: '2019-02-19',
-      endReview: '2019-02-19',
-      startNotify: '2019-02-19',
-      endNotify: '2019-02-19',
+      startCall: new Date('2019-02-19'),
+      endCall: new Date('2019-02-19'),
+      startReview: new Date('2019-02-19'),
+      endReview: new Date('2019-02-19'),
+      startNotify: new Date('2019-02-19'),
+      endNotify: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     })
