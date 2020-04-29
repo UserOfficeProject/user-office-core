@@ -1,20 +1,21 @@
 import Grid from '@material-ui/core/Grid';
 import { Edit } from '@material-ui/icons';
+import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useDataApi } from '../../hooks/useDataApi';
+
 import { UserRole } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { InviteUserForm } from './InviteUserForm';
 import PeopleTable from './PeopleTable';
-import { useSnackbar } from 'notistack';
 
 export default function PeoplePage() {
-  const [userData, setUserData] = useState<{id: number} | null>(null);
+  const [userData, setUserData] = useState<{ id: number } | null>(null);
   const [sendUserEmail, setSendUserEmail] = useState({
     show: false,
     title: '',
-    userRole: UserRole.USER
+    userRole: UserRole.USER,
   });
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
@@ -59,7 +60,7 @@ export default function PeoplePage() {
                     setSendUserEmail({
                       show: false,
                       title: '',
-                      userRole: UserRole.USER
+                      userRole: UserRole.USER,
                     })
                   }
                   action={() => console.log()}
@@ -71,7 +72,17 @@ export default function PeoplePage() {
                   actionIcon={<Edit />}
                   action={setUserData}
                   menyItems={menyItems}
-                  onRemove={(user: {id: number}) => api().deleteUser({id: user.id}).then(data => data.deleteUser.error && enqueueSnackbar(data.deleteUser.error, { variant: 'error' }))}
+                  onRemove={(user: { id: number }) =>
+                    api()
+                      .deleteUser({ id: user.id })
+                      .then(
+                        data =>
+                          data.deleteUser.error &&
+                          enqueueSnackbar(data.deleteUser.error, {
+                            variant: 'error',
+                          })
+                      )
+                  }
                 />
               )}
             </StyledPaper>

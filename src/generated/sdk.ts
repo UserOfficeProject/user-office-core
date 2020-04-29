@@ -253,12 +253,12 @@ export type Mutation = {
 
 export type MutationCreateCallArgs = {
   shortCode: Scalars['String'],
-  startCall: Scalars['String'],
-  endCall: Scalars['String'],
-  startReview: Scalars['String'],
-  endReview: Scalars['String'],
-  startNotify: Scalars['String'],
-  endNotify: Scalars['String'],
+  startCall: Scalars['DateTime'],
+  endCall: Scalars['DateTime'],
+  startReview: Scalars['DateTime'],
+  endReview: Scalars['DateTime'],
+  startNotify: Scalars['DateTime'],
+  endNotify: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
@@ -1294,14 +1294,15 @@ export type SetPageContentMutation = (
 
 export type CreateCallMutationVariables = {
   shortCode: Scalars['String'],
-  startCall: Scalars['String'],
-  endCall: Scalars['String'],
-  startReview: Scalars['String'],
-  endReview: Scalars['String'],
-  startNotify: Scalars['String'],
-  endNotify: Scalars['String'],
+  startCall: Scalars['DateTime'],
+  endCall: Scalars['DateTime'],
+  startReview: Scalars['DateTime'],
+  endReview: Scalars['DateTime'],
+  startNotify: Scalars['DateTime'],
+  endNotify: Scalars['DateTime'],
   cycleComment: Scalars['String'],
-  surveyComment: Scalars['String']
+  surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>
 };
 
 
@@ -2690,8 +2691,8 @@ export const SetPageContentDocument = gql`
 }
     `;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: String!, $endCall: String!, $startReview: String!, $endReview: String!, $startNotify: String!, $endNotify: String!, $cycleComment: String!, $surveyComment: String!) {
-  createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
+  createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
       id
