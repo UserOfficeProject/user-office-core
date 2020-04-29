@@ -59,7 +59,7 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
             id={proposalQuestionId}
             name={proposalQuestionId}
             value={stateValue}
-            label={templateField.question.question}
+            label={question}
             select
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)
@@ -90,13 +90,11 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
           required={config.required ? true : false}
           error={isError}
         >
-          <FormLabel className={classes.label}>
-            {templateField.question.question}
-          </FormLabel>
-          <span>{templateField.question.config.small_label}</span>
+          <FormLabel className={classes.label}>{question}</FormLabel>
+          <span>{config.small_label}</span>
           <RadioGroup
-            id={templateField.question.proposalQuestionId}
-            name={templateField.question.proposalQuestionId}
+            id={proposalQuestionId}
+            name={proposalQuestionId}
             value={stateValue}
             onChange={evt =>
               handleOnChange(evt, (evt.target as HTMLInputElement).value)

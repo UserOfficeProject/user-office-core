@@ -1,4 +1,4 @@
 {
-    "video": false,
-    "baseUrl": "http://proxy:80"
+  "video": false,
+  "baseUrl": "http://proxy:3000"
 }

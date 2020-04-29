@@ -1,13 +1,11 @@
 import { useState } from 'react';
-
 import {
-  DataType,
+  FieldDependency,
   ProposalTemplate,
   QuestionRel,
-  FieldDependency,
 } from '../generated/sdk';
 import { getFieldById } from '../models/ProposalModelFunctions';
-import { EventType, Event } from '../models/QuestionaryEditorModel';
+import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
 
 export function usePersistModel() {
@@ -87,31 +85,31 @@ export function usePersistModel() {
   };
 
   // TODO Use this method again after using new UI
-  const createQuestion = async (topicId: number, dataType: DataType) => {
-    setIsLoading(true);
+  // const createQuestion = async (topicId: number, dataType: DataType) => {
+  //   setIsLoading(true);
 
-    return api()
-      .createQuestion({
-        dataType: dataType,
-      })
-      .then(questionResponse => {
-        const questionId = questionResponse.createQuestion.question
-          ?.proposalQuestionId as string;
+  //   return api()
+  //     .createQuestion({
+  //       dataType: dataType,
+  //     })
+  //     .then(questionResponse => {
+  //       const questionId = questionResponse.createQuestion.question
+  //         ?.proposalQuestionId as string;
 
-        return api()
-          .updateQuestionRel({
-            questionId,
-            templateId: 1,
-            topicId,
-            sortOrder: 0,
-          })
-          .then(questionRelResponse => {
-            setIsLoading(false);
+  //       return api()
+  //         .updateQuestionRel({
+  //           questionId,
+  //           templateId: 1,
+  //           topicId,
+  //           sortOrder: 0,
+  //         })
+  //         .then(questionRelResponse => {
+  //           setIsLoading(false);
 
-            return questionRelResponse.updateQuestionRel;
-          });
-      });
-  };
+  //           return questionRelResponse.updateQuestionRel;
+  //         });
+  //     });
+  // };
 
   const deleteField = async (id: string) => {
     setIsLoading(true);

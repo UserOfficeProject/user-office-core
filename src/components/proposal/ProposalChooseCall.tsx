@@ -14,7 +14,7 @@ export default function ProposalChooseCall() {
     return <p>Loading...</p>;
   }
 
-  if (calls.length == 1) {
+  if (calls.length === 1) {
     history.push(`/ProposalCreate/${calls[0].templateId}`);
   }
 
