@@ -69,7 +69,7 @@ const createDummyTemplateSteps = () => {
       'links_to_field',
       'has_links_to_field',
       'has_links_to_field',
-      new FieldCondition(EvaluatorOperator.EQ, 'yes')
+      new FieldCondition(EvaluatorOperator.eq, 'yes')
     ),
   });
 

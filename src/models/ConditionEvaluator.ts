@@ -2,8 +2,8 @@ import JSDict from '../utils/Dictionary';
 import { Answer } from './ProposalModel';
 
 export enum EvaluatorOperator {
-  EQ = 'EQ',
-  NEQ = 'NEQ',
+  eq = 'eq',
+  neq = 'neq',
 }
 
 export class EqualityValidator implements FieldConditionEvaluator {
@@ -28,8 +28,8 @@ export class ConditionEvaluator {
         EvaluatorOperator,
         FieldConditionEvaluator
       >();
-      this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
-      this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
+      this.validatorMap.put(EvaluatorOperator.eq, new EqualityValidator());
+      this.validatorMap.put(EvaluatorOperator.neq, new InequalityValidator());
     }
 
     return this.validatorMap;

@@ -116,7 +116,7 @@ const create1Topic3FieldWithDependenciesQuestionary = () => {
             'links_with_industry',
             'has_links_with_industry',
             'has_links_with_industry',
-            new FieldCondition(EvaluatorOperator.EQ, 'yes')
+            new FieldCondition(EvaluatorOperator.eq, 'yes')
           ),
         }),
         'https://example.com'
