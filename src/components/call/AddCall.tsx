@@ -89,15 +89,15 @@ const AddCall: React.FC<AddCallProps> = props => {
 
           await api()
             .createCall({
-              shortCode,
+              shortCode: shortCode,
               startCall: start,
               endCall: end,
               startReview: startReview,
               endReview: endReview,
               startNotify: startNotify,
               endNotify: endNotify,
-              cycleComment,
-              surveyComment,
+              cycleComment: cycleComment,
+              surveyComment: surveyComment,
               templateId: +templateId,
             })
             .then(data =>
