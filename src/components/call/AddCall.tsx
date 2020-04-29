@@ -44,7 +44,7 @@ const createCallValidationSchema = Yup.object().shape({
   endNotify: Yup.date().required('Date is required'),
   cycleComment: Yup.string().required('Date is required'),
   surveyComment: Yup.string().required('Date is required'),
-  templateId: Yup.number().required('Call template is required'),
+  templateId: Yup.number().notRequired(),
 });
 
 type AddCallProps = {
@@ -98,7 +98,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               endNotify: endNotify,
               cycleComment: cycleComment,
               surveyComment: surveyComment,
-              templateId: +templateId,
+              templateId: templateId ? +templateId : null,
             })
             .then(data =>
               data.createCall.error

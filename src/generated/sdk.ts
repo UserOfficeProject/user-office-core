@@ -1302,7 +1302,7 @@ export type CreateCallMutationVariables = {
   endNotify: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
-  templateId: Scalars['Int']
+  templateId?: Maybe<Scalars['Int']>
 };
 
 
@@ -2691,7 +2691,7 @@ export const SetPageContentDocument = gql`
 }
     `;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int!) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
   createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
