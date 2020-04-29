@@ -22,9 +22,9 @@ export default function ProposalTechnicalReview(props: {
 
   const initialValues = {
     status: props?.data?.status || '',
-    timeAllocation: props?.data?.timeAllocation,
-    comment: props?.data?.comment,
-    publicComment: props?.data?.publicComment,
+    timeAllocation: props?.data?.timeAllocation || '',
+    comment: props?.data?.comment || '',
+    publicComment: props?.data?.publicComment || '',
   };
 
   return (
@@ -44,7 +44,7 @@ export default function ProposalTechnicalReview(props: {
           await api()
             .addTechnicalReview({
               proposalID: props.id,
-              timeAllocation: values.timeAllocation!,
+              timeAllocation: +values.timeAllocation!,
               comment: values.comment!,
               publicComment: values.publicComment,
               status:
@@ -57,7 +57,7 @@ export default function ProposalTechnicalReview(props: {
             );
           props.setReview({
             proposalID: props?.data?.proposalID!,
-            timeAllocation: values.timeAllocation!,
+            timeAllocation: +values.timeAllocation!,
             comment: values.comment!,
             status:
               TechnicalReviewStatus[values.status as TechnicalReviewStatus],

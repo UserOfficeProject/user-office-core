@@ -32,3 +32,27 @@ export class BasicUserDetails {
     public organisation: string
   ) {}
 }
+
+export const dummyUser = new User(
+  0,
+  null,
+  '',
+  null,
+  '',
+  '',
+  null,
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  '',
+  false,
+  '',
+  null,
+  '',
+  ''
+);

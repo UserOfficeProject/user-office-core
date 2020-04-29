@@ -33,9 +33,10 @@ context('Page tests', () => {
     cy.contains('Help').click();
 
     cy.window().then(win => {
-      cy.wait(10000).then(() => {
+      cy.wait(5000).then(() => {
         win.tinyMCE.get('HELPPAGE').setContent(faqContents); // faq page editor
         cy.contains('Update').click();
+        cy.wait(2000);
         cy.reload();
         cy.contains('View Proposals').click();
         cy.contains('FAQ').click();
