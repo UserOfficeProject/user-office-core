@@ -13,7 +13,7 @@ import { AdminComponentFileUpload } from './AdminComponentFileUpload';
 import { AdminComponentMultipleChoice } from './AdminComponentMultipleChoice';
 import { AdminComponentTextInput } from './AdminComponentTextInput';
 
-export default function QuestionaryFieldEditor(props: {
+export default function QuestionRelEditor(props: {
   field: QuestionRel | null;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;

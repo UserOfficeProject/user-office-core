@@ -3,7 +3,7 @@ import React from 'react';
 
 import { EventType } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
-import { AdminComponentShellSignature } from './QuestionaryFieldEditor';
+import { AdminComponentShellSignature } from './QuestionRelEditor';
 
 export const AdminComponentShell: AdminComponentShellSignature = props => {
   const classes = makeStyles(theme => ({

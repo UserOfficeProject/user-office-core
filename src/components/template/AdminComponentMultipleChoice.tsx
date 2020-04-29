@@ -11,7 +11,7 @@ import FormikUICustomDependencySelector from '../common/FormikUICustomDependency
 import FormikUICustomTable from '../common/FormikUICustomTable';
 import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
-import { AdminComponentSignature } from './QuestionaryFieldEditor';
+import { AdminComponentSignature } from './QuestionRelEditor';
 
 export const AdminComponentMultipleChoice: AdminComponentSignature = props => {
   const field = props.field;

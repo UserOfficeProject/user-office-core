@@ -9,7 +9,7 @@ import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
 import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
-import { AdminComponentSignature } from './QuestionaryFieldEditor';
+import { AdminComponentSignature } from './QuestionRelEditor';
 
 export const AdminComponentDate: AdminComponentSignature = props => {
   const field = props.field;

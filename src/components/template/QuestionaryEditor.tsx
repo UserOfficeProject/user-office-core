@@ -20,7 +20,7 @@ import QuestionaryEditorModel, {
 } from '../../models/QuestionaryEditorModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
-import QuestionaryFieldEditor from './QuestionaryFieldEditor';
+import QuestionRelEditor from './QuestionRelEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
@@ -169,7 +169,7 @@ export default function QuestionaryEditor() {
         {addNewTopicFallbackButton}
       </StyledPaper>
 
-      <QuestionaryFieldEditor
+      <QuestionRelEditor
         field={selectedField}
         dispatch={dispatch}
         closeMe={handleFieldEditorClose}

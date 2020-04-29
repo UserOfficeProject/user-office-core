@@ -9,7 +9,7 @@ import FormikUICustomDependencySelector from '../common/FormikUICustomDependency
 import FormikUICustomSelect from '../common/FormikUICustomSelect';
 import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
-import { AdminComponentSignature } from './QuestionaryFieldEditor';
+import { AdminComponentSignature } from './QuestionRelEditor';
 
 export const AdminComponentFileUpload: AdminComponentSignature = props => {
   const field = props.field;
