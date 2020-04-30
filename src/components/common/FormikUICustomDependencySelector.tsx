@@ -10,6 +10,7 @@ import {
 import ClearIcon from '@material-ui/icons/Clear';
 import { FormikActions } from 'formik';
 import React, { useCallback, useEffect, useState } from 'react';
+
 import {
   DataType,
   EvaluatorOperator,

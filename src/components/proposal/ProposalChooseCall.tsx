@@ -3,19 +3,19 @@ import React from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { useActiveCalls } from '../../hooks/useActiveCalls';
+import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function ProposalChooseCall() {
-  const calls = useActiveCalls({ filter: { isActive: true } });
+  const { callsData } = useCallsData(true, {});
   const history = useHistory();
 
-  if (!calls) {
+  if (!callsData) {
     return <p>Loading...</p>;
   }
 
-  if (calls.length === 1) {
-    history.push(`/ProposalCreate/${calls[0].templateId}`);
+  if (callsData.length === 1) {
+    history.push(`/ProposalCreate/${callsData[0].templateId}`);
   }
 
   return (
@@ -26,7 +26,7 @@ export default function ProposalChooseCall() {
             Choose call
           </Typography>
           <ul>
-            {calls.map(call => {
+            {callsData.map(call => {
               const linkTo = '/ProposalCreate/' + call.id;
 
               return (
