@@ -1,14 +1,12 @@
 // FIXME: This should be fixed for sure. It produces compile errors and ts-ignore should never be used.
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import {
+  Answer,
   DataType,
   FieldDependency,
-  ProposalTemplate,
-  QuestionRel,
-  Questionary,
-  Answer,
-  TemplateStep,
   QuestionaryStep,
+  QuestionRel,
+  TemplateStep,
 } from '../generated/sdk';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { DataTypeSpec } from './ProposalModel';

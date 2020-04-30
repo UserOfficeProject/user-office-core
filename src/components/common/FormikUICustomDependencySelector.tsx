@@ -15,9 +15,8 @@ import {
   DataType,
   EvaluatorOperator,
   ProposalTemplate,
-  SelectionFromOptionsConfig,
   QuestionRel,
-  FieldDependency,
+  SelectionFromOptionsConfig,
 } from '../../generated/sdk';
 import {
   getAllFields,
