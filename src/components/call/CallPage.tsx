@@ -5,14 +5,15 @@ import { Add } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 
+import { Call } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import { tableIcons } from '../../utils/tableIcons';
+import { tableIcons } from '../../utils/materialIcons';
 import AddCall from './AddCall';
 
-export default function CallPage() {
+const CallPage: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData } = useCallsData(show);
+  const { loading, callsData } = useCallsData(show, {});
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
@@ -24,16 +25,18 @@ export default function CallPage() {
     return <p>Loading</p>;
   }
 
+  const AddIcon = (): JSX.Element => <Add data-cy="add-call" />;
+
   return (
     <React.Fragment>
       <Dialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
-        onClose={() => setShow(false)}
+        onClose={(): void => setShow(false)}
       >
         <DialogContent>
-          <AddCall close={() => setShow(false)} />
+          <AddCall close={(): void => setShow(false)} />
         </DialogContent>
       </Dialog>
       <ContentContainer>
@@ -44,16 +47,16 @@ export default function CallPage() {
                 icons={tableIcons}
                 title="Calls"
                 columns={columns}
-                data={callsData}
+                data={callsData as Call[]}
                 options={{
                   search: false,
                 }}
                 actions={[
                   {
-                    icon: () => <Add data-cy="add-call" />,
+                    icon: AddIcon,
                     isFreeAction: true,
                     tooltip: 'Add Call',
-                    onClick: (event, rowData) => setShow(true),
+                    onClick: (): void => setShow(true),
                   },
                 ]}
               />
@@ -63,4 +66,6 @@ export default function CallPage() {
       </ContentContainer>
     </React.Fragment>
   );
-}
+};
+
+export default CallPage;

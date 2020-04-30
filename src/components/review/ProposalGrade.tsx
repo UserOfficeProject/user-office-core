@@ -14,7 +14,7 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { useReviewData } from '../../hooks/useReviewData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -107,7 +107,7 @@ export default function ProposalGrade(props: {
             disabled={review.status === 'SUBMITTED'}
           >
             {[...Array(10)].map((e, i) => (
-              <MenuItem value={i + 1} key={`item-${i}`}>
+              <MenuItem key={i} value={i + 1}>
                 {i + 1}
               </MenuItem>
             ))}
