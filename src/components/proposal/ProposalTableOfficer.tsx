@@ -1,9 +1,10 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { Visibility, Delete } from '@material-ui/icons';
+import { Visibility, Delete, RecordVoiceOverTwoTone } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router';
+import { Review, ReviewStatus } from '../../generated/sdk';
 
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
@@ -20,6 +21,35 @@ const ProposalTableOfficer: React.FC = () => {
   );
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
+  const average = (numbers: number[])  => {
+    var sum = numbers.reduce(function(sum, value) {
+      return sum + value;
+    }, 0);
+  
+    var avg = sum / numbers.length;
+    return avg;
+  }
+
+  const standardDeviation = (numbers: number[]) => {
+    if(numbers.length < 2){
+      return NaN
+    }
+    var avg = average(numbers);
+  
+    var squareDiffs = numbers?.map(function(value) {
+      var diff = value - avg;
+      var sqrDiff = diff * diff;
+      return sqrDiff;
+    });
+  
+    var avgSquareDiff = average(squareDiffs);
+  
+    var stdDev = Math.sqrt(avgSquareDiff);
+    return stdDev;
+  }
+
+  const getGrades = (reviews: Review[] | null | undefined) => reviews?.filter(review => review.status === ReviewStatus.SUBMITTED).map((review) => review.grade!) ?? [];
+  
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
@@ -32,6 +62,17 @@ const ProposalTableOfficer: React.FC = () => {
           : '',
     },
     { title: 'Status', field: 'status' },
+    { 
+      title: 'Deviation', field: 'deviation',
+      render: (rowData: ProposalData): number => standardDeviation(getGrades(rowData.reviews)),
+      customSort: (a: ProposalData, b: ProposalData) => (standardDeviation(getGrades(a.reviews)) || -1) - (standardDeviation(getGrades(b.reviews)) || -1)
+    },
+    { 
+      title: 'Average Score', field: 'average', 
+      render: (rowData: ProposalData): number => average(getGrades(rowData.reviews)),
+      customSort: (a: ProposalData, b: ProposalData) => (average(getGrades(a.reviews)) || -1) - (average(getGrades(b.reviews)) || -1)
+      
+     },
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -82,6 +123,7 @@ const ProposalTableOfficer: React.FC = () => {
           search: true,
           selection: true,
           debounceInterval: 400,
+          columnsButton: true
         }}
         actions={[
           {
