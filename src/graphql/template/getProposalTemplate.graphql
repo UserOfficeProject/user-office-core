@@ -9,5 +9,8 @@ query getProposalTemplate($templateId: Int!) {
         ...questionRel
       }
     }
+    complementaryQuestions {
+      ...question
+    }
   }
 }
