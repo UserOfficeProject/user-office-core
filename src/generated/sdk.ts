@@ -135,8 +135,8 @@ export type Entry = {
 };
 
 export enum EvaluatorOperator {
-  EQ = 'eq',
-  NEQ = 'neq'
+  EQ = 'EQ',
+  NEQ = 'NEQ'
 }
 
 export type EventLog = {
@@ -2031,14 +2031,12 @@ export type UpdateReviewMutation = (
   ) }
 );
 
-export type UserWithReviewsQueryVariables = {
-  id: Scalars['Int']
-};
+export type UserWithReviewsQueryVariables = {};
 
 
 export type UserWithReviewsQuery = (
   { __typename?: 'Query' }
-  & { user: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'id' | 'firstname' | 'lastname' | 'organisation'>
     & { reviews: Array<(
@@ -3131,8 +3129,8 @@ export const UpdateReviewDocument = gql`
 }
     ${CoreReviewFragmentDoc}`;
 export const UserWithReviewsDocument = gql`
-    query userWithReviews($id: Int!) {
-  user(id: $id) {
+    query userWithReviews {
+  me {
     id
     firstname
     lastname
@@ -3512,7 +3510,7 @@ export function getSdk(client: GraphQLClient) {
     updateReview(variables: UpdateReviewMutationVariables): Promise<UpdateReviewMutation> {
       return client.request<UpdateReviewMutation>(print(UpdateReviewDocument), variables);
     },
-    userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
+    userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
