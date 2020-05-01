@@ -9,28 +9,25 @@ import {
   FieldCondition,
   FieldDependency,
   ProposalStatus,
-  ProposalTemplate,
   Question,
   Questionary,
   QuestionaryStep,
   QuestionRel,
   Topic,
+  ProposalEndStatus,
 } from '../../models/ProposalModel';
 import {
   EmbellishmentConfig,
   FieldConfigType,
   SelectionFromOptionsConfig,
   TextInputConfig,
-  BooleanConfig,
 } from '../../resolvers/types/FieldConfig';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
-export let dummyTemplate: ProposalTemplate;
-export let dummyQuestionary: Questionary;
 export let dummyProposal: Proposal;
+export let dummyQuestionary: Questionary;
 export let dummyProposalSubmitted: Proposal;
-export let dummyAnswers: Answer[];
 
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends Array<infer U>
@@ -188,14 +185,16 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
-    return dummyProposal;
+    const dummyProposalRef = dummyProposalFactory(dummyProposal);
+    dummyProposal.id = -1; // hacky
+    return dummyProposalRef;
   }
 
   async updateTopicCompletenesses(
     id: number,
     topicsCompleted: number[]
   ): Promise<void> {
-    // Do something here or remove the function
+    throw new Error('Not implemented');
   }
 
   async getQuestionary(proposalId: number): Promise<Questionary> {
@@ -219,6 +218,21 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     questionId: string,
     answer: string
   ): Promise<string> {
+    if (dummyProposal.id !== proposalId) {
+      throw new Error('Wrong ID');
+    }
+    const updated = dummyQuestionary.steps.some(step =>
+      step.fields.some(field => {
+        if (field.question.proposalQuestionId === questionId) {
+          field.value = answer;
+          return true;
+        }
+        return false;
+      })
+    );
+    if (!updated) {
+      throw new Error('Question not found');
+    }
     return questionId;
   }
 
@@ -226,52 +240,37 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return true;
   }
 
-  async rejectProposal(id: number): Promise<Proposal> {
-    if (id && id > 0) {
-      return dummyProposal;
+  async rejectProposal(proposalId: number): Promise<Proposal> {
+    if (dummyProposal.id !== proposalId) {
+      throw new Error('Wrong ID');
     }
-    throw new Error('Wrong ID');
+
+    dummyProposal.finalStatus = ProposalEndStatus.REJECTED; // What is the final status for rejecte?
+    return dummyProposal;
   }
 
   async update(proposal: Proposal): Promise<Proposal> {
-    if (proposal.id && proposal.id > 0) {
-      if (proposal.id == dummyProposalSubmitted.id) {
-        return dummyProposalSubmitted;
-      } else {
-        return dummyProposal;
-      }
+    if (proposal.id !== dummyProposal.id) {
+      throw new Error('Proposal does not exist');
     }
-    throw new Error('Error');
+    dummyProposal = proposal;
+    return dummyProposal;
   }
 
   async setProposalUsers(id: number, users: number[]): Promise<void> {
-    // Do something here or remove the function
-  }
-
-  async acceptProposal(id: number): Promise<Proposal> {
-    if (id && id > 0) {
-      return dummyProposal;
-    }
-    throw new Error('Wrong ID');
+    throw new Error('Not implemented');
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    if (id && id > 0) {
-      return dummyProposal;
+    if (id !== dummyProposal.id) {
+      throw new Error('Wrong ID');
     }
-    throw new Error('Wrong ID');
+    dummyProposal.status = ProposalStatus.SUBMITTED;
+    return dummyProposal;
   }
 
   async get(id: number) {
-    if (id && id > 0) {
-      if (id == dummyProposalSubmitted.id) {
-        return dummyProposalSubmitted;
-      } else {
-        return dummyProposal;
-      }
-    }
-
-    return null;
+    return id === dummyProposal.id ? dummyProposal : null;
   }
 
   async create(proposerID: number, callID: number, templateId: number) {
