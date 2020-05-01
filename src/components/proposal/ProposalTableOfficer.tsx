@@ -65,12 +65,12 @@ const ProposalTableOfficer: React.FC = () => {
     { 
       title: 'Deviation', field: 'deviation',
       render: (rowData: ProposalData): number => standardDeviation(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) => (standardDeviation(getGrades(a.reviews)) || -1) - (standardDeviation(getGrades(b.reviews)) || -1)
+      customSort: (a: ProposalData, b: ProposalData) => (standardDeviation(getGrades(a.reviews)) || 0) - (standardDeviation(getGrades(b.reviews)) || 0)
     },
     { 
       title: 'Average Score', field: 'average', 
       render: (rowData: ProposalData): number => average(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) => (average(getGrades(a.reviews)) || -1) - (average(getGrades(b.reviews)) || -1)
+      customSort: (a: ProposalData, b: ProposalData) => (average(getGrades(a.reviews)) || 0) - (average(getGrades(b.reviews)) || 0) 
       
      },
   ];
