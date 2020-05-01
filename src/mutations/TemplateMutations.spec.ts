@@ -25,7 +25,6 @@ const userAuthorization = new UserAuthorization(
   new ReviewDataSourceMock()
 );
 
-const queries = new TemplateQueries(dummyTemplateDataSource);
 const mutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
