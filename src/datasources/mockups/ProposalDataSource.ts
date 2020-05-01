@@ -4,24 +4,24 @@ import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
 import {
   Answer,
+  createConfig,
+  DataType,
+  FieldCondition,
+  FieldDependency,
   ProposalStatus,
   ProposalTemplate,
+  Question,
   Questionary,
   QuestionaryStep,
-  Topic,
-  DataType,
-  createConfig,
-  FieldDependency,
-  FieldCondition,
-  Question,
-  TemplateStep,
   QuestionRel,
+  Topic,
 } from '../../models/ProposalModel';
 import {
   EmbellishmentConfig,
+  FieldConfigType,
   SelectionFromOptionsConfig,
   TextInputConfig,
-  FieldConfigType,
+  BooleanConfig,
 } from '../../resolvers/types/FieldConfig';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -32,33 +32,58 @@ export let dummyProposal: Proposal;
 export let dummyProposalSubmitted: Proposal;
 export let dummyAnswers: Answer[];
 
-const createDummyQuestion = (values: {
-  proposal_question_id?: string;
-  natural_key?: string;
-  data_type?: DataType;
-  question?: string;
-  config?: typeof FieldConfigType;
-}): Question => {
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends Array<infer U>
+    ? Array<DeepPartial<U>>
+    : T[P] extends ReadonlyArray<infer U>
+    ? ReadonlyArray<DeepPartial<U>>
+    : DeepPartial<T[P]>;
+};
+
+export const dummyConfigFactory = (values?: any): typeof FieldConfigType => {
+  return {
+    required: true,
+    small_label: 'small_label',
+    tooltip: 'tooltip',
+    ...values,
+  };
+};
+export const dummyQuestionFactory = (
+  values?: DeepPartial<Question>
+): Question => {
   return new Question(
-    values.proposal_question_id || 'random_field_name_' + Math.random(),
-    values.natural_key || 'is_dangerous',
-    values.data_type || DataType.TEXT_INPUT,
-    values.question || 'Some random question',
-    values.config || { required: false, tooltip: '', small_label: '' }
+    values?.proposalQuestionId || 'random_field_name_' + Math.random(),
+    values?.naturalKey || 'is_dangerous',
+    values?.dataType || DataType.TEXT_INPUT,
+    values?.question || 'Some random question',
+    (values?.config as any) || dummyConfigFactory()
   );
 };
 
-const createDummyQuestionRel = (values: {
-  question?: Question;
-  sort_order?: number;
-  topic_id?: number;
-  dependency?: FieldDependency;
-}): QuestionRel => {
+export const dummyQuestionRelFactory = (
+  values?: DeepPartial<QuestionRel>
+): QuestionRel => {
   return new QuestionRel(
-    values.question || createDummyQuestion({}),
-    values.sort_order || Math.round(Math.random() * 100),
-    values.topic_id || Math.round(Math.random() * 10),
-    values.dependency || undefined
+    dummyQuestionFactory(values?.question),
+    values?.sortOrder || Math.round(Math.random() * 100),
+    values?.topicId || Math.round(Math.random() * 10)
+  );
+};
+
+const dummyProposalFactory = (values?: Partial<Proposal>) => {
+  return new Proposal(
+    values?.id || 1,
+    values?.title || 'title',
+    values?.abstract || 'abstract',
+    values?.proposerId || 1,
+    values?.status || ProposalStatus.DRAFT,
+    values?.created || new Date(),
+    values?.updated || new Date(),
+    values?.shortCode || 'shortCode',
+    values?.rankOrder || 0,
+    values?.finalStatus || 0,
+    values?.callId || 0,
+    values?.templateId || 1
   );
 };
 
@@ -66,11 +91,11 @@ const create1Topic3FieldWithDependenciesQuestionary = () => {
   return new Questionary([
     new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
       new Answer(
-        createDummyQuestionRel({
-          question: createDummyQuestion({
-            proposal_question_id: 'ttl_general',
-            natural_key: 'ttl_general',
-            data_type: DataType.EMBELLISHMENT,
+        dummyQuestionRelFactory({
+          question: dummyQuestionFactory({
+            proposalQuestionId: 'ttl_general',
+            naturalKey: 'ttl_general',
+            dataType: DataType.EMBELLISHMENT,
             config: createConfig<EmbellishmentConfig>(
               new EmbellishmentConfig(),
               {
@@ -84,11 +109,11 @@ const create1Topic3FieldWithDependenciesQuestionary = () => {
       ),
 
       new Answer(
-        createDummyQuestionRel({
-          question: createDummyQuestion({
-            proposal_question_id: 'has_links_with_industry',
-            natural_key: 'has_links_with_industry',
-            data_type: DataType.SELECTION_FROM_OPTIONS,
+        dummyQuestionRelFactory({
+          question: dummyQuestionFactory({
+            proposalQuestionId: 'has_links_with_industry',
+            naturalKey: 'has_links_with_industry',
+            dataType: DataType.SELECTION_FROM_OPTIONS,
             config: createConfig<SelectionFromOptionsConfig>(
               new SelectionFromOptionsConfig(),
               {
@@ -102,11 +127,11 @@ const create1Topic3FieldWithDependenciesQuestionary = () => {
       ),
 
       new Answer(
-        createDummyQuestionRel({
-          question: createDummyQuestion({
-            proposal_question_id: 'links_with_industry',
-            natural_key: 'links_with_industry',
-            data_type: DataType.TEXT_INPUT,
+        dummyQuestionRelFactory({
+          question: dummyQuestionFactory({
+            proposalQuestionId: 'links_with_industry',
+            naturalKey: 'links_with_industry',
+            dataType: DataType.TEXT_INPUT,
             config: createConfig<TextInputConfig>(new TextInputConfig(), {
               placeholder: 'Please specify links with industry',
               multiline: true,
