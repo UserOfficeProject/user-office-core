@@ -1,0 +1,22 @@
+mutation createQuestionRel(
+  $templateId: Int!
+  $questionId: String!
+  $topicId: Int!
+  $sortOrder: Int!
+  $dependency: FieldDependencyInput
+) {
+  createQuestionRel(
+    templateId: $templateId
+    questionId: $questionId
+    topicId: $topicId
+    sortOrder: $sortOrder
+    dependency: $dependency
+  ) {
+    template {
+      steps {
+        ...templateStep
+      }
+    }
+    error
+  }
+}

@@ -26,6 +26,9 @@ export enum EventType {
   CREATE_TOPIC_REQUESTED,
   TOPIC_CREATED,
   REORDER_TOPIC_REQUESTED,
+  PICK_QUESTION_REQUESTED,
+  CREATE_QUESTION_REL_REQUESTED,
+  QUESTION_REL_CREATED,
 }
 
 export interface Event {
@@ -41,6 +44,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
     isArchived: false,
     name: 'blank',
     proposalCount: 0,
+    complementaryQuestions: [],
   };
 
   function reducer(state: ProposalTemplate, action: Event): ProposalTemplate {

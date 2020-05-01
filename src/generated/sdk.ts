@@ -221,6 +221,7 @@ export type Mutation = {
   updateQuestion: QuestionResponseWrap,
   updateQuestionRel: ProposalTemplateResponseWrap,
   updateTopic: TopicResponseWrap,
+  createQuestionRel: ProposalTemplateResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
@@ -390,6 +391,15 @@ export type MutationUpdateTopicArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>
+};
+
+
+export type MutationCreateQuestionRelArgs = {
+  templateId: Scalars['Int'],
+  questionId: Scalars['String'],
+  sortOrder?: Maybe<Scalars['Int']>,
+  dependency?: Maybe<FieldDependencyInput>,
+  topicId?: Maybe<Scalars['Int']>
 };
 
 
@@ -1828,6 +1838,30 @@ export type CreateQuestionMutation = (
   ) }
 );
 
+export type CreateQuestionRelMutationVariables = {
+  templateId: Scalars['Int'],
+  questionId: Scalars['String'],
+  topicId: Scalars['Int'],
+  sortOrder: Scalars['Int'],
+  dependency?: Maybe<FieldDependencyInput>
+};
+
+
+export type CreateQuestionRelMutation = (
+  { __typename?: 'Mutation' }
+  & { createQuestionRel: (
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & { steps: Array<(
+        { __typename?: 'TemplateStep' }
+        & TemplateStepFragment
+      )> }
+    )> }
+  ) }
+);
+
 export type CreateTopicMutationVariables = {
   templateId: Scalars['Int'],
   sortOrder: Scalars['Int']
@@ -1936,6 +1970,7 @@ export type GetProposalTemplateQuery = (
   { __typename?: 'Query' }
   & { proposalTemplate: Maybe<(
     { __typename?: 'ProposalTemplate' }
+    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description'>
     & { steps: Array<(
       { __typename?: 'TemplateStep' }
       & { topic: (
@@ -3025,6 +3060,18 @@ export const CreateQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
+export const CreateQuestionRelDocument = gql`
+    mutation createQuestionRel($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!, $dependency: FieldDependencyInput) {
+  createQuestionRel(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
+    template {
+      steps {
+        ...templateStep
+      }
+    }
+    error
+  }
+}
+    ${TemplateStepFragmentDoc}`;
 export const CreateTopicDocument = gql`
     mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
@@ -3094,6 +3141,9 @@ export const GetProposalTemplateDocument = gql`
         ...questionRel
       }
     }
+    templateId
+    name
+    description
     complementaryQuestions {
       ...question
     }
@@ -3483,6 +3533,9 @@ export function getSdk(client: GraphQLClient) {
     },
     createQuestion(variables: CreateQuestionMutationVariables): Promise<CreateQuestionMutation> {
       return client.request<CreateQuestionMutation>(print(CreateQuestionDocument), variables);
+    },
+    createQuestionRel(variables: CreateQuestionRelMutationVariables): Promise<CreateQuestionRelMutation> {
+      return client.request<CreateQuestionRelMutation>(print(CreateQuestionRelDocument), variables);
     },
     createTopic(variables: CreateTopicMutationVariables): Promise<CreateTopicMutation> {
       return client.request<CreateTopicMutation>(print(CreateTopicDocument), variables);

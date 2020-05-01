@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import {
   FieldDependency,
   ProposalTemplate,
@@ -140,6 +139,18 @@ export function usePersistModel() {
       .createTopic({ templateId: 1, sortOrder })
       .then(data => {
         return data.createTopic;
+      });
+  };
+
+  const createQuestionRel = async (
+    templateId: number,
+    topicId: number,
+    questionId: string
+  ) => {
+    return api()
+      .updateQuestionRel({ templateId, topicId, questionId })
+      .then(data => {
+        return data.updateQuestionRel;
       });
   };
 
@@ -289,6 +300,25 @@ export function usePersistModel() {
 
             return result;
           });
+          break;
+        case EventType.CREATE_QUESTION_REL_REQUESTED:
+          executeAndMonitorCall(async () => {
+            const templateId = getState().templateId;
+            const { topicId, proposalQuestionId } = action.payload;
+            const result = await createQuestionRel(
+              templateId,
+              topicId,
+              proposalQuestionId
+            );
+            if (result.template) {
+              dispatch({
+                type: EventType.QUESTION_REL_CREATED,
+                payload: result.template,
+              });
+            }
+            return result;
+          });
+
           break;
         default:
           break;
