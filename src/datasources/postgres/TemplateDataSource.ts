@@ -10,7 +10,10 @@ import {
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
-import { FieldDependencyInput } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import {
+  FieldDependencyInput,
+  UpdateQuestionRelArgs,
+} from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';
@@ -26,6 +29,7 @@ import {
   ProposalTemplateRecord,
   TopicRecord,
 } from './records';
+import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getComplementaryQuestions(
@@ -234,29 +238,48 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return question;
   }
 
-  async updateQuestionRel(
-    questionId: string,
-    templateId: number,
-    values: {
-      topicId?: number;
-      sortOrder?: number;
-      dependency?: FieldDependencyInput;
-    }
+  async createQuestionRel(
+    args: CreateQuestionRelArgs
   ): Promise<ProposalTemplate> {
+    const { templateId, questionId, dependency, sortOrder, topicId } = args;
     await to(
       database('proposal_question__proposal_template__rels')
-        .where({ proposal_question_id: questionId, template_id: templateId })
+        .where({
+          proposal_question_id: args.questionId,
+          template_id: args.templateId,
+        })
         .del()
     );
 
     await database('proposal_question__proposal_template__rels').insert({
       proposal_question_id: questionId,
       template_id: templateId,
-      topic_id: values.topicId,
-      sort_order: values.sortOrder,
-      dependency_proposal_question_id: values.dependency?.dependencyId,
-      dependency_condition: values.dependency?.condition,
+      topic_id: topicId,
+      sort_order: sortOrder,
+      dependency_proposal_question_id: dependency?.dependencyId,
+      dependency_condition: dependency?.condition,
     });
+
+    const returnValue = await this.getProposalTemplate(templateId);
+    if (!returnValue) {
+      throw new Error('Could not get template');
+    }
+
+    return returnValue;
+  }
+
+  async updateQuestionRel(
+    args: UpdateQuestionRelArgs
+  ): Promise<ProposalTemplate> {
+    const { templateId, questionId, dependency, sortOrder, topicId } = args;
+    await database('proposal_question__proposal_template__rels')
+      .update({
+        topic_id: topicId,
+        sort_order: sortOrder,
+        dependency_proposal_question_id: dependency?.dependencyId,
+        dependency_condition: dependency?.condition,
+      })
+      .where({ proposal_question_id: questionId, template_id: templateId });
 
     const returnValue = await this.getProposalTemplate(templateId);
     if (!returnValue) {
@@ -278,29 +301,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       .where({ template_id: values.templateId });
 
     return this.getProposalTemplate(values.templateId);
-  }
-
-  async createQuestionAndRel(
-    templateId: number,
-    fieldId: string,
-    naturalKey: string,
-    topicId: number,
-    dataType: DataType,
-    question: string,
-    config: string
-  ) {
-    await this.createQuestion(fieldId, naturalKey, dataType, question, config);
-
-    await database('proposal_question__proposal_template__rels').insert(
-      {
-        proposal_question_id: fieldId,
-        template_id: templateId,
-        topic_id: topicId,
-      },
-      ['*']
-    );
-
-    return this.getProposalTemplateSteps(templateId);
   }
 
   async createQuestion(
@@ -328,18 +328,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     }
 
     return createQuestionObject(resultSet[0]);
-  }
-
-  async createQuestionRel(
-    questionId: string,
-    templateId: number
-  ): Promise<TemplateStep[]> {
-    await database('proposal_question__proposal_template__rels').insert({
-      proposal_question_id: questionId,
-      template_id: templateId,
-    });
-
-    return this.getProposalTemplateSteps(templateId);
   }
 
   async getQuestion(questionId: string): Promise<Question | null> {

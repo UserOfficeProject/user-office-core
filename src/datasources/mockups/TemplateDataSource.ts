@@ -148,17 +148,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async createQuestionAndRel(
-    templateId: number,
-    questionId: string,
-    naturalKey: string,
-    topicId: number,
-    dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<TemplateStep[]> {
-    return dummyTemplateSteps;
-  }
   async updateQuestionRel(
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate> {

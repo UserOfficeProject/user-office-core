@@ -10,8 +10,12 @@ import { QuestionRel } from '../models/ProposalModel';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs as UpdateTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
-import { FieldDependencyInput } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import {
+  FieldDependencyInput,
+  UpdateQuestionRelArgs,
+} from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 
 export interface TemplateDataSource {
   // Template
@@ -47,37 +51,15 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionRel(
-    questionId: string,
-    templateId: number
-  ): Promise<TemplateStep[]>;
-
+  createQuestionRel(args: CreateQuestionRelArgs): Promise<ProposalTemplate>;
   getQuestionRel(
     questionId: string,
     templateId: number
   ): Promise<QuestionRel | null>;
 
-  updateQuestionRel(
-    questionId: string,
-    templateId: number,
-    values: {
-      topicId?: number;
-      sortOrder?: number;
-      dependency?: FieldDependencyInput;
-    }
-  ): Promise<ProposalTemplate>;
+  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<ProposalTemplate>;
 
   deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
-
-  createQuestionAndRel(
-    templateId: number,
-    questionId: string,
-    naturalKey: string,
-    topicId: number,
-    dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<TemplateStep[]>;
 
   // Topic
   createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
