@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
 import { TemplateStep } from './TemplateStep';
+import { Question } from './Question';
 
 @ObjectType()
 export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {
@@ -55,6 +56,17 @@ export class ProposalTemplateResolver {
     @Ctx() context: ResolverContext
   ): Promise<TemplateStep[] | null> {
     return context.queries.template.getProposalTemplateSteps(
+      context.user,
+      template.templateId
+    );
+  }
+
+  @FieldResolver(() => [Question])
+  async complementaryQuestions(
+    @Root() template: ProposalTemplate,
+    @Ctx() context: ResolverContext
+  ): Promise<Question[] | null> {
+    return context.queries.template.getComplementaryQuestions(
       context.user,
       template.templateId
     );

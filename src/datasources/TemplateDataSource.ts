@@ -44,6 +44,7 @@ export interface TemplateDataSource {
     }
   ): Promise<Question>;
   deleteQuestion(questionId: string): Promise<Question>;
+  getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
   createQuestionRel(

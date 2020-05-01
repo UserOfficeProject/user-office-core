@@ -28,6 +28,30 @@ import {
 } from './records';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
+  async getComplementaryQuestions(
+    templateId: number
+  ): Promise<Question[] | null> {
+    const resultSet: ProposalQuestionRecord[] = (
+      await database.raw(
+        `
+        SELECT *
+        FROM proposal_questions AS questions
+        WHERE proposal_question_id NOT IN
+            (SELECT proposal_question_id
+             FROM proposal_question__proposal_template__rels
+             WHERE template_id = ${templateId}
+             )
+        `
+      )
+    ).rows;
+
+    if (!resultSet) {
+      return [];
+    }
+
+    return resultSet.map(value => createQuestionObject(value));
+  }
+
   async createTemplate(
     name: string,
     description?: string

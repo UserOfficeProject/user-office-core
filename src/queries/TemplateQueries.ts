@@ -9,6 +9,14 @@ export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized()
+  async getComplementaryQuestions(
+    agent: User | null,
+    templateId: number
+  ): Promise<Question[] | null> {
+    return this.dataSource.getComplementaryQuestions(templateId);
+  }
+
+  @Authorized()
   async getProposalTemplateSteps(
     agent: User | null,
     templateId: number
