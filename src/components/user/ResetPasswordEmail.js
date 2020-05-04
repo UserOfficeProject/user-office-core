@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 
-import { getUnauthorizedApi } from '../../hooks/useDataApi';
+import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { FormWrapper } from '../../styles/StyledComponents';
 import PhotoInSide from './PhotoInSide';
 
@@ -38,8 +38,9 @@ const useStyles = makeStyles(theme => ({
 export default function ResetPasswordEmail() {
   const classes = useStyles();
   const [emailSuccess, setSuccess] = useState(null);
+  const unauthorizedApi = useUnauthorizedApi();
   const requestResetEmail = values => {
-    getUnauthorizedApi()
+    unauthorizedApi
       .resetPasswordEmail({ email: values.email })
       .then(data => setSuccess(data.resetPasswordEmail));
   };
