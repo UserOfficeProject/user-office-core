@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 import { Variables } from 'graphql-request/dist/src/types';
 import { decode } from 'jsonwebtoken';
-import { useSnackbar } from 'notistack';
+import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
 
 import { UserContext } from '../context/UserContextProvider';
@@ -10,7 +10,7 @@ import { getSdk } from '../generated/sdk';
 const endpoint = '/graphql';
 
 const notificationWithClientLog = async (
-  enqueueSnackbar: any,
+  enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
   message: string,
   error = ''
 ) => {
@@ -30,7 +30,7 @@ const notificationWithClientLog = async (
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
-    private enqueueSnackbar: (message: string, options: any) => void
+    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar']
   ) {
     super(endpoint);
   }
@@ -61,7 +61,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
     private token: string,
-    private enqueueSnackbar: (message: string, options: any) => void,
+    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
     private error?: (reason: string) => void,
     private tokenRenewed?: (newToken: string) => void
   ) {
