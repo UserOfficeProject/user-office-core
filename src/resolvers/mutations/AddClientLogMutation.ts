@@ -11,7 +11,7 @@ export class AddClientLogMutation {
     @Arg('error', () => String) error: string,
     @Ctx() context: ResolverContext
   ) {
-    wrapResponse(
+    return wrapResponse(
       context.mutations.admin.addClientLog(error),
       SuccessResponseWrap
     );
