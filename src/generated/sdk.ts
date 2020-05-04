@@ -135,8 +135,8 @@ export type Entry = {
 };
 
 export enum EvaluatorOperator {
-  EQ = 'EQ',
-  NEQ = 'NEQ'
+  EQ = 'eq',
+  NEQ = 'neq'
 }
 
 export type EventLog = {
