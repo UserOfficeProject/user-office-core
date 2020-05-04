@@ -15,7 +15,7 @@ import {
   UserContext,
   UserContextProvider,
 } from '../context/UserContextProvider';
-import { getUnauthorizedApi } from '../hooks/useDataApi';
+import { useUnauthorizedApi } from '../hooks/useDataApi';
 import { getTheme } from '../theme';
 import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';
@@ -62,7 +62,7 @@ class App extends React.Component {
   }
 
   componentDidCatch(error: any): void {
-    getUnauthorizedApi().addClientLog(error);
+    useUnauthorizedApi().addClientLog(error);
   }
 
   render(): JSX.Element {
