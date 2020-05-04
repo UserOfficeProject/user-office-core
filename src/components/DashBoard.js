@@ -29,7 +29,7 @@ import ProposalCreate from './proposal/ProposaCreate';
 import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalGrade from './review/ProposalGrade';
+import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
@@ -210,7 +210,7 @@ export default function Dashboard({ match }) {
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
           <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
-          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"

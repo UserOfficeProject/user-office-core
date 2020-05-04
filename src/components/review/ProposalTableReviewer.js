@@ -2,17 +2,17 @@ import { Edit, Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
-import { Redirect } from 'react-router';
-
 import { UserContext } from '../../context/UserContextProvider';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useUserWithReviewsData } from '../../hooks/useUserData';
 import { tableIcons } from '../../utils/tableIcons';
+import { useHistory } from 'react-router';
 
 export default function ProposalTableReviewer() {
   const { user } = useContext(UserContext);
   const { loading, userData } = useUserWithReviewsData(user.id);
   const downloadPDFProposal = useDownloadPDFProposal();
+  const history = useHistory();
 
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
@@ -24,7 +24,7 @@ export default function ProposalTableReviewer() {
   const [editReviewID, setEditReviewID] = useState(0);
 
   if (editReviewID) {
-    return <Redirect push to={`/ProposalGrade/${editReviewID}`} />;
+    history.push(`/ProposalGrade/${editReviewID}`);
   }
 
   if (loading) {
