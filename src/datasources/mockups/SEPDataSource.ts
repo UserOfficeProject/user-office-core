@@ -1,4 +1,5 @@
-import { SEP, SEPAssignment } from '../../models/SEP';
+import { SEP, SEPAssignment, SEPMember } from '../../models/SEP';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -27,6 +28,9 @@ export const dummySEPWithoutCode = new SEP(
 
 export const dummySEPs = [dummySEP, anotherDummySEP];
 
+export const dummySEPMember = new SEPMember(1, 4, 1, 1);
+export const anotherDummySEPMember = new SEPMember(2, 5, 2, 1);
+
 export const dummySEPAssignment = new SEPAssignment(
   null,
   2,
@@ -51,6 +55,8 @@ export const dummySEPAssignments = [
   dummySEPAssignment,
   anotherDummySEPAssignment,
 ];
+
+export const dummySEPMembers = [dummySEPMember, anotherDummySEPMember];
 
 export class SEPDataSourceMock implements SEPDataSource {
   async create(
@@ -108,27 +114,25 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEPAssignments.filter(assignment => assignment.sepId === id);
   }
 
-  async assignChairAndSecretary(memberIds: number[], sepId: number) {
-    const sep = dummySEPs.find(element => element.id === sepId);
+  async getMembers(sepId: number) {
+    return dummySEPMembers.filter(member => member.sepId === sepId);
+  }
+
+  async getSEPUserRoles(id: number, sepId: number) {
+    return [{ id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' }];
+  }
+
+  async addSEPMembersRoles(args: AddSEPMembersRole[]) {
+    const sep = dummySEPs.find(element => element.id === args[0].SEPID);
 
     if (sep) {
       return sep;
     }
 
-    throw new Error(`SEP not found ${sepId}`);
+    throw new Error(`SEP not found ${args[0].SEPID}`);
   }
 
-  async assignMember(memberId: number, sepId: number) {
-    const sep = dummySEPs.find(element => element.id === sepId);
-
-    if (sep) {
-      return sep;
-    }
-
-    throw new Error(`SEP not found ${sepId}`);
-  }
-
-  async removeMember(memberId: number, sepId: number) {
+  async removeSEPMemberRole(memberId: number, sepId: number) {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {

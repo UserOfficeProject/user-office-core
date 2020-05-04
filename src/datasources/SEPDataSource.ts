@@ -1,4 +1,6 @@
-import { SEP, SEPAssignment } from '../models/SEP';
+import { Role } from '../models/Role';
+import { SEP, SEPAssignment, SEPMember } from '../models/SEP';
+import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 
 export interface SEPDataSource {
   create(
@@ -21,7 +23,8 @@ export interface SEPDataSource {
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
   getAssignments(id: number): Promise<SEPAssignment[]>;
-  assignChairAndSecretary(memberIds: number[], sepId: number): Promise<SEP>;
-  assignMember(memberId: number, sepId: number): Promise<SEP>;
-  removeMember(memberId: number, sepId: number): Promise<SEP>;
+  getMembers(sepId: number): Promise<SEPMember[]>;
+  getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
+  addSEPMembersRoles(args: AddSEPMembersRole[]): Promise<SEP>;
+  removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
 }

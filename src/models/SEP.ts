@@ -8,6 +8,15 @@ export class SEP {
   ) {}
 }
 
+export class SEPMember {
+  constructor(
+    public roleUserId: number,
+    public roleId: number,
+    public userId: number,
+    public sepId: number
+  ) {}
+}
+
 export class SEPAssignment {
   constructor(
     public proposalId: number | null,

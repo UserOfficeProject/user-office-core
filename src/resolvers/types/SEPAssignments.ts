@@ -43,7 +43,7 @@ export class SEPUserResolver {
     @Root() sepAssignment: SEPAssignment,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.user.dataSource.getSEPUserRoles(
+    return context.queries.sep.dataSource.getSEPUserRoles(
       sepAssignment.sepMemberUserId,
       sepAssignment.sepId
     );

@@ -82,8 +82,18 @@ describe('Test SEPMutations', () => {
   test('A userofficer can assign chair and secretary to SEP', () => {
     return expect(
       SEPMutationsInstance.assignChairAndSecretary(dummyUserOfficer, {
-        memberIds: [1, 2],
-        sepId: 1,
+        addSEPMembersRole: [
+          {
+            SEPID: 1,
+            roleID: 4,
+            userID: 1,
+          },
+          {
+            SEPID: 1,
+            roleID: 5,
+            userID: 2,
+          },
+        ],
       })
     ).resolves.toStrictEqual(dummySEP);
   });

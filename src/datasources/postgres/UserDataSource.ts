@@ -4,10 +4,8 @@ import { Transaction } from 'knex';
 
 import { Role } from '../../models/Role';
 import { User, BasicUserDetails } from '../../models/User';
-import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { RemoveSEPMemberRole } from '../../resolvers/mutations/RemoveSEPMemberRoleMutation';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
@@ -45,36 +43,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then(() => {
         return true;
       });
-  }
-
-  async addSEPMembersRole(
-    usersWithRoles: AddSEPMembersRole[]
-  ): Promise<boolean> {
-    const rolesToInsert = usersWithRoles.map(userWithRole => {
-      return {
-        user_id: userWithRole.userID,
-        role_id: userWithRole.roleID,
-        sep_id: userWithRole.SEPID,
-      };
-    });
-
-    await database('role_user')
-      .del()
-      .where('sep_id', rolesToInsert[0].sep_id)
-      .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
-
-    await database.insert(rolesToInsert).into('role_user');
-
-    return true;
-  }
-
-  async removeSEPMemberRole(args: RemoveSEPMemberRole): Promise<boolean> {
-    await database('role_user')
-      .del()
-      .where('sep_id', args.sepId)
-      .andWhere('user_id', args.memberId);
-
-    return true;
   }
 
   checkEmailExist(email: string): Promise<boolean> {
@@ -206,19 +174,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
-      .then((roles: RoleRecord[]) =>
-        roles.map(role => new Role(role.role_id, role.short_code, role.title))
-      );
-  }
-
-  async getSEPUserRoles(id: number, sepId: number): Promise<Role[]> {
-    return database
-      .select()
-      .from('roles as r')
-      .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
-      .join('users as u', { 'u.user_id': 'rc.user_id' })
-      .where('u.user_id', id)
-      .andWhere('rc.sep_id', sepId)
       .then((roles: RoleRecord[]) =>
         roles.map(role => new Role(role.role_id, role.short_code, role.title))
       );

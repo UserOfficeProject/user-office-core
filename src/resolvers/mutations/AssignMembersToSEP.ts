@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
+import { AddSEPMembersRoleArgs } from './AddSEPMembersRoleMutation';
 
 @ArgsType()
 export class UpdateMemberSEPArgs {
@@ -34,7 +35,7 @@ export class AssignSEPChairAndSecretaryArgs {
 export class AssignMembersToSEPMutation {
   @Mutation(() => SEPResponseWrap)
   async assignChairAndSecretary(
-    @Args() args: AssignSEPChairAndSecretaryArgs,
+    @Args() args: AddSEPMembersRoleArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(

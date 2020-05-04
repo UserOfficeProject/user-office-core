@@ -5,12 +5,10 @@ import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { User } from '../models/User';
+import { User, UserRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import {
-  UpdateMemberSEPArgs,
-  AssignSEPChairAndSecretaryArgs,
-} from '../resolvers/mutations/AssignMembersToSEP';
+import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
+import { UpdateMemberSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
@@ -29,11 +27,10 @@ const updateSEPValidationSchema = yup.object().shape({
 });
 
 const assignSEPChairAndSecretaryValidationSchema = yup.object().shape({
-  memberIds: yup
+  addSEPMembersRole: yup
     .array()
     .required()
     .min(2),
-  sepId: yup.number().required(),
 });
 
 const updateSEPMemberValidationSchema = yup.object().shape({
@@ -102,14 +99,14 @@ export default class SEPMutations {
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairAndSecretary(
     agent: User | null,
-    args: AssignSEPChairAndSecretaryArgs
+    args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .assignChairAndSecretary(args.memberIds, args.sepId)
+      .addSEPMembersRoles(args.addSEPMembersRole)
       .then(result => result)
       .catch(err => {
         logger.logException(
-          'Could not assign members to scientific evaluation panel',
+          'Could not assign chair and secretary to scientific evaluation panel',
           err,
           { agent }
         );
@@ -118,7 +115,7 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(updateSEPMemberValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMember(
@@ -126,7 +123,13 @@ export default class SEPMutations {
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .assignMember(args.memberId, args.sepId)
+      .addSEPMembersRoles([
+        {
+          userID: args.memberId,
+          SEPID: args.sepId,
+          roleID: UserRole.SEP_MEMBER,
+        },
+      ])
       .then(result => result)
       .catch(err => {
         logger.logException(
@@ -147,7 +150,7 @@ export default class SEPMutations {
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .removeMember(args.memberId, args.sepId)
+      .removeSEPMemberRole(args.memberId, args.sepId)
       .then(result => result)
       .catch(err => {
         logger.logException(
