@@ -1,5 +1,6 @@
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
+import { useParams } from 'react-router';
 
 import { ProposalTemplate, TemplateStep, QuestionRel } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
@@ -39,9 +40,10 @@ export interface Event {
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
+  const { templateId } = useParams();
   const blankInitTemplate: ProposalTemplate = {
     steps: [],
-    templateId: 1,
+    templateId: 0,
     callCount: 0,
     isArchived: false,
     name: 'blank',
@@ -154,7 +156,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
   useEffect(() => {
     api()
-      .getProposalTemplate({ templateId: 1 })
+      .getProposalTemplate({ templateId: parseInt(templateId!) })
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,

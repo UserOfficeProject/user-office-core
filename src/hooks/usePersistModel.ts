@@ -15,10 +15,14 @@ export function usePersistModel() {
 
   const api = useDataApi();
 
-  const updateFieldTopicRel = async (topicId: number, fieldIds: string[]) => {
+  const updateFieldTopicRel = async (
+    templateId: number,
+    topicId: number,
+    fieldIds: string[]
+  ) => {
     return api()
       .updateQuestionsTopicRels({
-        templateId: 1,
+        templateId,
         topicId,
         fieldIds,
       })
@@ -59,7 +63,7 @@ export function usePersistModel() {
     };
   };
 
-  const updateItem = async (field: QuestionRel) => {
+  const updateItem = async (templateId: number, field: QuestionRel) => {
     return api()
       .updateQuestion({
         id: field.question.proposalQuestionId,
@@ -72,7 +76,7 @@ export function usePersistModel() {
       .then(data => {
         return api()
           .updateQuestionRel({
-            templateId: 1,
+            templateId,
             topicId: 1,
             sortOrder: 0,
             questionId: field.question.proposalQuestionId,
@@ -100,13 +104,13 @@ export function usePersistModel() {
       });
   };
 
-  const deleteQuestionRel = async (id: string) => {
+  const deleteQuestionRel = async (templateId: number, questionId: string) => {
     setIsLoading(true);
 
     return api()
       .deleteQuestionRel({
-        templateId: 1,
-        questionId: id,
+        templateId,
+        questionId,
       })
       .then(data => {
         setIsLoading(false);
@@ -123,9 +127,9 @@ export function usePersistModel() {
       .then(data => data.deleteTopic);
   };
 
-  const createTopic = async (sortOrder: number) => {
+  const createTopic = async (templateId: number, sortOrder: number) => {
     return api()
-      .createTopic({ templateId: 1, sortOrder })
+      .createTopic({ templateId, sortOrder })
       .then(data => {
         return data.createTopic;
       });
@@ -187,6 +191,7 @@ export function usePersistModel() {
 
           executeAndMonitorCall(() =>
             updateFieldTopicRel(
+              state.templateId,
               reducedTopic!.topic.id,
               reducedTopic!.fields.map(
                 field => field.question.proposalQuestionId
@@ -196,6 +201,7 @@ export function usePersistModel() {
           if (reducedTopicId !== extendedTopicId) {
             executeAndMonitorCall(() =>
               updateFieldTopicRel(
+                state.templateId,
                 extendedTopic!.topic.id,
                 extendedTopic!.fields.map(
                   field => field.question.proposalQuestionId
@@ -218,7 +224,7 @@ export function usePersistModel() {
         case EventType.UPDATE_FIELD_REQUESTED:
           executeAndMonitorCall(async () => {
             const field = action.payload.field as QuestionRel;
-            const result = await updateItem(field);
+            const result = await updateItem(state.templateId, field);
             dispatch({
               type: EventType.FIELD_UPDATED,
               payload: result.template,
@@ -240,7 +246,10 @@ export function usePersistModel() {
           break;
         case EventType.DELETE_QUESTION_REL_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await deleteQuestionRel(action.payload.fieldId);
+            const result = await deleteQuestionRel(
+              state.templateId,
+              action.payload.fieldId
+            );
             if (result.template) {
               dispatch({
                 type: EventType.QUESTION_REL_DELETED,
@@ -256,7 +265,10 @@ export function usePersistModel() {
           break;
         case EventType.CREATE_TOPIC_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await createTopic(action.payload.sortOrder);
+            const result = await createTopic(
+              state.templateId,
+              action.payload.sortOrder
+            );
             if (result.template) {
               dispatch({
                 type: EventType.TOPIC_CREATED,

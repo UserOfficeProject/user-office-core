@@ -209,7 +209,10 @@ export default function Dashboard({ match }) {
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
-          <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
+          <Route
+            path="/QuestionaryEditor/:templateId"
+            component={QuestionaryEditor}
+          />
           <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
