@@ -4,8 +4,7 @@ import { GetSepAssignmentsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPAssignmentsData(
-  id: number,
-  show: boolean
+  id: number
 ): {
   loadingAssignments: boolean;
   SEPAssignmentsData: GetSepAssignmentsQuery['sepAssignments'] | null;
@@ -25,7 +24,7 @@ export function useSEPAssignmentsData(
         setSEPAssignmentsData(data.sepAssignments);
         setLoadingAssignments(false);
       });
-  }, [id, show, api]);
+  }, [id, api]);
 
   return { loadingAssignments, SEPAssignmentsData, setSEPAssignmentsData };
 }
