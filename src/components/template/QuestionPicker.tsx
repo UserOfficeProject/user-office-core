@@ -99,7 +99,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
   };
 
   return (
-    <Grid container className={classes.container}>
+    <Grid container className={classes.container} id={props.id}>
       <Grid item xs={10}>
         Question drawer
       </Grid>
@@ -210,4 +210,5 @@ interface IQuestionPickerProps {
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
   closeMe: () => void;
+  id?: string;
 }

@@ -190,6 +190,7 @@ export default function QuestionaryEditor() {
                         closeMe={() => {
                           setQuestionPickerTopicId(null);
                         }}
+                        id="questionPicker"
                       />
                     ) : null;
 
