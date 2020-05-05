@@ -1,12 +1,10 @@
 import { useState } from 'react';
-
 import {
+  DataType,
   FieldDependency,
   ProposalTemplate,
   QuestionRel,
-  DataType,
 } from '../generated/sdk';
-import { getFieldById } from '../models/ProposalModelFunctions';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
 

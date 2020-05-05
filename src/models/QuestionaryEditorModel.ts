@@ -163,7 +163,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           payload: data.proposalTemplate,
         });
       });
-  }, [api, memoizedDispatch]);
+  }, [api, memoizedDispatch, templateId]);
 
   return { state, dispatch };
 }
