@@ -20,11 +20,12 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: User | null,
+    active = true,
     filter?: string,
     first?: number,
     offset?: number
   ) {
-    return this.dataSource.getAll(filter, first, offset);
+    return this.dataSource.getAll(active, filter, first, offset);
   }
 
   @Authorized([Roles.USER_OFFICER])

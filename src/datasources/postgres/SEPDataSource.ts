@@ -103,6 +103,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getAll(
+    active: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -122,6 +123,9 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         }
         if (offset) {
           query.offset(offset);
+        }
+        if (active) {
+          query.where('active', active);
         }
       })
       .then((allSeps: SEPRecord[]) => {
@@ -201,6 +205,39 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sepUpdated = await this.get(sepId);
 
     if (memberRemoved && sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async assignProposal(proposalId: number, sepId: number) {
+    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
+    await database.raw(
+      `${database('SEP_Assignments').insert({
+        proposal_id: proposalId,
+        sep_id: sepId,
+      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
+    );
+
+    const sepUpdated = await this.get(sepId);
+
+    if (sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeProposalAssignment(proposalId: number, sepId: number) {
+    const assignmentRemoved = await database('SEP_Assignments')
+      .del()
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (assignmentRemoved && sepUpdated) {
       return sepUpdated;
     }
 

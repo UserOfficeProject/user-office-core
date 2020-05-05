@@ -18,6 +18,7 @@ export interface SEPDataSource {
   ): Promise<SEP>;
   get(id: number): Promise<SEP | null>;
   getAll(
+    active: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -27,4 +28,6 @@ export interface SEPDataSource {
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRoles(args: AddSEPMembersRole[]): Promise<SEP>;
   removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
+  assignProposal(proposalId: number, sepId: number): Promise<SEP>;
+  removeProposalAssignment(proposalId: number, sepId: number): Promise<SEP>;
 }

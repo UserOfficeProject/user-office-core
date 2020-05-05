@@ -19,8 +19,8 @@ export class SEPMember {
 
 export class SEPAssignment {
   constructor(
-    public proposalId: number | null,
-    public sepMemberUserId: number,
+    public proposalId: number,
+    public sepMemberUserId: number | null,
     public sepId: number,
     public dateAssigned: Date,
     public reassigned: boolean,
