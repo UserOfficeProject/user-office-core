@@ -16,10 +16,10 @@ export enum EventType {
   MOVE_TOPIC_REQUESTED,
   UPDATE_TOPIC_TITLE_REQUESTED,
   UPDATE_FIELD_REQUESTED,
-  CREATE_NEW_FIELD_REQUESTED,
+  CREATE_NEW_QUESTION_REQUESTED,
   FIELD_CREATED,
-  DELETE_FIELD_REQUESTED,
-  FIELD_DELETED,
+  DELETE_QUESTION_REL_REQUESTED,
+  QUESTION_REL_DELETED,
   SERVICE_ERROR_OCCURRED,
   FIELD_UPDATED,
   DELETE_TOPIC_REQUESTED,
@@ -29,6 +29,8 @@ export enum EventType {
   PICK_QUESTION_REQUESTED,
   CREATE_QUESTION_REL_REQUESTED,
   QUESTION_REL_CREATED,
+  QUESTION_PICKER_NEW_QUESTION_CLICKED,
+  QUESTION_CREATED,
 }
 
 export interface Event {
@@ -132,7 +134,13 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           return draft;
         case EventType.TOPIC_CREATED:
         case EventType.FIELD_UPDATED:
-        case EventType.FIELD_DELETED:
+        case EventType.QUESTION_REL_DELETED:
+          return { ...action.payload };
+        case EventType.QUESTION_CREATED:
+          draft.complementaryQuestions.push(action.payload);
+
+          return draft;
+        case EventType.QUESTION_REL_CREATED:
           return { ...action.payload };
       }
     });

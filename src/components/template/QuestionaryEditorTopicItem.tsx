@@ -1,18 +1,20 @@
-import { makeStyles, Grid, useTheme } from '@material-ui/core';
+import { Grid, makeStyles, useTheme } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
-import { DataType, QuestionRel } from '../../generated/sdk';
-import { EmbellishmentConfig } from '../../generated/sdk';
-import { Event } from '../../models/QuestionaryEditorModel';
+import {
+  DataType,
+  EmbellishmentConfig,
+  FieldConfig,
+  FieldDependency,
+} from '../../generated/sdk';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 
 export default function QuestionaryEditorTopicItem(props: {
-  data: QuestionRel;
-  dispatch: React.Dispatch<Event>;
+  data: IQuestionaryEditorTopicData;
   index: number;
-  onClick: { (data: QuestionRel): void };
+  onClick: { (data: IQuestionaryEditorTopicData): void };
 }) {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
@@ -88,8 +90,8 @@ export default function QuestionaryEditorTopicItem(props: {
 
   return (
     <Draggable
-      key={props.data.question.proposalQuestionId}
-      draggableId={props.data.question.proposalQuestionId}
+      key={props.data.proposalQuestionId}
+      draggableId={props.data.proposalQuestionId}
       index={props.index}
     >
       {(provided, snapshot) => (
@@ -115,16 +117,16 @@ export default function QuestionaryEditorTopicItem(props: {
             className={classes.questionId}
             data-cy="proposal-question-id"
           >
-            {props.data.question.naturalKey}
+            {props.data.naturalKey}
           </Grid>
           <Grid item xs={2} className={classes.icon}>
-            {getTemplateFieldIcon(props.data.question.dataType)}
+            {getTemplateFieldIcon(props.data.dataType)}
           </Grid>
 
           <Grid item xs={10} className={classes.question}>
-            {props.data.question.dataType === DataType.EMBELLISHMENT
-              ? (props.data.question.config as EmbellishmentConfig).plain
-              : props.data.question.question}
+            {props.data.dataType === DataType.EMBELLISHMENT
+              ? (props.data.config as EmbellishmentConfig).plain
+              : props.data.question}
           </Grid>
 
           <Grid item xs={12} className={classes.dependencies}>
@@ -134,4 +136,13 @@ export default function QuestionaryEditorTopicItem(props: {
       )}
     </Draggable>
   );
+}
+
+export interface IQuestionaryEditorTopicData {
+  proposalQuestionId: string;
+  question: string;
+  naturalKey: string;
+  dataType: DataType;
+  dependency?: FieldDependency | null;
+  config?: FieldConfig | null;
 }

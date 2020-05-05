@@ -1,10 +1,4 @@
 import {
-  getAllFields,
-  getFieldById,
-  getTopicById,
-  getQuestionaryStepByTopicId,
-} from './ProposalModelFunctions';
-import {
   ProposalTemplate,
   Questionary,
   DataType,
@@ -14,6 +8,12 @@ import {
   FieldDependency,
   QuestionRel,
 } from '../generated/sdk';
+import {
+  getAllFields,
+  getFieldById,
+  getTopicById,
+  getQuestionaryStepByTopicId,
+} from './ProposalModelFunctions';
 
 export const create1TopicFieldlessTemplate = (): ProposalTemplate => {
   return {

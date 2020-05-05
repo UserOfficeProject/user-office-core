@@ -42,7 +42,7 @@ export const AdminComponentShell: AdminComponentShellSignature = props => {
           data-cy="delete"
           onClick={() => {
             props.dispatch({
-              type: EventType.DELETE_FIELD_REQUESTED,
+              type: EventType.DELETE_QUESTION_REL_REQUESTED,
               payload: { fieldId: props.field.question.proposalQuestionId },
             });
             props.closeMe();

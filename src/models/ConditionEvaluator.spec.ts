@@ -1,9 +1,9 @@
 import { Answer } from '../generated/sdk';
+import { create1Topic3FieldWithDependenciesQuestionary } from './ProposalModel.spec';
 import {
   areDependenciesSatisfied,
   getFieldById,
 } from './ProposalModelFunctions';
-import { create1Topic3FieldWithDependenciesQuestionary } from './ProposalModel.spec';
 
 test('Is dependency checking working', () => {
   const template = create1Topic3FieldWithDependenciesQuestionary();

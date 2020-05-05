@@ -1,8 +1,10 @@
 import { useState } from 'react';
+
 import {
   FieldDependency,
   ProposalTemplate,
   QuestionRel,
+  DataType,
 } from '../generated/sdk';
 import { getFieldById } from '../models/ProposalModelFunctions';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
@@ -84,34 +86,21 @@ export function usePersistModel() {
       });
   };
 
-  // TODO Use this method again after using new UI
-  // const createQuestion = async (topicId: number, dataType: DataType) => {
-  //   setIsLoading(true);
+  const createQuestion = async (dataType: DataType) => {
+    setIsLoading(true);
 
-  //   return api()
-  //     .createQuestion({
-  //       dataType: dataType,
-  //     })
-  //     .then(questionResponse => {
-  //       const questionId = questionResponse.createQuestion.question
-  //         ?.proposalQuestionId as string;
+    return api()
+      .createQuestion({
+        dataType: dataType,
+      })
+      .then(questionResponse => {
+        setIsLoading(false);
 
-  //       return api()
-  //         .updateQuestionRel({
-  //           questionId,
-  //           templateId: 1,
-  //           topicId,
-  //           sortOrder: 0,
-  //         })
-  //         .then(questionRelResponse => {
-  //           setIsLoading(false);
+        return questionResponse.createQuestion;
+      });
+  };
 
-  //           return questionRelResponse.updateQuestionRel;
-  //         });
-  //     });
-  // };
-
-  const deleteField = async (id: string) => {
+  const deleteQuestionRel = async (id: string) => {
     setIsLoading(true);
 
     return api()
@@ -145,12 +134,13 @@ export function usePersistModel() {
   const createQuestionRel = async (
     templateId: number,
     topicId: number,
-    questionId: string
+    questionId: string,
+    sortOrder: number
   ) => {
     return api()
-      .updateQuestionRel({ templateId, topicId, questionId })
+      .createQuestionRel({ templateId, topicId, questionId, sortOrder })
       .then(data => {
-        return data.updateQuestionRel;
+        return data.createQuestionRel;
       });
   };
 
@@ -237,47 +227,23 @@ export function usePersistModel() {
             return result;
           });
           break;
-        case EventType.CREATE_NEW_FIELD_REQUESTED:
+        case EventType.CREATE_NEW_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
-            setIsLoading(true);
+            const result = await createQuestion(action.payload.dataType);
+            dispatch({
+              type: EventType.QUESTION_CREATED,
+              payload: result.question,
+            });
 
-            return api()
-              .createQuestion({
-                dataType: action.payload.dataType,
-              })
-              .then(questionResponse => {
-                const questionId = questionResponse.createQuestion.question
-                  ?.proposalQuestionId as string;
-
-                return api()
-                  .updateQuestionRel({
-                    questionId,
-                    templateId: 1,
-                    topicId: action.payload.topicId,
-                    sortOrder: 0,
-                  })
-                  .then(questionRelResponse => {
-                    setIsLoading(false);
-                    const template =
-                      questionRelResponse.updateQuestionRel.template;
-                    if (template) {
-                      dispatch({
-                        type: EventType.FIELD_CREATED,
-                        payload: getFieldById(template.steps, questionId),
-                      });
-                    }
-
-                    return questionRelResponse.updateQuestionRel;
-                  });
-              });
+            return result;
           });
           break;
-        case EventType.DELETE_FIELD_REQUESTED:
+        case EventType.DELETE_QUESTION_REL_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await deleteField(action.payload.fieldId);
+            const result = await deleteQuestionRel(action.payload.fieldId);
             if (result.template) {
               dispatch({
-                type: EventType.FIELD_DELETED,
+                type: EventType.QUESTION_REL_DELETED,
                 payload: result.template,
               });
             }
@@ -302,13 +268,15 @@ export function usePersistModel() {
           });
           break;
         case EventType.CREATE_QUESTION_REL_REQUESTED:
+          const { questionId, topicId, sortOrder } = action.payload;
+
           executeAndMonitorCall(async () => {
             const templateId = getState().templateId;
-            const { topicId, proposalQuestionId } = action.payload;
             const result = await createQuestionRel(
               templateId,
               topicId,
-              proposalQuestionId
+              questionId,
+              sortOrder
             );
             if (result.template) {
               dispatch({
@@ -316,6 +284,7 @@ export function usePersistModel() {
                 payload: result.template,
               });
             }
+
             return result;
           });
 

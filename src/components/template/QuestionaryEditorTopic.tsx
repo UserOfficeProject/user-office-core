@@ -1,25 +1,48 @@
 import {
-  makeStyles,
-  Grid,
-  useTheme,
-  Menu,
-  Fade,
-  MenuItem,
-  ListItemIcon,
-  Typography,
   Divider,
+  Fade,
+  Grid,
+  ListItemIcon,
+  makeStyles,
+  Menu,
+  MenuItem,
+  Typography,
+  useTheme,
 } from '@material-ui/core';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import React, { useState } from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 
-import { DataType } from '../../generated/sdk';
-import { TemplateStep, QuestionRel } from '../../generated/sdk';
-import { EventType, Event } from '../../models/QuestionaryEditorModel';
-import getTemplateFieldIcon from './getTemplateFieldIcon';
-import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
+import { QuestionRel, TemplateStep } from '../../generated/sdk';
+import { Event, EventType } from '../../models/QuestionaryEditorModel';
+import QuestionaryEditorTopicItem, {
+  IQuestionaryEditorTopicData,
+} from './QuestionaryEditorTopicItem';
+
+class QuestionRelItemAdapter implements IQuestionaryEditorTopicData {
+  constructor(public source: QuestionRel) {}
+
+  get proposalQuestionId() {
+    return this.source.question.proposalQuestionId;
+  }
+  get question() {
+    return this.source.question.question;
+  }
+  get naturalKey() {
+    return this.source.question.naturalKey;
+  }
+  get dataType() {
+    return this.source.question.dataType;
+  }
+  get dependency() {
+    return this.source.dependency;
+  }
+  get config() {
+    return this.source.question.config;
+  }
+}
 
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
@@ -81,14 +104,6 @@ export default function QuestionaryEditorTopic(props: {
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
 
-  const onCreateNewFieldClicked = (dataType: DataType) => {
-    dispatch({
-      type: EventType.CREATE_NEW_FIELD_REQUESTED,
-      payload: { topicId: props.data.topic.id, dataType: dataType },
-    });
-    setAnchorEl(null);
-  };
-
   const getListStyle = (isDraggingOver: any) => ({
     background: isDraggingOver
       ? theme.palette.primary.light
@@ -139,9 +154,10 @@ export default function QuestionaryEditorTopic(props: {
       return data.fields.map((item, index) => (
         <QuestionaryEditorTopicItem
           index={index}
-          data={item}
-          dispatch={dispatch}
-          onClick={props.onItemClick}
+          data={new QuestionRelItemAdapter(item)}
+          onClick={item =>
+            props.onItemClick((item as QuestionRelItemAdapter).source)
+          }
           key={item.question.proposalQuestionId.toString()}
         />
       ));
@@ -189,64 +205,22 @@ export default function QuestionaryEditorTopic(props: {
             >
               <MenuItem
                 className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.TEXT_INPUT)}
+                onClick={() => {
+                  dispatch({
+                    type: EventType.PICK_QUESTION_REQUESTED,
+                    payload: {
+                      sortOrder: index + 1,
+                      topic: props.data.topic,
+                    },
+                    // +1 means - add immediately after this topic
+                  });
+                  setAnchorEl(null);
+                }}
               >
                 <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+                  <PlaylistAddIcon />
                 </ListItemIcon>
-                <Typography variant="inherit">Add Text input</Typography>
-              </MenuItem>
-
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.EMBELLISHMENT)}
-              >
-                <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
-                </ListItemIcon>
-                <Typography variant="inherit">Add Embellishment</Typography>
-              </MenuItem>
-
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.DATE)}
-              >
-                <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.DATE)!}
-                </ListItemIcon>
-                <Typography variant="inherit">Add Date</Typography>
-              </MenuItem>
-
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.FILE_UPLOAD)}
-              >
-                <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
-                </ListItemIcon>
-                <Typography variant="inherit">Add File upload</Typography>
-              </MenuItem>
-
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() =>
-                  onCreateNewFieldClicked(DataType.SELECTION_FROM_OPTIONS)
-                }
-              >
-                <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
-                </ListItemIcon>
-                <Typography variant="inherit">Add Multiple choice</Typography>
-              </MenuItem>
-
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => onCreateNewFieldClicked(DataType.BOOLEAN)}
-              >
-                <ListItemIcon>
-                  {getTemplateFieldIcon(DataType.BOOLEAN)!}
-                </ListItemIcon>
-                <Typography variant="inherit">Add Boolean</Typography>
+                <Typography variant="inherit">Add question</Typography>
               </MenuItem>
               <Divider />
               <MenuItem
