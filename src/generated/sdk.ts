@@ -1854,10 +1854,7 @@ export type CreateQuestionRelMutation = (
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
-      & { steps: Array<(
-        { __typename?: 'TemplateStep' }
-        & TemplateStepFragment
-      )> }
+      & ProposalTemplateFragment
     )> }
   ) }
 );
@@ -1875,10 +1872,7 @@ export type CreateTopicMutation = (
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
-      & { steps: Array<(
-        { __typename?: 'TemplateStep' }
-        & TemplateStepFragment
-      )> }
+      & ProposalTemplateFragment
     )> }
   ) }
 );
@@ -1930,10 +1924,7 @@ export type DeleteQuestionRelMutation = (
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
-      & { steps: Array<(
-        { __typename?: 'TemplateStep' }
-        & TemplateStepFragment
-      )> }
+      & ProposalTemplateFragment
     )> }
   ) }
 );
@@ -1949,6 +1940,24 @@ export type DeleteTopicMutation = (
     { __typename?: 'ProposalTemplateResponseWrap' }
     & Pick<ProposalTemplateResponseWrap, 'error'>
   ) }
+);
+
+export type ProposalTemplateFragment = (
+  { __typename?: 'ProposalTemplate' }
+  & Pick<ProposalTemplate, 'templateId' | 'name' | 'description'>
+  & { steps: Array<(
+    { __typename?: 'TemplateStep' }
+    & { topic: (
+      { __typename?: 'Topic' }
+      & Pick<Topic, 'title' | 'id'>
+    ), fields: Array<(
+      { __typename?: 'QuestionRel' }
+      & QuestionRelFragment
+    )> }
+  )>, complementaryQuestions: Array<(
+    { __typename?: 'Question' }
+    & QuestionFragment
+  )> }
 );
 
 export type GetIsNaturalKeyPresentQueryVariables = {
@@ -1970,20 +1979,7 @@ export type GetProposalTemplateQuery = (
   { __typename?: 'Query' }
   & { proposalTemplate: Maybe<(
     { __typename?: 'ProposalTemplate' }
-    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description'>
-    & { steps: Array<(
-      { __typename?: 'TemplateStep' }
-      & { topic: (
-        { __typename?: 'Topic' }
-        & Pick<Topic, 'title' | 'id'>
-      ), fields: Array<(
-        { __typename?: 'QuestionRel' }
-        & QuestionRelFragment
-      )> }
-    )>, complementaryQuestions: Array<(
-      { __typename?: 'Question' }
-      & QuestionFragment
-    )> }
+    & ProposalTemplateFragment
   )> }
 );
 
@@ -2036,10 +2032,7 @@ export type UpdateQuestionRelMutation = (
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
-      & { steps: Array<(
-        { __typename?: 'TemplateStep' }
-        & TemplateStepFragment
-      )> }
+      & ProposalTemplateFragment
     )> }
   ) }
 );
@@ -2581,6 +2574,26 @@ export const CoreReviewFragmentDoc = gql`
   grade
 }
     `;
+export const ProposalTemplateFragmentDoc = gql`
+    fragment proposalTemplate on ProposalTemplate {
+  steps {
+    topic {
+      title
+      id
+    }
+    fields {
+      ...questionRel
+    }
+  }
+  templateId
+  name
+  description
+  complementaryQuestions {
+    ...question
+  }
+}
+    ${QuestionRelFragmentDoc}
+${QuestionFragmentDoc}`;
 export const BasicUserDetailsFragmentDoc = gql`
     fragment basicUserDetails on BasicUserDetails {
   id
@@ -3064,26 +3077,22 @@ export const CreateQuestionRelDocument = gql`
     mutation createQuestionRel($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!, $dependency: FieldDependencyInput) {
   createQuestionRel(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
     template {
-      steps {
-        ...templateStep
-      }
+      ...proposalTemplate
     }
     error
   }
 }
-    ${TemplateStepFragmentDoc}`;
+    ${ProposalTemplateFragmentDoc}`;
 export const CreateTopicDocument = gql`
     mutation createTopic($templateId: Int!, $sortOrder: Int!) {
   createTopic(templateId: $templateId, sortOrder: $sortOrder) {
     template {
-      steps {
-        ...templateStep
-      }
+      ...proposalTemplate
     }
     error
   }
 }
-    ${TemplateStepFragmentDoc}`;
+    ${ProposalTemplateFragmentDoc}`;
 export const DeleteProposalTemplateDocument = gql`
     mutation deleteProposalTemplate($id: Int!) {
   deleteProposalTemplate(id: $id) {
@@ -3109,14 +3118,12 @@ export const DeleteQuestionRelDocument = gql`
     mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
   deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
     template {
-      steps {
-        ...templateStep
-      }
+      ...proposalTemplate
     }
     error
   }
 }
-    ${TemplateStepFragmentDoc}`;
+    ${ProposalTemplateFragmentDoc}`;
 export const DeleteTopicDocument = gql`
     mutation deleteTopic($topicId: Int!) {
   deleteTopic(topicId: $topicId) {
@@ -3132,25 +3139,10 @@ export const GetIsNaturalKeyPresentDocument = gql`
 export const GetProposalTemplateDocument = gql`
     query getProposalTemplate($templateId: Int!) {
   proposalTemplate(templateId: $templateId) {
-    steps {
-      topic {
-        title
-        id
-      }
-      fields {
-        ...questionRel
-      }
-    }
-    templateId
-    name
-    description
-    complementaryQuestions {
-      ...question
-    }
+    ...proposalTemplate
   }
 }
-    ${QuestionRelFragmentDoc}
-${QuestionFragmentDoc}`;
+    ${ProposalTemplateFragmentDoc}`;
 export const GetProposalTemplatesDocument = gql`
     query getProposalTemplates($filter: ProposalTemplatesFilter) {
   proposalTemplates(filter: $filter) {
@@ -3177,14 +3169,12 @@ export const UpdateQuestionRelDocument = gql`
     mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $dependency: FieldDependencyInput) {
   updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
     template {
-      steps {
-        ...templateStep
-      }
+      ...proposalTemplate
     }
     error
   }
 }
-    ${TemplateStepFragmentDoc}`;
+    ${ProposalTemplateFragmentDoc}`;
 export const UpdateQuestionsTopicRelsDocument = gql`
     mutation updateQuestionsTopicRels($templateId: Int!, $topicId: Int!, $fieldIds: [String!]) {
   updateQuestionsTopicRels(templateId: $templateId, topicId: $topicId, fieldIds: $fieldIds) {

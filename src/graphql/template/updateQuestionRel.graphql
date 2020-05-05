@@ -13,9 +13,7 @@ mutation updateQuestionRel(
     dependency: $dependency
   ) {
     template {
-      steps {
-        ...templateStep
-      }
+      ...proposalTemplate
     }
     error
   }

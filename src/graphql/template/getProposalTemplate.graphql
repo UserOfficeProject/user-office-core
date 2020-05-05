@@ -1,19 +1,5 @@
 query getProposalTemplate($templateId: Int!) {
   proposalTemplate(templateId: $templateId) {
-    steps {
-      topic {
-        title
-        id
-      }
-      fields {
-        ...questionRel
-      }
-    }
-    templateId
-    name
-    description
-    complementaryQuestions {
-      ...question
-    }
+    ...proposalTemplate
   }
 }
