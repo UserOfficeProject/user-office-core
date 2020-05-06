@@ -74,7 +74,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
               disabled={isSubmitting}
               data-cy="submit"
             >
-              Assign proposal/s to SEP
+              Assign to SEP
             </Button>
           </Form>
         )}

@@ -211,4 +211,96 @@ context('Scientific evaluation panel tests', () => {
         expect(element.text()).to.be.equal('No records to display');
       });
   });
+
+  it('Officer should be able to assign proposal to existing SEP', () => {
+    const title = faker.random.words(3);
+    const abstract = faker.random.words(8);
+    cy.login('user');
+    cy.contains('User').click();
+    cy.contains('New Proposal').click();
+    cy.get('#title').type(title);
+    cy.get('#abstract').type(abstract);
+    cy.contains('Save and continue').click();
+    cy.wait(500);
+    cy.contains('Submit').click();
+    cy.contains('OK').click();
+    cy.contains('Logout').click();
+
+    cy.login('officer');
+    cy.contains('User Officer').click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get("[title='Assign proposals to SEP']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedSEPId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedSEPId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to SEP').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="sep-assignments-table"]')
+      .find('tbody td')
+      .should('have.length', 6);
+
+    cy.get('[data-cy="sep-assignments-table"]')
+      .find('tbody td')
+      .last()
+      .then(element => {
+        expect(element.text()).length.to.be.greaterThan(0);
+      });
+  });
+
+  it('Officer should be able to remove assigned proposal from existing SEP', () => {
+    cy.login('officer');
+    cy.contains('User Officer').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Delete"]').click();
+    cy.get('[title="Save"]').click();
+
+    cy.wait(1000);
+
+    cy.contains('Logs').click();
+
+    cy.wait(1000);
+
+    cy.contains('Assignments').click();
+
+    cy.get('[data-cy="sep-assignments-table"]')
+      .find('tbody td')
+      .should('have.length', 1);
+
+    cy.get('[data-cy="sep-assignments-table"]')
+      .find('tbody td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('No records to display');
+      });
+  });
 });
