@@ -14,6 +14,9 @@ import { SEP } from '../types/SEP';
 
 @ArgsType()
 export class SEPsArgs {
+  @Field(() => Boolean, { nullable: true })
+  active?: boolean;
+
   @Field(() => String, { nullable: true })
   filter?: string;
 
@@ -37,9 +40,15 @@ class SEPsQueryResult {
 export class SEPsQuery {
   @Query(() => SEPsQueryResult, { nullable: true })
   async seps(
-    @Args() { filter, first, offset }: SEPsArgs,
+    @Args() { active, filter, first, offset }: SEPsArgs,
     @Ctx() context: ResolverContext
   ): Promise<SEPsQueryResult | null> {
-    return context.queries.sep.getAll(context.user, filter, first, offset);
+    return context.queries.sep.getAll(
+      context.user,
+      active,
+      filter,
+      first,
+      offset
+    );
   }
 }

@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { SEPResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
+import { AddSEPMembersRoleArgs } from './AddSEPMembersRoleMutation';
 
 @ArgsType()
 export class UpdateMemberSEPArgs {
@@ -34,11 +35,11 @@ export class AssignSEPChairAndSecretaryArgs {
 export class AssignMembersToSEPMutation {
   @Mutation(() => SEPResponseWrap)
   async assignChairAndSecretary(
-    @Args() args: AssignSEPChairAndSecretaryArgs,
+    @Args() args: AddSEPMembersRoleArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignChairAndSecretary(context.user, args),
+      context.mutations.sep.assignChairAndSecretaryToSEP(context.user, args),
       SEPResponseWrap
     );
   }
@@ -48,7 +49,7 @@ export class AssignMembersToSEPMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignMember(context.user, args),
+      context.mutations.sep.assignMemberToSEP(context.user, args),
       SEPResponseWrap
     );
   }
@@ -59,7 +60,7 @@ export class AssignMembersToSEPMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.removeMember(context.user, args),
+      context.mutations.sep.removeMemberFromSEP(context.user, args),
       SEPResponseWrap
     );
   }

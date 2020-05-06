@@ -86,6 +86,16 @@ interface SEPMembersAssignedEvent extends GeneralEvent {
   sep: SEP;
 }
 
+interface SEPProposalAssignedEvent extends GeneralEvent {
+  type: Event.SEP_PROPOSAL_ASSIGNED;
+  sep: SEP;
+}
+
+interface SEPProposalRemovedEvent extends GeneralEvent {
+  type: Event.SEP_PROPOSAL_REMOVED;
+  sep: SEP;
+}
+
 interface SEPMemberRemovedEvent extends GeneralEvent {
   type: Event.SEP_MEMBER_REMOVED;
   sep: SEP;
@@ -104,5 +114,7 @@ export type ApplicationEvent =
   | SEPCreatedEvent
   | SEPUpdatedEvent
   | SEPMembersAssignedEvent
+  | SEPProposalAssignedEvent
+  | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | UserDeletedEvent;

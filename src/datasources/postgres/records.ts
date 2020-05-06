@@ -205,6 +205,13 @@ export interface SEPAssignmentRecord {
   readonly email_sent: boolean;
 }
 
+export interface SEPMemberRecord {
+  readonly role_user_id: number;
+  readonly role_id: number;
+  readonly user_id: number;
+  readonly sep_id: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

@@ -73,7 +73,7 @@ const templateMutations = new TemplateMutations(
 const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 
 const sepQueries = new SEPQueries(sepDataSource);
-const sepMutations = new SEPMutations(sepDataSource);
+const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
 const context: BasicResolverContext = {
   userAuthorization,
