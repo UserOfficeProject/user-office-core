@@ -7,6 +7,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router';
 
+import { Review, ReviewStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
@@ -25,6 +26,42 @@ const ProposalTableOfficer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
+  const average = (numbers: number[]) => {
+    const sum = numbers.reduce(function(sum, value) {
+      return sum + value;
+    }, 0);
+
+    const avg = sum / numbers.length;
+
+    return avg;
+  };
+
+  const standardDeviation = (numbers: number[]) => {
+    if (numbers.length < 2) {
+      return NaN;
+    }
+    const avg = average(numbers);
+
+    const squareDiffs = numbers?.map(function(value) {
+      const diff = value - avg;
+      const sqrDiff = diff * diff;
+
+      return sqrDiff;
+    });
+
+    const avgSquareDiff = average(squareDiffs);
+
+    const stdDev = Math.sqrt(avgSquareDiff);
+
+    return stdDev;
+  };
+
+  const getGrades = (reviews: Review[] | null | undefined) =>
+    reviews
+      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
+      .map(review => review.grade!) ?? [];
+
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
@@ -37,6 +74,24 @@ const ProposalTableOfficer: React.FC = () => {
           : '',
     },
     { title: 'Status', field: 'status' },
+    {
+      title: 'Deviation',
+      field: 'deviation',
+      render: (rowData: ProposalData): number =>
+        standardDeviation(getGrades(rowData.reviews)),
+      customSort: (a: ProposalData, b: ProposalData) =>
+        (standardDeviation(getGrades(a.reviews)) || 0) -
+        (standardDeviation(getGrades(b.reviews)) || 0),
+    },
+    {
+      title: 'Average Score',
+      field: 'average',
+      render: (rowData: ProposalData): number =>
+        average(getGrades(rowData.reviews)),
+      customSort: (a: ProposalData, b: ProposalData) =>
+        (average(getGrades(a.reviews)) || 0) -
+        (average(getGrades(b.reviews)) || 0),
+    },
   ];
 
   const [editProposalID, setEditProposalID] = useState(0);
@@ -119,6 +174,7 @@ const ProposalTableOfficer: React.FC = () => {
           search: true,
           selection: true,
           debounceInterval: 400,
+          columnsButton: true,
         }}
         actions={[
           {

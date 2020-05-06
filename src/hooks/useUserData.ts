@@ -5,7 +5,7 @@ import { useDataApi } from './useDataApi';
 
 export function useUserWithReviewsData(id: number) {
   const api = useDataApi();
-  const [userData, setUserData] = useState<UserWithReviewsQuery['user'] | null>(
+  const [userData, setUserData] = useState<UserWithReviewsQuery['me'] | null>(
     null
   );
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export function useUserWithReviewsData(id: number) {
         id,
       })
       .then(data => {
-        setUserData(data.user);
+        setUserData(data.me);
         setLoading(false);
       });
   }, [id, api]);
