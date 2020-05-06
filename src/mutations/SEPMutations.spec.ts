@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   SEPDataSourceMock,
   dummySEP,
@@ -8,13 +9,22 @@ import {
 import {
   dummyUser,
   dummyUserOfficer,
+  UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { UserRole } from '../models/User';
 import { Rejection } from '../rejection';
+import { UserAuthorization } from '../utils/UserAuthorization';
 import SEPMutations from './SEPMutations';
 
+const userAuthorization = new UserAuthorization(
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
+);
 const dummySEPDataSource = new SEPDataSourceMock();
-const SEPMutationsInstance = new SEPMutations(dummySEPDataSource);
+const SEPMutationsInstance = new SEPMutations(
+  dummySEPDataSource,
+  userAuthorization
+);
 
 describe('Test SEPMutations', () => {
   test('A user cannot create SEP', async () => {
