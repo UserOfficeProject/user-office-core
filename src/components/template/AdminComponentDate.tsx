@@ -1,14 +1,12 @@
-import { Formik, Form, Field } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-
+import { DateConfig } from '../../generated/sdk';
 import { EventType } from '../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
-import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
-import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
-import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
+import { DateConfigFragment } from './formFragments/DateConfigFragment';
 import { AdminComponentSignature } from './QuestionRelEditor';
 
 export const AdminComponentDate: AdminComponentSignature = props => {
@@ -55,38 +53,9 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            <Field
-              name="question.config.tooltip"
-              label="Tooltip"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="tooltip"
+            <DateConfigFragment
+              config={formikProps.values.question.config as DateConfig}
             />
-            <TitledContainer label="Constraints">
-              <Field
-                name="question.config.required"
-                label="Is required"
-                checked={formikProps.values.question.config.required}
-                component={FormikUICustomCheckbox}
-                margin="normal"
-                fullWidth
-                data-cy="required"
-              />
-            </TitledContainer>
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                label="User must check it to continue"
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

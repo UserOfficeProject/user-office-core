@@ -1,15 +1,15 @@
-import { Formik, Form, Field } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-
 import { EventType } from '../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
-import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
-import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
 import { AdminComponentSignature } from './QuestionRelEditor';
+import TitledContainer from '../common/TitledContainer';
+import { BooleanConfigFragment } from './formFragments/BooleanConfigFragment';
+import { BooleanConfig } from '../../generated/sdk';
 
 export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
@@ -59,17 +59,9 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
 
-            <TitledContainer label="Constraints">
-              <Field
-                name="question.config.required"
-                checked={formikProps.values.question.config.required}
-                component={FormikUICustomCheckbox}
-                label="User must check it to continue"
-                margin="normal"
-                fullWidth
-                data-cy="required"
-              />
-            </TitledContainer>
+            <BooleanConfigFragment
+              config={formikProps.values.question.config as BooleanConfig}
+            />
             <TitledContainer label="Dependencies">
               <Field
                 name="dependency"

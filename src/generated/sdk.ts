@@ -1000,6 +1000,7 @@ export type TextInputConfig = {
   multiline: Scalars['Boolean'],
   placeholder: Scalars['String'],
   htmlQuestion?: Maybe<Scalars['String']>,
+  isHtmlQuestion: Scalars['Boolean'],
 };
 
 export type TokenResponseWrap = {
@@ -1441,7 +1442,7 @@ type FieldConfigSelectionFromOptionsConfigFragment = (
 
 type FieldConfigTextInputConfigFragment = (
   { __typename?: 'TextInputConfig' }
-  & Pick<TextInputConfig, 'min' | 'max' | 'multiline' | 'placeholder' | 'small_label' | 'required' | 'tooltip' | 'htmlQuestion'>
+  & Pick<TextInputConfig, 'min' | 'max' | 'multiline' | 'placeholder' | 'small_label' | 'required' | 'tooltip' | 'htmlQuestion' | 'isHtmlQuestion'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment;
@@ -2473,6 +2474,7 @@ export const FieldConfigFragmentDoc = gql`
     required
     tooltip
     htmlQuestion
+    isHtmlQuestion
   }
 }
     `;

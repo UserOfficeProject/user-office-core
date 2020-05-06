@@ -40,7 +40,7 @@ class QuestionItemAdapter implements IQuestionaryEditorTopicData {
     return null;
   }
   get config() {
-    return undefined;
+    return this.source.config;
   }
 }
 

@@ -41,8 +41,12 @@ context('Proposal tests', () => {
       .clear()
       .type(`${topic}{enter}`);
 
-    /* Select from options */
     cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    /* Select from options */
+    cy.get('#questionPicker [data-cy=show-more-button]').click();
 
     cy.contains('Add Boolean').click();
 

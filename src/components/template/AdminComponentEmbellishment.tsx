@@ -1,15 +1,12 @@
-import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-
 import { EmbellishmentConfig } from '../../generated/sdk';
 import { EventType } from '../../models/QuestionaryEditorModel';
-import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
-import FormikUICustomEditor from '../common/FormikUICustomEditor';
 import TitledContainer from '../common/TitledContainer';
 import { AdminComponentShell } from './AdminComponentShell';
+import { EmbellishmentConfigFragment } from './formFragments/EmbellishmentConfigFragment';
 import { AdminComponentSignature } from './QuestionRelEditor';
 
 export const AdminComponentEmbellishment: AdminComponentSignature = props => {
@@ -39,43 +36,8 @@ export const AdminComponentEmbellishment: AdminComponentSignature = props => {
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Embellishment">
-            <Field
-              name="question.config.html"
-              type="text"
-              component={FormikUICustomEditor}
-              margin="normal"
-              fullWidth
-              init={{
-                skin: false,
-                content_css: false,
-                plugins: ['link', 'preview', 'image', 'code'],
-                toolbar: 'bold italic',
-                branding: false,
-              }}
-              data-cy="html"
-            />
-
-            <Field
-              name="question.config.plain"
-              label="Plain description"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="plain"
-            />
-
-            <Field
-              name="question.config.omitFromPdf"
-              checked={
-                (formikProps.values.question.config as EmbellishmentConfig)
-                  .omitFromPdf
-              }
-              component={FormikUICustomCheckbox}
-              label="Omit from PDF"
-              margin="normal"
-              fullWidth
-              data-cy="omit"
+            <EmbellishmentConfigFragment
+              config={formikProps.values.question.config as EmbellishmentConfig}
             />
 
             <TitledContainer label="Dependencies">
