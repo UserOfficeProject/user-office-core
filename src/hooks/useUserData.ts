@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { UserWithReviewsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useUserWithReviewsData(id: number) {
+export function useUserWithReviewsData() {
   const api = useDataApi();
   const [userData, setUserData] = useState<UserWithReviewsQuery['me'] | null>(
     null
@@ -12,14 +12,12 @@ export function useUserWithReviewsData(id: number) {
   useEffect(() => {
     setLoading(true);
     api()
-      .userWithReviews({
-        id,
-      })
+      .userWithReviews()
       .then(data => {
         setUserData(data.me);
         setLoading(false);
       });
-  }, [id, api]);
+  }, [api]);
 
   return { loading, userData };
 }
