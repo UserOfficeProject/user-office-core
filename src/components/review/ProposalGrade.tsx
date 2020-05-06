@@ -45,8 +45,8 @@ export default function ProposalGrade(props: {
   return (
     <Formik
       initialValues={{
-        grade: review.grade,
-        comment: review.comment,
+        grade: review.grade || '',
+        comment: review.comment || '',
         saveOnly: true,
       }}
       onSubmit={async (values, actions) => {
@@ -54,7 +54,7 @@ export default function ProposalGrade(props: {
           .updateReview({
             reviewID: props.reviewID,
             //This should be taken care of in validationSchema
-            grade: values.grade ? values.grade : 0,
+            grade: +values.grade,
             comment: values.comment ? values.comment : '',
             status: values.saveOnly
               ? ReviewStatus.DRAFT
@@ -103,7 +103,6 @@ export default function ProposalGrade(props: {
               id: 'grade-proposal',
             }}
             component={Select}
-            margin="normal"
             disabled={review.status === 'SUBMITTED'}
           >
             {[...Array(10)].map((e, i) => (
