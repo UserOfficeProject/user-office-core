@@ -2,14 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig } from '../../generated/sdk';
-import { EventType } from '../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import { EventType } from '../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
 import { AdminComponentShell } from './AdminComponentShell';
-import { DateConfigFragment } from './formFragments/DateConfigFragment';
-import { AdminComponentSignature } from './QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
+import TitledContainer from '../../common/TitledContainer';
+import { BooleanConfigFragment } from '../formFragments/BooleanConfigFragment';
+import { BooleanConfig } from '../../../generated/sdk';
 
-export const AdminComponentDate: AdminComponentSignature = props => {
+export const AdminComponentBoolean: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -29,12 +31,15 @@ export const AdminComponentDate: AdminComponentSignature = props => {
         question: Yup.object({
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
+          config: Yup.object({
+            required: Yup.bool(),
+          }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Date">
+          <AdminComponentShell {...props} label="Checkbox">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -53,9 +58,22 @@ export const AdminComponentDate: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            <DateConfigFragment
-              config={formikProps.values.question.config as DateConfig}
+
+            <BooleanConfigFragment
+              config={formikProps.values.question.config as BooleanConfig}
             />
+            <TitledContainer label="Dependencies">
+              <Field
+                name="dependency"
+                component={FormikUICustomDependencySelector}
+                templateField={props.field}
+                template={props.template}
+                label="User must check it to continue"
+                margin="normal"
+                fullWidth
+                data-cy="dependencies"
+              />
+            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}
