@@ -1,15 +1,13 @@
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 import { EmbellishmentConfig } from '../../../generated/sdk';
 import { EventType } from '../../../models/QuestionaryEditorModel';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './FormShell';
 import { EmbellishmentConfigFragment } from '../formFragments/EmbellishmentConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
+import { AdminComponentShell } from './FormShell';
 
-export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
+export const QuestionEmbellismentForm: AdminComponentSignature = props => {
   const field = props.field;
 
   return (
@@ -39,18 +37,6 @@ export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
             <EmbellishmentConfigFragment
               config={formikProps.values.question.config as EmbellishmentConfig}
             />
-
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

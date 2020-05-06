@@ -68,7 +68,6 @@ export const QuestionRelBooleanForm: AdminComponentSignature = props => {
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}
-                label="User must check it to continue"
                 margin="normal"
                 fullWidth
                 data-cy="dependencies"

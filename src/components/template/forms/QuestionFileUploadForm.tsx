@@ -11,7 +11,7 @@ import { AdminComponentShell } from './FormShell';
 import { FileUploadConfigFragment } from '../formFragments/FileUploadConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
-export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
+export const QuestionFileUploadForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -64,18 +64,6 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
             <FileUploadConfigFragment
               config={formikProps.values.question.config as FileUploadConfig}
             />
-
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

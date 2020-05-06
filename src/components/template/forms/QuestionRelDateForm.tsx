@@ -8,6 +8,8 @@ import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
 import { AdminComponentShell } from './FormShell';
 import { DateConfigFragment } from '../formFragments/DateConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
+import TitledContainer from '../../common/TitledContainer';
+import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
 
 export const QuestionRelDateForm: AdminComponentSignature = props => {
   const field = props.field;
@@ -56,6 +58,17 @@ export const QuestionRelDateForm: AdminComponentSignature = props => {
             <DateConfigFragment
               config={formikProps.values.question.config as DateConfig}
             />
+            <TitledContainer label="Dependencies">
+              <Field
+                name="dependency"
+                component={FormikUICustomDependencySelector}
+                templateField={props.field}
+                template={props.template}
+                margin="normal"
+                fullWidth
+                data-cy="dependencies"
+              />
+            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

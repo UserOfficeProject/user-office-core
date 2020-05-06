@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { FileUploadConfig } from '../../../generated/sdk';
+import { TextInputConfig } from '../../../generated/sdk';
 import { EventType } from '../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
 import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './FormShell';
-import { FileUploadConfigFragment } from '../formFragments/FileUploadConfigFragment';
+import { TextInputConfigFragment } from '../formFragments/TextInputConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
+import { AdminComponentShell } from './FormShell';
 
-export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
+export const QuestionTextInputForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -22,7 +22,17 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals },
+            field: {
+              ...field,
+              ...vals,
+              config: {
+                ...vals.question.config,
+                htmlQuestion: (vals.question.config as TextInputConfig)
+                  .isHtmlQuestion
+                  ? (vals.question.config as TextInputConfig).htmlQuestion
+                  : null,
+              },
+            },
           },
         });
         props.closeMe();
@@ -32,16 +42,19 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
           config: Yup.object({
-            file_type: Yup.array(),
-            small_label: Yup.string(),
-            max_files: Yup.number(),
+            min: Yup.number().nullable(),
+            max: Yup.number().nullable(),
+            required: Yup.boolean(),
+            placeholder: Yup.string(),
+            multiline: Yup.boolean(),
+            isHtmlQuestion: Yup.boolean(),
           }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="File upload">
+          <AdminComponentShell {...props} label="Text input">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -51,6 +64,7 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'natural_key' }}
             />
+
             <Field
               name="question.question"
               label="Question"
@@ -60,22 +74,9 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-
-            <FileUploadConfigFragment
-              config={formikProps.values.question.config as FileUploadConfig}
+            <TextInputConfigFragment
+              config={formikProps.values.question.config as TextInputConfig}
             />
-
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}
