@@ -6,12 +6,12 @@ import { DataType } from '../../generated/sdk';
 import { QuestionRel, ProposalTemplate } from '../../generated/sdk';
 import { Event } from '../../models/QuestionaryEditorModel';
 import JSDict from '../../utils/Dictionary';
-import { AdminComponentBoolean } from './AdminComponentBoolean';
-import { AdminComponentDate } from './AdminComponentDate';
-import { AdminComponentEmbellishment } from './AdminComponentEmbellishment';
-import { AdminComponentFileUpload } from './AdminComponentFileUpload';
-import { AdminComponentMultipleChoice } from './AdminComponentMultipleChoice';
-import { AdminComponentTextInput } from './AdminComponentTextInput';
+import { QuestionRelBooleanForm } from './forms/QuestionRelBooleanForm';
+import { QuestionRelDateForm } from './forms/QuestionRelDateForm';
+import { QuestionRelEmbellismentForm } from './forms/QuestionRelEmbellismentForm';
+import { QuestionRelFileUploadForm } from './forms/QuestionRelFileUploadForm';
+import { QuestionRelMultipleChoiceForm } from './forms/QuestionRelMultipleChoiceForm';
+import { QuestionRelTextInputForm } from './forms/QuestionRelTextInputForm';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;
@@ -35,15 +35,15 @@ export default function QuestionRelEditor(props: {
   }))();
 
   const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
-  componentMap.put(DataType.BOOLEAN, AdminComponentBoolean);
-  componentMap.put(DataType.EMBELLISHMENT, AdminComponentEmbellishment);
-  componentMap.put(DataType.DATE, AdminComponentDate);
-  componentMap.put(DataType.FILE_UPLOAD, AdminComponentFileUpload);
+  componentMap.put(DataType.BOOLEAN, QuestionRelBooleanForm);
+  componentMap.put(DataType.EMBELLISHMENT, QuestionRelEmbellismentForm);
+  componentMap.put(DataType.DATE, QuestionRelDateForm);
+  componentMap.put(DataType.FILE_UPLOAD, QuestionRelFileUploadForm);
   componentMap.put(
     DataType.SELECTION_FROM_OPTIONS,
-    AdminComponentMultipleChoice
+    QuestionRelMultipleChoiceForm
   );
-  componentMap.put(DataType.TEXT_INPUT, AdminComponentTextInput);
+  componentMap.put(DataType.TEXT_INPUT, QuestionRelTextInputForm);
 
   if (props.field === null) {
     return null;

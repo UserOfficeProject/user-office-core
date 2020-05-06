@@ -2,16 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { FileUploadConfig } from '../../../generated/sdk';
+import { DateConfig } from '../../../generated/sdk';
 import { EventType } from '../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './AdminComponentShell';
-import { FileUploadConfigFragment } from '../formFragments/FileUploadConfigFragment';
+import { AdminComponentShell } from './FormShell';
+import { DateConfigFragment } from '../formFragments/DateConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
-export const AdminComponentFileUpload: AdminComponentSignature = props => {
+export const QuestionRelDateForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -31,17 +29,12 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
         question: Yup.object({
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
-          config: Yup.object({
-            file_type: Yup.array(),
-            small_label: Yup.string(),
-            max_files: Yup.number(),
-          }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="File upload">
+          <AdminComponentShell {...props} label="Date">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -60,23 +53,9 @@ export const AdminComponentFileUpload: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-
-            <FileUploadConfigFragment
-              config={formikProps.values.question.config as FileUploadConfig}
+            <DateConfigFragment
+              config={formikProps.values.question.config as DateConfig}
             />
-
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                label="User must check it to continue"
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

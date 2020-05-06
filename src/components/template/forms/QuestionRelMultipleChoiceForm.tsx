@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
+import { SelectionFromOptionsConfig } from '../../../generated/sdk';
 import { EventType } from '../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
 import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import { AdminComponentShell } from './AdminComponentShell';
-import { AdminComponentSignature } from '../QuestionRelEditor';
 import TitledContainer from '../../common/TitledContainer';
-import { BooleanConfigFragment } from '../formFragments/BooleanConfigFragment';
-import { BooleanConfig } from '../../../generated/sdk';
+import { AdminComponentShell } from './FormShell';
+import { MultipleChoiceConfigFragment } from '../formFragments/MultipleChoiceConfigFragment';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 
-export const AdminComponentBoolean: AdminComponentSignature = props => {
+export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -33,13 +33,14 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
           question: Yup.string().required('Question is required'),
           config: Yup.object({
             required: Yup.bool(),
+            variant: Yup.string().required('Variant is required'),
           }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Checkbox">
+          <AdminComponentShell {...props} label="Multiple choice">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -59,8 +60,10 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
 
-            <BooleanConfigFragment
-              config={formikProps.values.question.config as BooleanConfig}
+            <MultipleChoiceConfigFragment
+              config={
+                formikProps.values.question.config as SelectionFromOptionsConfig
+              }
             />
             <TitledContainer label="Dependencies">
               <Field
@@ -71,7 +74,7 @@ export const AdminComponentBoolean: AdminComponentSignature = props => {
                 label="User must check it to continue"
                 margin="normal"
                 fullWidth
-                data-cy="dependencies"
+                inputProps={{ 'data-cy': 'dependencies' }}
               />
             </TitledContainer>
           </AdminComponentShell>

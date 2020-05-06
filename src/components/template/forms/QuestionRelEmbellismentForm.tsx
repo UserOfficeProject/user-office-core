@@ -5,11 +5,11 @@ import { EmbellishmentConfig } from '../../../generated/sdk';
 import { EventType } from '../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentShell } from './FormShell';
 import { EmbellishmentConfigFragment } from '../formFragments/EmbellishmentConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
-export const AdminComponentEmbellishment: AdminComponentSignature = props => {
+export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
   const field = props.field;
 
   return (
