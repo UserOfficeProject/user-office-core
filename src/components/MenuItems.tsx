@@ -16,8 +16,13 @@ import { Link } from 'react-router-dom';
 
 import { useCallsData } from '../hooks/useCallsData';
 
-export default function MenuItems({ role }) {
-  const { loading, callsData } = useCallsData();
+type MenuItemsProps = {
+  /** Logged in user role. */
+  role: string;
+};
+
+const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
+  const { loading, callsData } = useCallsData(false, {});
 
   let proposalDisabled = false;
 
@@ -66,7 +71,7 @@ export default function MenuItems({ role }) {
     </div>
   );
 
-  const user_officer = (
+  const userOfficer = (
     <div data-cy="officer-menu-items">
       <ListItem component={Link} to="/ProposalPage" button>
         <ListItemIcon>
@@ -133,10 +138,12 @@ export default function MenuItems({ role }) {
     case 'user':
       return user;
     case 'user_officer':
-      return user_officer;
+      return userOfficer;
     case 'reviewer':
       return reviewer;
     default:
       return null;
   }
-}
+};
+
+export default MenuItems;
