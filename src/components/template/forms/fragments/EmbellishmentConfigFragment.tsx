@@ -1,9 +1,9 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { Fragment } from 'react';
-import FormikUICustomCheckbox from '../../common/FormikUICustomCheckbox';
-import { EmbellishmentConfig } from '../../../generated/sdk';
-import FormikUICustomEditor from '../../common/FormikUICustomEditor';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import { EmbellishmentConfig } from '../../../../generated/sdk';
+import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 
 export const EmbellishmentConfigFragment = (props: {
   config: EmbellishmentConfig;

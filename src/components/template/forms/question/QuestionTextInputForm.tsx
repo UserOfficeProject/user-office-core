@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import { AdminComponentShell } from './FormShell';
-import { AdminComponentSignature } from '../QuestionRelEditor';
-import TitledContainer from '../../common/TitledContainer';
-import { BooleanConfigFragment } from '../formFragments/BooleanConfigFragment';
-import { BooleanConfig } from '../../../generated/sdk';
+import { TextInputConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
+import TitledContainer from '../../../common/TitledContainer';
+import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import { AdminComponentShell } from '../FormShell';
 
-export const QuestionBooleanForm: AdminComponentSignature = props => {
+export const QuestionTextInputForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -22,7 +22,17 @@ export const QuestionBooleanForm: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals },
+            field: {
+              ...field,
+              ...vals,
+              config: {
+                ...vals.question.config,
+                htmlQuestion: (vals.question.config as TextInputConfig)
+                  .isHtmlQuestion
+                  ? (vals.question.config as TextInputConfig).htmlQuestion
+                  : null,
+              },
+            },
           },
         });
         props.closeMe();
@@ -32,14 +42,19 @@ export const QuestionBooleanForm: AdminComponentSignature = props => {
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
           config: Yup.object({
-            required: Yup.bool(),
+            min: Yup.number().nullable(),
+            max: Yup.number().nullable(),
+            required: Yup.boolean(),
+            placeholder: Yup.string(),
+            multiline: Yup.boolean(),
+            isHtmlQuestion: Yup.boolean(),
           }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Checkbox">
+          <AdminComponentShell {...props} label="Text input">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -49,6 +64,7 @@ export const QuestionBooleanForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'natural_key' }}
             />
+
             <Field
               name="question.question"
               label="Question"
@@ -58,9 +74,8 @@ export const QuestionBooleanForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-
-            <BooleanConfigFragment
-              config={formikProps.values.question.config as BooleanConfig}
+            <TextInputConfigFragment
+              config={formikProps.values.question.config as TextInputConfig}
             />
           </AdminComponentShell>
         </Form>

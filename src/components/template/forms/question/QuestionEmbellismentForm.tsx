@@ -1,11 +1,11 @@
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { EmbellishmentConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { EmbellishmentConfigFragment } from '../formFragments/EmbellishmentConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
-import { AdminComponentShell } from './FormShell';
+import { EmbellishmentConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import { AdminComponentShell } from '../FormShell';
 
 export const QuestionEmbellismentForm: AdminComponentSignature = props => {
   const field = props.field;

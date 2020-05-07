@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { FileUploadConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './FormShell';
-import { FileUploadConfigFragment } from '../formFragments/FileUploadConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
+import { AdminComponentShell } from '../FormShell';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import TitledContainer from '../../../common/TitledContainer';
+import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
+import { BooleanConfig } from '../../../../generated/sdk';
 
-export const QuestionFileUploadForm: AdminComponentSignature = props => {
+export const QuestionBooleanForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -32,16 +32,14 @@ export const QuestionFileUploadForm: AdminComponentSignature = props => {
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
           config: Yup.object({
-            file_type: Yup.array(),
-            small_label: Yup.string(),
-            max_files: Yup.number(),
+            required: Yup.bool(),
           }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="File upload">
+          <AdminComponentShell {...props} label="Checkbox">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -61,8 +59,8 @@ export const QuestionFileUploadForm: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
 
-            <FileUploadConfigFragment
-              config={formikProps.values.question.config as FileUploadConfig}
+            <BooleanConfigFragment
+              config={formikProps.values.question.config as BooleanConfig}
             />
           </AdminComponentShell>
         </Form>

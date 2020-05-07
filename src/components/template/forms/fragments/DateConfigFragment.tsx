@@ -1,9 +1,9 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { Fragment } from 'react';
-import FormikUICustomCheckbox from '../../common/FormikUICustomCheckbox';
-import TitledContainer from '../../common/TitledContainer';
-import { DateConfig } from '../../../generated/sdk';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import TitledContainer from '../../../common/TitledContainer';
+import { DateConfig } from '../../../../generated/sdk';
 
 export const DateConfigFragment = (props: { config: DateConfig }) => {
   return (

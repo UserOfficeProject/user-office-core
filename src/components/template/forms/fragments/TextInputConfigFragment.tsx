@@ -2,10 +2,10 @@ import { Collapse } from '@material-ui/core';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { Fragment, useState } from 'react';
-import { TextInputConfig } from '../../../generated/sdk';
-import FormikUICustomCheckbox from '../../common/FormikUICustomCheckbox';
-import FormikUICustomEditor from '../../common/FormikUICustomEditor';
-import TitledContainer from '../../common/TitledContainer';
+import { TextInputConfig } from '../../../../generated/sdk';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
+import TitledContainer from '../../../common/TitledContainer';
 
 export const TextInputConfigFragment = (props: { config: TextInputConfig }) => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(

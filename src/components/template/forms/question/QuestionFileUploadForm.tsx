@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { SelectionFromOptionsConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../common/TitledContainer';
-import { AdminComponentShell } from './FormShell';
-import { MultipleChoiceConfigFragment } from '../formFragments/MultipleChoiceConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { FileUploadConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
+import TitledContainer from '../../../common/TitledContainer';
+import { AdminComponentShell } from '../FormShell';
+import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
 
-export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
+export const QuestionFileUploadForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -32,15 +32,16 @@ export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
           config: Yup.object({
-            required: Yup.bool(),
-            variant: Yup.string().required('Variant is required'),
+            file_type: Yup.array(),
+            small_label: Yup.string(),
+            max_files: Yup.number(),
           }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Multiple choice">
+          <AdminComponentShell {...props} label="File upload">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -60,22 +61,9 @@ export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
 
-            <MultipleChoiceConfigFragment
-              config={
-                formikProps.values.question.config as SelectionFromOptionsConfig
-              }
+            <FileUploadConfigFragment
+              config={formikProps.values.question.config as FileUploadConfig}
             />
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                margin="normal"
-                fullWidth
-                inputProps={{ 'data-cy': 'dependencies' }}
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

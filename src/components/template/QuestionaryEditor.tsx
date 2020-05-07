@@ -21,7 +21,7 @@ import QuestionaryEditorModel, {
 import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
-import QuestionRelEditor from './QuestionRelEditor';
+import QuestionRelEditor from './forms/questionRel/QuestionRelEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();

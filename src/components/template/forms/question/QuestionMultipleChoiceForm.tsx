@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from './FormShell';
-import { DateConfigFragment } from '../formFragments/DateConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
-import TitledContainer from '../../common/TitledContainer';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
+import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
+import TitledContainer from '../../../common/TitledContainer';
+import { AdminComponentShell } from '../FormShell';
+import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
 
-export const QuestionRelDateForm: AdminComponentSignature = props => {
+export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -31,12 +31,16 @@ export const QuestionRelDateForm: AdminComponentSignature = props => {
         question: Yup.object({
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
+          config: Yup.object({
+            required: Yup.bool(),
+            variant: Yup.string().required('Variant is required'),
+          }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Date">
+          <AdminComponentShell {...props} label="Multiple choice">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -55,20 +59,12 @@ export const QuestionRelDateForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            <DateConfigFragment
-              config={formikProps.values.question.config as DateConfig}
+
+            <MultipleChoiceConfigFragment
+              config={
+                formikProps.values.question.config as SelectionFromOptionsConfig
+              }
             />
-            <TitledContainer label="Dependencies">
-              <Field
-                name="dependency"
-                component={FormikUICustomDependencySelector}
-                templateField={props.field}
-                template={props.template}
-                margin="normal"
-                fullWidth
-                data-cy="dependencies"
-              />
-            </TitledContainer>
           </AdminComponentShell>
         </Form>
       )}

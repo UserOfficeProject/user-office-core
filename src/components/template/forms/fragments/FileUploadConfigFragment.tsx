@@ -1,9 +1,9 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { Fragment } from 'react';
-import { FileUploadConfig } from '../../../generated/sdk';
-import FormikUICustomSelect from '../../common/FormikUICustomSelect';
-import TitledContainer from '../../common/TitledContainer';
+import { FileUploadConfig } from '../../../../generated/sdk';
+import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
+import TitledContainer from '../../../common/TitledContainer';
 
 export const FileUploadConfigFragment = (props: {
   config: FileUploadConfig;

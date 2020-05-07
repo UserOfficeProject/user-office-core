@@ -2,12 +2,12 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from './FormShell';
-import { DateConfigFragment } from '../formFragments/DateConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { DateConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import { AdminComponentShell } from '../FormShell';
+import { DateConfigFragment } from '../fragments/DateConfigFragment';
+import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
 
 export const QuestionDateForm: AdminComponentSignature = props => {
   const field = props.field;

@@ -1,8 +1,8 @@
 import { Field } from 'formik';
 import React from 'react';
-import { BooleanConfig } from '../../../generated/sdk';
-import FormikUICustomCheckbox from '../../common/FormikUICustomCheckbox';
-import TitledContainer from '../../common/TitledContainer';
+import { BooleanConfig } from '../../../../generated/sdk';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import TitledContainer from '../../../common/TitledContainer';
 
 export const BooleanConfigFragment = (props: { config: BooleanConfig }) => {
   return (

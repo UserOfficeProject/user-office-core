@@ -2,16 +2,16 @@ import { Grid, Modal, Backdrop, Fade } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import React, { FunctionComponent } from 'react';
 
-import { DataType } from '../../generated/sdk';
-import { QuestionRel, ProposalTemplate } from '../../generated/sdk';
-import { Event } from '../../models/QuestionaryEditorModel';
-import JSDict from '../../utils/Dictionary';
-import { QuestionRelBooleanForm } from './forms/QuestionRelBooleanForm';
-import { QuestionRelDateForm } from './forms/QuestionRelDateForm';
-import { QuestionRelEmbellismentForm } from './forms/QuestionRelEmbellismentForm';
-import { QuestionRelFileUploadForm } from './forms/QuestionRelFileUploadForm';
-import { QuestionRelMultipleChoiceForm } from './forms/QuestionRelMultipleChoiceForm';
-import { QuestionRelTextInputForm } from './forms/QuestionRelTextInputForm';
+import { DataType } from '../../../../generated/sdk';
+import { QuestionRel, ProposalTemplate } from '../../../../generated/sdk';
+import { Event } from '../../../../models/QuestionaryEditorModel';
+import JSDict from '../../../../utils/Dictionary';
+import { QuestionRelBooleanForm } from './QuestionRelBooleanForm';
+import { QuestionRelDateForm } from './QuestionRelDateForm';
+import { QuestionRelEmbellismentForm } from './QuestionRelEmbellismentForm';
+import { QuestionRelFileUploadForm } from './QuestionRelFileUploadForm';
+import { QuestionRelMultipleChoiceForm } from './QuestionRelMultipleChoiceForm';
+import { QuestionRelTextInputForm } from './QuestionRelTextInputForm';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;

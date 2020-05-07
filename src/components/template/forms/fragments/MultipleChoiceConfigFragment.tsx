@@ -1,10 +1,10 @@
 import { Field } from 'formik';
 import React, { Fragment } from 'react';
-import FormikDropdown from '../../common/FormikDropdown';
-import FormikUICustomCheckbox from '../../common/FormikUICustomCheckbox';
-import FormikUICustomTable from '../../common/FormikUICustomTable';
-import TitledContainer from '../../common/TitledContainer';
-import { SelectionFromOptionsConfig } from '../../../generated/sdk';
+import FormikDropdown from '../../../common/FormikDropdown';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import FormikUICustomTable from '../../../common/FormikUICustomTable';
+import TitledContainer from '../../../common/TitledContainer';
+import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
 
 export const MultipleChoiceConfigFragment = (props: {
   config: SelectionFromOptionsConfig;

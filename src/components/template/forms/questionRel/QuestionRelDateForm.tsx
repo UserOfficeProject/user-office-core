@@ -2,16 +2,16 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { TextInputConfig } from '../../../generated/sdk';
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import { useNaturalKeySchema } from '../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../common/TitledContainer';
-import { TextInputConfigFragment } from '../formFragments/TextInputConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
-import { AdminComponentShell } from './FormShell';
+import { DateConfig } from '../../../../generated/sdk';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
+import { AdminComponentShell } from '../FormShell';
+import { DateConfigFragment } from '../fragments/DateConfigFragment';
+import { AdminComponentSignature } from './QuestionRelEditor';
+import TitledContainer from '../../../common/TitledContainer';
+import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 
-export const QuestionRelTextInputForm: AdminComponentSignature = props => {
+export const QuestionRelDateForm: AdminComponentSignature = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
 
@@ -22,17 +22,7 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: {
-              ...field,
-              ...vals,
-              config: {
-                ...vals.question.config,
-                htmlQuestion: (vals.question.config as TextInputConfig)
-                  .isHtmlQuestion
-                  ? (vals.question.config as TextInputConfig).htmlQuestion
-                  : null,
-              },
-            },
+            field: { ...field, ...vals },
           },
         });
         props.closeMe();
@@ -41,20 +31,12 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
         question: Yup.object({
           naturalKey: naturalKeySchema,
           question: Yup.string().required('Question is required'),
-          config: Yup.object({
-            min: Yup.number().nullable(),
-            max: Yup.number().nullable(),
-            required: Yup.boolean(),
-            placeholder: Yup.string(),
-            multiline: Yup.boolean(),
-            isHtmlQuestion: Yup.boolean(),
-          }),
         }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Text input">
+          <AdminComponentShell {...props} label="Date">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -64,7 +46,6 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'natural_key' }}
             />
-
             <Field
               name="question.question"
               label="Question"
@@ -74,10 +55,9 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-            <TextInputConfigFragment
-              config={formikProps.values.question.config as TextInputConfig}
+            <DateConfigFragment
+              config={formikProps.values.question.config as DateConfig}
             />
-
             <TitledContainer label="Dependencies">
               <Field
                 name="dependency"
