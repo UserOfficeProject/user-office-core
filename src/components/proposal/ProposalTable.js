@@ -19,7 +19,7 @@ export default function ProposalTable(props) {
   const [editProposalID, setEditProposalID] = useState(0);
 
   if (editProposalID) {
-    return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;
+    return <Redirect push to={`/ProposalEdit/${editProposalID}`} />;
   }
 
   return (
