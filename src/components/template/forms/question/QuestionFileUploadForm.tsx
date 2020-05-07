@@ -7,11 +7,11 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { QuestionFormShell } from './QuestionFormShell';
 import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionAdminComponentSignature } from '../QuestionEditor';
 
-export const QuestionFileUploadForm: AdminComponentSignature = props => {
+export const QuestionFileUploadForm: QuestionAdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <Formik
@@ -60,7 +60,7 @@ export const QuestionFileUploadForm: AdminComponentSignature = props => {
             />
 
             <FileUploadConfigFragment
-              config={formikProps.values.question.config as FileUploadConfig}
+              config={formikProps.values.config as FileUploadConfig}
             />
           </QuestionFormShell>
         </Form>

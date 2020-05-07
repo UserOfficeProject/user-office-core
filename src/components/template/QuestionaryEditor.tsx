@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
-import { QuestionRel } from '../../generated/sdk';
+import { QuestionRel, Question } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   Event,
@@ -22,10 +22,17 @@ import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
 import QuestionRelEditor from './forms/QuestionRelEditor';
+import QuestionEditor from './forms/QuestionEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
-  const [selectedField, setSelectedField] = useState<QuestionRel | null>(null);
+  const [
+    selectedQuestionRel,
+    setSelectedQuestionRel,
+  ] = useState<QuestionRel | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
+    null
+  );
   const [questionPickerTopicId, setQuestionPickerTopicId] = useState<
     number | null
   >(null);
@@ -38,7 +45,7 @@ export default function QuestionaryEditor() {
           break;
 
         case EventType.FIELD_CREATED:
-          setSelectedField(action.payload);
+          setSelectedQuestionRel(action.payload);
           break;
 
         case EventType.PICK_QUESTION_REQUESTED:
@@ -112,11 +119,11 @@ export default function QuestionaryEditor() {
   };
 
   const onQuestionRelClick = (data: QuestionRel): void => {
-    setSelectedField(data);
+    setSelectedQuestionRel(data);
   };
 
   const handleFieldEditorClose = (): void => {
-    setSelectedField(null);
+    setSelectedQuestionRel(null);
   };
 
   const getContainerStyle = (): any => {
@@ -190,6 +197,9 @@ export default function QuestionaryEditor() {
                         closeMe={() => {
                           setQuestionPickerTopicId(null);
                         }}
+                        onItemClick={(data: Question) =>
+                          setSelectedQuestion(data)
+                        }
                         id="questionPicker"
                       />
                     ) : null;
@@ -217,7 +227,14 @@ export default function QuestionaryEditor() {
       </StyledPaper>
 
       <QuestionRelEditor
-        field={selectedField}
+        field={selectedQuestionRel}
+        dispatch={dispatch}
+        closeMe={handleFieldEditorClose}
+        template={state}
+      />
+
+      <QuestionEditor
+        field={selectedQuestion}
         dispatch={dispatch}
         closeMe={handleFieldEditorClose}
         template={state}

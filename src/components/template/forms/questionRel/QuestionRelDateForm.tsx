@@ -5,11 +5,11 @@ import { DateConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { QuestionFormShell } from '../question/QuestionFormShell';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelDateForm: AdminComponentSignature = props => {
+export const QuestionRelDateForm: QuestionRelAdminComponentSignature = props => {
   const field = props.field;
 
   return (
@@ -28,7 +28,7 @@ export const QuestionRelDateForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Date">
+          <QuestionRelFormShell {...props} label="Date">
             <DateConfigFragment
               config={formikProps.values.question.config as DateConfig}
             />
@@ -43,7 +43,7 @@ export const QuestionRelDateForm: AdminComponentSignature = props => {
                 data-cy="dependencies"
               />
             </TitledContainer>
-          </QuestionFormShell>
+          </QuestionRelFormShell>
         </Form>
       )}
     </Formik>

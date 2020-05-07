@@ -34,7 +34,10 @@ export default function QuestionRelEditor(props: {
     },
   }))();
 
-  const componentMap = JSDict.Create<DataType, AdminComponentSignature>();
+  const componentMap = JSDict.Create<
+    DataType,
+    QuestionRelAdminComponentSignature
+  >();
   componentMap.put(DataType.BOOLEAN, QuestionRelBooleanForm);
   componentMap.put(DataType.EMBELLISHMENT, QuestionRelEmbellismentForm);
   componentMap.put(DataType.DATE, QuestionRelDateForm);
@@ -82,11 +85,13 @@ export default function QuestionRelEditor(props: {
   );
 }
 
-interface AdminComponentProps {
+interface QuestionRelAdminComponentProps {
   field: QuestionRel;
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
 }
 
-export type AdminComponentSignature = FunctionComponent<AdminComponentProps>;
+export type QuestionRelAdminComponentSignature = FunctionComponent<
+  QuestionRelAdminComponentProps
+>;

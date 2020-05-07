@@ -7,11 +7,11 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { QuestionFormShell } from './QuestionFormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionAdminComponentSignature } from '../QuestionEditor';
 
-export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
+export const QuestionMultipleChoiceForm: QuestionAdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <Formik
@@ -59,9 +59,7 @@ export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
             />
 
             <MultipleChoiceConfigFragment
-              config={
-                formikProps.values.question.config as SelectionFromOptionsConfig
-              }
+              config={formikProps.values.config as SelectionFromOptionsConfig}
             />
           </QuestionFormShell>
         </Form>

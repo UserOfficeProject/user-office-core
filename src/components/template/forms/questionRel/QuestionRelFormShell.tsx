@@ -3,14 +3,10 @@ import React, { FunctionComponent } from 'react';
 
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
-import {
-  QuestionRel,
-  ProposalTemplate,
-  Question,
-} from '../../../../generated/sdk';
+import { QuestionRel, ProposalTemplate } from '../../../../generated/sdk';
 import { Event } from '../../../../models/QuestionaryEditorModel';
 
-export const QuestionFormShell: QuestionFormShellSignature = props => {
+export const QuestionRelFormShell: QuestionRelFormShellSignature = props => {
   const classes = makeStyles(theme => ({
     container: {
       width: '100%',
@@ -35,7 +31,7 @@ export const QuestionFormShell: QuestionFormShellSignature = props => {
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
-        {getTemplateFieldIcon(props.field.dataType)}
+        {getTemplateFieldIcon(props.field.question.dataType)}
         {props.label}
       </Typography>
       {props.children}
@@ -47,8 +43,11 @@ export const QuestionFormShell: QuestionFormShellSignature = props => {
           data-cy="delete"
           onClick={() => {
             props.dispatch({
-              type: EventType.DELETE_QUESTION_REQUESTED,
-              payload: { fieldId: props.field.proposalQuestionId },
+              type: EventType.DELETE_QUESTION_REL_REQUESTED,
+              payload: {
+                fieldId: props.field.question.proposalQuestionId,
+                templateId: props.template.templateId,
+              },
             });
             props.closeMe();
           }}
@@ -68,12 +67,14 @@ export const QuestionFormShell: QuestionFormShellSignature = props => {
   );
 };
 
-interface QuestionFormShellProps {
-  field: Question;
+interface QuestionRelFormShellProps {
+  field: QuestionRel;
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
   label: string;
 }
 
-type QuestionFormShellSignature = FunctionComponent<QuestionFormShellProps>;
+type QuestionRelFormShellSignature = FunctionComponent<
+  QuestionRelFormShellProps
+>;

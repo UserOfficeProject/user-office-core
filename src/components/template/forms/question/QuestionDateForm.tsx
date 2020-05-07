@@ -5,13 +5,13 @@ import * as Yup from 'yup';
 import { DateConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { QuestionFormShell } from './QuestionFormShell';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionAdminComponentSignature } from '../QuestionEditor';
+import { QuestionFormShell } from './QuestionFormShell';
 
-export const QuestionDateForm: AdminComponentSignature = props => {
+export const QuestionDateForm: QuestionAdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <Formik
@@ -54,7 +54,7 @@ export const QuestionDateForm: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
             <DateConfigFragment
-              config={formikProps.values.question.config as DateConfig}
+              config={formikProps.values.config as DateConfig}
             />
           </QuestionFormShell>
         </Form>

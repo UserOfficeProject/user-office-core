@@ -84,7 +84,9 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
       <QuestionaryEditorTopicItem
         index={index}
         data={new QuestionItemAdapter(question)}
-        onClick={item => {}}
+        onClick={item =>
+          props.onItemClick((item as QuestionItemAdapter).source)
+        }
         key={question.proposalQuestionId.toString()}
       />
     ));
@@ -209,6 +211,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 interface IQuestionPickerProps {
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
+  onItemClick: { (data: Question): void };
   closeMe: () => void;
   id?: string;
 }

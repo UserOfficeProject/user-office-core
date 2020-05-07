@@ -5,11 +5,11 @@ import { TextInputConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { QuestionFormShell } from '../question/QuestionFormShell';
 import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelTextInputForm: AdminComponentSignature = props => {
+export const QuestionRelTextInputForm: QuestionRelAdminComponentSignature = props => {
   const field = props.field;
 
   return (
@@ -49,7 +49,7 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Text input">
+          <QuestionRelFormShell {...props} label="Text input">
             <TextInputConfigFragment
               config={formikProps.values.question.config as TextInputConfig}
             />
@@ -65,7 +65,7 @@ export const QuestionRelTextInputForm: AdminComponentSignature = props => {
                 data-cy="dependencies"
               />
             </TitledContainer>
-          </QuestionFormShell>
+          </QuestionRelFormShell>
         </Form>
       )}
     </Formik>

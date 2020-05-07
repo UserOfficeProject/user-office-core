@@ -7,11 +7,11 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { QuestionFormShell } from './QuestionFormShell';
 import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionAdminComponentSignature } from '../QuestionEditor';
 
-export const QuestionTextInputForm: AdminComponentSignature = props => {
+export const QuestionTextInputForm: QuestionAdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <Formik
@@ -24,10 +24,9 @@ export const QuestionTextInputForm: AdminComponentSignature = props => {
               ...field,
               ...vals,
               config: {
-                ...vals.question.config,
-                htmlQuestion: (vals.question.config as TextInputConfig)
-                  .isHtmlQuestion
-                  ? (vals.question.config as TextInputConfig).htmlQuestion
+                ...vals.config,
+                htmlQuestion: (vals.config as TextInputConfig).isHtmlQuestion
+                  ? (vals.config as TextInputConfig).htmlQuestion
                   : null,
               },
             },
@@ -73,7 +72,7 @@ export const QuestionTextInputForm: AdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'question' }}
             />
             <TextInputConfigFragment
-              config={formikProps.values.question.config as TextInputConfig}
+              config={formikProps.values.config as TextInputConfig}
             />
           </QuestionFormShell>
         </Form>

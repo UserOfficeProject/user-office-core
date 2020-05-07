@@ -5,11 +5,11 @@ import { EmbellishmentConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { QuestionFormShell } from '../question/QuestionFormShell';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
+export const QuestionRelEmbellismentForm: QuestionRelAdminComponentSignature = props => {
   const field = props.field;
 
   return (
@@ -35,7 +35,7 @@ export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Embellishment">
+          <QuestionRelFormShell {...props} label="Embellishment">
             <EmbellishmentConfigFragment
               config={formikProps.values.question.config as EmbellishmentConfig}
             />
@@ -51,7 +51,7 @@ export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
                 data-cy="dependencies"
               />
             </TitledContainer>
-          </QuestionFormShell>
+          </QuestionRelFormShell>
         </Form>
       )}
     </Formik>

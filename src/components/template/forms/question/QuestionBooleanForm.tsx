@@ -5,13 +5,13 @@ import * as Yup from 'yup';
 import { BooleanConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { QuestionFormShell } from './QuestionFormShell';
 import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
-import { AdminComponentSignature } from '../QuestionRelEditor';
+import { QuestionAdminComponentSignature } from '../QuestionEditor';
+import { QuestionFormShell } from './QuestionFormShell';
 
-export const QuestionBooleanForm: AdminComponentSignature = props => {
+export const QuestionBooleanForm: QuestionAdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
   return (
     <Formik
@@ -58,7 +58,7 @@ export const QuestionBooleanForm: AdminComponentSignature = props => {
             />
 
             <BooleanConfigFragment
-              config={formikProps.values.question.config as BooleanConfig}
+              config={formikProps.values.config as BooleanConfig}
             />
           </QuestionFormShell>
         </Form>
