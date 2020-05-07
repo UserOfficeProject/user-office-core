@@ -1,15 +1,16 @@
-import React, { Fragment } from "react";
-import Typography from "@material-ui/core/Typography";
-import { Formik, Form, Field } from "formik";
-import Grid from "@material-ui/core/Grid";
-import { TextField } from "formik-material-ui";
-import Button from "@material-ui/core/Button";
-import { useDataApi } from "../../hooks/useDataApi";
-import * as Yup from "yup";
-import { TechnicalReviewStatus, TechnicalReview } from "../../generated/sdk";
-import FormikDropdown from "../common/FormikDropdown";
-import { ButtonContainer } from "../../styles/StyledComponents";
-import { useSnackbar } from "notistack";
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
+import React, { Fragment } from 'react';
+import * as Yup from 'yup';
+
+import { TechnicalReviewStatus, TechnicalReview } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { ButtonContainer } from '../../styles/StyledComponents';
+import FormikDropdown from '../common/FormikDropdown';
 
 export default function ProposalTechnicalReview(props: {
   data: TechnicalReview | null | undefined;
@@ -18,42 +19,48 @@ export default function ProposalTechnicalReview(props: {
 }) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
+  const initialValues = {
+    status: props?.data?.status || '',
+    timeAllocation: props?.data?.timeAllocation || '',
+    comment: props?.data?.comment || '',
+    publicComment: props?.data?.publicComment || '',
+  };
+
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>
         Technical Review
       </Typography>
       <Formik
-        initialValues={{
-          status: props?.data?.status,
-          timeAllocation: props?.data?.timeAllocation,
-          comment: props?.data?.comment
-        }}
+        initialValues={initialValues}
         validationSchema={Yup.object().shape({
-          status: Yup.string().required("status is required"),
-          timeAllocation: Yup.number().required("time is required"),
-          comment: Yup.string().required("comment is required")
+          status: Yup.string().nullable(),
+          timeAllocation: Yup.number().nullable(),
+          comment: Yup.string().nullable(),
+          publicComment: Yup.string().nullable(),
         })}
         onSubmit={async (values, actions) => {
           await api()
             .addTechnicalReview({
               proposalID: props.id,
-              timeAllocation: values.timeAllocation!,
+              timeAllocation: +values.timeAllocation!,
               comment: values.comment!,
+              publicComment: values.publicComment,
               status:
-                TechnicalReviewStatus[values.status as TechnicalReviewStatus]
+                TechnicalReviewStatus[values.status as TechnicalReviewStatus],
             })
             .then(data =>
-              enqueueSnackbar("Updated", {
-                variant: data.addTechnicalReview.error ? "error" : "success"
+              enqueueSnackbar('Updated', {
+                variant: data.addTechnicalReview.error ? 'error' : 'success',
               })
             );
           props.setReview({
             proposalID: props?.data?.proposalID!,
-            timeAllocation: values.timeAllocation!,
+            timeAllocation: +values.timeAllocation!,
             comment: values.comment!,
             status:
-              TechnicalReviewStatus[values.status as TechnicalReviewStatus]
+              TechnicalReviewStatus[values.status as TechnicalReviewStatus],
           });
           actions.setSubmitting(false);
         }}
@@ -66,17 +73,16 @@ export default function ProposalTechnicalReview(props: {
                   name="status"
                   label="Status"
                   items={[
-                    { text: "Feasible", value: TechnicalReviewStatus.FEASIBLE },
+                    { text: 'Feasible', value: TechnicalReviewStatus.FEASIBLE },
                     {
-                      text: "Partially feasible",
-                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE
+                      text: 'Partially feasible',
+                      value: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
                     },
                     {
-                      text: "Unfeasible",
-                      value: TechnicalReviewStatus.UNFEASIBLE
-                    }
+                      text: 'Unfeasible',
+                      value: TechnicalReviewStatus.UNFEASIBLE,
+                    },
                   ]}
-                  required
                 />
               </Grid>
               <Grid item xs={6}>
@@ -89,22 +95,36 @@ export default function ProposalTechnicalReview(props: {
                   fullWidth
                   autoComplete="off"
                   data-cy="timeAllocation"
-                  required
                 />
               </Grid>
               <Grid item xs={12}>
                 <Field
                   name="comment"
-                  label="Comment"
+                  label="Internal comment"
                   type="text"
                   component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"
                   data-cy="comment"
-                  multiline={true}
-                  rows={2}
-                  required
+                  multiline
+                  rowsMax="16"
+                  rows="4"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Field
+                  name="publicComment"
+                  label="Public comment"
+                  type="text"
+                  component={TextField}
+                  margin="normal"
+                  fullWidth
+                  autoComplete="off"
+                  data-cy="publicComment"
+                  multiline
+                  rowsMax="16"
+                  rows="4"
                 />
               </Grid>
             </Grid>

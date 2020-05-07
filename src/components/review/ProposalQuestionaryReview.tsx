@@ -1,17 +1,18 @@
-import React, { Fragment, HTMLAttributes, useEffect, useState } from "react";
-import { getAllFields } from "../../models/ProposalModelFunctions";
 import {
   Table,
   TableRow,
   TableCell,
   TableBody,
   Typography,
-  makeStyles
-} from "@material-ui/core";
-import { Proposal, QuestionaryField } from "../../generated/sdk";
-import { DataType } from "../../generated/sdk";
-import { useDataApi } from "../../hooks/useDataApi";
-import { FileMetaData } from "../../models/FileUpload";
+  makeStyles,
+} from '@material-ui/core';
+import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
+
+import { Proposal, Answer } from '../../generated/sdk';
+import { DataType } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { FileMetaData } from '../../models/FileUpload';
+import { getAllFields } from '../../models/ProposalModelFunctions';
 
 export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {
@@ -24,25 +25,25 @@ export default function ProposalQuestionaryReview(
 
   const classes = makeStyles(theme => ({
     heading: {
-      marginTop: theme.spacing(2)
-    }
+      marginTop: theme.spacing(2),
+    },
   }))();
 
-  const allFields = getAllFields(questionary) as QuestionaryField[];
+  const allFields = getAllFields(questionary.steps) as Answer[];
   const completedFields = allFields.filter(field => {
     return !!field.value;
   });
 
   // Get all questions with a file upload and create a string with fileid comma separated
   const fileIds = completedFields
-    .filter(field => field.data_type === DataType.FILE_UPLOAD)
+    .filter(field => field.question.dataType === DataType.FILE_UPLOAD)
     .map(fileId => fileId.value)
-    .join(",");
+    .join(',');
 
   useEffect(() => {
     if (fileIds) {
       api()
-        .getFileMetadata({ fileIds: fileIds.split(",") })
+        .getFileMetadata({ fileIds: fileIds.split(',') })
         .then(data => {
           setFiles(data?.fileMetadata || []);
         });
@@ -63,6 +64,7 @@ export default function ProposalQuestionaryReview(
   );
 
   const users = props.data.users || [];
+
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
@@ -90,13 +92,13 @@ export default function ProposalQuestionaryReview(
                 .toString()}
             </TableCell>
           </TableRow>
-          {completedFields.map((row: QuestionaryField) => (
-            <TableRow key={row.proposal_question_id}>
-              <TableCell>{row.question}</TableCell>
+          {completedFields.map((row: Answer) => (
+            <TableRow key={row.question.proposalQuestionId}>
+              <TableCell>{row.question.question}</TableCell>
               <TableCell>
-                {row.data_type === DataType.FILE_UPLOAD
+                {row.question.dataType === DataType.FILE_UPLOAD
                   ? row.value
-                      .split(",")
+                      .split(',')
                       .map((value: string) =>
                         downloadLink(files.find(file => file.fileId === value))
                       )

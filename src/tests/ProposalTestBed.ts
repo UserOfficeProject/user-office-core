@@ -3,133 +3,145 @@ import {
   FieldConfig,
   FieldDependency,
   ProposalTemplate,
-  ProposalTemplateField,
-  Questionary
-} from "../generated/sdk";
-import { DataType } from "../generated/sdk";
+  Questionary,
+  QuestionRel,
+  Question,
+} from '../generated/sdk';
+import { DataType } from '../generated/sdk';
 
 export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => {
   return {
     steps: [
       {
         topic: {
-          topic_title: "General information",
-          topic_id: 0,
-          sort_order: 1,
-          is_enabled: true
+          title: 'General information',
+          id: 0,
+          sortOrder: 1,
+          isEnabled: true,
         },
         isCompleted: false,
         fields: [
           {
-            proposal_question_id: "ttl_general",
-            natural_key: "ttl_general",
-            data_type: DataType.EMBELLISHMENT,
-            question: "",
-            config: {
-              html: "General information",
-              plain: "General information",
-              small_label: "",
-              required: false,
-              tooltip: ""
+            topicId: 0,
+            question: {
+              question: '',
+              proposalQuestionId: 'ttl_general',
+              naturalKey: 'ttl_general',
+              dataType: DataType.EMBELLISHMENT,
+              config: {
+                html: 'General information',
+                plain: 'General information',
+                small_label: '',
+                required: false,
+                tooltip: '',
+              },
             },
-            value: "",
-            sort_order: 1,
-            topic_id: 0,
-            dependencies: []
+
+            value: '',
+            sortOrder: 1,
           },
           {
-            proposal_question_id: "has_links_with_industry",
-            natural_key: "has_links_with_industry",
-            data_type: DataType.SELECTION_FROM_OPTIONS,
-            question: "Has links with industry",
-            config: {
-              variant: "radio",
-              options: ["yes", "no"],
-              small_label: "",
-              required: false,
-              tooltip: ""
+            topicId: 0,
+            question: {
+              question: 'Has links with industry',
+              proposalQuestionId: 'has_links_with_industry',
+              naturalKey: 'has_links_with_industry',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: {
+                variant: 'radio',
+                options: ['yes', 'no'],
+                small_label: '',
+                required: false,
+                tooltip: '',
+              },
             },
-            value: "",
-            sort_order: 2,
-            topic_id: 0,
-            dependencies: []
+
+            value: '',
+            sortOrder: 2,
           },
           {
-            proposal_question_id: "links_with_industry",
-            natural_key: "links_with_industry",
-            data_type: DataType.TEXT_INPUT,
-            question: "If yes, please describe:",
-            config: {
-              min: 0,
-              max: 1000000,
-              multiline: false,
-              placeholder: "Please specify links with industry",
-              small_label: "",
-              required: false,
-              tooltip: ""
+            topicId: 0,
+            question: {
+              question: 'If yes, please describe:',
+              proposalQuestionId: 'links_with_industry',
+              naturalKey: 'links_with_industry',
+              dataType: DataType.TEXT_INPUT,
+              config: {
+                min: 0,
+                max: 1000000,
+                multiline: false,
+                placeholder: 'Please specify links with industry',
+                small_label: '',
+                required: false,
+                tooltip: '',
+              },
             },
-            value: "",
-            sort_order: 2,
-            topic_id: 0,
-            dependencies: [
-              {
-                dependency_id: "has_links_with_industry",
-                condition: {
-                  condition: EvaluatorOperator.EQ,
-                  params: "yes"
-                },
-                question_id: "links_with_industry",
-                dependency_natural_key: "has_links_with_industry"
-              }
-            ]
-          }
-        ]
-      }
-    ]
+
+            value: '',
+            sortOrder: 2,
+            dependency: {
+              dependencyId: 'has_links_with_industry',
+              condition: {
+                condition: EvaluatorOperator.EQ,
+                params: 'yes',
+              },
+              questionId: 'links_with_industry',
+              dependencyNaturalKey: 'has_links_with_industry',
+            },
+          },
+        ],
+      },
+    ],
   };
 };
 
 export const create1TopicFieldlessTemplate = (): ProposalTemplate => {
   return {
+    templateId: 1,
+    name: 'test',
+    callCount: 0,
+    isArchived: false,
+    proposalCount: 0,
+    description: 'desription',
     steps: [
       {
         topic: {
-          topic_id: 0,
-          topic_title: "General information",
-          sort_order: 0,
-          is_enabled: true
+          id: 0,
+          title: 'General information',
+          sortOrder: 0,
+          isEnabled: true,
         },
-        fields: []
-      }
-    ]
+        fields: [],
+      },
+    ],
   };
 };
 
 export const createDummyField = (values: {
-  data_type?: DataType;
-  proposal_question_id?: string;
-  natural_key?: string;
-  sort_order?: number;
-  topic_id?: number;
-  question?: string;
+  dataType?: DataType;
+  proposalQuestionId?: string;
+  naturalKey?: string;
+  sortOrder?: number;
+  id?: number;
+  question?: Question;
   config?: FieldConfig;
-  dependencies?: FieldDependency[];
-}): ProposalTemplateField => {
-  return {
-    proposal_question_id:
-      values.proposal_question_id || "random_field_name_" + Math.random(),
-    natural_key: values.natural_key || "is_dangerous",
-    data_type: values.data_type || DataType.TEXT_INPUT,
-    sort_order: values.sort_order || Math.round(Math.random() * 100),
-    question: values.question || "Some random question",
+  dependency?: FieldDependency;
+}): QuestionRel => ({
+  topicId: values.id || 1,
+  sortOrder: values.sortOrder || Math.round(Math.random() * 100),
+  question: values.question || {
+    question: 'Some random question',
+    proposalQuestionId:
+      values.proposalQuestionId || 'random_field_name_' + Math.random(),
+    naturalKey: values.naturalKey || 'is_dangerous',
+    dataType: values.dataType || DataType.TEXT_INPUT,
     config: values.config || {
       required: false,
-      small_label: "",
-      tooltip: "",
+      small_label: '',
+      tooltip: '',
       min: 0,
-      max: 0
+      max: 0,
     },
-    topic_id: values.topic_id || Math.round(Math.random() * 10),
-    dependencies: values.dependencies || []
-  };
-};
+  },
+  dependency: values.dependency,
+});

@@ -1,22 +1,27 @@
-import { makeStyles } from "@material-ui/core";
-import { getIn } from "formik";
-import React, { ChangeEvent, useState, useEffect } from "react";
-import { TextInputConfig } from "../../generated/sdk";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import TextFieldWithCounter from "../common/TextFieldWithCounter";
+import { makeStyles } from '@material-ui/core';
+import { getIn } from 'formik';
+import React, { ChangeEvent, useState, useEffect } from 'react';
 
-export function ProposalComponentTextInput(props: IBasicComponentProps) {
+import { TextInputConfig } from '../../generated/sdk';
+import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import { BasicComponentProps } from './IBasicComponentProps';
+
+export function ProposalComponentTextInput(props: BasicComponentProps) {
   const classes = makeStyles({
     textField: {
-      margin: "15px 0 10px 0"
-    }
+      margin: '15px 0 10px 0',
+    },
   })();
-  let { templateField, touched, errors, onComplete } = props;
-  let { proposal_question_id, question, value } = templateField;
-  let [stateValue, setStateValue] = useState(value);
-  const fieldError = getIn(errors, proposal_question_id);
-  const isError = getIn(touched, proposal_question_id) && !!fieldError;
-  const config = templateField.config as TextInputConfig;
+  const { templateField, touched, errors, onComplete } = props;
+  const {
+    question: { proposalQuestionId },
+    question,
+    value,
+  } = templateField;
+  const [stateValue, setStateValue] = useState(value);
+  const fieldError = getIn(errors, proposalQuestionId);
+  const isError = getIn(touched, proposalQuestionId) && !!fieldError;
+  const config = templateField.question.config as TextInputConfig;
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -27,17 +32,17 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
       {config.htmlQuestion && (
         <div
           dangerouslySetInnerHTML={{
-            __html: config.htmlQuestion!
+            __html: config.htmlQuestion!,
           }}
         ></div>
       )}
       <TextFieldWithCounter
         variant="standard"
-        id={proposal_question_id}
-        name={proposal_question_id}
+        id={proposalQuestionId}
+        name={proposalQuestionId}
         fullWidth
         required={config.required ? true : false}
-        label={config.htmlQuestion ? "" : question}
+        label={config.htmlQuestion ? '' : question.question}
         value={stateValue}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
@@ -47,13 +52,13 @@ export function ProposalComponentTextInput(props: IBasicComponentProps) {
         }}
         placeholder={config.placeholder}
         error={isError}
-        helperText={isError && errors[proposal_question_id]}
+        helperText={isError && errors[proposalQuestionId]}
         multiline={config.multiline}
         rows={config.multiline ? 2 : 1}
         rowsMax={config.multiline ? 16 : undefined}
         className={classes.textField}
         InputLabelProps={{
-          shrink: true
+          shrink: true,
         }}
         maxLen={config.max || undefined}
       />

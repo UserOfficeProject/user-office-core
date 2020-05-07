@@ -1,13 +1,14 @@
 mutation createCall(
   $shortCode: String!
-  $startCall: String!
-  $endCall: String!
-  $startReview: String!
-  $endReview: String!
-  $startNotify: String!
-  $endNotify: String!
+  $startCall: DateTime!
+  $endCall: DateTime!
+  $startReview: DateTime!
+  $endReview: DateTime!
+  $startNotify: DateTime!
+  $endNotify: DateTime!
   $cycleComment: String!
   $surveyComment: String!
+  $templateId: Int
 ) {
   createCall(
     shortCode: $shortCode
@@ -19,6 +20,7 @@ mutation createCall(
     endNotify: $endNotify
     cycleComment: $cycleComment
     surveyComment: $surveyComment
+    templateId: $templateId
   ) {
     error
     call {

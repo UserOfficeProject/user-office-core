@@ -1,11 +1,13 @@
-import React from "react";
-import ProposalContainer from "./ProposalContainer";
-import { useProposalData } from "../../hooks/useProposalData";
+import React from 'react';
+import { useParams } from 'react-router';
 
-export default function ProposalEdit(props: { match: any }): JSX.Element {
-  const { proposalData } = useProposalData(
-    parseInt(props.match.params.proposalID)
-  );
+import { useProposalData } from '../../hooks/useProposalData';
+import ProposalContainer from './ProposalContainer';
+
+export default function ProposalEdit() {
+  const { proposalID } = useParams();
+
+  const { proposalData } = useProposalData(parseInt(proposalID!));
 
   if (!proposalData) {
     return <p>Loading</p>;

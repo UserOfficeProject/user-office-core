@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { useDataApi } from "./useDataApi";
-import { Proposal } from "../generated/sdk";
+import { useEffect, useState } from 'react';
 
-export function useProposalData(id: number | null) {
+import { Proposal } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
+
+export function useProposalData(id: number | null | undefined) {
   const [proposalData, setProposalData] = useState<Proposal | null>(null);
   const [loading, setLoading] = useState(true);
 

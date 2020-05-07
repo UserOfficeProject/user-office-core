@@ -1,0 +1,6 @@
+mutation removeSEPMemberRole($memberId: Int!, $sepId: Int!) {
+  removeSEPMemberRole(memberId: $memberId, sepId: $sepId) {
+    error
+    success
+  }
+}

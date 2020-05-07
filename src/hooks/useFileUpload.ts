@@ -1,18 +1,19 @@
-import { useState } from "react";
-import { FileMetaData } from "../models/FileUpload";
+import { useState } from 'react';
+
+import { FileMetaData } from '../models/FileUpload';
 
 export enum UPLOAD_STATE {
   PRISTINE,
   UPLOADING,
   COMPLETE,
   ERROR,
-  ABORTED
+  ABORTED,
 }
 
 export function useFileUpload() {
   const [progress, setProgress] = useState<number>(0);
   const [state, setState] = useState<UPLOAD_STATE>(UPLOAD_STATE.PRISTINE);
-  var xhr: XMLHttpRequest;
+  let xhr: XMLHttpRequest;
 
   const reset = () => {
     setProgress(0);
@@ -29,21 +30,21 @@ export function useFileUpload() {
 
   const uploadFile = (file: File, completeHandler: Function) => {
     setState(UPLOAD_STATE.UPLOADING);
-    var formData = new FormData();
-    formData.append("file", file);
+    const formData = new FormData();
+    formData.append('file', file);
     xhr = new XMLHttpRequest();
 
     xhr.upload.addEventListener(
-      "progress",
+      'progress',
       event => {
-        var percent = (event.loaded / event.total) * 100;
+        const percent = (event.loaded / event.total) * 100;
         setProgress(percent);
       },
       false
     );
 
     xhr.addEventListener(
-      "load",
+      'load',
       event => {
         const { responseText } = event.currentTarget as XMLHttpRequest;
         try {
@@ -60,7 +61,7 @@ export function useFileUpload() {
     );
 
     xhr.addEventListener(
-      "error",
+      'error',
       () => {
         setState(UPLOAD_STATE.ERROR);
       },
@@ -68,14 +69,14 @@ export function useFileUpload() {
     );
 
     xhr.addEventListener(
-      "abort",
+      'abort',
       () => {
         setState(UPLOAD_STATE.ABORTED);
       },
       false
     );
 
-    xhr.open("POST", "/files/upload");
+    xhr.open('POST', '/files/upload');
     xhr.send(formData);
   };
 

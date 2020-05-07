@@ -12,7 +12,7 @@ export default function submitFormAsync(
         resolve(isValid);
       })
       .catch((e: any) => {
-        console.log("error: ", e);
+        console.log('error: ', e);
         reject();
       });
   });

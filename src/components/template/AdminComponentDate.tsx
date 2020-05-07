@@ -1,18 +1,20 @@
-import React from "react";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-material-ui";
-import { EventType } from "../../models/QuestionaryEditorModel";
-import { AdminComponentSignature } from "./QuestionaryFieldEditor";
-import * as Yup from "yup";
-import { AdminComponentShell } from "./AdminComponentShell";
-import FormikUICustomDependencySelector from "../common/FormikUICustomDependencySelector";
-import TitledContainer from "../common/TitledContainer";
-import FormikUICustomCheckbox from "../common/FormikUICustomCheckbox";
-import { useNaturalKeySchema } from "../../utils/userFieldValidationSchema";
+import { Formik, Form, Field } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
+import { EventType } from '../../models/QuestionaryEditorModel';
+import { useNaturalKeySchema } from '../../utils/userFieldValidationSchema';
+import FormikUICustomCheckbox from '../common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from '../common/FormikUICustomDependencySelector';
+import TitledContainer from '../common/TitledContainer';
+import { AdminComponentShell } from './AdminComponentShell';
+import { AdminComponentSignature } from './QuestionaryFieldEditor';
 
 export const AdminComponentDate: AdminComponentSignature = props => {
   const field = props.field;
-  const naturalKeySchema = useNaturalKeySchema(field.natural_key);
+  const naturalKeySchema = useNaturalKeySchema(field.question.naturalKey);
+
   return (
     <Formik
       initialValues={field}
@@ -20,39 +22,41 @@ export const AdminComponentDate: AdminComponentSignature = props => {
         props.dispatch({
           type: EventType.UPDATE_FIELD_REQUESTED,
           payload: {
-            field: { ...field, ...vals }
-          }
+            field: { ...field, ...vals },
+          },
         });
         props.closeMe();
       }}
       validationSchema={Yup.object().shape({
-        natural_key: naturalKeySchema,
-        question: Yup.string().required("Question is required")
+        question: Yup.object({
+          naturalKey: naturalKeySchema,
+          question: Yup.string().required('Question is required'),
+        }),
       })}
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
           <AdminComponentShell {...props} label="Date">
             <Field
-              name="natural_key"
+              name="question.naturalKey"
               label="Key"
               type="text"
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "natural_key" }}
+              inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
-              name="question"
+              name="question.question"
               label="Question"
               type="text"
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ "data-cy": "question" }}
+              inputProps={{ 'data-cy': 'question' }}
             />
             <Field
-              name="config.tooltip"
+              name="question.config.tooltip"
               label="Tooltip"
               type="text"
               component={TextField}
@@ -62,9 +66,9 @@ export const AdminComponentDate: AdminComponentSignature = props => {
             />
             <TitledContainer label="Constraints">
               <Field
-                name="config.required"
+                name="question.config.required"
                 label="Is required"
-                checked={formikProps.values.config.required}
+                checked={formikProps.values.question.config.required}
                 component={FormikUICustomCheckbox}
                 margin="normal"
                 fullWidth
@@ -73,7 +77,7 @@ export const AdminComponentDate: AdminComponentSignature = props => {
             </TitledContainer>
             <TitledContainer label="Dependencies">
               <Field
-                name="dependencies"
+                name="dependency"
                 component={FormikUICustomDependencySelector}
                 templateField={props.field}
                 template={props.template}

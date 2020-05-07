@@ -1,17 +1,14 @@
-import produce from "immer";
-import { Reducer, useCallback, useEffect } from "react";
-import {
-  ProposalTemplate,
-  ProposalTemplateField,
-  TemplateStep
-} from "../generated/sdk";
-import { useDataApi } from "../hooks/useDataApi";
-import useReducerWithMiddleWares from "../utils/useReducerWithMiddleWares";
+import produce from 'immer';
+import { Reducer, useCallback, useEffect } from 'react';
+
+import { ProposalTemplate, TemplateStep, QuestionRel } from '../generated/sdk';
+import { useDataApi } from '../hooks/useDataApi';
+import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-  getTopicById
-} from "./ProposalModelFunctions";
+  getTopicById,
+} from './ProposalModelFunctions';
 
 export enum EventType {
   READY,
@@ -28,34 +25,25 @@ export enum EventType {
   DELETE_TOPIC_REQUESTED,
   CREATE_TOPIC_REQUESTED,
   TOPIC_CREATED,
-  REORDER_TOPIC_REQUESTED
+  REORDER_TOPIC_REQUESTED,
 }
 
-export interface IEvent {
+export interface Event {
   type: EventType;
   payload: any;
 }
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
-  const blankInitTemplate: ProposalTemplate = { steps: [] };
-  const [state, dispatch] = useReducerWithMiddleWares<
-    Reducer<ProposalTemplate, IEvent>
-  >(reducer, blankInitTemplate, middlewares || []);
-  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
-  const api = useDataApi();
+  const blankInitTemplate: ProposalTemplate = {
+    steps: [],
+    templateId: 1,
+    callCount: 0,
+    isArchived: false,
+    name: 'blank',
+    proposalCount: 0,
+  };
 
-  useEffect(() => {
-    api()
-      .getProposalTemplate()
-      .then(data => {
-        memoizedDispatch({
-          type: EventType.READY,
-          payload: data.proposalTemplate
-        });
-      });
-  }, [api, memoizedDispatch]);
-
-  function reducer(state: ProposalTemplate, action: IEvent): ProposalTemplate {
+  function reducer(state: ProposalTemplate, action: Event): ProposalTemplate {
     return produce(state, draft => {
       switch (action.type) {
         case EventType.READY:
@@ -65,16 +53,15 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             return draft;
           }
 
-          var from = draft.steps.find(step => {
+          const from = draft.steps.find(step => {
             return (
-              step.topic.topic_id.toString() ===
-              action.payload.source.droppableId
+              step.topic.id.toString() === action.payload.source.droppableId
             );
           })!;
 
-          var to = draft.steps.find(step => {
+          const to = draft.steps.find(step => {
             return (
-              step.topic.topic_id.toString() ===
+              step.topic.id.toString() ===
               action.payload.destination.droppableId
             );
           })!;
@@ -99,31 +86,37 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_TOPIC_TITLE_REQUESTED:
-          getTopicById(draft, action.payload.topicId)!.topic_title =
+          getTopicById(draft.steps, action.payload.topicId).topic_title =
             action.payload.title;
+
           return draft;
         case EventType.UPDATE_FIELD_REQUESTED:
-          const field: ProposalTemplateField = action.payload.field;
-          const fieldToUpdate = getFieldById(draft, field.proposal_question_id);
+          const field: QuestionRel = action.payload.field;
+          const fieldToUpdate = getFieldById(
+            draft.steps,
+            field.question.proposalQuestionId
+          );
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
           } else {
-            console.error("Object(s) are not defined", field, fieldToUpdate);
+            console.error('Object(s) are not defined', field, fieldToUpdate);
           }
+
           return draft;
         case EventType.FIELD_CREATED:
-          const newField: ProposalTemplateField = action.payload;
+          const newField: QuestionRel = action.payload;
           const stepToExtend = getQuestionaryStepByTopicId(
-            draft,
-            newField.topic_id
+            draft.steps,
+            newField.topicId
           ) as TemplateStep;
           if (stepToExtend) {
             stepToExtend.fields.push(newField);
           }
+
           return draft;
         case EventType.DELETE_TOPIC_REQUESTED:
           const stepToDelete = getQuestionaryStepByTopicId(
-            draft,
+            draft.steps,
             action.payload
           );
           if (!stepToDelete) {
@@ -131,6 +124,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           }
           const stepIdx = draft.steps.indexOf(stepToDelete);
           draft.steps.splice(stepIdx, 1);
+
           return draft;
         case EventType.TOPIC_CREATED:
         case EventType.FIELD_UPDATED:
@@ -139,6 +133,23 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
       }
     });
   }
+
+  const [state, dispatch] = useReducerWithMiddleWares<
+    Reducer<ProposalTemplate, Event>
+  >(reducer, blankInitTemplate, middlewares || []);
+  const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
+  const api = useDataApi();
+
+  useEffect(() => {
+    api()
+      .getProposalTemplate({ templateId: 1 })
+      .then(data => {
+        memoizedDispatch({
+          type: EventType.READY,
+          payload: data.proposalTemplate,
+        });
+      });
+  }, [api, memoizedDispatch]);
 
   return { state, dispatch };
 }

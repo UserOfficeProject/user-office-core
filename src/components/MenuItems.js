@@ -1,18 +1,20 @@
-import React from "react";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import NoteAdd from "@material-ui/icons/NoteAdd";
-import People from "@material-ui/icons/People";
-import Help from "@material-ui/icons/Help";
-import FolderOpen from "@material-ui/icons/FolderOpen";
-import ExitToApp from "@material-ui/icons/ExitToApp";
-import CalendarToday from "@material-ui/icons/CalendarToday";
-import SettingsApplications from "@material-ui/icons/SettingsApplications";
-import { Link } from "react-router-dom";
-import { useCallsData } from "../hooks/useCallsData";
-import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import CalendarToday from '@material-ui/icons/CalendarToday';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ExitToApp from '@material-ui/icons/ExitToApp';
+import FolderOpen from '@material-ui/icons/FolderOpen';
+import GroupWorkIcon from '@material-ui/icons/GroupWork';
+import Help from '@material-ui/icons/Help';
+import NoteAdd from '@material-ui/icons/NoteAdd';
+import People from '@material-ui/icons/People';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import SettingsApplications from '@material-ui/icons/SettingsApplications';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import { useCallsData } from '../hooks/useCallsData';
 
 export default function MenuItems({ role }) {
   const { loading, callsData } = useCallsData();
@@ -31,7 +33,7 @@ export default function MenuItems({ role }) {
       : false;
   }
   const user = (
-    <div>
+    <div data-cy="user-menu-items">
       <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <DashboardIcon />
@@ -40,7 +42,7 @@ export default function MenuItems({ role }) {
       </ListItem>
       <ListItem
         component={Link}
-        to="/ProposalSubmission"
+        to="/ProposalSelectType"
         button
         disabled={proposalDisabled}
       >
@@ -65,7 +67,7 @@ export default function MenuItems({ role }) {
   );
 
   const user_officer = (
-    <div>
+    <div data-cy="officer-menu-items">
       <ListItem component={Link} to="/ProposalPage" button>
         <ListItemIcon>
           <FolderOpen />
@@ -84,17 +86,23 @@ export default function MenuItems({ role }) {
         </ListItemIcon>
         <ListItemText primary="View People" />
       </ListItem>
+      <ListItem component={Link} to="/SEPPage" button>
+        <ListItemIcon>
+          <GroupWorkIcon />
+        </ListItemIcon>
+        <ListItemText primary="SEPs" />
+      </ListItem>
       <ListItem component={Link} to="/PageEditor" button>
         <ListItemIcon>
           <SettingsApplications />
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
-      <ListItem component={Link} to="/QuestionaryEditor" button>
+      <ListItem component={Link} to="/Questionaries" button>
         <ListItemIcon>
           <QuestionAnswerIcon />
         </ListItemIcon>
-        <ListItemText primary="Edit Questionary" />
+        <ListItemText primary="Questionaries" />
       </ListItem>
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
@@ -105,8 +113,8 @@ export default function MenuItems({ role }) {
     </div>
   );
   const reviewer = (
-    <div>
-      <ListItem component={Link} to="/ProposalTableReviewer" button>
+    <div data-cy="reviewer-menu-items">
+      <ListItem component={Link} to="/" button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
@@ -122,11 +130,11 @@ export default function MenuItems({ role }) {
   );
 
   switch (role) {
-    case "user":
+    case 'user':
       return user;
-    case "user_officer":
+    case 'user_officer':
       return user_officer;
-    case "reviewer":
+    case 'reviewer':
       return reviewer;
     default:
       return null;

@@ -1,51 +1,59 @@
-import { makeStyles } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import React from "react";
-import { useDataApi } from "../../hooks/useDataApi";
-import { emailFieldSchema } from "../../utils/userFieldValidationSchema";
+import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React from 'react';
 
-export function InviteUserForm(props: { action: Function }) {
+import { UserRole } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
+import { emailFieldSchema } from '../../utils/userFieldValidationSchema';
+export function InviteUserForm(props: {
+  action: Function;
+  title: string;
+  userRole: UserRole;
+  close: Function;
+}) {
   const api = useDataApi();
   const classes = makeStyles({
     buttons: {
-      display: "flex",
-      justifyContent: "flex-end"
+      display: 'flex',
+      justifyContent: 'flex-end',
     },
     button: {
-      marginTop: "25px",
-      marginLeft: "10px"
-    }
+      marginTop: '25px',
+      marginLeft: '10px',
+    },
   })();
 
   return (
     <Formik
       initialValues={{
-        name: "",
-        lastname: "",
-        email: ""
+        name: '',
+        lastname: '',
+        email: '',
       }}
       onSubmit={async values => {
         const createResult = await api().createUserByEmailInvite({
           firstname: values.name,
           lastname: values.lastname,
-          email: values.email
+          email: values.email,
+          userRole: props.userRole,
         });
         props.action({
           firstname: values.name,
           lastname: values.lastname,
-          organisation: "",
-          id: createResult?.createUserByEmailInvite.id
+          organisation: '',
+          id: createResult?.createUserByEmailInvite.id,
         });
+        props.close();
       }}
       validationSchema={emailFieldSchema}
     >
       {subformik => (
         <Form>
           <Typography component="h1" variant="h5">
-            Invite by Email
+            {props.title}
           </Typography>
           <Field
             name="name"
@@ -75,6 +83,14 @@ export function InviteUserForm(props: { action: Function }) {
           />
 
           <div className={classes.buttons}>
+            <Button
+              onClick={() => props.close()}
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={() => subformik.submitForm()}
               variant="contained"

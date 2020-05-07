@@ -2,41 +2,41 @@ import {
   makeStyles,
   Button,
   CircularProgress,
-  StandardProps
-} from "@material-ui/core";
-import { Fragment, Component } from "react";
-import React from "react";
-import { ButtonProps, ButtonClassKey } from "@material-ui/core/Button";
+  StandardProps,
+} from '@material-ui/core';
+import { ButtonProps, ButtonClassKey } from '@material-ui/core/Button';
+import { Fragment, Component } from 'react';
+import React from 'react';
 
 const ProposalNavigationFragment = (props: {
-  back?: IButtonConfig;
-  reset?: IButtonConfig;
-  save?: IButtonConfig;
-  saveAndNext?: IButtonConfig;
+  back?: ButtonConfig;
+  reset?: ButtonConfig;
+  save?: ButtonConfig;
+  saveAndNext?: ButtonConfig;
   isLoading: boolean;
   disabled?: boolean;
-}) => {
+}): JSX.Element => {
   if (props.disabled === true) {
     return <div></div>;
   }
   const classes = makeStyles({
     buttons: {
-      marginTop: "15px",
-      display: "flex",
-      justifyContent: "flex-end"
+      marginTop: '15px',
+      display: 'flex',
+      justifyContent: 'flex-end',
     },
     button: {
-      margin: "25px 10px 0 10px",
-      "&:first-child": {
-        marginLeft: "0"
+      margin: '25px 10px 0 10px',
+      '&:first-child': {
+        marginLeft: '0',
       },
-      "&:last-child": {
-        marginRight: "0"
-      }
+      '&:last-child': {
+        marginRight: '0',
+      },
     },
     lastLeftButton: {
-      marginRight: "auto"
-    }
+      marginRight: 'auto',
+    },
   })();
 
   const backbutton = props.back ? (
@@ -47,7 +47,7 @@ const ProposalNavigationFragment = (props: {
       disabled={props.back.disabled}
       isbusy={props.back.isBusy}
     >
-      {props.back.label || "Back"}
+      {props.back.label || 'Back'}
     </NavigButton>
   ) : null;
   const resetButton = props.reset ? (
@@ -58,7 +58,7 @@ const ProposalNavigationFragment = (props: {
       disabled={props.reset.disabled}
       isbusy={props.reset.isBusy}
     >
-      {props.reset.label || "Reset"}
+      {props.reset.label || 'Reset'}
     </NavigButton>
   ) : null;
   const saveButton = props.save ? (
@@ -71,7 +71,7 @@ const ProposalNavigationFragment = (props: {
       disabled={props.save.disabled}
       isbusy={props.save.isBusy}
     >
-      {props.save.label || "Save"}
+      {props.save.label || 'Save'}
     </NavigButton>
   ) : null;
   const saveAndNextButton = props.saveAndNext ? (
@@ -84,7 +84,7 @@ const ProposalNavigationFragment = (props: {
       disabled={props.saveAndNext.disabled}
       isbusy={props.saveAndNext.isBusy}
     >
-      {props.saveAndNext.label || "Save and continue"}
+      {props.saveAndNext.label || 'Save and continue'}
     </NavigButton>
   ) : null;
   const buttonArea = props.isLoading ? (
@@ -103,7 +103,7 @@ const ProposalNavigationFragment = (props: {
 
 export default ProposalNavigationFragment;
 
-interface IButtonConfig {
+interface ButtonConfig {
   callback: () => void;
   label?: string;
   disabled?: boolean;
@@ -114,19 +114,20 @@ class NavigButton extends Component<
   StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>
 > {
   render() {
-    var { className, ...other } = this.props;
+    const { className, isbusy, ...other } = this.props;
+
     return (
-      <div className={className} style={{ position: "relative" }}>
+      <div className={className} style={{ position: 'relative' }}>
         <Button {...other} />
-        {this.props.isbusy && (
+        {isbusy && (
           <CircularProgress
             size={24}
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
               marginTop: -12,
-              marginLeft: -12
+              marginLeft: -12,
             }}
           />
         )}

@@ -1,0 +1,9 @@
+fragment question on Question {
+  question
+  proposalQuestionId
+  naturalKey
+  dataType
+  config {
+    ...fieldConfig
+  }
+}

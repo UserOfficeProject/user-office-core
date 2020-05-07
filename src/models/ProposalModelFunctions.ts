@@ -1,16 +1,18 @@
+// FIXME: This should be fixed for sure. It produces compile errors and ts-ignore should never be used.
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import {
+  Answer,
   DataType,
   FieldDependency,
-  ProposalTemplate,
-  ProposalTemplateField,
-  Questionary,
-  QuestionaryField
-} from "../generated/sdk";
-import { ConditionEvaluator } from "./ConditionEvaluator";
-import { DataTypeSpec } from "./ProposalModel";
+  QuestionaryStep,
+  QuestionRel,
+  TemplateStep,
+} from '../generated/sdk';
+import { ConditionEvaluator } from './ConditionEvaluator';
+import { DataTypeSpec } from './ProposalModel';
 
-type AbstractField = ProposalTemplateField | QuestionaryField;
-type AbstractCollection = ProposalTemplate | Questionary;
+type AbstractField = QuestionRel | Answer;
+type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
@@ -19,57 +21,70 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
       return { readonly: false };
   }
 }
+
 export function getTopicById(collection: AbstractCollection, topicId: number) {
   // @ts-ignore-line
-  const step = collection.steps.find(step => step.topic.topic_id === topicId);
+  const step = collection.find(step => step.topic.id === topicId);
+
   return step ? step.topic : undefined;
 }
+
 export function getQuestionaryStepByTopicId(
-  template: AbstractCollection,
+  collection: AbstractCollection,
   topicId: number
 ) {
   // @ts-ignore-line
-  return template.steps.find(step => step.topic.topic_id === topicId);
+  return collection.find(step => step.topic.id === topicId);
 }
+
 export function getFieldById(
   collection: AbstractCollection,
   questionId: string
 ) {
   let needle: AbstractField | undefined;
-
   // @ts-ignore-line
-  collection.steps.every(step => {
+  collection.every(step => {
     needle = step.fields.find(
       // @ts-ignore-line
-      field => field.proposal_question_id === questionId
+      field => field.question.proposalQuestionId === questionId
     );
+
     return needle === undefined;
   });
+
   return needle;
 }
+
 export function getAllFields(collection: AbstractCollection) {
   let allFields = new Array<AbstractField>();
   // @ts-ignore-line
-  collection.steps.forEach(step => {
+  collection.forEach(step => {
     allFields = allFields.concat(step.fields);
   });
+
   return allFields;
 }
+
 export function isDependencySatisfied(
-  collection: Questionary,
-  dependency: FieldDependency
+  collection: QuestionaryStep[],
+  dependency: FieldDependency | undefined | null
 ): boolean {
+  if (!dependency?.condition) {
+    return true;
+  }
   const { condition, params } = dependency.condition;
-  const field = getFieldById(collection, dependency.dependency_id) as
-    | QuestionaryField
+  const field = getFieldById(collection, dependency.dependencyId) as
+    | Answer
     | undefined;
   if (!field) {
     return true;
   }
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const isParentSatisfied = areDependenciesSatisfied(
     collection,
-    dependency.dependency_id
+    dependency.dependencyId
   );
+
   return (
     isParentSatisfied &&
     new ConditionEvaluator()
@@ -77,17 +92,15 @@ export function isDependencySatisfied(
       .isSatisfied(field, params)
   );
 }
+
 export function areDependenciesSatisfied(
-  questionary: Questionary,
+  questionary: QuestionaryStep[],
   fieldId: string
 ) {
   const field = getFieldById(questionary, fieldId);
   if (!field) {
     return true;
   }
-  const isAtLeastOneDissatisfied = field.dependencies!.some(dep => {
-    let result = isDependencySatisfied(questionary, dep) === false;
-    return result;
-  });
-  return isAtLeastOneDissatisfied === false;
+
+  return isDependencySatisfied(questionary, field.dependency);
 }

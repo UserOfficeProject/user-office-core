@@ -1,7 +1,7 @@
-import { QuestionaryField } from "../../generated/sdk";
+import { Answer } from '../../generated/sdk';
 
-export interface IBasicComponentProps {
-  templateField: QuestionaryField;
+export interface BasicComponentProps {
+  templateField: Answer;
   touched: any;
   errors: any;
   onComplete: (evt: React.SyntheticEvent, newValue: any) => void;

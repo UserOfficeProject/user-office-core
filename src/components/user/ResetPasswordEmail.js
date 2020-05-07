@@ -1,44 +1,46 @@
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { Field, Form, Formik } from "formik";
-import { TextField } from "formik-material-ui";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import * as Yup from "yup";
-import { getUnauthorizedApi } from "../../hooks/useDataApi";
-import PhotoInSide from "./PhotoInSide";
-import { FormWrapper } from "../../styles/StyledComponents";
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
+
+import { useUnauthorizedApi } from '../../hooks/useDataApi';
+import { FormWrapper } from '../../styles/StyledComponents';
+import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main
+    backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1)
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
+    margin: theme.spacing(3, 0, 2),
   },
   sentMessageSuccess: {
-    color: theme.palette.secondary.main
+    color: theme.palette.secondary.main,
   },
   sentMessageError: {
-    color: theme.palette.error.main
-  }
+    color: theme.palette.error.main,
+  },
 }));
 
 export default function ResetPasswordEmail() {
   const classes = useStyles();
   const [emailSuccess, setSuccess] = useState(null);
+  const unauthorizedApi = useUnauthorizedApi();
   const requestResetEmail = values => {
-    getUnauthorizedApi()
+    unauthorizedApi
       .resetPasswordEmail({ email: values.email })
       .then(data => setSuccess(data.resetPasswordEmail));
   };
@@ -46,15 +48,15 @@ export default function ResetPasswordEmail() {
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ email: "" }}
+        initialValues={{ email: '' }}
         onSubmit={async (values, actions) => {
           await requestResetEmail(values);
           actions.setSubmitting(false);
         }}
         validationSchema={Yup.object().shape({
           email: Yup.string()
-            .email("Please enter a valid email")
-            .required("Please enter an email")
+            .email('Please enter a valid email')
+            .required('Please enter an email'),
         })}
       >
         <Form className={classes.form}>

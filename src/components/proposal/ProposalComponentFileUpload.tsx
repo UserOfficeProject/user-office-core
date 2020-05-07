@@ -1,18 +1,22 @@
-import { FormControl, FormLabel } from "@material-ui/core";
-import React, { ChangeEvent, useState, useEffect } from "react";
-import { FileUploadConfig } from "../../generated/sdk";
-import { FileUploadComponent } from "../common/FileUploadComponent";
-import { IBasicComponentProps } from "./IBasicComponentProps";
-import { ProposalErrorLabel } from "./ProposalErrorLabel";
+import { FormControl, FormLabel } from '@material-ui/core';
+import React, { ChangeEvent, useState, useEffect } from 'react';
+
+import { FileUploadConfig } from '../../generated/sdk';
+import { FileUploadComponent } from '../common/FileUploadComponent';
+import { BasicComponentProps } from './IBasicComponentProps';
+import { ProposalErrorLabel } from './ProposalErrorLabel';
 
 export function ProposalComponentFileUpload(
-  props: IBasicComponentProps & { files: string[] }
+  props: BasicComponentProps & { files: string[] }
 ) {
   const { templateField, errors, onComplete } = props;
-  const { proposal_question_id, value } = templateField;
-  const isError = errors[proposal_question_id] ? true : false;
-  const config = templateField.config as FileUploadConfig;
-  let [stateValue, setStateValue] = useState(value);
+  const {
+    question: { proposalQuestionId },
+    value,
+  } = templateField;
+  const isError = errors[proposalQuestionId] ? true : false;
+  const config = templateField.question.config as FileUploadConfig;
+  const [stateValue, setStateValue] = useState(value);
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -20,12 +24,12 @@ export function ProposalComponentFileUpload(
 
   return (
     <FormControl error={isError} required={config.required ? true : false}>
-      <FormLabel error={isError}>{templateField.question}</FormLabel>
-      <span>{templateField.config.small_label}</span>
+      <FormLabel error={isError}>{templateField.question.question}</FormLabel>
+      <span>{templateField.question.config.small_label}</span>
       <FileUploadComponent
         maxFiles={config.max_files}
-        id={templateField.proposal_question_id}
-        fileType={config.file_type ? config.file_type.join(",") : ""}
+        id={templateField.question.proposalQuestionId}
+        fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
           setStateValue(evt.target.value);
           onComplete(evt, evt.target.value); // letting Formik know that there was a change
@@ -33,7 +37,7 @@ export function ProposalComponentFileUpload(
         value={stateValue}
       />
       {isError && (
-        <ProposalErrorLabel>{errors[proposal_question_id]}</ProposalErrorLabel>
+        <ProposalErrorLabel>{errors[proposalQuestionId]}</ProposalErrorLabel>
       )}
     </FormControl>
   );

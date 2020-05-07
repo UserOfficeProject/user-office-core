@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
-import { GetBlankProposalQuery } from "../generated/sdk";
-import { useDataApi } from "./useDataApi";
+import { useEffect, useState } from 'react';
 
-export function useBlankProposal() {
+import { GetBlankProposalQuery } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
+
+export function useBlankProposal(callId: number) {
   const [proposal, setProposal] = useState<
-    GetBlankProposalQuery["blankProposal"]
+    GetBlankProposalQuery['blankProposal']
   >();
 
   const api = useDataApi();
 
   useEffect(() => {
     api()
-      .getBlankProposal()
+      .getBlankProposal({ callId })
       .then(data => {
         setProposal(data.blankProposal);
       });
-  }, [api]);
+  }, [api, callId]);
 
   return { proposal };
 }

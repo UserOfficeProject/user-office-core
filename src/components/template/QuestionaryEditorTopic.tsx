@@ -1,8 +1,3 @@
-import { Droppable, Draggable } from "react-beautiful-dnd";
-import React, { useState } from "react";
-
-import QuestionaryEditorTopicItem from "./QuestionaryEditorTopicItem";
-import { DataType } from "../../generated/sdk";
 import {
   makeStyles,
   Grid,
@@ -12,71 +7,76 @@ import {
   MenuItem,
   ListItemIcon,
   Typography,
-  Divider
-} from "@material-ui/core";
-import { EventType, IEvent } from "../../models/QuestionaryEditorModel";
-import DeleteRoundedIcon from "@material-ui/icons/DeleteRounded";
-import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import getTemplateFieldIcon from "./getTemplateFieldIcon";
-import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
-import { TemplateStep, ProposalTemplateField } from "../../generated/sdk";
+  Divider,
+} from '@material-ui/core';
+import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import React, { useState } from 'react';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
+
+import { DataType } from '../../generated/sdk';
+import { TemplateStep, QuestionRel } from '../../generated/sdk';
+import { EventType, Event } from '../../models/QuestionaryEditorModel';
+import getTemplateFieldIcon from './getTemplateFieldIcon';
+import QuestionaryEditorTopicItem from './QuestionaryEditorTopicItem';
 
 export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
-  dispatch: React.Dispatch<IEvent>;
+  dispatch: React.Dispatch<Event>;
   index: number;
-  onItemClick: { (data: ProposalTemplateField): void };
+  onItemClick: { (data: QuestionRel): void };
   dragMode: boolean;
 }) {
   const theme = useTheme();
 
   const classes = makeStyles(theme => ({
     container: {
-      alignItems: "flex-start",
-      alignContent: "flex-start",
-      background: "#FFF",
-      flexBasis: "100%"
+      alignItems: 'flex-start',
+      alignContent: 'flex-start',
+      background: '#FFF',
+      flexBasis: '100%',
     },
     inputHeading: {
-      fontSize: "15px",
+      fontSize: '15px',
       color: theme.palette.grey[600],
       fontWeight: 600,
-      width: "100%"
+      width: '100%',
     },
     itemContainer: {
-      minHeight: "180px"
+      minHeight: '180px',
     },
     topic: {
-      fontSize: "15px",
-      padding: "0 5px",
-      marginBottom: "16px",
+      fontSize: '15px',
+      padding: '0 5px',
+      marginBottom: '16px',
       color: theme.palette.grey[600],
       fontWeight: 600,
-      background: "white",
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis"
+      background: 'white',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
     },
     addQuestionMenuItem: {
-      minHeight: 0
+      minHeight: 0,
     },
     showMoreButton: {
-      cursor: "pointer"
+      cursor: 'pointer',
     },
     addIcon: {
-      textAlign: "right",
-      paddingRight: "8px"
+      textAlign: 'right',
+      paddingRight: '8px',
     },
     dragMode: {
       borderColor: theme.palette.grey[400],
-      padding: "5px",
-      borderWidth: "1px",
-      borderStyle: "dashed"
-    }
+      padding: '5px',
+      borderWidth: '1px',
+      borderStyle: 'dashed',
+    },
   }))();
 
   const { data, dispatch, index } = props;
-  const [title, setTitle] = useState<string>(data.topic.topic_title);
+  const [title, setTitle] = useState<string>(data.topic.title);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
@@ -84,7 +84,7 @@ export default function QuestionaryEditorTopic(props: {
   const onCreateNewFieldClicked = (dataType: DataType) => {
     dispatch({
       type: EventType.CREATE_NEW_FIELD_REQUESTED,
-      payload: { topicId: props.data.topic.topic_id, dataType: dataType }
+      payload: { topicId: props.data.topic.id, dataType: dataType },
     });
     setAnchorEl(null);
   };
@@ -93,12 +93,12 @@ export default function QuestionaryEditorTopic(props: {
     background: isDraggingOver
       ? theme.palette.primary.light
       : theme.palette.grey[100],
-    transition: "all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)"
+    transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
 
   const getItemStyle = (isDragging: any, draggableStyle: any) => ({
-    background: "#FFF",
-    ...draggableStyle
+    background: '#FFF',
+    ...draggableStyle,
   });
 
   const titleJsx = isEditMode ? (
@@ -112,11 +112,11 @@ export default function QuestionaryEditorTopic(props: {
         setIsEditMode(false);
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
-          payload: { topicId: data.topic.topic_id, title: title }
+          payload: { topicId: data.topic.id, title: title },
         });
       }}
       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
+        if (e.key === 'Enter') {
           e.currentTarget.blur();
         }
       }}
@@ -128,7 +128,7 @@ export default function QuestionaryEditorTopic(props: {
       }}
       data-cy="topic-title"
     >
-      {index + 2}. {props.data.topic.topic_title}
+      {index + 2}. {props.data.topic.title}
     </span>
   );
 
@@ -142,7 +142,7 @@ export default function QuestionaryEditorTopic(props: {
           data={item}
           dispatch={dispatch}
           onClick={props.onItemClick}
-          key={item.proposal_question_id.toString()}
+          key={item.question.proposalQuestionId.toString()}
         />
       ));
     }
@@ -150,8 +150,8 @@ export default function QuestionaryEditorTopic(props: {
 
   return (
     <Draggable
-      key={data.topic.topic_id.toString()}
-      draggableId={data.topic.topic_id.toString()}
+      key={data.topic.id.toString()}
+      draggableId={data.topic.id.toString()}
       index={index}
       isDragDisabled={!props.dragMode}
     >
@@ -254,7 +254,7 @@ export default function QuestionaryEditorTopic(props: {
                 onClick={() =>
                   dispatch({
                     type: EventType.DELETE_TOPIC_REQUESTED,
-                    payload: data.topic.topic_id
+                    payload: data.topic.id,
                   })
                 }
               >
@@ -269,7 +269,7 @@ export default function QuestionaryEditorTopic(props: {
                 onClick={() =>
                   dispatch({
                     type: EventType.CREATE_TOPIC_REQUESTED,
-                    payload: { sortOrder: index + 1 }
+                    payload: { sortOrder: index + 1 },
                     // +1 means - add immediately after this topic
                   })
                 }
@@ -282,7 +282,7 @@ export default function QuestionaryEditorTopic(props: {
             </Menu>
           </Grid>
 
-          <Droppable droppableId={data.topic.topic_id.toString()} type="field">
+          <Droppable droppableId={data.topic.id.toString()} type="field">
             {(provided, snapshot) => (
               <Grid
                 item

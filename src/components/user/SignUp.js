@@ -1,118 +1,118 @@
-import { Card, CardContent } from "@material-ui/core";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import FormLabel from "@material-ui/core/FormLabel";
-import Grid from "@material-ui/core/Grid";
-import { makeStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import clsx from "clsx";
-import { Field, Form, Formik } from "formik";
-import { CheckboxWithLabel, TextField } from "formik-material-ui";
-import React, { useContext, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
-import { UserContext } from "../../context/UserContextProvider";
-import { getUnauthorizedApi } from "../../hooks/useDataApi";
-import { useGetFields } from "../../hooks/useGetFields";
-import { useGetPageContent } from "../../hooks/useGetPageContent";
-import { useOrcIDInformation } from "../../hooks/useOrcIDInformation";
-import orcid from "../../images/orcid.png";
+import { Card, CardContent } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import FormLabel from '@material-ui/core/FormLabel';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import clsx from 'clsx';
+import { Field, Form, Formik } from 'formik';
+import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import queryString from 'query-string';
+import React, { useContext, useState } from 'react';
+import { Link, Redirect } from 'react-router-dom';
+
+import { UserContext } from '../../context/UserContextProvider';
+import { useUnauthorizedApi } from '../../hooks/useDataApi';
+import { useGetFields } from '../../hooks/useGetFields';
+import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
+import orcid from '../../images/orcid.png';
 import {
   userFieldSchema,
-  userPasswordFieldSchema
-} from "../../utils/userFieldValidationSchema";
-import { ErrorFocus } from "../common/ErrorFocus";
-import FormikDropdown from "../common/FormikDropdown";
-import InformationModal from "../pages/InformationModal";
-
-const queryString = require("query-string");
+  userPasswordFieldSchema,
+} from '../../utils/userFieldValidationSchema';
+import { ErrorFocus } from '../common/ErrorFocus';
+import FormikDropdown from '../common/FormikDropdown';
+import InformationModal from '../pages/InformationModal';
 
 const useStyles = makeStyles(theme => ({
-  "@global": {
+  '@global': {
     body: {
-      backgroundColor: theme.palette.common.white
-    }
+      backgroundColor: theme.palette.common.white,
+    },
   },
   container: {
-    marginBottom: theme.spacing(8)
+    marginBottom: theme.spacing(8),
   },
   avatar: {
     margin: theme.spacing(1),
-    marginLeft: "auto",
-    marginRight: "auto",
-    backgroundColor: theme.palette.secondary.main
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    backgroundColor: theme.palette.secondary.main,
   },
   heading: {
-    textAlign: "center"
+    textAlign: 'center',
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(3)
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
   },
   errorBox: {
-    border: `2px solid ${theme.palette.error.main}`
+    border: `2px solid ${theme.palette.error.main}`,
   },
   agreeBox: {
-    "font-size": ".8em"
+    'font-size': '.8em',
   },
   errorText: {
-    color: theme.palette.error.main
+    color: theme.palette.error.main,
   },
   requiredStar: {
     color: theme.palette.error.main,
-    content: " *"
+    content: ' *',
   },
   orcidIconSmall: {
-    "vertical-align": "middle",
-    "margin-right": "4px",
-    width: "16px",
-    height: "16px",
-    border: "0px"
+    'vertical-align': 'middle',
+    'margin-right': '4px',
+    width: '16px',
+    height: '16px',
+    border: '0px',
   },
   orcButton: {
-    "&:hover": {
-      border: "1px solid #338caf",
-      color: theme.palette.primary.light
+    '&:hover': {
+      border: '1px solid #338caf',
+      color: theme.palette.primary.light,
     },
-    border: "1px solid #D3D3D3",
-    padding: ".3em",
-    "background-color": "#fff !important",
-    "border-radius": "8px",
-    "box-shadow": "1px 1px 3px #999",
-    cursor: "pointer",
-    color: "#999",
-    "font-weight": "bold",
-    "font-size": ".8em",
-    "line-height": "24px",
-    "vertical-align": "middle"
+    border: '1px solid #D3D3D3',
+    padding: '.3em',
+    'background-color': '#fff !important',
+    'border-radius': '8px',
+    'box-shadow': '1px 1px 3px #999',
+    cursor: 'pointer',
+    color: '#999',
+    'font-weight': 'bold',
+    'font-size': '.8em',
+    'line-height': '24px',
+    'vertical-align': 'middle',
   },
 
   submit: {
-    margin: theme.spacing(3, 0, 2)
+    margin: theme.spacing(3, 0, 2),
   },
   orcidIconMedium: {
-    display: "block",
-    margin: "0 .5em 0 0",
+    display: 'block',
+    margin: '0 .5em 0 0',
     padding: 0,
-    float: "left",
-    width: "24px",
-    height: "24px"
+    float: 'left',
+    width: '24px',
+    height: '24px',
   },
   gridRoot: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   cardHeader: {
-    fontSize: "18px",
-    padding: "22px 0 0 12px"
+    fontSize: '18px',
+    padding: '22px 0 0 12px',
   },
   card: {
-    margin: "30px 0"
+    margin: '30px 0',
   },
   cardTitle: {
-    color: "black"
-  }
+    color: 'black',
+  },
 }));
 
 export default function SignUp(props) {
@@ -124,13 +124,14 @@ export default function SignUp(props) {
   const { handleLogin, token } = useContext(UserContext);
 
   const [orcidError, setOrcidError] = useState(false);
-  const [, privacyPageContent] = useGetPageContent("PRIVACYPAGE");
-  const [, cookiePageContent] = useGetPageContent("COOKIEPAGE");
+  const [, privacyPageContent] = useGetPageContent('PRIVACYPAGE');
+  const [, cookiePageContent] = useGetPageContent('COOKIEPAGE');
 
   const fieldsContent = useGetFields();
   const searchParams = queryString.parse(props.location.search);
-  let authCodeOrcID = searchParams.code;
+  const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
+  const unauthorizedApi = useUnauthorizedApi();
 
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
@@ -145,11 +146,11 @@ export default function SignUp(props) {
   const reDirectOrcID = () => {
     window.location.href =
       process.env.REACT_APP_ORCID_REDIRECT +
-      "?" +
+      '?' +
       queryString.stringify({
         email,
         given_names: firstname,
-        family_names: lastname
+        family_names: lastname,
       });
   };
 
@@ -171,7 +172,7 @@ export default function SignUp(props) {
   }
 
   const sendSignUpRequest = values => {
-    getUnauthorizedApi()
+    unauthorizedApi
       .createUser({
         ...values,
         orcid: orcData.orcid,
@@ -180,7 +181,7 @@ export default function SignUp(props) {
         preferredname: values.preferredname
           ? values.preferredname
           : values.firstname,
-        gender: values.gender === "other" ? values.othergender : values.gender
+        gender: values.gender === 'other' ? values.othergender : values.gender,
       })
       .then(data => setUserID(data.createUser.user.id));
   };
@@ -188,30 +189,31 @@ export default function SignUp(props) {
   if (authCodeOrcID && loading) {
     return <p>loading</p>;
   }
+
   return (
     <Container component="main" maxWidth="xs" className={classes.container}>
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
         initialValues={{
-          user_title: "",
+          user_title: '',
           firstname,
-          middlename: "",
+          middlename: '',
           lastname,
-          password: "",
-          preferredname: "",
-          gender: "",
-          nationality: "",
-          birthdate: "",
-          organisation: "",
-          department: "",
-          organisation_address: "",
-          position: "",
+          password: '',
+          preferredname: '',
+          gender: '',
+          nationality: '',
+          birthdate: '',
+          organisation: '',
+          department: '',
+          organisation_address: '',
+          position: '',
           email,
-          telephone: "",
-          telephone_alt: "",
+          telephone: '',
+          telephone_alt: '',
           privacy_agreement: false,
-          cookie_policy: false
+          cookie_policy: false,
         }}
         onSubmit={async (values, actions) => {
           if (orcData && orcData.orcid) {
@@ -243,14 +245,14 @@ export default function SignUp(props) {
                 <Card
                   className={clsx({
                     [classes.card]: true,
-                    [classes.errorBox]: orcidError
+                    [classes.errorBox]: orcidError,
                   })}
                 >
                   <Typography className={classes.cardHeader}>
                     {orcData ? (
                       <FormLabel
                         classes={{
-                          root: classes.cardTitle
+                          root: classes.cardTitle,
                         }}
                       >
                         1. ORCID iD
@@ -259,17 +261,17 @@ export default function SignUp(props) {
                       <FormLabel
                         required
                         classes={{
-                          root: classes.cardTitle
+                          root: classes.cardTitle,
                         }}
                       >
-                        {" "}
+                        {' '}
                         1. Create or connect your ORCID iD
                       </FormLabel>
                     )}
                   </Typography>
                   <CardContent>
                     {orcData ? (
-                      <a href={"https://orcid.org/" + orcData.orcid}>
+                      <a href={'https://orcid.org/' + orcData.orcid}>
                         <img
                           className={classes.orcidIconSmall}
                           src={orcid}
@@ -377,11 +379,11 @@ export default function SignUp(props) {
                       name="user_title"
                       label="Title"
                       items={[
-                        { text: "Ms.", value: "Ms." },
-                        { text: "Mr.", value: "Mr." },
-                        { text: "Dr.", value: "Dr." },
-                        { text: "Prof.", value: "Prof." },
-                        { text: "Rather not say", value: "unspecified" }
+                        { text: 'Ms.', value: 'Ms.' },
+                        { text: 'Mr.', value: 'Mr.' },
+                        { text: 'Dr.', value: 'Dr.' },
+                        { text: 'Prof.', value: 'Prof.' },
+                        { text: 'Rather not say', value: 'unspecified' },
                       ]}
                       data-cy="title"
                       required
@@ -433,15 +435,15 @@ export default function SignUp(props) {
                       name="gender"
                       label="Gender"
                       items={[
-                        { text: "Female", value: "female" },
-                        { text: "Male", value: "male" },
-                        { text: "Other", value: "other" }
+                        { text: 'Female', value: 'female' },
+                        { text: 'Male', value: 'male' },
+                        { text: 'Other', value: 'other' },
                       ]}
                       data-cy="gender"
                       required
                       disabled={!orcData}
                     />
-                    {values.gender === "other" && (
+                    {values.gender === 'other' && (
                       <Field
                         name="othergender"
                         label="Please specify gender"
@@ -473,7 +475,7 @@ export default function SignUp(props) {
                       required
                       disabled={!orcData}
                       InputLabelProps={{
-                        shrink: true
+                        shrink: true,
                       }}
                     />
                   </CardContent>
@@ -574,10 +576,10 @@ export default function SignUp(props) {
                         DEMAX
                         <InformationModal
                           text={privacyPageContent}
-                          linkText={"Privacy Statement"}
+                          linkText={'Privacy Statement'}
                         />
                       </>
-                    )
+                    ),
                   }}
                   margin="normal"
                   data-cy="privacy-agreement"
@@ -594,10 +596,10 @@ export default function SignUp(props) {
                         I consent to the DEMAX
                         <InformationModal
                           text={cookiePageContent}
-                          linkText={"Cookie policy"}
+                          linkText={'Cookie policy'}
                         />
                       </>
-                    )
+                    ),
                   }}
                   margin="normal"
                   data-cy="cookie-policy"
@@ -620,8 +622,8 @@ export default function SignUp(props) {
               <Grid item>
                 <Link to="/SignIn/">
                   {userID
-                    ? "Click here for sign in"
-                    : "Have an account? Sign In"}
+                    ? 'Click here for sign in'
+                    : 'Have an account? Sign In'}
                 </Link>
               </Grid>
             </Grid>

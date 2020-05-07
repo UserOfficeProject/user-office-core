@@ -1,15 +1,15 @@
 /// <reference types="Cypress" />
-var faker = require("faker");
+/// <reference types="../types" />
+var faker = require('faker');
 
-context("User administration tests", () => {
+context('User administration tests', () => {
   before(() => {
-    //@ts-ignore
     cy.resetDB();
   });
 
   beforeEach(() => {
     cy.viewport(1100, 900);
-    cy.visit("/");
+    cy.visit('/');
   });
 
   const newFirstName = faker.name.firstName();
@@ -17,77 +17,92 @@ context("User administration tests", () => {
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
-  const newPosition = faker.random.word().split(" ")[0];
+  const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.phoneNumber();
 
-  it("Should be able administer user information", () => {
-    //@ts-ignore
-    cy.login("officer");
+  it('Should be able administer user information', () => {
+    cy.login('officer');
 
-    cy.contains("View People").click();
+    cy.contains('View People').click();
 
     cy.get("[title='Edit user']")
       .first()
       .click();
 
     cy.get("[name='firstname']")
-      .clear({ force: true })
-      .type(newFirstName, { force: true });
+      .clear()
+      .type(newFirstName);
 
     cy.get("[name='middlename']")
       .clear()
-      .type(newMiddleName, { force: true });
+      .type(newMiddleName);
 
     cy.get("[name='lastname']")
       .clear()
-      .type(newLastName, { force: true });
+      .type(newLastName);
 
     cy.get("[name='preferredname']")
       .clear()
-      .type(newPrefferedName, { force: true });
+      .type(newPrefferedName);
 
     cy.get("[name='position']")
       .clear()
-      .type(newPosition, { force: true });
+      .type(newPosition);
 
     cy.get("[name='department']")
       .clear()
-      .type(newDepartment, { force: true });
+      .type(newDepartment);
 
     cy.get("[name='telephone']")
       .clear()
-      .type(newTelephone, { force: true });
+      .type(newTelephone);
 
-    cy.contains("Update Profile").click();
+    cy.contains('Update Profile').click();
 
     cy.reload();
 
     cy.get("[name='firstname']")
-      .invoke("val")
-      .should("eq", newFirstName);
+      .invoke('val')
+      .should('eq', newFirstName);
 
     cy.get("[name='middlename']")
-      .invoke("val")
-      .should("eq", newMiddleName);
+      .invoke('val')
+      .should('eq', newMiddleName);
 
     cy.get("[name='lastname']")
-      .invoke("val")
-      .should("eq", newLastName);
+      .invoke('val')
+      .should('eq', newLastName);
 
     cy.get("[name='preferredname']")
-      .invoke("val")
-      .should("eq", newPrefferedName);
+      .invoke('val')
+      .should('eq', newPrefferedName);
 
     cy.get("[name='position']")
-      .invoke("val")
-      .should("eq", newPosition);
+      .invoke('val')
+      .should('eq', newPosition);
 
     cy.get("[name='department']")
-      .invoke("val")
-      .should("eq", newDepartment);
+      .invoke('val')
+      .should('eq', newDepartment);
 
     cy.get("[name='telephone']")
-      .invoke("val")
-      .should("eq", newTelephone);
+      .invoke('val')
+      .should('eq', newTelephone);
+  });
+
+  it('Should be able to delete user user information', () => {
+    cy.login('officer');
+
+    cy.contains('View People').click();
+
+    cy.get("[title='Delete']")
+      .first()
+      .click();
+
+    cy.get("[title='Save']")
+      .first()
+      .click();
+
+    cy.contains('1-2 of 2');
   });
 });

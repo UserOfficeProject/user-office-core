@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { useDataApi } from "./useDataApi";
-import { ProposalStatus } from "../generated/sdk";
-import { Proposal } from "../generated/sdk";
+import { useEffect, useState } from 'react';
+
+import { ProposalStatus } from '../generated/sdk';
+import { Proposal } from '../generated/sdk';
+import { useDataApi } from './useDataApi';
 
 export function useProposalsData(filter: string) {
   const api = useDataApi();
@@ -10,7 +11,7 @@ export function useProposalsData(filter: string) {
   useEffect(() => {
     api()
       .getProposals({
-        filter: filter
+        filter: { text: filter },
       })
       .then(data => {
         if (data.proposals) {
@@ -20,8 +21,8 @@ export function useProposalsData(filter: string) {
                 ...proposal,
                 status:
                   proposal.status === ProposalStatus.DRAFT
-                    ? "Open"
-                    : "Submitted"
+                    ? 'Open'
+                    : 'Submitted',
               };
             })
           );
@@ -33,6 +34,6 @@ export function useProposalsData(filter: string) {
   return { loading, proposalsData, setProposalsData };
 }
 
-interface ProposalData extends Omit<Proposal, "status" | "questionary"> {
+export interface ProposalData extends Omit<Proposal, 'status' | 'questionary'> {
   status: string;
 }

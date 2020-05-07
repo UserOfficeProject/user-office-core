@@ -1,0 +1,22 @@
+mutation updateQuestionRel(
+  $questionId: String!
+  $templateId: Int!
+  $topicId: Int
+  $sortOrder: Int
+  $dependency: FieldDependencyInput
+) {
+  updateQuestionRel(
+    questionId: $questionId
+    templateId: $templateId
+    topicId: $topicId
+    sortOrder: $sortOrder
+    dependency: $dependency
+  ) {
+    template {
+      steps {
+        ...templateStep
+      }
+    }
+    error
+  }
+}

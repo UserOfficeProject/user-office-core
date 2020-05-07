@@ -1,29 +1,29 @@
-import React, { Fragment, useState, useCallback } from "react";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import React, { Fragment, useState, useCallback } from 'react';
 
 const defaultOptions = {
-  title: "",
-  description: "",
-  confirmationText: "OK",
-  cancellationText: "Cancel",
+  title: '',
+  description: '',
+  confirmationText: 'OK',
+  cancellationText: 'Cancel',
   dialogProps: {},
-  onClose: () => {},
-  onCancel: () => {}
+  onClose: (): void => {},
+  onCancel: (): void => {},
 };
-
-const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
-  props: any
-) => {
-  const classes = makeStyles(theme => ({
+//
+const withConfirm = <T extends unknown>(
+  WrappedComponent: (props: T) => JSX.Element
+) => (props: Omit<T, 'confirm'>): JSX.Element => {
+  const classes = makeStyles(() => ({
     title: {
-      marginTop: "12px"
-    }
+      marginTop: '12px',
+    },
   }))();
   const [onConfirm, setOnConfirm] = useState<Function | null>(null);
   const [options, setOptions] = useState(defaultOptions);
@@ -34,7 +34,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
     cancellationText,
     dialogProps,
     onClose,
-    onCancel
+    onCancel,
   } = options;
   const handleClose = useCallback(() => {
     onClose();
@@ -55,14 +55,18 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
   );
   /* Returns function opening the dialog, passed to the wrapped component. */
   const confirm = useCallback(
-    (onConfirm, options: IOptions) => () => {
+    (onConfirm, options: Options) => (): void => {
       setOnConfirm(() => onConfirm);
       setOptions({ ...defaultOptions, ...options });
     },
     []
   );
+
+  // @ts
   return (
     <Fragment>
+      {/* 
+      // @ts-ignore-line */}
       <WrappedComponent {...props} confirm={confirm} />
       <Dialog
         fullWidth
@@ -87,7 +91,7 @@ const withConfirm = (WrappedComponent: (props: any) => JSX.Element) => (
   );
 };
 
-interface IOptions {
+interface Options {
   title: string;
   description: string;
   confirmationText?: string;
@@ -96,5 +100,10 @@ interface IOptions {
   onClose?: () => void;
   onCancel?: () => void;
 }
+
+export type WithConfirmType = (
+  callback: () => void,
+  params: { title: string; description: string }
+) => Function;
 
 export default withConfirm;
