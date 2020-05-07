@@ -7,7 +7,7 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { AdminComponentShell } from '../FormShell';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 
 export const QuestionDateForm: AdminComponentSignature = props => {
   const field = props.field;

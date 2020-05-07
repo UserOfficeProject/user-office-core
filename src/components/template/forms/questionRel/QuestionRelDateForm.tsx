@@ -7,7 +7,7 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { AdminComponentShell } from '../FormShell';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { AdminComponentSignature } from './QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 import TitledContainer from '../../../common/TitledContainer';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 

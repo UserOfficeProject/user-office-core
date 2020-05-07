@@ -6,7 +6,7 @@ import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import { AdminComponentShell } from '../FormShell';
-import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 import TitledContainer from '../../../common/TitledContainer';
 import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
 import { BooleanConfig } from '../../../../generated/sdk';

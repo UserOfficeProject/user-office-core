@@ -7,7 +7,7 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import TitledContainer from '../../../common/TitledContainer';
 import { AdminComponentShell } from '../FormShell';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
-import { AdminComponentSignature } from './QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 
 export const QuestionRelEmbellismentForm: AdminComponentSignature = props => {
   const field = props.field;

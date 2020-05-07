@@ -8,7 +8,7 @@ import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
-import { AdminComponentSignature } from './QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 import { AdminComponentShell } from '../FormShell';
 
 export const QuestionRelTextInputForm: AdminComponentSignature = props => {

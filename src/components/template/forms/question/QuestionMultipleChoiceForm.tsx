@@ -9,7 +9,7 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import TitledContainer from '../../../common/TitledContainer';
 import { AdminComponentShell } from '../FormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
-import { AdminComponentSignature } from '../questionRel/QuestionRelEditor';
+import { AdminComponentSignature } from '../QuestionRelEditor';
 
 export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
   const field = props.field;
