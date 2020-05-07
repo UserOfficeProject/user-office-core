@@ -38,6 +38,15 @@ const ProposalTableOfficer: React.FC = () => {
     return avg;
   };
 
+  const absoluteDifference = (numbers: number[]) => {
+    if (numbers.length < 2) {
+      return NaN;
+    }
+    numbers = numbers.sort();
+
+    return numbers[numbers.length - 1] - numbers[0];
+  };
+
   const standardDeviation = (numbers: number[]) => {
     if (numbers.length < 2) {
       return NaN;
@@ -113,6 +122,15 @@ const ProposalTableOfficer: React.FC = () => {
       customSort: (a: ProposalData, b: ProposalData) =>
         (standardDeviation(getGrades(a.reviews)) || 0) -
         (standardDeviation(getGrades(b.reviews)) || 0),
+    },
+    {
+      title: 'Absolute Difference',
+      field: 'absolute',
+      render: (rowData: ProposalData): number =>
+        absoluteDifference(getGrades(rowData.reviews)),
+      customSort: (a: ProposalData, b: ProposalData) =>
+        (absoluteDifference(getGrades(a.reviews)) || 0) -
+        (absoluteDifference(getGrades(b.reviews)) || 0),
     },
     {
       title: 'Average Score',
