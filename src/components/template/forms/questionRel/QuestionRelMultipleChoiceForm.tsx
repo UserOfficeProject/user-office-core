@@ -5,7 +5,7 @@ import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from '../question/QuestionFormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -35,7 +35,7 @@ export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Multiple choice">
+          <QuestionFormShell {...props} label="Multiple choice">
             <MultipleChoiceConfigFragment
               config={
                 formikProps.values.question.config as SelectionFromOptionsConfig
@@ -52,7 +52,7 @@ export const QuestionRelMultipleChoiceForm: AdminComponentSignature = props => {
                 inputProps={{ 'data-cy': 'dependencies' }}
               />
             </TitledContainer>
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

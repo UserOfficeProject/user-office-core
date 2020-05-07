@@ -5,7 +5,7 @@ import { FileUploadConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from '../question/QuestionFormShell';
 import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -36,7 +36,7 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="File upload">
+          <QuestionFormShell {...props} label="File upload">
             <FileUploadConfigFragment
               config={formikProps.values.question.config as FileUploadConfig}
             />
@@ -52,7 +52,7 @@ export const QuestionRelFileUploadForm: AdminComponentSignature = props => {
                 data-cy="dependencies"
               />
             </TitledContainer>
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

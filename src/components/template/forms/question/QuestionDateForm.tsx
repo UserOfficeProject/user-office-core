@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { DateConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from './QuestionFormShell';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -34,7 +34,7 @@ export const QuestionDateForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Date">
+          <QuestionFormShell {...props} label="Date">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -56,7 +56,7 @@ export const QuestionDateForm: AdminComponentSignature = props => {
             <DateConfigFragment
               config={formikProps.values.question.config as DateConfig}
             />
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

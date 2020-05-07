@@ -5,7 +5,7 @@ import { BooleanConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from '../question/QuestionFormShell';
 import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -34,7 +34,7 @@ export const QuestionRelBooleanForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Checkbox">
+          <QuestionFormShell {...props} label="Checkbox">
             <BooleanConfigFragment
               config={formikProps.values.question.config as BooleanConfig}
             />
@@ -49,7 +49,7 @@ export const QuestionRelBooleanForm: AdminComponentSignature = props => {
                 data-cy="dependencies"
               />
             </TitledContainer>
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

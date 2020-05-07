@@ -89,11 +89,4 @@ interface AdminComponentProps {
   closeMe: Function;
 }
 
-interface AdminComponentShellProps extends AdminComponentProps {
-  label: string;
-}
 export type AdminComponentSignature = FunctionComponent<AdminComponentProps>;
-
-export type AdminComponentShellSignature = FunctionComponent<
-  AdminComponentShellProps
->;

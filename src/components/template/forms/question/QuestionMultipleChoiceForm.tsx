@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from './QuestionFormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -38,7 +38,7 @@ export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Multiple choice">
+          <QuestionFormShell {...props} label="Multiple choice">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -63,7 +63,7 @@ export const QuestionMultipleChoiceForm: AdminComponentSignature = props => {
                 formikProps.values.question.config as SelectionFromOptionsConfig
               }
             />
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

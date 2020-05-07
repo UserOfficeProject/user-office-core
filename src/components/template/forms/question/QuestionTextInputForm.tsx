@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { TextInputConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from './QuestionFormShell';
 import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -52,7 +52,7 @@ export const QuestionTextInputForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Text input">
+          <QuestionFormShell {...props} label="Text input">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -75,7 +75,7 @@ export const QuestionTextInputForm: AdminComponentSignature = props => {
             <TextInputConfigFragment
               config={formikProps.values.question.config as TextInputConfig}
             />
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

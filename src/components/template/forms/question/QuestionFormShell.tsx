@@ -1,11 +1,12 @@
 import { Button, Typography, makeStyles } from '@material-ui/core';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
-import { EventType } from '../../../models/QuestionaryEditorModel';
-import getTemplateFieldIcon from '../getTemplateFieldIcon';
-import { AdminComponentShellSignature } from './QuestionRelEditor';
+import { EventType } from '../../../../models/QuestionaryEditorModel';
+import getTemplateFieldIcon from '../../getTemplateFieldIcon';
+import { QuestionRel, ProposalTemplate } from '../../../../generated/sdk';
+import { Event } from '../../../../models/QuestionaryEditorModel';
 
-export const AdminComponentShell: AdminComponentShellSignature = props => {
+export const QuestionFormShell: QuestionFormShellSignature = props => {
   const classes = makeStyles(theme => ({
     container: {
       width: '100%',
@@ -62,3 +63,13 @@ export const AdminComponentShell: AdminComponentShellSignature = props => {
     </div>
   );
 };
+
+interface QuestionFormShellProps {
+  field: QuestionRel;
+  template: ProposalTemplate;
+  dispatch: React.Dispatch<Event>;
+  closeMe: Function;
+  label: string;
+}
+
+type QuestionFormShellSignature = FunctionComponent<QuestionFormShellProps>;

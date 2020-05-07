@@ -3,7 +3,7 @@ import React from 'react';
 import * as Yup from 'yup';
 import { EmbellishmentConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from './QuestionFormShell';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -33,11 +33,11 @@ export const QuestionEmbellismentForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="Embellishment">
+          <QuestionFormShell {...props} label="Embellishment">
             <EmbellishmentConfigFragment
               config={formikProps.values.question.config as EmbellishmentConfig}
             />
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>

@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { FileUploadConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { AdminComponentShell } from '../FormShell';
+import { QuestionFormShell } from './QuestionFormShell';
 import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
 
@@ -39,7 +39,7 @@ export const QuestionFileUploadForm: AdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <AdminComponentShell {...props} label="File upload">
+          <QuestionFormShell {...props} label="File upload">
             <Field
               name="question.naturalKey"
               label="Key"
@@ -62,7 +62,7 @@ export const QuestionFileUploadForm: AdminComponentSignature = props => {
             <FileUploadConfigFragment
               config={formikProps.values.question.config as FileUploadConfig}
             />
-          </AdminComponentShell>
+          </QuestionFormShell>
         </Form>
       )}
     </Formik>
