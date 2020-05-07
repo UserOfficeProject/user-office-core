@@ -44,7 +44,7 @@ const ProposalTableOfficer: React.FC = () => {
     }
     numbers = numbers.sort();
 
-    return numbers[numbers.length - 1] - numbers[0];
+    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
   };
 
   const standardDeviation = (numbers: number[]) => {
