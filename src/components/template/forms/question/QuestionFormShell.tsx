@@ -3,14 +3,11 @@ import React, { FunctionComponent } from 'react';
 
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
-import {
-  QuestionRel,
-  ProposalTemplate,
-  Question,
-} from '../../../../generated/sdk';
+import { ProposalTemplate, Question } from '../../../../generated/sdk';
 import { Event } from '../../../../models/QuestionaryEditorModel';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionFormShell: QuestionFormShellSignature = props => {
+export const QuestionFormShell: TFormSignature<Question> = props => {
   const classes = makeStyles(theme => ({
     container: {
       width: '100%',
@@ -36,7 +33,6 @@ export const QuestionFormShell: QuestionFormShellSignature = props => {
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
         {getTemplateFieldIcon(props.field.dataType)}
-        {props.label}
       </Typography>
       {props.children}
       <div className={classes.actions}>

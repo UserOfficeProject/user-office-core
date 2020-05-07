@@ -2,14 +2,17 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
+import {
+  SelectionFromOptionsConfig,
+  Question,
+} from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { QuestionFormShell } from './QuestionFormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
-import { QuestionAdminComponentSignature } from '../QuestionEditor';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionMultipleChoiceForm: QuestionAdminComponentSignature = props => {
+export const QuestionMultipleChoiceForm: TFormSignature<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -38,7 +41,7 @@ export const QuestionMultipleChoiceForm: QuestionAdminComponentSignature = props
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Multiple choice">
+          <QuestionFormShell {...props}>
             <Field
               name="question.naturalKey"
               label="Key"

@@ -2,14 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { BooleanConfig } from '../../../../generated/sdk';
+import { BooleanConfig, Question } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
-import { QuestionAdminComponentSignature } from '../QuestionEditor';
 import { QuestionFormShell } from './QuestionFormShell';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionBooleanForm: QuestionAdminComponentSignature = props => {
+export const QuestionBooleanForm: TFormSignature<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -37,7 +37,7 @@ export const QuestionBooleanForm: QuestionAdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Checkbox">
+          <QuestionFormShell {...props}>
             <Field
               name="question.naturalKey"
               label="Key"

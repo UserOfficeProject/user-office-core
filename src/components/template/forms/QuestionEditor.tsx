@@ -9,6 +9,7 @@ import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';
 import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
+import { TFormSignature } from './TFormSignature';
 
 export default function QuestionEditor(props: {
   field: Question | null;
@@ -16,10 +17,7 @@ export default function QuestionEditor(props: {
   closeMe: Function;
   template: ProposalTemplate;
 }) {
-  const componentMap = JSDict.Create<
-    DataType,
-    QuestionAdminComponentSignature
-  >();
+  const componentMap = JSDict.Create<DataType, TFormSignature<Question>>();
   componentMap.put(DataType.BOOLEAN, QuestionBooleanForm);
   componentMap.put(DataType.EMBELLISHMENT, QuestionEmbellismentForm);
   componentMap.put(DataType.FILE_UPLOAD, QuestionFileUploadForm);
@@ -45,14 +43,3 @@ export default function QuestionEditor(props: {
     </ModalWrapper>
   );
 }
-
-interface QuestionAdminComponentProps {
-  field: Question;
-  template: ProposalTemplate;
-  dispatch: React.Dispatch<Event>;
-  closeMe: Function;
-}
-
-export type QuestionAdminComponentSignature = FunctionComponent<
-  QuestionAdminComponentProps
->;

@@ -2,14 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig } from '../../../../generated/sdk';
+import { DateConfig, Question } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { QuestionAdminComponentSignature } from '../QuestionEditor';
 import { QuestionFormShell } from './QuestionFormShell';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionDateForm: QuestionAdminComponentSignature = props => {
+export const QuestionDateForm: TFormSignature<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -34,7 +34,7 @@ export const QuestionDateForm: QuestionAdminComponentSignature = props => {
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Date">
+          <QuestionFormShell {...props}>
             <Field
               name="naturalKey"
               label="Key"

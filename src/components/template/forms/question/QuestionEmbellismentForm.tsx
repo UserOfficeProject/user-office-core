@@ -1,13 +1,13 @@
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { EmbellishmentConfig } from '../../../../generated/sdk';
+import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
-import { QuestionAdminComponentSignature } from '../QuestionEditor';
 import { QuestionFormShell } from './QuestionFormShell';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionEmbellismentForm: QuestionAdminComponentSignature = props => {
+export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
   const field = props.field;
 
   return (
@@ -33,7 +33,7 @@ export const QuestionEmbellismentForm: QuestionAdminComponentSignature = props =
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="Embellishment">
+          <QuestionFormShell {...props}>
             <EmbellishmentConfigFragment
               config={formikProps.values.config as EmbellishmentConfig}
             />

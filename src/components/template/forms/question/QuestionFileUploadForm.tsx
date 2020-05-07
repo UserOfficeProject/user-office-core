@@ -2,14 +2,14 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { FileUploadConfig } from '../../../../generated/sdk';
+import { FileUploadConfig, Question } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import { QuestionFormShell } from './QuestionFormShell';
 import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
-import { QuestionAdminComponentSignature } from '../QuestionEditor';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionFileUploadForm: QuestionAdminComponentSignature = props => {
+export const QuestionFileUploadForm: TFormSignature<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -39,7 +39,7 @@ export const QuestionFileUploadForm: QuestionAdminComponentSignature = props => 
     >
       {formikProps => (
         <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props} label="File upload">
+          <QuestionFormShell {...props}>
             <Field
               name="question.naturalKey"
               label="Key"
