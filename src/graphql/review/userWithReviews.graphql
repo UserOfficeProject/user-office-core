@@ -1,5 +1,5 @@
-query userWithReviews($id: Int!) {
-  user(id: $id) {
+query userWithReviews {
+  me {
     id
     firstname
     lastname

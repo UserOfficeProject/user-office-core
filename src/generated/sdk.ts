@@ -212,6 +212,8 @@ export type Mutation = {
   assignChairAndSecretary: SepResponseWrap,
   assignMember: SepResponseWrap,
   removeMember: SepResponseWrap,
+  assignProposal: SepResponseWrap,
+  removeProposalAssignment: SepResponseWrap,
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
@@ -225,10 +227,8 @@ export type Mutation = {
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
-  removeSEPMemberRole: SepMembersRoleResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
-  addSEPMembersRole: SepMembersRoleResponseWrap,
   createProposal: ProposalResponseWrap,
   createProposalTemplate: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
@@ -311,8 +311,7 @@ export type MutationAddUserForReviewArgs = {
 
 
 export type MutationAssignChairAndSecretaryArgs = {
-  memberIds: Array<Scalars['Int']>,
-  sepId: Scalars['Int']
+  addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
 };
 
 
@@ -324,6 +323,18 @@ export type MutationAssignMemberArgs = {
 
 export type MutationRemoveMemberArgs = {
   memberId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type MutationAssignProposalArgs = {
+  proposalId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type MutationRemoveProposalAssignmentArgs = {
+  proposalId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -440,12 +451,6 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationRemoveSepMemberRoleArgs = {
-  memberId: Scalars['Int'],
-  sepId: Scalars['Int']
-};
-
-
 export type MutationUpdateUserArgs = {
   id: Scalars['Int'],
   user_title?: Maybe<Scalars['String']>,
@@ -472,11 +477,6 @@ export type MutationUpdateUserArgs = {
 
 export type MutationAddClientLogArgs = {
   error: Scalars['String']
-};
-
-
-export type MutationAddSepMembersRoleArgs = {
-  addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
 };
 
 
@@ -709,6 +709,7 @@ export type Query = {
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
   sep?: Maybe<Sep>,
+  sepMembers?: Maybe<Array<SepMember>>,
   sepAssignments?: Maybe<Array<SepAssignment>>,
   seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
@@ -800,12 +801,18 @@ export type QuerySepArgs = {
 };
 
 
+export type QuerySepMembersArgs = {
+  sepId: Scalars['Int']
+};
+
+
 export type QuerySepAssignmentsArgs = {
   id: Scalars['Int']
 };
 
 
 export type QuerySepsArgs = {
+  active?: Maybe<Scalars['Boolean']>,
   filter?: Maybe<Scalars['String']>,
   first?: Maybe<Scalars['Int']>,
   offset?: Maybe<Scalars['Int']>
@@ -926,13 +933,24 @@ export type Sep = {
 
 export type SepAssignment = {
    __typename?: 'SEPAssignment',
-  proposalId?: Maybe<Scalars['Int']>,
-  sepMemberUserId: Scalars['Int'],
+  proposalId: Scalars['Int'],
+  sepMemberUserId?: Maybe<Scalars['Int']>,
   sepId: Scalars['Int'],
   dateAssigned: Scalars['DateTime'],
   reassigned: Scalars['Boolean'],
   dateReassigned?: Maybe<Scalars['DateTime']>,
   emailSent: Scalars['Boolean'],
+  proposal: Proposal,
+  roles: Array<Role>,
+  user?: Maybe<BasicUserDetails>,
+};
+
+export type SepMember = {
+   __typename?: 'SEPMember',
+  roleUserId: Scalars['Int'],
+  roleId: Scalars['Int'],
+  userId: Scalars['Int'],
+  sepId: Scalars['Int'],
   roles: Array<Role>,
   user: BasicUserDetails,
 };
@@ -1091,16 +1109,21 @@ export enum UserRole {
   SEP_MEMBER = 'SEP_MEMBER'
 }
 
-export type AddSepMembersRoleMutationVariables = {
-  addSEPMembersRole: Array<AddSepMembersRole>
+export type AssignProposalMutationVariables = {
+  proposalId: Scalars['Int'],
+  sepId: Scalars['Int']
 };
 
 
-export type AddSepMembersRoleMutation = (
+export type AssignProposalMutation = (
   { __typename?: 'Mutation' }
-  & { addSEPMembersRole: (
-    { __typename?: 'SEPMembersRoleResponseWrap' }
-    & Pick<SepMembersRoleResponseWrap, 'error' | 'success'>
+  & { assignProposal: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
   ) }
 );
 
@@ -1123,8 +1146,7 @@ export type AssignMemberMutation = (
 );
 
 export type AssignChairAndSecretaryMutationVariables = {
-  memberIds: Array<Scalars['Int']>,
-  sepId: Scalars['Int']
+  addSEPMembersRole: Array<AddSepMembersRole>
 };
 
 
@@ -1183,6 +1205,29 @@ export type GetSepAssignmentsQuery = (
   & { sepAssignments: Maybe<Array<(
     { __typename?: 'SEPAssignment' }
     & Pick<SepAssignment, 'proposalId' | 'sepMemberUserId' | 'sepId' | 'dateAssigned' | 'reassigned' | 'dateReassigned' | 'emailSent'>
+    & { proposal: (
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'id' | 'title' | 'status' | 'shortCode'>
+    ), roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )>, user: Maybe<(
+      { __typename?: 'BasicUserDetails' }
+      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
+    )> }
+  )>> }
+);
+
+export type GetSepMembersQueryVariables = {
+  sepId: Scalars['Int']
+};
+
+
+export type GetSepMembersQuery = (
+  { __typename?: 'Query' }
+  & { sepMembers: Maybe<Array<(
+    { __typename?: 'SEPMember' }
+    & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
     & { roles: Array<(
       { __typename?: 'Role' }
       & Pick<Role, 'id' | 'shortCode' | 'title'>
@@ -1194,7 +1239,8 @@ export type GetSepAssignmentsQuery = (
 );
 
 export type GetSePsQueryVariables = {
-  filter: Scalars['String']
+  filter: Scalars['String'],
+  active: Scalars['Boolean']
 };
 
 
@@ -1208,6 +1254,24 @@ export type GetSePsQuery = (
       & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
     )> }
   )> }
+);
+
+export type RemoveProposalAssignmentMutationVariables = {
+  proposalId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type RemoveProposalAssignmentMutation = (
+  { __typename?: 'Mutation' }
+  & { removeProposalAssignment: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
 );
 
 export type RemoveMemberMutationVariables = {
@@ -1225,20 +1289,6 @@ export type RemoveMemberMutation = (
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
-  ) }
-);
-
-export type RemoveSepMemberRoleMutationVariables = {
-  memberId: Scalars['Int'],
-  sepId: Scalars['Int']
-};
-
-
-export type RemoveSepMemberRoleMutation = (
-  { __typename?: 'Mutation' }
-  & { removeSEPMemberRole: (
-    { __typename?: 'SEPMembersRoleResponseWrap' }
-    & Pick<SepMembersRoleResponseWrap, 'error' | 'success'>
   ) }
 );
 
@@ -1783,14 +1833,12 @@ export type UpdateReviewMutation = (
   ) }
 );
 
-export type UserWithReviewsQueryVariables = {
-  id: Scalars['Int']
-};
+export type UserWithReviewsQueryVariables = {};
 
 
 export type UserWithReviewsQuery = (
   { __typename?: 'Query' }
-  & { user: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'id' | 'firstname' | 'lastname' | 'organisation'>
     & { reviews: Array<(
@@ -2605,11 +2653,13 @@ export const BasicUserDetailsFragmentDoc = gql`
   position
 }
     `;
-export const AddSepMembersRoleDocument = gql`
-    mutation addSEPMembersRole($addSEPMembersRole: [AddSEPMembersRole!]!) {
-  addSEPMembersRole(addSEPMembersRole: $addSEPMembersRole) {
+export const AssignProposalDocument = gql`
+    mutation assignProposal($proposalId: Int!, $sepId: Int!) {
+  assignProposal(proposalId: $proposalId, sepId: $sepId) {
     error
-    success
+    sep {
+      id
+    }
   }
 }
     `;
@@ -2624,8 +2674,8 @@ export const AssignMemberDocument = gql`
 }
     `;
 export const AssignChairAndSecretaryDocument = gql`
-    mutation assignChairAndSecretary($memberIds: [Int!]!, $sepId: Int!) {
-  assignChairAndSecretary(memberIds: $memberIds, sepId: $sepId) {
+    mutation assignChairAndSecretary($addSEPMembersRole: [AddSEPMembersRole!]!) {
+  assignChairAndSecretary(addSEPMembersRole: $addSEPMembersRole) {
     error
     sep {
       id
@@ -2662,6 +2712,12 @@ export const GetSepAssignmentsDocument = gql`
     sepId
     dateAssigned
     reassigned
+    proposal {
+      id
+      title
+      status
+      shortCode
+    }
     roles {
       id
       shortCode
@@ -2678,9 +2734,30 @@ export const GetSepAssignmentsDocument = gql`
   }
 }
     `;
+export const GetSepMembersDocument = gql`
+    query getSEPMembers($sepId: Int!) {
+  sepMembers(sepId: $sepId) {
+    roleUserId
+    roleId
+    userId
+    sepId
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+      organisation
+    }
+  }
+}
+    `;
 export const GetSePsDocument = gql`
-    query getSEPs($filter: String!) {
-  seps(filter: $filter) {
+    query getSEPs($filter: String!, $active: Boolean!) {
+  seps(filter: $filter, active: $active) {
     seps {
       id
       code
@@ -2692,9 +2769,9 @@ export const GetSePsDocument = gql`
   }
 }
     `;
-export const RemoveMemberDocument = gql`
-    mutation removeMember($memberId: Int!, $sepId: Int!) {
-  removeMember(memberId: $memberId, sepId: $sepId) {
+export const RemoveProposalAssignmentDocument = gql`
+    mutation removeProposalAssignment($proposalId: Int!, $sepId: Int!) {
+  removeProposalAssignment(proposalId: $proposalId, sepId: $sepId) {
     error
     sep {
       id
@@ -2702,11 +2779,13 @@ export const RemoveMemberDocument = gql`
   }
 }
     `;
-export const RemoveSepMemberRoleDocument = gql`
-    mutation removeSEPMemberRole($memberId: Int!, $sepId: Int!) {
-  removeSEPMemberRole(memberId: $memberId, sepId: $sepId) {
+export const RemoveMemberDocument = gql`
+    mutation removeMember($memberId: Int!, $sepId: Int!) {
+  removeMember(memberId: $memberId, sepId: $sepId) {
     error
-    success
+    sep {
+      id
+    }
   }
 }
     `;
@@ -3030,8 +3109,8 @@ export const UpdateReviewDocument = gql`
 }
     ${CoreReviewFragmentDoc}`;
 export const UserWithReviewsDocument = gql`
-    query userWithReviews($id: Int!) {
-  user(id: $id) {
+    query userWithReviews {
+  me {
     id
     firstname
     lastname
@@ -3427,8 +3506,8 @@ export const VerifyEmailDocument = gql`
     `;
 export function getSdk(client: GraphQLClient) {
   return {
-    addSEPMembersRole(variables: AddSepMembersRoleMutationVariables): Promise<AddSepMembersRoleMutation> {
-      return client.request<AddSepMembersRoleMutation>(print(AddSepMembersRoleDocument), variables);
+    assignProposal(variables: AssignProposalMutationVariables): Promise<AssignProposalMutation> {
+      return client.request<AssignProposalMutation>(print(AssignProposalDocument), variables);
     },
     assignMember(variables: AssignMemberMutationVariables): Promise<AssignMemberMutation> {
       return client.request<AssignMemberMutation>(print(AssignMemberDocument), variables);
@@ -3445,14 +3524,17 @@ export function getSdk(client: GraphQLClient) {
     getSEPAssignments(variables: GetSepAssignmentsQueryVariables): Promise<GetSepAssignmentsQuery> {
       return client.request<GetSepAssignmentsQuery>(print(GetSepAssignmentsDocument), variables);
     },
+    getSEPMembers(variables: GetSepMembersQueryVariables): Promise<GetSepMembersQuery> {
+      return client.request<GetSepMembersQuery>(print(GetSepMembersDocument), variables);
+    },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return client.request<GetSePsQuery>(print(GetSePsDocument), variables);
     },
+    removeProposalAssignment(variables: RemoveProposalAssignmentMutationVariables): Promise<RemoveProposalAssignmentMutation> {
+      return client.request<RemoveProposalAssignmentMutation>(print(RemoveProposalAssignmentDocument), variables);
+    },
     removeMember(variables: RemoveMemberMutationVariables): Promise<RemoveMemberMutation> {
       return client.request<RemoveMemberMutation>(print(RemoveMemberDocument), variables);
-    },
-    removeSEPMemberRole(variables: RemoveSepMemberRoleMutationVariables): Promise<RemoveSepMemberRoleMutation> {
-      return client.request<RemoveSepMemberRoleMutation>(print(RemoveSepMemberRoleDocument), variables);
     },
     updateSEP(variables: UpdateSepMutationVariables): Promise<UpdateSepMutation> {
       return client.request<UpdateSepMutation>(print(UpdateSepDocument), variables);
@@ -3567,6 +3649,24 @@ export function getSdk(client: GraphQLClient) {
     },
     updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
       return client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables);
+    },
+    addTechnicalReview(variables: AddTechnicalReviewMutationVariables): Promise<AddTechnicalReviewMutation> {
+      return client.request<AddTechnicalReviewMutation>(print(AddTechnicalReviewDocument), variables);
+    },
+    addUserForReview(variables: AddUserForReviewMutationVariables): Promise<AddUserForReviewMutation> {
+      return client.request<AddUserForReviewMutation>(print(AddUserForReviewDocument), variables);
+    },
+    getReview(variables: GetReviewQueryVariables): Promise<GetReviewQuery> {
+      return client.request<GetReviewQuery>(print(GetReviewDocument), variables);
+    },
+    removeUserForReview(variables: RemoveUserForReviewMutationVariables): Promise<RemoveUserForReviewMutation> {
+      return client.request<RemoveUserForReviewMutation>(print(RemoveUserForReviewDocument), variables);
+    },
+    updateReview(variables: UpdateReviewMutationVariables): Promise<UpdateReviewMutation> {
+      return client.request<UpdateReviewMutation>(print(UpdateReviewDocument), variables);
+    },
+    userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
+      return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
       return client.request<CreateUserMutation>(print(CreateUserDocument), variables);

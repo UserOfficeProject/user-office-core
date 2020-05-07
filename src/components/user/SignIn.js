@@ -13,7 +13,7 @@ import { Link, Redirect } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { getUnauthorizedApi } from '../../hooks/useDataApi';
+import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import orcid from '../../images/orcid.png';
 import { FormWrapper } from '../../styles/StyledComponents';
 import PhotoInSide from './PhotoInSide';
@@ -75,21 +75,21 @@ export default function SignInSide() {
   const [failedLogin, setFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { handleLogin, token } = useContext(UserContext);
+  const unauthorizedApi = useUnauthorizedApi();
 
   const requestToken = values => {
     const { email, password } = values;
 
-    getUnauthorizedApi()
-      .login({ email, password })
-      .then(data => {
-        if (!data.login.error) {
-          handleLogin(data.login.token);
-        } else {
+    unauthorizedApi.login({ email, password }).then(data => {
+      if (data.login && !data.login.error) {
+        handleLogin(data.login.token);
+      } else {
+        if (data.login) {
           setErrorMessage(getTranslation(data.login.error));
           setFailed(true);
         }
-      })
-      .catch(error => setFailed(true));
+      }
+    });
   };
 
   if (token) {

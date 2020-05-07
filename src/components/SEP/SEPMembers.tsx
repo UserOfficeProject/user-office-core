@@ -7,13 +7,13 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import {
-  SepAssignment,
+  SepMember,
   BasicUserDetails,
   UserRole,
   AddSepMembersRole,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { useSEPAssignmentsData } from '../../hooks/useSEPAssignmentsData';
+import { useSEPMembersData } from '../../hooks/useSEPMembersData';
 import { useUsersData } from '../../hooks/useUsersData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
@@ -41,10 +41,10 @@ const useStyles = makeStyles({
 const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
   const {
-    loadingAssignments,
-    SEPAssignmentsData,
-    setSEPAssignmentsData,
-  } = useSEPAssignmentsData(sepId, modalOpen);
+    loadingMembers,
+    SEPMembersData,
+    setSEPMembersData,
+  } = useSEPMembersData(sepId, modalOpen);
   const { loading, usersData } = useUsersData('');
   const classes = useStyles();
   const api = useDataApi();
@@ -66,18 +66,18 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     },
   ];
 
-  const initializeValues = (assignments: SepAssignment[]): void => {
-    assignments.forEach(assignment => {
-      assignment.roles.forEach(role => {
+  const initializeValues = (members: SepMember[]): void => {
+    members.forEach(member => {
+      member.roles.forEach(role => {
         switch (role.shortCode.toUpperCase()) {
           case UserRole.SEP_CHAIR:
-            initialValues.SEPChair = assignment.sepMemberUserId.toString();
+            initialValues.SEPChair = member.userId.toString();
             break;
           case UserRole.SEP_SECRETARY:
-            initialValues.SEPSecretary = assignment.sepMemberUserId.toString();
+            initialValues.SEPSecretary = member.userId.toString();
             break;
           case UserRole.SEP_MEMBER:
-            initialValues.SEPReviewers.push(assignment.user);
+            initialValues.SEPReviewers.push(member.user);
             break;
           default:
             break;
@@ -125,20 +125,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const sendSEPChairAndSecretaryUpdate = async (
     values: SEPMemberAssignments
   ): Promise<void> => {
-    const [memberIds, roleValues] = assignChairAndSecretaryToSEP(values);
+    const [, roleValues] = assignChairAndSecretaryToSEP(values);
 
     const assignChairAndSecretaryResult = await api().assignChairAndSecretary({
-      memberIds,
-      sepId,
-    });
-
-    const SEPMembersRoleResult = await api().addSEPMembersRole({
       addSEPMembersRole: roleValues,
     });
 
     showNotification(
-      !!assignChairAndSecretaryResult.assignChairAndSecretary.error ||
-        !!SEPMembersRoleResult.addSEPMembersRole.error
+      !!assignChairAndSecretaryResult.assignChairAndSecretary.error
     );
   };
 
@@ -150,20 +144,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       sepId,
     });
 
-    const SEPMembersRoleResult = await api().addSEPMembersRole({
-      addSEPMembersRole: [
-        {
-          userID: user.id,
-          roleID: UserRole.SEP_MEMBER,
-          SEPID: sepId,
-        },
-      ],
-    });
-
-    showNotification(
-      !!assignedMembersResult.assignMember.error ||
-        !!SEPMembersRoleResult.addSEPMembersRole.error
-    );
+    showNotification(!!assignedMembersResult.assignMember.error);
   };
 
   const removeMember = async (user: BasicUserDetails): Promise<void> => {
@@ -172,26 +153,16 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       sepId,
     });
 
-    const SEPMembersRoleResult = await api().removeSEPMemberRole({
-      memberId: user.id,
-      sepId: sepId,
-    });
-
-    if (SEPAssignmentsData) {
-      setSEPAssignmentsData(
-        SEPAssignmentsData.filter(
-          assignment => assignment.sepMemberUserId !== user.id
-        )
+    if (SEPMembersData) {
+      setSEPMembersData(
+        SEPMembersData.filter(member => member.userId !== user.id)
       );
     }
 
-    showNotification(
-      !!removedMembersResult.removeMember.error ||
-        !!SEPMembersRoleResult.removeSEPMemberRole.error
-    );
+    showNotification(!!removedMembersResult.removeMember.error);
   };
 
-  if (!usersData || loading || loadingAssignments) {
+  if (!usersData || loading || loadingMembers) {
     return <p>Loading...</p>;
   }
 
@@ -202,8 +173,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     };
   });
 
-  if (SEPAssignmentsData && SEPAssignmentsData.length > 0) {
-    initializeValues(SEPAssignmentsData as SepAssignment[]);
+  if (SEPMembersData && SEPMembersData.length > 0) {
+    initializeValues(SEPMembersData as SepMember[]);
   }
 
   const AddIcon = (): JSX.Element => <Add data-cy="add-member" />;

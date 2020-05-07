@@ -16,7 +16,7 @@ import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { getUnauthorizedApi } from '../../hooks/useDataApi';
+import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
 import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
@@ -131,6 +131,7 @@ export default function SignUp(props) {
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
+  const unauthorizedApi = useUnauthorizedApi();
 
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
@@ -171,7 +172,7 @@ export default function SignUp(props) {
   }
 
   const sendSignUpRequest = values => {
-    getUnauthorizedApi()
+    unauthorizedApi
       .createUser({
         ...values,
         orcid: orcData.orcid,
