@@ -1,13 +1,18 @@
 import { Edit, Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable from 'material-table';
+import MaterialTable, { Query, QueryResult } from 'material-table';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router';
 
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { tableIcons } from '../../utils/tableIcons';
+import { ProposalData } from '../../hooks/useProposalsData';
+import { tableIcons } from '../../utils/materialIcons';
 
-export default function ProposalTable(props) {
+export default function ProposalTable(props: {
+  title: string;
+  searchQuery: (x: Query<ProposalData>) => Promise<QueryResult<ProposalData>>;
+  search: boolean;
+}) {
   const downloadPDFProposal = useDownloadPDFProposal();
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
@@ -27,7 +32,7 @@ export default function ProposalTable(props) {
       icons={tableIcons}
       title={props.title}
       columns={columns}
-      data={query => props.searchQuery(query)}
+      data={(query: Query<ProposalData>) => props.searchQuery(query)}
       options={{
         search: props.search,
         debounceInterval: 400,
@@ -43,13 +48,15 @@ export default function ProposalTable(props) {
               rowData.status === 'Submitted'
                 ? 'View proposal'
                 : 'Edit proposal',
-            onClick: (event, rowData) => setEditProposalID(rowData.id),
+            onClick: (event, rowData) =>
+              setEditProposalID(Array.isArray(rowData) ? 0 : rowData.id),
           };
         },
         {
           icon: () => <GetAppIcon />,
           tooltip: 'Download proposal',
-          onClick: (event, rowData) => downloadPDFProposal(rowData.id),
+          onClick: (event, rowData) =>
+            downloadPDFProposal(Array.isArray(rowData) ? 0 : rowData.id),
         },
       ]}
     />
