@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { DataType, ProposalTemplate, Question } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 import JSDict from '../../../utils/Dictionary';
@@ -14,7 +14,7 @@ import { TFormSignature } from './TFormSignature';
 export default function QuestionEditor(props: {
   field: Question | null;
   dispatch: React.Dispatch<Event>;
-  closeMe: Function;
+  closeMe: () => void;
   template: ProposalTemplate;
 }) {
   const componentMap = JSDict.Create<DataType, TFormSignature<Question>>();
@@ -30,10 +30,7 @@ export default function QuestionEditor(props: {
   }
 
   return (
-    <ModalWrapper
-      closeMe={event => props.closeMe()}
-      isOpen={props.field != null}
-    >
+    <ModalWrapper closeMe={props.closeMe} isOpen={props.field != null}>
       {React.createElement(componentMap.get(props.field.dataType)!, {
         field: props.field,
         dispatch: props.dispatch,
