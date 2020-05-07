@@ -36,7 +36,7 @@ export const QuestionDateForm: QuestionAdminComponentSignature = props => {
         <Form style={{ flexGrow: 1 }}>
           <QuestionFormShell {...props} label="Date">
             <Field
-              name="question.naturalKey"
+              name="naturalKey"
               label="Key"
               type="text"
               component={TextField}
@@ -45,7 +45,7 @@ export const QuestionDateForm: QuestionAdminComponentSignature = props => {
               inputProps={{ 'data-cy': 'natural_key' }}
             />
             <Field
-              name="question.question"
+              name="question"
               label="Question"
               type="text"
               component={TextField}

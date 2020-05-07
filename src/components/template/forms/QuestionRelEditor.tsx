@@ -12,6 +12,7 @@ import { QuestionRelEmbellismentForm } from './questionRel/QuestionRelEmbellisme
 import { QuestionRelFileUploadForm } from './questionRel/QuestionRelFileUploadForm';
 import { QuestionRelMultipleChoiceForm } from './questionRel/QuestionRelMultipleChoiceForm';
 import { QuestionRelTextInputForm } from './questionRel/QuestionRelTextInputForm';
+import ModalWrapper from '../ModalWrapper';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;
@@ -19,21 +20,6 @@ export default function QuestionRelEditor(props: {
   closeMe: Function;
   template: ProposalTemplate;
 }) {
-  const classes = makeStyles(() => ({
-    container: {
-      backgroundColor: 'white',
-      padding: '20px',
-      maxWidth: '700px',
-      maxHeight: '100%',
-      overflowY: 'auto',
-    },
-    modal: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  }))();
-
   const componentMap = JSDict.Create<
     DataType,
     QuestionRelAdminComponentSignature
@@ -51,37 +37,19 @@ export default function QuestionRelEditor(props: {
   if (props.field === null) {
     return null;
   }
-  if (componentMap.get(props.field.question.dataType) === null) {
-    return <span>Error ocurred</span>;
-  }
 
   return (
-    <Modal
-      className={classes.modal}
-      open={props.field != null}
-      onClose={() => {
-        props.closeMe();
-      }}
-      closeAfterTransition
-      BackdropComponent={Backdrop}
-      BackdropProps={{
-        timeout: 500,
-      }}
+    <ModalWrapper
+      closeMe={event => props.closeMe()}
+      isOpen={props.field != null}
     >
-      <Fade in={props.field != null}>
-        <Grid container className={classes.container}>
-          {React.createElement(
-            componentMap.get(props.field.question.dataType)!,
-            {
-              field: props.field,
-              dispatch: props.dispatch,
-              closeMe: props.closeMe,
-              template: props.template,
-            }
-          )}
-        </Grid>
-      </Fade>
-    </Modal>
+      {React.createElement(componentMap.get(props.field.question.dataType)!, {
+        field: props.field,
+        dispatch: props.dispatch,
+        closeMe: props.closeMe,
+        template: props.template,
+      })}
+    </ModalWrapper>
   );
 }
 
