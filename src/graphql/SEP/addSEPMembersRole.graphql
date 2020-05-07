@@ -1,6 +1,0 @@
-mutation addSEPMembersRole($addSEPMembersRole: [AddSEPMembersRole!]!) {
-  addSEPMembersRole(addSEPMembersRole: $addSEPMembersRole) {
-    error
-    success
-  }
-}

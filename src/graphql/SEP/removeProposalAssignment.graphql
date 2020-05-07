@@ -1,0 +1,8 @@
+mutation removeProposalAssignment($proposalId: Int!, $sepId: Int!) {
+  removeProposalAssignment(proposalId: $proposalId, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}
