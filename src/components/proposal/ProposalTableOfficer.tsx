@@ -78,7 +78,7 @@ const ProposalTableOfficer: React.FC = () => {
    */
   const RowActionButtons = (rowData: ProposalData) => (
     <>
-      <IconButton>
+      <IconButton data-cy="view-proposal">
         <Link
           to={`/ProposalReviewUserOfficer/${rowData.id}`}
           style={{ color: 'inherit', textDecoration: 'inherit' }}

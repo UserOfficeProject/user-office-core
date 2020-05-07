@@ -32,7 +32,7 @@ context('Event log tests', () => {
 
     cy.login('officer');
 
-    cy.get('button[title="View proposal"]')
+    cy.get("[data-cy='view-proposal']")
       .first()
       .click();
     cy.contains('Logs').click();
