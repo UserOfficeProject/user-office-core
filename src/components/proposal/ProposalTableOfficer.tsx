@@ -1,9 +1,10 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { IconButton } from '@material-ui/core';
 import { Visibility, Delete } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
-import React, { useState } from 'react';
-import { Redirect } from 'react-router';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { Review, ReviewStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -56,9 +57,39 @@ const ProposalTableOfficer: React.FC = () => {
       ?.filter(review => review.status === ReviewStatus.SUBMITTED)
       .map(review => review.grade!) ?? [];
 
+  /**
+   * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
+   * and selection flag is true they are not working properly.
+   */
+  const RowActionButtons = (rowData: ProposalData) => (
+    <>
+      <IconButton>
+        <Link
+          to={`/ProposalReviewUserOfficer/${rowData.id}`}
+          style={{ color: 'inherit', textDecoration: 'inherit' }}
+        >
+          <Visibility />
+        </Link>
+      </IconButton>
+      <IconButton onClick={() => downloadPDFProposal(rowData.id)}>
+        <GetAppIcon />
+      </IconButton>
+    </>
+  );
+
   const columns = [
+    {
+      title: 'Actions',
+      cellStyle: { padding: 0, width: '10%' },
+      sorting: false,
+      render: RowActionButtons,
+    },
     { title: 'Proposal ID', field: 'shortCode' },
-    { title: 'Title', field: 'title' },
+    {
+      title: 'Title',
+      field: 'title',
+      width: 'auto',
+    },
     { title: 'Time(Days)', field: 'technicalReview.timeAllocation' },
     {
       title: 'Technical status',
@@ -88,8 +119,6 @@ const ProposalTableOfficer: React.FC = () => {
     },
   ];
 
-  const [editProposalID, setEditProposalID] = useState(0);
-
   const deleteProposals = (): void => {
     selectedProposals.forEach(id => {
       new Promise(async resolve => {
@@ -104,17 +133,10 @@ const ProposalTableOfficer: React.FC = () => {
     });
   };
 
-  if (editProposalID) {
-    return (
-      <Redirect push to={`/ProposalReviewUserOfficer/${editProposalID}`} />
-    );
-  }
-
   if (loading) {
     return <p>Loading</p>;
   }
 
-  const VisibilityIcon = (): JSX.Element => <Visibility />;
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
 
@@ -139,21 +161,6 @@ const ProposalTableOfficer: React.FC = () => {
           columnsButton: true,
         }}
         actions={[
-          {
-            icon: VisibilityIcon,
-            tooltip: 'View proposal',
-            onClick: (event, rowData): void =>
-              setEditProposalID((rowData as ProposalData).id),
-            position: 'row',
-          },
-          {
-            icon: GetAppIconComponent,
-            tooltip: 'Download proposals',
-            onClick: (event, rowData): void => {
-              downloadPDFProposal((rowData as ProposalData).id);
-            },
-            position: 'row',
-          },
           {
             icon: GetAppIconComponent,
             tooltip: 'Download proposals',
