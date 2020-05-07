@@ -3599,7 +3599,7 @@ export function getSdk(client: GraphQLClient) {
     updateReview(variables: UpdateReviewMutationVariables): Promise<UpdateReviewMutation> {
       return client.request<UpdateReviewMutation>(print(UpdateReviewDocument), variables);
     },
-    userWithReviews(variables: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
+    userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
     createProposalTemplate(variables: CreateProposalTemplateMutationVariables): Promise<CreateProposalTemplateMutation> {
@@ -3649,24 +3649,6 @@ export function getSdk(client: GraphQLClient) {
     },
     updateTopicOrder(variables: UpdateTopicOrderMutationVariables): Promise<UpdateTopicOrderMutation> {
       return client.request<UpdateTopicOrderMutation>(print(UpdateTopicOrderDocument), variables);
-    },
-    addTechnicalReview(variables: AddTechnicalReviewMutationVariables): Promise<AddTechnicalReviewMutation> {
-      return client.request<AddTechnicalReviewMutation>(print(AddTechnicalReviewDocument), variables);
-    },
-    addUserForReview(variables: AddUserForReviewMutationVariables): Promise<AddUserForReviewMutation> {
-      return client.request<AddUserForReviewMutation>(print(AddUserForReviewDocument), variables);
-    },
-    getReview(variables: GetReviewQueryVariables): Promise<GetReviewQuery> {
-      return client.request<GetReviewQuery>(print(GetReviewDocument), variables);
-    },
-    removeUserForReview(variables: RemoveUserForReviewMutationVariables): Promise<RemoveUserForReviewMutation> {
-      return client.request<RemoveUserForReviewMutation>(print(RemoveUserForReviewDocument), variables);
-    },
-    updateReview(variables: UpdateReviewMutationVariables): Promise<UpdateReviewMutation> {
-      return client.request<UpdateReviewMutation>(print(UpdateReviewDocument), variables);
-    },
-    userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
-      return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
     createUser(variables: CreateUserMutationVariables): Promise<CreateUserMutation> {
       return client.request<CreateUserMutation>(print(CreateUserDocument), variables);
