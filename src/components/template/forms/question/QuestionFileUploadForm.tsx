@@ -5,8 +5,6 @@ import * as Yup from 'yup';
 import { FileUploadConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../../common/TitledContainer';
 import { AdminComponentShell } from '../FormShell';
 import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';

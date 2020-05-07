@@ -3,9 +3,9 @@ import React from 'react';
 import * as Yup from 'yup';
 import { EmbellishmentConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { AdminComponentShell } from '../FormShell';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
-import { AdminComponentShell } from '../FormShell';
 
 export const QuestionEmbellismentForm: AdminComponentSignature = props => {
   const field = props.field;

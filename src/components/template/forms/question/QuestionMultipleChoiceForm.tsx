@@ -5,8 +5,6 @@ import * as Yup from 'yup';
 import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../../common/TitledContainer';
 import { AdminComponentShell } from '../FormShell';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
 import { AdminComponentSignature } from '../QuestionRelEditor';
