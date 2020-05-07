@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SEP, SEPAssignment } from '../../models/SEP';
+import { Role } from '../../models/Role';
+import { SEP, SEPAssignment, SEPMember } from '../../models/SEP';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
-import { SEPRecord, SEPAssignmentRecord } from './records';
+import {
+  SEPRecord,
+  SEPAssignmentRecord,
+  SEPMemberRecord,
+  RoleRecord,
+} from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
   private createSEPObject(sep: SEPRecord) {
@@ -24,6 +31,15 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       sepAssignment.reassigned,
       sepAssignment.date_reassigned,
       sepAssignment.email_sent
+    );
+  }
+
+  private createSEPMemberObject(sepMember: SEPMemberRecord) {
+    return new SEPMember(
+      sepMember.role_user_id,
+      sepMember.role_id,
+      sepMember.user_id,
+      sepMember.sep_id
     );
   }
 
@@ -87,6 +103,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getAll(
+    active: boolean,
     filter?: string,
     first?: number,
     offset?: number
@@ -106,6 +123,9 @@ export default class PostgresSEPDataSource implements SEPDataSource {
         }
         if (offset) {
           query.offset(offset);
+        }
+        if (active) {
+          query.where('active', active);
         }
       })
       .then((allSeps: SEPRecord[]) => {
@@ -128,54 +148,96 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
-  async assignChairAndSecretary(memberIds: number[], sepId: number) {
-    const dataToInsert = memberIds.map(memberId => {
-      return { sep_member_user_id: memberId, sep_id: sepId };
+  async getMembers(sepId: number): Promise<SEPMember[]> {
+    const sepAssignments: SEPMemberRecord[] = await database
+      .from('role_user')
+      .where('sep_id', sepId);
+
+    return sepAssignments.map(sepMember =>
+      this.createSEPMemberObject(sepMember)
+    );
+  }
+
+  async getSEPUserRoles(id: number, sepId: number): Promise<Role[]> {
+    return database
+      .select()
+      .from('roles as r')
+      .join('role_user as rc', { 'r.role_id': 'rc.role_id' })
+      .join('users as u', { 'u.user_id': 'rc.user_id' })
+      .where('u.user_id', id)
+      .andWhere('rc.sep_id', sepId)
+      .then((roles: RoleRecord[]) =>
+        roles.map(role => new Role(role.role_id, role.short_code, role.title))
+      );
+  }
+
+  async addSEPMembersRoles(usersWithRoles: AddSEPMembersRole[]) {
+    const rolesToInsert = usersWithRoles.map(userWithRole => {
+      return {
+        user_id: userWithRole.userID,
+        role_id: userWithRole.roleID,
+        sep_id: userWithRole.SEPID,
+      };
     });
 
-    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
-    await database.raw(
-      `${database('SEP_Assignments').insert(
-        dataToInsert
-      )} ON CONFLICT (sep_id, SEP_member_user_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
-    );
-
-    const sepUpdated = await this.get(sepId);
-
-    if (sepUpdated) {
-      return sepUpdated;
-    }
-
-    throw new Error(`SEP not found ${sepId}`);
-  }
-
-  async assignMember(memberId: number, sepId: number) {
-    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
-    await database.raw(
-      `${database('SEP_Assignments').insert({
-        sep_member_user_id: memberId,
-        sep_id: sepId,
-      })} ON CONFLICT (sep_id, sep_member_user_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
-    );
-
-    const sepUpdated = await this.get(sepId);
-
-    if (sepUpdated) {
-      return sepUpdated;
-    }
-
-    throw new Error(`SEP not found ${sepId}`);
-  }
-
-  async removeMember(memberId: number, sepId: number) {
-    const memberRemoved = await database('SEP_Assignments')
+    await database('role_user')
       .del()
-      .where('sep_member_user_id', memberId)
-      .andWhere('sep_id', sepId);
+      .where('sep_id', rolesToInsert[0].sep_id)
+      .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
+
+    await database.insert(rolesToInsert).into('role_user');
+
+    const sepUpdated = await this.get(rolesToInsert[0].sep_id);
+
+    if (sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${rolesToInsert[0].sep_id}`);
+  }
+
+  async removeSEPMemberRole(memberId: number, sepId: number) {
+    const memberRemoved = await database('role_user')
+      .del()
+      .where('sep_id', sepId)
+      .andWhere('user_id', memberId);
 
     const sepUpdated = await this.get(sepId);
 
     if (memberRemoved && sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async assignProposal(proposalId: number, sepId: number) {
+    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
+    await database.raw(
+      `${database('SEP_Assignments').insert({
+        proposal_id: proposalId,
+        sep_id: sepId,
+      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
+    );
+
+    const sepUpdated = await this.get(sepId);
+
+    if (sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeProposalAssignment(proposalId: number, sepId: number) {
+    const assignmentRemoved = await database('SEP_Assignments')
+      .del()
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (assignmentRemoved && sepUpdated) {
       return sepUpdated;
     }
 

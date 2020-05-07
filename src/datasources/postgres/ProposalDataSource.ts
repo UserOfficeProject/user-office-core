@@ -340,9 +340,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
              proposal_question__proposal_template__rels.sort_order`)
     ).rows;
 
-    const fields = answerRecords.map(
-      record => new Answer(createQuestionRelObject(record), record.value || '')
-    );
+    const fields = answerRecords.map(record => {
+      const value = record.value ? JSON.parse(record.value).value : '';
+
+      return new Answer(createQuestionRelObject(record), value);
+    });
 
     const steps = Array<QuestionaryStep>();
     topicRecords.forEach(topic => {
@@ -368,10 +370,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error(`No proposal with id: ${proposalId}`);
     }
 
-    return this.getQuestionaryWithTemplateId(
-      proposal.proposerId,
-      proposal.templateId
-    );
+    return this.getQuestionaryWithTemplateId(proposal.id, proposal.templateId);
   }
 
   async updateTopicCompletenesses(

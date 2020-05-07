@@ -5,6 +5,7 @@ import {
   anotherDummySEP,
   dummySEPs,
   dummySEPAssignment,
+  dummySEPMembers,
 } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUser,
@@ -22,19 +23,25 @@ describe('Test SEPQueries', () => {
 
   test('A userofficer can get all SEPs if no filter is passed', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficer)
+      SEPQueriesInstance.getAll(dummyUserOfficer, false)
     ).resolves.toStrictEqual({ totalCount: 2, seps: dummySEPs });
+  });
+
+  test('A userofficer can get only `active` SEPs', () => {
+    return expect(
+      SEPQueriesInstance.getAll(dummyUserOfficer, true)
+    ).resolves.toStrictEqual({ totalCount: 1, seps: [dummySEP] });
   });
 
   test('A userofficer can filter SEPs by `code` and `description`', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficer, 'SEP 2')
+      SEPQueriesInstance.getAll(dummyUserOfficer, false, 'SEP 2')
     ).resolves.toStrictEqual({ totalCount: 1, seps: [anotherDummySEP] });
   });
 
   test('A userofficer can get SEPs paginated', () => {
     return expect(
-      SEPQueriesInstance.getAll(dummyUserOfficer, '', 1, 1)
+      SEPQueriesInstance.getAll(dummyUserOfficer, false, '', 1, 1)
     ).resolves.toStrictEqual({ totalCount: 1, seps: [dummySEP] });
   });
 
@@ -42,6 +49,12 @@ describe('Test SEPQueries', () => {
     return expect(
       SEPQueriesInstance.get(dummyUserOfficer, 1)
     ).resolves.toStrictEqual(dummySEP);
+  });
+
+  test('A userofficer can get SEP Members by SEP id', () => {
+    return expect(
+      SEPQueriesInstance.getMembers(dummyUserOfficer, 1)
+    ).resolves.toStrictEqual(dummySEPMembers);
   });
 
   test('A userofficer can get SEP Assignments by SEP id', () => {

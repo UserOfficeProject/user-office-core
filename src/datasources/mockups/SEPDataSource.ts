@@ -1,4 +1,5 @@
-import { SEP, SEPAssignment } from '../../models/SEP';
+import { SEP, SEPAssignment, SEPMember } from '../../models/SEP';
+import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
 export const dummySEP = new SEP(
@@ -27,8 +28,11 @@ export const dummySEPWithoutCode = new SEP(
 
 export const dummySEPs = [dummySEP, anotherDummySEP];
 
+export const dummySEPMember = new SEPMember(1, 4, 1, 1);
+export const anotherDummySEPMember = new SEPMember(2, 5, 2, 1);
+
 export const dummySEPAssignment = new SEPAssignment(
-  null,
+  1,
   2,
   1,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -38,7 +42,7 @@ export const dummySEPAssignment = new SEPAssignment(
 );
 
 export const anotherDummySEPAssignment = new SEPAssignment(
-  null,
+  1,
   3,
   2,
   new Date('2020-04-20 08:25:12.23043+00'),
@@ -51,6 +55,8 @@ export const dummySEPAssignments = [
   dummySEPAssignment,
   anotherDummySEPAssignment,
 ];
+
+export const dummySEPMembers = [dummySEPMember, anotherDummySEPMember];
 
 export class SEPDataSourceMock implements SEPDataSource {
   async create(
@@ -84,7 +90,12 @@ export class SEPDataSourceMock implements SEPDataSource {
     return null;
   }
 
-  async getAll(filter?: string, first?: number, offset?: number) {
+  async getAll(
+    active: boolean,
+    filter?: string,
+    first?: number,
+    offset?: number
+  ) {
     // NOTE: Copy sorted by id 'desc'
     let dummySEPsCopy = [...dummySEPs.sort((a, b) => b.id - a.id)];
 
@@ -101,6 +112,10 @@ export class SEPDataSourceMock implements SEPDataSource {
       );
     }
 
+    if (active) {
+      dummySEPsCopy = dummySEPsCopy.filter(sep => sep.active);
+    }
+
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
 
@@ -108,7 +123,25 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEPAssignments.filter(assignment => assignment.sepId === id);
   }
 
-  async assignChairAndSecretary(memberIds: number[], sepId: number) {
+  async getMembers(sepId: number) {
+    return dummySEPMembers.filter(member => member.sepId === sepId);
+  }
+
+  async getSEPUserRoles(id: number, sepId: number) {
+    return [{ id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' }];
+  }
+
+  async addSEPMembersRoles(args: AddSEPMembersRole[]) {
+    const sep = dummySEPs.find(element => element.id === args[0].SEPID);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${args[0].SEPID}`);
+  }
+
+  async removeSEPMemberRole(memberId: number, sepId: number) {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {
@@ -118,7 +151,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     throw new Error(`SEP not found ${sepId}`);
   }
 
-  async assignMember(memberId: number, sepId: number) {
+  async assignProposal(proposalId: number, sepId: number) {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {
@@ -128,7 +161,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     throw new Error(`SEP not found ${sepId}`);
   }
 
-  async removeMember(memberId: number, sepId: number) {
+  async removeProposalAssignment(proposalId: number, sepId: number) {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {

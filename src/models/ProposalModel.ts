@@ -21,9 +21,9 @@ export class FieldDependency {
 
   static fromObject(obj: any) {
     return new FieldDependency(
-      obj.question_id,
-      obj.dependency_id,
-      obj.dependency_natural_key,
+      obj.questionId,
+      obj.dependencyId,
+      obj.dependencyNaturalKey,
       typeof obj.condition == 'string'
         ? JSON.parse(obj.condition)
         : obj.condition
@@ -49,12 +49,7 @@ export class Topic {
   ) {}
 
   public static fromObject(obj: any) {
-    return new Topic(
-      obj.topic_id,
-      obj.topic_title,
-      obj.sort_order,
-      obj.is_enabled
-    );
+    return new Topic(obj.id, obj.title, obj.sortOrder, obj.isEnabled);
   }
 }
 
@@ -69,11 +64,11 @@ export class Question {
 
   static fromObject(obj: any) {
     return new Question(
-      obj.proposal_question_id,
-      obj.natural_key,
-      obj.data_type,
-      obj.sort_order,
-      obj.question
+      obj.proposalQuestionId,
+      obj.naturalKey,
+      obj.dataType,
+      obj.question,
+      obj.config
     );
   }
 }
@@ -89,8 +84,8 @@ export class QuestionRel {
   public static fromObject(obj: any) {
     return new QuestionRel(
       Question.fromObject(obj.question),
-      obj.topic_id,
-      obj.sort_order,
+      obj.topicId,
+      obj.sortOrder,
       obj.dependency ? FieldDependency.fromObject(obj.dependency) : undefined
     );
   }

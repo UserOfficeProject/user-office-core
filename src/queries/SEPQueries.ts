@@ -4,7 +4,7 @@ import { Roles } from '../models/Role';
 import { User } from '../models/User';
 
 export default class SEPQueries {
-  constructor(private dataSource: SEPDataSource) {}
+  constructor(public dataSource: SEPDataSource) {}
 
   @Authorized([Roles.USER_OFFICER])
   async get(agent: User | null, id: number) {
@@ -20,11 +20,17 @@ export default class SEPQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: User | null,
+    active = true,
     filter?: string,
     first?: number,
     offset?: number
   ) {
-    return this.dataSource.getAll(filter, first, offset);
+    return this.dataSource.getAll(active, filter, first, offset);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getMembers(agent: User | null, sepId: number) {
+    return this.dataSource.getMembers(sepId);
   }
 
   @Authorized([Roles.USER_OFFICER])
