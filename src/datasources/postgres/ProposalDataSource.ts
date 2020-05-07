@@ -370,10 +370,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       throw new Error(`No proposal with id: ${proposalId}`);
     }
 
-    return this.getQuestionaryWithTemplateId(
-      proposal.proposerId,
-      proposal.templateId
-    );
+    return this.getQuestionaryWithTemplateId(proposal.id, proposal.templateId);
   }
 
   async updateTopicCompletenesses(
