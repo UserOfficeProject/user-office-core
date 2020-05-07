@@ -5,6 +5,12 @@ query getSEPAssignments($id: Int!) {
     sepId
     dateAssigned
     reassigned
+    proposal {
+      id
+      title
+      status
+      shortCode
+    }
     roles {
       id
       shortCode

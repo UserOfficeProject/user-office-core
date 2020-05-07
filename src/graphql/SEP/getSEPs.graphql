@@ -1,5 +1,5 @@
-query getSEPs($filter: String!) {
-  seps(filter: $filter) {
+query getSEPs($filter: String!, $active: Boolean!) {
+  seps(filter: $filter, active: $active) {
     seps {
       id
       code

@@ -26,6 +26,10 @@ const ProposalTableReviewer: React.FC = () => {
   const [editReviewID, setEditReviewID] = useState(0);
   const history = useHistory();
 
+  /**
+   * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
+   * and selection flag is true they are not working properly.
+   */
   const RowActionButtons = (rowData: UserWithReview) => (
     <>
       <IconButton onClick={() => setEditReviewID(rowData.reviewId)}>

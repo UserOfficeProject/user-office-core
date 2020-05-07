@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-const SEPValidationSchema = yup.object().shape({
+export const SEPValidationSchema = yup.object().shape({
   code: yup.string().required('Code can not be blank'),
   description: yup.string().required('Description can not be blank'),
   numberRatingsRequired: yup
@@ -8,4 +8,6 @@ const SEPValidationSchema = yup.object().shape({
     .min(2, 'Ratings required can not be lower than 2'),
 });
 
-export default SEPValidationSchema;
+export const AssignProposalToSEPValidationSchema = yup.object().shape({
+  selectedSEPId: yup.string().required('You must select active SEP'),
+});

@@ -5,7 +5,8 @@ import { useDataApi } from './useDataApi';
 
 export function useSEPsData(
   show: boolean,
-  filter: string
+  filter: string,
+  active = true
 ): {
   loading: boolean;
   SEPsData: Sep[];
@@ -18,6 +19,7 @@ export function useSEPsData(
     api()
       .getSEPs({
         filter: filter,
+        active,
       })
       .then(data => {
         if (data.seps) {
@@ -31,7 +33,7 @@ export function useSEPsData(
         }
         setLoading(false);
       });
-  }, [filter, show, api]);
+  }, [filter, show, active, api]);
 
   return { loading, SEPsData, setSEPsData };
 }
