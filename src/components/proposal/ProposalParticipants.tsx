@@ -1,7 +1,9 @@
+import { makeStyles } from '@material-ui/core/styles';
 import { People } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { BasicUserDetails } from '../../models/User';
 import PeopleTable from '../user/PeopleTable';
 import ParticipantModal from './ParticipantModal';
 
@@ -19,19 +21,32 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function ProposalParticipants(props) {
+type ProposalParticipantsProps = {
+  /** Error flag */
+  error: boolean;
+  /** Basic user details array to be shown in the modal. */
+  users: BasicUserDetails[];
+  /** Function for setting up the users. */
+  setUsers: (users: BasicUserDetails[]) => void;
+};
+
+const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
+  error,
+  users,
+  setUsers,
+}) => {
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
 
-  const addUser = user => {
-    props.setUsers([...props.users, user]);
+  const addUser = (user: BasicUserDetails) => {
+    setUsers([...users, user]);
     setOpen(false);
   };
 
-  const removeUser = user => {
-    const newUsers = [...props.users];
+  const removeUser = (user: BasicUserDetails) => {
+    const newUsers = [...users];
     newUsers.splice(newUsers.indexOf(user), 1);
-    props.setUsers(newUsers);
+    setUsers(newUsers);
   };
 
   const openModal = () => {
@@ -42,9 +57,9 @@ export default function ProposalParticipants(props) {
     <React.Fragment>
       <ParticipantModal
         show={modalOpen}
-        close={setOpen.bind(this, false)}
+        close={() => setOpen(false)}
         addParticipant={addUser}
-        selectedUsers={props.users}
+        selectedUsers={users.map(user => user.id)}
         title={'Add Co-Proposer'}
         userRole={'USER'}
       />
@@ -54,11 +69,11 @@ export default function ProposalParticipants(props) {
         actionText={'Add Co-Proposers'}
         action={openModal}
         isFreeAction={true}
-        data={props.users}
+        data={users}
         search={false}
         onRemove={removeUser}
       />
-      {props.error && (
+      {error && (
         <p className={classes.errorText}>
           You must be part of the proposal. Either add yourself as Principal
           Investigator or a Co-Proposer!
@@ -66,4 +81,12 @@ export default function ProposalParticipants(props) {
       )}
     </React.Fragment>
   );
-}
+};
+
+ProposalParticipants.propTypes = {
+  error: PropTypes.bool.isRequired,
+  users: PropTypes.array.isRequired,
+  setUsers: PropTypes.func.isRequired,
+};
+
+export default ProposalParticipants;
