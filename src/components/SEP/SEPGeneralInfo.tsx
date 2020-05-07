@@ -15,7 +15,7 @@ import React from 'react';
 import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ButtonContainer } from '../../styles/StyledComponents';
-import SEPValidationSchema from './SEPValidationSchema';
+import { SEPValidationSchema } from './SEPValidationSchema';
 
 type SEPPageProps = {
   /** SEP data to be shown */

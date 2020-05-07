@@ -1,0 +1,8 @@
+mutation assignProposal($proposalId: Int!, $sepId: Int!) {
+  assignProposal(proposalId: $proposalId, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}

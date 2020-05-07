@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { useDataApi } from '../../hooks/useDataApi';
-import SEPValidationSchema from './SEPValidationSchema';
+import { SEPValidationSchema } from './SEPValidationSchema';
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
