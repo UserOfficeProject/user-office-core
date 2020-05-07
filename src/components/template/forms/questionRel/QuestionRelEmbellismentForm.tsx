@@ -1,15 +1,16 @@
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { EmbellishmentConfig } from '../../../../generated/sdk';
+import { EmbellishmentConfig, QuestionRel } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
-import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelEmbellismentForm: QuestionRelAdminComponentSignature = props => {
+import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { TFormSignature } from '../TFormSignature';
+
+export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props => {
   const field = props.field;
 
   return (

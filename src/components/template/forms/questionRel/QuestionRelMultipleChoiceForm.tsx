@@ -1,15 +1,18 @@
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { SelectionFromOptionsConfig } from '../../../../generated/sdk';
+import {
+  SelectionFromOptionsConfig,
+  QuestionRel,
+} from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
-import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionRelMultipleChoiceForm: QuestionRelAdminComponentSignature = props => {
+export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props => {
   const field = props.field;
 
   return (

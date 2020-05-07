@@ -1,15 +1,16 @@
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig } from '../../../../generated/sdk';
+import { DateConfig, QuestionRel } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { DateConfigFragment } from '../fragments/DateConfigFragment';
-import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelDateForm: QuestionRelAdminComponentSignature = props => {
+import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { TFormSignature } from '../TFormSignature';
+
+export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
   const field = props.field;
 
   return (

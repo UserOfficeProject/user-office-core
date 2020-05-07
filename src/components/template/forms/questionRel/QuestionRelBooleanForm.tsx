@@ -1,15 +1,15 @@
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { BooleanConfig } from '../../../../generated/sdk';
+import { BooleanConfig, QuestionRel } from '../../../../generated/sdk';
 import { EventType } from '../../../../models/QuestionaryEditorModel';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
-import { QuestionRelAdminComponentSignature } from '../QuestionRelEditor';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { TFormSignature } from '../TFormSignature';
 
-export const QuestionRelBooleanForm: QuestionRelAdminComponentSignature = props => {
+export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
   const field = props.field;
 
   return (

@@ -13,6 +13,7 @@ import { QuestionRelFileUploadForm } from './questionRel/QuestionRelFileUploadFo
 import { QuestionRelMultipleChoiceForm } from './questionRel/QuestionRelMultipleChoiceForm';
 import { QuestionRelTextInputForm } from './questionRel/QuestionRelTextInputForm';
 import ModalWrapper from '../ModalWrapper';
+import { TFormSignature } from './TFormSignature';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;
@@ -20,10 +21,7 @@ export default function QuestionRelEditor(props: {
   closeMe: Function;
   template: ProposalTemplate;
 }) {
-  const componentMap = JSDict.Create<
-    DataType,
-    QuestionRelAdminComponentSignature
-  >();
+  const componentMap = JSDict.Create<DataType, TFormSignature<QuestionRel>>();
   componentMap.put(DataType.BOOLEAN, QuestionRelBooleanForm);
   componentMap.put(DataType.EMBELLISHMENT, QuestionRelEmbellismentForm);
   componentMap.put(DataType.DATE, QuestionRelDateForm);
@@ -52,14 +50,3 @@ export default function QuestionRelEditor(props: {
     </ModalWrapper>
   );
 }
-
-interface QuestionRelAdminComponentProps {
-  field: QuestionRel;
-  template: ProposalTemplate;
-  dispatch: React.Dispatch<Event>;
-  closeMe: Function;
-}
-
-export type QuestionRelAdminComponentSignature = FunctionComponent<
-  QuestionRelAdminComponentProps
->;
