@@ -43,7 +43,7 @@ export class UpdateQuestionsTopicRelsMutation {
     return wrapResponse(
       context.mutations.template.updateQuestionsTopicRels(context.user, {
         topicId: args.topicId,
-        fieldIds: args.fieldIds,
+        questionIds: args.fieldIds,
         templateId: args.templateId,
       }),
       UpdateQuestionsTopicRelsResponseWrap

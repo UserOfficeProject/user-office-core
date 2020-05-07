@@ -10,10 +10,7 @@ import {
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
-import {
-  FieldDependencyInput,
-  UpdateQuestionRelArgs,
-} from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';

@@ -64,6 +64,9 @@ export class TextInputConfig extends ConfigBase {
 
   @Field(() => String, { nullable: true })
   htmlQuestion: string;
+
+  @Field(() => Boolean)
+  isHtmlQuestion: boolean;
 }
 
 export const FieldConfigType = createUnionType({

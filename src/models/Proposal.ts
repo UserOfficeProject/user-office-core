@@ -10,7 +10,7 @@ export class Proposal {
     public updated: Date,
     public shortCode: string,
     public rankOrder: number,
-    public finalStatus: number,
+    public finalStatus: number, // Should use ProposalEndStatus enum here
     public callId: number,
     public templateId: number
   ) {}

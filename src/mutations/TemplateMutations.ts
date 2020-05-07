@@ -26,6 +26,7 @@ import {
 } from '../resolvers/types/FieldConfig';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 
 export default class TemplateMutations {
   constructor(
@@ -178,7 +179,7 @@ export default class TemplateMutations {
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
-      .updateQuestionRel(args.questionId, args.templateId, args)
+      .updateQuestionRel(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
@@ -231,20 +232,18 @@ export default class TemplateMutations {
     values: {
       templateId: number;
       topicId: number;
-      fieldIds: string[];
+      questionIds: string[];
     }
   ): Promise<string[] | Rejection> {
     let isSuccess = true;
     let index = 1;
-    for (const field of values.fieldIds) {
-      const updatedField = await this.dataSource.updateQuestionRel(
-        field,
-        values.templateId,
-        {
-          topicId: values.topicId,
-          sortOrder: index,
-        }
-      );
+    for (const questionId of values.questionIds) {
+      const updatedField = await this.dataSource.updateQuestionRel({
+        questionId,
+        topicId: values.topicId,
+        templateId: values.templateId,
+        sortOrder: index,
+      });
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -252,13 +251,27 @@ export default class TemplateMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    return values.fieldIds;
+    return values.questionIds;
   }
 
   @Authorized([Roles.USER_OFFICER])
   updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not update topic order', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  createQuestionRel(user: User | null, args: CreateQuestionRelArgs) {
+    return this.dataSource
+      .createQuestionRel(args)
       .then(data => data)
       .catch(err => {
         logger.logException('Could not update topic order', err, {
