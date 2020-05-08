@@ -1,11 +1,22 @@
 import { Container } from '@material-ui/core';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import SimpleTabs from '../common/TabPanel';
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';
 
-export default function ProfilePage({ match }) {
+const ProfilePagePropTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
+
+type ProfilePageProps = PropTypes.InferProps<typeof ProfilePagePropTypes>;
+
+const ProfilePage: React.FC<ProfilePageProps> = ({ match }) => {
   return (
     <Container maxWidth="lg">
       <SimpleTabs tabNames={['General', 'Settings']}>
@@ -14,4 +25,6 @@ export default function ProfilePage({ match }) {
       </SimpleTabs>
     </Container>
   );
-}
+};
+
+export default ProfilePage;

@@ -16,7 +16,7 @@ export function useCallsData(show: boolean, filter: GetCallsQueryVariables) {
         setCallsData(data.calls);
         setLoading(false);
       });
-  }, [api, show]);
+  }, [api, show, filter]);
 
   return { loading, callsData };
 }

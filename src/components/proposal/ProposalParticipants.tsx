@@ -3,6 +3,7 @@ import { People } from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { UserRole } from '../../generated/sdk';
 import { BasicUserDetails } from '../../models/User';
 import PeopleTable from '../user/PeopleTable';
 import ParticipantModal from './ParticipantModal';
@@ -61,7 +62,7 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         addParticipant={addUser}
         selectedUsers={users.map(user => user.id)}
         title={'Add Co-Proposer'}
-        userRole={'USER'}
+        userRole={UserRole.USER}
       />
       <PeopleTable
         title="Co-Proposers"
@@ -71,6 +72,7 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         isFreeAction={true}
         data={users}
         search={false}
+        userRole={UserRole.USER}
         onRemove={removeUser}
       />
       {error && (
