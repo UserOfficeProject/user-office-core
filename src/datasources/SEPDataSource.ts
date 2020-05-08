@@ -30,4 +30,9 @@ export interface SEPDataSource {
   removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<SEP>;
   removeProposalAssignment(proposalId: number, sepId: number): Promise<SEP>;
+  assignMemberToSEPProposal(
+    proposalId: number,
+    sepId: number,
+    memberId: number
+  ): Promise<SEP>;
 }
