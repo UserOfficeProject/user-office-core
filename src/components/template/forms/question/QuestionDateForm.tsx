@@ -20,10 +20,8 @@ export const QuestionDateForm: TFormSignature<Question> = props => {
       dispatch={props.dispatch}
       field={props.field}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          naturalKey: naturalKeySchema,
-          question: Yup.string().required('Question is required'),
-        }),
+        naturalKey: naturalKeySchema,
+        question: Yup.string().required('Question is required'),
       })}
     >
       {formikProps => (

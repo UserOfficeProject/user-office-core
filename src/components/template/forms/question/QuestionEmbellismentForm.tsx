@@ -16,11 +16,9 @@ export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
       dispatch={props.dispatch}
       field={props.field}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          config: Yup.object({
-            html: Yup.string().required('Content is required'),
-            plain: Yup.string().required('Plain description is required'),
-          }),
+        config: Yup.object({
+          html: Yup.string().required('Content is required'),
+          plain: Yup.string().required('Plain description is required'),
         }),
       })}
     >

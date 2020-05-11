@@ -20,14 +20,12 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
       dispatch={props.dispatch}
       field={props.field}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          naturalKey: naturalKeySchema,
-          question: Yup.string().required('Question is required'),
-          config: Yup.object({
-            file_type: Yup.array(),
-            small_label: Yup.string(),
-            max_files: Yup.number(),
-          }),
+        naturalKey: naturalKeySchema,
+        question: Yup.string().required('Question is required'),
+        config: Yup.object({
+          file_type: Yup.array(),
+          small_label: Yup.string(),
+          max_files: Yup.number(),
         }),
       })}
     >
