@@ -14,6 +14,7 @@ export const QuestionBooleanForm: TFormSignature<Question> = props => {
 
   return (
     <QuestionFormShell
+      label="Boolean"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}

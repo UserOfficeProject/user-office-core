@@ -14,6 +14,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
 
   return (
     <QuestionFormShell
+      label="File upload"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}

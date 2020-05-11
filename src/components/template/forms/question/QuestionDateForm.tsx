@@ -14,6 +14,7 @@ export const QuestionDateForm: TFormSignature<Question> = props => {
 
   return (
     <QuestionFormShell
+      label="Date"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}

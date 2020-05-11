@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 import { Question, TextInputConfig } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
@@ -14,6 +14,7 @@ export const QuestionTextInputForm: TFormSignature<Question> = props => {
 
   return (
     <QuestionFormShell
+      label="Text input"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}

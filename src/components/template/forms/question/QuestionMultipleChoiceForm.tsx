@@ -17,6 +17,7 @@ export const QuestionMultipleChoiceForm: TFormSignature<Question> = props => {
 
   return (
     <QuestionFormShell
+      label="Multiple choice"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}

@@ -9,6 +9,7 @@ export const QuestionFormShell = (props: {
   validationSchema: any;
   field: Question;
   dispatch: React.Dispatch<Event>;
+  label: string;
   closeMe: Function;
   children: (formikProps: FormikProps<Question>) => React.ReactNode;
 }) => {
@@ -37,12 +38,13 @@ export const QuestionFormShell = (props: {
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
         {getTemplateFieldIcon(props.field.dataType)}
+        {props.label}
       </Typography>
       <Formik
         initialValues={props.field}
         onSubmit={async vals => {
           props.dispatch({
-            type: EventType.UPDATE_FIELD_REQUESTED,
+            type: EventType.UPDATE_QUESTION_REQUESTED,
             payload: {
               field: { ...props.field, ...vals },
             },

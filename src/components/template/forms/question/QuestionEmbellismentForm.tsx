@@ -8,6 +8,7 @@ import { QuestionFormShell } from './QuestionFormShell';
 export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
   return (
     <QuestionFormShell
+      label="Embellisment"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       field={props.field}
