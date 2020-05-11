@@ -19,10 +19,10 @@ import QuestionaryEditorModel, {
   EventType,
 } from '../../models/QuestionaryEditorModel';
 import { StyledPaper } from '../../styles/StyledComponents';
+import QuestionEditor from './forms/QuestionEditor';
+import QuestionRelEditor from './forms/QuestionRelEditor';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
-import QuestionRelEditor from './forms/QuestionRelEditor';
-import QuestionEditor from './forms/QuestionEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
@@ -44,8 +44,8 @@ export default function QuestionaryEditor() {
           enqueueSnackbar(action.payload, { variant: 'error' });
           break;
 
-        case EventType.FIELD_CREATED:
-          setSelectedQuestionRel(action.payload);
+        case EventType.QUESTION_CREATED:
+          setSelectedQuestion(action.payload);
           break;
 
         case EventType.PICK_QUESTION_REQUESTED:
@@ -100,12 +100,17 @@ export default function QuestionaryEditor() {
         if (topicId && questionId) {
           dispatch({
             type: EventType.CREATE_QUESTION_REL_REQUESTED,
-            payload: { topicId, questionId, sortOrder },
+            payload: {
+              topicId,
+              questionId,
+              sortOrder,
+              templateId: state.templateId,
+            },
           });
         }
       } else {
         dispatch({
-          type: EventType.REORDER_FIELD_REQUESTED,
+          type: EventType.REORDER_QUESTION_REL_REQUESTED,
           payload: { source: result.source, destination: result.destination },
         });
       }

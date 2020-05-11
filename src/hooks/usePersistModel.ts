@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import {
   DataType,
   FieldDependency,
@@ -174,7 +175,7 @@ export function usePersistModel() {
       const state = getState();
 
       switch (action.type) {
-        case EventType.REORDER_FIELD_REQUESTED:
+        case EventType.REORDER_QUESTION_REL_REQUESTED:
           const reducedTopicId = parseInt(action.payload.source.droppableId);
           const extendedTopicId = parseInt(
             action.payload.destination.droppableId
@@ -232,9 +233,9 @@ export function usePersistModel() {
           break;
         case EventType.UPDATE_QUESTION_REL_REQUESTED:
           executeAndMonitorCall(async () => {
-            const question = action.payload.field as QuestionRel;
+            const questionRel = action.payload.field as QuestionRel;
             const templateId = action.payload.templateId;
-            const result = await updateQuestionRel(templateId, question);
+            const result = await updateQuestionRel(templateId, questionRel);
             dispatch({
               type: EventType.QUESTION_REL_UPDATED,
               payload: result.template,
@@ -243,7 +244,7 @@ export function usePersistModel() {
             return result;
           });
           break;
-        case EventType.CREATE_NEW_QUESTION_REQUESTED:
+        case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createQuestion(action.payload.dataType);
             dispatch({
@@ -273,6 +274,12 @@ export function usePersistModel() {
         case EventType.DELETE_TOPIC_REQUESTED:
           executeAndMonitorCall(() => deleteTopic(action.payload));
           break;
+        case EventType.DELETE_QUESTION_REQUESTED:
+          // TODO implement this
+          // executeAndMonitorCall(() =>
+          //   deleteQuestion(action.payload.questionId)
+          // );
+          break;
         case EventType.CREATE_TOPIC_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createTopic(
@@ -290,10 +297,9 @@ export function usePersistModel() {
           });
           break;
         case EventType.CREATE_QUESTION_REL_REQUESTED:
-          const { questionId, topicId, sortOrder } = action.payload;
+          const { questionId, topicId, sortOrder, templateId } = action.payload;
 
           executeAndMonitorCall(async () => {
-            const templateId = getState().templateId;
             const result = await createQuestionRel(
               templateId,
               topicId,

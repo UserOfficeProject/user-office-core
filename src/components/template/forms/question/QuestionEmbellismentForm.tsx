@@ -2,6 +2,7 @@ import { TextField } from '@material-ui/core';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
@@ -14,7 +15,7 @@ export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
       label="Embellisment"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
-      field={props.field}
+      question={props.field}
       validationSchema={Yup.object().shape({
         config: Yup.object({
           html: Yup.string().required('Content is required'),

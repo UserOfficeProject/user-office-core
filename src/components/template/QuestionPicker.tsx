@@ -94,7 +94,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 
   const onCreateNewQuestionClicked = (dataType: DataType) => {
     dispatch({
-      type: EventType.CREATE_NEW_QUESTION_REQUESTED,
+      type: EventType.CREATE_QUESTION_REQUESTED,
       payload: { dataType: dataType },
     });
     setAnchorEl(null);

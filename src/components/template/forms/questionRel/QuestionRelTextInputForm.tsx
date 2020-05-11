@@ -2,6 +2,7 @@ import { Collapse, TextField } from '@material-ui/core';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
+
 import { QuestionRel, TextInputConfig } from '../../../../generated/sdk';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
@@ -14,11 +15,12 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     (props.field.question.config as TextInputConfig).isHtmlQuestion
   );
+
   return (
     <QuestionRelFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
-      field={props.field}
+      questionRel={props.field}
       label="Text input"
       template={props.template}
       validationSchema={Yup.object().shape({

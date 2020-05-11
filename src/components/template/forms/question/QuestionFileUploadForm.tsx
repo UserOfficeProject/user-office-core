@@ -2,6 +2,7 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
@@ -18,7 +19,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
       label="File upload"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
-      field={props.field}
+      question={props.field}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),

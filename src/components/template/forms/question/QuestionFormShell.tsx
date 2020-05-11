@@ -1,13 +1,14 @@
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
+
 import { Question } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
 export const QuestionFormShell = (props: {
   validationSchema: any;
-  field: Question;
+  question: Question;
   dispatch: React.Dispatch<Event>;
   label: string;
   closeMe: Function;
@@ -37,16 +38,16 @@ export const QuestionFormShell = (props: {
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.heading}>
-        {getTemplateFieldIcon(props.field.dataType)}
+        {getTemplateFieldIcon(props.question.dataType)}
         {props.label}
       </Typography>
       <Formik
-        initialValues={props.field}
-        onSubmit={async vals => {
+        initialValues={props.question}
+        onSubmit={async form => {
           props.dispatch({
             type: EventType.UPDATE_QUESTION_REQUESTED,
             payload: {
-              field: { ...props.field, ...vals },
+              field: { ...props.question, ...form },
             },
           });
           props.closeMe();
@@ -66,7 +67,7 @@ export const QuestionFormShell = (props: {
                 onClick={() => {
                   props.dispatch({
                     type: EventType.DELETE_QUESTION_REQUESTED,
-                    payload: { fieldId: props.field.proposalQuestionId },
+                    payload: { questionId: props.question.proposalQuestionId },
                   });
                   props.closeMe();
                 }}

@@ -1,6 +1,7 @@
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { QuestionRel } from '../../../../generated/sdk';
 import FormikDropdown from '../../../common/FormikDropdown';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
@@ -15,7 +16,7 @@ export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props 
     <QuestionRelFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
-      field={props.field}
+      questionRel={props.field}
       label="Multiple choice"
       template={props.template}
       validationSchema={Yup.object().shape({

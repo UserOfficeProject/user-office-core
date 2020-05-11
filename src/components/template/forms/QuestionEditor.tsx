@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { DataType, ProposalTemplate, Question } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 import JSDict from '../../../utils/Dictionary';

@@ -2,6 +2,7 @@ import { TextField } from '@material-ui/core';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { QuestionRel } from '../../../../generated/sdk';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
@@ -14,7 +15,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
     <QuestionRelFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
-      field={props.field}
+      questionRel={props.field}
       label="File upload"
       template={props.template}
       validationSchema={Yup.object().shape({
