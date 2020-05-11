@@ -4,6 +4,7 @@ import {
   FieldDependency,
   ProposalTemplate,
   QuestionRel,
+  Question,
 } from '../generated/sdk';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
@@ -61,31 +62,29 @@ export function usePersistModel() {
     };
   };
 
-  const updateItem = async (templateId: number, field: QuestionRel) => {
+  const updateQuestion = async (question: Question) => {
     return api()
       .updateQuestion({
-        id: field.question.proposalQuestionId,
-        naturalKey: field.question.naturalKey,
-        question: field.question.question,
-        config: field.question.config
-          ? JSON.stringify(field.question.config)
+        id: question.proposalQuestionId,
+        naturalKey: question.naturalKey,
+        question: question.question,
+        config: question.config ? JSON.stringify(question.config) : undefined,
+      })
+      .then(data => data.updateQuestion);
+  };
+
+  const updateQuestionRel = async (templateId: number, field: QuestionRel) => {
+    return api()
+      .updateQuestionRel({
+        templateId,
+        topicId: 1,
+        sortOrder: 0,
+        questionId: field.question.proposalQuestionId,
+        dependency: field.dependency
+          ? prepareDependencies(field.dependency)
           : undefined,
       })
-      .then(data => {
-        return api()
-          .updateQuestionRel({
-            templateId,
-            topicId: 1,
-            sortOrder: 0,
-            questionId: field.question.proposalQuestionId,
-            dependency: field.dependency
-              ? prepareDependencies(field.dependency)
-              : undefined,
-          })
-          .then(data => {
-            return data.updateQuestionRel;
-          });
-      });
+      .then(data => data.updateQuestionRel);
   };
 
   const createQuestion = async (dataType: DataType) => {
@@ -221,10 +220,23 @@ export function usePersistModel() {
           break;
         case EventType.UPDATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
-            const field = action.payload.field as QuestionRel;
-            const result = await updateItem(state.templateId, field);
+            const question = action.payload.field as Question;
+            const result = await updateQuestion(question);
             dispatch({
-              type: EventType.FIELD_UPDATED,
+              type: EventType.QUESTION_UPDATED,
+              payload: result.question,
+            });
+
+            return result;
+          });
+          break;
+        case EventType.UPDATE_QUESTION_REL_REQUESTED:
+          executeAndMonitorCall(async () => {
+            const question = action.payload.field as QuestionRel;
+            const templateId = action.payload.templateId;
+            const result = await updateQuestionRel(templateId, question);
+            dispatch({
+              type: EventType.QUESTION_REL_UPDATED,
               payload: result.template,
             });
 

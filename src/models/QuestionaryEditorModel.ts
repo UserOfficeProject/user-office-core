@@ -2,7 +2,12 @@ import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
-import { ProposalTemplate, TemplateStep, QuestionRel } from '../generated/sdk';
+import {
+  ProposalTemplate,
+  TemplateStep,
+  QuestionRel,
+  Question,
+} from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
@@ -23,7 +28,7 @@ export enum EventType {
   DELETE_QUESTION_REL_REQUESTED,
   QUESTION_REL_DELETED,
   SERVICE_ERROR_OCCURRED,
-  FIELD_UPDATED,
+  QUESTION_REL_UPDATED,
   DELETE_TOPIC_REQUESTED,
   CREATE_TOPIC_REQUESTED,
   TOPIC_CREATED,
@@ -34,6 +39,7 @@ export enum EventType {
   QUESTION_PICKER_NEW_QUESTION_CLICKED,
   QUESTION_CREATED,
   DELETE_QUESTION_REQUESTED,
+  QUESTION_UPDATED,
 }
 
 export interface Event {
@@ -100,10 +106,10 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             action.payload.title;
 
           return draft;
-        case EventType.UPDATE_QUESTION_REQUESTED:
+        case EventType.UPDATE_QUESTION_REL_REQUESTED: {
           const field: QuestionRel = action.payload.field;
           const fieldToUpdate = getFieldById(
-            draft.steps,
+            state.steps,
             field.question.proposalQuestionId
           );
           if (field && fieldToUpdate) {
@@ -113,6 +119,21 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           }
 
           return draft;
+        }
+        case EventType.UPDATE_QUESTION_REQUESTED: {
+          const field: Question = action.payload.field;
+          const fieldToUpdate = draft.complementaryQuestions.find(
+            question => question.proposalQuestionId === field.proposalQuestionId
+          );
+          if (field && fieldToUpdate) {
+            Object.assign(fieldToUpdate, field);
+          } else {
+            console.error('Object(s) are not defined', field, fieldToUpdate);
+          }
+
+          return draft;
+        }
+
         case EventType.FIELD_CREATED:
           const newField: QuestionRel = action.payload;
           const stepToExtend = getQuestionaryStepByTopicId(
@@ -137,7 +158,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.TOPIC_CREATED:
-        case EventType.FIELD_UPDATED:
+        case EventType.QUESTION_REL_UPDATED:
         case EventType.QUESTION_REL_DELETED:
           return { ...action.payload };
         case EventType.QUESTION_CREATED:
@@ -146,6 +167,16 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           return draft;
         case EventType.QUESTION_REL_CREATED:
           return { ...action.payload };
+        case EventType.QUESTION_UPDATED:
+          let question = action.payload as Question;
+          Object.assign(
+            draft.complementaryQuestions.find(
+              question =>
+                question.proposalQuestionId === question.proposalQuestionId
+            ),
+            question
+          );
+          return draft;
       }
     });
   }
