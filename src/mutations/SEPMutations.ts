@@ -8,7 +8,10 @@ import { SEP } from '../models/SEP';
 import { User, UserRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
-import { UpdateMemberSEPArgs } from '../resolvers/mutations/AssignMembersToSEP';
+import {
+  UpdateMemberSEPArgs,
+  AssignSEPProposalToMemberArgs,
+} from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
@@ -53,6 +56,12 @@ const updateSEPMemberValidationSchema = yup.object().shape({
 const assignProposalToSEPValidationSchema = yup.object().shape({
   proposalId: yup.number().required(),
   sepId: yup.number().required(),
+});
+
+const assignSEPMemberToProposalValidationSchema = yup.object().shape({
+  proposalId: yup.number().required(),
+  sepId: yup.number().required(),
+  memberId: yup.number().required(),
 });
 
 export default class SEPMutations {
@@ -243,6 +252,34 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     return this.dataSource
       .removeProposalAssignment(args.proposalId, args.sepId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException(
+          'Could not assign proposal to scientific evaluation panel',
+          err,
+          { agent }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @EventBus(Event.SEP_MEMBER_TO_PROPOSAL_ASSIGNED)
+  async assignMemberToSEPProposal(
+    agent: User | null,
+    args: AssignSEPProposalToMemberArgs
+  ): Promise<SEP | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.dataSource
+      .assignMemberToSEPProposal(args.proposalId, args.sepId, args.memberId)
       .then(result => result)
       .catch(err => {
         logger.logException(

@@ -203,4 +203,27 @@ describe('Test SEPMutations', () => {
       })
     ).resolves.toStrictEqual(dummySEP);
   });
+
+  test('A user can not assign SEP member to proposal', async () => {
+    const result = (await SEPMutationsInstance.assignMemberToSEPProposal(
+      dummyUser,
+      {
+        proposalId: 1,
+        sepId: 1,
+        memberId: 1,
+      }
+    )) as Rejection;
+
+    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A userofficer can assign SEP member to proposal', () => {
+    return expect(
+      SEPMutationsInstance.assignMemberToSEPProposal(dummyUserOfficer, {
+        proposalId: 1,
+        sepId: 1,
+        memberId: 1,
+      })
+    ).resolves.toStrictEqual(dummySEP);
+  });
 });

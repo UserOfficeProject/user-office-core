@@ -243,4 +243,23 @@ export default class PostgresSEPDataSource implements SEPDataSource {
 
     throw new Error(`SEP not found ${sepId}`);
   }
+
+  async assignMemberToSEPProposal(
+    proposalId: number,
+    sepId: number,
+    memberId: number
+  ) {
+    const assignmentUpdated = await database('SEP_Assignments')
+      .update('sep_member_user_id', memberId)
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (assignmentUpdated && sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
 }
