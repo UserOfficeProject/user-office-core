@@ -8,6 +8,7 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
   return (
@@ -27,6 +28,7 @@ export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
+          <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
             <Field
               name="question.config.required"

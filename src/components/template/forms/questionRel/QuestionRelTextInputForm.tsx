@@ -10,6 +10,7 @@ import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
@@ -38,6 +39,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
+          <QuestionExcerpt question={props.field.question} />
           <Field
             label="Enable rich text question"
             name="question.config.isHtmlQuestion"

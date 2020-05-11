@@ -10,6 +10,7 @@ import FormikUICustomTable from '../../../common/FormikUICustomTable';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props => {
   return (
@@ -30,6 +31,7 @@ export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props 
     >
       {formikProps => (
         <>
+          <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
             <Field
               name="question.config.required"

@@ -42,6 +42,7 @@ export const QuestionRelFormShell = (props: {
         {getTemplateFieldIcon(props.questionRel.question.dataType)}
         {props.label}
       </Typography>
+
       <Formik
         initialValues={props.questionRel}
         onSubmit={async form => {
@@ -75,7 +76,7 @@ export const QuestionRelFormShell = (props: {
                   props.closeMe();
                 }}
               >
-                Delete
+                Remove from template
               </Button>
               <Button
                 type="submit"
@@ -83,7 +84,7 @@ export const QuestionRelFormShell = (props: {
                 color="primary"
                 data-cy="submit"
               >
-                Save
+                Update
               </Button>
             </div>
           </Form>

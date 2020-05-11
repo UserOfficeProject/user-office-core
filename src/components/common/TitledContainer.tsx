@@ -1,7 +1,7 @@
 import { Container, Typography, makeStyles } from '@material-ui/core';
 import React, { FunctionComponent } from 'react';
 
-const TitledContainer: FunctionComponent<{ label: string }> = props => {
+const TitledContainer: FunctionComponent<{ label?: string }> = props => {
   const classes = makeStyles(theme => ({
     container: {
       marginTop: '35px',

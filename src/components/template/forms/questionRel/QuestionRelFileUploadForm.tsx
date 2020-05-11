@@ -9,6 +9,7 @@ import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
   return (
@@ -30,6 +31,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
+          <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
             <Field
               name="question.config.small_label"

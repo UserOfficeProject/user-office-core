@@ -9,6 +9,7 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
   return (
@@ -22,6 +23,7 @@ export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
+          <QuestionExcerpt question={props.field.question} />
           <Field
             name="question.config.tooltip"
             label="Tooltip"
