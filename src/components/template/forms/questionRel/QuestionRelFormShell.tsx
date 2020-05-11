@@ -80,6 +80,21 @@ export const QuestionRelFormShell = (props: {
                 Remove from template
               </Button>
               <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                data-cy="open-question-editor"
+                onClick={() => {
+                  props.dispatch({
+                    type: EventType.OPEN_QUESTION_EDITOR,
+                    payload: props.questionRel.question,
+                  });
+                  props.closeMe();
+                }}
+              >
+                Edit question base
+              </Button>
+              <Button
                 type="submit"
                 variant="contained"
                 color="primary"

@@ -13,31 +13,27 @@ import {
 
 export enum EventType {
   READY,
-
   CREATE_QUESTION_REQUESTED,
   UPDATE_QUESTION_REQUESTED,
   DELETE_QUESTION_REQUESTED,
   QUESTION_CREATED,
   QUESTION_UPDATED,
-
   CREATE_QUESTION_REL_REQUESTED,
   UPDATE_QUESTION_REL_REQUESTED,
   DELETE_QUESTION_REL_REQUESTED,
   QUESTION_REL_CREATED,
   QUESTION_REL_UPDATED,
   QUESTION_REL_DELETED,
-
   REORDER_QUESTION_REL_REQUESTED,
-
   CREATE_TOPIC_REQUESTED,
   DELETE_TOPIC_REQUESTED,
   TOPIC_CREATED,
   UPDATE_TOPIC_TITLE_REQUESTED,
-
   REORDER_TOPIC_REQUESTED,
   PICK_QUESTION_REQUESTED,
   QUESTION_PICKER_NEW_QUESTION_CLICKED,
   SERVICE_ERROR_OCCURRED,
+  OPEN_QUESTION_EDITOR,
 }
 
 export interface Event {
@@ -161,14 +157,16 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
         case EventType.QUESTION_REL_CREATED:
           return { ...action.payload };
         case EventType.QUESTION_UPDATED: {
-          const question = action.payload as Question;
-          Object.assign(
+          const newQuestion = action.payload as Question;
+          const curQuestion =
             draft.complementaryQuestions.find(
               curQuestion =>
-                curQuestion.proposalQuestionId === question.proposalQuestionId
-            ),
-            question
-          );
+                curQuestion.proposalQuestionId ===
+                newQuestion.proposalQuestionId
+            ) || getFieldById(draft.steps, newQuestion.proposalQuestionId);
+          if (newQuestion && curQuestion) {
+            Object.assign(curQuestion.question, newQuestion);
+          }
 
           return draft;
         }
