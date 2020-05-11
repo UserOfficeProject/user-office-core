@@ -108,7 +108,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
         case EventType.UPDATE_QUESTION_REL_REQUESTED: {
           const questionRel: QuestionRel = action.payload.field;
           const questionRelToUpdate = getFieldById(
-            state.steps,
+            draft.steps,
             questionRel.question.proposalQuestionId
           );
           if (questionRel && questionRelToUpdate) {

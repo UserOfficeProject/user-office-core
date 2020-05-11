@@ -50,6 +50,7 @@ export const QuestionRelFormShell = (props: {
             type: EventType.UPDATE_QUESTION_REL_REQUESTED,
             payload: {
               field: { ...props.questionRel, ...form },
+              templateId: props.template.templateId,
             },
           });
           props.closeMe();

@@ -78,8 +78,8 @@ export function usePersistModel() {
     return api()
       .updateQuestionRel({
         templateId,
-        topicId: 1,
-        sortOrder: 0,
+        topicId: field.topicId,
+        sortOrder: field.sortOrder,
         questionId: field.question.proposalQuestionId,
         dependency: field.dependency
           ? prepareDependencies(field.dependency)
@@ -236,10 +236,12 @@ export function usePersistModel() {
             const questionRel = action.payload.field as QuestionRel;
             const templateId = action.payload.templateId;
             const result = await updateQuestionRel(templateId, questionRel);
-            dispatch({
-              type: EventType.QUESTION_REL_UPDATED,
-              payload: result.template,
-            });
+            if (result.template) {
+              dispatch({
+                type: EventType.QUESTION_REL_UPDATED,
+                payload: result.template,
+              });
+            }
 
             return result;
           });
@@ -247,11 +249,12 @@ export function usePersistModel() {
         case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createQuestion(action.payload.dataType);
-            dispatch({
-              type: EventType.QUESTION_CREATED,
-              payload: result.question,
-            });
-
+            if (result.question) {
+              dispatch({
+                type: EventType.QUESTION_CREATED,
+                payload: result.question,
+              });
+            }
             return result;
           });
           break;
