@@ -11,11 +11,13 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 import { UserContext } from '../../context/UserContextProvider';
+import { PageName } from '../../generated/sdk';
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
@@ -26,7 +28,7 @@ import {
   userPasswordFieldSchema,
 } from '../../utils/userFieldValidationSchema';
 import { ErrorFocus } from '../common/ErrorFocus';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown, { Option } from '../common/FormikDropdown';
 import InformationModal from '../pages/InformationModal';
 
 const useStyles = makeStyles(theme => ({
@@ -115,22 +117,30 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SignUp(props) {
-  const classes = useStyles();
-  const [userID, setUserID] = useState(null);
+const SignUpPropTypes = {
+  location: PropTypes.shape({
+    search: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
-  const [nationalitiesList, setNationalitiesList] = useState([]);
-  const [institutionsList, setInstitutionsList] = useState([]);
+type SignUpProps = PropTypes.InferProps<typeof SignUpPropTypes>;
+
+const SignUp: React.FC<SignUpProps> = props => {
+  const classes = useStyles();
+  const [userID, setUserID] = useState<number | null>(null);
+
+  const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
+  const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const { handleLogin, token } = useContext(UserContext);
 
   const [orcidError, setOrcidError] = useState(false);
-  const [, privacyPageContent] = useGetPageContent('PRIVACYPAGE');
-  const [, cookiePageContent] = useGetPageContent('COOKIEPAGE');
+  const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
+  const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
-  const { loading, orcData } = useOrcIDInformation(authCodeOrcID);
+  const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
 
   if (orcData && orcData.token) {
@@ -161,29 +171,32 @@ export default function SignUp(props) {
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
     setInstitutionsList(
       fieldsContent.institutions.map(institution => {
-        return { text: institution.value, value: institution.id };
+        return { text: institution.value, value: institution.id.toString() };
       })
     );
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
-        return { text: nationality.value, value: nationality.id };
+        return { text: nationality.value, value: nationality.id.toString() };
       })
     );
   }
 
-  const sendSignUpRequest = values => {
+  // FIXME: Values here should be from type CreateUserMutationVariables. For now it is OK because it needs a bit of a refactor.
+  const sendSignUpRequest = (values: any) => {
     unauthorizedApi
       .createUser({
         ...values,
-        orcid: orcData.orcid,
-        orcidHash: orcData.orcidHash,
-        refreshToken: orcData.refreshToken,
+        nationality: +values.nationality,
+        organisation: +values.organisation,
+        orcid: orcData?.orcid as string,
+        orcidHash: orcData?.orcidHash as string,
+        refreshToken: orcData?.refreshToken as string,
         preferredname: values.preferredname
           ? values.preferredname
           : values.firstname,
         gender: values.gender === 'other' ? values.othergender : values.gender,
       })
-      .then(data => setUserID(data.createUser.user.id));
+      .then(data => setUserID(data?.createUser?.user?.id as number));
   };
 
   if (authCodeOrcID && loading) {
@@ -201,6 +214,7 @@ export default function SignUp(props) {
           middlename: '',
           lastname,
           password: '',
+          confirmPassword: '',
           preferredname: '',
           gender: '',
           nationality: '',
@@ -209,7 +223,7 @@ export default function SignUp(props) {
           department: '',
           organisation_address: '',
           position: '',
-          email,
+          email: email || '',
           telephone: '',
           telephone_alt: '',
           privacy_agreement: false,
@@ -517,7 +531,7 @@ export default function SignUp(props) {
                         required
                         disabled={!orcData}
                       />
-                      {values.organisation === 1 && (
+                      {+values.organisation === 1 && (
                         <Field
                           name="otherOrganisation"
                           label="Please specify organisation"
@@ -633,4 +647,6 @@ export default function SignUp(props) {
       </Formik>
     </Container>
   );
-}
+};
+
+export default SignUp;

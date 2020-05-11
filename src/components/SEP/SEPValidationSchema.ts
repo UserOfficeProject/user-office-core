@@ -11,3 +11,7 @@ export const SEPValidationSchema = yup.object().shape({
 export const AssignProposalToSEPValidationSchema = yup.object().shape({
   selectedSEPId: yup.string().required('You must select active SEP'),
 });
+
+export const AssignSEPMemberToProposalValidationSchema = yup.object().shape({
+  selectedMemberId: yup.string().required('You must select SEP member'),
+});

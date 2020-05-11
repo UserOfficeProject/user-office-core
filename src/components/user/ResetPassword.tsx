@@ -7,12 +7,13 @@ import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as Yup from 'yup';
 
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { FormWrapper } from '../../styles/StyledComponents';
+import { userPasswordFieldSchema } from '../../utils/userFieldValidationSchema';
 import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
@@ -27,37 +28,53 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-  sentMessageSuccess: {
+  sentMessage: {
     color: theme.palette.secondary.main,
   },
-  sentMessageError: {
+  errorMessage: {
     color: theme.palette.error.main,
   },
 }));
 
-export default function ResetPasswordEmail() {
+const ResetPasswordPropTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      token: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
+
+type ResetPasswordProps = PropTypes.InferProps<typeof ResetPasswordPropTypes>;
+
+const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
   const classes = useStyles();
-  const [emailSuccess, setSuccess] = useState(null);
+  const [passwordReset, setPasswordReset] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
   const unauthorizedApi = useUnauthorizedApi();
-  const requestResetEmail = values => {
-    unauthorizedApi
-      .resetPasswordEmail({ email: values.email })
-      .then(data => setSuccess(data.resetPasswordEmail));
+  const requestResetPassword = async (values: { password: string }) => {
+    const { password } = values;
+
+    await unauthorizedApi
+      .resetPassword({
+        token: match.params.token,
+        password,
+      })
+      .then(data =>
+        data.resetPassword.error
+          ? setErrorMessage(true)
+          : setPasswordReset(true)
+      );
   };
 
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ email: '' }}
+        initialValues={{ password: '' }}
         onSubmit={async (values, actions) => {
-          await requestResetEmail(values);
+          await requestResetPassword(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string()
-            .email('Please enter a valid email')
-            .required('Please enter an email'),
-        })}
+        validationSchema={userPasswordFieldSchema}
       >
         <Form className={classes.form}>
           <CssBaseline />
@@ -66,26 +83,35 @@ export default function ResetPasswordEmail() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Reset Password
+              Set Password
             </Typography>
             <Field
-              name="email"
-              label="Email"
-              type="email"
+              name="password"
+              label="Password"
+              type="password"
+              component={TextField}
+              margin="normal"
+              helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
+              fullWidth
+            />
+            <Field
+              name="confirmPassword"
+              label="Confirm Password"
+              type="password"
               component={TextField}
               margin="normal"
               fullWidth
             />
-            {emailSuccess !== null &&
-              (emailSuccess ? (
-                <p className={classes.sentMessageSuccess}>
-                  A mail has been sent to the provided email.
-                </p>
-              ) : (
-                <p className={classes.sentMessageError}>
-                  No account found for this email address.
-                </p>
-              ))}
+            {passwordReset && (
+              <p className={classes.sentMessage}>
+                Your password has been changed
+              </p>
+            )}
+            {errorMessage && (
+              <p className={classes.errorMessage}>
+                This link has expired, please reset password again
+              </p>
+            )}
             <Button
               type="submit"
               fullWidth
@@ -93,11 +119,11 @@ export default function ResetPasswordEmail() {
               color="primary"
               className={classes.submit}
             >
-              Send Email
+              Set password
             </Button>
             <Grid container>
               <Grid item>
-                <Link to="/SignIn/">Have an account? Sign In</Link>
+                <Link to="/SignIn/">Back to Sign In? Sign In</Link>
               </Grid>
             </Grid>
           </FormWrapper>
@@ -105,4 +131,6 @@ export default function ResetPasswordEmail() {
       </Formik>
     </PhotoInSide>
   );
-}
+};
+
+export default ResetPassword;
