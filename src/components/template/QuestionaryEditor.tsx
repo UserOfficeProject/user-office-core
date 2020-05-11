@@ -12,7 +12,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
-import { QuestionRel, Question } from '../../generated/sdk';
+import { QuestionRel, Question, QuestionaryStep } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
 import QuestionaryEditorModel, {
   Event,
@@ -23,6 +23,10 @@ import QuestionEditor from './forms/QuestionEditor';
 import QuestionRelEditor from './forms/QuestionRelEditor';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
+import {
+  getTopicById,
+  getQuestionaryStepByTopicId,
+} from '../../models/ProposalModelFunctions';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
@@ -108,7 +112,22 @@ export default function QuestionaryEditor() {
             },
           });
         }
-      } else {
+      } else if (result?.destination?.droppableId === 'questionPicker') {
+        const dragSource = result.source;
+        const topicId = parseInt(dragSource.droppableId);
+        const step = getQuestionaryStepByTopicId(
+          state.steps,
+          topicId
+        ) as QuestionaryStep;
+        const question = step.fields[dragSource.index].question;
+        dispatch({
+          type: EventType.DELETE_QUESTION_REL_REQUESTED,
+          payload: {
+            fieldId: question.proposalQuestionId,
+            templateId: state.templateId,
+          },
+        });
+      } else if (result?.destination && result?.source) {
         dispatch({
           type: EventType.REORDER_QUESTION_REL_REQUESTED,
           payload: { source: result.source, destination: result.destination },
