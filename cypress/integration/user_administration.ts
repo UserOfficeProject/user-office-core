@@ -59,6 +59,8 @@ context('User administration tests', () => {
 
     cy.contains('Update Profile').click();
 
+    cy.wait(1000);
+
     cy.reload();
 
     cy.get("[name='firstname']")

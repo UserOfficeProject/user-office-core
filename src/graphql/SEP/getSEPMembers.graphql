@@ -1,0 +1,19 @@
+query getSEPMembers($sepId: Int!) {
+  sepMembers(sepId: $sepId) {
+    roleUserId
+    roleId
+    userId
+    sepId
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+      organisation
+    }
+  }
+}

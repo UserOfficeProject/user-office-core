@@ -14,6 +14,7 @@ interface UserContextData {
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => void;
+  handleRole: React.Dispatch<string | null | undefined>;
 }
 
 interface DecodedTokenData extends UserContextData {
@@ -36,6 +37,7 @@ const initUserData: UserContextData = {
   handleLogin: value => value,
   handleNewToken: value => value,
   handleLogout: () => null,
+  handleRole: value => value,
 };
 
 const checkLocalStorage = (

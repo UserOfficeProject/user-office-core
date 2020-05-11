@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     height: '100vh',
   },
@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function PhotoInSide(props) {
+const PhotoInSide: React.FC = props => {
   const classes = useStyles();
 
   return (
@@ -29,4 +29,6 @@ export default function PhotoInSide(props) {
       </Grid>
     </Grid>
   );
-}
+};
+
+export default PhotoInSide;

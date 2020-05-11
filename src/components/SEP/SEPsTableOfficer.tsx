@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 
 const SEPsTableOfficer: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, SEPsData } = useSEPsData(show, '');
+  const { loading, SEPsData } = useSEPsData(show, '', false);
   const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },

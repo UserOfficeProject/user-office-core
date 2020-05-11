@@ -9,10 +9,10 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import * as Yup from 'yup';
 
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { FormWrapper } from '../../styles/StyledComponents';
-import { userPasswordFieldSchema } from '../../utils/userFieldValidationSchema';
 import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
@@ -27,43 +27,37 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-  sentMessage: {
+  sentMessageSuccess: {
     color: theme.palette.secondary.main,
   },
-  errorMessage: {
+  sentMessageError: {
     color: theme.palette.error.main,
   },
 }));
 
-export default function ResetPassword({ match }) {
+export default function ResetPasswordEmail() {
   const classes = useStyles();
-  const [passwordReset, setPasswordReset] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState<null | boolean>(null);
   const unauthorizedApi = useUnauthorizedApi();
-  const requestResetPassword = values => {
-    const { password } = values;
-
-    unauthorizedApi
-      .resetPassword({
-        token: match.params.token,
-        password,
-      })
-      .then(data =>
-        data.resetPassword.error
-          ? setErrorMessage(true)
-          : setPasswordReset(true)
-      );
+  const requestResetEmail = async (values: { email: string }) => {
+    await unauthorizedApi
+      .resetPasswordEmail({ email: values.email })
+      .then(data => setEmailSuccess(!!data.resetPasswordEmail));
   };
 
   return (
     <PhotoInSide>
       <Formik
-        initialValues={{ password: '' }}
+        initialValues={{ email: '' }}
         onSubmit={async (values, actions) => {
-          await requestResetPassword(values);
+          await requestResetEmail(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={userPasswordFieldSchema}
+        validationSchema={Yup.object().shape({
+          email: Yup.string()
+            .email('Please enter a valid email')
+            .required('Please enter an email'),
+        })}
       >
         <Form className={classes.form}>
           <CssBaseline />
@@ -72,35 +66,26 @@ export default function ResetPassword({ match }) {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Set Password
+              Reset Password
             </Typography>
             <Field
-              name="password"
-              label="Password"
-              type="password"
-              component={TextField}
-              margin="normal"
-              helperText="Password must contain at least 8 characters (including upper case, lower case and numbers)"
-              fullWidth
-            />
-            <Field
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
+              name="email"
+              label="Email"
+              type="email"
               component={TextField}
               margin="normal"
               fullWidth
             />
-            {passwordReset && (
-              <p className={classes.sentMessage}>
-                Your password has been changed
-              </p>
-            )}
-            {errorMessage && (
-              <p className={classes.errorMessage}>
-                This link has expired, please reset password again
-              </p>
-            )}
+            {emailSuccess !== null &&
+              (emailSuccess ? (
+                <p className={classes.sentMessageSuccess}>
+                  A mail has been sent to the provided email.
+                </p>
+              ) : (
+                <p className={classes.sentMessageError}>
+                  No account found for this email address.
+                </p>
+              ))}
             <Button
               type="submit"
               fullWidth
@@ -108,11 +93,11 @@ export default function ResetPassword({ match }) {
               color="primary"
               className={classes.submit}
             >
-              Set password
+              Send Email
             </Button>
             <Grid container>
               <Grid item>
-                <Link to="/SignIn/">Back to Sign In? Sign In</Link>
+                <Link to="/SignIn/">Have an account? Sign In</Link>
               </Grid>
             </Grid>
           </FormWrapper>

@@ -13,11 +13,12 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
+import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 
 import { UserContext } from '../context/UserContextProvider';
-import { UserRole } from '../generated/sdk';
+import { UserRole, PageName } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
@@ -39,6 +40,32 @@ import QuestionaryEditor from './template/QuestionaryEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
+
+type BottomNavItemProps = {
+  /** Content of the information modal. */
+  text?: string;
+  /** Text of the button link in the information modal. */
+  linkText?: string;
+};
+
+const BottomNavItem: React.FC<BottomNavItemProps> = ({ text, linkText }) => {
+  return (
+    <InformationModal
+      text={text}
+      linkText={linkText}
+      linkStyle={{
+        fontSize: '10px',
+        minWidth: 'auto',
+        padding: '10px',
+      }}
+    />
+  );
+};
+
+BottomNavItem.propTypes = {
+  text: PropTypes.string,
+  linkText: PropTypes.string,
+};
 
 const drawerWidth = 240;
 
@@ -122,7 +149,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Dashboard({ match }) {
+const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const { user, currentRole } = useContext(UserContext);
@@ -133,8 +160,8 @@ export default function Dashboard({ match }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const [, privacyPageContent] = useGetPageContent('PRIVACYPAGE');
-  const [, faqPageContent] = useGetPageContent('HELPPAGE');
+  const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
+  const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
   return (
     <div className={classes.root}>
@@ -247,18 +274,6 @@ export default function Dashboard({ match }) {
       </main>
     </div>
   );
-}
-
-const BottomNavItem = props => {
-  return (
-    <InformationModal
-      text={props.text}
-      linkText={props.linkText}
-      linkStyle={{
-        fontSize: '10px',
-        minWidth: 'auto',
-        padding: '10px',
-      }}
-    />
-  );
 };
+
+export default Dashboard;

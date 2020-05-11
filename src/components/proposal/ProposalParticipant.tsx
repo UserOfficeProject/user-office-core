@@ -2,6 +2,7 @@ import { IconButton, Typography } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useState, useEffect } from 'react';
 
+import { UserRole } from '../../generated/sdk';
 import { useBasicUserData, BasicUserData } from '../../hooks/useUserData';
 import { User } from '../../models/User';
 import ParticipantModal from './ParticipantModal';
@@ -28,7 +29,7 @@ export default function ProposalParticipant(props: {
     <div className={props.className}>
       <ParticipantModal
         show={isPickerOpen}
-        userRole={'USER'}
+        userRole={UserRole.USER}
         title={'Set Principal Investigator'}
         close={() => {
           setIsPickerOpen(false);
