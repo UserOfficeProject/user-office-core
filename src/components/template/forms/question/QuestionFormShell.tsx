@@ -53,7 +53,9 @@ export const QuestionFormShell = (props: {
         }}
         validationSchema={props.validationSchema}
       >
-        <Form style={{ flexGrow: 1 }}>{props.children}</Form>
+        {formikProps => (
+          <Form style={{ flexGrow: 1 }}>{props.children(formikProps)}</Form>
+        )}
       </Formik>
       <div className={classes.actions}>
         <Button

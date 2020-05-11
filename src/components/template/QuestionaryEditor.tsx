@@ -122,10 +122,6 @@ export default function QuestionaryEditor() {
     setSelectedQuestionRel(data);
   };
 
-  const handleFieldEditorClose = (): void => {
-    setSelectedQuestionRel(null);
-  };
-
   const getContainerStyle = (): any => {
     return isLoading
       ? {
@@ -229,14 +225,14 @@ export default function QuestionaryEditor() {
       <QuestionRelEditor
         field={selectedQuestionRel}
         dispatch={dispatch}
-        closeMe={handleFieldEditorClose}
+        closeMe={() => setSelectedQuestionRel(null)}
         template={state}
       />
 
       <QuestionEditor
         field={selectedQuestion}
         dispatch={dispatch}
-        closeMe={handleFieldEditorClose}
+        closeMe={() => setSelectedQuestion(null)}
         template={state}
       />
     </>

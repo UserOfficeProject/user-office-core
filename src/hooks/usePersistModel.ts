@@ -219,7 +219,7 @@ export function usePersistModel() {
             })
           );
           break;
-        case EventType.UPDATE_FIELD_REQUESTED:
+        case EventType.UPDATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
             const field = action.payload.field as QuestionRel;
             const result = await updateItem(state.templateId, field);

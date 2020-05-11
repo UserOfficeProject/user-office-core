@@ -16,7 +16,8 @@ export enum EventType {
   REORDER_FIELD_REQUESTED,
   MOVE_TOPIC_REQUESTED,
   UPDATE_TOPIC_TITLE_REQUESTED,
-  UPDATE_FIELD_REQUESTED,
+  UPDATE_QUESTION_REQUESTED,
+  UPDATE_QUESTION_REL_REQUESTED,
   CREATE_NEW_QUESTION_REQUESTED,
   FIELD_CREATED,
   DELETE_QUESTION_REL_REQUESTED,
@@ -99,7 +100,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             action.payload.title;
 
           return draft;
-        case EventType.UPDATE_FIELD_REQUESTED:
+        case EventType.UPDATE_QUESTION_REQUESTED:
           const field: QuestionRel = action.payload.field;
           const fieldToUpdate = getFieldById(
             draft.steps,
