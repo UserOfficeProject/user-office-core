@@ -24,9 +24,9 @@ export default function PeoplePage() {
     return <Redirect to={`/PeoplePage/${userData.id}`} />;
   }
 
-  const menyItems = [];
+  const menuItems = [];
 
-  menyItems.push({
+  menuItems.push({
     title: 'Invite User',
     action: () =>
       setSendUserEmail({
@@ -36,7 +36,7 @@ export default function PeoplePage() {
       }),
   });
 
-  menyItems.push({
+  menuItems.push({
     title: 'Invite Reviewer',
     action: () =>
       setSendUserEmail({
@@ -71,7 +71,7 @@ export default function PeoplePage() {
                   actionText="Edit user"
                   actionIcon={<Edit />}
                   action={setUserData}
-                  menyItems={menyItems}
+                  menuItems={menuItems}
                   onRemove={(user: { id: number }) =>
                     api()
                       .deleteUser({ id: user.id })

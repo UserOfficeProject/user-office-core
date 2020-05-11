@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import parse from 'html-react-parser';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -34,7 +35,16 @@ const DialogActions = withStyles(theme => ({
   },
 }))(MuiDialogActions);
 
-export default function InformationDialog(props) {
+type InformationDialogProps = {
+  /** Content of the information modal. */
+  text?: string;
+  /** Text of the button link in the information modal. */
+  linkText?: string;
+  /** Styles object of the button link in the information modal. */
+  linkStyle?: React.CSSProperties;
+};
+
+const InformationDialog: React.FC<InformationDialogProps> = props => {
   const [open, setOpen] = React.useState(false);
   const classes = useStyles();
   const handleClickOpen = () => {
@@ -73,4 +83,12 @@ export default function InformationDialog(props) {
       </Dialog>
     </div>
   );
-}
+};
+
+InformationDialog.propTypes = {
+  text: PropTypes.string,
+  linkText: PropTypes.string,
+  linkStyle: PropTypes.objectOf(PropTypes.string),
+};
+
+export default InformationDialog;

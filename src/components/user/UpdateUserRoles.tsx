@@ -30,7 +30,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Array<Role>>([]);
 
-  const addRole = (role: any) => {
+  const addRole = (role: Role) => {
     setRoles([...roles, role]);
     setOpen(false);
   };
@@ -87,7 +87,7 @@ export default function UpdateUserRoles(props: { id: number }) {
         title="Roles"
         columns={columns}
         icons={tableIcons}
-        data={roles.map((role: any) => {
+        data={roles.map((role: Role) => {
           return { name: role.title, id: role.id };
         })}
         options={{

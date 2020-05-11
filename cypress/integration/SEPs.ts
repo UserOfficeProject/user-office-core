@@ -258,7 +258,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
-      .should('have.length', 6);
+      .should('have.length', 7);
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
@@ -266,6 +266,54 @@ context('Scientific evaluation panel tests', () => {
       .then(element => {
         expect(element.text()).length.to.be.greaterThan(0);
       });
+  });
+
+  it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
+    let selectedUser = '';
+    cy.login('officer');
+    cy.contains('User Officer').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Assign SEP Member']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedMemberId']")
+      .first()
+      .click();
+
+    cy.get('.MuiMenu-list')
+      .find('[data-value="1"]')
+      .then(element => {
+        selectedUser = element.text();
+      });
+
+    cy.get("[id='menu-selectedMemberId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to proposal').click();
+
+    cy.get('[data-cy="sep-assignments-table"]').should(element => {
+      selectedUser = selectedUser.split(' - ')[0];
+      expect(element.text()).to.contain(selectedUser);
+    });
+
+    cy.contains('Logs').click();
+
+    cy.get("[title='Last Page'] button")
+      .first()
+      .click({ force: true });
+
+    cy.contains('SEP_MEMBER_TO_PROPOSAL_ASSIGNED');
   });
 
   it('Officer should be able to remove assigned proposal from existing SEP', () => {

@@ -2,29 +2,34 @@ import { AddBox } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React from 'react';
 
+import { GetRolesQuery, Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/tableIcons';
+import { tableIcons } from '../../utils/materialIcons';
 
-function sendRoleRequest(apiCall) {
+function sendRoleRequest(apiCall: any) {
   return apiCall()
     .getRoles()
-    .then(data => {
+    .then((data: GetRolesQuery) => {
       return {
         page: 0,
-        totalCount: data.roles.length,
-        data: data.roles.map(role => {
-          return { title: role.title, id: role.id };
-        }),
+        totalCount: data?.roles?.length,
+        data: data?.roles,
       };
     });
 }
 
-function RoleTable(props) {
+type RoleTableProps = {
+  add: (values: Role) => void;
+};
+
+const RoleTable: React.FC<RoleTableProps> = props => {
   const sendRequest = useDataApi();
   const columns = [
     { title: 'Title', field: 'title' },
     { title: 'ID', field: 'id' },
   ];
+
+  const AddBoxIcon = (): JSX.Element => <AddBox />;
 
   return (
     <MaterialTable
@@ -37,14 +42,18 @@ function RoleTable(props) {
       }}
       actions={[
         {
-          icon: () => <AddBox />,
+          icon: AddBoxIcon,
           tooltip: 'Select role',
           onClick: (event, rowData) =>
-            props.add({ id: rowData.id, title: rowData.title }),
+            props.add({
+              id: (rowData as Role).id,
+              title: (rowData as Role).title,
+              shortCode: (rowData as Role).shortCode,
+            }),
         },
       ]}
     />
   );
-}
+};
 
 export default RoleTable;

@@ -1,15 +1,18 @@
-import { Grid } from '@material-ui/core';
+import { Grid, DialogContent, Dialog } from '@material-ui/core';
+import { AssignmentInd } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import { Formik, Form } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { SepAssignment } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPAssignmentsData } from '../../hooks/useSEPAssignmentsData';
+import { BasicUserDetails } from '../../models/User';
 import { tableIcons } from '../../utils/materialIcons';
+import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 
 type SEPAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
@@ -24,6 +27,7 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
   } = useSEPAssignmentsData(sepId);
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
+  const [proposalId, setProposalId] = useState<null | number>(null);
 
   const columns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -45,6 +49,13 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
       title: 'Reaassigned',
       render: (rowData: SepAssignment): string =>
         rowData.reassigned ? 'Yes' : 'No',
+    },
+    {
+      title: 'Reviewer assigned',
+      render: (rowData: SepAssignment): string =>
+        rowData.user
+          ? `${rowData.user.firstname} ${rowData.user.lastname}`
+          : '-',
     },
   ];
 
@@ -75,10 +86,65 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
     });
   };
 
+  const assignMemberToSEPProposal = async (memberUser: BasicUserDetails) => {
+    const assignmentResult = await api().assignMemberToSEPProposal({
+      memberId: memberUser.id,
+      proposalId: proposalId as number,
+      sepId,
+    });
+
+    if (
+      !assignmentResult.assignMemberToSEPProposal.error &&
+      SEPAssignmentsData
+    ) {
+      setSEPAssignmentsData(
+        SEPAssignmentsData.map(assitnmentItem => {
+          if (assitnmentItem.proposalId === proposalId) {
+            return {
+              ...assitnmentItem,
+              sepMemberUserId: memberUser.id,
+              user: memberUser,
+            };
+          } else {
+            return assitnmentItem;
+          }
+        })
+      );
+    }
+
+    enqueueSnackbar('Member assigned', {
+      variant: assignmentResult.assignMemberToSEPProposal.error
+        ? 'error'
+        : 'success',
+    });
+  };
+
   const initialValues = SEPAssignmentsData as SepAssignment[];
+  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   return (
     <React.Fragment>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={!!proposalId}
+        onClose={(): void => setProposalId(null)}
+      >
+        <DialogContent>
+          <AssignSEPMemberToProposal
+            sepId={sepId}
+            close={() => setProposalId(null)}
+            assignedMember={
+              initialValues.find(
+                assignment => assignment.proposalId === proposalId
+              )?.sepMemberUserId
+            }
+            assignMemberToSEPProposal={memberUser =>
+              assignMemberToSEPProposal(memberUser)
+            }
+          />
+        </DialogContent>
+      </Dialog>
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
@@ -96,6 +162,13 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
                   columns={columns}
                   title={'SEP Assignments'}
                   data={initialValues}
+                  actions={[
+                    rowData => ({
+                      icon: AssignmentIndIcon,
+                      onClick: () => setProposalId(rowData.proposalId),
+                      tooltip: 'Assign SEP Member',
+                    }),
+                  ]}
                   editable={{
                     onRowDelete: (rowData: SepAssignment): Promise<void> =>
                       removeAssignedProposal(rowData),

@@ -1,4 +1,4 @@
-import { getTranslation } from '@esss-swap/duo-localisation';
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -77,7 +77,7 @@ export default function SignInSide() {
   const { handleLogin, token } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
 
-  const requestToken = values => {
+  const requestToken = (values: { email: string; password: string }) => {
     const { email, password } = values;
 
     unauthorizedApi.login({ email, password }).then(data => {
@@ -85,7 +85,7 @@ export default function SignInSide() {
         handleLogin(data.login.token);
       } else {
         if (data.login) {
-          setErrorMessage(getTranslation(data.login.error));
+          setErrorMessage(getTranslation(data.login.error as ResourceId));
           setFailed(true);
         }
       }
@@ -169,8 +169,8 @@ export default function SignInSide() {
                     color="primary"
                     className={classes.orcButton}
                     onClick={() =>
-                      (window.location.href =
-                        process.env.REACT_APP_ORCID_REDIRECT)
+                      (window.location.href = process.env
+                        .REACT_APP_ORCID_REDIRECT as string)
                     }
                   >
                     <img

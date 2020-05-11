@@ -1,0 +1,16 @@
+mutation assignMemberToSEPProposal(
+  $memberId: Int!
+  $sepId: Int!
+  $proposalId: Int!
+) {
+  assignMemberToSEPProposal(
+    memberId: $memberId
+    sepId: $sepId
+    proposalId: $proposalId
+  ) {
+    error
+    sep {
+      id
+    }
+  }
+}

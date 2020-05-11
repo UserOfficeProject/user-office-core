@@ -1,21 +1,40 @@
-import React from 'react';
+import PropTypes from 'prop-types';
+import React, { useCallback } from 'react';
 
 import { ProposalStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { timeAgo } from '../../utils/Time';
 import ProposalTable from './ProposalTable';
 
-export default function ProposalTableUser(props) {
+export type PartialProposalsDataType = {
+  id: number;
+  title: string;
+  status: string;
+  shortCode: string;
+  created: string | null;
+};
+
+export type UserProposalDataType = {
+  page: number;
+  totalCount: number | undefined;
+  data: PartialProposalsDataType[] | undefined;
+};
+
+type ProposalTableUserProps = {
+  id: number;
+};
+
+const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
   const api = useDataApi();
 
-  const sendUserProposalRequest = searchQuery => {
+  const sendUserProposalRequest = useCallback(async () => {
     return api()
-      .getUserProposals({ id: props.id })
+      .getUserProposals({ id })
       .then(data => {
         return {
           page: 0,
-          totalCount: data.me.proposals.length,
-          data: data.me.proposals
+          totalCount: data?.me?.proposals.length,
+          data: data?.me?.proposals
             .sort((a, b) => {
               return (
                 new Date(b.created).getTime() - new Date(a.created).getTime()
@@ -35,7 +54,7 @@ export default function ProposalTableUser(props) {
             }),
         };
       });
-  };
+  }, [api, id]);
 
   return (
     <ProposalTable
@@ -44,4 +63,10 @@ export default function ProposalTableUser(props) {
       searchQuery={sendUserProposalRequest}
     />
   );
-}
+};
+
+ProposalTableUser.propTypes = {
+  id: PropTypes.number.isRequired,
+};
+
+export default ProposalTableUser;

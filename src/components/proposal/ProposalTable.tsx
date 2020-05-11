@@ -1,19 +1,43 @@
 import { Edit, Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable, { Query, QueryResult } from 'material-table';
-import React, { useState } from 'react';
+import MaterialTable from 'material-table';
+import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router';
 
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
+import {
+  UserProposalDataType,
+  PartialProposalsDataType,
+} from './ProposalTableUser';
 
-export default function ProposalTable(props: {
+type ProposalTableProps = {
+  /** Error flag */
   title: string;
-  searchQuery: (x: Query<ProposalData>) => Promise<QueryResult<ProposalData>>;
+  /** Basic user details array to be shown in the modal. */
   search: boolean;
-}) {
+  /** Function for getting data. */
+  searchQuery: () => Promise<UserProposalDataType>;
+};
+
+const ProposalTable: React.FC<ProposalTableProps> = ({
+  title,
+  search,
+  searchQuery,
+}) => {
   const downloadPDFProposal = useDownloadPDFProposal();
+  const [partialProposalsData, setPartialProposalsDataData] = useState<
+    PartialProposalsDataType[] | undefined
+  >([]);
+  useEffect(() => {
+    searchQuery().then(data => {
+      if (data) {
+        setPartialProposalsDataData(data.data);
+      }
+    });
+  }, [searchQuery]);
+
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
@@ -24,17 +48,19 @@ export default function ProposalTable(props: {
   const [editProposalID, setEditProposalID] = useState(0);
 
   if (editProposalID) {
-    return <Redirect push to={`/ProposalSubmission/${editProposalID}`} />;
+    return <Redirect push to={`/ProposalEdit/${editProposalID}`} />;
   }
+
+  const GetAppIconCompopnent = (): JSX.Element => <GetAppIcon />;
 
   return (
     <MaterialTable
       icons={tableIcons}
-      title={props.title}
+      title={title}
       columns={columns}
-      data={(query: Query<ProposalData>) => props.searchQuery(query)}
+      data={partialProposalsData as PartialProposalsDataType[]}
       options={{
-        search: props.search,
+        search: search,
         debounceInterval: 400,
       }}
       actions={[
@@ -49,16 +75,24 @@ export default function ProposalTable(props: {
                 ? 'View proposal'
                 : 'Edit proposal',
             onClick: (event, rowData) =>
-              setEditProposalID(Array.isArray(rowData) ? 0 : rowData.id),
+              setEditProposalID((rowData as PartialProposalsDataType).id),
           };
         },
         {
-          icon: () => <GetAppIcon />,
+          icon: GetAppIconCompopnent,
           tooltip: 'Download proposal',
           onClick: (event, rowData) =>
-            downloadPDFProposal(Array.isArray(rowData) ? 0 : rowData.id),
+            downloadPDFProposal((rowData as PartialProposalsDataType).id),
         },
       ]}
     />
   );
-}
+};
+
+ProposalTable.propTypes = {
+  title: PropTypes.string.isRequired,
+  search: PropTypes.bool.isRequired,
+  searchQuery: PropTypes.func.isRequired,
+};
+
+export default ProposalTable;
