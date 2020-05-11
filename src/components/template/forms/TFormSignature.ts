@@ -1,5 +1,5 @@
-import { ProposalTemplate } from '../../../generated/sdk';
 import { FunctionComponent } from 'react';
+import { ProposalTemplate } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 
 interface FormProps<ValueObjectType> {

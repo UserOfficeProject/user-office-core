@@ -1,13 +1,17 @@
-import { Button, Typography, makeStyles } from '@material-ui/core';
-import React, { FunctionComponent } from 'react';
-
-import { EventType } from '../../../../models/QuestionaryEditorModel';
+import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Form, Formik, FormikProps } from 'formik';
+import React from 'react';
+import { Question } from '../../../../generated/sdk';
+import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
-import { ProposalTemplate, Question } from '../../../../generated/sdk';
-import { Event } from '../../../../models/QuestionaryEditorModel';
-import { TFormSignature } from '../TFormSignature';
 
-export const QuestionFormShell: TFormSignature<Question> = props => {
+export const QuestionFormShell = (props: {
+  validationSchema: any;
+  field: Question;
+  dispatch: React.Dispatch<Event>;
+  closeMe: Function;
+  children: (formikProps: FormikProps<Question>) => React.ReactNode;
+}) => {
   const classes = makeStyles(theme => ({
     container: {
       width: '100%',
@@ -34,7 +38,21 @@ export const QuestionFormShell: TFormSignature<Question> = props => {
       <Typography variant="h4" className={classes.heading}>
         {getTemplateFieldIcon(props.field.dataType)}
       </Typography>
-      {props.children}
+      <Formik
+        initialValues={props.field}
+        onSubmit={async vals => {
+          props.dispatch({
+            type: EventType.UPDATE_FIELD_REQUESTED,
+            payload: {
+              field: { ...props.field, ...vals },
+            },
+          });
+          props.closeMe();
+        }}
+        validationSchema={props.validationSchema}
+      >
+        <Form style={{ flexGrow: 1 }}>{props.children}</Form>
+      </Formik>
       <div className={classes.actions}>
         <Button
           type="button"
@@ -63,13 +81,3 @@ export const QuestionFormShell: TFormSignature<Question> = props => {
     </div>
   );
 };
-
-interface QuestionFormShellProps {
-  field: Question;
-  template: ProposalTemplate;
-  dispatch: React.Dispatch<Event>;
-  closeMe: Function;
-  label: string;
-}
-
-type QuestionFormShellSignature = FunctionComponent<QuestionFormShellProps>;

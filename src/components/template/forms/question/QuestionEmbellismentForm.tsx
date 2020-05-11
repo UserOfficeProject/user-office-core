@@ -1,27 +1,16 @@
-import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
-import { EventType } from '../../../../models/QuestionaryEditorModel';
 import { EmbellishmentConfigFragment } from '../fragments/EmbellishmentConfigFragment';
-import { QuestionFormShell } from './QuestionFormShell';
 import { TFormSignature } from '../TFormSignature';
+import { QuestionFormShell } from './QuestionFormShell';
 
 export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
-  const field = props.field;
-
   return (
-    <Formik
-      initialValues={field}
-      onSubmit={async vals => {
-        props.dispatch({
-          type: EventType.UPDATE_FIELD_REQUESTED,
-          payload: {
-            field: { ...field, ...vals },
-          },
-        });
-        props.closeMe();
-      }}
+    <QuestionFormShell
+      closeMe={props.closeMe}
+      dispatch={props.dispatch}
+      field={props.field}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
@@ -32,14 +21,12 @@ export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
       })}
     >
       {formikProps => (
-        <Form style={{ flexGrow: 1 }}>
-          <QuestionFormShell {...props}>
-            <EmbellishmentConfigFragment
-              config={formikProps.values.config as EmbellishmentConfig}
-            />
-          </QuestionFormShell>
-        </Form>
+        <>
+          <EmbellishmentConfigFragment
+            config={formikProps.values.config as EmbellishmentConfig}
+          />
+        </>
       )}
-    </Formik>
+    </QuestionFormShell>
   );
 };
