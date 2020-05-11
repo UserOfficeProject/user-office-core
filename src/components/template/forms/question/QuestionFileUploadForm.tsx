@@ -2,9 +2,10 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { FileUploadConfig, Question } from '../../../../generated/sdk';
+import { Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { FileUploadConfigFragment } from '../fragments/FileUploadConfigFragment';
+import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
+import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
@@ -51,9 +52,47 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'question' }}
           />
 
-          <FileUploadConfigFragment
-            config={formikProps.values.config as FileUploadConfig}
-          />
+          <TitledContainer label="Options">
+            <Field
+              name="question.config.small_label"
+              label="Helper text"
+              placeholder="(e.g. only PDF accepted)"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="small_label"
+            />
+          </TitledContainer>
+
+          <TitledContainer label="Constraints">
+            <Field
+              name="config.file_type"
+              label="Accepted file types (leave empty for any)"
+              id="fileType"
+              component={FormikUICustomSelect}
+              availableOptions={[
+                '.pdf',
+                '.doc',
+                '.docx',
+                'audio/*',
+                'video/*',
+                'image/*',
+              ]}
+              margin="normal"
+              fullWidth
+              data-cy="file_type"
+            />
+            <Field
+              name="config.max_files"
+              label="Max number of files"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max_files"
+            />
+          </TitledContainer>
         </>
       )}
     </QuestionFormShell>

@@ -55,37 +55,39 @@ export const QuestionRelFormShell = (props: {
         validationSchema={props.validationSchema}
       >
         {formikProps => (
-          <Form style={{ flexGrow: 1 }}>{props.children(formikProps)}</Form>
+          <Form style={{ flexGrow: 1 }}>
+            {props.children(formikProps)}
+            <div className={classes.actions}>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                data-cy="delete"
+                onClick={() => {
+                  props.dispatch({
+                    type: EventType.DELETE_QUESTION_REL_REQUESTED,
+                    payload: {
+                      fieldId: props.field.question.proposalQuestionId,
+                      templateId: props.template.templateId,
+                    },
+                  });
+                  props.closeMe();
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                data-cy="submit"
+              >
+                Save
+              </Button>
+            </div>
+          </Form>
         )}
       </Formik>
-      <div className={classes.actions}>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          data-cy="delete"
-          onClick={() => {
-            props.dispatch({
-              type: EventType.DELETE_QUESTION_REL_REQUESTED,
-              payload: {
-                fieldId: props.field.question.proposalQuestionId,
-                templateId: props.template.templateId,
-              },
-            });
-            props.closeMe();
-          }}
-        >
-          Delete
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          data-cy="submit"
-        >
-          Save
-        </Button>
-      </div>
     </div>
   );
 };

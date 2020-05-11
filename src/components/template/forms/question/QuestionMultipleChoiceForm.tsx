@@ -2,12 +2,12 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import {
-  Question,
-  SelectionFromOptionsConfig,
-} from '../../../../generated/sdk';
+import { Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { MultipleChoiceConfigFragment } from '../fragments/MultipleChoiceConfigFragment';
+import FormikDropdown from '../../../common/FormikDropdown';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import FormikUICustomTable from '../../../common/FormikUICustomTable';
+import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
@@ -35,7 +35,7 @@ export const QuestionMultipleChoiceForm: TFormSignature<Question> = props => {
       {formikProps => (
         <>
           <Field
-            name="question.naturalKey"
+            name="naturalKey"
             label="Key"
             type="text"
             component={TextField}
@@ -44,7 +44,7 @@ export const QuestionMultipleChoiceForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'natural_key' }}
           />
           <Field
-            name="question.question"
+            name="question"
             label="Question"
             type="text"
             component={TextField}
@@ -53,9 +53,51 @@ export const QuestionMultipleChoiceForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'question' }}
           />
 
-          <MultipleChoiceConfigFragment
-            config={formikProps.values.config as SelectionFromOptionsConfig}
-          />
+          <TitledContainer label="Constraints">
+            <Field
+              name="config.required"
+              label="Is required"
+              checked={formikProps.values.config.required}
+              component={FormikUICustomCheckbox}
+              margin="normal"
+              fullWidth
+              inputProps={{ 'data-cy': 'required' }}
+            />
+          </TitledContainer>
+
+          <TitledContainer label="Options">
+            <FormikDropdown
+              name="config.variant"
+              label="Variant"
+              items={[
+                { text: 'Radio', value: 'radio' },
+                { text: 'Dropdown', value: 'dropdown' },
+              ]}
+              data-cy="variant"
+            />
+          </TitledContainer>
+
+          <TitledContainer label="Items">
+            <Field
+              title=""
+              name="config.options"
+              component={FormikUICustomTable}
+              columns={[{ title: 'Answer', field: 'answer' }]}
+              dataTransforms={{
+                toTable: (options: string[]) => {
+                  return options.map(option => {
+                    return { answer: option };
+                  });
+                },
+                fromTable: (rows: any[]) => {
+                  return rows.map(row => row.answer);
+                },
+              }}
+              margin="normal"
+              fullWidth
+              data-cy="options"
+            />
+          </TitledContainer>
         </>
       )}
     </QuestionFormShell>

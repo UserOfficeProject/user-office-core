@@ -1,14 +1,19 @@
+import { Collapse, TextField } from '@material-ui/core';
 import { Field } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { QuestionRel, TextInputConfig } from '../../../../generated/sdk';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
+import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 import TitledContainer from '../../../common/TitledContainer';
-import { TextInputConfigFragment } from '../fragments/TextInputConfigFragment';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
 
 export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
+  const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
+    (props.field.question.config as TextInputConfig).isHtmlQuestion
+  );
   return (
     <QuestionRelFormShell
       closeMe={props.closeMe}
@@ -31,9 +36,88 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
-          <TextInputConfigFragment
-            config={formikProps.values.question.config as TextInputConfig}
+          <Field
+            label="Enable rich text question"
+            name="question.config.isHtmlQuestion"
+            component={FormikUICustomCheckbox}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setIsRichQuestion(event.target.checked);
+            }}
+            checked={isRichQuestion}
           />
+          <Collapse in={isRichQuestion}>
+            <Field
+              visible={isRichQuestion}
+              name="question.config.htmlQuestion"
+              type="text"
+              component={FormikUICustomEditor}
+              margin="normal"
+              fullWidth
+              init={{
+                skin: false,
+                content_css: false,
+                plugins: ['link', 'preview', 'image', 'code'],
+                toolbar: 'bold italic',
+                branding: false,
+              }}
+              data-cy="htmlQuestion"
+            />
+          </Collapse>
+          <TitledContainer label="Constraints">
+            <Field
+              name="question.config.required"
+              checked={formikProps.values.question.config.required}
+              component={FormikUICustomCheckbox}
+              label="Is required"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+
+            <Field
+              name="question.config.min"
+              label="Min"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="min"
+            />
+
+            <Field
+              name="question.config.max"
+              label="Max"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="max"
+            />
+          </TitledContainer>
+          <TitledContainer label="Options">
+            <Field
+              name="question.config.placeholder"
+              label="Placeholder text"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="placeholder"
+            />
+
+            <Field
+              name="question.config.multiline"
+              checked={
+                (formikProps.values.question.config as TextInputConfig)
+                  .multiline
+              }
+              component={FormikUICustomCheckbox}
+              label="Multiple line"
+              margin="normal"
+              fullWidth
+              data-cy="multiline"
+            />
+          </TitledContainer>
 
           <TitledContainer label="Dependencies">
             <Field

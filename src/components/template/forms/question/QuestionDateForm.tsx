@@ -2,9 +2,10 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig, Question } from '../../../../generated/sdk';
+import { Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { DateConfigFragment } from '../fragments/DateConfigFragment';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
@@ -45,9 +46,26 @@ export const QuestionDateForm: TFormSignature<Question> = props => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-          <DateConfigFragment
-            config={formikProps.values.config as DateConfig}
+          <Field
+            name="config.tooltip"
+            label="Tooltip"
+            type="text"
+            component={TextField}
+            margin="normal"
+            fullWidth
+            data-cy="tooltip"
           />
+          <TitledContainer label="Constraints">
+            <Field
+              name="config.required"
+              label="Is required"
+              checked={formikProps.values.config.required}
+              component={FormikUICustomCheckbox}
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+          </TitledContainer>
         </>
       )}
     </QuestionFormShell>

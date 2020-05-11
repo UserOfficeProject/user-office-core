@@ -1,10 +1,11 @@
+import { TextField } from '@material-ui/core';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
-import { DateConfig, QuestionRel } from '../../../../generated/sdk';
+import { QuestionRel } from '../../../../generated/sdk';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
-import { DateConfigFragment } from '../fragments/DateConfigFragment';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
 
@@ -20,9 +21,26 @@ export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
     >
       {formikProps => (
         <>
-          <DateConfigFragment
-            config={formikProps.values.question.config as DateConfig}
+          <Field
+            name="question.config.tooltip"
+            label="Tooltip"
+            type="text"
+            component={TextField}
+            margin="normal"
+            fullWidth
+            data-cy="tooltip"
           />
+          <TitledContainer label="Constraints">
+            <Field
+              name="question.config.required"
+              label="Is required"
+              checked={formikProps.values.question.config.required}
+              component={FormikUICustomCheckbox}
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+          </TitledContainer>
           <TitledContainer label="Dependencies">
             <Field
               name="dependency"

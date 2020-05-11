@@ -2,9 +2,10 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-import { BooleanConfig, Question } from '../../../../generated/sdk';
+import { Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import { BooleanConfigFragment } from '../fragments/BooleanConfigFragment';
+import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
+import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
@@ -19,19 +20,17 @@ export const QuestionBooleanForm: TFormSignature<Question> = props => {
       dispatch={props.dispatch}
       field={props.field}
       validationSchema={Yup.object().shape({
-        question: Yup.object({
-          naturalKey: naturalKeySchema,
-          question: Yup.string().required('Question is required'),
-          config: Yup.object({
-            required: Yup.bool(),
-          }),
+        naturalKey: naturalKeySchema,
+        question: Yup.string().required('Question is required'),
+        config: Yup.object({
+          required: Yup.bool(),
         }),
       })}
     >
       {formikProps => (
         <>
           <Field
-            name="question.naturalKey"
+            name="naturalKey"
             label="Key"
             type="text"
             component={TextField}
@@ -40,7 +39,7 @@ export const QuestionBooleanForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'natural_key' }}
           />
           <Field
-            name="question.question"
+            name="question"
             label="Question"
             type="text"
             component={TextField}
@@ -49,9 +48,17 @@ export const QuestionBooleanForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'question' }}
           />
 
-          <BooleanConfigFragment
-            config={formikProps.values.config as BooleanConfig}
-          />
+          <TitledContainer label="Constraints">
+            <Field
+              name="config.required"
+              checked={formikProps.values.config.required}
+              component={FormikUICustomCheckbox}
+              label="User must check it to continue"
+              margin="normal"
+              fullWidth
+              data-cy="required"
+            />
+          </TitledContainer>
         </>
       )}
     </QuestionFormShell>
