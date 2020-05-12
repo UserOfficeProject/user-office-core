@@ -219,7 +219,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       natural_key: values.naturalKey,
       data_type: values.dataType,
       question: values.question,
-      config: values.config,
+      default_config: values.config,
     };
 
     await database
@@ -314,7 +314,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           natural_key: naturalKey,
           data_type: dataType,
           question: question,
-          config: config,
+          default_config: config,
         },
         ['*']
       )
