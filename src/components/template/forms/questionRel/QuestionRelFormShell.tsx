@@ -1,4 +1,4 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Button, makeStyles, Typography, Link } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
@@ -21,7 +21,7 @@ export const QuestionRelFormShell = (props: {
     },
     heading: {
       marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(1),
+      marginBottom: '21px',
       display: 'flex',
       alignItems: 'center',
       color: theme.palette.grey[600],
@@ -34,6 +34,12 @@ export const QuestionRelFormShell = (props: {
       display: 'flex',
       justifyContent: 'space-between',
     },
+    naturalKey: {
+      fontSize: '16px',
+      paddingLeft: '21px',
+      display: 'block',
+      marginBottom: '16px',
+    },
   }))();
 
   return (
@@ -42,7 +48,19 @@ export const QuestionRelFormShell = (props: {
         {getTemplateFieldIcon(props.questionRel.question.dataType)}
         {props.label}
       </Typography>
-
+      <Link
+        href="#"
+        onClick={() => {
+          props.dispatch({
+            type: EventType.OPEN_QUESTION_EDITOR,
+            payload: props.questionRel.question,
+          });
+          props.closeMe();
+        }}
+        className={classes.naturalKey}
+      >
+        {props.questionRel.question.naturalKey}
+      </Link>
       <Formik
         initialValues={props.questionRel}
         onSubmit={async form => {
@@ -78,21 +96,6 @@ export const QuestionRelFormShell = (props: {
                 }}
               >
                 Remove from template
-              </Button>
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                data-cy="open-question-editor"
-                onClick={() => {
-                  props.dispatch({
-                    type: EventType.OPEN_QUESTION_EDITOR,
-                    payload: props.questionRel.question,
-                  });
-                  props.closeMe();
-                }}
-              >
-                Edit question base
               </Button>
               <Button
                 type="submit"
