@@ -1,3 +1,4 @@
+import { ResourceId } from '@esss-swap/duo-localisation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
@@ -59,6 +60,23 @@ export default class UserMutations {
     }
 
     return user;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USERS_DELETED_INACTIVE)
+  async deleteInactiveUsers(agent: User | null): Promise<User[] | Rejection> {
+    try {
+      const result = await this.dataSource.deleteInactiveUsers();
+
+      // NOTE: Added new custom rejection message like this because we don't need this on the frontend.
+      if (!result) {
+        return rejection('NO_INACTIVE_USERS' as ResourceId);
+      }
+
+      return result;
+    } catch (error) {
+      return rejection('INTERNAL_ERROR');
+    }
   }
 
   createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {

@@ -32,7 +32,7 @@ const EventBusDecorator = (eventType: Event) => {
         [resultKey]: result,
         key: resultKey,
         loggedInUserId: loggedInUser ? loggedInUser.id : null,
-        isRejection: isRejection(result),
+        rejection: isRejection(result) ? result.reason : null,
       } as ApplicationEvent;
 
       // NOTE: Do not log the event in testing environment.

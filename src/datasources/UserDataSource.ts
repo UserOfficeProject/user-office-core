@@ -56,4 +56,5 @@ export interface UserDataSource {
   setUserPassword(id: number, password: string): Promise<BasicUserDetails>;
   getPasswordByUsername(username: string): Promise<string | null>;
   setUserEmailVerified(id: number): Promise<void>;
+  deleteInactiveUsers(): Promise<User[] | null>;
 }

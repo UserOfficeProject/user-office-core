@@ -125,6 +125,13 @@ export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
 }
 
 @ObjectType()
+export class RemoveInactiveUsersWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => [User], { nullable: true })
+  public users: User[];
+}
+
+@ObjectType()
 export class TokenResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String, { nullable: true })

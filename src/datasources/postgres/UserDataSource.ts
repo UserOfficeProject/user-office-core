@@ -31,6 +31,31 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
   }
 
+  async deleteInactiveUsers(): Promise<User[] | null> {
+    const currentTime = new Date();
+    currentTime.setDate(currentTime.getDate() - 14);
+
+    const removedUsers: UserRecord[] = await database('users')
+      .where('placeholder', true)
+      .andWhere('created_at', '<', currentTime)
+      .del()
+      .returning('*');
+
+    if (!removedUsers) {
+      throw new Error('Could not delete all inactive users');
+    }
+
+    if (removedUsers.length === 0) {
+      return null;
+    }
+
+    const removedUsersStandardized = removedUsers.map(removedUser =>
+      createUserObject(removedUser)
+    );
+
+    return removedUsersStandardized;
+  }
+
   addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     const { userID, roleID } = args;
 
