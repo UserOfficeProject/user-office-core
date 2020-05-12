@@ -30,6 +30,7 @@ export type Answer = {
   question: Question,
   sortOrder: Scalars['Int'],
   topicId: Scalars['Int'],
+  config: FieldConfig,
   dependency?: Maybe<FieldDependency>,
   value?: Maybe<Scalars['IntStringDateBool']>,
 };
@@ -212,6 +213,7 @@ export type Mutation = {
   assignChairAndSecretary: SepResponseWrap,
   assignMember: SepResponseWrap,
   removeMember: SepResponseWrap,
+  assignMemberToSEPProposal: SepResponseWrap,
   assignProposal: SepResponseWrap,
   removeProposalAssignment: SepResponseWrap,
   createSEP: SepResponseWrap,
@@ -327,6 +329,13 @@ export type MutationRemoveMemberArgs = {
 };
 
 
+export type MutationAssignMemberToSepProposalArgs = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  proposalId: Scalars['Int']
+};
+
+
 export type MutationAssignProposalArgs = {
   proposalId: Scalars['Int'],
   sepId: Scalars['Int']
@@ -394,6 +403,7 @@ export type MutationUpdateQuestionRelArgs = {
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
   sortOrder?: Maybe<Scalars['Int']>,
+  config?: Maybe<Scalars['String']>,
   dependency?: Maybe<FieldDependencyInput>
 };
 
@@ -408,9 +418,8 @@ export type MutationUpdateTopicArgs = {
 export type MutationCreateQuestionRelArgs = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
-  sortOrder?: Maybe<Scalars['Int']>,
-  dependency?: Maybe<FieldDependencyInput>,
-  topicId?: Maybe<Scalars['Int']>
+  sortOrder: Scalars['Int'],
+  topicId: Scalars['Int']
 };
 
 
@@ -858,6 +867,7 @@ export type QuestionRel = {
   question: Question,
   sortOrder: Scalars['Int'],
   topicId: Scalars['Int'],
+  config: FieldConfig,
   dependency?: Maybe<FieldDependency>,
 };
 
@@ -1450,6 +1460,24 @@ export type AnswerFragment = (
   & { question: (
     { __typename?: 'Question' }
     & QuestionFragment
+  ), config: (
+    { __typename?: 'BooleanConfig' }
+    & FieldConfigBooleanConfigFragment
+  ) | (
+    { __typename?: 'DateConfig' }
+    & FieldConfigDateConfigFragment
+  ) | (
+    { __typename?: 'EmbellishmentConfig' }
+    & FieldConfigEmbellishmentConfigFragment
+  ) | (
+    { __typename?: 'FileUploadConfig' }
+    & FieldConfigFileUploadConfigFragment
+  ) | (
+    { __typename?: 'SelectionFromOptionsConfig' }
+    & FieldConfigSelectionFromOptionsConfigFragment
+  ) | (
+    { __typename?: 'TextInputConfig' }
+    & FieldConfigTextInputConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -1527,6 +1555,24 @@ export type QuestionRelFragment = (
   & { question: (
     { __typename?: 'Question' }
     & QuestionFragment
+  ), config: (
+    { __typename?: 'BooleanConfig' }
+    & FieldConfigBooleanConfigFragment
+  ) | (
+    { __typename?: 'DateConfig' }
+    & FieldConfigDateConfigFragment
+  ) | (
+    { __typename?: 'EmbellishmentConfig' }
+    & FieldConfigEmbellishmentConfigFragment
+  ) | (
+    { __typename?: 'FileUploadConfig' }
+    & FieldConfigFileUploadConfigFragment
+  ) | (
+    { __typename?: 'SelectionFromOptionsConfig' }
+    & FieldConfigSelectionFromOptionsConfigFragment
+  ) | (
+    { __typename?: 'TextInputConfig' }
+    & FieldConfigTextInputConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -1891,8 +1937,7 @@ export type CreateQuestionRelMutationVariables = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
   topicId: Scalars['Int'],
-  sortOrder: Scalars['Int'],
-  dependency?: Maybe<FieldDependencyInput>
+  sortOrder: Scalars['Int']
 };
 
 
@@ -2070,6 +2115,7 @@ export type UpdateQuestionRelMutationVariables = {
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
   sortOrder?: Maybe<Scalars['Int']>,
+  config?: Maybe<Scalars['String']>,
   dependency?: Maybe<FieldDependencyInput>
 };
 
@@ -2550,6 +2596,9 @@ export const AnswerFragmentDoc = gql`
   }
   sortOrder
   topicId
+  config {
+    ...fieldConfig
+  }
   dependency {
     questionId
     dependencyId
@@ -2561,6 +2610,7 @@ export const AnswerFragmentDoc = gql`
   value
 }
     ${QuestionFragmentDoc}
+${FieldConfigFragmentDoc}
 ${FieldConditionFragmentDoc}`;
 export const QuestionaryStepFragmentDoc = gql`
     fragment questionaryStep on QuestionaryStep {
@@ -2583,6 +2633,9 @@ export const QuestionRelFragmentDoc = gql`
   }
   sortOrder
   topicId
+  config {
+    ...fieldConfig
+  }
   dependency {
     questionId
     dependencyId
@@ -2593,6 +2646,7 @@ export const QuestionRelFragmentDoc = gql`
   }
 }
     ${QuestionFragmentDoc}
+${FieldConfigFragmentDoc}
 ${FieldConditionFragmentDoc}`;
 export const TemplateStepFragmentDoc = gql`
     fragment templateStep on TemplateStep {
@@ -3155,8 +3209,8 @@ export const CreateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const CreateQuestionRelDocument = gql`
-    mutation createQuestionRel($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!, $dependency: FieldDependencyInput) {
-  createQuestionRel(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
+    mutation createQuestionRel($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
+  createQuestionRel(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
     template {
       ...proposalTemplate
     }
@@ -3247,8 +3301,8 @@ export const UpdateQuestionDocument = gql`
 }
     ${QuestionFragmentDoc}`;
 export const UpdateQuestionRelDocument = gql`
-    mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $dependency: FieldDependencyInput) {
-  updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, dependency: $dependency) {
+    mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
+  updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
     template {
       ...proposalTemplate
     }

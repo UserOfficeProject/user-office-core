@@ -3,6 +3,7 @@ mutation updateQuestionRel(
   $templateId: Int!
   $topicId: Int
   $sortOrder: Int
+  $config: String
   $dependency: FieldDependencyInput
 ) {
   updateQuestionRel(
@@ -10,6 +11,7 @@ mutation updateQuestionRel(
     templateId: $templateId
     topicId: $topicId
     sortOrder: $sortOrder
+    config: $config
     dependency: $dependency
   ) {
     template {

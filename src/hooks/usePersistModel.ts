@@ -81,6 +81,7 @@ export function usePersistModel() {
         topicId: field.topicId,
         sortOrder: field.sortOrder,
         questionId: field.question.proposalQuestionId,
+        config: field.config ? JSON.stringify(field.config) : undefined,
         dependency: field.dependency
           ? prepareDependencies(field.dependency)
           : undefined,
