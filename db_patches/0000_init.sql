@@ -142,9 +142,9 @@ CREATE TABLE roles (
 
 
 CREATE TABLE role_user (
-  role_user_id serial PRIMARY KEY,
-  role_id int NOT NULL REFERENCES roles (role_id) ON UPDATE CASCADE
-, user_id int NOT NULL REFERENCES users (user_id) ON UPDATE CASCADE
+  role_id int REFERENCES roles (role_id) ON UPDATE CASCADE
+, user_id int REFERENCES users (user_id) ON UPDATE CASCADE
+, CONSTRAINT role_user_pkey PRIMARY KEY (role_id, user_id)  -- explicit pk
 );
 
 
