@@ -10,6 +10,7 @@ import {
   getQuestionaryStepByTopicId,
   getTopicById,
 } from './ProposalModelFunctions';
+import { DraftsRounded } from '@material-ui/icons';
 
 export enum EventType {
   READY,
@@ -34,6 +35,7 @@ export enum EventType {
   QUESTION_PICKER_NEW_QUESTION_CLICKED,
   SERVICE_ERROR_OCCURRED,
   OPEN_QUESTION_EDITOR,
+  QUESTION_DELETED,
 }
 
 export interface Event {
@@ -109,12 +111,6 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           );
           if (questionRel && questionRelToUpdate) {
             Object.assign(questionRelToUpdate, questionRel);
-          } else {
-            console.error(
-              'Object(s) are not defined',
-              questionRel,
-              questionRelToUpdate
-            );
           }
 
           return draft;
@@ -126,8 +122,6 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           );
           if (field && fieldToUpdate) {
             Object.assign(fieldToUpdate, field);
-          } else {
-            console.error('Object(s) are not defined', field, fieldToUpdate);
           }
 
           return draft;
@@ -144,6 +138,16 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           const stepIdx = draft.steps.indexOf(stepToDelete);
           draft.steps.splice(stepIdx, 1);
 
+          return draft;
+        }
+        case EventType.QUESTION_DELETED: {
+          const questionId = action.payload;
+          draft.complementaryQuestions.splice(
+            draft.complementaryQuestions.findIndex(
+              question => question.proposalQuestionId === questionId
+            ),
+            1
+          );
           return draft;
         }
         case EventType.TOPIC_CREATED:

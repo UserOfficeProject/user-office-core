@@ -102,6 +102,14 @@ export function usePersistModel() {
       });
   };
 
+  const deleteQuestion = async (questionId: string) => {
+    return api()
+      .deleteQuestion({
+        questionId,
+      })
+      .then(data => data.deleteQuestion);
+  };
+
   const deleteQuestionRel = async (templateId: number, questionId: string) => {
     setIsLoading(true);
 
@@ -277,12 +285,19 @@ export function usePersistModel() {
         case EventType.DELETE_TOPIC_REQUESTED:
           executeAndMonitorCall(() => deleteTopic(action.payload));
           break;
-        case EventType.DELETE_QUESTION_REQUESTED:
-          // TODO implement this
-          // executeAndMonitorCall(() =>
-          //   deleteQuestion(action.payload.questionId)
-          // );
+        case EventType.DELETE_QUESTION_REQUESTED: {
+          executeAndMonitorCall(async () => {
+            const result = await deleteQuestion(action.payload.questionId);
+            if (result.question) {
+              dispatch({
+                type: EventType.QUESTION_DELETED,
+                payload: result.question.proposalQuestionId,
+              });
+            }
+            return result;
+          });
           break;
+        }
         case EventType.CREATE_TOPIC_REQUESTED:
           executeAndMonitorCall(async () => {
             const result = await createTopic(
