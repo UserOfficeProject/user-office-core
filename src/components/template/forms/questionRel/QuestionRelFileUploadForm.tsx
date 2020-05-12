@@ -1,4 +1,4 @@
-import { TextField } from '@material-ui/core';
+import { TextField } from 'formik-material-ui';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';

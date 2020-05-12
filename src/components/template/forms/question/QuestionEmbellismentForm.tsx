@@ -1,15 +1,18 @@
-import { TextField } from '@material-ui/core';
 import { Field } from 'formik';
+import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-
 import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
+import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
 export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
+  const field = props.field;
+  const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
+
   return (
     <QuestionFormShell
       label="Embellisment"
@@ -17,6 +20,7 @@ export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
       dispatch={props.dispatch}
       question={props.field}
       validationSchema={Yup.object().shape({
+        naturalKey: naturalKeySchema,
         config: Yup.object({
           html: Yup.string().required('Content is required'),
           plain: Yup.string().required('Plain description is required'),
@@ -26,7 +30,16 @@ export const QuestionEmbellismentForm: TFormSignature<Question> = props => {
       {formikProps => (
         <>
           <Field
-            name="question.config.html"
+            name="naturalKey"
+            label="Key"
+            type="text"
+            component={TextField}
+            margin="normal"
+            fullWidth
+            inputProps={{ 'data-cy': 'natural_key' }}
+          />
+          <Field
+            name="config.html"
             type="text"
             component={FormikUICustomEditor}
             margin="normal"
