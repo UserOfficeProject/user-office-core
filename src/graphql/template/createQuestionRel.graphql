@@ -3,14 +3,12 @@ mutation createQuestionRel(
   $questionId: String!
   $topicId: Int!
   $sortOrder: Int!
-  $dependency: FieldDependencyInput
 ) {
   createQuestionRel(
     templateId: $templateId
     questionId: $questionId
     topicId: $topicId
     sortOrder: $sortOrder
-    dependency: $dependency
   ) {
     template {
       ...proposalTemplate
