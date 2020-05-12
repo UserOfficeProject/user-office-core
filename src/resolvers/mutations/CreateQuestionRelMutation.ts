@@ -23,9 +23,6 @@ export class CreateQuestionRelArgs {
   @Field(() => Int, { nullable: true })
   sortOrder?: number;
 
-  @Field(() => FieldDependencyInput, { nullable: true })
-  dependency?: FieldDependencyInput;
-
   @Field(() => Int, { nullable: true })
   topicId?: number;
 }

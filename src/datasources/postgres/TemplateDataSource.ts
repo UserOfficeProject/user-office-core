@@ -238,7 +238,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createQuestionRel(
     args: CreateQuestionRelArgs
   ): Promise<ProposalTemplate> {
-    const { templateId, questionId, dependency, sortOrder, topicId } = args;
+    const { templateId, questionId, sortOrder, topicId } = args;
     await to(
       database('proposal_question__proposal_template__rels')
         .where({
@@ -253,8 +253,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       template_id: templateId,
       topic_id: topicId,
       sort_order: sortOrder,
-      dependency_proposal_question_id: dependency?.dependencyId,
-      dependency_condition: dependency?.condition,
     });
 
     const returnValue = await this.getProposalTemplate(templateId);
