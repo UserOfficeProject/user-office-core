@@ -5,7 +5,7 @@ BEGIN
 	BEGIN
 
 	ALTER table proposal_question__proposal_template__rels
-	ADD COLUMN config VARCHAR(512) DEFAULT NULL 
+	ADD COLUMN config VARCHAR(512) DEFAULT NULL;
 
 	ALTER TABLE proposal_questions
 	RENAME COLUMN config TO default_config;

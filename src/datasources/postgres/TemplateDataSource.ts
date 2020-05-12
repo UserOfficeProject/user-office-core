@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
-
 import {
   DataType,
   ProposalTemplate,
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
+import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
@@ -26,7 +26,6 @@ import {
   ProposalTemplateRecord,
   TopicRecord,
 } from './records';
-import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
   async getComplementaryQuestions(
@@ -239,20 +238,18 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     args: CreateQuestionRelArgs
   ): Promise<ProposalTemplate> {
     const { templateId, questionId, sortOrder, topicId } = args;
-    await to(
-      database('proposal_question__proposal_template__rels')
-        .where({
-          proposal_question_id: args.questionId,
-          template_id: args.templateId,
-        })
-        .del()
-    );
+    const question = await this.getQuestion(questionId);
+
+    if (!question) {
+      throw new Error(`Could not find question ${questionId}`);
+    }
 
     await database('proposal_question__proposal_template__rels').insert({
       proposal_question_id: questionId,
       template_id: templateId,
       topic_id: topicId,
       sort_order: sortOrder,
+      config: question.config, // default_config
     });
 
     const returnValue = await this.getProposalTemplate(templateId);

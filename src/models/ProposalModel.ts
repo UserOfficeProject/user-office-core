@@ -78,6 +78,7 @@ export class QuestionRel {
     public question: Question,
     public topicId: number,
     public sortOrder: number,
+    public config: typeof FieldConfigType,
     public dependency?: FieldDependency
   ) {}
 
@@ -86,6 +87,7 @@ export class QuestionRel {
       Question.fromObject(obj.question),
       obj.topicId,
       obj.sortOrder,
+      obj.config,
       obj.dependency ? FieldDependency.fromObject(obj.dependency) : undefined
     );
   }
@@ -96,6 +98,7 @@ export class Answer extends QuestionRel {
       templateField.question,
       templateField.topicId,
       templateField.sortOrder,
+      templateField.config,
       templateField.dependency
     );
   }

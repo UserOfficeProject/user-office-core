@@ -20,11 +20,11 @@ export class CreateQuestionRelArgs {
   @Field()
   questionId: string;
 
-  @Field(() => Int, { nullable: true })
-  sortOrder?: number;
+  @Field(() => Int)
+  sortOrder: number;
 
-  @Field(() => Int, { nullable: true })
-  topicId?: number;
+  @Field(() => Int)
+  topicId: number;
 }
 
 @Resolver()

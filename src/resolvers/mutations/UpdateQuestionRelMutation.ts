@@ -48,6 +48,9 @@ export class UpdateQuestionRelArgs {
   @Field(() => Int, { nullable: true })
   public sortOrder?: number;
 
+  @Field({ nullable: true })
+  public config?: string;
+
   @Field(() => FieldDependencyInput, { nullable: true })
   public dependency?: FieldDependencyInput;
 }
