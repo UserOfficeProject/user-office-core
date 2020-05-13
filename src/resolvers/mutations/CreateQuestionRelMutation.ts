@@ -7,6 +7,7 @@ import {
   Mutation,
   Resolver,
 } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';

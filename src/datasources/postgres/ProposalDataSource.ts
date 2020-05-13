@@ -366,6 +366,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where('call_id', callId)
       .then((rows: CallRecord[]) => {
         const call = rows[0];
+
         return this.getQuestionaryWithTemplateId(0, call.template_id);
       });
   }

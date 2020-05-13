@@ -1,9 +1,9 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
 import { QuestionRel as QuestionRelOrign } from '../../models/ProposalModel';
+import { FieldConfigType } from './FieldConfig';
 import { FieldDependency } from './FieldDependency';
 import { Question } from './Question';
-import { FieldConfigType } from './FieldConfig';
 
 @ObjectType()
 export class QuestionRel implements Partial<QuestionRelOrign> {

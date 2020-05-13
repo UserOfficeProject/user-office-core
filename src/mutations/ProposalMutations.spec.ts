@@ -13,11 +13,11 @@ import {
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
+import { ProposalStatus } from '../models/ProposalModel';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
-import { ProposalStatus } from '../models/ProposalModel';
 
 const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
@@ -41,6 +41,7 @@ beforeEach(() => {
 
 test('A user on the proposal can update its title if it is in edit mode', () => {
   const newTitle = 'New Title';
+
   return expect(
     proposalMutations.update(dummyUser, { id: 1, title: newTitle })
   ).resolves.toHaveProperty('title', newTitle);
@@ -65,6 +66,7 @@ test('A user-officer can update a proposal', async () => {
 test('A user-officer can update submitted proposal', async () => {
   const newTitle = 'New Title';
   await proposalMutations.submit(dummyUserOfficer, 1);
+
   return expect(
     proposalMutations.update(dummyUserOfficer, { id: 1, title: newTitle })
   ).resolves.toHaveProperty('title', newTitle);
@@ -73,6 +75,7 @@ test('A user-officer can update submitted proposal', async () => {
 test('A user-officer can update a proposals score in submit mode', async () => {
   const newProposerId = 99;
   await proposalMutations.submit(dummyUserOfficer, 1);
+
   return expect(
     proposalMutations.update(dummyUserOfficer, {
       id: 1,
@@ -84,6 +87,7 @@ test('A user-officer can update a proposals score in submit mode', async () => {
 test('A user can not update a proposals score mode', async () => {
   const newProposerId = 99;
   await proposalMutations.submit(dummyUser, 1);
+
   return expect(
     proposalMutations.update(dummyUser, {
       id: 1,

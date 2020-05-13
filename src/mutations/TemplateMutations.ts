@@ -11,6 +11,7 @@ import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
@@ -26,7 +27,6 @@ import {
 } from '../resolvers/types/FieldConfig';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 
 export default class TemplateMutations {
   constructor(

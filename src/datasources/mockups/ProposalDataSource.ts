@@ -189,6 +189,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async deleteProposal(id: number): Promise<Proposal> {
     const dummyProposalRef = dummyProposalFactory(dummyProposal);
     dummyProposal.id = -1; // hacky
+
     return dummyProposalRef;
   }
 
@@ -227,14 +228,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       step.fields.some(field => {
         if (field.question.proposalQuestionId === questionId) {
           field.value = answer;
+
           return true;
         }
+
         return false;
       })
     );
     if (!updated) {
       throw new Error('Question not found');
     }
+
     return questionId;
   }
 
@@ -248,6 +252,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     }
 
     dummyProposal.finalStatus = ProposalEndStatus.REJECTED; // What is the final status for rejecte?
+
     return dummyProposal;
   }
 
@@ -256,6 +261,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       throw new Error('Proposal does not exist');
     }
     dummyProposal = proposal;
+
     return dummyProposal;
   }
 
@@ -268,6 +274,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       throw new Error('Wrong ID');
     }
     dummyProposal.status = ProposalStatus.SUBMITTED;
+
     return dummyProposal;
   }
 

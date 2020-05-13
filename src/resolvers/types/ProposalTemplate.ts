@@ -10,8 +10,8 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
-import { TemplateStep } from './TemplateStep';
 import { Question } from './Question';
+import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
 export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {
