@@ -34,9 +34,9 @@ export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props 
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
             <Field
-              name="question.config.required"
+              name="config.required"
               label="Is required"
-              checked={formikProps.values.question.config.required}
+              checked={formikProps.values.config.required}
               component={FormikUICustomCheckbox}
               margin="normal"
               fullWidth
@@ -46,7 +46,7 @@ export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props 
 
           <TitledContainer label="Options">
             <FormikDropdown
-              name="question.config.variant"
+              name="config.variant"
               label="Variant"
               items={[
                 { text: 'Radio', value: 'radio' },
@@ -59,7 +59,7 @@ export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props 
           <TitledContainer label="Items">
             <Field
               title=""
-              name="question.config.options"
+              name="config.options"
               component={FormikUICustomTable}
               columns={[{ title: 'Answer', field: 'answer' }]}
               dataTransforms={{

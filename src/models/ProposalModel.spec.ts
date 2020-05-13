@@ -52,6 +52,13 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
         fields: [
           {
             topicId: 0,
+            config: {
+              html: 'General information',
+              plain: 'General information',
+              small_label: '',
+              required: false,
+              tooltip: '',
+            },
             question: {
               question: '',
               proposalQuestionId: 'ttl_general',
@@ -71,6 +78,13 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
           },
           {
             topicId: 0,
+            config: {
+              variant: 'radio',
+              options: ['yes', 'no'],
+              small_label: '',
+              required: false,
+              tooltip: '',
+            },
             question: {
               question: 'Has links with industry',
               proposalQuestionId: 'has_links_with_industry',
@@ -90,6 +104,15 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
           },
           {
             topicId: 0,
+            config: {
+              min: 0,
+              max: 1000000,
+              multiline: false,
+              placeholder: 'Please specify links with industry',
+              small_label: '',
+              required: false,
+              tooltip: '',
+            },
             question: {
               question: 'If yes, please describe:',
               proposalQuestionId: 'links_with_industry',
@@ -135,6 +158,13 @@ export const createDummyField = (values: {
   dependency?: FieldDependency;
 }): QuestionRel => ({
   topicId: values.id || 1,
+  config: values.config || {
+    required: false,
+    small_label: '',
+    tooltip: '',
+    min: 0,
+    max: 0,
+  },
   sortOrder: values.sortOrder || Math.round(Math.random() * 100),
   question: values.question || {
     question: 'Some random question',

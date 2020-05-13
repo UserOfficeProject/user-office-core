@@ -40,7 +40,7 @@ export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const config = templateField.question.config as SelectionFromOptionsConfig;
+  const config = templateField.config as SelectionFromOptionsConfig;
 
   useEffect(() => {
     setStateValue(templateField.value);

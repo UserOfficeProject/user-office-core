@@ -25,7 +25,7 @@ export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
         <>
           <QuestionExcerpt question={props.field.question} />
           <Field
-            name="question.config.tooltip"
+            name="config.tooltip"
             label="Tooltip"
             type="text"
             component={TextField}
@@ -35,9 +35,9 @@ export const QuestionRelDateForm: TFormSignature<QuestionRel> = props => {
           />
           <TitledContainer label="Constraints">
             <Field
-              name="question.config.required"
+              name="config.required"
               label="Is required"
-              checked={formikProps.values.question.config.required}
+              checked={formikProps.values.config.required}
               component={FormikUICustomCheckbox}
               margin="normal"
               fullWidth

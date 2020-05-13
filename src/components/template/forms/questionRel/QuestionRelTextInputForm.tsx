@@ -15,7 +15,7 @@ import { QuestionExcerpt } from './QuestionExcerpt';
 
 export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
-    (props.field.question.config as TextInputConfig).isHtmlQuestion
+    (props.field.config as TextInputConfig).isHtmlQuestion
   );
 
   return (
@@ -44,8 +44,8 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
 
           <TitledContainer label="Constraints">
             <Field
-              name="question.config.required"
-              checked={formikProps.values.question.config.required}
+              name="config.required"
+              checked={formikProps.values.config.required}
               component={FormikUICustomCheckbox}
               label="Is required"
               margin="normal"
@@ -54,7 +54,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
             />
 
             <Field
-              name="question.config.min"
+              name="config.min"
               label="Min"
               type="text"
               component={TextField}
@@ -64,7 +64,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
             />
 
             <Field
-              name="question.config.max"
+              name="config.max"
               label="Max"
               type="text"
               component={TextField}
@@ -76,7 +76,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
           <TitledContainer label="Options">
             <Field
               label="Enable rich text question"
-              name="question.config.isHtmlQuestion"
+              name="config.isHtmlQuestion"
               component={FormikUICustomCheckbox}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setIsRichQuestion(event.target.checked);
@@ -86,7 +86,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
             <Collapse in={isRichQuestion}>
               <Field
                 visible={isRichQuestion}
-                name="question.config.htmlQuestion"
+                name="config.htmlQuestion"
                 type="text"
                 component={FormikUICustomEditor}
                 margin="normal"
@@ -102,7 +102,7 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
               />
             </Collapse>
             <Field
-              name="question.config.placeholder"
+              name="config.placeholder"
               label="Placeholder text"
               type="text"
               component={TextField}
@@ -112,11 +112,8 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
             />
 
             <Field
-              name="question.config.multiline"
-              checked={
-                (formikProps.values.question.config as TextInputConfig)
-                  .multiline
-              }
+              name="config.multiline"
+              checked={(formikProps.values.config as TextInputConfig).multiline}
               component={FormikUICustomCheckbox}
               label="Multiple lines"
               margin="normal"

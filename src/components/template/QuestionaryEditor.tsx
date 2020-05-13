@@ -11,9 +11,9 @@ import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-
-import { QuestionRel, Question, QuestionaryStep } from '../../generated/sdk';
+import { Question, QuestionaryStep, QuestionRel } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
+import { getQuestionaryStepByTopicId } from '../../models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
   Event,
   EventType,
@@ -23,10 +23,6 @@ import QuestionEditor from './forms/QuestionEditor';
 import QuestionRelEditor from './forms/QuestionRelEditor';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
-import {
-  getTopicById,
-  getQuestionaryStepByTopicId,
-} from '../../models/ProposalModelFunctions';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();

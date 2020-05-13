@@ -31,8 +31,8 @@ export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Constraints">
             <Field
-              name="question.config.required"
-              checked={formikProps.values.question.config.required}
+              name="config.required"
+              checked={formikProps.values.config.required}
               component={FormikUICustomCheckbox}
               label="User must check it to continue"
               margin="normal"

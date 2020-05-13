@@ -31,7 +31,7 @@ export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props =>
       {formikProps => (
         <>
           <Field
-            name="question.config.html"
+            name="config.html"
             type="text"
             component={FormikUICustomEditor}
             margin="normal"
@@ -47,7 +47,7 @@ export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props =>
           />
 
           <Field
-            name="question.config.plain"
+            name="config.plain"
             label="Plain description"
             type="text"
             component={TextField}
@@ -57,10 +57,9 @@ export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props =>
           />
 
           <Field
-            name="question.config.omitFromPdf"
+            name="config.omitFromPdf"
             checked={
-              (formikProps.values.question.config as EmbellishmentConfig)
-                .omitFromPdf
+              (formikProps.values.config as EmbellishmentConfig).omitFromPdf
             }
             component={FormikUICustomCheckbox}
             label="Omit from PDF"

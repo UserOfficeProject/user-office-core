@@ -34,7 +34,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
             <Field
-              name="question.config.small_label"
+              name="config.small_label"
               label="Helper text"
               placeholder="(e.g. only PDF accepted)"
               type="text"
@@ -47,7 +47,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
 
           <TitledContainer label="Constraints">
             <Field
-              name="question.config.file_type"
+              name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
               component={FormikUICustomSelect}
@@ -64,7 +64,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
               data-cy="file_type"
             />
             <Field
-              name="question.config.max_files"
+              name="config.max_files"
               label="Max number of files"
               type="text"
               component={TextField}
