@@ -360,8 +360,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Questionary(steps);
   }
 
-  async getEmptyQuestionary(templateId: number): Promise<Questionary> {
-    return this.getQuestionaryWithTemplateId(0, templateId);
+  async getEmptyQuestionary(callId: number): Promise<Questionary> {
+    return await database('call')
+      .select('*')
+      .where('call_id', callId)
+      .then((rows: CallRecord[]) => {
+        const call = rows[0];
+        return this.getQuestionaryWithTemplateId(0, call.template_id);
+      });
   }
 
   async getQuestionary(proposalId: number): Promise<Questionary> {

@@ -263,11 +263,19 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async updateQuestionRel(
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate> {
-    const { templateId, questionId, dependency, sortOrder, topicId } = args;
+    const {
+      templateId,
+      questionId,
+      dependency,
+      sortOrder,
+      topicId,
+      config,
+    } = args;
     await database('proposal_question__proposal_template__rels')
       .update({
         topic_id: topicId,
         sort_order: sortOrder,
+        config: config,
         dependency_proposal_question_id: dependency?.dependencyId,
         dependency_condition: dependency?.condition,
       })

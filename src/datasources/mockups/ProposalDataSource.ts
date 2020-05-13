@@ -21,6 +21,7 @@ import {
   FieldConfigType,
   SelectionFromOptionsConfig,
   TextInputConfig,
+  BooleanConfig,
 } from '../../resolvers/types/FieldConfig';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -63,7 +64,8 @@ export const dummyQuestionRelFactory = (
   return new QuestionRel(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
-    values?.topicId || Math.round(Math.random() * 10)
+    values?.topicId || Math.round(Math.random() * 10),
+    new BooleanConfig()
   );
 };
 
