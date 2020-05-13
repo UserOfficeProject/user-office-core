@@ -457,7 +457,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       throw new Error('Could not clone template');
     }
     const newTemplate = await this.createTemplate(
-      sourceTemplate.name,
+      `Copy of ${sourceTemplate.name}`,
       sourceTemplate.description
     );
 
@@ -500,7 +500,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
                     AND sort_order = (SELECT sort_order 
                                       FROM   proposal_topics 
                                       WHERE  topic_id = source.topic_id)) 
-      FROM   questions_proposal_template AS source 
+      FROM   proposal_question__proposal_template__rels AS source  
+      WHERE template_id=${sourceTemplate.templateId}
     `);
 
     return newTemplate;

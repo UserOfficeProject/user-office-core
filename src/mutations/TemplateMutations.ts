@@ -49,6 +49,18 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  async cloneTemplate(
+    agent: User | null,
+    templateId: number
+  ): Promise<unknown> {
+    const result = await this.dataSource
+      .cloneTemplate(templateId)
+      .then(result => result);
+
+    return result;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
     user: User | null,
     id: number
