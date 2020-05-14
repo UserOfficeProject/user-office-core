@@ -203,3 +203,15 @@ test('Can create a proposal', () => {
     Proposal
   );
 });
+
+test('User officer can set final status of a proposal', () => {
+  return expect(
+    proposalMutations.admin(dummyUserOfficer, { id: 1, finalStatus: 1 })
+  ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('User cannot set final status of a proposal', () => {
+  return expect(
+    proposalMutations.admin(dummyUserNotOnProposal, { id: 1, finalStatus: 1 })
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
