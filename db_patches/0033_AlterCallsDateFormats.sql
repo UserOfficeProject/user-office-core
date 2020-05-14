@@ -5,7 +5,6 @@ BEGIN
 	BEGIN
 
     ALTER table "call" alter start_call type TIMESTAMPTZ;
-    ALTER table "call" alter start_call type TIMESTAMPTZ;
     ALTER table "call" alter end_call type TIMESTAMPTZ;
     ALTER table "call" alter start_review type TIMESTAMPTZ;
     ALTER table "call" alter end_review type TIMESTAMPTZ;
