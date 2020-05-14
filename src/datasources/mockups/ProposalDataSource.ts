@@ -82,7 +82,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.rankOrder || 0,
     values?.finalStatus || 0,
     values?.callId || 0,
-    values?.templateId || 1
+    values?.templateId || 1,
+    values?.commentForUser || 'comment for user',
+    values?.commentForManagement || 'comment for management'
   );
 };
 
