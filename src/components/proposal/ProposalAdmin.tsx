@@ -64,6 +64,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                 <FormikDropdown
                   name="finalStatus"
                   label="Final status"
+                  data-cy="proposalFinalStatus"
                   items={[
                     { text: 'Unset', value: ProposalEndStatus.UNSET },
                     { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
@@ -77,6 +78,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                 <FormikDropdown
                   name="proposalStatus"
                   label="Proposal status"
+                  data-cy="proposalStatus"
                   items={[
                     { text: '', value: ProposalStatus.BLANK },
                     { text: 'Draft', value: ProposalStatus.DRAFT },
@@ -94,7 +96,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                   margin="normal"
                   fullWidth
                   autoComplete="off"
-                  data-cy="comment"
+                  data-cy="commentForUser"
                   multiline
                   rowsMax="16"
                   rows="4"
@@ -109,7 +111,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                   margin="normal"
                   fullWidth
                   autoComplete="off"
-                  data-cy="publicComment"
+                  data-cy="commentForManagement"
                   multiline
                   rowsMax="16"
                   rows="4"
