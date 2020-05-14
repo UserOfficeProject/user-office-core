@@ -26,6 +26,8 @@ services:
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
+  duo-cron-job:
+    image: dmsc/duo-cron-job
   db:
     image: postgres:11.2
     restart: always
