@@ -41,7 +41,7 @@ interface TProps {
   disabled?: boolean;
 }
 
-interface Option {
+export interface Option {
   text: string;
   value: string;
 }

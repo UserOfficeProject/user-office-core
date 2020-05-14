@@ -82,7 +82,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
         <>
           <ParticipantModal
             show={modalOpen}
-            close={setOpen}
+            close={() => setOpen(false)}
             addParticipant={addUser}
             selectedUsers={reviews.map(review => review.userID)}
             title={'Reviewer'}

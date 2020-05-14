@@ -1,41 +1,42 @@
 import Button from '@material-ui/core/Button';
 import { Email } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import MaterialTable, { MTableToolbar } from 'material-table';
+import MaterialTable, { MTableToolbar, Query } from 'material-table';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { UserRole } from '../../generated/sdk';
+import { UserRole, GetUsersQuery } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/tableIcons';
+import { BasicUserDetails } from '../../models/User';
+import { tableIcons } from '../../utils/materialIcons';
 import { InviteUserForm } from './InviteUserForm';
 
 function sendUserRequest(
-  searchQuery,
-  api,
-  setLoading,
-  selectedUsers,
-  userRole
+  searchQuery: Query<any>,
+  api: any,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  selectedUsers: number[] | undefined,
+  userRole: UserRole | undefined
 ) {
   const variables = {
     filter: searchQuery.search,
     offset: searchQuery.pageSize * searchQuery.page,
     first: searchQuery.pageSize,
     subtractUsers: selectedUsers ? selectedUsers : [],
+    userRole: userRole ? userRole : null,
   };
-  if (userRole) {
-    variables.userRole = userRole;
-  }
+
   setLoading(true);
 
   return api()
     .getUsers(variables)
-    .then(data => {
+    .then((data: GetUsersQuery) => {
       setLoading(false);
 
       return {
         page: searchQuery.page,
-        totalCount: data.users.totalCount,
-        data: data.users.users.map(user => {
+        totalCount: data?.users?.totalCount,
+        data: data?.users?.users.map((user: BasicUserDetails) => {
           return {
             firstname: user.firstname,
             lastname: user.lastname,
@@ -47,7 +48,22 @@ function sendUserRequest(
     });
 }
 
-function PeopleTable(props) {
+type PeopleTableProps = {
+  title: string;
+  userRole?: UserRole;
+  actionIcon: JSX.Element;
+  actionText: string;
+  action: (data: any) => void;
+  isFreeAction?: boolean;
+  data?: BasicUserDetails[];
+  search?: boolean;
+  onRemove?: (user: BasicUserDetails) => void;
+  emailInvite?: boolean;
+  selectedUsers?: number[];
+  menuItems?: any[];
+};
+
+const PeopleTable: React.FC<PeopleTableProps> = props => {
   const sendRequest = useDataApi();
   const [loading, setLoading] = useState(false);
   const [pageSize, setPageSize] = useState(5);
@@ -65,7 +81,7 @@ function PeopleTable(props) {
       },
     },
   })();
-  if (sendUserEmail) {
+  if (sendUserEmail && props.userRole) {
     return (
       <InviteUserForm
         title={
@@ -77,18 +93,30 @@ function PeopleTable(props) {
       />
     );
   }
+  const EmailIcon = (): JSX.Element => <Email />;
   const actionArray = [];
+
+  const ToolbarElement = (data: any) => (
+    <div>
+      <MTableToolbar {...data} />
+      {props.menuItems?.map((item: any, i) => (
+        <Button variant="outlined" onClick={() => item.action()} key={i}>
+          {item.title}
+        </Button>
+      ))}
+    </div>
+  );
 
   props.action &&
     actionArray.push({
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
       tooltip: props.actionText,
-      onClick: (event, rowData) => props.action(rowData),
+      onClick: (event: any, rowData: any) => props.action(rowData),
     });
   props.emailInvite &&
     actionArray.push({
-      icon: () => <Email />,
+      icon: EmailIcon,
       isFreeAction: true,
       tooltip: 'Add by email',
       onClick: () => setSendUserEmail(true),
@@ -101,20 +129,7 @@ function PeopleTable(props) {
         title={props.title}
         columns={columns}
         components={{
-          Toolbar: data => (
-            <div>
-              <MTableToolbar {...data} />
-              {props.menyItems?.map((item, i) => (
-                <Button
-                  variant="outlined"
-                  onClick={() => item.action()}
-                  key={i}
-                >
-                  {item.title}
-                </Button>
-              ))}
-            </div>
-          ),
+          Toolbar: ToolbarElement,
         }}
         data={
           props.data
@@ -144,14 +159,29 @@ function PeopleTable(props) {
                 onRowDelete: oldData =>
                   new Promise(resolve => {
                     resolve();
-                    props.onRemove(oldData);
+                    (props.onRemove as any)(oldData);
                   }),
               }
-            : null
+            : {}
         }
       />
     </div>
   );
-}
+};
+
+PeopleTable.propTypes = {
+  title: PropTypes.string.isRequired,
+  actionIcon: PropTypes.element.isRequired,
+  actionText: PropTypes.string.isRequired,
+  action: PropTypes.func.isRequired,
+  isFreeAction: PropTypes.bool,
+  userRole: PropTypes.any,
+  data: PropTypes.array,
+  search: PropTypes.bool,
+  onRemove: PropTypes.func,
+  emailInvite: PropTypes.bool,
+  selectedUsers: PropTypes.array,
+  menuItems: PropTypes.array,
+};
 
 export default PeopleTable;

@@ -3,6 +3,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import { AddBox } from '@material-ui/icons';
 import React from 'react';
 
+import { UserRole } from '../../generated/sdk';
 import PeopleTable from '../user/PeopleTable';
 
 function ParticipantModal(props: {
@@ -11,7 +12,7 @@ function ParticipantModal(props: {
   show: boolean;
   close: any;
   selectedUsers?: number[];
-  userRole: string;
+  userRole: UserRole;
 }) {
   const addUser = (rowData: any) => {
     props.addParticipant({

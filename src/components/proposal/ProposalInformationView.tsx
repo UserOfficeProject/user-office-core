@@ -148,7 +148,7 @@ export default function ProposalInformationView(props: {
           />
           <ProposalParticipants
             error={userError}
-            setUsers={(users: User[]) => {
+            setUsers={(users: BasicUserDetails[]) => {
               setUsers(users);
               dispatch({
                 type: EventType.PROPOSAL_METADATA_CHANGED,

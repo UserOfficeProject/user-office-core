@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Email from '@material-ui/icons/Email';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -23,7 +24,19 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EmailVerification({ match }) {
+const EmailVerificationPropTypes = {
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      token: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
+
+type EmailVerificationProps = PropTypes.InferProps<
+  typeof EmailVerificationPropTypes
+>;
+
+const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
   const classes = useStyles();
   const [emailVerified, setEmailVerified] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
@@ -71,4 +84,6 @@ export default function EmailVerification({ match }) {
       </FormWrapper>
     </PhotoInSide>
   );
-}
+};
+
+export default EmailVerification;

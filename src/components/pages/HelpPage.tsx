@@ -2,11 +2,14 @@ import Grid from '@material-ui/core/Grid';
 import parse from 'html-react-parser';
 import React from 'react';
 
+import { PageName } from '../../generated/sdk';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
-export default function HelpPage() {
-  const [loadingHelpContent, helpPageContent] = useGetPageContent('HELPPAGE');
+const HelpPage: React.FC = () => {
+  const [loadingHelpContent, helpPageContent] = useGetPageContent(
+    PageName.HELPPAGE
+  );
 
   return (
     <React.Fragment>
@@ -21,4 +24,6 @@ export default function HelpPage() {
       </ContentContainer>
     </React.Fragment>
   );
-}
+};
+
+export default HelpPage;

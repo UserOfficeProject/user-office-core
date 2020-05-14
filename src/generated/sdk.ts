@@ -1178,6 +1178,25 @@ export type AssignChairAndSecretaryMutation = (
   ) }
 );
 
+export type AssignMemberToSepProposalMutationVariables = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  proposalId: Scalars['Int']
+};
+
+
+export type AssignMemberToSepProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { assignMemberToSEPProposal: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
 export type CreateSepMutationVariables = {
   code: Scalars['String'],
   description: Scalars['String'],
@@ -2775,6 +2794,16 @@ export const AssignChairAndSecretaryDocument = gql`
   }
 }
     `;
+export const AssignMemberToSepProposalDocument = gql`
+    mutation assignMemberToSEPProposal($memberId: Int!, $sepId: Int!, $proposalId: Int!) {
+  assignMemberToSEPProposal(memberId: $memberId, sepId: $sepId, proposalId: $proposalId) {
+    error
+    sep {
+      id
+    }
+  }
+}
+    `;
 export const CreateSepDocument = gql`
     mutation createSEP($code: String!, $description: String!, $numberRatingsRequired: Int!, $active: Boolean!) {
   createSEP(code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
@@ -3611,6 +3640,9 @@ export function getSdk(client: GraphQLClient) {
     },
     assignChairAndSecretary(variables: AssignChairAndSecretaryMutationVariables): Promise<AssignChairAndSecretaryMutation> {
       return client.request<AssignChairAndSecretaryMutation>(print(AssignChairAndSecretaryDocument), variables);
+    },
+    assignMemberToSEPProposal(variables: AssignMemberToSepProposalMutationVariables): Promise<AssignMemberToSepProposalMutation> {
+      return client.request<AssignMemberToSepProposalMutation>(print(AssignMemberToSepProposalDocument), variables);
     },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
