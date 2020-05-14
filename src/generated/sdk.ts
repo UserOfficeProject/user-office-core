@@ -219,18 +219,19 @@ export type Mutation = {
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
+  createQuestionRel: ProposalTemplateResponseWrap,
   createTopic: ProposalTemplateResponseWrap,
   deleteQuestionRel: ProposalTemplateResponseWrap,
   updateProposalTemplate: ProposalTemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
   updateQuestionRel: ProposalTemplateResponseWrap,
   updateTopic: TopicResponseWrap,
-  createQuestionRel: ProposalTemplateResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
+  cloneProposalTemplate: ProposalTemplateResponseWrap,
   createProposal: ProposalResponseWrap,
   createProposalTemplate: ProposalTemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
@@ -370,6 +371,14 @@ export type MutationCreateQuestionArgs = {
 };
 
 
+export type MutationCreateQuestionRelArgs = {
+  templateId: Scalars['Int'],
+  questionId: Scalars['String'],
+  sortOrder: Scalars['Int'],
+  topicId: Scalars['Int']
+};
+
+
 export type MutationCreateTopicArgs = {
   templateId: Scalars['Int'],
   sortOrder: Scalars['Int']
@@ -412,14 +421,6 @@ export type MutationUpdateTopicArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>
-};
-
-
-export type MutationCreateQuestionRelArgs = {
-  templateId: Scalars['Int'],
-  questionId: Scalars['String'],
-  sortOrder: Scalars['Int'],
-  topicId: Scalars['Int']
 };
 
 
@@ -486,6 +487,11 @@ export type MutationUpdateUserArgs = {
 
 export type MutationAddClientLogArgs = {
   error: Scalars['String']
+};
+
+
+export type MutationCloneProposalTemplateArgs = {
+  templateId: Scalars['Int']
 };
 
 
@@ -1898,6 +1904,23 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type CloneProposalTemplateMutationVariables = {
+  templateId: Scalars['Int']
+};
+
+
+export type CloneProposalTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneProposalTemplate: (
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & ProposalTemplateMetadataFragment
+    )> }
+  ) }
+);
+
 export type CreateProposalTemplateMutationVariables = {
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>
@@ -1911,7 +1934,7 @@ export type CreateProposalTemplateMutation = (
     & Pick<ProposalTemplateResponseWrap, 'error'>
     & { template: Maybe<(
       { __typename?: 'ProposalTemplate' }
-      & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+      & ProposalTemplateMetadataFragment
     )> }
   ) }
 );
@@ -2052,6 +2075,11 @@ export type ProposalTemplateFragment = (
     { __typename?: 'Question' }
     & QuestionFragment
   )> }
+);
+
+export type ProposalTemplateMetadataFragment = (
+  { __typename?: 'ProposalTemplate' }
+  & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
 );
 
 export type GetIsNaturalKeyPresentQueryVariables = {
@@ -2698,6 +2726,16 @@ export const ProposalTemplateFragmentDoc = gql`
 }
     ${QuestionRelFragmentDoc}
 ${QuestionFragmentDoc}`;
+export const ProposalTemplateMetadataFragmentDoc = gql`
+    fragment proposalTemplateMetadata on ProposalTemplate {
+  templateId
+  name
+  description
+  isArchived
+  proposalCount
+  callCount
+}
+    `;
 export const BasicUserDetailsFragmentDoc = gql`
     fragment basicUserDetails on BasicUserDetails {
   id
@@ -3183,21 +3221,26 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
-export const CreateProposalTemplateDocument = gql`
-    mutation createProposalTemplate($name: String!, $description: String) {
-  createProposalTemplate(name: $name, description: $description) {
+export const CloneProposalTemplateDocument = gql`
+    mutation cloneProposalTemplate($templateId: Int!) {
+  cloneProposalTemplate(templateId: $templateId) {
     template {
-      templateId
-      name
-      description
-      isArchived
-      proposalCount
-      callCount
+      ...proposalTemplateMetadata
     }
     error
   }
 }
-    `;
+    ${ProposalTemplateMetadataFragmentDoc}`;
+export const CreateProposalTemplateDocument = gql`
+    mutation createProposalTemplate($name: String!, $description: String) {
+  createProposalTemplate(name: $name, description: $description) {
+    template {
+      ...proposalTemplateMetadata
+    }
+    error
+  }
+}
+    ${ProposalTemplateMetadataFragmentDoc}`;
 export const CreateQuestionDocument = gql`
     mutation createQuestion($dataType: DataType!) {
   createQuestion(dataType: $dataType) {
@@ -3655,6 +3698,9 @@ export function getSdk(client: GraphQLClient) {
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
+    },
+    cloneProposalTemplate(variables: CloneProposalTemplateMutationVariables): Promise<CloneProposalTemplateMutation> {
+      return client.request<CloneProposalTemplateMutation>(print(CloneProposalTemplateDocument), variables);
     },
     createProposalTemplate(variables: CreateProposalTemplateMutationVariables): Promise<CreateProposalTemplateMutation> {
       return client.request<CreateProposalTemplateMutation>(print(CreateProposalTemplateDocument), variables);

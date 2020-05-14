@@ -1,7 +1,6 @@
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
-
 import { ProposalTemplate, Question, QuestionRel } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
@@ -10,7 +9,6 @@ import {
   getQuestionaryStepByTopicId,
   getTopicById,
 } from './ProposalModelFunctions';
-import { DraftsRounded } from '@material-ui/icons';
 
 export enum EventType {
   READY,

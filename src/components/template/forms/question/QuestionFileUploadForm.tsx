@@ -33,7 +33,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
       {formikProps => (
         <>
           <Field
-            name="question.naturalKey"
+            name="naturalKey"
             label="Key"
             type="text"
             component={TextField}
@@ -42,7 +42,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
             inputProps={{ 'data-cy': 'natural_key' }}
           />
           <Field
-            name="question.question"
+            name="question"
             label="Question"
             type="text"
             component={TextField}
@@ -53,7 +53,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
 
           <TitledContainer label="Options">
             <Field
-              name="question.config.small_label"
+              name="config.small_label"
               label="Helper text"
               placeholder="(e.g. only PDF accepted)"
               type="text"

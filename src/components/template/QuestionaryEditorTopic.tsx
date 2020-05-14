@@ -40,7 +40,7 @@ class QuestionRelItemAdapter implements IQuestionaryEditorTopicData {
     return this.source.dependency;
   }
   get config() {
-    return this.source.question.config;
+    return this.source.config;
   }
 }
 
@@ -143,7 +143,7 @@ export default function QuestionaryEditorTopic(props: {
       }}
       data-cy="topic-title"
     >
-      {index + 2}. {props.data.topic.title}
+      {index + 2}. {title}
     </span>
   );
 

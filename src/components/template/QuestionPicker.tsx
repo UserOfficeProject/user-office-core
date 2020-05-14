@@ -54,8 +54,9 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
     container: {
       alignItems: 'flex-start',
       alignContent: 'flex-start',
-      background: '#DDD',
       flexBasis: '100%',
+      marginRight: '10px',
+      boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
     },
     itemContainer: {
       minHeight: '180px',
