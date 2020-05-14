@@ -2,6 +2,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import { Add } from '@material-ui/icons';
+import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 
@@ -17,8 +18,18 @@ const CallPage: React.FC = () => {
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
-    { title: 'Start Date', field: 'startCall' },
-    { title: 'End Date', field: 'endCall' },
+    {
+      title: 'Start Date',
+      field: 'startCall',
+      render: (rowData: Call): string =>
+        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+    },
+    {
+      title: 'End Date',
+      field: 'endCall',
+      render: (rowData: Call): string =>
+        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+    },
   ];
 
   if (loading) {
