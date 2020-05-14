@@ -488,16 +488,18 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
                   proposal_question_id, 
                   sort_order, 
                   dependency_proposal_question_id, 
-                  dependency_condition, 
+                  dependency_condition,
+                  config, 
                   topic_id) 
       SELECT ${newTemplate.templateId}, 
             proposal_question_id, 
             sort_order, 
             dependency_proposal_question_id, 
-            dependency_condition, 
+            dependency_condition,
+            config, 
             (SELECT topic_id 
               FROM   proposal_topics AS newTopics 
-              WHERE  template_id = ${sourceTemplate.templateId} 
+              WHERE  template_id = ${newTemplate.templateId} 
                     AND sort_order = (SELECT sort_order 
                                       FROM   proposal_topics 
                                       WHERE  topic_id = source.topic_id)) 
