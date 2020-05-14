@@ -203,6 +203,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           proposer_id: proposal.proposerId,
           rank_order: proposal.rankOrder,
           final_status: proposal.finalStatus,
+          comment_for_user: proposal.commentForUser,
+          comment_for_management: proposal.commentForManagement,
         },
         ['*']
       )

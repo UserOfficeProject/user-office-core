@@ -53,6 +53,12 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => Int)
   public templateId?: number;
 
+  @Field(() => String, { nullable: true })
+  public commentForUser: string;
+
+  @Field(() => String, { nullable: true })
+  public commentForManagement?: string;
+
   public proposerId: number;
 }
 
