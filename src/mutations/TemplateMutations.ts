@@ -286,7 +286,7 @@ export default class TemplateMutations {
       .createQuestionRel(args)
       .then(data => data)
       .catch(err => {
-        logger.logException('Could not update topic order', err, {
+        logger.logException('Could not create Question Relation', err, {
           user,
         });
 
