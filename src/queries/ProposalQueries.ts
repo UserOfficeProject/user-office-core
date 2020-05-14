@@ -28,6 +28,8 @@ export default class ProposalQueries {
     if (!(await this.userAuth.isUserOfficer(agent))) {
       delete proposal.rankOrder;
       delete proposal.finalStatus;
+      delete proposal.commentForUser;
+      delete proposal.commentForManagement;
     }
 
     if ((await this.hasAccessRights(agent, proposal)) === true) {
@@ -116,7 +118,9 @@ export default class ProposalQueries {
       0,
       ProposalEndStatus.UNSET,
       call?.id,
-      call?.templateId
+      call?.templateId,
+      '',
+      ''
     );
 
     return blankProposal;

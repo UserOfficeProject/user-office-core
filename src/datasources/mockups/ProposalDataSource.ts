@@ -143,7 +143,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       1,
-      1
+      1,
+      '',
+      ''
     );
 
     dummyProposalSubmitted = new Proposal(
@@ -158,7 +160,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       1,
-      1
+      1,
+      '',
+      ''
     );
   }
 

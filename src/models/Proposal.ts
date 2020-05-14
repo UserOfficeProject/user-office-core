@@ -12,6 +12,8 @@ export class Proposal {
     public rankOrder: number,
     public finalStatus: number,
     public callId: number,
-    public templateId: number
+    public templateId: number,
+    public commentForUser: string,
+    public commentForManagement: string
   ) {}
 }

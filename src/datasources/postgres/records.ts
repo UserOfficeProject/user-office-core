@@ -37,6 +37,8 @@ export interface ProposalRecord {
   readonly technical_score: number;
   readonly call_id: number;
   readonly template_id: number;
+  readonly comment_for_user: string;
+  readonly comment_for_management: string;
 }
 
 export interface TopicRecord {
@@ -259,7 +261,9 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.rank_order,
     proposal.final_status,
     proposal.call_id,
-    proposal.template_id
+    proposal.template_id,
+    proposal.comment_for_user,
+    proposal.comment_for_management
   );
 };
 
