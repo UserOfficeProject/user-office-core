@@ -7,8 +7,10 @@ import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
 import { isMatchingConstraints } from '../models/ProposalModelFunctions';
+import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
@@ -69,8 +71,6 @@ export default class ProposalMutations {
       users,
       proposerId,
       partialSave,
-      rankOrder,
-      finalStatus,
     } = args;
 
     // Get proposal information
@@ -113,16 +113,6 @@ export default class ProposalMutations {
 
     if (abstract !== undefined) {
       proposal.abstract = abstract;
-    }
-    if ((await this.userAuth.isUserOfficer(agent)) && rankOrder !== undefined) {
-      proposal.rankOrder = rankOrder;
-    }
-
-    if (
-      (await this.userAuth.isUserOfficer(agent)) &&
-      finalStatus !== undefined
-    ) {
-      proposal.finalStatus = finalStatus;
     }
 
     if (users !== undefined) {
@@ -256,7 +246,8 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-  @Authorized()
+
+  @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: User | null,
     proposalId: number
@@ -267,14 +258,50 @@ export default class ProposalMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isMemberOfProposal(agent, proposal))
-    ) {
-      return rejection('NOT_ALLOWED');
+    const result = await this.proposalDataSource.deleteProposal(proposalId);
+
+    return result || rejection('INTERNAL_ERROR');
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async admin(
+    agent: User | null,
+    args: AdministrationProposalArgs
+  ): Promise<Proposal | Rejection> {
+    const {
+      id,
+      rankOrder,
+      finalStatus,
+      status,
+      commentForManagement,
+      commentForUser,
+    } = args;
+    const proposal = await this.proposalDataSource.get(id);
+
+    if (!proposal) {
+      return rejection('INTERNAL_ERROR');
+    }
+    if (rankOrder !== undefined) {
+      proposal.rankOrder = rankOrder;
     }
 
-    const result = await this.proposalDataSource.deleteProposal(proposalId);
+    if (finalStatus !== undefined) {
+      proposal.finalStatus = finalStatus;
+    }
+
+    if (status !== undefined) {
+      proposal.status = status;
+    }
+
+    if (commentForUser !== undefined) {
+      proposal.commentForUser = commentForUser;
+    }
+
+    if (commentForManagement !== undefined) {
+      proposal.commentForManagement = commentForManagement;
+    }
+
+    const result = await this.proposalDataSource.update(proposal);
 
     return result || rejection('INTERNAL_ERROR');
   }
