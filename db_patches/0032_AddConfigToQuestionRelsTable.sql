@@ -15,10 +15,10 @@ BEGIN
 		SELECT default_config 
 		FROM proposal_questions as questions
 		WHERE questions.proposal_question_id = rels.proposal_question_id
-		)
+		);
 
 	ALTER TABLE proposal_question__proposal_template__rels
-	ALTER COLUMN config SET NOT NULL
+	ALTER COLUMN config SET NOT NULL;
 
     END;
 	END IF;
