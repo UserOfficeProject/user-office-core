@@ -16,9 +16,8 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
-
 import { UserContext } from '../context/UserContextProvider';
-import { UserRole, PageName } from '../generated/sdk';
+import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
@@ -30,7 +29,7 @@ import ProposalCreate from './proposal/ProposaCreate';
 import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalReviewReviewer from './review/ProposalReviewReviewer';
+import ProposalGrade from './review/ProposalGrade';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
@@ -40,7 +39,6 @@ import QuestionaryEditor from './template/QuestionaryEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
-import ProposalGrade from './review/ProposalGrade';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
