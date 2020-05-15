@@ -1,6 +1,7 @@
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
+
 import { ProposalTemplate, Question, QuestionRel } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
@@ -147,6 +148,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
             ),
             1
           );
+
           return draft;
         }
         case EventType.TOPIC_CREATED:

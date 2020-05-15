@@ -7,8 +7,8 @@ import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
 import { QuestionExcerpt } from './QuestionExcerpt';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
 export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
   return (

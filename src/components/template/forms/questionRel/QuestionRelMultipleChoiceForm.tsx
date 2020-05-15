@@ -9,8 +9,8 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import FormikUICustomTable from '../../../common/FormikUICustomTable';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
 import { QuestionExcerpt } from './QuestionExcerpt';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
 export const QuestionRelMultipleChoiceForm: TFormSignature<QuestionRel> = props => {
   return (

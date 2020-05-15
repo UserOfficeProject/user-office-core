@@ -264,6 +264,7 @@ export function usePersistModel() {
                 payload: result.question,
               });
             }
+
             return result;
           });
           break;
@@ -295,6 +296,7 @@ export function usePersistModel() {
                 payload: result.question.proposalQuestionId,
               });
             }
+
             return result;
           });
           break;

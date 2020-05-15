@@ -1,5 +1,5 @@
-import { TextField } from 'formik-material-ui';
 import { Field } from 'formik';
+import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -8,8 +8,8 @@ import FormikUICustomDependencySelector from '../../../common/FormikUICustomDepe
 import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
 import { QuestionExcerpt } from './QuestionExcerpt';
+import { QuestionRelFormShell } from './QuestionRelFormShell';
 
 export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
   return (

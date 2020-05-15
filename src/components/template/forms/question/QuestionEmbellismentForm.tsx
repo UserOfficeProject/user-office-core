@@ -2,6 +2,7 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';

@@ -2,6 +2,7 @@ import { Grid, makeStyles, useTheme } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+
 import {
   DataType,
   EmbellishmentConfig,
