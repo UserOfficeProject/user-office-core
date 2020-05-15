@@ -205,6 +205,7 @@ export type FileUploadConfig = {
 export type Mutation = {
    __typename?: 'Mutation',
   createCall: CallResponseWrap,
+  administrationProposal: ProposalResponseWrap,
   updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   addReview: ReviewResponseWrap,
@@ -269,6 +270,16 @@ export type MutationCreateCallArgs = {
 };
 
 
+export type MutationAdministrationProposalArgs = {
+  id: Scalars['Int'],
+  commentForUser?: Maybe<Scalars['String']>,
+  commentForManagement?: Maybe<Scalars['String']>,
+  finalStatus?: Maybe<ProposalEndStatus>,
+  status?: Maybe<ProposalStatus>,
+  rankOrder?: Maybe<Scalars['Int']>
+};
+
+
 export type MutationUpdateProposalFilesArgs = {
   proposalId: Scalars['Int'],
   questionId: Scalars['String'],
@@ -284,9 +295,7 @@ export type MutationUpdateProposalArgs = {
   topicsCompleted?: Maybe<Array<Scalars['Int']>>,
   users?: Maybe<Array<Scalars['Int']>>,
   proposerId?: Maybe<Scalars['Int']>,
-  partialSave?: Maybe<Scalars['Boolean']>,
-  rankOrder?: Maybe<Scalars['Int']>,
-  finalStatus?: Maybe<ProposalEndStatus>
+  partialSave?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -639,6 +648,8 @@ export type Proposal = {
   finalStatus?: Maybe<ProposalEndStatus>,
   callId: Scalars['Int'],
   templateId: Scalars['Int'],
+  commentForUser?: Maybe<Scalars['String']>,
+  commentForManagement?: Maybe<Scalars['String']>,
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews?: Maybe<Array<Review>>,
@@ -1446,6 +1457,28 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
+export type AdministrationProposalMutationVariables = {
+  id: Scalars['Int'],
+  rankOrder?: Maybe<Scalars['Int']>,
+  finalStatus?: Maybe<ProposalEndStatus>,
+  status?: Maybe<ProposalStatus>,
+  commentForUser?: Maybe<Scalars['String']>,
+  commentForManagement?: Maybe<Scalars['String']>
+};
+
+
+export type AdministrationProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { administrationProposal: (
+    { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
+    & { proposal: Maybe<(
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'id'>
+    )> }
+  ) }
+);
+
 export type CreateProposalMutationVariables = {
   callId: Scalars['Int']
 };
@@ -1691,7 +1724,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1730,7 +1763,7 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'created' | 'updated' | 'callId' | 'templateId'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -1746,7 +1779,7 @@ export type GetProposalsQuery = (
         & BasicUserDetailsFragment
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
-        & Pick<TechnicalReview, 'id' | 'comment' | 'timeAllocation' | 'status' | 'proposalID'>
+        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
       )> }
     )> }
   )> }
@@ -1777,9 +1810,7 @@ export type UpdateProposalMutationVariables = {
   topicsCompleted?: Maybe<Array<Scalars['Int']>>,
   users?: Maybe<Array<Scalars['Int']>>,
   proposerId?: Maybe<Scalars['Int']>,
-  partialSave?: Maybe<Scalars['Boolean']>,
-  rankOrder?: Maybe<Scalars['Int']>,
-  finalStatus?: Maybe<ProposalEndStatus>
+  partialSave?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -2982,6 +3013,16 @@ export const GetEventLogsDocument = gql`
   }
 }
     `;
+export const AdministrationProposalDocument = gql`
+    mutation administrationProposal($id: Int!, $rankOrder: Int, $finalStatus: ProposalEndStatus, $status: ProposalStatus, $commentForUser: String, $commentForManagement: String) {
+  administrationProposal(id: $id, rankOrder: $rankOrder, finalStatus: $finalStatus, status: $status, commentForUser: $commentForUser, commentForManagement: $commentForManagement) {
+    proposal {
+      id
+    }
+    error
+  }
+}
+    `;
 export const CreateProposalDocument = gql`
     mutation createProposal($callId: Int!) {
   createProposal(callId: $callId) {
@@ -3066,6 +3107,8 @@ export const GetProposalDocument = gql`
     shortCode
     rankOrder
     finalStatus
+    commentForUser
+    commentForManagement
     created
     updated
     callId
@@ -3117,6 +3160,8 @@ export const GetProposalsDocument = gql`
       shortCode
       rankOrder
       finalStatus
+      commentForUser
+      commentForManagement
       created
       updated
       callId
@@ -3685,6 +3730,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
+    },
+    administrationProposal(variables: AdministrationProposalMutationVariables): Promise<AdministrationProposalMutation> {
+      return client.request<AdministrationProposalMutation>(print(AdministrationProposalDocument), variables);
     },
     createProposal(variables: CreateProposalMutationVariables): Promise<CreateProposalMutation> {
       return client.request<CreateProposalMutation>(print(CreateProposalDocument), variables);

@@ -46,6 +46,7 @@
     "react-scripts": "3.3.0",
     "tinymce": "^5.1.4",
     "typescript": "^3.7.4",
+    "xlsx": "^0.16.0",
     "yup": "^0.27.0"
   },
   "proxy": "http://localhost:4000",
