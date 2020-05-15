@@ -25,7 +25,6 @@ const userAuthorization = new UserAuthorization(
   new ReviewDataSourceMock()
 );
 
-const queries = new TemplateQueries(dummyTemplateDataSource);
 const mutations = new TemplateMutations(
   dummyTemplateDataSource,
   userAuthorization,
@@ -111,7 +110,7 @@ test('A user-officer can update question topic rel', async () => {
   const response = await mutations.updateQuestionsTopicRels(dummyUserOfficer, {
     templateId: 1,
     topicId: 1,
-    fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+    questionIds: ['has_links_with_industry', 'enable_crystallization'],
   });
   expect(isRejection(response)).toEqual(false);
   expect((response as string[])[0]).toEqual('has_links_with_industry');
@@ -121,7 +120,7 @@ test('A user can not update question topic rel', async () => {
   const response = await mutations.updateQuestionsTopicRels(dummyUser, {
     templateId: 1,
     topicId: 1,
-    fieldIds: ['has_links_with_industry', 'enable_crystallization'],
+    questionIds: ['has_links_with_industry', 'enable_crystallization'],
   });
   expect(isRejection(response)).toEqual(true);
 });

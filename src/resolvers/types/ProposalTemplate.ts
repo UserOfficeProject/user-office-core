@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
+import { Question } from './Question';
 import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
@@ -55,6 +56,17 @@ export class ProposalTemplateResolver {
     @Ctx() context: ResolverContext
   ): Promise<TemplateStep[] | null> {
     return context.queries.template.getProposalTemplateSteps(
+      context.user,
+      template.templateId
+    );
+  }
+
+  @FieldResolver(() => [Question])
+  async complementaryQuestions(
+    @Root() template: ProposalTemplate,
+    @Ctx() context: ResolverContext
+  ): Promise<Question[] | null> {
+    return context.queries.template.getComplementaryQuestions(
       context.user,
       template.templateId
     );

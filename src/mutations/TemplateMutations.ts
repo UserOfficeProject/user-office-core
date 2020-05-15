@@ -11,6 +11,7 @@ import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
@@ -42,6 +43,18 @@ export default class TemplateMutations {
   ): Promise<ProposalTemplate | Rejection> {
     const result = await this.dataSource
       .createTemplate(name, description)
+      .then(result => result);
+
+    return result;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async cloneTemplate(
+    agent: User | null,
+    templateId: number
+  ): Promise<unknown> {
+    const result = await this.dataSource
+      .cloneTemplate(templateId)
       .then(result => result);
 
     return result;
@@ -178,7 +191,7 @@ export default class TemplateMutations {
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
-      .updateQuestionRel(args.questionId, args.templateId, args)
+      .updateQuestionRel(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
@@ -231,20 +244,18 @@ export default class TemplateMutations {
     values: {
       templateId: number;
       topicId: number;
-      fieldIds: string[];
+      questionIds: string[];
     }
   ): Promise<string[] | Rejection> {
     let isSuccess = true;
     let index = 1;
-    for (const field of values.fieldIds) {
-      const updatedField = await this.dataSource.updateQuestionRel(
-        field,
-        values.templateId,
-        {
-          topicId: values.topicId,
-          sortOrder: index,
-        }
-      );
+    for (const questionId of values.questionIds) {
+      const updatedField = await this.dataSource.updateQuestionRel({
+        questionId,
+        topicId: values.topicId,
+        templateId: values.templateId,
+        sortOrder: index,
+      });
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -252,7 +263,7 @@ export default class TemplateMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    return values.fieldIds;
+    return values.questionIds;
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -262,6 +273,20 @@ export default class TemplateMutations {
       .then(data => data)
       .catch(err => {
         logger.logException('Could not update topic order', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  createQuestionRel(user: User | null, args: CreateQuestionRelArgs) {
+    return this.dataSource
+      .createQuestionRel(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not create Question Relation', err, {
           user,
         });
 

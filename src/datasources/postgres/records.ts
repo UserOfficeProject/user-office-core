@@ -58,7 +58,7 @@ export interface ProposalQuestionRecord {
   readonly proposal_question_id: string;
   readonly data_type: string;
   readonly question: string;
-  readonly config: string;
+  readonly default_config: string;
   readonly sort_order: number;
   readonly created_at: Date;
   readonly updated_at: Date;
@@ -71,6 +71,7 @@ export interface ProposalQuestionProposalTemplateRelRecord {
   readonly template_id: string;
   readonly topic_id: number;
   readonly sort_order: number;
+  readonly config: string;
   readonly dependency_proposal_question_id: string;
   readonly dependency_condition: string;
 }
@@ -233,7 +234,7 @@ export const createQuestionObject = (question: ProposalQuestionRecord) => {
     question.natural_key,
     question.data_type as DataType,
     question.question,
-    createConfigByType(question.data_type as DataType, question.config)
+    createConfigByType(question.data_type as DataType, question.default_config)
   );
 };
 
@@ -303,10 +304,11 @@ export const createQuestionRelObject = (
       record.natural_key,
       record.data_type as DataType,
       record.question,
-      createConfigByType(record.data_type as DataType, record.config)
+      createConfigByType(record.data_type as DataType, record.default_config)
     ),
     record.topic_id,
     record.sort_order,
+    createConfigByType(record.data_type as DataType, record.config),
     record.dependency_proposal_question_id
       ? new FieldDependency(
           record.proposal_question_id,

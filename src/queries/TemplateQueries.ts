@@ -1,12 +1,20 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { TemplateStep } from '../models/ProposalModel';
+import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
+
+  @Authorized()
+  async getComplementaryQuestions(
+    agent: User | null,
+    templateId: number
+  ): Promise<Question[] | null> {
+    return this.dataSource.getComplementaryQuestions(templateId);
+  }
 
   @Authorized()
   async getProposalTemplateSteps(
