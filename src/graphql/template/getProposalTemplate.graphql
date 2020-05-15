@@ -1,0 +1,5 @@
+query getProposalTemplate($templateId: Int!) {
+  proposalTemplate(templateId: $templateId) {
+    ...proposalTemplate
+  }
+}

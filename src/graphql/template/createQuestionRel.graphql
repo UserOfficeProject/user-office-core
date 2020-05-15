@@ -1,0 +1,18 @@
+mutation createQuestionRel(
+  $templateId: Int!
+  $questionId: String!
+  $topicId: Int!
+  $sortOrder: Int!
+) {
+  createQuestionRel(
+    templateId: $templateId
+    questionId: $questionId
+    topicId: $topicId
+    sortOrder: $sortOrder
+  ) {
+    template {
+      ...proposalTemplate
+    }
+    error
+  }
+}

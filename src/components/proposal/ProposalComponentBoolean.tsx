@@ -13,7 +13,8 @@ import { ProposalErrorLabel } from './ProposalErrorLabel';
 export function ProposalComponentBoolean(props: BasicComponentProps) {
   const { templateField, errors, onComplete, touched } = props;
   const {
-    question: { proposalQuestionId, config, question },
+    question: { proposalQuestionId, question },
+    config,
   } = templateField;
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;

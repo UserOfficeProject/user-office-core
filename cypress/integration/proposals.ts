@@ -2,6 +2,8 @@
 /// <reference types="../types" />
 var faker = require('faker');
 
+var addItemToTopic = element => {};
+
 context('Proposal tests', () => {
   before(() => {
     cy.resetDB();
@@ -41,8 +43,12 @@ context('Proposal tests', () => {
       .clear()
       .type(`${topic}{enter}`);
 
-    /* Select from options */
     cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    /* Boolean */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
     cy.contains('Add Boolean').click();
 
@@ -58,22 +64,20 @@ context('Proposal tests', () => {
       .then(fieldId => {
         boolId = fieldId;
       });
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(booleanQuestion).click();
+
     /* --- */
 
     /* Text input */
-    cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
     cy.contains('Add Text input').click();
 
     cy.get('[data-cy=question]')
       .clear()
       .type(textQuestion);
-
-    cy.get('#dependency-id').click();
-    cy.get('#menu- > .MuiPaper-root > .MuiList-root').click(); // Get first answer from dropdown
-
-    cy.get('#dependencyValue').click();
-    cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
 
     cy.contains('Is required').click();
 
@@ -85,46 +89,6 @@ context('Proposal tests', () => {
       .then(fieldId => {
         textId = fieldId;
       });
-
-    /* Date */
-    cy.get('[data-cy=show-more-button]').click();
-
-    cy.contains('Add Date').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(dateQuestion);
-
-    cy.contains('Is required').click();
-
-    cy.contains('Save').click();
-
-    cy.contains(dateQuestion)
-      .siblings("[data-cy='proposal-question-id']")
-      .invoke('html')
-      .then(fieldId => {
-        dateId = fieldId;
-      });
-    /* --- */
-
-    /* File */
-    cy.get('[data-cy=show-more-button]').click();
-
-    cy.contains('Add File upload').click();
-
-    cy.get('[data-cy=question]')
-      .clear()
-      .type(fileQuestion);
-
-    cy.contains('Save').click();
-
-    cy.contains(dateQuestion)
-      .siblings("[data-cy='proposal-question-id']")
-      .invoke('html')
-      .then(fieldId => {
-        dateId = fieldId;
-      });
-    /* --- */
 
     /* Update question */
     const newKey = faker.random
@@ -144,6 +108,65 @@ context('Proposal tests', () => {
     cy.wait(500);
 
     cy.contains(newKey);
+    /* --- */
+
+    // ALT clicking assigns question to topic
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(textQuestion).click();
+
+    // wait until ALT CLICK finishes
+    cy.wait(500);
+
+    cy.contains(textQuestion).click();
+
+    // Updating dependencies
+    cy.get('#dependency-id').click();
+    cy.get('#menu- > .MuiPaper-root > .MuiList-root').click(); // Get first answer from dropdown
+
+    cy.get('#dependencyValue').click();
+    cy.get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']").click(); // get true from fropdown
+
+    cy.contains('Update').click();
+
+    /* Date */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Date').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(dateQuestion);
+
+    cy.contains('Is required').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(dateQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        dateId = fieldId;
+      });
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(dateQuestion).click();
+    /* --- */
+
+    /* File */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add File upload').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(fileQuestion);
+
+    cy.contains('Save').click();
+
+    cy.contains(fileQuestion);
+
+    cy.get('body').type('{alt}', { release: false });
+    cy.contains(fileQuestion).click();
     /* --- */
 
     cy.contains(booleanQuestion);
