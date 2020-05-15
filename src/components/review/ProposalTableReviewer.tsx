@@ -45,7 +45,7 @@ const ProposalTableReviewer: React.FC = () => {
   const columns = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, width: '10%' },
+      cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
       render: RowActionButtons,
     },

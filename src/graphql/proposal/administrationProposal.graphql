@@ -1,0 +1,22 @@
+mutation administrationProposal(
+  $id: Int!
+  $rankOrder: Int
+  $finalStatus: ProposalEndStatus
+  $status: ProposalStatus
+  $commentForUser: String
+  $commentForManagement: String
+) {
+  administrationProposal(
+    id: $id
+    rankOrder: $rankOrder
+    finalStatus: $finalStatus
+    status: $status
+    commentForUser: $commentForUser
+    commentForManagement: $commentForManagement
+  ) {
+    proposal {
+      id
+    }
+    error
+  }
+}

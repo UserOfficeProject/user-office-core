@@ -7,6 +7,7 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import XLSX from 'xlsx';
 
 import { Review, ReviewStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -44,7 +45,7 @@ const ProposalTableOfficer: React.FC = () => {
     }
     numbers = numbers.sort();
 
-    return numbers[numbers.length - 1] - numbers[0];
+    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
   };
 
   const standardDeviation = (numbers: number[]) => {
@@ -95,7 +96,7 @@ const ProposalTableOfficer: React.FC = () => {
   const columns = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, width: '10%' },
+      cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
       render: RowActionButtons,
     },
@@ -141,6 +142,7 @@ const ProposalTableOfficer: React.FC = () => {
         (average(getGrades(a.reviews)) || 0) -
         (average(getGrades(b.reviews)) || 0),
     },
+    { title: 'Final Status', field: 'finalStatus', hidden: true },
   ];
 
   const deleteProposals = (): void => {
@@ -210,11 +212,52 @@ const ProposalTableOfficer: React.FC = () => {
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        localization={{
+          toolbar: {
+            exportName: 'Export as Excel',
+          },
+        }}
         options={{
           search: true,
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          exportButton: true,
+          exportCsv: (columns, data: ProposalData[]) => {
+            const dataColumns = [
+              'Proposal ID',
+              'Title',
+              'Principal Investigator',
+              'Technical Status',
+              'Tehnical Comment',
+              'Time(Days)',
+              'Score difference',
+              'Average Score',
+              'Comment Management',
+              'Decision',
+              'Order',
+            ];
+            const dataToExport = data.map(proposalData => [
+              proposalData.shortCode,
+              proposalData.title,
+              `${proposalData.proposer.firstname} ${proposalData.proposer.lastname}`,
+              getTranslation(
+                proposalData.technicalReview?.status as ResourceId
+              ),
+              proposalData.technicalReview?.publicComment,
+              proposalData.technicalReview?.timeAllocation,
+              absoluteDifference(getGrades(proposalData.reviews)) || 'NA',
+              average(getGrades(proposalData.reviews)) || 'NA',
+              proposalData.commentForManagement,
+              proposalData.finalStatus,
+              proposalData.rankOrder,
+            ]);
+
+            const ws = XLSX.utils.aoa_to_sheet([dataColumns, ...dataToExport]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
+            XLSX.writeFile(wb, 'proposals.xlsx');
+          },
         }}
         actions={[
           {

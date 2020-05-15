@@ -7,6 +7,8 @@ query getProposal($id: Int!) {
     shortCode
     rankOrder
     finalStatus
+    commentForUser
+    commentForManagement
     created
     updated
     callId
