@@ -1,6 +1,6 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton } from '@material-ui/core';
-import { DialogContent, Dialog } from '@material-ui/core';
+import { DialogContent, Dialog, TextField } from '@material-ui/core';
 import { Visibility, Delete, Assignment } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
@@ -16,7 +16,7 @@ import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
 import DialogConfirmation from '../common/DialogConfirmation';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
-
+import RankInput from './RankInput';
 const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
@@ -28,6 +28,20 @@ const ProposalTableOfficer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
+  const setNewRanking = (proposalID: number, ranking: number) => {
+    api().administrationProposal({
+      id: proposalID,
+      rankOrder: ranking,
+    });
+    setProposalsData(
+      proposalsData.map(prop => {
+        if (prop.id === proposalID) prop.rankOrder = ranking;
+
+        return prop;
+      })
+    );
+  };
 
   const average = (numbers: number[]) => {
     const sum = numbers.reduce(function(sum, value) {
@@ -106,7 +120,11 @@ const ProposalTableOfficer: React.FC = () => {
       field: 'title',
       width: 'auto',
     },
-    { title: 'Time(Days)', field: 'technicalReview.timeAllocation' },
+    {
+      title: 'Time(Days)',
+      field: 'technicalReview.timeAllocation',
+      hidden: true,
+    },
     {
       title: 'Technical status',
       render: (rowData: ProposalData): string =>
@@ -118,6 +136,7 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Deviation',
       field: 'deviation',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         standardDeviation(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
@@ -127,6 +146,7 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Absolute Difference',
       field: 'absolute',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         absoluteDifference(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
@@ -143,6 +163,19 @@ const ProposalTableOfficer: React.FC = () => {
         (average(getGrades(b.reviews)) || 0),
     },
     { title: 'Final Status', field: 'finalStatus', hidden: true },
+    {
+      title: 'Ranking',
+      field: 'rankOrder',
+      // To be refactored
+      // eslint-disable-next-line react/display-name
+      render: (rowData: ProposalData) => (
+        <RankInput
+          proposalID={rowData.id}
+          defaultvalue={rowData.rankOrder}
+          onChange={setNewRanking}
+        />
+      ),
+    },
   ];
 
   const deleteProposals = (): void => {
