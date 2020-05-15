@@ -13,8 +13,8 @@ const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
   switch (field.question.dataType) {
     case DataType.TEXT_INPUT:
       let txtInputSchema = Yup.string();
-      config = field.question.config as TextInputConfig;
-      field.question.config.required &&
+      config = field.config as TextInputConfig;
+      field.config.required &&
         (txtInputSchema = txtInputSchema.required(`This is a required field`));
       config.min &&
         (txtInputSchema = txtInputSchema.min(
@@ -30,8 +30,8 @@ const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
       return txtInputSchema;
     case DataType.SELECTION_FROM_OPTIONS:
       let selectFromOptionsSchema = Yup.string();
-      config = field.question.config as SelectionFromOptionsConfig;
-      field.question.config.required &&
+      config = field.config as SelectionFromOptionsConfig;
+      field.config.required &&
         (selectFromOptionsSchema = selectFromOptionsSchema.required(
           `This is a required field`
         ));
@@ -39,14 +39,14 @@ const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
       return selectFromOptionsSchema;
     case DataType.DATE:
       let dateSchema = Yup.date();
-      field.question.config.required &&
+      field.config.required &&
         (dateSchema = dateSchema.required(`This date is required`));
 
       return dateSchema;
     case DataType.BOOLEAN:
       let booleanSchema = Yup.bool();
 
-      field.question.config.required &&
+      field.config.required &&
         (booleanSchema = booleanSchema
           .oneOf([true], 'This field is required')
           .required('This field is required'));

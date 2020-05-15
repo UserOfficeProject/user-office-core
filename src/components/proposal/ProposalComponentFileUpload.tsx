@@ -15,7 +15,7 @@ export function ProposalComponentFileUpload(
     value,
   } = templateField;
   const isError = errors[proposalQuestionId] ? true : false;
-  const config = templateField.question.config as FileUploadConfig;
+  const config = templateField.config as FileUploadConfig;
   const [stateValue, setStateValue] = useState(value);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function ProposalComponentFileUpload(
   return (
     <FormControl error={isError} required={config.required ? true : false}>
       <FormLabel error={isError}>{templateField.question.question}</FormLabel>
-      <span>{templateField.question.config.small_label}</span>
+      <span>{config.small_label}</span>
       <FileUploadComponent
         maxFiles={config.max_files}
         id={templateField.question.proposalQuestionId}

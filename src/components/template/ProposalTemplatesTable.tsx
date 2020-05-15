@@ -96,7 +96,19 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
           onClick: (event: any, data: RowDataType | RowDataType[]) => {
             props.confirm(
               () => {
-                console.log('Confirmed');
+                api()
+                  .cloneProposalTemplate({
+                    templateId: (data as RowDataType).templateId,
+                  })
+                  .then(result => {
+                    const clonedTemplate =
+                      result.cloneProposalTemplate.template;
+                    if (clonedTemplate) {
+                      const newTemplates = [...templates];
+                      newTemplates.push(clonedTemplate);
+                      setTemplates(newTemplates);
+                    }
+                  });
               },
               {
                 title: 'Are you sure?',
