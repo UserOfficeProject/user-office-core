@@ -34,6 +34,7 @@ export enum EventType {
   SERVICE_ERROR_OCCURRED,
   OPEN_QUESTION_EDITOR,
   QUESTION_DELETED,
+  OPEN_QUESTIONREL_EDITOR,
 }
 
 export interface Event {

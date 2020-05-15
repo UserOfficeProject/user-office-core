@@ -14,7 +14,12 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-import { DataType, ProposalTemplate, Question } from '../../generated/sdk';
+import {
+  DataType,
+  ProposalTemplate,
+  Question,
+  Topic,
+} from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import QuestionaryEditorTopicItem, {
@@ -85,9 +90,26 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
       <QuestionaryEditorTopicItem
         index={index}
         data={new QuestionItemAdapter(question)}
-        onClick={item =>
-          props.onItemClick((item as QuestionItemAdapter).source)
-        }
+        onClick={item => {
+          const isAltDown = (window.event as MouseEvent)?.altKey;
+
+          if (isAltDown) {
+            dispatch({
+              type: EventType.CREATE_QUESTION_REL_REQUESTED,
+              payload: {
+                topicId: props.topic.id,
+                questionId: item.proposalQuestionId,
+                sortOrder: 0,
+                templateId: template.templateId,
+              },
+            });
+          } else {
+            props.dispatch({
+              type: EventType.OPEN_QUESTION_EDITOR,
+              payload: question,
+            });
+          }
+        }}
         key={question.proposalQuestionId.toString()}
       />
     ));
@@ -102,7 +124,12 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
   };
 
   return (
-    <Grid container className={classes.container} id={props.id}>
+    <Grid
+      container
+      className={classes.container}
+      id={props.id}
+      data-cy="questionPicker"
+    >
       <Grid item xs={10}>
         Question drawer
       </Grid>
@@ -210,9 +237,9 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 };
 
 interface IQuestionPickerProps {
+  topic: Topic;
   template: ProposalTemplate;
   dispatch: React.Dispatch<Event>;
-  onItemClick: { (data: Question): void };
   closeMe: () => void;
   id?: string;
 }

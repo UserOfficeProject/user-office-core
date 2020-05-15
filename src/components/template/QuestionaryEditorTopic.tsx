@@ -48,7 +48,6 @@ export default function QuestionaryEditorTopic(props: {
   data: TemplateStep;
   dispatch: React.Dispatch<Event>;
   index: number;
-  onItemClick: { (data: QuestionRel): void };
   dragMode: boolean;
 }) {
   const theme = useTheme();
@@ -156,7 +155,10 @@ export default function QuestionaryEditorTopic(props: {
           index={index}
           data={new QuestionRelItemAdapter(item)}
           onClick={item =>
-            props.onItemClick((item as QuestionRelItemAdapter).source)
+            dispatch({
+              type: EventType.OPEN_QUESTIONREL_EDITOR,
+              payload: (item as QuestionRelItemAdapter).source,
+            })
           }
           key={item.question.proposalQuestionId.toString()}
         />

@@ -56,6 +56,10 @@ export default function QuestionaryEditor() {
           setSelectedQuestion(action.payload);
           break;
 
+        case EventType.OPEN_QUESTIONREL_EDITOR:
+          setSelectedQuestionRel(action.payload);
+          break;
+
         case EventType.QUESTION_PICKER_NEW_QUESTION_CLICKED:
           // TODO open question edit modal window
           //setQuestionPickerTopicId(action.payload.topic.id);
@@ -142,10 +146,6 @@ export default function QuestionaryEditor() {
     }
   };
 
-  const onQuestionRelClick = (data: QuestionRel): void => {
-    setSelectedQuestionRel(data);
-  };
-
   const getContainerStyle = (): any => {
     return isLoading
       ? {
@@ -211,15 +211,13 @@ export default function QuestionaryEditor() {
                   const questionPicker =
                     step.topic.id === questionPickerTopicId ? (
                       <QuestionPicker
+                        topic={step.topic}
                         dispatch={dispatch}
                         template={state}
                         key="questionPicker"
                         closeMe={() => {
                           setQuestionPickerTopicId(null);
                         }}
-                        onItemClick={(data: Question) =>
-                          setSelectedQuestion(data)
-                        }
                         id="questionPicker"
                       />
                     ) : null;
@@ -231,7 +229,6 @@ export default function QuestionaryEditor() {
                         dispatch={dispatch}
                         index={index}
                         key={step.topic.id}
-                        onItemClick={onQuestionRelClick}
                         dragMode={isTopicReorderMode}
                       />
                       {questionPicker}
