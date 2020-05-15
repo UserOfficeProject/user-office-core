@@ -3188,6 +3188,7 @@ export const GetProposalsDocument = gql`
       technicalReview {
         id
         comment
+        publicComment
         timeAllocation
         status
         proposalID
@@ -3208,8 +3209,8 @@ export const SubmitProposalDocument = gql`
 }
     `;
 export const UpdateProposalDocument = gql`
-    mutation updateProposal($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $topicsCompleted: [Int!], $users: [Int!], $proposerId: Int, $partialSave: Boolean, $rankOrder: Int, $finalStatus: ProposalEndStatus) {
-  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, topicsCompleted: $topicsCompleted, users: $users, proposerId: $proposerId, partialSave: $partialSave, rankOrder: $rankOrder, finalStatus: $finalStatus) {
+    mutation updateProposal($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $topicsCompleted: [Int!], $users: [Int!], $proposerId: Int, $partialSave: Boolean) {
+  updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, topicsCompleted: $topicsCompleted, users: $users, proposerId: $proposerId, partialSave: $partialSave) {
     proposal {
       id
     }
