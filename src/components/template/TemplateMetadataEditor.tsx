@@ -3,6 +3,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
+
 import { ProposalTemplate } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import { ButtonContainer } from '../../styles/StyledComponents';
@@ -125,5 +126,6 @@ export function TemplateMetadataEditor(props: {
   );
 
   const body = isEditMode ? inputJSX : staticJSX;
+
   return <Paper className={classes.container}>{body}</Paper>;
 }

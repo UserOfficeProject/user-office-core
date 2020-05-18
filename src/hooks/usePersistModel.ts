@@ -346,6 +346,7 @@ export function usePersistModel() {
                 payload: result.template,
               });
             }
+
             return result;
           });
         }
