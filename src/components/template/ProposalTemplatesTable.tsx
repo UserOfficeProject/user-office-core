@@ -115,6 +115,8 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                 description: `Are you sure you want to clone ${
                   (data as RowDataType).name
                 }`,
+                confirmationText: 'Yes',
+                cancellationText: 'Cancel',
               }
             )();
           },
@@ -147,6 +149,8 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                 description: `Are you sure you want to delete ${
                   (data as RowDataType).name
                 }`,
+                confirmationText: 'Yes',
+                cancellationText: 'Cancel',
               }
             )();
           },

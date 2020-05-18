@@ -31,7 +31,9 @@ context('Proposal tests', () => {
 
     cy.contains('Questionaries').click();
 
-    cy.get("[title='Edit']")
+    cy.contains('default template')
+      .parent()
+      .get("[title='Edit']")
       .first()
       .click();
 
@@ -172,6 +174,38 @@ context('Proposal tests', () => {
     cy.contains(booleanQuestion);
     cy.contains(textQuestion);
     cy.contains(dateQuestion);
+  });
+
+  it('User officer can clone template', () => {
+    cy.login('officer');
+
+    cy.contains('Questionaries').click();
+
+    cy.contains('default template')
+      .parent()
+      .get("[title='Clone']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.contains('Copy of default template');
+  });
+
+  it('User officer can delete template', () => {
+    cy.login('officer');
+
+    cy.contains('Questionaries').click();
+
+    cy.contains('Copy of default template')
+      .parent()
+      .get("[title='Delete']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.contains('Copy of default template').should('not.exist');
   });
 
   it('User can create proposal', () => {
