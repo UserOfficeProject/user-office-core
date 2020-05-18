@@ -35,7 +35,7 @@ context('Event log tests', () => {
     cy.get("[data-cy='view-proposal']")
       .first()
       .click();
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
     cy.contains('PROPOSAL_CREATED');
   });
 

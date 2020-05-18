@@ -21,7 +21,7 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
   const [stateValue, setStateValue] = useState(value);
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
-  const config = templateField.question.config as TextInputConfig;
+  const config = templateField.config as TextInputConfig;
 
   useEffect(() => {
     setStateValue(templateField.value);

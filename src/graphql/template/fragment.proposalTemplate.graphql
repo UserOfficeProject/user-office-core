@@ -1,0 +1,17 @@
+fragment proposalTemplate on ProposalTemplate {
+  steps {
+    topic {
+      title
+      id
+    }
+    fields {
+      ...questionRel
+    }
+  }
+  templateId
+  name
+  description
+  complementaryQuestions {
+    ...question
+  }
+}

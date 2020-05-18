@@ -4,6 +4,9 @@ fragment answer on Answer {
   }
   sortOrder
   topicId
+  config {
+    ...fieldConfig
+  }
   dependency {
     questionId
     dependencyId

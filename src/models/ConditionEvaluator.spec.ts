@@ -1,5 +1,5 @@
 import { Answer } from '../generated/sdk';
-import { create1Topic3FieldWithDependenciesQuestionary } from '../tests/ProposalTestBed';
+import { create1Topic3FieldWithDependenciesQuestionary } from './ProposalModel.spec';
 import {
   areDependenciesSatisfied,
   getFieldById,

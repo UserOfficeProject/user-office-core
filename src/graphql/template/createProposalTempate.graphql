@@ -1,12 +1,7 @@
 mutation createProposalTemplate($name: String!, $description: String) {
   createProposalTemplate(name: $name, description: $description) {
     template {
-      templateId
-      name
-      description
-      isArchived
-      proposalCount
-      callCount
+      ...proposalTemplateMetadata
     }
     error
   }

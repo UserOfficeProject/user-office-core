@@ -11,8 +11,11 @@ import { BasicComponentProps } from './IBasicComponentProps';
 
 export function ProposalComponentDatePicker(props: BasicComponentProps) {
   const { templateField, touched, errors, onComplete } = props;
-  const { proposalQuestionId, config, question } = templateField.question;
-  const value = templateField.value;
+  const {
+    question: { proposalQuestionId, question },
+    config,
+    value,
+  } = templateField;
   const fieldError = getIn(errors, proposalQuestionId);
   const isError = getIn(touched, proposalQuestionId) && !!fieldError;
   const [stateValue, setStateValue] = useState(value || '');

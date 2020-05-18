@@ -18,7 +18,7 @@ import React, { useContext } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 
 import { UserContext } from '../context/UserContextProvider';
-import { UserRole, PageName } from '../generated/sdk';
+import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
@@ -30,7 +30,7 @@ import ProposalCreate from './proposal/ProposaCreate';
 import ProposalChooseCall from './proposal/ProposalChooseCall';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalReviewReviewer from './review/ProposalReviewReviewer';
+import ProposalGrade from './review/ProposalGrade';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
@@ -236,8 +236,11 @@ const Dashboard: React.FC = () => {
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
-          <Route path="/QuestionaryEditor" component={QuestionaryEditor} />
-          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
+          <Route
+            path="/QuestionaryEditor/:templateId"
+            component={QuestionaryEditor}
+          />
+          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
           <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"

@@ -38,7 +38,7 @@
     "path": "^0.12.7",
     "query-string": "^6.9.0",
     "react": "^16.12.0",
-    "react-beautiful-dnd": "^11.0.5",
+    "react-beautiful-dnd": "^13.0.0",
     "react-cookie": "^4.0.1",
     "react-dom": "^16.12.0",
     "react-router": "^5.1.2",
@@ -46,6 +46,7 @@
     "react-scripts": "3.3.0",
     "tinymce": "^5.1.4",
     "typescript": "^3.7.4",
+    "xlsx": "^0.16.0",
     "yup": "^0.27.0"
   },
   "proxy": "http://localhost:4000",
