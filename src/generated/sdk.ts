@@ -401,7 +401,7 @@ export type MutationDeleteQuestionRelArgs = {
 
 
 export type MutationUpdateProposalTemplateArgs = {
-  templateId: Scalars['Float'],
+  templateId: Scalars['Int'],
   name?: Maybe<Scalars['String']>,
   description?: Maybe<Scalars['String']>,
   isArchived?: Maybe<Scalars['Boolean']>
@@ -2168,6 +2168,26 @@ export type GetProposalTemplatesQuery = (
   )> }
 );
 
+export type UpdateProposalTemplateMutationVariables = {
+  templateId: Scalars['Int'],
+  name?: Maybe<Scalars['String']>,
+  description?: Maybe<Scalars['String']>,
+  isArchived?: Maybe<Scalars['Boolean']>
+};
+
+
+export type UpdateProposalTemplateMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProposalTemplate: (
+    { __typename?: 'ProposalTemplateResponseWrap' }
+    & Pick<ProposalTemplateResponseWrap, 'error'>
+    & { template: Maybe<(
+      { __typename?: 'ProposalTemplate' }
+      & ProposalTemplateMetadataFragment
+    )> }
+  ) }
+);
+
 export type UpdateQuestionMutationVariables = {
   id: Scalars['String'],
   naturalKey?: Maybe<Scalars['String']>,
@@ -3408,6 +3428,16 @@ export const GetProposalTemplatesDocument = gql`
   }
 }
     `;
+export const UpdateProposalTemplateDocument = gql`
+    mutation updateProposalTemplate($templateId: Int!, $name: String, $description: String, $isArchived: Boolean) {
+  updateProposalTemplate(templateId: $templateId, name: $name, description: $description, isArchived: $isArchived) {
+    template {
+      ...proposalTemplateMetadata
+    }
+    error
+  }
+}
+    ${ProposalTemplateMetadataFragmentDoc}`;
 export const UpdateQuestionDocument = gql`
     mutation updateQuestion($id: String!, $naturalKey: String, $question: String, $config: String) {
   updateQuestion(id: $id, naturalKey: $naturalKey, question: $question, config: $config) {
@@ -3815,6 +3845,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getProposalTemplates(variables?: GetProposalTemplatesQueryVariables): Promise<GetProposalTemplatesQuery> {
       return client.request<GetProposalTemplatesQuery>(print(GetProposalTemplatesDocument), variables);
+    },
+    updateProposalTemplate(variables: UpdateProposalTemplateMutationVariables): Promise<UpdateProposalTemplateMutation> {
+      return client.request<UpdateProposalTemplateMutation>(print(UpdateProposalTemplateDocument), variables);
     },
     updateQuestion(variables: UpdateQuestionMutationVariables): Promise<UpdateQuestionMutation> {
       return client.request<UpdateQuestionMutation>(print(UpdateQuestionDocument), variables);

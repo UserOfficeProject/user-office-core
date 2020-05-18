@@ -20,7 +20,6 @@ import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import QuestionaryEditorTopicItem, {
   IQuestionaryEditorTopicData,
 } from './QuestionaryEditorTopicItem';
-import { ClickToEditTextField } from '../common/ClickToEditTextField';
 
 class QuestionRelItemAdapter implements IQuestionaryEditorTopicData {
   constructor(public source: QuestionRel) {}
@@ -100,6 +99,7 @@ export default function QuestionaryEditorTopic(props: {
 
   const { data, dispatch, index } = props;
   const [title, setTitle] = useState<string>(data.topic.title);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
 
@@ -115,29 +115,35 @@ export default function QuestionaryEditorTopic(props: {
     ...draggableStyle,
   });
 
-  const titleJsx = (
-    <ClickToEditTextField
-      inputJSX={
-        <input
-          type="text"
-          value={title}
-          data-cy="topic-title-input"
-          className={classes.inputHeading}
-          onChange={event => setTitle(event.target.value)}
-        />
-      }
-      staticJSX={
-        <span data-cy="topic-title">
-          {index + 2}. {title}
-        </span>
-      }
-      onChange={() => {
+  const titleJsx = isEditMode ? (
+    <input
+      type="text"
+      value={title}
+      data-cy="topic-title-input"
+      className={classes.inputHeading}
+      onChange={event => setTitle(event.target.value)}
+      onBlur={() => {
+        setIsEditMode(false);
         dispatch({
           type: EventType.UPDATE_TOPIC_TITLE_REQUESTED,
           payload: { topicId: data.topic.id, title: title },
         });
       }}
+      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+          e.currentTarget.blur();
+        }
+      }}
     />
+  ) : (
+    <span
+      onClick={() => {
+        setIsEditMode(true);
+      }}
+      data-cy="topic-title"
+    >
+      {index + 2}. {title}
+    </span>
   );
 
   const getItems = () => {
