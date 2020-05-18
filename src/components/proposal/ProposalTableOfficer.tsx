@@ -1,6 +1,6 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton } from '@material-ui/core';
-import { DialogContent, Dialog, TextField } from '@material-ui/core';
+import { DialogContent, Dialog } from '@material-ui/core';
 import { Visibility, Delete, Assignment } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
