@@ -41,6 +41,8 @@ export class BasicUserDetails {
     public firstname: string,
     public lastname: string,
     public organisation: string,
-    public position: string
+    public position: string,
+    public created: Date,
+    public placeholder: boolean
   ) {}
 }

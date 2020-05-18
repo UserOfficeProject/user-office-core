@@ -44,7 +44,9 @@ export default class UserQueries {
       user.firstname,
       user.lastname,
       user.organisation,
-      user.position
+      user.position,
+      user.created,
+      user.placeholder
     );
   }
 

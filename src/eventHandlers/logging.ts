@@ -12,19 +12,14 @@ export default function createHandler(
     const timestamp = new Date().toLocaleString();
     console.log(`${timestamp} -- ${json}`);
 
-    // NOTE: If the event is rejection and the reason is `INTERNAL_ERROR` than log that in the database as well. Later we will be able to see all errors that happened.
-    if (!!event.rejection) {
-      // NOTE: Do not log cron-job service rejections
-      if (event.rejection !== 'NO_INACTIVE_USERS') {
-        await eventLogsDataSource.set(
-          event.loggedInUserId,
-          event.type,
-          json,
-          'error'
-        );
-      }
-
-      return;
+    // NOTE: If the event is rejection than log that in the database as well. Later we will be able to see all errors that happened.
+    if (event.isRejection) {
+      await eventLogsDataSource.set(
+        event.loggedInUserId,
+        event.type,
+        json,
+        'error'
+      );
     }
 
     // NOTE: We need to have custom checks for events where response is not standard one.
@@ -45,17 +40,6 @@ export default function createHandler(
             event.type,
             json,
             event.emailinviteresponse.userId.toString()
-          );
-          break;
-        case Event.USERS_DELETED_INACTIVE:
-          await eventLogsDataSource.set(
-            event.loggedInUserId,
-            event.type,
-            json,
-            (event as any)[event.key]
-              .map((user: any) => user.id)
-              .join('_')
-              .toString()
           );
           break;
         default:

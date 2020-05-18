@@ -7,7 +7,7 @@ interface GeneralEvent {
   type: Event;
   key: string;
   loggedInUserId: number | null;
-  rejection: string | null;
+  isRejection: boolean;
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
@@ -60,11 +60,6 @@ interface UserCreateEvent extends GeneralEvent {
 interface UserDeletedEvent extends GeneralEvent {
   type: Event.USER_DELETED;
   user: User;
-}
-
-interface InactiveUsersDeletedEvent extends GeneralEvent {
-  type: Event.USERS_DELETED_INACTIVE;
-  users: User[];
 }
 
 interface EmailInvite extends GeneralEvent {
@@ -128,5 +123,4 @@ export type ApplicationEvent =
   | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | SEPMemberToProposalAssignedEvent
-  | UserDeletedEvent
-  | InactiveUsersDeletedEvent;
+  | UserDeletedEvent;

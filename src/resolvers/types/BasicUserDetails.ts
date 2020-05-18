@@ -14,4 +14,8 @@ export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   public organisation: string;
   @Field()
   public position: string;
+  @Field()
+  public placeholder: boolean;
+  @Field()
+  public created: Date;
 }
