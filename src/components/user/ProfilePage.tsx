@@ -27,4 +27,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ match }) => {
   );
 };
 
+ProfilePage.propTypes = ProfilePagePropTypes;
+
 export default ProfilePage;

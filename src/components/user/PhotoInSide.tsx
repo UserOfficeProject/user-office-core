@@ -2,6 +2,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const useStyles = makeStyles(() => ({
@@ -29,6 +30,13 @@ const PhotoInSide: React.FC = props => {
       </Grid>
     </Grid>
   );
+};
+
+PhotoInSide.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
 };
 
 export default PhotoInSide;

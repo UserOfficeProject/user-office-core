@@ -86,4 +86,6 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({ match }) => {
   );
 };
 
+EmailVerification.propTypes = EmailVerificationPropTypes;
+
 export default EmailVerification;

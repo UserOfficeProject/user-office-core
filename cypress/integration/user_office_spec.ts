@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
-const faker = require('faker');
 
 context('User Officer tests', () => {
+  const faker = require('faker');
+
   beforeEach(() => {
     cy.visit('/');
   });

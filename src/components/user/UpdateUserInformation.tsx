@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -12,12 +13,13 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState, useContext } from 'react';
 
 import { UserContext } from '../../context/UserContextProvider';
+import { UpdateUserMutationVariables } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import orcid from '../../images/orcid.png';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { userFieldSchema } from '../../utils/userFieldValidationSchema';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown, { Option } from '../common/FormikDropdown';
 import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
 
 const useStyles = makeStyles({
@@ -43,33 +45,24 @@ export default function UpdateUserInformation(props: { id: number }) {
   const [userData, setUserData] = useState<any>(null);
   const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
-  const [nationalitiesList, setNationalitiesList] = useState<
-    { text: string; value: string }[]
-  >([]);
-  const [institutionsList, setInstitutionsList] = useState<
-    { text: string; value: string }[]
-  >([]);
+  const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
+  const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const { enqueueSnackbar } = useSnackbar();
 
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
     setInstitutionsList(
-      fieldsContent.institutions.map((institution: any) => {
-        return { text: institution.value, value: institution.id };
+      fieldsContent.institutions.map(institution => {
+        return { text: institution.value, value: institution.id.toString() };
       })
     );
     setNationalitiesList(
-      fieldsContent.nationalities.map((nationality: any) => {
-        return { text: nationality.value, value: nationality.id };
+      fieldsContent.nationalities.map(nationality => {
+        return { text: nationality.value, value: nationality.id.toString() };
       })
     );
   }
 
-  const sendUserUpdate = (values: any) => {
-    const variables = {
-      id: props.id,
-      ...values,
-      gender: values.gender === 'other' ? values.othergender : values.gender,
-    };
+  const sendUserUpdate = (variables: UpdateUserMutationVariables) => {
     sendRequest()
       .updateUser(variables)
       .then(data =>
@@ -136,7 +129,14 @@ export default function UpdateUserInformation(props: { id: number }) {
           orcid: userData.orcid,
         }}
         onSubmit={(values, actions) => {
-          sendUserUpdate(values);
+          const newValues = {
+            id: props.id,
+            ...values,
+            gender:
+              values.gender === 'other' ? values.othergender : values.gender,
+          };
+
+          sendUserUpdate(newValues);
           actions.setFieldValue('oldEmail', values.email);
           actions.setSubmitting(false);
         }}

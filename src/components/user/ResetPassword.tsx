@@ -133,4 +133,6 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
   );
 };
 
+ResetPassword.propTypes = ResetPasswordPropTypes;
+
 export default ResetPassword;
