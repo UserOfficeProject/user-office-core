@@ -1,4 +1,12 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Mutation,
+  Resolver,
+  Int,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
@@ -6,7 +14,7 @@ import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class UpdateProposalTemplateArgs {
-  @Field()
+  @Field(() => Int)
   public templateId: number;
 
   @Field({ nullable: true })
