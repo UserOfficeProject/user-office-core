@@ -20,6 +20,8 @@ export default function createHandler(
         json,
         'error'
       );
+
+      return;
     }
 
     // NOTE: We need to have custom checks for events where response is not standard one.
