@@ -1,4 +1,3 @@
-import { ResourceId } from '@esss-swap/duo-localisation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
