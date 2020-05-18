@@ -9,7 +9,9 @@ export const basicDummyUser = new BasicUserDetails(
   'john',
   'doe',
   'org',
-  'boss'
+  'boss',
+  new Date('2019-07-17 08:25:12.23043+00'),
+  false
 );
 
 export const basicDummyUserNotOnProposal = new BasicUserDetails(
@@ -17,7 +19,9 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   'john',
   'doe',
   'org',
-  'boss'
+  'boss',
+  new Date('2019-07-17 08:25:12.23043+00'),
+  false
 );
 
 export const dummyUserOfficer = new User(
@@ -123,6 +127,7 @@ export class UserDataSourceMock implements UserDataSource {
   async delete(id: number): Promise<User | null> {
     return dummyUser;
   }
+
   async addUserRole(args: AddUserRoleArgs): Promise<boolean> {
     return true;
   }
@@ -159,7 +164,15 @@ export class UserDataSourceMock implements UserDataSource {
     id: number,
     password: string
   ): Promise<BasicUserDetails> {
-    return new BasicUserDetails(id, 'John', 'Smith', 'ESS', 'Manager');
+    return new BasicUserDetails(
+      id,
+      'John',
+      'Smith',
+      'ESS',
+      'Manager',
+      new Date('2019-07-17 08:25:12.23043+00'),
+      false
+    );
   }
   async getByEmail(email: string): Promise<User | null> {
     if (dummyUser.email === email) {

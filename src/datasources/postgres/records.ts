@@ -353,7 +353,9 @@ export const createBasicUserObject = (user: UserRecord) => {
     user.preferredname,
     user.lastname,
     user.institution,
-    user.position
+    user.position,
+    user.created_at,
+    user.placeholder
   );
 };
 
