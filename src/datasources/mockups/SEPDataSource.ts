@@ -131,14 +131,14 @@ export class SEPDataSourceMock implements SEPDataSource {
     return [{ id: 4, shortCode: 'SEP_Chair', title: 'SEP Chair' }];
   }
 
-  async addSEPMembersRoles(args: AddSEPMembersRole[]) {
-    const sep = dummySEPs.find(element => element.id === args[0].SEPID);
+  async addSEPMembersRole(args: AddSEPMembersRole) {
+    const sep = dummySEPs.find(element => element.id === args.SEPID);
 
     if (sep) {
       return sep;
     }
 
-    throw new Error(`SEP not found ${args[0].SEPID}`);
+    throw new Error(`SEP not found ${args.SEPID}`);
   }
 
   async removeSEPMemberRole(memberId: number, sepId: number) {

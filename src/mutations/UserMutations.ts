@@ -94,6 +94,19 @@ export default class UserMutations {
       userId = await this.dataSource.createInviteUser(args);
       await this.dataSource.setUserRoles(userId, [UserRole.USER]);
       role = UserRole.USER;
+    } else if (
+      args.userRole === UserRole.SEP_CHAIR &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      // NOTE: For inviting SEP_CHAIR and SEP_SECRETARY we do not setUserRoles because they are set right after in separate call.
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.SEP_CHAIR;
+    } else if (
+      args.userRole === UserRole.SEP_SECRETARY &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.SEP_SECRETARY;
     }
 
     if (!userId) {
