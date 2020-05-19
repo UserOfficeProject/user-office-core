@@ -31,21 +31,18 @@ const updateSEPValidationSchema = yup.object().shape({
   numberRatingsRequired: yup.number().min(2),
 });
 
-const assignSEPChairAndSecretaryValidationSchema = yup.object().shape({
+const assignSEPChairOrSecretaryValidationSchema = yup.object().shape({
   addSEPMembersRole: yup
-    .array()
-    .of(
-      yup.object().shape({
-        userID: yup.number().required(),
-        roleID: yup
-          .number()
-          .oneOf([UserRole.SEP_CHAIR, UserRole.SEP_SECRETARY])
-          .required(),
-        SEPID: yup.number().required(),
-      })
-    )
-    .required()
-    .min(2),
+    .object()
+    .shape({
+      userID: yup.number().required(),
+      roleID: yup
+        .number()
+        .oneOf([UserRole.SEP_CHAIR, UserRole.SEP_SECRETARY])
+        .required(),
+      SEPID: yup.number().required(),
+    })
+    .required(),
 });
 
 const updateSEPMemberValidationSchema = yup.object().shape({
@@ -124,14 +121,14 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPChairAndSecretaryValidationSchema)
+  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
-  async assignChairAndSecretaryToSEP(
+  async assignChairOrSecretaryToSEP(
     agent: User | null,
     args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
-      .addSEPMembersRoles(args.addSEPMembersRole)
+      .addSEPMembersRole(args.addSEPMembersRole)
       .then(result => result)
       .catch(err => {
         logger.logException(
@@ -175,13 +172,11 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .addSEPMembersRoles([
-        {
-          userID: args.memberId,
-          SEPID: args.sepId,
-          roleID: UserRole.SEP_MEMBER,
-        },
-      ])
+      .addSEPMembersRole({
+        userID: args.memberId,
+        SEPID: args.sepId,
+        roleID: UserRole.SEP_MEMBER,
+      })
       .then(result => result)
       .catch(err => {
         logger.logException(

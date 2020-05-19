@@ -46,12 +46,12 @@ export class AssignSEPChairAndSecretaryArgs {
 @Resolver()
 export class AssignMembersToSEPMutation {
   @Mutation(() => SEPResponseWrap)
-  async assignChairAndSecretary(
+  async assignChairOrSecretary(
     @Args() args: AddSEPMembersRoleArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sep.assignChairAndSecretaryToSEP(context.user, args),
+      context.mutations.sep.assignChairOrSecretaryToSEP(context.user, args),
       SEPResponseWrap
     );
   }

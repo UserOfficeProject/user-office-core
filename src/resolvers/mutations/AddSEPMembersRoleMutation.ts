@@ -16,6 +16,6 @@ export class AddSEPMembersRole {
 
 @ArgsType()
 export class AddSEPMembersRoleArgs {
-  @Field(() => [AddSEPMembersRole], { nullable: true })
-  public addSEPMembersRole: AddSEPMembersRole[];
+  @Field(() => AddSEPMembersRole, { nullable: true })
+  public addSEPMembersRole: AddSEPMembersRole;
 }

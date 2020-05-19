@@ -26,7 +26,7 @@ export interface SEPDataSource {
   getAssignments(id: number): Promise<SEPAssignment[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
-  addSEPMembersRoles(args: AddSEPMembersRole[]): Promise<SEP>;
+  addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
   removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<SEP>;
   removeProposalAssignment(proposalId: number, sepId: number): Promise<SEP>;

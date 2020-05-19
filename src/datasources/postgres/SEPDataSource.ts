@@ -171,29 +171,27 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       );
   }
 
-  async addSEPMembersRoles(usersWithRoles: AddSEPMembersRole[]) {
-    const rolesToInsert = usersWithRoles.map(userWithRole => {
-      return {
-        user_id: userWithRole.userID,
-        role_id: userWithRole.roleID,
-        sep_id: userWithRole.SEPID,
-      };
-    });
+  async addSEPMembersRole(userWithRoles: AddSEPMembersRole) {
+    const roleToInsert = {
+      user_id: userWithRoles.userID,
+      role_id: userWithRoles.roleID,
+      sep_id: userWithRoles.SEPID,
+    };
 
     await database('role_user')
       .del()
-      .where('sep_id', rolesToInsert[0].sep_id)
-      .whereIn('user_id', [...rolesToInsert.map(role => role.user_id)]);
+      .where('sep_id', roleToInsert.sep_id)
+      .andWhere('role_id', roleToInsert.role_id);
 
-    await database.insert(rolesToInsert).into('role_user');
+    await database.insert(roleToInsert).into('role_user');
 
-    const sepUpdated = await this.get(rolesToInsert[0].sep_id);
+    const sepUpdated = await this.get(roleToInsert.sep_id);
 
     if (sepUpdated) {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${rolesToInsert[0].sep_id}`);
+    throw new Error(`SEP not found ${roleToInsert.sep_id}`);
   }
 
   async removeSEPMemberRole(memberId: number, sepId: number) {
