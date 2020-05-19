@@ -90,7 +90,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
     };
   };
 
-  const getArciveButton = () => {
+  const getArchiveButton = () => {
     return {
       icon: () => <Archive />,
       tooltip: 'Archive',
@@ -175,7 +175,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
       if (isDeleteable) {
         return getDeleteButton();
       } else {
-        return getArciveButton();
+        return getArchiveButton();
       }
     }
   };
