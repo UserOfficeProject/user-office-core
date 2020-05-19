@@ -7,8 +7,8 @@ mutation assignMember($memberId: Int!, $sepId: Int!) {
   }
 }
 
-mutation assignChairAndSecretary($addSEPMembersRole: [AddSEPMembersRole!]!) {
-  assignChairAndSecretary(addSEPMembersRole: $addSEPMembersRole) {
+mutation assignChairOrSecretary($addSEPMembersRole: AddSEPMembersRole!) {
+  assignChairOrSecretary(addSEPMembersRole: $addSEPMembersRole) {
     error
     sep {
       id

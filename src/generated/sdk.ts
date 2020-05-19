@@ -211,7 +211,7 @@ export type Mutation = {
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
-  assignChairAndSecretary: SepResponseWrap,
+  assignChairOrSecretary: SepResponseWrap,
   assignMember: SepResponseWrap,
   removeMember: SepResponseWrap,
   assignMemberToSEPProposal: SepResponseWrap,
@@ -322,8 +322,8 @@ export type MutationAddUserForReviewArgs = {
 };
 
 
-export type MutationAssignChairAndSecretaryArgs = {
-  addSEPMembersRole?: Maybe<Array<AddSepMembersRole>>
+export type MutationAssignChairOrSecretaryArgs = {
+  addSEPMembersRole?: Maybe<AddSepMembersRole>
 };
 
 
@@ -1172,14 +1172,14 @@ export type AssignMemberMutation = (
   ) }
 );
 
-export type AssignChairAndSecretaryMutationVariables = {
-  addSEPMembersRole: Array<AddSepMembersRole>
+export type AssignChairOrSecretaryMutationVariables = {
+  addSEPMembersRole: AddSepMembersRole
 };
 
 
-export type AssignChairAndSecretaryMutation = (
+export type AssignChairOrSecretaryMutation = (
   { __typename?: 'Mutation' }
-  & { assignChairAndSecretary: (
+  & { assignChairOrSecretary: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
@@ -2815,9 +2815,9 @@ export const AssignMemberDocument = gql`
   }
 }
     `;
-export const AssignChairAndSecretaryDocument = gql`
-    mutation assignChairAndSecretary($addSEPMembersRole: [AddSEPMembersRole!]!) {
-  assignChairAndSecretary(addSEPMembersRole: $addSEPMembersRole) {
+export const AssignChairOrSecretaryDocument = gql`
+    mutation assignChairOrSecretary($addSEPMembersRole: AddSEPMembersRole!) {
+  assignChairOrSecretary(addSEPMembersRole: $addSEPMembersRole) {
     error
     sep {
       id
@@ -3684,8 +3684,8 @@ export function getSdk(client: GraphQLClient) {
     assignMember(variables: AssignMemberMutationVariables): Promise<AssignMemberMutation> {
       return client.request<AssignMemberMutation>(print(AssignMemberDocument), variables);
     },
-    assignChairAndSecretary(variables: AssignChairAndSecretaryMutationVariables): Promise<AssignChairAndSecretaryMutation> {
-      return client.request<AssignChairAndSecretaryMutation>(print(AssignChairAndSecretaryDocument), variables);
+    assignChairOrSecretary(variables: AssignChairOrSecretaryMutationVariables): Promise<AssignChairOrSecretaryMutation> {
+      return client.request<AssignChairOrSecretaryMutation>(print(AssignChairOrSecretaryDocument), variables);
     },
     assignMemberToSEPProposal(variables: AssignMemberToSepProposalMutationVariables): Promise<AssignMemberToSepProposalMutation> {
       return client.request<AssignMemberToSepProposalMutation>(print(AssignMemberToSepProposalDocument), variables);
