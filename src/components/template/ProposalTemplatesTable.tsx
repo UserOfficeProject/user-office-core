@@ -1,8 +1,9 @@
-import { Delete, Edit, Email, FileCopy } from '@material-ui/icons';
+import { Delete, Edit, Email, FileCopy, Archive } from '@material-ui/icons';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+import UnarchiveIcon from '@material-ui/icons/Unarchive';
 
 import {
   GetProposalTemplatesQuery,
@@ -12,16 +13,17 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
 
+type RowDataType = Pick<
+  ProposalTemplate,
+  | 'templateId'
+  | 'name'
+  | 'description'
+  | 'isArchived'
+  | 'proposalCount'
+  | 'callCount'
+>;
+
 function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
-  type RowDataType = Pick<
-    ProposalTemplate,
-    | 'templateId'
-    | 'name'
-    | 'description'
-    | 'isArchived'
-    | 'proposalCount'
-    | 'callCount'
-  >;
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [templates, setTemplates] = useState<RowDataType[]>([]);
@@ -121,43 +123,139 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
             )();
           },
         },
-        rowData => ({
-          icon: () => <Delete />,
-          tooltip: 'Delete',
-          onClick: (event: any, data: RowDataType | RowDataType[]) => {
-            props.confirm(
-              () => {
-                api()
-                  .deleteProposalTemplate({
-                    id: (data as RowDataType).templateId,
-                  })
-                  .then(response => {
-                    const data = [...templates];
-                    data.splice(
-                      templates.findIndex(
-                        elem =>
-                          elem.templateId ===
-                          response.deleteProposalTemplate.template?.templateId
-                      ),
-                      1
-                    );
-                    setTemplates(data);
-                  });
-              },
-              {
-                title: 'Are you sure?',
-                description: `Are you sure you want to delete ${
-                  (data as RowDataType).name
-                }`,
-                confirmationText: 'Yes',
-                cancellationText: 'Cancel',
-              }
-            )();
-          },
-        }),
+        rowData => getMaintenanceButton(rowData),
       ]}
     />
   );
+
+  function getMaintenanceButton(rowData: RowDataType) {
+    if (rowData.isArchived) {
+      return getUnarchiveButton();
+    } else {
+      const isDeleteable =
+        rowData.callCount === 0 && rowData.proposalCount === 0;
+      if (isDeleteable) {
+        return getDeleteButton();
+      } else {
+        return getArciveButton();
+      }
+    }
+  }
+
+  function getUnarchiveButton() {
+    return {
+      icon: () => <UnarchiveIcon />,
+      tooltip: 'Unarchive',
+      onClick: (event: any, data: RowDataType | RowDataType[]) => {
+        props.confirm(
+          () => {
+            api()
+              .updateProposalTemplate({
+                templateId: (data as RowDataType).templateId,
+                isArchived: false,
+              })
+              .then(response => {
+                const data = [...templates];
+                data.splice(
+                  templates.findIndex(
+                    elem =>
+                      elem.templateId ===
+                      response.updateProposalTemplate.template?.templateId
+                  ),
+                  1,
+                  response.updateProposalTemplate.template!
+                );
+                setTemplates(data);
+              });
+          },
+          {
+            title: 'Are you sure?',
+            description: `Are you sure you want to unarchive ${
+              (data as RowDataType).name
+            }`,
+            confirmationText: 'Yes',
+            cancellationText: 'Cancel',
+          }
+        )();
+      },
+    };
+  }
+
+  function getArciveButton() {
+    return {
+      icon: () => <Archive />,
+      tooltip: 'Archive',
+      onClick: (event: any, data: RowDataType | RowDataType[]) => {
+        props.confirm(
+          () => {
+            api()
+              .updateProposalTemplate({
+                templateId: (data as RowDataType).templateId,
+                isArchived: true,
+              })
+              .then(response => {
+                const data = [...templates];
+                data.splice(
+                  templates.findIndex(
+                    elem =>
+                      elem.templateId ===
+                      response.updateProposalTemplate.template?.templateId
+                  ),
+                  1,
+                  response.updateProposalTemplate.template!
+                );
+                setTemplates(data);
+              });
+          },
+          {
+            title: 'Are you sure?',
+            description: `Are you sure you want to archive ${
+              (data as RowDataType).name
+            }`,
+            confirmationText: 'Yes',
+            cancellationText: 'Cancel',
+          }
+        )();
+      },
+    };
+  }
+
+  function getDeleteButton() {
+    return {
+      icon: () => <Delete />,
+      tooltip: 'Delete',
+      onClick: (event: any, data: RowDataType | RowDataType[]) => {
+        props.confirm(
+          () => {
+            api()
+              .deleteProposalTemplate({
+                id: (data as RowDataType).templateId,
+              })
+              .then(response => {
+                const data = [...templates];
+                data.splice(
+                  templates.findIndex(
+                    elem =>
+                      elem.templateId ===
+                      response.deleteProposalTemplate.template?.templateId
+                  ),
+                  1
+                );
+                setTemplates(data);
+              });
+          },
+          {
+            title: 'Are you sure?',
+            description: `Are you sure you want to delete ${
+              (data as RowDataType).name
+            }`,
+            confirmationText: 'Yes',
+            cancellationText: 'Cancel',
+          }
+        )();
+      },
+    };
+  }
 }
 
 interface IProposalTemplatesTableProps {
