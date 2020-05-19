@@ -36,6 +36,8 @@ export enum EventType {
   OPEN_QUESTION_EDITOR,
   QUESTION_DELETED,
   OPEN_QUESTIONREL_EDITOR,
+  UPDATE_TEMPLATE_METADATA_REQUESTED,
+  TEMPLATE_METADATA_UPDATED,
 }
 
 export interface Event {
@@ -174,6 +176,9 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
           }
 
           return draft;
+        }
+        case EventType.TEMPLATE_METADATA_UPDATED: {
+          return { ...draft, ...action.payload };
         }
       }
     });

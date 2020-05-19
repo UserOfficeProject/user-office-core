@@ -24,6 +24,7 @@ import QuestionEditor from './forms/QuestionEditor';
 import QuestionRelEditor from './forms/QuestionRelEditor';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
 import { QuestionPicker } from './QuestionPicker';
+import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
@@ -62,8 +63,7 @@ export default function QuestionaryEditor() {
           break;
 
         case EventType.QUESTION_PICKER_NEW_QUESTION_CLICKED:
-          // TODO open question edit modal window
-          //setQuestionPickerTopicId(action.payload.topic.id);
+          setQuestionPickerTopicId(action.payload.topic.id);
           break;
       }
     };
@@ -197,6 +197,7 @@ export default function QuestionaryEditor() {
 
   return (
     <>
+      <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         {enableReorderTopicsToggle}

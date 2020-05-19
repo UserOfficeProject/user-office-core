@@ -1,5 +1,5 @@
 import { Typography } from '@material-ui/core';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -7,7 +7,10 @@ import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function ProposalChooseCall() {
-  const { callsData } = useCallsData(true, {});
+  const { callsData } = useCallsData(
+    true,
+    useCallback(() => ({ filter: { isActive: true } }), [])() // useCallback to prevent infinite re-render
+  );
   const history = useHistory();
 
   if (!callsData) {

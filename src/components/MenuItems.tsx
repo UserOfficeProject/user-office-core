@@ -22,7 +22,7 @@ type MenuItemsProps = {
 };
 
 const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
-  const { loading, callsData } = useCallsData(false, {});
+  const { loading, callsData } = useCallsData(false);
 
   let proposalDisabled = false;
 

@@ -155,6 +155,20 @@ export function usePersistModel() {
       });
   };
 
+  const updateProposalMetadata = async (
+    templateId: number,
+    name: string,
+    description: string
+  ) => {
+    return api()
+      .updateProposalTemplate({
+        templateId,
+        name,
+        description,
+      })
+      .then(data => data.updateProposalTemplate);
+  };
+
   type MonitorableServiceCall = () => Promise<{
     error?: string | null;
   }>;
@@ -317,6 +331,25 @@ export function usePersistModel() {
             return result;
           });
           break;
+        case EventType.UPDATE_TEMPLATE_METADATA_REQUESTED: {
+          const { templateId, name, description } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await updateProposalMetadata(
+              templateId,
+              name,
+              description
+            );
+            if (result.template) {
+              dispatch({
+                type: EventType.TEMPLATE_METADATA_UPDATED,
+                payload: result.template,
+              });
+            }
+
+            return result;
+          });
+        }
         case EventType.CREATE_QUESTION_REL_REQUESTED:
           const { questionId, topicId, sortOrder, templateId } = action.payload;
 

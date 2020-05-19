@@ -14,7 +14,7 @@ import AddCall from './AddCall';
 
 const CallPage: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData } = useCallsData(show, {});
+  const { loading, callsData } = useCallsData(show);
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
