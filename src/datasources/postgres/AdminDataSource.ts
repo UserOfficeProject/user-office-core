@@ -84,8 +84,18 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  /**
+   * NB! This will actually wipe the database
+   */
   async resetDB() {
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>(async (resolve, reject) => {
+      await database.raw(`
+        DROP SCHEMA public CASCADE;
+        CREATE SCHEMA public;
+        GRANT ALL ON SCHEMA public TO duouser;
+        GRANT ALL ON SCHEMA public TO public;
+      `);
+
       const directoryPath = './db_patches';
       fs.readdir(directoryPath, async function(err, files) {
         if (err) {
