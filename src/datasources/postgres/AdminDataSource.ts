@@ -115,12 +115,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
             .then(result => {
               let msg = `${file} executed. ${result.command || ''}\n`;
               log.push(msg);
-              console.log(result);
+              console.log(msg);
             })
             .catch(err => {
               let msg = `${file} failed. ${err}`;
               log.push(msg);
-              console.error(err);
+              console.error(msg);
               resolve(log.join('\n'));
             });
         }
