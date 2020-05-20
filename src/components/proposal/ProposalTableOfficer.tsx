@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
-import { Visibility, Delete, Assignment } from '@material-ui/icons';
+import { Visibility, Delete, Assignment, Email } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
@@ -21,6 +21,8 @@ const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
   const [openAssignment, setOpenAssignment] = React.useState(false);
+  const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
+
   const initalSelectedProposals: number[] = [];
   const [selectedProposals, setSelectedProposals] = React.useState(
     initalSelectedProposals
@@ -176,7 +178,31 @@ const ProposalTableOfficer: React.FC = () => {
         />
       ),
     },
+    { title: 'Notified', field: 'notified' },
   ];
+
+  const emailProposals = (): void => {
+    selectedProposals.forEach(id => {
+      new Promise(async resolve => {
+        await api()
+          .notifyProposal({ id })
+          .then(data => {
+            if (data.notifyProposal.error) {
+              enqueueSnackbar(`Could not send email to proposal: ${id}`, {
+                variant: 'error',
+              });
+            } else {
+              proposalsData[
+                proposalsData.findIndex(val => val.id === id)
+              ].notified = true;
+              setProposalsData([...proposalsData]);
+            }
+          });
+
+        resolve();
+      });
+    });
+  };
 
   const deleteProposals = (): void => {
     selectedProposals.forEach(id => {
@@ -217,6 +243,7 @@ const ProposalTableOfficer: React.FC = () => {
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
   const AssignIcon = (): JSX.Element => <Assignment />;
+  const EmailIcon = (): JSX.Element => <Email />;
 
   return (
     <>
@@ -226,6 +253,13 @@ const ProposalTableOfficer: React.FC = () => {
         open={open}
         action={deleteProposals}
         handleOpen={setOpen}
+      />
+      <DialogConfirmation
+        title="Notify results"
+        text="This action will trigger emails to be sent to principal investigators"
+        open={openEmailProposals}
+        action={emailProposals}
+        handleOpen={setOpenEmailProposals}
       />
       <Dialog
         aria-labelledby="simple-modal-title"
@@ -319,6 +353,17 @@ const ProposalTableOfficer: React.FC = () => {
             tooltip: 'Assign proposals to SEP',
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
+              setSelectedProposals(
+                (rowData as ProposalData[]).map((row: ProposalData) => row.id)
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: EmailIcon,
+            tooltip: 'Notify users final result',
+            onClick: (event, rowData): void => {
+              setOpenEmailProposals(true);
               setSelectedProposals(
                 (rowData as ProposalData[]).map((row: ProposalData) => row.id)
               );

@@ -13,6 +13,7 @@ query getProposal($id: Int!) {
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }

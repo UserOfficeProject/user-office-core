@@ -42,6 +42,8 @@ export type BasicUserDetails = {
   lastname: Scalars['String'],
   organisation: Scalars['String'],
   position: Scalars['String'],
+  placeholder?: Maybe<Scalars['Boolean']>,
+  created?: Maybe<Scalars['DateTime']>,
 };
 
 export type BasicUserDetailsResponseWrap = {
@@ -206,6 +208,7 @@ export type Mutation = {
    __typename?: 'Mutation',
   createCall: CallResponseWrap,
   administrationProposal: ProposalResponseWrap,
+  notifyProposal: ProposalResponseWrap,
   updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   addReview: ReviewResponseWrap,
@@ -277,6 +280,11 @@ export type MutationAdministrationProposalArgs = {
   finalStatus?: Maybe<ProposalEndStatus>,
   status?: Maybe<ProposalStatus>,
   rankOrder?: Maybe<Scalars['Int']>
+};
+
+
+export type MutationNotifyProposalArgs = {
+  id: Scalars['Int']
 };
 
 
@@ -650,6 +658,7 @@ export type Proposal = {
   templateId: Scalars['Int'],
   commentForUser?: Maybe<Scalars['String']>,
   commentForManagement?: Maybe<Scalars['String']>,
+  notified: Scalars['Boolean'],
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews?: Maybe<Array<Review>>,
@@ -1678,7 +1687,7 @@ export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
   & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId'>
+    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1724,7 +1733,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1763,7 +1772,7 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -1783,6 +1792,23 @@ export type GetProposalsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type NotifyProposalMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type NotifyProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { notifyProposal: (
+    { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
+    & { proposal: Maybe<(
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'id'>
+    )> }
+  ) }
 );
 
 export type SubmitProposalMutationVariables = {
@@ -2347,7 +2373,7 @@ export type DeleteUserMutation = (
 
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
 );
 
 export type GetBasicUserDetailsQueryVariables = {
@@ -2813,6 +2839,8 @@ export const BasicUserDetailsFragmentDoc = gql`
   lastname
   organisation
   position
+  placeholder
+  created
 }
     `;
 export const AssignProposalDocument = gql`
@@ -3078,6 +3106,7 @@ export const GetBlankProposalDocument = gql`
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -3133,6 +3162,7 @@ export const GetProposalDocument = gql`
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -3186,6 +3216,7 @@ export const GetProposalsDocument = gql`
       updated
       callId
       templateId
+      notified
       proposer {
         ...basicUserDetails
       }
@@ -3218,6 +3249,16 @@ export const GetProposalsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const NotifyProposalDocument = gql`
+    mutation notifyProposal($id: Int!) {
+  notifyProposal(id: $id) {
+    proposal {
+      id
+    }
+    error
+  }
+}
+    `;
 export const SubmitProposalDocument = gql`
     mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {
@@ -3782,6 +3823,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getProposals(variables?: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return client.request<GetProposalsQuery>(print(GetProposalsDocument), variables);
+    },
+    notifyProposal(variables: NotifyProposalMutationVariables): Promise<NotifyProposalMutation> {
+      return client.request<NotifyProposalMutation>(print(NotifyProposalDocument), variables);
     },
     submitProposal(variables: SubmitProposalMutationVariables): Promise<SubmitProposalMutation> {
       return client.request<SubmitProposalMutation>(print(SubmitProposalDocument), variables);
