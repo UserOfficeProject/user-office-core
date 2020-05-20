@@ -2,7 +2,10 @@ import { Page } from '../../models/Admin';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 
 export class AdminDataSourceMock implements AdminDataSource {
-  async resetDB(): Promise<boolean> {
+  applyPatches(): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+  async resetDB(): Promise<string> {
     throw new Error('Method not implemented.');
   }
   async getInstitution(id: number): Promise<string | null> {

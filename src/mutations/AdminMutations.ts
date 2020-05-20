@@ -8,7 +8,12 @@ import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class AdminMutations {
-  async resetDB(): Promise<boolean | Rejection> {
+  constructor(
+    private dataSource: AdminDataSource,
+    private userAuth: UserAuthorization
+  ) {}
+
+  async resetDB(): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
@@ -17,10 +22,12 @@ export default class AdminMutations {
       return rejection('NOT_ALLOWED');
     }
   }
-  constructor(
-    private dataSource: AdminDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+
+  async applyPatches(): Promise<string | Rejection> {
+    logger.logWarn('Applying patches', {});
+
+    return this.dataSource.applyPatches();
+  }
 
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
