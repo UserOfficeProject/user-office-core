@@ -4,11 +4,11 @@ import { PrepareDBResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class PrepareDBMutationMutation {
+export class ApplyPatchesMutation {
   @Mutation(() => PrepareDBResponseWrap)
-  prepareDB(@Ctx() context: ResolverContext) {
+  applyPatches(@Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.admin.resetDB(),
+      context.mutations.admin.applyPatches(),
       PrepareDBResponseWrap
     );
   }

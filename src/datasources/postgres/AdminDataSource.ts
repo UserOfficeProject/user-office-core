@@ -88,33 +88,44 @@ export default class PostgresAdminDataSource implements AdminDataSource {
    * NB! This will actually wipe the database
    */
   async resetDB() {
-    return new Promise<boolean>(async (resolve, reject) => {
-      await database.raw(`
+    await database.raw(`
         DROP SCHEMA public CASCADE;
         CREATE SCHEMA public;
         GRANT ALL ON SCHEMA public TO duouser;
         GRANT ALL ON SCHEMA public TO public;
       `);
 
+    return await this.applyPatches();
+  }
+
+  async applyPatches(): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      var log = [`Upgrade started: ${Date.now()}`];
       const directoryPath = './db_patches';
       fs.readdir(directoryPath, async function(err, files) {
         if (err) {
           logger.logError(err.message, err);
-
+          log.push(err.message);
           return false;
         }
         for await (const file of files) {
           const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
           await database
             .raw(contents)
-            .then(() => console.log(`${file} executed`))
+            .then(result => {
+              let msg = `${file} executed. ${result.command || ''}\n`;
+              log.push(msg);
+              console.log(result);
+            })
             .catch(err => {
-              console.error(`${file} failed. ${err}`);
-              resolve(false);
+              let msg = `${file} failed. ${err}`;
+              log.push(msg);
+              console.error(err);
+              resolve(log.join('\n'));
             });
         }
 
-        resolve(true);
+        resolve(log.join('\n'));
       });
     });
   }
