@@ -1,30 +1,30 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { GetSepAssignmentsQuery } from '../generated/sdk';
+import { GetSepProposalsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPAssignmentsData(
-  id: number
+  sepId: number
 ): {
   loadingAssignments: boolean;
-  SEPAssignmentsData: GetSepAssignmentsQuery['sepAssignments'] | null;
+  SEPAssignmentsData: GetSepProposalsQuery['sepProposals'] | null;
   setSEPAssignmentsData: Dispatch<
-    SetStateAction<GetSepAssignmentsQuery['sepAssignments'] | null>
+    SetStateAction<GetSepProposalsQuery['sepProposals'] | null>
   >;
 } {
   const api = useDataApi();
   const [SEPAssignmentsData, setSEPAssignmentsData] = useState<
-    GetSepAssignmentsQuery['sepAssignments'] | null
+    GetSepProposalsQuery['sepProposals'] | null
   >([]);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
   useEffect(() => {
     api()
-      .getSEPAssignments({ id })
+      .getSEPProposals({ sepId })
       .then(data => {
-        setSEPAssignmentsData(data.sepAssignments);
+        setSEPAssignmentsData(data.sepProposals);
         setLoadingAssignments(false);
       });
-  }, [id, api]);
+  }, [sepId, api]);
 
   return { loadingAssignments, SEPAssignmentsData, setSEPAssignmentsData };
 }
