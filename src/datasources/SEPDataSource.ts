@@ -1,5 +1,5 @@
 import { Role } from '../models/Role';
-import { SEP, SEPAssignment, SEPMember } from '../models/SEP';
+import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
 import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 
 export interface SEPDataSource {
@@ -23,7 +23,8 @@ export interface SEPDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
-  getAssignments(id: number): Promise<SEPAssignment[]>;
+  getAssignments(sepId: number, proposalId: number): Promise<SEPAssignment[]>;
+  getSEPProposals(sepId: number): Promise<SEPProposal[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;

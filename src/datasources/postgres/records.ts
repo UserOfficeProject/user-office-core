@@ -198,6 +198,12 @@ export interface SEPRecord {
   readonly full_count: number;
 }
 
+export interface SEPProposalRecord {
+  readonly proposal_id: number;
+  readonly sep_id: number;
+  readonly date_assigned: Date;
+}
+
 export interface SEPAssignmentRecord {
   readonly proposal_id: number;
   readonly sep_member_user_id: number;

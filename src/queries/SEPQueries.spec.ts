@@ -59,7 +59,10 @@ describe('Test SEPQueries', () => {
 
   test('A userofficer can get SEP Assignments by SEP id', () => {
     return expect(
-      SEPQueriesInstance.getAssignments(dummyUserOfficer, 1)
+      SEPQueriesInstance.getAssignments(dummyUserOfficer, {
+        sepId: 1,
+        proposalId: 1,
+      })
     ).resolves.toStrictEqual([dummySEPAssignment]);
   });
 });

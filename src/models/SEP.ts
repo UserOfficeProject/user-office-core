@@ -17,6 +17,14 @@ export class SEPMember {
   ) {}
 }
 
+export class SEPProposal {
+  constructor(
+    public proposalId: number,
+    public sepId: number,
+    public dateAssigned: Date
+  ) {}
+}
+
 export class SEPAssignment {
   constructor(
     public proposalId: number,
