@@ -4,6 +4,7 @@ import SparkPost from 'sparkpost';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { ProposalEndStatus } from '../models/ProposalModel';
 import { UserRole } from '../models/User';
 import { logger } from '../utils/Logger';
 
@@ -16,39 +17,7 @@ export default function createHandler(userDataSource: UserDataSource) {
   // Handler to send email to proposers in accepted proposal
 
   return async function emailHandler(event: ApplicationEvent) {
-    function sendEmail(_address: string, _topic: string, _message: string) {
-      // Do something or remove the function.
-    }
-
     switch (event.type) {
-      case Event.PROPOSAL_ACCEPTED: {
-        const proposal = event.proposal;
-        const participants = await userDataSource.getProposalUsers(proposal.id);
-
-        for (const { firstname, lastname } of participants) {
-          const email = 'dummy@dummy.com';
-          const topic = 'Congrats!';
-          const message = `Dear ${firstname} ${lastname}, your proposal has been accepted.`;
-          sendEmail(email, topic, message);
-        }
-
-        return;
-      }
-
-      case Event.PROPOSAL_REJECTED: {
-        const proposal = event.proposal;
-        const participants = await userDataSource.getProposalUsers(proposal.id);
-
-        for (const { firstname, lastname } of participants) {
-          const email = 'dummy@dummy.com';
-          const topic = 'Tough luck!';
-          const message = `Sorry ${firstname} ${lastname}, your proposal was rejected because: ${event.reason}`;
-          sendEmail(email, topic, message);
-        }
-
-        return;
-      }
-
       case Event.USER_PASSWORD_RESET_EMAIL: {
         client.transmissions
           .send({
@@ -203,6 +172,55 @@ export default function createHandler(userDataSource: UserDataSource) {
               });
             });
         }
+
+        return;
+      }
+      case Event.PROPOSAL_NOTIFIED: {
+        const principalInvestigator = await userDataSource.get(
+          event.proposal.proposerId
+        );
+        if (!principalInvestigator) {
+          return;
+        }
+        const { finalStatus } = event.proposal;
+        let template_id = '';
+        if (finalStatus === ProposalEndStatus.ACCEPTED) {
+          template_id = 'Accepted-Proposal';
+        } else if (finalStatus === ProposalEndStatus.REJECTED) {
+          template_id = 'Rejected-Proposal';
+        } else if (finalStatus === ProposalEndStatus.RESERVED) {
+          template_id = 'Reserved-Proposal';
+        } else {
+          logger.logError('Failed email notification', { event });
+
+          return;
+        }
+
+        client.transmissions
+          .send({
+            content: {
+              template_id,
+            },
+            substitution_data: {
+              piPreferredname: principalInvestigator.preferredname,
+              piLastname: principalInvestigator.lastname,
+              proposalNumber: event.proposal.shortCode,
+              proposalTitle: event.proposal.title,
+            },
+            recipients: [{ address: principalInvestigator.email }],
+          })
+          .then((res: any) => {
+            logger.logInfo('Email sent on proposal notify:', {
+              result: res,
+              event,
+            });
+          })
+          .catch((err: string) => {
+            logger.logError('Could not send email on proposal notify:', {
+              error: err,
+              event,
+            });
+          });
 
         return;
       }

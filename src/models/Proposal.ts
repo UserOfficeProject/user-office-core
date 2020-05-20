@@ -14,6 +14,7 @@ export class Proposal {
     public callId: number,
     public templateId: number,
     public commentForUser: string,
-    public commentForManagement: string
+    public commentForManagement: string,
+    public notified: boolean
   ) {}
 }

@@ -59,6 +59,9 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public commentForManagement?: string;
 
+  @Field(() => Boolean)
+  public notified: boolean;
+
   public proposerId: number;
 }
 
