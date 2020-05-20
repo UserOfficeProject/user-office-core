@@ -6,16 +6,22 @@ import { BasicUserDetails as BasicUserDetailsOrigin } from '../../models/User';
 export class BasicUserDetails implements Partial<BasicUserDetailsOrigin> {
   @Field(() => Int)
   public id: number;
+
   @Field()
   public firstname: string;
+
   @Field()
   public lastname: string;
+
   @Field()
   public organisation: string;
+
   @Field()
   public position: string;
-  @Field()
-  public placeholder: boolean;
-  @Field()
-  public created: Date;
+
+  @Field(() => Boolean, { nullable: true })
+  public placeholder?: boolean;
+
+  @Field(() => Date, { nullable: true })
+  public created?: Date;
 }
