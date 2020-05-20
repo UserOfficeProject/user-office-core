@@ -70,9 +70,9 @@ context('Scientific evaluation panel tests', () => {
     SEPsTable.should('contain', description);
   });
 
-  it('Officer should be able to assign SEP Chair and SEP Secretary to existing SEP', () => {
-    let selectedChairUser = '';
-    let selectedSecretaryUser = '';
+  it('Officer should be able to assign SEP Chair to existing SEP', () => {
+    let selectedChairUserFirstName = '';
+    let selectedChairUserLastName = '';
 
     cy.login('officer');
 
@@ -85,25 +85,29 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.get('[id="mui-component-select-SEPChair"]').click();
+    cy.get('[title="Set SEP Chair"]').click();
 
-    cy.get('.MuiMenu-list')
-      .find('[data-value="1"]')
+    cy.wait(1000);
+
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr')
+      .eq(1)
+      .find('td.MuiTableCell-alignLeft')
+      .first()
       .then(element => {
-        selectedChairUser = element.text();
+        selectedChairUserFirstName = element.text();
       });
 
-    cy.get('.MuiMenu-list [data-value="1"]').click();
-
-    cy.get('[id="mui-component-select-SEPSecretary"]').click();
-    cy.get('.MuiMenu-list')
-      .find('[data-value="2"]')
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr')
+      .eq(1)
+      .find('td.MuiTableCell-alignLeft')
+      .eq(1)
       .then(element => {
-        selectedSecretaryUser = element.text();
+        selectedChairUserLastName = element.text();
       });
-    cy.get('.MuiMenu-list [data-value="2"]').click();
 
-    cy.contains('Save SEP Members').click();
+    cy.get('[title="Select user"]')
+      .eq(1)
+      .click();
 
     cy.wait(1000);
 
@@ -117,12 +121,70 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.get('[id="mui-component-select-SEPChair"]').should(element => {
-      expect(selectedChairUser).to.equal(element.text());
+    cy.get('input[id="SEPChair"]').should(element => {
+      expect(element.val()).to.equal(
+        `${selectedChairUserFirstName} ${selectedChairUserLastName}`
+      );
     });
+  });
 
-    cy.get('[id="mui-component-select-SEPSecretary"]').should(element => {
-      expect(selectedSecretaryUser).to.equal(element.text());
+  it('Officer should be able to assign SEP Secretary to existing SEP', () => {
+    let selectedSecretaryUserFirstName = '';
+    let selectedSecretaryUserLastName = '';
+
+    cy.login('officer');
+
+    cy.contains('User Officer').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Set SEP Secretary"]').click();
+
+    cy.wait(1000);
+
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
+      .last()
+      .find('td.MuiTableCell-alignLeft')
+      .first()
+      .then(element => {
+        selectedSecretaryUserFirstName = element.text();
+      });
+
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
+      .last()
+      .find('td.MuiTableCell-alignLeft')
+      .eq(1)
+      .then(element => {
+        selectedSecretaryUserLastName = element.text();
+      });
+
+    cy.get('[title="Select user"]')
+      .last()
+      .click();
+
+    cy.wait(1000);
+
+    cy.contains('Logs').click();
+
+    cy.wait(1000);
+
+    cy.contains('SEP_MEMBERS_ASSIGNED');
+
+    cy.contains('Members').click();
+
+    cy.wait(1000);
+
+    cy.get('input[id="SEPSecretary"]').should(element => {
+      expect(element.val()).to.contain(
+        `${selectedSecretaryUserFirstName} ${selectedSecretaryUserLastName}`
+      );
     });
   });
 
@@ -193,6 +255,10 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Logs').click();
 
     cy.wait(1000);
+
+    cy.get("[title='Last Page'] button")
+      .first()
+      .click({ force: true });
 
     cy.contains('SEP_MEMBER_REMOVED');
 
@@ -291,7 +357,7 @@ context('Scientific evaluation panel tests', () => {
       .click();
 
     cy.get('.MuiMenu-list')
-      .find('[data-value="1"]')
+      .find('[tabindex="0"]')
       .then(element => {
         selectedUser = element.text();
       });

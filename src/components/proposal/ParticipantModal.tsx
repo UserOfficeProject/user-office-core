@@ -12,7 +12,8 @@ function ParticipantModal(props: {
   show: boolean;
   close: any;
   selectedUsers?: number[];
-  userRole: UserRole;
+  userRole?: UserRole;
+  invitationUserRole?: UserRole;
 }) {
   const addUser = (rowData: any) => {
     props.addParticipant({
@@ -37,8 +38,9 @@ function ParticipantModal(props: {
           actionIcon={<AddBox data-cy="select-user" />}
           action={addUser}
           selectedUsers={props.selectedUsers}
-          userRole={props.userRole}
+          userRole={props.userRole || ('' as UserRole)}
           emailInvite={true}
+          invitationUserRole={props.invitationUserRole || props.userRole}
         />
       </DialogContent>
     </Dialog>
