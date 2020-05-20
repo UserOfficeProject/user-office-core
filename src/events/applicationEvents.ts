@@ -36,6 +36,11 @@ interface ProposalCreatedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface ProposalNotifiedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_NOTIFIED;
+  proposal: Proposal;
+}
+
 interface UserResetPasswordEmailEvent extends GeneralEvent {
   type: Event.USER_PASSWORD_RESET_EMAIL;
   userlinkresponse: {
@@ -123,4 +128,5 @@ export type ApplicationEvent =
   | SEPProposalRemovedEvent
   | SEPMemberRemovedEvent
   | SEPMemberToProposalAssignedEvent
-  | UserDeletedEvent;
+  | UserDeletedEvent
+  | ProposalNotifiedEvent;

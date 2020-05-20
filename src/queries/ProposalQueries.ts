@@ -120,7 +120,8 @@ export default class ProposalQueries {
       call?.id,
       call?.templateId,
       '',
-      ''
+      '',
+      false
     );
 
     return blankProposal;

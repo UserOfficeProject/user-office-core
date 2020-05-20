@@ -11,6 +11,7 @@ import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
+import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
@@ -259,6 +260,19 @@ export default class ProposalMutations {
     }
 
     const result = await this.proposalDataSource.deleteProposal(proposalId);
+
+    return result || rejection('INTERNAL_ERROR');
+  }
+  @EventBus(Event.PROPOSAL_NOTIFIED)
+  @Authorized([Roles.USER_OFFICER])
+  async notify(user: User | null, args: NotifyProposalArgs): Promise<unknown> {
+    const proposal = await this.proposalDataSource.get(args.id);
+
+    if (!proposal) {
+      return rejection('INTERNAL_ERROR');
+    }
+    proposal.notified = true;
+    const result = await this.proposalDataSource.update(proposal);
 
     return result || rejection('INTERNAL_ERROR');
   }
