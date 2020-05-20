@@ -179,7 +179,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         const principalInvestigator = await userDataSource.get(
           event.proposal.proposerId
         );
-        if (!principalInvestigator) {
+        if (!principalInvestigator || event.proposal.notified) {
           return;
         }
         const { finalStatus } = event.proposal;
