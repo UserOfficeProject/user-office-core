@@ -1,14 +1,20 @@
+DO
+$$
+BEGIN
+	IF register_patch('AlterProposalQuestion.sql', 'jekabskarklins', 'Adding column nid (natural id)', '2020-02-24') THEN
+	BEGIN
 
-/*
-author: 
-    jekabskarklins
-purpose: 
-    Adding column nid (natural id)
-date:
-    24.feb.2020
-*/
 
-ALTER TABLE proposal_questions 
-    ADD COLUMN natural_key VARCHAR(128) UNIQUE; 
+  
+		ALTER TABLE proposal_questions 
+			ADD COLUMN natural_key VARCHAR(128) UNIQUE; 
 
-UPDATE proposal_questions SET natural_key = proposal_question_id;
+		UPDATE proposal_questions SET natural_key = proposal_question_id;
+
+
+
+    END;
+	END IF;
+END;
+$$
+LANGUAGE plpgsql;
