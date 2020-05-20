@@ -161,7 +161,6 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getSEPProposals(sepId: number): Promise<SEPProposal[]> {
-    console.log(sepId);
     const sepProposals: SEPProposalRecord[] = await database
       .from('SEP_Proposals')
       .where('sep_id', sepId);
@@ -279,6 +278,26 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     const sepUpdated = await this.get(sepId);
 
     if (assignmentAdded && sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeMemberFromSepProposal(
+    proposalId: number,
+    sepId: number,
+    memberId: number
+  ) {
+    const memberRemovedFromProposal = await database('SEP_Assignments')
+      .del()
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId)
+      .andWhere('sep_member_user_id', memberId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (memberRemovedFromProposal && sepUpdated) {
       return sepUpdated;
     }
 

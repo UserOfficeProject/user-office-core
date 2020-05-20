@@ -205,4 +205,18 @@ export class SEPDataSourceMock implements SEPDataSource {
 
     throw new Error(`SEP not found ${sepId}`);
   }
+
+  async removeMemberFromSepProposal(
+    proposalId: number,
+    sepId: number,
+    memberId: number
+  ) {
+    const sep = dummySEPs.find(element => element.id === sepId);
+
+    if (sep) {
+      return sep;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
 }
