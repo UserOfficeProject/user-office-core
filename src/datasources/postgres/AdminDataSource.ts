@@ -100,12 +100,13 @@ export default class PostgresAdminDataSource implements AdminDataSource {
 
   async applyPatches(): Promise<string> {
     return new Promise<string>(async (resolve, reject) => {
-      var log = [`Upgrade started: ${Date.now()}`];
+      const log = [`Upgrade started: ${Date.now()}`];
       const directoryPath = './db_patches';
       fs.readdir(directoryPath, async function(err, files) {
         if (err) {
           logger.logError(err.message, err);
           log.push(err.message);
+
           return false;
         }
         for await (const file of files) {
@@ -113,12 +114,12 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           await database
             .raw(contents)
             .then(result => {
-              let msg = `${file} executed. ${result.command || ''}\n`;
+              const msg = `${file} executed. ${result.command || ''}\n`;
               log.push(msg);
               console.log(msg);
             })
             .catch(err => {
-              let msg = `${file} failed. ${err}`;
+              const msg = `${file} failed. ${err}`;
               log.push(msg);
               console.error(msg);
               resolve(log.join('\n'));
