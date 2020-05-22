@@ -118,7 +118,7 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
 }
 
 @ObjectType()
-export class SuccessResponseWrap extends ResponseWrapBase<Topic> {
+export class SuccessResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => Boolean, { nullable: true })
   public isSuccess: boolean;
@@ -129,4 +129,11 @@ export class TokenResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String, { nullable: true })
   public token: string;
+}
+
+@ObjectType()
+export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
+  @Response()
+  @Field(() => String)
+  public log: string;
 }

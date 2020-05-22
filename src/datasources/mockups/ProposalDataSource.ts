@@ -84,7 +84,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.callId || 0,
     values?.templateId || 1,
     values?.commentForUser || 'comment for user',
-    values?.commentForManagement || 'comment for management'
+    values?.commentForManagement || 'comment for management',
+    false
   );
 };
 
@@ -171,7 +172,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       '',
-      ''
+      '',
+      false
     );
 
     dummyProposalSubmitted = new Proposal(
@@ -188,7 +190,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       '',
-      ''
+      '',
+      false
     );
   }
 

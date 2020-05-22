@@ -39,6 +39,7 @@ export interface ProposalRecord {
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
+  readonly notified: boolean;
 }
 
 export interface TopicRecord {
@@ -270,7 +271,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.call_id,
     proposal.template_id,
     proposal.comment_for_user,
-    proposal.comment_for_management
+    proposal.comment_for_management,
+    proposal.notified
   );
 };
 

@@ -84,12 +84,28 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       );
   }
 
+  /**
+   * NB! This will actually wipe the database
+   */
   async resetDB() {
-    return new Promise<boolean>((resolve, reject) => {
+    await database.raw(`
+        DROP SCHEMA public CASCADE;
+        CREATE SCHEMA public;
+        GRANT ALL ON SCHEMA public TO duouser;
+        GRANT ALL ON SCHEMA public TO public;
+      `);
+
+    return await this.applyPatches();
+  }
+
+  async applyPatches(): Promise<string> {
+    return new Promise<string>(async (resolve, reject) => {
+      const log = [`Upgrade started: ${Date.now()}`];
       const directoryPath = './db_patches';
       fs.readdir(directoryPath, async function(err, files) {
         if (err) {
           logger.logError(err.message, err);
+          log.push(err.message);
 
           return false;
         }
@@ -97,14 +113,20 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
           await database
             .raw(contents)
-            .then(() => console.log(`${file} executed`))
+            .then(result => {
+              const msg = `${file} executed. ${result.command || ''}\n`;
+              log.push(msg);
+              console.log(msg);
+            })
             .catch(err => {
-              console.error(`${file} failed. ${err}`);
-              resolve(false);
+              const msg = `${file} failed. ${err}`;
+              log.push(msg);
+              console.error(msg);
+              resolve(log.join('\n'));
             });
         }
 
-        resolve(true);
+        resolve(log.join('\n'));
       });
     });
   }
