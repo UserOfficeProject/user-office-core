@@ -23,7 +23,10 @@ export interface SEPDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
-  getAssignments(sepId: number, proposalId: number): Promise<SEPAssignment[]>;
+  getSEPProposalAssignments(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number): Promise<SEPProposal[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;

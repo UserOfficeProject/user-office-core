@@ -261,7 +261,7 @@ export default class SEPMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
-  @EventBus(Event.SEP_MEMBER_TO_PROPOSAL_ASSIGNED)
+  @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async assignMemberToSEPProposal(
     agent: User | null,
     args: AssignSEPProposalToMemberArgs
@@ -289,7 +289,7 @@ export default class SEPMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
-  @EventBus(Event.SEP_MEMBER_TO_PROPOSAL_ASSIGNED)
+  @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromSepProposal(
     agent: User | null,
     args: AssignSEPProposalToMemberArgs

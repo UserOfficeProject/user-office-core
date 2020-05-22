@@ -39,7 +39,7 @@ export class SEPUserResolver {
     @Root() sepProposal: SEPProposal,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.sep.dataSource.getAssignments(
+    return context.queries.sep.dataSource.getSEPProposalAssignments(
       sepProposal.sepId,
       sepProposal.proposalId
     );

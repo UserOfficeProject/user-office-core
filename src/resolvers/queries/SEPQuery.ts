@@ -2,7 +2,6 @@ import { Query, Ctx, Resolver, Arg, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SEP } from '../types/SEP';
-import { SEPAssignment } from '../types/SEPAssignments';
 import { SEPMember } from '../types/SEPMembers';
 import { SEPProposal } from '../types/SEPProposal';
 
@@ -30,18 +29,5 @@ export class SEPQuery {
     @Ctx() context: ResolverContext
   ): Promise<SEPProposal[] | null> {
     return context.queries.sep.getSEPProposals(context.user, sepId);
-  }
-
-  // TODO: Check if this is going to be used. If not remove it!
-  @Query(() => [SEPAssignment], { nullable: true })
-  async sepAssignments(
-    @Arg('sepId', () => Int) sepId: number,
-    @Arg('proposalId', () => Int) proposalId: number,
-    @Ctx() context: ResolverContext
-  ): Promise<SEPAssignment[] | null> {
-    return context.queries.sep.getAssignments(context.user, {
-      sepId,
-      proposalId,
-    });
   }
 }

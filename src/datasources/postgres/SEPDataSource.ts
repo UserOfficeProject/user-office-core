@@ -146,7 +146,7 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async getAssignments(
+  async getSEPProposalAssignments(
     sepId: number,
     proposalId: number
   ): Promise<SEPAssignment[]> {

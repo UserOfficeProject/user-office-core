@@ -137,7 +137,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
   }
 
-  async getAssignments(sepId: number, proposalId: number) {
+  async getSEPProposalAssignments(sepId: number, proposalId: number) {
     return dummySEPAssignments.filter(
       assignment =>
         assignment.sepId === sepId && assignment.proposalId === proposalId

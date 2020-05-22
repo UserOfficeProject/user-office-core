@@ -37,13 +37,4 @@ export default class SEPQueries {
   async getSEPProposals(agent: User | null, sepId: number) {
     return this.dataSource.getSEPProposals(sepId);
   }
-
-  // TODO: Check if this is going to be used. If not remove it!
-  @Authorized([Roles.USER_OFFICER])
-  async getAssignments(
-    agent: User | null,
-    { sepId, proposalId }: { sepId: number; proposalId: number }
-  ) {
-    return this.dataSource.getAssignments(sepId, proposalId);
-  }
 }
