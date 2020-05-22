@@ -745,7 +745,6 @@ export type Query = {
   sep?: Maybe<Sep>,
   sepMembers?: Maybe<Array<SepMember>>,
   sepProposals?: Maybe<Array<SepProposal>>,
-  sepAssignments?: Maybe<Array<SepAssignment>>,
   seps?: Maybe<SePsQueryResult>,
   user?: Maybe<User>,
   me?: Maybe<User>,
@@ -842,12 +841,6 @@ export type QuerySepMembersArgs = {
 
 
 export type QuerySepProposalsArgs = {
-  sepId: Scalars['Int']
-};
-
-
-export type QuerySepAssignmentsArgs = {
-  proposalId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -1265,6 +1258,26 @@ export type GetSepQuery = (
   )> }
 );
 
+export type GetSepMembersQueryVariables = {
+  sepId: Scalars['Int']
+};
+
+
+export type GetSepMembersQuery = (
+  { __typename?: 'Query' }
+  & { sepMembers: Maybe<Array<(
+    { __typename?: 'SEPMember' }
+    & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )>, user: (
+      { __typename?: 'BasicUserDetails' }
+      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
+    ) }
+  )>> }
+);
+
 export type GetSepProposalsQueryVariables = {
   sepId: Scalars['Int']
 };
@@ -1289,26 +1302,6 @@ export type GetSepProposalsQuery = (
         & Pick<Role, 'id' | 'shortCode' | 'title'>
       )> }
     )>> }
-  )>> }
-);
-
-export type GetSepMembersQueryVariables = {
-  sepId: Scalars['Int']
-};
-
-
-export type GetSepMembersQuery = (
-  { __typename?: 'Query' }
-  & { sepMembers: Maybe<Array<(
-    { __typename?: 'SEPMember' }
-    & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
-    & { roles: Array<(
-      { __typename?: 'Role' }
-      & Pick<Role, 'id' | 'shortCode' | 'title'>
-    )>, user: (
-      { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
-    ) }
   )>> }
 );
 
@@ -2923,6 +2916,27 @@ export const GetSepDocument = gql`
   }
 }
     `;
+export const GetSepMembersDocument = gql`
+    query getSEPMembers($sepId: Int!) {
+  sepMembers(sepId: $sepId) {
+    roleUserId
+    roleId
+    userId
+    sepId
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+      organisation
+    }
+  }
+}
+    `;
 export const GetSepProposalsDocument = gql`
     query getSEPProposals($sepId: Int!) {
   sepProposals(sepId: $sepId) {
@@ -2950,27 +2964,6 @@ export const GetSepProposalsDocument = gql`
         shortCode
         title
       }
-    }
-  }
-}
-    `;
-export const GetSepMembersDocument = gql`
-    query getSEPMembers($sepId: Int!) {
-  sepMembers(sepId: $sepId) {
-    roleUserId
-    roleId
-    userId
-    sepId
-    roles {
-      id
-      shortCode
-      title
-    }
-    user {
-      id
-      firstname
-      lastname
-      organisation
     }
   }
 }
@@ -3784,11 +3777,11 @@ export function getSdk(client: GraphQLClient) {
     getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
       return client.request<GetSepQuery>(print(GetSepDocument), variables);
     },
-    getSEPProposals(variables: GetSepProposalsQueryVariables): Promise<GetSepProposalsQuery> {
-      return client.request<GetSepProposalsQuery>(print(GetSepProposalsDocument), variables);
-    },
     getSEPMembers(variables: GetSepMembersQueryVariables): Promise<GetSepMembersQuery> {
       return client.request<GetSepMembersQuery>(print(GetSepMembersDocument), variables);
+    },
+    getSEPProposals(variables: GetSepProposalsQueryVariables): Promise<GetSepProposalsQuery> {
+      return client.request<GetSepProposalsQuery>(print(GetSepProposalsDocument), variables);
     },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return client.request<GetSePsQuery>(print(GetSePsDocument), variables);

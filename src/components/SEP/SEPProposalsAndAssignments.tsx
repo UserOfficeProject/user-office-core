@@ -7,9 +7,9 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { SepProposal, SepMember } from '../../generated/sdk';
+import { SepProposal, SepMember, SepAssignment } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { useSEPAssignmentsData } from '../../hooks/useSEPAssignmentsData';
+import { useSEPProposalsData } from '../../hooks/useSEPProposalsData';
 import { BasicUserDetails } from '../../models/User';
 import { tableIcons } from '../../utils/materialIcons';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
@@ -17,7 +17,7 @@ import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
   root: {
-    '& .MuiTableFooter-root .MuiTableCell-footer': {
+    '& tr:last-child td': {
       border: 'none',
     },
     '& .MuiPaper-root': {
@@ -27,23 +27,25 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-type SEPAssignmentsProps = {
+type SEPProposalsAndAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
   sepId: number;
 };
 
-const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
+const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
+  sepId,
+}) => {
   const {
-    loadingAssignments,
-    SEPAssignmentsData,
-    setSEPAssignmentsData,
-  } = useSEPAssignmentsData(sepId);
+    loadingSEPProposals,
+    SEPProposalsData,
+    setSEPProposalsData,
+  } = useSEPProposalsData(sepId);
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
   const classes = useStyles();
 
-  const columns = [
+  const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
     {
       title: 'Title',
@@ -66,7 +68,7 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
     },
   ];
 
-  const reviewerColumns = [
+  const assignmentColumns = [
     {
       title: 'First name',
       field: 'user.firstname',
@@ -78,27 +80,28 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
     {
       title: 'Date assigned',
       field: 'dateAssigned',
-      render: (rowData: SepProposal): string =>
+      render: (rowData: SepAssignment): string =>
         dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
     },
   ];
 
-  if (loadingAssignments) {
+  if (loadingSEPProposals) {
     return <p>Loading...</p>;
   }
 
-  const removeAssignedProposal = async (
-    assignment: SepProposal
+  const removeProposalFromSEP = async (
+    proposalToRemove: SepProposal
   ): Promise<void> => {
     const removeProposalAssignment = await api().removeProposalAssignment({
-      proposalId: assignment.proposalId,
+      proposalId: proposalToRemove.proposalId,
       sepId,
     });
 
-    if (SEPAssignmentsData) {
-      setSEPAssignmentsData(
-        SEPAssignmentsData.filter(
-          assitnmentItem => assitnmentItem.proposalId !== assignment.proposalId
+    if (SEPProposalsData) {
+      setSEPProposalsData(
+        SEPProposalsData.filter(
+          proposalItem =>
+            proposalItem.proposalId !== proposalToRemove.proposalId
         )
       );
     }
@@ -111,31 +114,32 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
   };
 
   const removeAssignedReviewer = async (
-    assignment: SepMember,
+    assignedReviewer: SepAssignment,
     proposalId: number
   ): Promise<void> => {
     const removeAssignedReviewer = await api().removeMemberFromSEPProposal({
       proposalId,
       sepId,
-      memberId: assignment.user.id,
+      memberId: assignedReviewer.sepMemberUserId as number,
     });
 
-    if (SEPAssignmentsData) {
-      setSEPAssignmentsData(
-        SEPAssignmentsData.map(assitnmentItem => {
-          if (assitnmentItem.proposalId === proposalId) {
+    if (SEPProposalsData) {
+      setSEPProposalsData(
+        SEPProposalsData.map(proposalItem => {
+          if (proposalItem.proposalId === proposalId) {
             const newAssignments =
-              assitnmentItem.assignments?.filter(
+              proposalItem.assignments?.filter(
                 oldAssignment =>
-                  oldAssignment.sepMemberUserId !== assignment.user.id
+                  oldAssignment.sepMemberUserId !==
+                  assignedReviewer.sepMemberUserId
               ) || [];
 
             return {
-              ...assitnmentItem,
+              ...proposalItem,
               assignments: newAssignments,
             };
           } else {
-            return assitnmentItem;
+            return proposalItem;
           }
         })
       );
@@ -155,15 +159,12 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
       sepId,
     });
 
-    if (
-      !assignmentResult.assignMemberToSEPProposal.error &&
-      SEPAssignmentsData
-    ) {
-      setSEPAssignmentsData(
-        SEPAssignmentsData.map(assitnmentItem => {
-          if (assitnmentItem.proposalId === proposalId) {
+    if (!assignmentResult.assignMemberToSEPProposal.error && SEPProposalsData) {
+      setSEPProposalsData(
+        SEPProposalsData.map(proposalItem => {
+          if (proposalItem.proposalId === proposalId) {
             const newAssignments = [
-              ...(assitnmentItem.assignments || []),
+              ...(proposalItem.assignments || []),
               {
                 user: memberUser.user,
                 roles: memberUser.roles,
@@ -173,11 +174,11 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
             ];
 
             return {
-              ...assitnmentItem,
+              ...proposalItem,
               assignments: newAssignments,
             };
           } else {
-            return assitnmentItem;
+            return proposalItem;
           }
         })
       );
@@ -192,22 +193,28 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
     });
   };
 
-  const initialValues = SEPAssignmentsData as SepProposal[];
+  const initialValues = SEPProposalsData as SepProposal[];
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
-  const ReviewersTable = (rowData: any): JSX.Element => (
-    <div className={classes.root}>
+  const ReviewersTable = (
+    rowData: SepProposal | SepProposal[]
+  ): JSX.Element => (
+    <div className={classes.root} data-cy="sep-reviewer-assignments-table">
       <MaterialTable
         icons={tableIcons}
-        columns={reviewerColumns}
-        title={'Proposal reviewers'}
-        data={rowData.assignments}
+        columns={assignmentColumns}
+        title={'Assigned reviewers'}
+        data={(rowData as SepProposal).assignments as SepAssignment[]}
         editable={{
-          onRowDelete: (rowAssignmentsData: any): Promise<void> =>
-            removeAssignedReviewer(rowAssignmentsData, rowData.proposalId),
+          onRowDelete: (rowAssignmentsData: SepAssignment): Promise<void> =>
+            removeAssignedReviewer(
+              rowAssignmentsData,
+              (rowData as SepProposal).proposalId
+            ),
         }}
         options={{
           search: false,
-          emptyRowsWhenPaging: false,
+          paging: false,
+          toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />
@@ -254,8 +261,8 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
               <Grid data-cy="sep-assignments-table" item xs={12}>
                 <MaterialTable
                   icons={tableIcons}
-                  columns={columns}
-                  title={'SEP Assignments'}
+                  columns={SEPProposalColumns}
+                  title={'SEP Proposals'}
                   data={initialValues}
                   detailPanel={[
                     {
@@ -272,7 +279,7 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
                   ]}
                   editable={{
                     onRowDelete: (rowData: SepProposal): Promise<void> =>
-                      removeAssignedProposal(rowData),
+                      removeProposalFromSEP(rowData),
                   }}
                   options={{
                     search: true,
@@ -287,8 +294,8 @@ const SEPAssignments: React.FC<SEPAssignmentsProps> = ({ sepId }) => {
   );
 };
 
-SEPAssignments.propTypes = {
+SEPProposalsAndAssignments.propTypes = {
   sepId: PropTypes.number.isRequired,
 };
 
-export default SEPAssignments;
+export default SEPProposalsAndAssignments;
