@@ -179,7 +179,7 @@ export default function createHandler(userDataSource: UserDataSource) {
         const principalInvestigator = await userDataSource.get(
           event.proposal.proposerId
         );
-        if (!principalInvestigator || event.proposal.notified) {
+        if (!principalInvestigator) {
           return;
         }
         const { finalStatus } = event.proposal;
@@ -206,8 +206,17 @@ export default function createHandler(userDataSource: UserDataSource) {
               piLastname: principalInvestigator.lastname,
               proposalNumber: event.proposal.shortCode,
               proposalTitle: event.proposal.title,
+              commentForUser: event.proposal.commentForUser,
             },
-            recipients: [{ address: principalInvestigator.email }],
+            recipients: [
+              { address: principalInvestigator.email },
+              {
+                address: {
+                  email: 'useroffice@esss.se',
+                  header_to: principalInvestigator.email,
+                },
+              },
+            ],
           })
           .then((res: any) => {
             logger.logInfo('Email sent on proposal notify:', {

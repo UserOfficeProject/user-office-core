@@ -268,7 +268,7 @@ export default class ProposalMutations {
   async notify(user: User | null, args: NotifyProposalArgs): Promise<unknown> {
     const proposal = await this.proposalDataSource.get(args.id);
 
-    if (!proposal) {
+    if (!proposal || proposal.notified) {
       return rejection('INTERNAL_ERROR');
     }
     proposal.notified = true;
