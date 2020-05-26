@@ -2373,7 +2373,7 @@ export type DeleteUserMutation = (
 
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
 );
 
 export type GetBasicUserDetailsQueryVariables = {
@@ -2489,7 +2489,7 @@ export type GetUserProposalsQuery = (
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status' | 'created'>
+      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status' | 'created' | 'finalStatus' | 'notified'>
     )> }
   )> }
 );
@@ -2839,8 +2839,6 @@ export const BasicUserDetailsFragmentDoc = gql`
   lastname
   organisation
   position
-  placeholder
-  created
 }
     `;
 export const AssignProposalDocument = gql`
@@ -3662,6 +3660,8 @@ export const GetUserProposalsDocument = gql`
       title
       status
       created
+      finalStatus
+      notified
     }
   }
 }

@@ -158,13 +158,21 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Average Score',
       field: 'average',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         average(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
         (average(getGrades(a.reviews)) || 0) -
         (average(getGrades(b.reviews)) || 0),
     },
-    { title: 'Final Status', field: 'finalStatus', hidden: true },
+    {
+      title: 'Final Status',
+      field: 'finalStatus',
+      render: (rowData: ProposalData): string =>
+        rowData.finalStatus
+          ? getTranslation(rowData.finalStatus as ResourceId)
+          : '',
+    },
     {
       title: 'Ranking',
       field: 'rankOrder',
@@ -188,9 +196,12 @@ const ProposalTableOfficer: React.FC = () => {
           .notifyProposal({ id })
           .then(data => {
             if (data.notifyProposal.error) {
-              enqueueSnackbar(`Could not send email to proposal: ${id}`, {
-                variant: 'error',
-              });
+              enqueueSnackbar(
+                `Could not send email to all selected proposals`,
+                {
+                  variant: 'error',
+                }
+              );
             } else {
               proposalsData[
                 proposalsData.findIndex(val => val.id === id)
