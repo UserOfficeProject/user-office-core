@@ -1,20 +1,17 @@
 import { Roles } from '../models/Role';
+import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
-import { User } from '../resolvers/types/User';
 import { userAuthorization } from '../utils/UserAuthorization';
-
-async function asyncForEach(array: Roles[], callback: Function) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
-  }
-}
 
 const Authorized = (roles: Roles[] = []) => {
   return (
     target: object,
     name: string,
     descriptor: {
-      value?: (agent: User | null, args: any) => Promise<Rejection | any>;
+      value?: (
+        agent: UserWithRole | null,
+        args: any
+      ) => Promise<Rejection | any>;
     }
   ) => {
     const originalMethod = descriptor.value;
@@ -31,12 +28,11 @@ const Authorized = (roles: Roles[] = []) => {
         return await originalMethod?.apply(this, args);
       }
 
-      let hasAccessRights = false;
-
-      await asyncForEach(roles, async (role: string) => {
-        hasAccessRights =
-          hasAccessRights || (await userAuthorization.hasRole(agent, role));
-      });
+      const hasAccessRights =
+        (await userAuthorization.hasRole(
+          agent,
+          agent.currentRole?.shortCode as string
+        )) && roles.some(role => role === agent.currentRole?.shortCode);
 
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);

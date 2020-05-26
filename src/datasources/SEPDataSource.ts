@@ -17,13 +17,14 @@ export interface SEPDataSource {
     active: boolean
   ): Promise<SEP>;
   get(id: number): Promise<SEP | null>;
+  getUserSeps(id: number): Promise<SEP[]>;
   getAll(
     active: boolean,
     filter?: string,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; seps: SEP[] }>;
-  getAssignments(id: number): Promise<SEPAssignment[]>;
+  getAssignments(sepId: number): Promise<SEPAssignment[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;

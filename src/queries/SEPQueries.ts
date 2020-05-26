@@ -1,23 +1,51 @@
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 export default class SEPQueries {
   constructor(public dataSource: SEPDataSource) {}
 
-  @Authorized([Roles.USER_OFFICER])
-  async get(agent: User | null, id: number) {
+  private async isMemberOfSEP(agent: User | null, sepId: number) {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.dataSource.getUserSeps(agent.id).then(seps => {
+      return seps.some(sepItem => sepItem.id === sepId);
+    });
+  }
+
+  private async hasAccessRights(
+    agent: UserWithRole | null,
+    sepId: number | null
+  ): Promise<boolean> {
+    if (sepId === null) {
+      return true;
+    }
+
+    return (
+      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      (await this.isMemberOfSEP(agent, sepId))
+    );
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async get(agent: UserWithRole | null, id: number) {
     const sep = await this.dataSource.get(id);
 
     if (!sep) {
       return null;
     }
 
-    return sep;
+    if ((await this.hasAccessRights(agent, sep.id)) === true) {
+      return sep;
+    } else {
+      return null;
+    }
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getAll(
     agent: User | null,
     active = true,
@@ -28,13 +56,21 @@ export default class SEPQueries {
     return this.dataSource.getAll(active, filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER])
-  async getMembers(agent: User | null, sepId: number) {
-    return this.dataSource.getMembers(sepId);
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async getMembers(agent: UserWithRole | null, sepId: number) {
+    if ((await this.hasAccessRights(agent, sepId)) === true) {
+      return this.dataSource.getMembers(sepId);
+    } else {
+      return null;
+    }
   }
 
-  @Authorized([Roles.USER_OFFICER])
-  async getAssignments(agent: User | null, id: number) {
-    return this.dataSource.getAssignments(id);
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async getAssignments(agent: UserWithRole | null, sepId: number) {
+    if ((await this.hasAccessRights(agent, sepId)) === true) {
+      return this.dataSource.getAssignments(sepId);
+    } else {
+      return null;
+    }
   }
 }

@@ -7,7 +7,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { Roles } from '../models/Role';
+import { Roles, Role } from '../models/Role';
 import { User, BasicUserDetails } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
@@ -288,9 +288,13 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
-      expiresIn: process.env.tokenLife,
-    });
+    const token = jsonwebtoken.sign(
+      { user, roles, currentRole: roles[0] },
+      this.secret,
+      {
+        expiresIn: process.env.tokenLife,
+      }
+    );
 
     return token;
   }
@@ -318,7 +322,11 @@ export default class UserMutations {
     try {
       const decoded: any = jsonwebtoken.verify(token, this.secret);
       const freshToken = jsonwebtoken.sign(
-        { user: decoded.user, roles: decoded.roles },
+        {
+          user: decoded.user,
+          roles: decoded.roles,
+          currentRole: decoded.currentRole,
+        },
         this.secret,
         {
           expiresIn: process.env.tokenLife,
@@ -326,6 +334,31 @@ export default class UserMutations {
       );
 
       return freshToken;
+    } catch (error) {
+      logger.logError('Bad token', { token });
+
+      return rejection('BAD_TOKEN');
+    }
+  }
+
+  async selectRole(
+    token: string,
+    selectedRoleId: number
+  ): Promise<string | Rejection> {
+    try {
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const currentRole = decoded.roles.find(
+        (role: Role) => role.id === selectedRoleId
+      );
+      const tokenWithRole = jsonwebtoken.sign(
+        { user: decoded.user, roles: decoded.roles, currentRole },
+        this.secret,
+        {
+          expiresIn: process.env.tokenLife,
+        }
+      );
+
+      return tokenWithRole;
     } catch (error) {
       logger.logError('Bad token', { token });
 

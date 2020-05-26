@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
@@ -48,5 +48,5 @@ export interface BasicResolverContext {
 }
 
 export interface ResolverContext extends BasicResolverContext {
-  user: User | null;
+  user: UserWithRole | null;
 }

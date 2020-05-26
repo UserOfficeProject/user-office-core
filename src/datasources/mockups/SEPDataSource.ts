@@ -90,6 +90,10 @@ export class SEPDataSourceMock implements SEPDataSource {
     return null;
   }
 
+  async getUserSeps(id: number): Promise<SEP[]> {
+    return [dummySEP];
+  }
+
   async getAll(
     active: boolean,
     filter?: string,
@@ -119,8 +123,8 @@ export class SEPDataSourceMock implements SEPDataSource {
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
 
-  async getAssignments(id: number) {
-    return dummySEPAssignments.filter(assignment => assignment.sepId === id);
+  async getAssignments(sepId: number) {
+    return dummySEPAssignments.filter(assignment => assignment.sepId === sepId);
   }
 
   async getMembers(sepId: number) {

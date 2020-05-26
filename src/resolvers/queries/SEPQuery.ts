@@ -25,9 +25,9 @@ export class SEPQuery {
 
   @Query(() => [SEPAssignment], { nullable: true })
   async sepAssignments(
-    @Arg('id', () => Int) id: number,
+    @Arg('sepId', () => Int) sepId: number,
     @Ctx() context: ResolverContext
   ): Promise<SEPAssignment[] | null> {
-    return context.queries.sep.getAssignments(context.user, id);
+    return context.queries.sep.getAssignments(context.user, sepId);
   }
 }
