@@ -8,6 +8,7 @@ context('Event log tests', () => {
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);

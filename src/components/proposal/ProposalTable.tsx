@@ -41,7 +41,10 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
   const columns = [
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
-    { title: 'Status', field: 'status' },
+    {
+      title: 'Status',
+      field: 'status',
+    },
     { title: 'Created', field: 'created' },
   ];
 
