@@ -335,7 +335,8 @@ context('Scientific evaluation panel tests', () => {
   });
 
   it('Officer should be able to assign SEP member to proposal in existing SEP', () => {
-    let selectedUser = '';
+    let selectedReviewerFirstName = '';
+    let selectedReviewerLastName = '';
     cy.login('officer');
     cy.contains('User Officer').click();
 
@@ -344,7 +345,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.contains('Assignments').click();
+    cy.contains('Proposals and Assignments').click();
 
     cy.wait(1000);
 
@@ -352,34 +353,99 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get("[id='mui-component-select-selectedMemberId']")
-      .first()
-      .click();
+    cy.wait(1000);
 
-    cy.get('.MuiMenu-list')
-      .find('[tabindex="0"]')
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
+      .first()
+      .find('td.MuiTableCell-alignLeft')
+      .first()
       .then(element => {
-        selectedUser = element.text();
+        selectedReviewerFirstName = element.text();
       });
 
-    cy.get("[id='menu-selectedMemberId'] li")
+    cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
+      .first()
+      .find('td.MuiTableCell-alignLeft')
+      .eq(1)
+      .then(element => {
+        selectedReviewerLastName = element.text();
+      });
+
+    cy.get("[title='Add reviewer']")
       .first()
       .click();
 
-    cy.contains('Assign to proposal').click();
-
-    cy.get('[data-cy="sep-assignments-table"]').should(element => {
-      selectedUser = selectedUser.split(' - ')[0];
-      expect(element.text()).to.contain(selectedUser);
-    });
+    cy.wait(1000);
 
     cy.contains('Logs').click();
+
+    cy.wait(1000);
 
     cy.get("[title='Last Page'] button")
       .first()
       .click({ force: true });
 
-    cy.contains('SEP_MEMBER_TO_PROPOSAL_ASSIGNED');
+    cy.contains('SEP_MEMBER_ASSIGNED_TO_PROPOSAL');
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Show Reviewers']")
+      .first()
+      .click();
+
+    cy.get('[data-cy="sep-reviewer-assignments-table"]').should(element => {
+      expect(element.text()).to.contain(selectedReviewerFirstName);
+      expect(element.text()).to.contain(selectedReviewerLastName);
+    });
+  });
+
+  it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
+    cy.login('officer');
+    cy.contains('User Officer').click();
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Show Reviewers']")
+      .first()
+      .click();
+
+    cy.get(
+      '[data-cy="sep-reviewer-assignments-table"] [title="Delete"]'
+    ).click();
+    cy.get('[title="Save"]').click();
+
+    cy.wait(1000);
+
+    cy.contains('Logs').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Last Page'] button")
+      .first()
+      .click({ force: true });
+
+    cy.contains('SEP_MEMBER_REMOVED_FROM_PROPOSAL');
+
+    cy.contains('Proposals and Assignments').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Show Reviewers']")
+      .first()
+      .click();
+
+    cy.get('[data-cy="sep-reviewer-assignments-table"]').should(element => {
+      expect(element.text()).to.contain('No records to display');
+    });
   });
 
   it('Officer should be able to remove assigned proposal from existing SEP', () => {
@@ -391,7 +457,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.contains('Assignments').click();
+    cy.contains('Proposals and Assignments').click();
 
     cy.wait(1000);
 

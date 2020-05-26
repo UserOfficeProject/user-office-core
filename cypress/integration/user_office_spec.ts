@@ -3,6 +3,10 @@
 context('User Officer tests', () => {
   const faker = require('faker');
 
+  before(() => {
+    cy.resetDB();
+  });
+
   beforeEach(() => {
     cy.visit('/');
   });

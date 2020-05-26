@@ -6,6 +6,8 @@ query getUserProposals {
       title
       status
       created
+      finalStatus
+      notified
     }
   }
 }

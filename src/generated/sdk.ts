@@ -680,6 +680,7 @@ export type Proposal = {
   templateId: Scalars['Int'],
   commentForUser?: Maybe<Scalars['String']>,
   commentForManagement?: Maybe<Scalars['String']>,
+  notified: Scalars['Boolean'],
   users: Array<BasicUserDetails>,
   proposer: BasicUserDetails,
   reviews?: Maybe<Array<Review>>,
@@ -1295,6 +1296,26 @@ export type GetSepQuery = (
   )> }
 );
 
+export type GetSepMembersQueryVariables = {
+  sepId: Scalars['Int']
+};
+
+
+export type GetSepMembersQuery = (
+  { __typename?: 'Query' }
+  & { sepMembers: Maybe<Array<(
+    { __typename?: 'SEPMember' }
+    & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )>, user: (
+      { __typename?: 'BasicUserDetails' }
+      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
+    ) }
+  )>> }
+);
+
 export type GetSepProposalsQueryVariables = {
   sepId: Scalars['Int']
 };
@@ -1319,26 +1340,6 @@ export type GetSepProposalsQuery = (
         & Pick<Role, 'id' | 'shortCode' | 'title'>
       )> }
     )>> }
-  )>> }
-);
-
-export type GetSepMembersQueryVariables = {
-  sepId: Scalars['Int']
-};
-
-
-export type GetSepMembersQuery = (
-  { __typename?: 'Query' }
-  & { sepMembers: Maybe<Array<(
-    { __typename?: 'SEPMember' }
-    & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
-    & { roles: Array<(
-      { __typename?: 'Role' }
-      & Pick<Role, 'id' | 'shortCode' | 'title'>
-    )>, user: (
-      { __typename?: 'BasicUserDetails' }
-      & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation'>
-    ) }
   )>> }
 );
 
@@ -1387,6 +1388,25 @@ export type RemoveMemberMutationVariables = {
 export type RemoveMemberMutation = (
   { __typename?: 'Mutation' }
   & { removeMember: (
+    { __typename?: 'SEPResponseWrap' }
+    & Pick<SepResponseWrap, 'error'>
+    & { sep: Maybe<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id'>
+    )> }
+  ) }
+);
+
+export type RemoveMemberFromSepProposalMutationVariables = {
+  memberId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  proposalId: Scalars['Int']
+};
+
+
+export type RemoveMemberFromSepProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { removeMemberFromSEPProposal: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
@@ -1736,7 +1756,7 @@ export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
   & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId'>
+    & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'title' | 'abstract' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1782,7 +1802,7 @@ export type GetProposalQuery = (
   { __typename?: 'Query' }
   & { proposal: Maybe<(
     { __typename?: 'Proposal' }
-    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
+    & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1821,7 +1841,7 @@ export type GetProposalsQuery = (
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId'>
+      & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'templateId' | 'notified'>
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -1841,6 +1861,23 @@ export type GetProposalsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type NotifyProposalMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type NotifyProposalMutation = (
+  { __typename?: 'Mutation' }
+  & { notifyProposal: (
+    { __typename?: 'ProposalResponseWrap' }
+    & Pick<ProposalResponseWrap, 'error'>
+    & { proposal: Maybe<(
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'id'>
+    )> }
+  ) }
 );
 
 export type SubmitProposalMutationVariables = {
@@ -2521,7 +2558,7 @@ export type GetUserProposalsQuery = (
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status' | 'created'>
+      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status' | 'created' | 'finalStatus' | 'notified'>
     )> }
   )> }
 );
@@ -2961,6 +2998,27 @@ export const GetSepDocument = gql`
   }
 }
     `;
+export const GetSepMembersDocument = gql`
+    query getSEPMembers($sepId: Int!) {
+  sepMembers(sepId: $sepId) {
+    roleUserId
+    roleId
+    userId
+    sepId
+    roles {
+      id
+      shortCode
+      title
+    }
+    user {
+      id
+      firstname
+      lastname
+      organisation
+    }
+  }
+}
+    `;
 export const GetSepProposalsDocument = gql`
     query getSEPProposals($sepId: Int!) {
   sepProposals(sepId: $sepId) {
@@ -2992,27 +3050,6 @@ export const GetSepProposalsDocument = gql`
   }
 }
     `;
-export const GetSepMembersDocument = gql`
-    query getSEPMembers($sepId: Int!) {
-  sepMembers(sepId: $sepId) {
-    roleUserId
-    roleId
-    userId
-    sepId
-    roles {
-      id
-      shortCode
-      title
-    }
-    user {
-      id
-      firstname
-      lastname
-      organisation
-    }
-  }
-}
-    `;
 export const GetSePsDocument = gql`
     query getSEPs($filter: String!, $active: Boolean!) {
   seps(filter: $filter, active: $active) {
@@ -3040,6 +3077,16 @@ export const RemoveProposalAssignmentDocument = gql`
 export const RemoveMemberDocument = gql`
     mutation removeMember($memberId: Int!, $sepId: Int!) {
   removeMember(memberId: $memberId, sepId: $sepId) {
+    error
+    sep {
+      id
+    }
+  }
+}
+    `;
+export const RemoveMemberFromSepProposalDocument = gql`
+    mutation removeMemberFromSEPProposal($memberId: Int!, $sepId: Int!, $proposalId: Int!) {
+  removeMemberFromSEPProposal(memberId: $memberId, sepId: $sepId, proposalId: $proposalId) {
     error
     sep {
       id
@@ -3164,6 +3211,7 @@ export const GetBlankProposalDocument = gql`
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -3219,6 +3267,7 @@ export const GetProposalDocument = gql`
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -3272,6 +3321,7 @@ export const GetProposalsDocument = gql`
       updated
       callId
       templateId
+      notified
       proposer {
         ...basicUserDetails
       }
@@ -3304,6 +3354,16 @@ export const GetProposalsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const NotifyProposalDocument = gql`
+    mutation notifyProposal($id: Int!) {
+  notifyProposal(id: $id) {
+    proposal {
+      id
+    }
+    error
+  }
+}
+    `;
 export const SubmitProposalDocument = gql`
     mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {
@@ -3707,6 +3767,8 @@ export const GetUserProposalsDocument = gql`
       title
       status
       created
+      finalStatus
+      notified
     }
   }
 }
@@ -3823,11 +3885,11 @@ export function getSdk(client: GraphQLClient) {
     getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
       return client.request<GetSepQuery>(print(GetSepDocument), variables);
     },
-    getSEPProposals(variables: GetSepProposalsQueryVariables): Promise<GetSepProposalsQuery> {
-      return client.request<GetSepProposalsQuery>(print(GetSepProposalsDocument), variables);
-    },
     getSEPMembers(variables: GetSepMembersQueryVariables): Promise<GetSepMembersQuery> {
       return client.request<GetSepMembersQuery>(print(GetSepMembersDocument), variables);
+    },
+    getSEPProposals(variables: GetSepProposalsQueryVariables): Promise<GetSepProposalsQuery> {
+      return client.request<GetSepProposalsQuery>(print(GetSepProposalsDocument), variables);
     },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return client.request<GetSePsQuery>(print(GetSePsDocument), variables);
@@ -3837,6 +3899,9 @@ export function getSdk(client: GraphQLClient) {
     },
     removeMember(variables: RemoveMemberMutationVariables): Promise<RemoveMemberMutation> {
       return client.request<RemoveMemberMutation>(print(RemoveMemberDocument), variables);
+    },
+    removeMemberFromSEPProposal(variables: RemoveMemberFromSepProposalMutationVariables): Promise<RemoveMemberFromSepProposalMutation> {
+      return client.request<RemoveMemberFromSepProposalMutation>(print(RemoveMemberFromSepProposalDocument), variables);
     },
     updateSEP(variables: UpdateSepMutationVariables): Promise<UpdateSepMutation> {
       return client.request<UpdateSepMutation>(print(UpdateSepDocument), variables);
@@ -3879,6 +3944,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getProposals(variables?: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return client.request<GetProposalsQuery>(print(GetProposalsDocument), variables);
+    },
+    notifyProposal(variables: NotifyProposalMutationVariables): Promise<NotifyProposalMutation> {
+      return client.request<NotifyProposalMutation>(print(NotifyProposalDocument), variables);
     },
     submitProposal(variables: SubmitProposalMutationVariables): Promise<SubmitProposalMutation> {
       return client.request<SubmitProposalMutation>(print(SubmitProposalDocument), variables);

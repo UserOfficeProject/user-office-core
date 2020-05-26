@@ -3,6 +3,10 @@
 context('User tests', () => {
   const faker = require('faker');
 
+  before(() => {
+    cy.resetDB();
+  });
+
   beforeEach(() => {
     cy.visit('/SignUp?code=WRMVXa');
   });

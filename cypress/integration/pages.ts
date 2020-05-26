@@ -3,6 +3,10 @@
 var faker = require('faker');
 
 context('Page tests', () => {
+  before(() => {
+    cy.resetDB();
+  });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);
