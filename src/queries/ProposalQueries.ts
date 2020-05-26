@@ -30,8 +30,8 @@ export default class ProposalQueries {
       delete proposal.commentForManagement;
     }
 
-    //If user not notified remove finalStatus and comment as these are not confirmed
-    if (!proposal.notified) {
+    //If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
+    if (!(await this.userAuth.isUserOfficer(agent)) && !proposal.notified) {
       delete proposal.finalStatus;
       delete proposal.commentForUser;
     }
