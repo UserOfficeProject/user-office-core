@@ -6,7 +6,8 @@ import { useDataApi } from './useDataApi';
 export function useSEPsData(
   show: boolean,
   filter: string,
-  active = true
+  active = true,
+  role = 'SEP_Member'
 ): {
   loading: boolean;
   SEPsData: Sep[];
@@ -16,24 +17,41 @@ export function useSEPsData(
   const [SEPsData, setSEPsData] = useState<Sep[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    api()
-      .getSEPs({
-        filter: filter,
-        active,
-      })
-      .then(data => {
-        if (data.seps) {
-          setSEPsData(
-            data.seps.seps.map(sep => {
-              return {
-                ...sep,
-              };
-            })
-          );
-        }
-        setLoading(false);
-      });
-  }, [filter, show, active, api]);
+    if (role === 'user_officer') {
+      api()
+        .getSEPs({
+          filter: filter,
+          active,
+        })
+        .then(data => {
+          if (data.seps) {
+            setSEPsData(
+              data.seps.seps.map(sep => {
+                return {
+                  ...sep,
+                };
+              })
+            );
+          }
+          setLoading(false);
+        });
+    } else {
+      api()
+        .getUserSeps()
+        .then(data => {
+          if (data.me?.seps) {
+            setSEPsData(
+              data.me.seps.map(sep => {
+                return {
+                  ...sep,
+                };
+              })
+            );
+          }
+          setLoading(false);
+        });
+    }
+  }, [filter, show, active, api, role]);
 
   return { loading, SEPsData, setSEPsData };
 }

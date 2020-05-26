@@ -1,5 +1,5 @@
-query getSEPAssignments($id: Int!) {
-  sepAssignments(id: $id) {
+query getSEPAssignments($sepId: Int!) {
+  sepAssignments(sepId: $sepId) {
     proposalId
     sepMemberUserId
     sepId

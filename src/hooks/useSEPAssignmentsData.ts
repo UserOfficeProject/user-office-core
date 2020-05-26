@@ -4,7 +4,7 @@ import { GetSepAssignmentsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPAssignmentsData(
-  id: number
+  sepId: number
 ): {
   loadingAssignments: boolean;
   SEPAssignmentsData: GetSepAssignmentsQuery['sepAssignments'] | null;
@@ -19,12 +19,12 @@ export function useSEPAssignmentsData(
   const [loadingAssignments, setLoadingAssignments] = useState(true);
   useEffect(() => {
     api()
-      .getSEPAssignments({ id })
+      .getSEPAssignments({ sepId })
       .then(data => {
         setSEPAssignmentsData(data.sepAssignments);
         setLoadingAssignments(false);
       });
-  }, [id, api]);
+  }, [sepId, api]);
 
   return { loadingAssignments, SEPAssignmentsData, setSEPAssignmentsData };
 }
