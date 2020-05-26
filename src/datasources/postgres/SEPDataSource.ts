@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../../models/Role';
-import { SEP, SEPAssignment, SEPMember } from '../../models/SEP';
+import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
@@ -9,6 +9,7 @@ import {
   SEPAssignmentRecord,
   SEPMemberRecord,
   RoleRecord,
+  SEPProposalRecord,
 } from './records';
 
 export default class PostgresSEPDataSource implements SEPDataSource {
@@ -22,6 +23,13 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
+  private createSEPProposalObject(sepAssignment: SEPProposalRecord) {
+    return new SEPProposal(
+      sepAssignment.proposal_id,
+      sepAssignment.sep_id,
+      sepAssignment.date_assigned
+    );
+  }
   private createSEPAssignmentObject(sepAssignment: SEPAssignmentRecord) {
     return new SEPAssignment(
       sepAssignment.proposal_id,
@@ -138,13 +146,27 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
-  async getAssignments(sepId: number): Promise<SEPAssignment[]> {
+  async getSEPProposalAssignments(
+    sepId: number,
+    proposalId: number
+  ): Promise<SEPAssignment[]> {
     const sepAssignments: SEPAssignmentRecord[] = await database
       .from('SEP_Assignments')
-      .where('sep_id', sepId);
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId);
 
     return sepAssignments.map(sepAssignment =>
       this.createSEPAssignmentObject(sepAssignment)
+    );
+  }
+
+  async getSEPProposals(sepId: number): Promise<SEPProposal[]> {
+    const sepProposals: SEPProposalRecord[] = await database
+      .from('SEP_Proposals')
+      .where('sep_id', sepId);
+
+    return sepProposals.map(sepProposal =>
+      this.createSEPProposalObject(sepProposal)
     );
   }
 
@@ -212,10 +234,10 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   async assignProposal(proposalId: number, sepId: number) {
     // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
     await database.raw(
-      `${database('SEP_Assignments').insert({
+      `${database('SEP_Proposals').insert({
         proposal_id: proposalId,
         sep_id: sepId,
-      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET reassigned='true', date_reassigned=NOW()`
+      })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW()`
     );
 
     const sepUpdated = await this.get(sepId);
@@ -228,14 +250,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async removeProposalAssignment(proposalId: number, sepId: number) {
-    const assignmentRemoved = await database('SEP_Assignments')
+    const proposalRemoved = await database('SEP_Proposals')
       .del()
       .where('sep_id', sepId)
       .andWhere('proposal_id', proposalId);
 
     const sepUpdated = await this.get(sepId);
 
-    if (assignmentRemoved && sepUpdated) {
+    if (proposalRemoved && sepUpdated) {
+      // NOTE: Remove all member assignments to proposal when it is removed from SEP.
+      await database('SEP_Assignments')
+        .del()
+        .where('sep_id', sepId)
+        .andWhere('proposal_id', proposalId);
+
       return sepUpdated;
     }
 
@@ -247,14 +275,35 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     sepId: number,
     memberId: number
   ) {
-    const assignmentUpdated = await database('SEP_Assignments')
-      .update('sep_member_user_id', memberId)
-      .where('sep_id', sepId)
-      .andWhere('proposal_id', proposalId);
+    const assignmentAdded = await database('SEP_Assignments').insert({
+      proposal_id: proposalId,
+      sep_member_user_id: memberId,
+      sep_id: sepId,
+    });
 
     const sepUpdated = await this.get(sepId);
 
-    if (assignmentUpdated && sepUpdated) {
+    if (assignmentAdded && sepUpdated) {
+      return sepUpdated;
+    }
+
+    throw new Error(`SEP not found ${sepId}`);
+  }
+
+  async removeMemberFromSepProposal(
+    proposalId: number,
+    sepId: number,
+    memberId: number
+  ) {
+    const memberRemovedFromProposal = await database('SEP_Assignments')
+      .del()
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId)
+      .andWhere('sep_member_user_id', memberId);
+
+    const sepUpdated = await this.get(sepId);
+
+    if (memberRemovedFromProposal && sepUpdated) {
       return sepUpdated;
     }
 

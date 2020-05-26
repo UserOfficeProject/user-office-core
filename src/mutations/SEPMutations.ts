@@ -261,7 +261,7 @@ export default class SEPMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
-  @EventBus(Event.SEP_MEMBER_TO_PROPOSAL_ASSIGNED)
+  @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async assignMemberToSEPProposal(
     agent: User | null,
     args: AssignSEPProposalToMemberArgs
@@ -282,6 +282,32 @@ export default class SEPMutations {
           err,
           { agent }
         );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
+  @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
+  async removeMemberFromSepProposal(
+    agent: User | null,
+    args: AssignSEPProposalToMemberArgs
+  ): Promise<SEP | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return this.dataSource
+      .removeMemberFromSepProposal(args.proposalId, args.sepId, args.memberId)
+      .then(result => result)
+      .catch(err => {
+        logger.logException('Could not remove member from SEP proposal', err, {
+          agent,
+        });
 
         return rejection('INTERNAL_ERROR');
       });
