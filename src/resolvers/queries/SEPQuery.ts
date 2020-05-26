@@ -2,8 +2,8 @@ import { Query, Ctx, Resolver, Arg, Int } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SEP } from '../types/SEP';
-import { SEPAssignment } from '../types/SEPAssignments';
 import { SEPMember } from '../types/SEPMembers';
+import { SEPProposal } from '../types/SEPProposal';
 
 @Resolver()
 export class SEPQuery {
@@ -23,11 +23,11 @@ export class SEPQuery {
     return context.queries.sep.getMembers(context.user, sepId);
   }
 
-  @Query(() => [SEPAssignment], { nullable: true })
-  async sepAssignments(
+  @Query(() => [SEPProposal], { nullable: true })
+  async sepProposals(
     @Arg('sepId', () => Int) sepId: number,
     @Ctx() context: ResolverContext
-  ): Promise<SEPAssignment[] | null> {
-    return context.queries.sep.getAssignments(context.user, sepId);
+  ): Promise<SEPProposal[] | null> {
+    return context.queries.sep.getSEPProposals(context.user, sepId);
   }
 }

@@ -108,7 +108,7 @@ describe('Test SEPMutations', () => {
     return expect(result).toStrictEqual(dummySEP);
   });
 
-  test('A userofficer can not assign other roles using `assignChairAndSecretaryToSEP`', async () => {
+  test('A userofficer can not assign other roles using `assignChairOrSecretaryToSEP`', async () => {
     const result = (await SEPMutationsInstance.assignChairOrSecretaryToSEP(
       dummyUserOfficer,
       {

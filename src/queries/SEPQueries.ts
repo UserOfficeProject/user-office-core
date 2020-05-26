@@ -66,9 +66,9 @@ export default class SEPQueries {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
-  async getAssignments(agent: UserWithRole | null, sepId: number) {
+  async getSEPProposals(agent: UserWithRole | null, sepId: number) {
     if ((await this.hasAccessRights(agent, sepId)) === true) {
-      return this.dataSource.getAssignments(sepId);
+      return this.dataSource.getSEPProposals(sepId);
     } else {
       return null;
     }

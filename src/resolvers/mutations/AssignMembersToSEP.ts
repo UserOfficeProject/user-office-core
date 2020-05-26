@@ -88,4 +88,15 @@ export class AssignMembersToSEPMutation {
       SEPResponseWrap
     );
   }
+
+  @Mutation(() => SEPResponseWrap)
+  async removeMemberFromSEPProposal(
+    @Args() args: AssignSEPProposalToMemberArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.sep.removeMemberFromSepProposal(context.user, args),
+      SEPResponseWrap
+    );
+  }
 }
