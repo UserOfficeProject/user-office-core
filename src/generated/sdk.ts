@@ -236,6 +236,7 @@ export type Mutation = {
   createUser: UserResponseWrap,
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
+  applyPatches: PrepareDbResponseWrap,
   cloneProposalTemplate: ProposalTemplateResponseWrap,
   createProposal: ProposalResponseWrap,
   createProposalTemplate: ProposalTemplateResponseWrap,
@@ -247,7 +248,7 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap,
   getTokenForUser: TokenResponseWrap,
   login: TokenResponseWrap,
-  prepareDB: SuccessResponseWrap,
+  prepareDB: PrepareDbResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
   resetPassword: BasicUserDetailsResponseWrap,
@@ -649,6 +650,12 @@ export type PageResponseWrap = {
    __typename?: 'PageResponseWrap',
   error?: Maybe<Scalars['String']>,
   page?: Maybe<Page>,
+};
+
+export type PrepareDbResponseWrap = {
+   __typename?: 'PrepareDBResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  log: Scalars['String'],
 };
 
 export type Proposal = {
