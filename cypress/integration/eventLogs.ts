@@ -52,8 +52,8 @@ context('Event log tests', () => {
 
     cy.contains('Update Profile').click();
 
-    // NOTE: Minute date format is enough because we don't know the exact time in seconds when update will happen in the database.
-    const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH:MM');
+    // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
+    const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
 
     cy.contains('Logout').click();
 
