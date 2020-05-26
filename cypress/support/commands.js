@@ -28,7 +28,7 @@ import { request } from 'graphql-request';
 const resetDB = () => {
   const query = `mutation {
     prepareDB {
-      isSuccess
+      log
       error
     }
   }`;
