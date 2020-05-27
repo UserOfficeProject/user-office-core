@@ -5,7 +5,7 @@ import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { User, UserRole, UserWithRole } from '../models/User';
+import { UserRole, UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import {
