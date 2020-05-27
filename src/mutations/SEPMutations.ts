@@ -5,7 +5,7 @@ import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { User, UserRole } from '../models/User';
+import { User, UserRole, UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import {
@@ -71,7 +71,7 @@ export default class SEPMutations {
   @ValidateArgs(createSEPValidationSchema)
   @EventBus(Event.SEP_CREATED)
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -97,7 +97,7 @@ export default class SEPMutations {
   @ValidateArgs(updateSEPValidationSchema)
   @EventBus(Event.SEP_UPDATED)
   async update(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -124,7 +124,7 @@ export default class SEPMutations {
   @ValidateArgs(assignSEPChairOrSecretaryValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -161,12 +161,15 @@ export default class SEPMutations {
   @ValidateArgs(updateSEPMemberValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMemberToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -193,12 +196,15 @@ export default class SEPMutations {
   @ValidateArgs(updateSEPMemberValidationSchema)
   @EventBus(Event.SEP_MEMBER_REMOVED)
   async removeMemberFromSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -221,7 +227,7 @@ export default class SEPMutations {
   @ValidateArgs(assignProposalToSEPValidationSchema)
   @EventBus(Event.SEP_PROPOSAL_ASSIGNED)
   async assignProposalToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -242,7 +248,7 @@ export default class SEPMutations {
   @ValidateArgs(assignProposalToSEPValidationSchema)
   @EventBus(Event.SEP_PROPOSAL_REMOVED)
   async removeProposalAssignment(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -263,12 +269,15 @@ export default class SEPMutations {
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
   @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async assignMemberToSEPProposal(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignSEPProposalToMemberArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -291,12 +300,15 @@ export default class SEPMutations {
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
   @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromSepProposal(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignSEPProposalToMemberArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }

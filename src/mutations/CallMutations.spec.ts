@@ -6,8 +6,8 @@ import {
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
   UserDataSourceMock,
-  dummyUser,
-  dummyUserOfficer,
+  dummyUserWithRole,
+  dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import CallMutations from './CallMutations';
@@ -23,7 +23,7 @@ const callMutations = new CallMutations(
 
 test('A user can not create a call', () => {
   return expect(
-    callMutations.create(dummyUser, {
+    callMutations.create(dummyUserWithRole, {
       shortCode: '2019-02-19',
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-19'),
@@ -55,7 +55,7 @@ test('A not logged in user can not create a call', () => {
 
 test('A logged in user officer can create a call', () => {
   return expect(
-    callMutations.create(dummyUserOfficer, {
+    callMutations.create(dummyUserOfficerWithRole, {
       shortCode: '2019-02-19',
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-19'),

@@ -2,7 +2,7 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export default class TemplateQueries {
@@ -10,7 +10,7 @@ export default class TemplateQueries {
 
   @Authorized()
   async getComplementaryQuestions(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<Question[] | null> {
     return this.dataSource.getComplementaryQuestions(templateId);
@@ -18,24 +18,27 @@ export default class TemplateQueries {
 
   @Authorized()
   async getProposalTemplateSteps(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<TemplateStep[] | null> {
     return this.dataSource.getProposalTemplateSteps(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
+  async isNaturalKeyPresent(agent: UserWithRole | null, naturalKey: string) {
     return this.dataSource.isNaturalKeyPresent(naturalKey);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getProposalTemplates(agent: User | null, args?: ProposalTemplatesArgs) {
+  async getProposalTemplates(
+    agent: UserWithRole | null,
+    args?: ProposalTemplatesArgs
+  ) {
     return this.dataSource.getProposalTemplates(args);
   }
 
   @Authorized()
-  async getProposalTemplate(agent: User | null, templateId: number) {
+  async getProposalTemplate(agent: UserWithRole | null, templateId: number) {
     return this.dataSource.getProposalTemplate(templateId);
   }
 }

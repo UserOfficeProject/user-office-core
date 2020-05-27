@@ -2,7 +2,7 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized } from '../decorators';
 import { Call } from '../models/Call';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
 import { logger } from '../utils/Logger';
@@ -16,7 +16,7 @@ export default class CallMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateCallArgs
   ): Promise<Call | Rejection> {
     return this.dataSource

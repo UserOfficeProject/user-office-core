@@ -8,7 +8,7 @@ import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { Roles, Role } from '../models/Role';
-import { User, BasicUserDetails } from '../models/User';
+import { User, BasicUserDetails, UserWithRole } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -52,7 +52,10 @@ export default class UserMutations {
 
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.USER_DELETED)
-  async delete(agent: User | null, id: number): Promise<User | Rejection> {
+  async delete(
+    agent: UserWithRole | null,
+    id: number
+  ): Promise<User | Rejection> {
     const user = await this.dataSource.delete(id);
     if (!user) {
       return rejection('INTERNAL_ERROR');
@@ -68,7 +71,7 @@ export default class UserMutations {
   @Authorized()
   @EventBus(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateUserByEmailInviteArgs
   ): Promise<EmailInviteResponse | Rejection> {
     let userId: number | null = null;
@@ -119,7 +122,7 @@ export default class UserMutations {
   @ValidateArgs(createUserValidationSchema)
   @EventBus(Event.USER_CREATED)
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse | Rejection> {
     if (
@@ -142,19 +145,19 @@ export default class UserMutations {
     }
 
     //Check if email exist in database and if user has been invited
-    let user = await this.dataSource.getByEmail(args.email);
+    let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
 
     if (user && user.placeholder) {
       const changePassword = await this.updatePassword(user, {
         id: user.id,
         password: args.password,
       });
-      const updatedUser = await this.update(user, {
+      const updatedUser = (await this.update(user, {
         id: user.id,
         placeholder: false,
         password: hash,
         ...args,
-      });
+      })) as UserWithRole;
 
       if (isRejection(updatedUser) || !changePassword) {
         logger.logError('Could not create user', {
@@ -166,7 +169,7 @@ export default class UserMutations {
       }
       user = updatedUser;
     } else {
-      user = await this.dataSource.create(
+      user = (await this.dataSource.create(
         args.user_title,
         args.firstname,
         args.middlename,
@@ -185,7 +188,7 @@ export default class UserMutations {
         args.email,
         args.telephone,
         args.telephone_alt
-      );
+      )) as UserWithRole;
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -224,7 +227,7 @@ export default class UserMutations {
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.USER_UPDATED)
   async update(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
     if (
@@ -301,7 +304,7 @@ export default class UserMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async getTokenForUser(
-    agent: User | null,
+    agent: UserWithRole | null,
     userId: number
   ): Promise<string | Rejection> {
     const user = await this.dataSource.get(userId);
@@ -368,7 +371,7 @@ export default class UserMutations {
 
   @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
-    agent: User | null,
+    agent: UserWithRole | null,
     email: string
   ): Promise<UserLinkResponse | Rejection> {
     const user = await this.dataSource.getByEmail(email);
@@ -422,7 +425,7 @@ export default class UserMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async addUserRole(agent: User | null, args: AddUserRoleArgs) {
+  async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
@@ -435,7 +438,7 @@ export default class UserMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async updatePassword(
-    agent: User | null,
+    agent: UserWithRole | null,
     { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     if (

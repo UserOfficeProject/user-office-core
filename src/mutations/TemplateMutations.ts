@@ -8,7 +8,7 @@ import {
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
@@ -25,19 +25,14 @@ import {
   FileUploadConfig,
   SelectionFromOptionsConfig,
 } from '../resolvers/types/FieldConfig';
-import { Logger, logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { logger } from '../utils/Logger';
 
 export default class TemplateMutations {
-  constructor(
-    private dataSource: TemplateDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
-  ) {}
+  constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized([Roles.USER_OFFICER])
   async createTemplate(
-    agent: User | null,
+    agent: UserWithRole | null,
     name: string,
     description?: string
   ): Promise<ProposalTemplate | Rejection> {
@@ -50,7 +45,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async cloneTemplate(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<unknown> {
     const result = await this.dataSource
@@ -62,7 +57,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
-    user: User | null,
+    user: UserWithRole | null,
     id: number
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
@@ -77,7 +72,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async createTopic(
-    user: User | null,
+    user: UserWithRole | null,
     args: CreateTopicArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
@@ -94,7 +89,7 @@ export default class TemplateMutations {
   }
   @Authorized([Roles.USER_OFFICER])
   async updateTopic(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
     return this.dataSource
@@ -111,7 +106,7 @@ export default class TemplateMutations {
   }
   @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
-    agent: User | null,
+    agent: UserWithRole | null,
     topicId: number
   ): Promise<Topic | Rejection> {
     return this.dataSource
@@ -125,7 +120,7 @@ export default class TemplateMutations {
   }
   @Authorized([Roles.USER_OFFICER])
   async createQuestion(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateQuestionArgs
   ): Promise<Question | Rejection> {
     const { dataType } = args;
@@ -151,7 +146,7 @@ export default class TemplateMutations {
   }
   @Authorized([Roles.USER_OFFICER])
   async updateQuestion(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateQuestionArgs
   ): Promise<Question | Rejection> {
     return this.dataSource
@@ -169,7 +164,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestion(
-    agent: User | null,
+    agent: UserWithRole | null,
     questionId: string
   ): Promise<Question | Rejection> {
     return this.dataSource
@@ -187,7 +182,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async updateQuestionRel(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
@@ -205,7 +200,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestionRel(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: DeleteQuestionRelArgs
   ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
@@ -222,7 +217,7 @@ export default class TemplateMutations {
   }
   @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
-    agent: User | null,
+    agent: UserWithRole | null,
     topicOrder: number[]
   ): Promise<number[] | Rejection> {
     return this.dataSource
@@ -240,7 +235,7 @@ export default class TemplateMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async updateQuestionsTopicRels(
-    agent: User | null,
+    agent: UserWithRole | null,
     values: {
       templateId: number;
       topicId: number;
@@ -267,7 +262,10 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
+  updateProposalTemplate(
+    user: UserWithRole | null,
+    args: UpdateProposalTemplateArgs
+  ) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)
@@ -281,7 +279,7 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  createQuestionRel(user: User | null, args: CreateQuestionRelArgs) {
+  createQuestionRel(user: UserWithRole | null, args: CreateQuestionRelArgs) {
     return this.dataSource
       .createQuestionRel(args)
       .then(data => data)

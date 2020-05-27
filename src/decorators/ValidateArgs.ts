@@ -1,8 +1,8 @@
 import { ResourceId } from '@esss-swap/duo-localisation';
 import * as yup from 'yup';
 
+import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
-import { User } from '../resolvers/types/User';
 
 const schemaValidation = async (schema: yup.ObjectSchema, inputArgs: any) => {
   try {
@@ -19,7 +19,10 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
     target: object,
     name: string,
     descriptor: {
-      value?: (agent: User | null, args: any) => Promise<Rejection | any>;
+      value?: (
+        agent: UserWithRole | null,
+        args: any
+      ) => Promise<Rejection | any>;
     }
   ) => {
     const originalMethod = descriptor.value;

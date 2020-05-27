@@ -32,7 +32,7 @@ import { logger } from './utils/Logger';
 import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
-const userQueries = new UserQueries(userDataSource, userAuthorization);
+const userQueries = new UserQueries(userDataSource);
 const userMutations = new UserMutations(userDataSource, userAuthorization);
 
 const proposalQueries = new ProposalQueries(
@@ -61,14 +61,10 @@ const fileQueries = new FileQueries(fileDataSource);
 const fileMutations = new FileMutations(fileDataSource);
 
 const adminQueries = new AdminQueries(adminDataSource);
-const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
+const adminMutations = new AdminMutations(adminDataSource);
 
 const templateQueries = new TemplateQueries(templateDataSource);
-const templateMutations = new TemplateMutations(
-  templateDataSource,
-  userAuthorization,
-  logger
-);
+const templateMutations = new TemplateMutations(templateDataSource);
 
 const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 

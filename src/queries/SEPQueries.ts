@@ -45,9 +45,9 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER])
   async getAll(
-    agent: User | null,
+    agent: UserWithRole | null,
     active = true,
     filter?: string,
     first?: number,

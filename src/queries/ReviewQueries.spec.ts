@@ -5,8 +5,8 @@ import {
 } from '../datasources/mockups/ReviewDataSource';
 import {
   UserDataSourceMock,
-  dummyUser,
-  dummyUserOfficer,
+  dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ReviewQueries from './ReviewQueries';
@@ -22,23 +22,23 @@ const reviewQueries = new ReviewQueries(
 );
 
 test('A userofficer can get a review', () => {
-  return expect(reviewQueries.get(dummyUserOfficer, 10)).resolves.toBe(
+  return expect(reviewQueries.get(dummyUserOfficerWithRole, 10)).resolves.toBe(
     dummyReview
   );
 });
 
 test('A user can not get a review', () => {
-  return expect(reviewQueries.get(dummyUser, 1)).resolves.toBe(null);
+  return expect(reviewQueries.get(dummyUserWithRole, 1)).resolves.toBe(null);
 });
 
 test('A userofficer can get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(dummyUserOfficer, 10)
+    reviewQueries.reviewsForProposal(dummyUserOfficerWithRole, 10)
   ).resolves.toStrictEqual([dummyReview]);
 });
 
 test('A user can not get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(dummyUser, 10)
+    reviewQueries.reviewsForProposal(dummyUserWithRole, 10)
   ).resolves.toStrictEqual(null);
 });
