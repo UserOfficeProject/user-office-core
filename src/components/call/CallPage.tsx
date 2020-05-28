@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import { Add } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Call } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
@@ -12,9 +12,15 @@ import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
 import AddCall from './AddCall';
 
+var callsFilter = {};
+
 const CallPage: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData } = useCallsData(show);
+  const { loading, callsData } = useCallsData(callsFilter);
+
+  useEffect(() => {
+    callsFilter = {};
+  }, [show]);
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },

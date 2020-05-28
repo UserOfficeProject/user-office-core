@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetCallsQuery, GetCallsQueryVariables } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useCallsData(show: boolean, filter?: GetCallsQueryVariables) {
+export function useCallsData(filter?: GetCallsQueryVariables) {
   const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>();
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +16,7 @@ export function useCallsData(show: boolean, filter?: GetCallsQueryVariables) {
         setCallsData(data.calls);
         setLoading(false);
       });
-  }, [api, show, filter]);
+  }, [api, filter]);
 
   return { loading, callsData, filter };
 }
