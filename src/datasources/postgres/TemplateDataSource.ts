@@ -37,8 +37,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         `
         SELECT *
         FROM questions AS questions
-        WHERE proposal_question_id NOT IN
-            (SELECT proposal_question_id
+        WHERE question_id NOT IN
+            (SELECT question_id
              FROM templates_has_questions
              WHERE template_id = ${templateId}
              )
@@ -136,8 +136,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       LEFT JOIN
         questions 
       ON 
-        templates_has_questions.proposal_question_id = 
-        questions.proposal_question_id
+        templates_has_questions.question_id = 
+        questions.question_id
       ORDER BY
        templates_has_questions.sort_order`)
     ).rows;
@@ -225,7 +225,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     await database
       .update(rows, ['*'])
       .from('questions')
-      .where('proposal_question_id', questionId);
+      .where('question_id', questionId);
 
     const question = await this.getQuestion(questionId);
     if (!question) {
@@ -246,7 +246,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     }
 
     await database('templates_has_questions').insert({
-      proposal_question_id: questionId,
+      question_id: questionId,
       template_id: templateId,
       topic_id: topicId,
       sort_order: sortOrder,
@@ -277,10 +277,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         topic_id: topicId,
         sort_order: sortOrder,
         config: config,
-        dependency_proposal_question_id: dependency?.dependencyId,
+        dependency_question_id: dependency?.dependencyId,
         dependency_condition: dependency?.condition,
       })
-      .where({ proposal_question_id: questionId, template_id: templateId });
+      .where({ question_id: questionId, template_id: templateId });
 
     const returnValue = await this.getProposalTemplate(templateId);
     if (!returnValue) {
@@ -314,7 +314,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const resultSet: ProposalQuestionRecord[] = await database
       .insert(
         {
-          proposal_question_id: fieldId,
+          question_id: fieldId,
           natural_key: naturalKey,
           data_type: dataType,
           question: question,
@@ -333,7 +333,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async getQuestion(questionId: string): Promise<Question | null> {
     return database('questions')
-      .where({ proposal_question_id: questionId })
+      .where({ question_id: questionId })
       .select('*')
       .then((resultSet: ProposalQuestionRecord[]) => {
         if (!resultSet || resultSet.length === 0) {
@@ -350,15 +350,15 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   ): Promise<QuestionRel | null> {
     return database('templates_has_questions')
       .where({
-        'templates_has_questions.proposal_question_id': questionId,
+        'templates_has_questions.question_id': questionId,
       })
       .andWhere({
         'templates_has_questions.template_id': templateId,
       })
       .leftJoin(
         'questions',
-        'templates_has_questions.proposal_question_id',
-        'questions.proposal_question_id'
+        'templates_has_questions.question_id',
+        'questions.question_id'
       )
       .select('*')
       .then(
@@ -379,7 +379,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async deleteQuestion(questionId: string): Promise<Question> {
     const [error, row] = await to(
       database('questions')
-        .where({ proposal_question_id: questionId })
+        .where({ question_id: questionId })
         .returning('*')
         .del()
     );
@@ -397,7 +397,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     const rowsAffected = await database('templates_has_questions')
       .where({
         template_id: args.templateId,
-        proposal_question_id: args.questionId,
+        question_id: args.questionId,
       })
       .del();
 
@@ -483,16 +483,16 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     await database.raw(`
       INSERT INTO templates_has_questions 
                   (template_id, 
-                  proposal_question_id, 
+                  question_id, 
                   sort_order, 
-                  dependency_proposal_question_id, 
+                  dependency_question_id, 
                   dependency_condition,
                   config, 
                   topic_id) 
       SELECT ${newTemplate.templateId}, 
-            proposal_question_id, 
+            question_id, 
             sort_order, 
-            dependency_proposal_question_id, 
+            dependency_question_id, 
             dependency_condition,
             config, 
             (SELECT topic_id 

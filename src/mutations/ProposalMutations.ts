@@ -81,7 +81,7 @@ export default class ProposalMutations {
       return rejection('NOT_FOUND');
     }
 
-    // Check if there is an open call, if not reject
+    // Check if the call is open
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.proposalDataSource.checkActiveCall(proposal.callId))

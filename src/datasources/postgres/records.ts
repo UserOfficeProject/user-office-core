@@ -50,13 +50,13 @@ export interface TopicRecord {
 }
 
 export interface FieldDependencyRecord {
-  readonly proposal_question_id: string;
+  readonly question_id: string;
   readonly proposal_question_dependency: string;
   readonly condition: string;
 }
 
 export interface ProposalQuestionRecord {
-  readonly proposal_question_id: string;
+  readonly question_id: string;
   readonly data_type: string;
   readonly question: string;
   readonly default_config: string;
@@ -68,12 +68,12 @@ export interface ProposalQuestionRecord {
 
 export interface ProposalQuestionProposalTemplateRelRecord {
   readonly id: number;
-  readonly proposal_question_id: string;
+  readonly question_id: string;
   readonly template_id: string;
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_proposal_question_id: string;
+  readonly dependency_question_id: string;
   readonly dependency_condition: string;
 }
 
@@ -237,7 +237,7 @@ export const createTopicObject = (proposal: TopicRecord) => {
 
 export const createQuestionObject = (question: ProposalQuestionRecord) => {
   return new Question(
-    question.proposal_question_id,
+    question.question_id,
     question.natural_key,
     question.data_type as DataType,
     question.question,
@@ -282,7 +282,7 @@ export const createFieldDependencyObject = (
   const conditionJson = JSON.parse(fieldDependency.condition);
 
   return new FieldDependency(
-    fieldDependency.proposal_question_id,
+    fieldDependency.question_id,
     fieldDependency.proposal_question_dependency,
     fieldDependency.natural_key,
     new FieldCondition(
@@ -308,7 +308,7 @@ export const createQuestionRelObject = (
 ) => {
   return new QuestionRel(
     new Question(
-      record.proposal_question_id,
+      record.question_id,
       record.natural_key,
       record.data_type as DataType,
       record.question,
@@ -317,10 +317,10 @@ export const createQuestionRelObject = (
     record.topic_id,
     record.sort_order,
     createConfigByType(record.data_type as DataType, record.config),
-    record.dependency_proposal_question_id
+    record.dependency_question_id
       ? new FieldDependency(
-          record.proposal_question_id,
-          record.dependency_proposal_question_id,
+          record.question_id,
+          record.dependency_question_id,
           record.natural_key,
           FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
         )

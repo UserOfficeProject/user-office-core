@@ -111,8 +111,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .count()
       .from('answers')
       .where({
-        proposal_id: proposal_id,
-        proposal_question_id: question_id,
+        proposal_id,
+        question_id,
       })
       .first();
 
@@ -123,16 +123,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           answer: answer,
         })
         .where({
-          proposal_id: proposal_id,
-          proposal_question_id: question_id,
+          proposal_id,
+          question_id,
         })
         .then(() => question_id);
     } else {
       return database('answers')
         .insert({
-          proposal_id: proposal_id,
-          proposal_question_id: question_id,
-          answer: answer,
+          proposal_id,
+          question_id,
+          answer,
         })
         .then(() => question_id);
     }
@@ -181,8 +181,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     const selectResult = await database
       .from('answers')
       .where({
-        proposal_id: proposal_id,
-        proposal_question_id: question_id,
+        proposal_id,
+        question_id,
       })
       .select('answer_id');
 
@@ -310,7 +310,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           FROM 
             topics
           LEFT JOIN
-            topic_completenesses
+          topic_completenesses
           ON 
             topics.topic_id = topic_completenesses.topic_id
             AND topic_completenesses.proposal_id = ${proposalId}
@@ -330,13 +330,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             LEFT JOIN
             questions 
             ON 
-              templates_has_questions.proposal_question_id = 
-              questions.proposal_question_id
+              templates_has_questions.question_id = 
+              questions.question_id
             LEFT JOIN
               answers
             ON
-              templates_has_questions.proposal_question_id = 
-              answers.proposal_question_id
+              templates_has_questions.question_id = 
+              answers.question_id
             AND
               answers.proposal_id=${proposalId}
             ORDER BY
@@ -387,14 +387,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     proposalId: number,
     topicsCompleted: number[]
   ): Promise<void> {
-    return database.transaction(async (tr: any) => {
+    return database.transaction(async trx => {
       for (const topic_id of topicsCompleted) {
         await database
           .raw(
             'INSERT into topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true',
             [proposalId, topic_id, true]
           )
-          .transacting(tr);
+          .transacting(trx);
       }
     });
   }
