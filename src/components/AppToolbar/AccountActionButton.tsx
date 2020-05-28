@@ -35,7 +35,7 @@ const AccountActionButton: React.FC = () => {
         onClose={(): void => setShow(false)}
       >
         <DialogContent>
-          <RoleSelection />
+          <RoleSelection close={() => setShow(false)} />
         </DialogContent>
       </Dialog>
       <IconButton

@@ -1,10 +1,11 @@
 /// <reference types="Cypress" />
 /// <reference types="../types" />
-var faker = require('faker');
 
-var addItemToTopic = element => {};
+const addItemToTopic = element => {};
 
 context('Proposal tests', () => {
+  const faker = require('faker');
+
   before(() => {
     cy.resetDB();
   });

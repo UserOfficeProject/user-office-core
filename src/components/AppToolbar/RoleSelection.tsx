@@ -2,7 +2,8 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
-import React, { useContext, useState } from 'react';
+import PropTypes from 'prop-types';
+import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
 import { UserContext } from '../../context/UserContextProvider';
@@ -10,14 +11,30 @@ import { Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 
-const RoleSelection: React.FC = () => {
-  const { roles, currentRole, token, handleNewToken, handleRole } = useContext(
+type RoleSelectionProps = {
+  close: () => void;
+};
+
+const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
+  const { currentRole, user, token, handleNewToken, handleRole } = useContext(
     UserContext
   );
   const [loading, setLoading] = useState(false);
   const api = useDataApi();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  useEffect(() => {
+    const getUserInformation = async () => {
+      const data = await api().getMyRoles();
+
+      if (data?.me) {
+        setRoles(data.me?.roles as Role[]);
+      }
+    };
+    getUserInformation();
+  }, [user.id, api]);
 
   if (!roles) {
     return <Redirect to="/SignIn" />;
@@ -38,6 +55,8 @@ const RoleSelection: React.FC = () => {
         enqueueSnackbar('User role changed!', {
           variant: 'success',
         });
+
+        close();
       }, 500);
     } else {
       enqueueSnackbar(getTranslation(result.selectRole.error as ResourceId), {
@@ -68,18 +87,24 @@ const RoleSelection: React.FC = () => {
   ];
 
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title="User roles"
-      columns={columns}
-      data={roles}
-      options={{
-        search: false,
-        paging: false,
-        minBodyHeight: '350px',
-      }}
-    />
+    <div data-cy="role-selection-table">
+      <MaterialTable
+        icons={tableIcons}
+        title="User roles"
+        columns={columns}
+        data={roles}
+        options={{
+          search: false,
+          paging: false,
+          minBodyHeight: '350px',
+        }}
+      />
+    </div>
   );
+};
+
+RoleSelection.propTypes = {
+  close: PropTypes.func.isRequired,
 };
 
 export default RoleSelection;

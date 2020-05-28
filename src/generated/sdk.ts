@@ -2475,6 +2475,21 @@ export type GetFieldsQuery = (
   )> }
 );
 
+export type GetMyRolesQueryVariables = {};
+
+
+export type GetMyRolesQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'firstname' | 'lastname'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )> }
+  )> }
+);
+
 export type GetOrcIdInformationQueryVariables = {
   authorizationCode: Scalars['String']
 };
@@ -3677,6 +3692,19 @@ export const GetFieldsDocument = gql`
   }
 }
     `;
+export const GetMyRolesDocument = gql`
+    query getMyRoles {
+  me {
+    firstname
+    lastname
+    roles {
+      id
+      shortCode
+      title
+    }
+  }
+}
+    `;
 export const GetOrcIdInformationDocument = gql`
     query getOrcIDInformation($authorizationCode: String!) {
   getOrcIDInformation(authorizationCode: $authorizationCode) {
@@ -4043,6 +4071,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getFields(variables?: GetFieldsQueryVariables): Promise<GetFieldsQuery> {
       return client.request<GetFieldsQuery>(print(GetFieldsDocument), variables);
+    },
+    getMyRoles(variables?: GetMyRolesQueryVariables): Promise<GetMyRolesQuery> {
+      return client.request<GetMyRolesQuery>(print(GetMyRolesDocument), variables);
     },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables): Promise<GetOrcIdInformationQuery> {
       return client.request<GetOrcIdInformationQuery>(print(GetOrcIdInformationDocument), variables);
