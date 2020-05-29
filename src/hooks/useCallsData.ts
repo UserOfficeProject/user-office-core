@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-
-import { GetCallsQuery, GetCallsQueryVariables } from '../generated/sdk';
+import { GetCallsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useCallsData(filter?: GetCallsQueryVariables) {
+export function useCallsData(isActive?: boolean, templateId?: number) {
   const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>(
     null
   );
@@ -13,12 +12,17 @@ export function useCallsData(filter?: GetCallsQueryVariables) {
 
   useEffect(() => {
     api()
-      .getCalls(filter)
+      .getCalls({
+        filter: {
+          isActive,
+          templateIds: templateId ? [templateId] : undefined,
+        },
+      })
       .then(data => {
         setCallsData(data.calls);
         setLoading(false);
       });
-  }, [api, filter]);
+  }, [api, isActive, templateId]);
 
-  return { loading, callsData, filter };
+  return { loading, callsData };
 }

@@ -5,9 +5,7 @@ import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-
 import {
-  GetCallsQueryVariables,
   GetProposalTemplatesQuery,
   ProposalTemplate,
 } from '../../generated/sdk';
@@ -27,11 +25,8 @@ type RowDataType = Pick<
   | 'callCount'
 >;
 
-function CallsModal(props: {
-  filter?: GetCallsQueryVariables;
-  onClose: () => void;
-}) {
-  const { loading, callsData } = useCallsData(props.filter);
+function CallsModal(props: { templateId?: number; onClose: () => void }) {
+  const { loading, callsData } = useCallsData(undefined, props.templateId);
 
   if (loading) {
     return <div>loading...</div>;
@@ -39,7 +34,7 @@ function CallsModal(props: {
 
   return (
     <Dialog
-      open={props.filter !== undefined}
+      open={props.templateId !== undefined}
       fullWidth={true}
       onClose={props.onClose}
     >
@@ -53,10 +48,8 @@ function CallsModal(props: {
 function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
   const [templates, setTemplates] = useState<RowDataType[]>([]);
-  const [callsFilter, setCallsFilter] = useState<
-    GetCallsQueryVariables | undefined
-  >(undefined);
   const history = useHistory();
 
   useEffect(() => {
@@ -75,10 +68,10 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
       editable: 'never',
       render: rowData => (
         <Link
-          href="#"
-          onClick={() =>
-            setCallsFilter({ filter: { templateIds: [rowData.templateId] } })
-          }
+          onClick={() => {
+            setSelectedTemplateId(rowData.templateId);
+          }}
+          style={{ cursor: 'pointer' }}
         >
           {rowData.callCount}
         </Link>
@@ -302,8 +295,8 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         ]}
       />
       <CallsModal
-        filter={callsFilter}
-        onClose={() => setCallsFilter(undefined)}
+        templateId={selectedTemplateId}
+        onClose={() => setSelectedTemplateId(undefined)}
       ></CallsModal>
     </>
   );

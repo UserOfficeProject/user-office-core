@@ -6,9 +6,8 @@ import { Link } from 'react-router-dom';
 import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
-const callFilter = { filter: { isActive: true } };
 export default function ProposalChooseCall() {
-  const { callsData } = useCallsData(callFilter);
+  const { callsData } = useCallsData(true);
   const history = useHistory();
 
   if (!callsData) {

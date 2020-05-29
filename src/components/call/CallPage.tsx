@@ -3,26 +3,22 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import { Add } from '@material-ui/icons';
 import React, { useEffect, useState } from 'react';
-
-import { Call } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
+import { Call, GetCallsQuery } from '../../generated/sdk';
+import { useDataApi } from '../../hooks/useDataApi';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import AddCall from './AddCall';
 import { CallsTable } from './CallsTable';
 
-let callsFilter = {};
-
 const CallPage: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData } = useCallsData(callsFilter);
+  const api = useDataApi();
+  const [callsData, setCallsData] = useState<GetCallsQuery['calls']>();
 
   useEffect(() => {
-    callsFilter = {}; // when dialog closes/opens reload calls
-  }, [show]);
-
-  if (loading) {
-    return <p>Loading</p>;
-  }
+    api()
+      .getCalls()
+      .then(response => setCallsData(response.calls));
+  }, [show, api]);
 
   const AddIcon = (): JSX.Element => <Add data-cy="add-call" />;
 
