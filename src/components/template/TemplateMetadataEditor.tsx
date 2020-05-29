@@ -14,7 +14,6 @@ export function TemplateMetadataEditor(props: {
 }) {
   const { template, dispatch } = props;
   const [isEditMode, setIsEditMode] = useState(false);
-  console.log('Rerendering' + props.template.name);
 
   const classes = makeStyles(theme => ({
     templateName: {
