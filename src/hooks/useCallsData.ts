@@ -4,7 +4,9 @@ import { GetCallsQuery, GetCallsQueryVariables } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useCallsData(filter?: GetCallsQueryVariables) {
-  const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>();
+  const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();

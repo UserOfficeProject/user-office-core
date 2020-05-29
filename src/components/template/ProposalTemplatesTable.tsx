@@ -1,17 +1,20 @@
-import { Delete, Edit, Email, FileCopy, Archive } from '@material-ui/icons';
+import { Dialog, DialogContent, Link } from '@material-ui/core';
+import { Archive, Delete, Edit, Email, FileCopy } from '@material-ui/icons';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-
 import {
+  GetCallsQueryVariables,
   GetProposalTemplatesQuery,
   ProposalTemplate,
 } from '../../generated/sdk';
+import { useCallsData } from '../../hooks/useCallsData';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
+import { CallsTable } from '../call/CallsTable';
 
 type RowDataType = Pick<
   ProposalTemplate,
@@ -23,11 +26,37 @@ type RowDataType = Pick<
   | 'callCount'
 >;
 
+function CallsModal(props: {
+  filter?: GetCallsQueryVariables;
+  onClose: () => void;
+}) {
+  const { loading, callsData } = useCallsData(props.filter);
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
+  return (
+    <Dialog
+      open={props.filter !== undefined}
+      fullWidth={true}
+      onClose={props.onClose}
+    >
+      <DialogContent>
+        <CallsTable data={callsData || undefined} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [templates, setTemplates] = useState<RowDataType[]>([]);
+  const [callsFilter, setCallsFilter] = useState<
+    GetCallsQueryVariables | undefined
+  >(undefined);
   const history = useHistory();
+
   useEffect(() => {
     props.dataProvider().then(data => {
       setTemplates(data.proposalTemplates);
@@ -38,7 +67,21 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
     { title: 'Name', field: 'name', editable: 'always' },
     { title: 'Description', field: 'description', editable: 'always' },
     { title: '# proposals', field: 'proposalCount', editable: 'never' },
-    { title: '# calls', field: 'callCount', editable: 'never' },
+    {
+      title: '# calls',
+      field: 'callCount',
+      editable: 'never',
+      render: rowData => (
+        <Link
+          href="#"
+          onClick={() =>
+            setCallsFilter({ filter: { templateIds: [rowData.templateId] } })
+          }
+        >
+          {rowData.callCount}
+        </Link>
+      ),
+    },
   ];
 
   const actionArray = [];
@@ -181,80 +224,86 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   };
 
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title="Proposal templates"
-      columns={columns}
-      data={templates}
-      editable={{
-        onRowAdd: data =>
-          new Promise(resolve => {
-            api()
-              .createProposalTemplate({
-                name: data.name,
-                description: data.description,
-              })
-              .then(result => {
-                const { template, error } = result.createProposalTemplate;
+    <>
+      <MaterialTable
+        icons={tableIcons}
+        title="Proposal templates"
+        columns={columns}
+        data={templates}
+        editable={{
+          onRowAdd: data =>
+            new Promise(resolve => {
+              api()
+                .createProposalTemplate({
+                  name: data.name,
+                  description: data.description,
+                })
+                .then(result => {
+                  const { template, error } = result.createProposalTemplate;
 
-                if (!template) {
-                  enqueueSnackbar(error || 'Error ocurred', {
-                    variant: 'error',
-                  });
-                } else {
-                  const newTemplates = [...templates];
-                  newTemplates.push(template!);
-                  setTemplates(newTemplates);
+                  if (!template) {
+                    enqueueSnackbar(error || 'Error ocurred', {
+                      variant: 'error',
+                    });
+                  } else {
+                    const newTemplates = [...templates];
+                    newTemplates.push(template!);
+                    setTemplates(newTemplates);
+                  }
+                  resolve();
+                });
+            }),
+        }}
+        actions={[
+          {
+            icon: () => <Edit />,
+            tooltip: 'Edit',
+            onClick: (event: any, data: RowDataType | RowDataType[]) => {
+              history.push(
+                `/QuestionaryEditor/${(data as RowDataType).templateId}`
+              );
+            },
+          },
+          {
+            icon: () => <FileCopy />,
+            hidden: false,
+            tooltip: 'Clone',
+            onClick: (event: any, data: RowDataType | RowDataType[]) => {
+              props.confirm(
+                () => {
+                  api()
+                    .cloneProposalTemplate({
+                      templateId: (data as RowDataType).templateId,
+                    })
+                    .then(result => {
+                      const clonedTemplate =
+                        result.cloneProposalTemplate.template;
+                      if (clonedTemplate) {
+                        const newTemplates = [...templates];
+                        newTemplates.push(clonedTemplate);
+                        setTemplates(newTemplates);
+                      }
+                    });
+                },
+                {
+                  title: 'Are you sure?',
+                  description: `Are you sure you want to clone ${
+                    (data as RowDataType).name
+                  }`,
+                  confirmationText: 'Yes',
+                  cancellationText: 'Cancel',
                 }
-                resolve();
-              });
-          }),
-      }}
-      actions={[
-        {
-          icon: () => <Edit />,
-          tooltip: 'Edit',
-          onClick: (event: any, data: RowDataType | RowDataType[]) => {
-            history.push(
-              `/QuestionaryEditor/${(data as RowDataType).templateId}`
-            );
+              )();
+            },
           },
-        },
-        {
-          icon: () => <FileCopy />,
-          hidden: false,
-          tooltip: 'Clone',
-          onClick: (event: any, data: RowDataType | RowDataType[]) => {
-            props.confirm(
-              () => {
-                api()
-                  .cloneProposalTemplate({
-                    templateId: (data as RowDataType).templateId,
-                  })
-                  .then(result => {
-                    const clonedTemplate =
-                      result.cloneProposalTemplate.template;
-                    if (clonedTemplate) {
-                      const newTemplates = [...templates];
-                      newTemplates.push(clonedTemplate);
-                      setTemplates(newTemplates);
-                    }
-                  });
-              },
-              {
-                title: 'Are you sure?',
-                description: `Are you sure you want to clone ${
-                  (data as RowDataType).name
-                }`,
-                confirmationText: 'Yes',
-                cancellationText: 'Cancel',
-              }
-            )();
-          },
-        },
-        rowData => getMaintenanceButton(rowData),
-      ]}
-    />
+          rowData => getMaintenanceButton(rowData),
+        ]}
+      />
+      <CallsModal
+        filter={callsFilter}
+        onClose={() => setCallsFilter(undefined)}
+      ></CallsModal>
+    </>
   );
 }
 
