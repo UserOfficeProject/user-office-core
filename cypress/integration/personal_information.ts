@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 /// <reference types="../types" />
-var faker = require('faker');
 
 context('Personal information tests', () => {
+  const faker = require('faker');
+
   before(() => {
     cy.resetDB();
   });
@@ -23,6 +24,8 @@ context('Personal information tests', () => {
     cy.login('user');
 
     cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Profile').click();
 
     cy.get("[name='firstname']")
       .clear()
@@ -83,5 +86,107 @@ context('Personal information tests', () => {
     cy.get("[name='telephone']")
       .invoke('val')
       .should('eq', newTelephone);
+  });
+
+  it('Should be able to see user officer role in use', () => {
+    cy.login('officer');
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.wait(1000);
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .first()
+      .should(element => {
+        expect(element.text()).to.contain('User Officer');
+
+        expect(element.text()).to.contain('In Use');
+      });
+  });
+
+  it('Should be able to see user role in use', () => {
+    cy.login('user');
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.wait(1000);
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .first()
+      .should(element => {
+        expect(element.text()).to.contain('User');
+
+        expect(element.text()).to.contain('In Use');
+      });
+  });
+
+  it('User Officer should be able to see all and change roles if we have multiple', () => {
+    cy.login('officer');
+
+    cy.contains('View People').click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="people-table"] table tbody tr')
+      .eq(1)
+      .find('[title="Edit user"]')
+      .click();
+
+    cy.contains('Settings').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Add Role"]').click();
+
+    cy.wait(1000);
+
+    cy.contains('Add Role');
+
+    cy.get('.MuiDialog-root table tbody tr')
+      .eq(3)
+      .find('[title="Select role"]')
+      .click();
+
+    cy.contains('Update Roles').click();
+
+    cy.wait(1000);
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.get('.MuiPopover-root .MuiMenuItem-root')
+      .contains('Roles')
+      .click();
+
+    cy.wait(1000);
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .should(element => {
+        expect(element.text()).to.contain('SEP Chair');
+        expect(element.text()).to.contain('Use');
+      });
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .contains('Use')
+      .click();
+
+    cy.wait(1000);
+
+    cy.contains('Scientific evaluation panels');
+
+    cy.get('[data-cy="SEPRoles-menu-items"]')
+      .find('.MuiListItem-root')
+      .should('have.length', 2);
   });
 });

@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 /// <reference types="../types" />
-var faker = require('faker');
 
 context('Page tests', () => {
+  const faker = require('faker');
+
   before(() => {
     cy.resetDB();
   });

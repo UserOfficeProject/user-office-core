@@ -255,6 +255,7 @@ export type Mutation = {
   setPageContent: PageResponseWrap,
   submitProposal: ProposalResponseWrap,
   token: TokenResponseWrap,
+  selectRole: TokenResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
   updateQuestionsTopicRels: UpdateQuestionsTopicRelsResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
@@ -602,6 +603,12 @@ export type MutationSubmitProposalArgs = {
 
 export type MutationTokenArgs = {
   token: Scalars['String']
+};
+
+
+export type MutationSelectRoleArgs = {
+  token: Scalars['String'],
+  selectedRoleId?: Maybe<Scalars['Int']>
 };
 
 
@@ -1146,6 +1153,7 @@ export type User = {
   roles: Array<Role>,
   reviews: Array<Review>,
   proposals: Array<Proposal>,
+  seps: Array<Sep>,
 };
 
 export type UserQueryResult = {
@@ -1259,6 +1267,20 @@ export type CreateSepMutation = (
       & Pick<Sep, 'id'>
     )> }
   ) }
+);
+
+export type GetUserSepsQueryVariables = {};
+
+
+export type GetUserSepsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { seps: Array<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
+    )> }
+  )> }
 );
 
 export type GetSepQueryVariables = {
@@ -2453,6 +2475,21 @@ export type GetFieldsQuery = (
   )> }
 );
 
+export type GetMyRolesQueryVariables = {};
+
+
+export type GetMyRolesQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'firstname' | 'lastname'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )> }
+  )> }
+);
+
 export type GetOrcIdInformationQueryVariables = {
   authorizationCode: Scalars['String']
 };
@@ -2617,6 +2654,20 @@ export type ResetPasswordEmailMutation = (
   & { resetPasswordEmail: (
     { __typename?: 'ResetPasswordEmailResponseWrap' }
     & Pick<ResetPasswordEmailResponseWrap, 'error' | 'success'>
+  ) }
+);
+
+export type SelectRoleMutationVariables = {
+  token: Scalars['String'],
+  selectedRoleId: Scalars['Int']
+};
+
+
+export type SelectRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { selectRole: (
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
   ) }
 );
 
@@ -2935,6 +2986,19 @@ export const CreateSepDocument = gql`
       id
     }
     error
+  }
+}
+    `;
+export const GetUserSepsDocument = gql`
+    query getUserSeps {
+  me {
+    seps {
+      id
+      code
+      description
+      numberRatingsRequired
+      active
+    }
   }
 }
     `;
@@ -3628,6 +3692,19 @@ export const GetFieldsDocument = gql`
   }
 }
     `;
+export const GetMyRolesDocument = gql`
+    query getMyRoles {
+  me {
+    firstname
+    lastname
+    roles {
+      id
+      shortCode
+      title
+    }
+  }
+}
+    `;
 export const GetOrcIdInformationDocument = gql`
     query getOrcIDInformation($authorizationCode: String!) {
   getOrcIDInformation(authorizationCode: $authorizationCode) {
@@ -3770,6 +3847,14 @@ export const ResetPasswordEmailDocument = gql`
   }
 }
     `;
+export const SelectRoleDocument = gql`
+    mutation selectRole($token: String!, $selectedRoleId: Int!) {
+  selectRole(token: $token, selectedRoleId: $selectedRoleId) {
+    token
+    error
+  }
+}
+    `;
 export const UpdatePasswordDocument = gql`
     mutation updatePassword($id: Int!, $password: String!) {
   updatePassword(id: $id, password: $password) {
@@ -3821,6 +3906,9 @@ export function getSdk(client: GraphQLClient) {
     },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
+    },
+    getUserSeps(variables?: GetUserSepsQueryVariables): Promise<GetUserSepsQuery> {
+      return client.request<GetUserSepsQuery>(print(GetUserSepsDocument), variables);
     },
     getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
       return client.request<GetSepQuery>(print(GetSepDocument), variables);
@@ -3984,6 +4072,9 @@ export function getSdk(client: GraphQLClient) {
     getFields(variables?: GetFieldsQueryVariables): Promise<GetFieldsQuery> {
       return client.request<GetFieldsQuery>(print(GetFieldsDocument), variables);
     },
+    getMyRoles(variables?: GetMyRolesQueryVariables): Promise<GetMyRolesQuery> {
+      return client.request<GetMyRolesQuery>(print(GetMyRolesDocument), variables);
+    },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables): Promise<GetOrcIdInformationQuery> {
       return client.request<GetOrcIdInformationQuery>(print(GetOrcIdInformationDocument), variables);
     },
@@ -4019,6 +4110,9 @@ export function getSdk(client: GraphQLClient) {
     },
     resetPasswordEmail(variables: ResetPasswordEmailMutationVariables): Promise<ResetPasswordEmailMutation> {
       return client.request<ResetPasswordEmailMutation>(print(ResetPasswordEmailDocument), variables);
+    },
+    selectRole(variables: SelectRoleMutationVariables): Promise<SelectRoleMutation> {
+      return client.request<SelectRoleMutation>(print(SelectRoleDocument), variables);
     },
     updatePassword(variables: UpdatePasswordMutationVariables): Promise<UpdatePasswordMutation> {
       return client.request<UpdatePasswordMutation>(print(UpdatePasswordDocument), variables);

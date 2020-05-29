@@ -50,7 +50,7 @@ export default function PeoplePage() {
     <React.Fragment>
       <ContentContainer>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid item xs={12} data-cy="people-table">
             <StyledPaper>
               {sendUserEmail.show ? (
                 <InviteUserForm

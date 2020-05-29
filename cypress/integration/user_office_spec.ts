@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+/// <reference types="../types" />
 
 context('User Officer tests', () => {
   const faker = require('faker');
