@@ -1,15 +1,15 @@
 import { eventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { UserWithRole } from '../models/User';
 import { Rejection, isRejection } from '../rejection';
-import { User } from '../resolvers/types/User';
 
 const EventBusDecorator = (eventType: Event) => {
   return (
     target: object,
     name: string,
     descriptor: {
-      value?: (agent: User, args: any) => Promise<Rejection | any>;
+      value?: (agent: UserWithRole, args: any) => Promise<Rejection | any>;
     }
   ) => {
     const originalMethod = descriptor.value;

@@ -3,7 +3,7 @@ import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
@@ -19,7 +19,7 @@ export default class ReviewMutations {
 
   @Authorized()
   async updateReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddReviewArgs
   ): Promise<Review | Rejection> {
     const { reviewID, comment, grade } = args;
@@ -53,7 +53,7 @@ export default class ReviewMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async setTechnicalReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
     return this.dataSource
@@ -70,7 +70,7 @@ export default class ReviewMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async removeUserForReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     id: number
   ): Promise<Review | Rejection> {
     return this.dataSource
@@ -88,7 +88,7 @@ export default class ReviewMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async addUserForReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
     const { proposalID, userID } = args;

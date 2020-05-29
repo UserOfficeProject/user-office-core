@@ -3,7 +3,7 @@ import { Authorized } from '../decorators';
 import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class ReviewQueries {
@@ -13,7 +13,7 @@ export default class ReviewQueries {
   ) {}
 
   @Authorized()
-  async get(agent: User | null, id: number): Promise<Review | null> {
+  async get(agent: UserWithRole | null, id: number): Promise<Review | null> {
     const review = await this.dataSource.get(id);
     if (!review) {
       return null;
@@ -21,7 +21,7 @@ export default class ReviewQueries {
 
     if (
       (await this.userAuth.isUserOfficer(agent)) ||
-      review.userID === (agent as User).id
+      review.userID === (agent as UserWithRole).id
     ) {
       return this.dataSource.get(id);
     } else {
@@ -31,7 +31,7 @@ export default class ReviewQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async reviewsForProposal(
-    agent: User | null,
+    agent: UserWithRole | null,
     proposalId: number
   ): Promise<Review[] | null> {
     return this.dataSource.getProposalReviews(proposalId);
@@ -39,7 +39,7 @@ export default class ReviewQueries {
 
   @Authorized()
   async technicalReviewForProposal(
-    user: User | null,
+    user: UserWithRole | null,
     proposalID: number
   ): Promise<TechnicalReview | null> {
     if (await this.userAuth.isUserOfficer(user)) {

@@ -8,7 +8,7 @@ import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
 import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
@@ -30,7 +30,7 @@ export default class ProposalMutations {
   @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     callId: number
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
@@ -60,7 +60,7 @@ export default class ProposalMutations {
   @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateProposalArgs
   ): Promise<Proposal | Rejection> {
     const {
@@ -187,7 +187,7 @@ export default class ProposalMutations {
   }
   @Authorized()
   async updateFiles(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateProposalFilesArgs
   ): Promise<string[] | Rejection> {
     const { proposalId, questionId, files } = args;
@@ -219,7 +219,7 @@ export default class ProposalMutations {
   @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
-    agent: User | null,
+    agent: UserWithRole | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
     const proposal = await this.proposalDataSource.get(proposalId);
@@ -250,7 +250,7 @@ export default class ProposalMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async delete(
-    agent: User | null,
+    agent: UserWithRole | null,
     proposalId: number
   ): Promise<Proposal | Rejection> {
     const proposal = await this.proposalDataSource.get(proposalId);
@@ -265,7 +265,10 @@ export default class ProposalMutations {
   }
   @EventBus(Event.PROPOSAL_NOTIFIED)
   @Authorized([Roles.USER_OFFICER])
-  async notify(user: User | null, args: NotifyProposalArgs): Promise<unknown> {
+  async notify(
+    user: UserWithRole | null,
+    args: NotifyProposalArgs
+  ): Promise<unknown> {
     const proposal = await this.proposalDataSource.get(args.id);
 
     if (!proposal || proposal.notified || !proposal.finalStatus) {
@@ -279,7 +282,7 @@ export default class ProposalMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async admin(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AdministrationProposalArgs
   ): Promise<Proposal | Rejection> {
     const {

@@ -2,16 +2,12 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized } from '../decorators';
 import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class AdminMutations {
-  constructor(
-    private dataSource: AdminDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: AdminDataSource) {}
 
   async resetDB(): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
@@ -31,7 +27,7 @@ export default class AdminMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
-    agent: User | null,
+    agent: UserWithRole | null,
     { id, text }: { id: number; text: string }
   ): Promise<Page | Rejection> {
     return this.dataSource

@@ -7,6 +7,9 @@ import {
   dummyUserNotOnProposal,
   dummyUserOfficer,
   UserDataSourceMock,
+  dummyUserWithRole,
+  dummyUserNotOnProposalWithRole,
+  dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { BasicUserDetails, UserRole } from '../models/User';
@@ -52,7 +55,7 @@ test('A user can invite another user by email', () => {
   );
 
   return expect(
-    userMutations.createUserByEmailInvite(dummyUser, {
+    userMutations.createUserByEmailInvite(dummyUserWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
@@ -74,7 +77,7 @@ test('A user must be logged in to invite another user by email', () => {
 
 test('A user cannot invite another user by email if the user already has an account', () => {
   return expect(
-    userMutations.createUserByEmailInvite(dummyUserNotOnProposal, {
+    userMutations.createUserByEmailInvite(dummyUserNotOnProposalWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyUser.email,
@@ -91,7 +94,7 @@ test('A user can reinvite another user by email if the user has not created an a
   );
 
   return expect(
-    userMutations.createUserByEmailInvite(dummyUser, {
+    userMutations.createUserByEmailInvite(dummyUserWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
@@ -108,7 +111,7 @@ test('A user officer can invite a reviewer by email', () => {
   );
 
   return expect(
-    userMutations.createUserByEmailInvite(dummyUserOfficer, {
+    userMutations.createUserByEmailInvite(dummyUserOfficerWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
       email: dummyPlaceHolderUser.email,
@@ -119,7 +122,7 @@ test('A user officer can invite a reviewer by email', () => {
 
 test('A user cannot invite a reviewer by email', () => {
   return expect(
-    userMutations.createUserByEmailInvite(dummyUser, {
+    userMutations.createUserByEmailInvite(dummyUserWithRole, {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'email@google.com',
@@ -130,7 +133,7 @@ test('A user cannot invite a reviewer by email', () => {
 
 test('A user can update its own name', () => {
   return expect(
-    userMutations.update(dummyUser, {
+    userMutations.update(dummyUserWithRole, {
       id: 2,
       firstname: 'klara',
       lastname: 'undefined',
@@ -140,7 +143,7 @@ test('A user can update its own name', () => {
 
 test('A user cannot update another users name', () => {
   return expect(
-    userMutations.update(dummyUserNotOnProposal, {
+    userMutations.update(dummyUserNotOnProposalWithRole, {
       id: 2,
       firstname: 'klara',
       lastname: 'undefined',
@@ -160,7 +163,7 @@ test('A not logged in user cannot update another users name', () => {
 
 test('A userofficer can update another users name', () => {
   return expect(
-    userMutations.update(dummyUserOfficer, {
+    userMutations.update(dummyUserOfficerWithRole, {
       id: 2,
       firstname: 'klara',
       lastname: 'undefined',
@@ -170,7 +173,7 @@ test('A userofficer can update another users name', () => {
 
 test('A user cannot update its roles', () => {
   return expect(
-    userMutations.update(dummyUser, {
+    userMutations.update(dummyUserWithRole, {
       id: 2,
       firstname: 'klara',
       lastname: 'undefined',
@@ -181,7 +184,7 @@ test('A user cannot update its roles', () => {
 
 test('A userofficer can update users roles', () => {
   return expect(
-    userMutations.update(dummyUserOfficer, {
+    userMutations.update(dummyUserOfficerWithRole, {
       id: 2,
       firstname: 'klara',
       lastname: 'undefined',
@@ -247,7 +250,7 @@ test('A user can not update its password if it has a bad token', () => {
 
 test('A user can update its password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUser, {
+    userMutations.updatePassword(dummyUserWithRole, {
       id: dummyUser.id,
       password: 'Test1234!',
     })
@@ -256,7 +259,7 @@ test('A user can update its password ', () => {
 
 test('A user can not update another users password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUserNotOnProposal, {
+    userMutations.updatePassword(dummyUserNotOnProposalWithRole, {
       id: dummyUser.id,
       password: 'Test1234!',
     })
@@ -274,7 +277,7 @@ test('A not logged in users can not update passwords ', () => {
 
 test('A user officer can update any password ', () => {
   return expect(
-    userMutations.updatePassword(dummyUserOfficer, {
+    userMutations.updatePassword(dummyUserOfficerWithRole, {
       id: dummyUser.id,
       password: 'Test1234!',
     })
@@ -284,7 +287,10 @@ test('A user officer can update any password ', () => {
 test('A user must not be able to obtain token for another user', async () => {
   return expect(
     isRejection(
-      await userMutations.getTokenForUser(dummyUser, dummyUserOfficer.id)
+      await userMutations.getTokenForUser(
+        dummyUserWithRole,
+        dummyUserOfficer.id
+      )
     )
   ).toBe(true);
 });
@@ -292,13 +298,13 @@ test('A user must not be able to obtain token for another user', async () => {
 test('A user must not be able to delete another user', async () => {
   return expect(
     isRejection(
-      await userMutations.delete(dummyUser, dummyUserNotOnProposal.id)
+      await userMutations.delete(dummyUserWithRole, dummyUserNotOnProposal.id)
     )
   ).toBe(true);
 });
 
 test('A user officer can must be able to delete another user', async () => {
   return expect(
-    userMutations.delete(dummyUserOfficer, dummyUser.id)
+    userMutations.delete(dummyUserOfficerWithRole, dummyUser.id)
   ).resolves.toBe(dummyUser);
 });

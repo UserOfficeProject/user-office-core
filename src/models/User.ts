@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { Role } from './Role';
 export class User {
   constructor(
     public id: number,
@@ -24,6 +25,10 @@ export class User {
     public created: string,
     public updated: string
   ) {}
+}
+
+export interface UserWithRole extends User {
+  currentRole: Role | undefined;
 }
 
 export enum UserRole {

@@ -110,6 +110,20 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       });
   }
 
+  async getUserSeps(id: number): Promise<SEP[]> {
+    return database
+      .select('ru.*', 's.*')
+      .from('role_user as ru')
+      .innerJoin('SEPs as s', {
+        'ru.sep_id': 's.sep_id',
+      })
+      .where('ru.user_id', id)
+      .groupBy('s.sep_id', 'ru.role_user_id')
+      .then((allSeps: SEPRecord[]) =>
+        allSeps.map(sep => this.createSEPObject(sep))
+      );
+  }
+
   async getAll(
     active: boolean,
     filter?: string,

@@ -104,6 +104,10 @@ export class SEPDataSourceMock implements SEPDataSource {
     return null;
   }
 
+  async getUserSeps(id: number): Promise<SEP[]> {
+    return [dummySEP];
+  }
+
   async getAll(
     active: boolean,
     filter?: string,
