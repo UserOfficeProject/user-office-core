@@ -1,4 +1,11 @@
-import * as yup from 'yup';
+import {
+  createSEPValidationSchema,
+  updateSEPValidationSchema,
+  updateSEPMemberValidationSchema,
+  assignProposalToSEPValidationSchema,
+  assignSEPChairOrSecretaryValidationSchema,
+  assignSEPMemberToProposalValidationSchema,
+} from '@esss-swap/duo-validation';
 
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
@@ -17,49 +24,6 @@ import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
 import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
-const createSEPValidationSchema = yup.object().shape({
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const updateSEPValidationSchema = yup.object().shape({
-  id: yup.number().required(),
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const assignSEPChairOrSecretaryValidationSchema = yup.object().shape({
-  addSEPMembersRole: yup
-    .object()
-    .shape({
-      userID: yup.number().required(),
-      roleID: yup
-        .number()
-        .oneOf([UserRole.SEP_CHAIR, UserRole.SEP_SECRETARY])
-        .required(),
-      SEPID: yup.number().required(),
-    })
-    .required(),
-});
-
-const updateSEPMemberValidationSchema = yup.object().shape({
-  memberId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignProposalToSEPValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignSEPMemberToProposalValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-  memberId: yup.number().required(),
-});
 
 export default class SEPMutations {
   constructor(
@@ -121,7 +85,7 @@ export default class SEPMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema)
+  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema(UserRole))
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
     agent: UserWithRole | null,

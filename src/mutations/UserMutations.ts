@@ -1,7 +1,7 @@
+import { createUserValidationSchema } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
-import * as yup from 'yup';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
@@ -18,18 +18,6 @@ import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
 import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
-// TODO: Update the validation schemas later when we know all the validation rules.
-const createUserValidationSchema = yup.object().shape({
-  firstname: yup
-    .string()
-    .required()
-    .min(2),
-  lastname: yup
-    .string()
-    .required()
-    .min(2),
-});
 
 export default class UserMutations {
   constructor(

@@ -28,6 +28,7 @@
   "license": "ISC",
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.9",
+    "@esss-swap/duo-validation": "^1.0.1",
     "@types/amqplib": "^0.5.13",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
@@ -43,7 +44,7 @@
     "@types/react-beautiful-dnd": "^11.0.5",
     "@types/request-promise": "^4.1.46",
     "@types/sparkpost": "^2.1.4",
-    "@types/yup": "^0.26.37",
+    "@types/yup": "^0.29.0",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "amqplib": "^0.5.3",
@@ -71,7 +72,7 @@
     "type-graphql": "^0.17.6",
     "typedi": "^0.8.0",
     "typescript": "^3.8.3",
-    "yup": "^0.28.4"
+    "yup": "^0.29.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
