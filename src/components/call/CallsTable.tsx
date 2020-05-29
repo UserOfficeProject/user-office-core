@@ -1,7 +1,8 @@
-import React from 'react';
-import { Call } from '../../generated/sdk';
-import MaterialTable, { MaterialTableProps } from 'material-table';
 import dateformat from 'dateformat';
+import MaterialTable, { MaterialTableProps } from 'material-table';
+import React from 'react';
+
+import { Call } from '../../generated/sdk';
 import { tableIcons } from '../../utils/materialIcons';
 
 export function CallsTable(props: CallsTableProps) {

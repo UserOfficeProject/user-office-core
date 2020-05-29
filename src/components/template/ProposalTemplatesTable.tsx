@@ -5,6 +5,7 @@ import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+
 import {
   GetCallsQueryVariables,
   GetProposalTemplatesQuery,
@@ -35,6 +36,7 @@ function CallsModal(props: {
   if (loading) {
     return <div>loading...</div>;
   }
+
   return (
     <Dialog
       open={props.filter !== undefined}

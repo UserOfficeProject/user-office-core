@@ -3,13 +3,14 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import { Add } from '@material-ui/icons';
 import React, { useEffect, useState } from 'react';
+
 import { Call } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import AddCall from './AddCall';
 import { CallsTable } from './CallsTable';
 
-var callsFilter = {};
+let callsFilter = {};
 
 const CallPage: React.FC = () => {
   const [show, setShow] = useState(false);

@@ -2,6 +2,7 @@ import { Typography } from '@material-ui/core';
 import React from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
+
 import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
