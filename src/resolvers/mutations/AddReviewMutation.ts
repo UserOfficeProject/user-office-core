@@ -5,13 +5,14 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
+  Resolver,
+} from 'type-graphql';
 
-import { ReviewResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { Review } from "../types/Review";
+import { ResolverContext } from '../../context';
+import { ReviewStatus } from '../../models/Review';
+import { ReviewResponseWrap } from '../types/CommonWrappers';
+import { Review } from '../types/Review';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class AddReviewArgs {
@@ -23,14 +24,17 @@ export class AddReviewArgs {
 
   @Field(() => Int)
   public grade: number;
+
+  @Field(() => ReviewStatus)
+  status: ReviewStatus;
 }
 
 @Resolver()
-export class AddReviewMutation {
+export class UpdateReviewMutation {
   @Mutation(() => ReviewResponseWrap)
   addReview(@Args() args: AddReviewArgs, @Ctx() context: ResolverContext) {
     return wrapResponse<Review>(
-      context.mutations.review.submitReview(context.user, args),
+      context.mutations.review.updateReview(context.user, args),
       ReviewResponseWrap
     );
   }

@@ -1,77 +1,74 @@
-import "reflect-metadata";
-import ReviewMutations from "./ReviewMutations";
-import { EventBus } from "../events/eventBus";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import 'reflect-metadata';
 import {
-  reviewDataSource,
-  dummyReview
-} from "../datasources/mockups/ReviewDataSource";
-import { ApplicationEvent } from "../events/applicationEvents";
-
+  ReviewDataSourceMock,
+  dummyReview,
+} from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
   dummyUserNotOnProposal,
-  dummyUserOfficer
-} from "../datasources/mockups/UserDataSource";
-import { Review } from "../models/Review";
+  dummyUserOfficer,
+} from '../datasources/mockups/UserDataSource';
+import { Review, ReviewStatus } from '../models/Review';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import ReviewMutations from './ReviewMutations';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
-  new reviewDataSource(),
-  userAuthorization,
-  dummyEventBus
+  new ReviewDataSourceMock(),
+  userAuthorization
 );
 
 //Update
 
-test("A reviewer can submit a review on a proposal he is on", () => {
+test('A reviewer can submit a review on a proposal he is on', () => {
   return expect(
-    reviewMutations.submitReview(dummyUser, {
+    reviewMutations.updateReview(dummyUser, {
       reviewID: 10,
-      comment: "Good proposal",
-      grade: 9
+      comment: 'Good proposal',
+      grade: 9,
+      status: ReviewStatus.DRAFT,
     })
   ).resolves.toBe(dummyReview);
 });
 
-test("A user can't submit a review on a proposal", () => {
+test('A user can not submit a review on a proposal', () => {
   return expect(
-    reviewMutations.submitReview(dummyUserNotOnProposal, {
+    reviewMutations.updateReview(dummyUserNotOnProposal, {
       reviewID: 1,
-      comment: "Good proposal",
-      grade: 9
+      comment: 'Good proposal',
+      grade: 9,
+      status: ReviewStatus.DRAFT,
     })
-  ).resolves.toHaveProperty("reason", "NOT_REVIEWER_OF_PROPOSAL");
+  ).resolves.toHaveProperty('reason', 'NOT_REVIEWER_OF_PROPOSAL');
 });
 
-test("A userofficer can add a reviewer for a proposal", () => {
+test('A userofficer can add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUserOfficer, {
       userID: 1,
-      proposalID: 1
+      proposalID: 1,
     })
   ).resolves.toBeInstanceOf(Review);
 });
 
-test("A user can't add a reviewer for a proposal", () => {
+test('A user can not add a reviewer for a proposal', () => {
   return expect(
     reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
-  ).resolves.toHaveProperty("reason", "NOT_USER_OFFICER");
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
-test("A userofficer can remove a reviewer for a proposal", () => {
+test('A userofficer can remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUserOfficer, 1)
   ).resolves.toBeInstanceOf(Review);
 });
 
-test("A user can't remove a reviewer for a proposal", () => {
+test('A user can not remove a reviewer for a proposal', () => {
   return expect(
     reviewMutations.removeUserForReview(dummyUser, 1)
-  ).resolves.toHaveProperty("reason", "NOT_USER_OFFICER");
+  ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

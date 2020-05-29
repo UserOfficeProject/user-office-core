@@ -6,21 +6,32 @@ import {
   Field,
   Int,
   Args,
-  ObjectType
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Proposal } from "../types/Proposal";
+  ObjectType,
+  InputType,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Proposal } from '../types/Proposal';
+
+@InputType()
+export class ProposalsFilter {
+  @Field(() => String, { nullable: true })
+  public text?: string;
+
+  @Field(() => [Int], { nullable: true })
+  public templateIds?: number[];
+}
 
 @ArgsType()
 class ProposalsArgs {
-  @Field(() => String, { nullable: true })
-  public filter: string;
+  @Field(() => ProposalsFilter, { nullable: true })
+  public filter?: ProposalsFilter;
 
   @Field(() => Int, { nullable: true })
-  public first: number;
+  public first?: number;
 
   @Field(() => Int, { nullable: true })
-  public offset: number;
+  public offset?: number;
 }
 
 @ObjectType()

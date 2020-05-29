@@ -1,22 +1,24 @@
-import express from "express";
-import multer from "multer";
-import { unlink, existsSync } from "fs";
-import baseContext from "../buildContext";
-import { logger } from "../utils/Logger";
-import { isRejection } from "../rejection";
+import { unlink, existsSync } from 'fs';
+
+import express from 'express';
+import multer from 'multer';
+
+import baseContext from '../buildContext';
+import { isRejection } from '../rejection';
+import { logger } from '../utils/Logger';
 
 const router = express.Router();
-var upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: 'uploads/' });
 
-router.post("/files/upload", upload.single("file"), async (req, res) => {
+router.post('/files/upload', upload.single('file'), async (req, res) => {
   try {
     const {
       originalname,
       size,
       mimetype,
-      path
+      path,
     } = req.file as Express.Multer.File;
-    var result = await baseContext.mutations.file.put(
+    const result = await baseContext.mutations.file.put(
       originalname,
       mimetype,
       size,
@@ -28,7 +30,7 @@ router.post("/files/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-router.get("/files/download/:file_id", async (req, res) => {
+router.get('/files/download/:file_id', async (req, res) => {
   try {
     const fileId = req.params.file_id;
     const path = await baseContext.mutations.file.prepare(fileId);
@@ -39,16 +41,18 @@ router.get("/files/download/:file_id", async (req, res) => {
           throw err;
         }
         if (existsSync(path)) {
-          unlink(path, () => {}); // delete file once done
+          unlink(path, () => {
+            // delete file once done
+          });
         }
       });
     } else {
-      throw new Error("Could not prepare file");
+      throw new Error('Could not prepare file');
     }
   } catch (e) {
-    logger.logException("Could not download file", e, { req });
+    logger.logException('Could not download file', e, { req });
     res.status(500).send(e);
   }
 });
 
-module.exports = router;
+export default router;

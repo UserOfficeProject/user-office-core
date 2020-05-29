@@ -1,4 +1,4 @@
-import { ProposalStatus } from "./ProposalModel";
+import { ProposalStatus } from './ProposalModel';
 export class Proposal {
   constructor(
     public id: number,
@@ -10,6 +10,11 @@ export class Proposal {
     public updated: Date,
     public shortCode: string,
     public rankOrder: number,
-    public finalStatus: number
+    public finalStatus: number, // Should use ProposalEndStatus enum here
+    public callId: number,
+    public templateId: number,
+    public commentForUser: string,
+    public commentForManagement: string,
+    public notified: boolean
   ) {}
 }

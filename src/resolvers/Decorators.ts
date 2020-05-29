@@ -1,6 +1,6 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
-const metadataKey = Symbol("Response");
+const metadataKey = Symbol('Response');
 
 export function Response(): (target: object, propertyKey: string) => void {
   return (target: object, propertyKey: string) => {
@@ -15,6 +15,14 @@ export function Response(): (target: object, propertyKey: string) => void {
   };
 }
 
+function getResponseFields(origin: any): object {
+  const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
+  const result: any = {};
+  properties.forEach(key => (result[key] = origin[key]));
+
+  return result;
+}
+
 export function getResponseField(origin: any): string | null {
   const responseFields = getResponseFields(origin);
   const keys = Object.keys(responseFields);
@@ -22,12 +30,6 @@ export function getResponseField(origin: any): string | null {
     // response wrapper must have one and only one key decorated with @Response
     return null;
   }
-  return keys[0];
-}
 
-function getResponseFields(origin: any): object {
-  const properties: string[] = Reflect.getMetadata(metadataKey, origin) || [];
-  const result: any = {};
-  properties.forEach(key => (result[key] = origin[key]));
-  return result;
+  return keys[0];
 }

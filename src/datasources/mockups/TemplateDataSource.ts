@@ -1,112 +1,264 @@
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import {
-  ProposalTemplate,
-  ProposalTemplateField,
   DataType,
-  Topic,
-  ProposalAnswer,
+  FieldCondition,
+  FieldDependency,
+  ProposalTemplate,
+  Question,
+  QuestionRel,
   TemplateStep,
-  Questionary
-} from "../../models/ProposalModel";
-import { Proposal } from "../../models/Proposal";
+  Topic,
+} from '../../models/ProposalModel';
+import { getFieldById } from '../../models/ProposalModelFunctions';
+import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
+import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
+import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
+import { TemplateDataSource } from '../TemplateDataSource';
 import {
-  createDummyTemplate,
-  createDummyField,
-  createDummyTopic
-} from "../../tests/ProposalTestBed";
-import { TemplateDataSource } from "../TemplateDataSource";
+  dummyQuestionFactory,
+  dummyQuestionRelFactory,
+} from './ProposalDataSource';
 
-export var dummyTemplate: ProposalTemplate;
-export var dummyQuestionary: Questionary;
-export var dummyProposal: Proposal;
-export var dummyProposalSubmitted: Proposal;
-export var dummyAnswers: ProposalAnswer[];
+export let dummyProposalTemplate: ProposalTemplate;
+export let dummyTemplateSteps: TemplateStep[];
+export let dummyComplementarySteps: Question[];
 
-export class templateDataSource implements TemplateDataSource {
-  async isNaturalKeyPresent(natural_key: string): Promise<Boolean> {
-    return true;
-  }
+const dummyProposalTemplateFactory = (values?: Partial<ProposalTemplate>) => {
+  return new ProposalTemplate(
+    values?.templateId || 1,
+    values?.name || 'Industrial template',
+    values?.description || 'Industrial template description',
+    values?.isArchived || false
+  );
+};
+
+const dummyTopicFactory = (values?: Partial<Topic>) => {
+  return new Topic(
+    values?.id || 1,
+    values?.title || 'General information',
+    values?.sortOrder || 0,
+    values?.isEnabled || true
+  );
+};
+
+const dummyTemplateStepsFactory = () => {
+  const hasLinksToField = dummyQuestionRelFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'has_links_to_field',
+      dataType: DataType.SELECTION_FROM_OPTIONS,
+    }),
+  });
+  const linksToField = dummyQuestionRelFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'links_to_field',
+      dataType: DataType.TEXT_INPUT,
+    }),
+    dependency: new FieldDependency(
+      'links_to_field',
+      'has_links_to_field',
+      'has_links_to_field',
+      new FieldCondition(EvaluatorOperator.eq, 'yes')
+    ),
+  });
+
+  const enableCrystallization = dummyQuestionRelFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'enable_crystallization',
+      dataType: DataType.BOOLEAN,
+      question: 'Is crystallization aplicable',
+      naturalKey: 'enable_crystallization',
+    }),
+  });
+
+  const hasLinksWithIndustry = dummyQuestionRelFactory({
+    question: dummyQuestionFactory({
+      proposalQuestionId: 'has_links_with_industry',
+      dataType: DataType.BOOLEAN,
+      question: 'Has links with industry',
+      naturalKey: 'has_links_with_industry',
+    }),
+  });
+
+  return [
+    new TemplateStep(new Topic(1, 'General information', 1, true), [
+      hasLinksToField,
+      linksToField,
+      hasLinksWithIndustry,
+      enableCrystallization,
+    ]),
+  ];
+};
+
+export class TemplateDataSourceMock implements TemplateDataSource {
   public init() {
-    dummyTemplate = createDummyTemplate();
+    dummyProposalTemplate = dummyProposalTemplateFactory();
+    dummyTemplateSteps = dummyTemplateStepsFactory();
+    dummyComplementarySteps = [
+      dummyQuestionFactory({
+        proposalQuestionId: 'not_in_template',
+        naturalKey: 'not_in_template',
+      }),
+    ];
+  }
+
+  async getComplementaryQuestions(
+    templateId: number
+  ): Promise<Question[] | null> {
+    return [dummyQuestionFactory()];
+  }
+  async cloneTemplate(templateId: number): Promise<ProposalTemplate> {
+    return dummyProposalTemplateFactory({ templateId: templateId + 1 });
+  }
+  async getProposalTemplate(
+    templateId: number
+  ): Promise<ProposalTemplate | null> {
+    return dummyProposalTemplate;
+  }
+  async updateTemplate(
+    values: UpdateProposalTemplateArgs
+  ): Promise<ProposalTemplate | null> {
+    dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
+
+    return dummyProposalTemplate;
+  }
+  async createQuestionRel(
+    args: CreateQuestionRelArgs
+  ): Promise<ProposalTemplate> {
+    return dummyProposalTemplate;
+  }
+  async getQuestionRel(
+    questionId: string,
+    templateId: number
+  ): Promise<QuestionRel | null> {
+    return dummyQuestionRelFactory({
+      question: { proposalQuestionId: questionId },
+    });
+  }
+  async deleteQuestionRel(
+    args: DeleteQuestionRelArgs
+  ): Promise<ProposalTemplate> {
+    dummyTemplateSteps.forEach(function(step) {
+      step.fields = step.fields.filter(field => {
+        return field.question.proposalQuestionId !== args.questionId;
+      });
+    });
+
+    return dummyProposalTemplate;
+  }
+  async updateQuestionRel(
+    args: UpdateQuestionRelArgs
+  ): Promise<ProposalTemplate> {
+    const question = getFieldById(
+      dummyTemplateSteps,
+      args.questionId
+    ) as QuestionRel;
+    question.sortOrder = args.sortOrder || 0;
+    question.topicId = args.topicId || 1;
+
+    return dummyProposalTemplate;
+  }
+  async createTemplate(
+    name: string,
+    description?: string
+  ): Promise<ProposalTemplate> {
+    return dummyProposalTemplateFactory({ name, description });
+  }
+  async deleteTemplate(templateId: number): Promise<ProposalTemplate> {
+    return dummyProposalTemplateFactory({ templateId });
+  }
+  async getProposalTemplates(
+    args?: ProposalTemplatesArgs
+  ): Promise<ProposalTemplate[]> {
+    return [
+      new ProposalTemplate(
+        1,
+        'Industrial',
+        'Industrial proposal template',
+        args?.filter?.isArchived || false
+      ),
+    ];
+  }
+  async isNaturalKeyPresent(naturalKey: string): Promise<boolean> {
+    return true;
   }
 
   async updateTopicOrder(topicOrder: number[]): Promise<number[]> {
     return topicOrder;
   }
   async deleteTopic(id: number): Promise<Topic> {
-    return createDummyTopic(id, {});
+    return dummyTopicFactory({ id });
   }
-  async createTemplateField(
-    fieldId: string,
+  async createQuestion(
+    questionId: string,
     naturalKey: string,
-    topicId: number,
     dataType: DataType,
-    question: string,
-    config: string
-  ): Promise<ProposalTemplateField> {
-    return createDummyField({
-      proposal_question_id: fieldId,
-      natural_key: naturalKey,
-      topic_id: topicId,
-      data_type: dataType,
-      question: question,
-      config: JSON.parse(config || "{}")
+    question: string
+  ): Promise<Question> {
+    return dummyQuestionFactory({
+      naturalKey: naturalKey,
+      dataType: dataType,
+      proposalQuestionId: questionId,
+      question,
     });
   }
 
-  async getTemplateField(
-    fieldId: string
-  ): Promise<ProposalTemplateField | null> {
-    return createDummyField({ proposal_question_id: fieldId });
+  async getQuestion(questionId: string): Promise<Question | null> {
+    return dummyQuestionFactory({ proposalQuestionId: questionId });
   }
 
-  async deleteTemplateField(fieldId: string): Promise<ProposalTemplate> {
-    return this.getProposalTemplate();
+  async deleteQuestion(questionId: string): Promise<Question> {
+    return dummyQuestionFactory({ proposalQuestionId: questionId });
   }
-  async updateTemplateField(
-    proposal_question_id: string,
+  async updateQuestion(
+    questionId: string,
     values: {
-      natural_key?: string;
-      data_type?: DataType;
+      naturalKey?: string;
+      dataType?: string;
       question?: string;
-      topic?: number;
       config?: string;
-      sort_order: number;
     }
-  ): Promise<ProposalTemplate> {
-    var template = await this.getProposalTemplate();
-    template.steps.forEach(topic => {
+  ): Promise<Question> {
+    const steps = await this.getProposalTemplateSteps();
+    steps.forEach(topic => {
       topic.fields!.forEach(field => {
-        if (field.proposal_question_id === proposal_question_id) {
+        if (field.question.proposalQuestionId === questionId) {
+          console.log(field);
           Object.assign(field, values);
+
+          return field.question;
         }
       });
     });
 
-    return template;
+    throw new Error('Not found');
   }
 
   async updateTopic(
-    id: number,
+    topicId: number,
     values: { title?: string; isEnabled?: boolean }
   ): Promise<Topic> {
     return new Topic(
-      id,
-      values.title || "Topic title",
+      topicId,
+      values.title || 'Topic title',
       3,
       values.isEnabled !== undefined ? values.isEnabled : true
     );
   }
 
-  async createTopic(sortOrder: number): Promise<ProposalTemplate> {
-    dummyTemplate.steps.splice(
-      sortOrder,
+  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
+    dummyTemplateSteps.splice(
+      args.sortOrder,
       0,
-      new TemplateStep(new Topic(2, "New Topic", sortOrder, false), [])
+      new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
     );
-    return dummyTemplate;
+
+    return dummyProposalTemplate;
   }
 
-  async getProposalTemplate(): Promise<ProposalTemplate> {
-    return createDummyTemplate();
+  async getProposalTemplateSteps(): Promise<TemplateStep[]> {
+    return dummyTemplateSteps;
   }
 }

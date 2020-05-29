@@ -1,8 +1,4 @@
-import "reflect-metadata";
-import { rejection } from "../rejection";
-import { Field, Int, ObjectType } from "type-graphql";
-import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
-
+import 'reflect-metadata';
 export class User {
   constructor(
     public id: number,
@@ -33,7 +29,10 @@ export class User {
 export enum UserRole {
   USER = 1,
   USEROFFICER = 2,
-  REVIEWER = 3
+  REVIEWER = 3,
+  SEP_CHAIR = 4,
+  SEP_SECRETARY = 5,
+  SEP_MEMBER = 6,
 }
 
 export class BasicUserDetails {
@@ -42,18 +41,8 @@ export class BasicUserDetails {
     public firstname: string,
     public lastname: string,
     public organisation: string,
-    public position: string
+    public position: string,
+    public created: Date,
+    public placeholder: boolean
   ) {}
-}
-export function checkUserArgs(args: UpdateUserArgs) {
-  const { firstname, lastname } = args;
-  if (firstname && firstname.length < 2) {
-    return rejection("TOO_SHORT_NAME");
-  }
-
-  if (lastname && lastname.length < 2) {
-    return rejection("TOO_SHORT_NAME");
-  }
-
-  return true;
 }

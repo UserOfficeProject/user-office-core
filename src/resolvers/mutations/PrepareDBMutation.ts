@@ -1,12 +1,16 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
-import { ResolverContext } from "../../context";
-import { SuccessResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+import { Ctx, Mutation, Resolver } from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { PrepareDBResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
 export class PrepareDBMutationMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => PrepareDBResponseWrap)
   prepareDB(@Ctx() context: ResolverContext) {
-    return wrapResponse(context.mutations.admin.resetDB(), SuccessResponseWrap);
+    return wrapResponse(
+      context.mutations.admin.resetDB(),
+      PrepareDBResponseWrap
+    );
   }
 }

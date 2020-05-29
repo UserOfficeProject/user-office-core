@@ -1,5 +1,6 @@
-import { Field, Int, ObjectType } from "type-graphql";
-import { Call as CallOrigin } from "../../models/Call";
+import { Field, Int, ObjectType } from 'type-graphql';
+
+import { Call as CallOrigin } from '../../models/Call';
 
 @ObjectType()
 export class Call implements Partial<CallOrigin> {
@@ -32,4 +33,7 @@ export class Call implements Partial<CallOrigin> {
 
   @Field()
   public surveyComment: string;
+
+  @Field(() => Int, { nullable: true })
+  public templateId?: number;
 }

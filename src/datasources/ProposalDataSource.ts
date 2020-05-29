@@ -1,12 +1,15 @@
-import { Questionary } from "../models/ProposalModel";
-import { Proposal } from "../models/Proposal";
+/* eslint-disable @typescript-eslint/camelcase */
+import { Proposal } from '../models/Proposal';
+import { Questionary } from '../models/ProposalModel';
+import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
+  getEmptyQuestionary(callId: number): Promise<Questionary>;
   // Read
   get(id: number): Promise<Proposal | null>;
-  checkActiveCall(): Promise<Boolean>;
+  checkActiveCall(callId: number): Promise<boolean>;
   getProposals(
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
@@ -14,7 +17,11 @@ export interface ProposalDataSource {
   getQuestionary(proposalId: number): Promise<Questionary>;
 
   // Write
-  create(id: number): Promise<Proposal>;
+  create(
+    proposerId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal>;
   update(proposal: Proposal): Promise<Proposal>;
   setProposalUsers(id: number, users: number[]): Promise<void>;
   submitProposal(id: number): Promise<Proposal>;

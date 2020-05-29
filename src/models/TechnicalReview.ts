@@ -3,6 +3,7 @@ export class TechnicalReview {
     public id: number,
     public proposalID: number,
     public comment: string,
+    public publicComment: string,
     public timeAllocation: number,
     public status: number
   ) {}
@@ -11,5 +12,5 @@ export class TechnicalReview {
 export enum TechnicalReviewStatus {
   FEASIBLE = 0,
   PARTIALLY_FEASIBLE = 1,
-  UNFEASIBLE = 2
+  UNFEASIBLE = 2,
 }

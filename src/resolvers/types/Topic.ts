@@ -1,17 +1,17 @@
-import { ObjectType, Field, Int } from "type-graphql";
+import { ObjectType, Field, Int } from 'type-graphql';
 
-import { Topic as TopicOrigin } from "../../models/ProposalModel";
+import { Topic as TopicOrigin } from '../../models/ProposalModel';
 @ObjectType()
 export class Topic implements Partial<TopicOrigin> {
   @Field(type => Int)
-  public topic_id: number; // TODO fix casing. Use CamelCasing
+  public id: number; // TODO fix casing. Use CamelCasing
 
   @Field()
-  public topic_title: string;
+  public title: string;
 
   @Field(type => Int)
-  public sort_order: number;
+  public sortOrder: number;
 
   @Field()
-  public is_enabled: boolean;
+  public isEnabled: boolean;
 }

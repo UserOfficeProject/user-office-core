@@ -1,7 +1,16 @@
-import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from "type-graphql";
-import { ResolverContext } from "../../context";
-import { CallResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+import {
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  Mutation,
+  Resolver,
+  Int,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { CallResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateCallArgs {
@@ -9,28 +18,31 @@ export class CreateCallArgs {
   public shortCode: string;
 
   @Field()
-  public startCall: string;
+  public startCall: Date;
 
   @Field()
-  public endCall: string;
+  public endCall: Date;
 
   @Field()
-  public startReview: string;
+  public startReview: Date;
 
   @Field()
-  public endReview: string;
+  public endReview: Date;
 
   @Field()
-  public startNotify: string;
+  public startNotify: Date;
 
   @Field()
-  public endNotify: string;
+  public endNotify: Date;
 
   @Field()
   public cycleComment: string;
 
   @Field()
   public surveyComment: string;
+
+  @Field(() => Int, { nullable: true })
+  public templateId?: number;
 }
 
 @Resolver()

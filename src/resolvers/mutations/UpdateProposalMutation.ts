@@ -6,13 +6,26 @@ import {
   InputType,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { DataType } from "../../models/ProposalModel";
-import { ProposalResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { ProposalEndStatus } from "../../models/ProposalModel";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { DataType } from '../../models/ProposalModel';
+import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
+import { ProposalResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
+
+@InputType()
+class ProposalAnswerInput {
+  @Field()
+  proposalQuestionId: string;
+
+  @Field(() => DataType, { nullable: true })
+  dataType: DataType;
+
+  @Field(() => String, { nullable: true })
+  value: string;
+}
 
 @ArgsType()
 export class UpdateProposalArgs {
@@ -39,12 +52,6 @@ export class UpdateProposalArgs {
 
   @Field(() => Boolean, { nullable: true })
   public partialSave?: boolean;
-
-  @Field(() => Int, { nullable: true })
-  public rankOrder?: number;
-
-  @Field(() => ProposalEndStatus, { nullable: true })
-  public finalStatus?: ProposalEndStatus;
 }
 
 @Resolver()
@@ -60,16 +67,4 @@ export class UpdateProposalMutation {
       ProposalResponseWrap
     );
   }
-}
-
-@InputType()
-class ProposalAnswerInput {
-  @Field()
-  proposal_question_id: string;
-
-  @Field(() => DataType, { nullable: true })
-  data_type: DataType;
-
-  @Field(() => String, { nullable: true })
-  value: string;
 }

@@ -1,200 +1,297 @@
-import { TemplateDataSource } from "../datasources/TemplateDataSource";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { EventBus } from "../events/eventBus";
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { Authorized } from '../decorators';
 import {
   createConfig,
   DataType,
   ProposalTemplate,
-  ProposalTemplateField,
-  Topic
-} from "../models/ProposalModel";
-import { User } from "../models/User";
-import { rejection, Rejection } from "../rejection";
-import { CreateTemplateFieldArgs } from "../resolvers/mutations/CreateTemplateFieldMutation";
-import { UpdateProposalTemplateFieldArgs } from "../resolvers/mutations/UpdateProposalTemplateFieldMutation";
+  Question,
+  Topic,
+} from '../models/ProposalModel';
+import { Roles } from '../models/Role';
+import { User } from '../models/User';
+import { rejection, Rejection } from '../rejection';
+import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
+import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
+import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
+import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
   ConfigBase,
   EmbellishmentConfig,
   FieldConfigType,
   FileUploadConfig,
-  SelectionFromOptionsConfig
-} from "../resolvers/types/FieldConfig";
-import { ILogger, logger } from "../utils/Logger";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { UpdateTopicArgs } from "../resolvers/mutations/UpdateTopicMutation";
+  SelectionFromOptionsConfig,
+} from '../resolvers/types/FieldConfig';
+import { Logger, logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class TemplateMutations {
   constructor(
     private dataSource: TemplateDataSource,
     private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>,
-    private logger: ILogger
+    private logger: Logger
   ) {}
 
-  async createTopic(
+  @Authorized([Roles.USER_OFFICER])
+  async createTemplate(
     agent: User | null,
-    sortOrder: number
+    name: string,
+    description?: string
   ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
+    const result = await this.dataSource
+      .createTemplate(name, description)
+      .then(result => result);
+
+    return result;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async cloneTemplate(
+    agent: User | null,
+    templateId: number
+  ): Promise<unknown> {
+    const result = await this.dataSource
+      .cloneTemplate(templateId)
+      .then(result => result);
+
+    return result;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteTemplate(
+    user: User | null,
+    id: number
+  ): Promise<ProposalTemplate | Rejection> {
     return this.dataSource
-      .createTopic(sortOrder)
+      .deleteTemplate(id)
       .then(template => template)
       .catch(err => {
-        logger.logException("Could not create topic", err, {
-          agent,
-          sortOrder
-        });
-        return rejection("INTERNAL_ERROR");
+        logger.logException('Could not delete proposal', err, { id, user });
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async createTopic(
+    user: User | null,
+    args: CreateTopicArgs
+  ): Promise<ProposalTemplate | Rejection> {
+    return this.dataSource
+      .createTopic(args)
+      .then(response => response)
+      .catch(err => {
+        logger.logException('Could not create topic', err, {
+          user,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+  @Authorized([Roles.USER_OFFICER])
   async updateTopic(
     agent: User | null,
     args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
     return this.dataSource
       .updateTopic(args.id, args)
       .then(topic => topic)
       .catch(err => {
-        logger.logException("Could not update topic", err, {
+        logger.logException('Could not update topic', err, {
           agent,
-          args
+          args,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
-
+  @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
     agent: User | null,
     topicId: number
   ): Promise<Topic | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
-
     return this.dataSource
       .deleteTopic(topicId)
       .then(topic => topic)
       .catch(err => {
-        logger.logException("Could not delete topic", err, { agent, topicId });
-        return rejection("INTERNAL_ERROR");
+        logger.logException('Could not delete topic', err, { agent, topicId });
+
+        return rejection('INTERNAL_ERROR');
       });
   }
-
-  async createTemplateField(
+  @Authorized([Roles.USER_OFFICER])
+  async createQuestion(
     agent: User | null,
-    args: CreateTemplateFieldArgs
-  ): Promise<ProposalTemplateField | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
-    const { dataType, topicId } = args;
+    args: CreateQuestionArgs
+  ): Promise<Question | Rejection> {
+    const { dataType } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
-      .createTemplateField(
+      .createQuestion(
         newFieldId,
         newFieldId, // natural key defaults to id
-        topicId,
         dataType,
-        "New question",
+        'New question',
         JSON.stringify(this.createBlankConfig(dataType))
       )
-      .then(template => template)
+      .then(question => question)
       .catch(err => {
-        logger.logException("Could not create template field", err, {
+        logger.logException('Could not create template field', err, {
           agent,
-          topicId,
-          dataType
+          dataType,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
-
-  async updateProposalTemplateField(
+  @Authorized([Roles.USER_OFFICER])
+  async updateQuestion(
     agent: User | null,
-    args: UpdateProposalTemplateFieldArgs
-  ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
+    args: UpdateQuestionArgs
+  ): Promise<Question | Rejection> {
     return this.dataSource
-      .updateTemplateField(args.id, args)
-      .then(template => template)
+      .updateQuestion(args.id, args)
+      .then(question => question)
       .catch(err => {
-        logger.logException("Could not update template field", err, {
+        logger.logException('Could not update question', err, {
           agent,
-          args
+          args,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
-  async deleteTemplateField(
+  @Authorized([Roles.USER_OFFICER])
+  async deleteQuestion(
     agent: User | null,
-    id: string
-  ): Promise<ProposalTemplate | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
+    questionId: string
+  ): Promise<Question | Rejection> {
     return this.dataSource
-      .deleteTemplateField(id)
+      .deleteQuestion(questionId)
       .then(template => template)
       .catch(err => {
-        logger.logException("Could not delete template field", err, {
+        logger.logException('Could not delete question', err, {
           agent,
-          id
+          id: questionId,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async updateQuestionRel(
+    agent: User | null,
+    args: UpdateQuestionRelArgs
+  ): Promise<ProposalTemplate | Rejection> {
+    return this.dataSource
+      .updateQuestionRel(args)
+      .then(steps => steps)
+      .catch(err => {
+        logger.logException('Could not update question rel', err, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteQuestionRel(
+    agent: User | null,
+    args: DeleteQuestionRelArgs
+  ): Promise<ProposalTemplate | Rejection> {
+    return this.dataSource
+      .deleteQuestionRel(args)
+      .then(steps => steps)
+      .catch(err => {
+        logger.logException('Could not delete question rel', err, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+  @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
     agent: User | null,
     topicOrder: number[]
   ): Promise<number[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
-    }
     return this.dataSource
       .updateTopicOrder(topicOrder)
       .then(order => order)
       .catch(err => {
-        logger.logException("Could not update topic order", err, {
+        logger.logException('Could not update topic order', err, {
           agent,
-          topicOrder
+          topicOrder,
         });
-        return rejection("INTERNAL_ERROR");
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
-  async updateFieldTopicRel(
+  @Authorized([Roles.USER_OFFICER])
+  async updateQuestionsTopicRels(
     agent: User | null,
-    topicId: number,
-    fieldIds: string[]
-  ): Promise<string[] | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("NOT_AUTHORIZED");
+    values: {
+      templateId: number;
+      topicId: number;
+      questionIds: string[];
     }
-    var isSuccess = true;
-    var index = 1;
-    for (const field of fieldIds) {
-      const updatedField = await this.dataSource.updateTemplateField(field, {
-        topicId,
-        sortOrder: index
+  ): Promise<string[] | Rejection> {
+    let isSuccess = true;
+    let index = 1;
+    for (const questionId of values.questionIds) {
+      const updatedField = await this.dataSource.updateQuestionRel({
+        questionId,
+        topicId: values.topicId,
+        templateId: values.templateId,
+        sortOrder: index,
       });
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
     if (isSuccess === false) {
-      return rejection("INTERNAL_ERROR");
+      return rejection('INTERNAL_ERROR');
     }
-    return fieldIds;
+
+    return values.questionIds;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
+    return this.dataSource
+      .updateTemplate(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not update topic order', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  createQuestionRel(user: User | null, args: CreateQuestionRelArgs) {
+    return this.dataSource
+      .createQuestionRel(args)
+      .then(data => data)
+      .catch(err => {
+        logger.logException('Could not create Question Relation', err, {
+          user,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   private createBlankConfig(dataType: DataType): typeof FieldConfigType {
@@ -203,8 +300,8 @@ export default class TemplateMutations {
         return createConfig<FileUploadConfig>(new FileUploadConfig());
       case DataType.EMBELLISHMENT:
         return createConfig<EmbellishmentConfig>(new EmbellishmentConfig(), {
-          plain: "New embellishment",
-          html: "<p>New embellishment</p>"
+          plain: 'New embellishment',
+          html: '<p>New embellishment</p>',
         });
       case DataType.SELECTION_FROM_OPTIONS:
         return createConfig<SelectionFromOptionsConfig>(

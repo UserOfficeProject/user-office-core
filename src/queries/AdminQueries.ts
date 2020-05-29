@@ -1,13 +1,9 @@
-import { AdminDataSource } from "../datasources/AdminDataSource";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import { AdminDataSource } from '../datasources/AdminDataSource';
 
 export default class AdminQueries {
-  constructor(
-    private dataSource: AdminDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: AdminDataSource) {}
 
-  async getPageText(id: number): Promise<String | null> {
+  async getPageText(id: number): Promise<string | null> {
     return await this.dataSource.get(id);
   }
 

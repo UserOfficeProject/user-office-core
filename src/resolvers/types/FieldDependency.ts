@@ -1,19 +1,19 @@
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field } from 'type-graphql';
 
-import { FieldDependency as FieldDependencyOrigin } from "../../models/ProposalModel";
-import { FieldCondition } from "./FieldCondition";
+import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
+import { FieldCondition } from './FieldCondition';
 
 @ObjectType()
 export class FieldDependency implements Partial<FieldDependencyOrigin> {
   @Field()
-  public question_id: string;
+  public questionId: string;
 
   @Field()
-  public dependency_id: string;
+  public dependencyId: string;
 
   @Field()
-  public dependency_natural_key: string;
+  public dependencyNaturalKey: string;
 
   @Field(() => FieldCondition)
-  public condition: FieldCondition;
+  public condition?: FieldCondition;
 }

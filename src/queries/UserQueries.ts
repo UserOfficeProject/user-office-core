@@ -1,13 +1,20 @@
-import { UserDataSource } from "../datasources/UserDataSource";
-import { User, BasicUserDetails } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-var rp = require("request-promise");
-const jsonwebtoken = require("jsonwebtoken");
-import * as bcrypt from "bcryptjs";
+/* eslint-disable @typescript-eslint/camelcase */
+import * as bcrypt from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
+// TODO: Try to replace request-promise with axios. request-promise depends on reqest which is deprecated.
+import { CoreOptions, UriOptions } from 'request';
+import rp from 'request-promise';
+
+import { UserDataSource } from '../datasources/UserDataSource';
+import { Authorized } from '../decorators';
+import { Roles } from '../models/Role';
+import { User, BasicUserDetails } from '../models/User';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserQueries {
   constructor(
-    private dataSource: UserDataSource,
+    public dataSource: UserDataSource,
     private userAuth: UserAuthorization
   ) {}
 
@@ -15,31 +22,31 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async get(agent: User | null, id: number) {
-    if (
-      (await this.userAuth.isUserOfficer(agent)) ||
-      (await this.userAuth.isUser(agent, id))
-    ) {
-      return this.dataSource.get(id);
-    } else {
-      return null;
-    }
+    return this.dataSource.get(id);
   }
 
+  @Authorized()
+  async me(agent: User | null) {
+    return this.dataSource.me((agent as User).id);
+  }
+
+  @Authorized()
   async getBasic(agent: User | null, id: number) {
-    if (!agent) {
-      return null;
-    }
     const user = await this.dataSource.getBasicUserInfo(id);
     if (!user) {
       return null;
     }
+
     return new BasicUserDetails(
       user.id,
       user.firstname,
       user.lastname,
       user.organisation,
-      user.position
+      user.position,
+      user.created,
+      user.placeholder
     );
   }
 
@@ -48,40 +55,43 @@ export default class UserQueries {
   }
 
   async getOrcIDAccessToken(authorizationCode: string) {
-    var options = {
-      method: "POST",
-      uri: process.env.ORCID_TOKEN_URL,
+    const options: CoreOptions & UriOptions = {
+      method: 'POST',
+      uri: process.env.ORCID_TOKEN_URL as string,
       qs: {
         client_id: process.env.ORCID_CLIENT_ID,
         client_secret: process.env.ORCID_CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code: authorizationCode
+        grant_type: 'authorization_code',
+        code: authorizationCode,
       },
       headers: {
-        "content-type": "application/x-www-form-urlencoded"
+        'content-type': 'application/x-www-form-urlencoded',
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
+
     return rp(options)
       .then(function(resp: any) {
         return {
-          ...resp
+          ...resp,
         };
       })
       .catch(function(err: any) {
+        logger.logException('Could not get getOrcIDAccessToken', err);
+
         return null;
       });
   }
 
   async getOrcIDInformation(authorizationCode: string) {
     // If in development fake response
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       return {
-        orcid: "0000-0000-0000-0000",
-        orcidHash: "asdadgiuerervnaofhioa",
-        refreshToken: "asdadgiuerervnaofhioa",
-        firstname: "Kalle",
-        lastname: "Kallesson"
+        orcid: '0000-0000-0000-0000',
+        orcidHash: 'asdadgiuerervnaofhioa',
+        refreshToken: 'asdadgiuerervnaofhioa',
+        firstname: 'Kalle',
+        lastname: 'Kallesson',
       };
     }
 
@@ -93,42 +103,48 @@ export default class UserQueries {
     const user = await this.dataSource.getByOrcID(orcData.orcid);
     if (user) {
       const roles = await this.dataSource.getUserRoles(user.id);
-      const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-        expiresIn: process.env.tokenLife
+      const secret = process.env.secret as string;
+      const token = jsonwebtoken.sign({ user, roles }, secret, {
+        expiresIn: process.env.tokenLife,
       });
+
       return { token };
     }
-    var options = {
+    const options = {
       uri: `${process.env.ORCID_API_URL}${orcData.orcid}/person`,
       headers: {
-        Accept: "application/vnd.orcid+json",
-        Authorization: `Bearer ${orcData.access_token}`
+        Accept: 'application/vnd.orcid+json',
+        Authorization: `Bearer ${orcData.access_token}`,
       },
-      json: true // Automatically parses the JSON string in the response
+      json: true, // Automatically parses the JSON string in the response
     };
 
     return rp(options)
       .then(function(resp: any) {
         // Generate hash for OrcID inorder to prevent user from change OrcID when sending back
-        const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+        const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
         const hash = bcrypt.hashSync(resp.name.path, salt);
+
         return {
           orcid: resp.name.path,
           orcidHash: hash,
           refreshToken: orcData.refresh_token,
-          firstname: resp.name["given-names"]
-            ? resp.name["given-names"].value
+          firstname: resp.name['given-names']
+            ? resp.name['given-names'].value
             : null,
-          lastname: resp.name["family-name"]
-            ? resp.name["family-name"].value
-            : null
+          lastname: resp.name['family-name']
+            ? resp.name['family-name'].value
+            : null,
         };
       })
       .catch(function(err: any) {
+        logger.logException('Could not get getOrcIDInformation', err);
+
         return null;
       });
   }
 
+  @Authorized()
   async getAll(
     agent: User | null,
     filter?: string,
@@ -137,9 +153,6 @@ export default class UserQueries {
     userRole?: number,
     subtractUsers?: [number]
   ) {
-    if (agent == null) {
-      return null;
-    }
     return this.dataSource.getUsers(
       filter,
       first,
@@ -149,12 +162,9 @@ export default class UserQueries {
     );
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getRoles(agent: User | null) {
-    if (await this.userAuth.isUserOfficer(agent)) {
-      return this.dataSource.getRoles();
-    } else {
-      return null;
-    }
+    return this.dataSource.getRoles();
   }
 
   async getUser(id: number) {

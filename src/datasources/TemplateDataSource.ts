@@ -1,48 +1,72 @@
-import { FieldDependencyInput } from "./../resolvers/mutations/UpdateProposalTemplateFieldMutation";
+/* eslint-disable @typescript-eslint/camelcase */
 import {
+  DataType,
   ProposalTemplate,
+  Question,
+  QuestionRel,
+  TemplateStep,
   Topic,
-  ProposalTemplateField,
-  FieldDependency,
-  DataType
-} from "../models/ProposalModel";
+} from '../models/ProposalModel';
+import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
+import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
+import { UpdateProposalTemplateArgs as UpdateTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
+import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export interface TemplateDataSource {
-  getProposalTemplate(): Promise<ProposalTemplate>;
-
+  // Template
+  createTemplate(name: string, description?: string): Promise<ProposalTemplate>;
+  getProposalTemplate(templateId: number): Promise<ProposalTemplate | null>;
+  getProposalTemplates(
+    args?: ProposalTemplatesArgs
+  ): Promise<ProposalTemplate[]>;
+  updateTemplate(values: UpdateTemplateArgs): Promise<ProposalTemplate | null>;
+  deleteTemplate(id: number): Promise<ProposalTemplate>;
+  cloneTemplate(templateId: number): Promise<ProposalTemplate>;
+  getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   // TemplateField
-  createTemplateField(
-    fieldId: string,
+  createQuestion(
+    questionId: string,
     naturalKey: string,
-    topicId: number,
     dataType: DataType,
     question: string,
     config: string
-  ): Promise<ProposalTemplateField>;
-  getTemplateField(fieldId: string): Promise<ProposalTemplateField | null>;
-  updateTemplateField(
-    proposal_question_id: string,
+  ): Promise<Question>;
+
+  getQuestion(questionId: string): Promise<Question | null>;
+  updateQuestion(
+    questionId: string,
     values: {
-      natural_key?: string;
+      naturalKey?: string;
       dataType?: string;
       question?: string;
-      topicId?: number;
       config?: string;
-      sortOrder?: number;
-      dependencies?: FieldDependencyInput[];
     }
-  ): Promise<ProposalTemplate>;
-  deleteTemplateField(fieldId: string): Promise<ProposalTemplate>;
+  ): Promise<Question>;
+  deleteQuestion(questionId: string): Promise<Question>;
+  getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
+
+  // TemplateField rel
+  createQuestionRel(args: CreateQuestionRelArgs): Promise<ProposalTemplate>;
+  getQuestionRel(
+    questionId: string,
+    templateId: number
+  ): Promise<QuestionRel | null>;
+
+  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<ProposalTemplate>;
+
+  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
 
   // Topic
-  createTopic(sortOrder: number): Promise<ProposalTemplate>;
+  createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
   updateTopic(
-    id: number,
+    topicId: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }
   ): Promise<Topic>;
   deleteTopic(id: number): Promise<Topic>;
 
   updateTopicOrder(topicOrder: number[]): Promise<number[]>;
 
-  isNaturalKeyPresent(natural_key: string): Promise<Boolean>;
+  isNaturalKeyPresent(naturalKey: string): Promise<boolean>;
 }

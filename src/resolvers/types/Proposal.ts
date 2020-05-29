@@ -5,18 +5,18 @@ import {
   Int,
   ObjectType,
   Resolver,
-  Root
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { Proposal as ProposalOrigin } from "../../models/Proposal";
+  Root,
+} from 'type-graphql';
 
-import { isRejection } from "../../rejection";
-import { ProposalStatus } from "../../models/ProposalModel";
-import { ProposalEndStatus } from "../../models/ProposalModel";
-import { Questionary } from "./Questionary";
-import { Review } from "./Review";
-import { TechnicalReview } from "./TechnicalReview";
-import { BasicUserDetails } from "./BasicUserDetails";
+import { ResolverContext } from '../../context';
+import { Proposal as ProposalOrigin } from '../../models/Proposal';
+import { ProposalStatus } from '../../models/ProposalModel';
+import { ProposalEndStatus } from '../../models/ProposalModel';
+import { isRejection } from '../../rejection';
+import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
+import { Review } from './Review';
+import { TechnicalReview } from './TechnicalReview';
 
 @ObjectType()
 export class Proposal implements Partial<ProposalOrigin> {
@@ -47,6 +47,21 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => ProposalEndStatus, { nullable: true })
   public finalStatus?: ProposalEndStatus;
 
+  @Field(() => Int)
+  public callId?: number;
+
+  @Field(() => Int)
+  public templateId?: number;
+
+  @Field(() => String, { nullable: true })
+  public commentForUser: string;
+
+  @Field(() => String, { nullable: true })
+  public commentForManagement?: string;
+
+  @Field(() => Boolean)
+  public notified: boolean;
+
   public proposerId: number;
 }
 
@@ -61,6 +76,7 @@ export class ProposalResolver {
       context.user,
       proposal.id
     );
+
     return isRejection(users) ? [] : users;
   }
 
@@ -75,11 +91,11 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => [Review])
+  @FieldResolver(() => [Review], { nullable: true })
   async reviews(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Review[]> {
+  ): Promise<Review[] | null> {
     return await context.queries.review.reviewsForProposal(
       context.user,
       proposal.id
@@ -102,10 +118,20 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
-    const questionary = await context.queries.proposal.getQuestionary(
-      context.user,
-      proposal.id
-    );
-    return isRejection(questionary) ? null : questionary;
+    if (proposal.status === ProposalStatus.BLANK) {
+      const questionary = await context.queries.proposal.getEmptyQuestionary(
+        context.user,
+        proposal.callId!
+      );
+
+      return isRejection(questionary) ? null : questionary;
+    } else {
+      const questionary = await context.queries.proposal.getQuestionary(
+        context.user,
+        proposal.id
+      );
+
+      return isRejection(questionary) ? null : questionary;
+    }
   }
 }

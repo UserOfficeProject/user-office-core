@@ -1,54 +1,59 @@
-import database from "./database";
+/* eslint-disable @typescript-eslint/camelcase */
+import BluePromise from 'bluebird';
+import { Transaction } from 'knex';
+
+import { Proposal } from '../../models/Proposal';
 import {
+  ProposalStatus,
+  Questionary,
+  QuestionaryStep,
+} from '../../models/ProposalModel';
+import { ProposalDataSource } from '../ProposalDataSource';
+import { Answer } from './../../models/ProposalModel';
+import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
+import database from './database';
+import {
+  CallRecord,
+  createProposalObject,
+  createQuestionRelObject,
+  createTopicObject,
+  ProposalQuestionProposalTemplateRelRecord,
+  ProposalQuestionRecord,
   ProposalRecord,
   TopicRecord,
-  ProposalQuestionRecord,
-  FieldDependencyRecord,
-  createProposalObject,
-  createFieldDependencyObject,
-  createTopicObject,
-  createQuestionaryFieldObject
-} from "./records";
-
-import { ProposalDataSource } from "../ProposalDataSource";
-import {
-  QuestionaryStep,
-  Questionary,
-  ProposalStatus
-} from "../../models/ProposalModel";
-import { Proposal } from "../../models/Proposal";
-import { Transaction } from "knex";
-
-const BluePromise = require("bluebird");
+} from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
-  public async checkActiveCall(): Promise<Boolean> {
+  public async checkActiveCall(callId: number): Promise<boolean> {
     const currentDate = new Date().toISOString();
+
     return database
       .select()
-      .from("call")
-      .where("start_call", "<=", currentDate)
-      .andWhere("end_call", ">=", currentDate)
+      .from('call')
+      .where('start_call', '<=', currentDate)
+      .andWhere('end_call', '>=', currentDate)
+      .andWhere('call_id', '=', callId)
       .first()
-      .then((call: any) => (call ? true : false));
+      .then((call: CallRecord) => (call ? true : false));
   }
 
   async setStatusProposal(id: number, status: number): Promise<Proposal> {
     return database
       .update(
         {
-          status
+          status,
         },
-        ["*"]
+        ['*']
       )
-      .from("proposals")
-      .where("proposal_id", id)
+      .from('proposals')
+      .where('proposal_id', id)
       .then((proposal: ProposalRecord[]) => {
         if (proposal === undefined || proposal.length !== 1) {
           throw new Error(
             `Failed to set status '${status}' for proposal with id '${id}'`
           );
         }
+
         return createProposalObject(proposal[0]);
       });
   }
@@ -58,15 +63,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
-    return database("proposals")
-      .where("proposals.proposal_id", id)
+    return database('proposals')
+      .where('proposals.proposal_id', id)
       .del()
-      .from("proposals")
-      .returning("*")
+      .from('proposals')
+      .returning('*')
       .then((proposal: ProposalRecord[]) => {
         if (proposal === undefined || proposal.length !== 1) {
           throw new Error(`Could not delete proposal with id:${id}`);
         }
+
         return createProposalObject(proposal[0]);
       });
   }
@@ -74,15 +80,15 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async setProposalUsers(id: number, users: number[]): Promise<void> {
     return database.transaction(function(trx: Transaction) {
       return database
-        .from("proposal_user")
-        .where("proposal_id", id)
+        .from('proposal_user')
+        .where('proposal_id', id)
         .del()
         .transacting(trx)
         .then(() => {
           return BluePromise.map(users, (user_id: number) => {
             return database
               .insert({ proposal_id: id, user_id: user_id })
-              .into("proposal_user")
+              .into('proposal_user')
               .transacting(trx);
           });
         })
@@ -103,30 +109,30 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   ): Promise<string> {
     const results: { count: string } = await database
       .count()
-      .from("proposal_answers")
+      .from('proposal_answers')
       .where({
         proposal_id: proposal_id,
-        proposal_question_id: question_id
+        proposal_question_id: question_id,
       })
       .first();
 
-    const hasEntry = results && results.count !== "0";
+    const hasEntry = results && results.count !== '0';
     if (hasEntry) {
-      return database("proposal_answers")
+      return database('proposal_answers')
         .update({
-          answer: answer
+          answer: answer,
         })
         .where({
           proposal_id: proposal_id,
-          proposal_question_id: question_id
+          proposal_question_id: question_id,
         })
         .then(() => question_id);
     } else {
-      return database("proposal_answers")
+      return database('proposal_answers')
         .insert({
           proposal_id: proposal_id,
           proposal_question_id: question_id,
-          answer: answer
+          answer: answer,
         })
         .then(() => question_id);
     }
@@ -144,7 +150,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
     }
 
-    await database("proposal_answers_files").insert(
+    await database('proposal_answers_files').insert(
       files.map(file => ({ answer_id: answerId, file_id: file }))
     );
 
@@ -162,9 +168,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
     }
 
-    return await database("proposal_answers_files")
+    return await database('proposal_answers_files')
       .where({ answer_id: answerId })
-      .returning("file_id")
+      .returning('file_id')
       .del();
   }
 
@@ -173,12 +179,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     question_id: string
   ): Promise<number | null> {
     const selectResult = await database
-      .from("proposal_answers")
+      .from('proposal_answers')
       .where({
         proposal_id: proposal_id,
-        proposal_question_id: question_id
+        proposal_question_id: question_id,
       })
-      .select("answer_id");
+      .select('answer_id');
 
     if (!selectResult || selectResult.length != 1) {
       return null;
@@ -196,16 +202,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           status: proposal.status,
           proposer_id: proposal.proposerId,
           rank_order: proposal.rankOrder,
-          final_status: proposal.finalStatus
+          final_status: proposal.finalStatus,
+          comment_for_user: proposal.commentForUser,
+          comment_for_management: proposal.commentForManagement,
+          notified: proposal.notified,
         },
-        ["*"]
+        ['*']
       )
-      .from("proposals")
-      .where("proposal_id", proposal.id)
+      .from('proposals')
+      .where('proposal_id', proposal.id)
       .then((records: ProposalRecord[]) => {
         if (records === undefined || !records.length) {
           throw new Error(`Proposal not found ${proposal.id}`);
         }
+
         return createProposalObject(records[0]);
       });
   }
@@ -213,37 +223,47 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   async get(id: number): Promise<Proposal | null> {
     return database
       .select()
-      .from("proposals")
-      .where("proposal_id", id)
+      .from('proposals')
+      .where('proposal_id', id)
       .first()
       .then((proposal: ProposalRecord) => {
         return proposal ? createProposalObject(proposal) : null;
       });
   }
 
-  async create(proposerID: number): Promise<Proposal> {
+  async create(
+    proposerId: number,
+    callId: number,
+    templateId: number
+  ): Promise<Proposal> {
     return database
-      .insert({ proposer_id: proposerID }, ["*"])
-      .from("proposals")
+      .insert(
+        { proposer_id: proposerId, call_id: callId, template_id: templateId },
+        ['*']
+      )
+      .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
       });
   }
 
   async getProposals(
-    filter?: string,
+    filter?: ProposalsFilter,
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }> {
     return database
-      .select(["*", database.raw("count(*) OVER() AS full_count")])
-      .from("proposals")
-      .orderBy("proposal_id", "desc")
-      .modify((query: any) => {
-        if (filter) {
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposals')
+      .orderBy('proposal_id', 'desc')
+      .modify(query => {
+        if (filter?.text) {
           query
-            .where("title", "ilike", `%${filter}%`)
-            .orWhere("abstract", "ilike", `%${filter}%`);
+            .where('title', 'ilike', `%${filter.text}%`)
+            .orWhere('abstract', 'ilike', `%${filter.text}%`);
+        }
+        if (filter?.templateIds) {
+          query.whereIn('template_id', filter.templateIds);
         }
         if (first) {
           query.limit(first);
@@ -254,59 +274,33 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       })
       .then((proposals: ProposalRecord[]) => {
         const props = proposals.map(proposal => createProposalObject(proposal));
+
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
-          proposals: props
+          proposals: props,
         };
       });
   }
 
   async getUserProposals(id: number): Promise<Proposal[]> {
     return database
-      .select("p.*")
-      .from("proposals as p")
-      .leftJoin("proposal_user as pc", {
-        "p.proposal_id": "pc.proposal_id"
+      .select('p.*')
+      .from('proposals as p')
+      .leftJoin('proposal_user as pc', {
+        'p.proposal_id': 'pc.proposal_id',
       })
-      .where("pc.user_id", id)
-      .orWhere("p.proposer_id", id)
-      .groupBy("p.proposal_id")
+      .where('pc.user_id', id)
+      .orWhere('p.proposer_id', id)
+      .groupBy('p.proposal_id')
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => createProposalObject(proposal))
       );
   }
 
-  async getQuestionary(proposalId: number): Promise<Questionary> {
-    const dependencyRecords: (FieldDependencyRecord & {
-      natural_key: string;
-    })[] = await database("proposal_question_dependencies")
-      .join(
-        "proposal_questions",
-        "proposal_question_dependencies.proposal_question_id",
-        "proposal_questions.proposal_question_id"
-      )
-      .select(
-        "proposal_question_dependencies.*",
-        "proposal_questions.natural_key"
-      );
-
-    const fieldRecords: Array<ProposalQuestionRecord & { value: any }> = (
-      await database.raw(`
-          SELECT 
-            proposal_questions.*, proposal_answers.answer as value
-          FROM 
-            proposal_questions
-          LEFT JOIN
-            proposal_answers 
-          ON 
-            proposal_questions.proposal_question_id = 
-            proposal_answers.proposal_question_id
-          AND
-            proposal_answers.proposal_id=${proposalId}
-          ORDER BY
-            proposal_questions.sort_order`)
-    ).rows;
-
+  private async getQuestionaryWithTemplateId(
+    proposalId: number,
+    templateId: number
+  ): Promise<Questionary> {
     const topicRecords: (TopicRecord & {
       is_complete: boolean;
     })[] = (
@@ -320,37 +314,73 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           ON 
             proposal_topics.topic_id = proposal_topic_completenesses.topic_id
             AND proposal_topic_completenesses.proposal_id = ${proposalId}
+          WHERE
+            proposal_topics.template_id = ${templateId}
           ORDER BY
             proposal_topics.sort_order`)
     ).rows;
 
-    const dependencies = dependencyRecords.map(record =>
-      createFieldDependencyObject(record)
-    );
+    const answerRecords: Array<ProposalQuestionRecord &
+      ProposalQuestionProposalTemplateRelRecord & { value: any }> = (
+      await database.raw(`
+            SELECT 
+              proposal_question__proposal_template__rels.*, proposal_questions.*, proposal_answers.answer as value
+            FROM 
+              proposal_question__proposal_template__rels
+            LEFT JOIN
+            proposal_questions 
+            ON 
+              proposal_question__proposal_template__rels.proposal_question_id = 
+              proposal_questions.proposal_question_id
+            LEFT JOIN
+              proposal_answers
+            ON
+              proposal_question__proposal_template__rels.proposal_question_id = 
+              proposal_answers.proposal_question_id
+            AND
+              proposal_answers.proposal_id=${proposalId}
+            ORDER BY
+             proposal_question__proposal_template__rels.sort_order`)
+    ).rows;
 
-    const fields = fieldRecords.map(record =>
-      createQuestionaryFieldObject(record)
-    );
+    const fields = answerRecords.map(record => {
+      const value = record.value ? JSON.parse(record.value).value : '';
 
-    let steps = Array<QuestionaryStep>();
+      return new Answer(createQuestionRelObject(record), value);
+    });
+
+    const steps = Array<QuestionaryStep>();
     topicRecords.forEach(topic => {
       steps.push(
         new QuestionaryStep(
           createTopicObject(topic),
           topic.is_complete || false,
-          fields.filter(field => field.topic_id === topic.topic_id)
+          fields.filter(field => field.topicId === topic.topic_id)
         )
       );
     });
 
-    fields.forEach(field => {
-      // @ts-ignore we are nullchecking inside the filter callbackfn
-      field.dependencies = dependencies.filter(dep => {
-        return dep !== null && dep.question_id === field.proposal_question_id;
-      });
-    });
-
     return new Questionary(steps);
+  }
+
+  async getEmptyQuestionary(callId: number): Promise<Questionary> {
+    return await database('call')
+      .select('*')
+      .where('call_id', callId)
+      .then((rows: CallRecord[]) => {
+        const call = rows[0];
+
+        return this.getQuestionaryWithTemplateId(0, call.template_id);
+      });
+  }
+
+  async getQuestionary(proposalId: number): Promise<Questionary> {
+    const proposal = await this.get(proposalId);
+    if (!proposal) {
+      throw new Error(`No proposal with id: ${proposalId}`);
+    }
+
+    return this.getQuestionaryWithTemplateId(proposal.id, proposal.templateId);
   }
 
   async updateTopicCompletenesses(
@@ -361,7 +391,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       for (const topic_id of topicsCompleted) {
         await database
           .raw(
-            `INSERT into proposal_topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true`,
+            'INSERT into proposal_topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true',
             [proposalId, topic_id, true]
           )
           .transacting(tr);

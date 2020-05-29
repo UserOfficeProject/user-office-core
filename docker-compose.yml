@@ -6,7 +6,7 @@ services:
     image: traefik:1.7 # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
     ports:
-      - "80:80" # The HTTP port
+      - "8081:80" # The HTTP port
       - "8080:8080" # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -26,6 +26,8 @@ services:
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
+  duo-cron-job:
+    image: dmsc/duo-cron-job
   db:
     image: postgres:11.2
     restart: always

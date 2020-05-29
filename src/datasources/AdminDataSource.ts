@@ -1,4 +1,4 @@
-import { Page } from "../models/Admin";
+import { Page } from '../models/Admin';
 
 export interface AdminDataSource {
   getInstitution(id: number): Promise<string | null>;
@@ -7,7 +7,8 @@ export interface AdminDataSource {
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;
   setPageText(id: number, text: string): Promise<Page>;
-  resetDB(): Promise<boolean>;
+  resetDB(): Promise<string>;
+  applyPatches(): Promise<string>;
 }
 export class Entry {
   constructor(public id: number, public value: string) {}

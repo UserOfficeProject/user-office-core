@@ -1,8 +1,9 @@
-import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from "type-graphql";
-import { ResolverContext } from "../../context";
-import { ResponseWrapBase } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
-import { Response } from "../Decorators";
+import { Arg, Ctx, Field, Mutation, ObjectType, Resolver } from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ObjectType()
 class EmailVerificationResponseWrap extends ResponseWrapBase<boolean> {
@@ -15,7 +16,7 @@ class EmailVerificationResponseWrap extends ResponseWrapBase<boolean> {
 export class EmailVerificationMutation {
   @Mutation(() => EmailVerificationResponseWrap)
   emailVerification(
-    @Arg("token") token: string,
+    @Arg('token') token: string,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(

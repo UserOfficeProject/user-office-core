@@ -1,44 +1,45 @@
-import JSDict from "../utils/Dictionary";
-import { QuestionaryField } from "./ProposalModel";
+import JSDict from '../utils/Dictionary';
+import { Answer } from './ProposalModel';
 
 export enum EvaluatorOperator {
-  EQ = "EQ",
-  NEQ = "NEQ"
+  eq = 'eq',
+  neq = 'neq',
+}
+
+export class EqualityValidator implements FieldConditionEvaluator {
+  isSatisfied(answer: Answer, params: object): boolean {
+    return answer.value === params;
+  }
+}
+
+export class InequalityValidator implements FieldConditionEvaluator {
+  isSatisfied(answer: Answer, params: object): boolean {
+    return answer.value !== params;
+  }
 }
 
 export class ConditionEvaluator {
-  private validatorMap!: JSDict<EvaluatorOperator, IFieldConditionEvaluator>;
+  private validatorMap!: JSDict<EvaluatorOperator, FieldConditionEvaluator>;
 
   private getMappings() {
     if (!this.validatorMap) {
       // lazy initialization
       this.validatorMap = JSDict.Create<
         EvaluatorOperator,
-        IFieldConditionEvaluator
+        FieldConditionEvaluator
       >();
-      this.validatorMap.put(EvaluatorOperator.EQ, new EqualityValidator());
-      this.validatorMap.put(EvaluatorOperator.NEQ, new InequalityValidator());
+      this.validatorMap.put(EvaluatorOperator.eq, new EqualityValidator());
+      this.validatorMap.put(EvaluatorOperator.neq, new InequalityValidator());
     }
+
     return this.validatorMap;
   }
 
-  getConditionEvaluator(id: EvaluatorOperator): IFieldConditionEvaluator {
-    return this.getMappings().get(id)!;
+  getConditionEvaluator(id: EvaluatorOperator): FieldConditionEvaluator {
+    return this.getMappings().get(id) as FieldConditionEvaluator;
   }
 }
 
-export interface IFieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: object): boolean;
-}
-
-export class EqualityValidator implements IFieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: object): boolean {
-    return field.value === params;
-  }
-}
-
-export class InequalityValidator implements IFieldConditionEvaluator {
-  isSatisfied(field: QuestionaryField, params: object): boolean {
-    return field.value !== params;
-  }
+export interface FieldConditionEvaluator {
+  isSatisfied(answer: Answer, params: object): boolean;
 }

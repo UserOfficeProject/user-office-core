@@ -5,13 +5,14 @@ import {
   Int,
   ObjectType,
   Resolver,
-  Root
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { User as UserOrigin } from "../../models/User";
-import { Proposal } from "./Proposal";
-import { Review } from "./Review";
-import { Role } from "./Role";
+  Root,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { User as UserOrigin } from '../../models/User';
+import { Proposal } from './Proposal';
+import { Review } from './Review';
+import { Role } from './Role';
 
 @ObjectType()
 export class User implements Partial<UserOrigin> {
@@ -45,7 +46,7 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public gender: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public nationality: number;
 
   @Field()
@@ -82,22 +83,20 @@ export class User implements Partial<UserOrigin> {
   public updated: string;
 }
 
-@Resolver(of => User)
+@Resolver(() => User)
 export class UserResolver {
   @FieldResolver(() => [Role])
   async roles(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.user as any).dataSource.getUserRoles(user.id);
+    return context.queries.user.dataSource.getUserRoles(user.id);
   }
 
   @FieldResolver(() => [Review])
   async reviews(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.review as any).dataSource.getUserReviews(user.id);
+    return context.queries.review.dataSource.getUserReviews(user.id);
   }
 
   @FieldResolver(() => [Proposal])
   async proposals(@Root() user: User, @Ctx() context: ResolverContext) {
-    return (context.queries.proposal as any).dataSource.getUserProposals(
-      user.id
-    );
+    return context.queries.proposal.dataSource.getUserProposals(user.id);
   }
 }

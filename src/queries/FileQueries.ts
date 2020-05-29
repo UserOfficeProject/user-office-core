@@ -1,11 +1,7 @@
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { IFileDataSource } from "../datasources/IFileDataSource";
+import { FileDataSource } from '../datasources/IFileDataSource';
 
 export default class FileQueries {
-  constructor(
-    private fileDataSource: IFileDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private fileDataSource: FileDataSource) {}
 
   async getFileMetadata(fileIds: string[]) {
     // TODO There should be authentification

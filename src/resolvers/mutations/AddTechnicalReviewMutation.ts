@@ -5,25 +5,29 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { TechnicalReviewResponseWrap } from "../types/CommonWrappers";
-import { TechnicalReview } from "../types/TechnicalReview";
-import { wrapResponse } from "../wrapResponse";
-import { TechnicalReviewStatus } from "../../models/TechnicalReview";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { TechnicalReviewStatus } from '../../models/TechnicalReview';
+import { TechnicalReviewResponseWrap } from '../types/CommonWrappers';
+import { TechnicalReview } from '../types/TechnicalReview';
+import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 export class AddTechnicalReviewArgs {
   @Field(() => Int)
   public proposalID: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public comment: string;
 
-  @Field(() => Int)
+  @Field(() => String, { nullable: true })
+  public publicComment: string;
+
+  @Field(() => Int, { nullable: true })
   public timeAllocation: number;
 
-  @Field(() => TechnicalReviewStatus)
+  @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
 }
 
@@ -34,7 +38,6 @@ export class AddTechnicalReviewMutation {
     @Args() args: AddTechnicalReviewArgs,
     @Ctx() context: ResolverContext
   ) {
-    console.log(args.status);
     return wrapResponse<TechnicalReview>(
       context.mutations.review.setTechnicalReview(context.user, args),
       TechnicalReviewResponseWrap

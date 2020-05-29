@@ -5,14 +5,15 @@ import {
   Int,
   ObjectType,
   Resolver,
-  Root
-} from "type-graphql";
-import { ResolverContext } from "../../context";
+  Root,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
 import {
   TechnicalReview as TechnicalReviewOrigin,
-  TechnicalReviewStatus
-} from "../../models/TechnicalReview";
-import { Proposal } from "../types/Proposal";
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
+import { Proposal } from '../types/Proposal';
 
 @ObjectType()
 export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
@@ -22,13 +23,16 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   @Field(() => Int)
   public proposalID: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public comment: string;
 
-  @Field(() => Int)
+  @Field(() => String, { nullable: true })
+  public publicComment: string;
+
+  @Field(() => Int, { nullable: true })
   public timeAllocation: number;
 
-  @Field(() => TechnicalReviewStatus)
+  @Field(() => TechnicalReviewStatus, { nullable: true })
   public status: TechnicalReviewStatus;
 }
 

@@ -5,12 +5,13 @@ import {
   Field,
   Mutation,
   Resolver,
-  Int
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { isRejection } from "../../rejection";
-import { UserResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Int,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { isRejection } from '../../rejection';
+import { UserResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateUserArgs {
@@ -79,7 +80,7 @@ export class CreateUserMutation {
     @Args() args: CreateUserArgs,
     @Ctx() context: ResolverContext
   ) {
-    const res = await context.mutations.user.create(args);
+    const res = await context.mutations.user.create(context.user, args);
 
     return wrapResponse(
       isRejection(res) ? Promise.resolve(res) : Promise.resolve(res.user),

@@ -1,112 +1,79 @@
-import { BasicResolverContext } from "./context";
-
+import { BasicResolverContext } from './context';
 // Site specific imports (only ESS atm)
-import PostgresUserDataSource from "./datasources/postgres/UserDataSource";
-import PostgresProposalDataSource from "./datasources/postgres/ProposalDataSource";
-import PostgresReviewDataSource from "./datasources/postgres/ReviewDataSource";
-import PostgresCallDataSource from "./datasources/postgres/CallDataSource";
-import PostgresFileDataSource from "./datasources/postgres/FileDataSource";
-import PostgresAdminDataSource from "./datasources/postgres/AdminDataSource";
-import TemplateDataSource from "./datasources/postgres/TemplateDataSource";
-
-import UserQueries from "./queries/UserQueries";
-import UserMutations from "./mutations/UserMutations";
-import ProposalQueries from "./queries/ProposalQueries";
-import ProposalMutations from "./mutations/ProposalMutations";
-import CallQueries from "./queries/CallQueries";
-import CallMutations from "./mutations/CallMutations";
-import { UserAuthorization } from "./utils/UserAuthorization";
-import { EventBus } from "./events/eventBus";
-import { ApplicationEvent } from "./events/applicationEvents";
-import createEventHandlers from "./eventHandlers";
-import ReviewQueries from "./queries/ReviewQueries";
-import ReviewMutations from "./mutations/ReviewMutations";
-import FileQueries from "./queries/FileQueries";
-import FileMutations from "./mutations/FileMutations";
-import AdminQueries from "./queries/AdminQueries";
-import AdminMutations from "./mutations/AdminMutations";
-
-import TemplateMutations from "./mutations/TemplateMutations";
-import TemplateQueries from "./queries/TemplateQueries";
-import { logger } from "./utils/Logger";
-
-// Site specific data sources and event handlers (only ESS atm)
-const userDataSource = new PostgresUserDataSource();
-const proposalDataSource = new PostgresProposalDataSource();
-const reviewDataSource = new PostgresReviewDataSource();
-const callDataSource = new PostgresCallDataSource();
-const fileDataSource = new PostgresFileDataSource();
-const adminDataSource = new PostgresAdminDataSource();
-const templateDataSource = new TemplateDataSource();
-
-const userAuthorization = new UserAuthorization(
+import {
+  adminDataSource,
+  callDataSource,
+  eventLogsDataSource,
+  fileDataSource,
+  proposalDataSource,
+  reviewDataSource,
+  sepDataSource,
+  templateDataSource,
   userDataSource,
-  reviewDataSource
-);
-
-const eventHandlers = createEventHandlers(userDataSource);
+} from './datasources';
+import AdminMutations from './mutations/AdminMutations';
+import CallMutations from './mutations/CallMutations';
+import FileMutations from './mutations/FileMutations';
+import ProposalMutations from './mutations/ProposalMutations';
+import ReviewMutations from './mutations/ReviewMutations';
+import SEPMutations from './mutations/SEPMutations';
+import TemplateMutations from './mutations/TemplateMutations';
+import UserMutations from './mutations/UserMutations';
+import AdminQueries from './queries/AdminQueries';
+import CallQueries from './queries/CallQueries';
+import EventLogQueries from './queries/EventLogQueries';
+import FileQueries from './queries/FileQueries';
+import ProposalQueries from './queries/ProposalQueries';
+import ReviewQueries from './queries/ReviewQueries';
+import SEPQueries from './queries/SEPQueries';
+import TemplateQueries from './queries/TemplateQueries';
+import UserQueries from './queries/UserQueries';
+import { logger } from './utils/Logger';
+import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
-const eventBus = new EventBus<ApplicationEvent>(eventHandlers);
-
 const userQueries = new UserQueries(userDataSource, userAuthorization);
-const userMutations = new UserMutations(
-  userDataSource,
-  userAuthorization,
-  eventBus
-);
+const userMutations = new UserMutations(userDataSource, userAuthorization);
+
 const proposalQueries = new ProposalQueries(
   proposalDataSource,
-  userAuthorization,
-  logger
+  callDataSource,
+  userAuthorization
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
   templateDataSource,
+  callDataSource,
   userAuthorization,
-  eventBus,
   logger
 );
 
 const reviewQueries = new ReviewQueries(reviewDataSource, userAuthorization);
 const reviewMutations = new ReviewMutations(
   reviewDataSource,
-  userAuthorization,
-  eventBus
+  userAuthorization
 );
 
-const callQueries = new CallQueries(callDataSource, userAuthorization);
-const callMutations = new CallMutations(
-  callDataSource,
-  userAuthorization,
-  eventBus
-);
+const callQueries = new CallQueries(callDataSource);
+const callMutations = new CallMutations(callDataSource, userAuthorization);
 
-const fileQueries = new FileQueries(fileDataSource, userAuthorization);
-const fileMutations = new FileMutations(
-  fileDataSource,
-  userAuthorization,
-  eventBus
-);
+const fileQueries = new FileQueries(fileDataSource);
+const fileMutations = new FileMutations(fileDataSource);
 
-const adminQueries = new AdminQueries(adminDataSource, userAuthorization);
-const adminMutations = new AdminMutations(
-  adminDataSource,
-  userAuthorization,
-  eventBus
-);
+const adminQueries = new AdminQueries(adminDataSource);
+const adminMutations = new AdminMutations(adminDataSource, userAuthorization);
 
-const templateQueries = new TemplateQueries(
-  templateDataSource,
-  userAuthorization,
-  logger
-);
+const templateQueries = new TemplateQueries(templateDataSource);
 const templateMutations = new TemplateMutations(
   templateDataSource,
   userAuthorization,
-  eventBus,
   logger
 );
+
+const eventLogQueries = new EventLogQueries(eventLogsDataSource);
+
+const sepQueries = new SEPQueries(sepDataSource);
+const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
 const context: BasicResolverContext = {
   userAuthorization,
@@ -117,7 +84,9 @@ const context: BasicResolverContext = {
     call: callQueries,
     file: fileQueries,
     admin: adminQueries,
-    template: templateQueries
+    template: templateQueries,
+    eventLogs: eventLogQueries,
+    sep: sepQueries,
   },
   mutations: {
     user: userMutations,
@@ -126,8 +95,9 @@ const context: BasicResolverContext = {
     call: callMutations,
     file: fileMutations,
     admin: adminMutations,
-    template: templateMutations
-  }
+    sep: sepMutations,
+    template: templateMutations,
+  },
 };
 
 export default context;

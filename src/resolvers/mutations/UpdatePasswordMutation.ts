@@ -5,11 +5,12 @@ import {
   Field,
   Int,
   Mutation,
-  Resolver
-} from "type-graphql";
-import { ResolverContext } from "../../context";
-import { BasicUserDetailsResponseWrap } from "../types/CommonWrappers";
-import { wrapResponse } from "../wrapResponse";
+  Resolver,
+} from 'type-graphql';
+
+import { ResolverContext } from '../../context';
+import { BasicUserDetailsResponseWrap } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 class UpdatePasswordArguments {
@@ -27,7 +28,7 @@ export class UpdatePasswordMutations {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.updatePassword(context.user, id, password),
+      context.mutations.user.updatePassword(context.user, { id, password }),
       BasicUserDetailsResponseWrap
     );
   }

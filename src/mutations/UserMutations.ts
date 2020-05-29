@@ -1,170 +1,228 @@
-import { User, checkUserArgs, BasicUserDetails } from "../models/User";
-import { UserDataSource } from "../datasources/UserDataSource";
-import { isRejection, rejection, Rejection } from "../rejection";
-import { EventBus } from "../events/eventBus";
-import { ApplicationEvent } from "../events/applicationEvents";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import { to } from 'await-to-js';
+import * as bcrypt from 'bcryptjs';
+import jsonwebtoken from 'jsonwebtoken';
+import * as yup from 'yup';
 
-const jsonwebtoken = require("jsonwebtoken");
-import * as bcrypt from "bcryptjs";
-import { to } from "await-to-js";
-import { logger } from "../utils/Logger";
-import { UpdateUserArgs } from "../resolvers/mutations/UpdateUserMutation";
-import { CreateUserArgs } from "../resolvers/mutations/CreateUserMutation";
-import { AddUserRoleArgs } from "../resolvers/mutations/AddUserRoleMutation";
-import { CreateUserByEmailInviteArgs } from "../resolvers/mutations/CreateUserByEmailInviteMutation";
+import { UserDataSource } from '../datasources/UserDataSource';
+import { EventBus, Authorized, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
+import { EmailInviteResponse } from '../models/EmailInviteResponse';
+import { Roles } from '../models/Role';
+import { User, BasicUserDetails } from '../models/User';
+import { UserRole } from '../models/User';
+import { UserLinkResponse } from '../models/UserLinkResponse';
+import { isRejection, rejection, Rejection } from '../rejection';
+import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
+import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
+import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
+import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
+
+// TODO: Update the validation schemas later when we know all the validation rules.
+const createUserValidationSchema = yup.object().shape({
+  firstname: yup
+    .string()
+    .required()
+    .min(2),
+  lastname: yup
+    .string()
+    .required()
+    .min(2),
+});
 
 export default class UserMutations {
   constructor(
     private dataSource: UserDataSource,
-    private userAuth: UserAuthorization,
-    private eventBus: EventBus<ApplicationEvent>
+    private userAuth: UserAuthorization
   ) {}
+
+  private secret = process.env.secret as string;
 
   createHash(password: string): string {
     //Check that password follows rules
 
     //Setting fixed salt for development
     //const salt = bcrypt.genSaltSync(10);
-    const salt = "$2a$10$1svMW3/FwE5G1BpE7/CPW.";
+    const salt = '$2a$10$1svMW3/FwE5G1BpE7/CPW.';
     const hash = bcrypt.hashSync(password, salt);
+
     return hash;
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_DELETED)
+  async delete(agent: User | null, id: number): Promise<User | Rejection> {
+    const user = await this.dataSource.delete(id);
+    if (!user) {
+      return rejection('INTERNAL_ERROR');
+    }
+
+    return user;
+  }
+
+  createEmailInviteResponse(userId: number, agentId: number, role: UserRole) {
+    return new EmailInviteResponse(userId, agentId, role);
+  }
+
+  @Authorized()
+  @EventBus(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
     agent: User | null,
     args: CreateUserByEmailInviteArgs
-  ): Promise<{ userId: number; inviterId: number } | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (!agent) {
-          return rejection("NOT_LOGGED");
-        }
-        // Check if email exist in database and if user has been invited before
-        const user = await this.dataSource.getByEmail(args.email);
-        if (user && user.placeholder) {
-          return {
-            userId: user.id,
-            inviterId: agent.id
-          };
-        } else if (user) {
-          return rejection("ACCOUNT_EXIST");
-        }
-        return {
-          userId: await this.dataSource.createInviteUser(args),
-          inviterId: agent.id
-        };
-      },
-      res => {
-        return {
-          type: "EMAIL_INVITE",
-          userId: res.userId,
-          inviterId: res.inviterId
-        };
-      }
-    );
+  ): Promise<EmailInviteResponse | Rejection> {
+    let userId: number | null = null;
+    let role: UserRole = args.userRole;
+    // Check if email exist in database and if user has been invited before
+    const user = await this.dataSource.getByEmail(args.email);
+    if (user && user.placeholder) {
+      userId = user.id;
+
+      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+    } else if (user) {
+      return rejection('ACCOUNT_EXIST');
+    }
+
+    if (
+      args.userRole === UserRole.REVIEWER &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      await this.dataSource.setUserRoles(userId, [UserRole.REVIEWER]);
+      role = UserRole.REVIEWER;
+    } else if (args.userRole === UserRole.USER) {
+      userId = await this.dataSource.createInviteUser(args);
+      await this.dataSource.setUserRoles(userId, [UserRole.USER]);
+      role = UserRole.USER;
+    } else if (
+      args.userRole === UserRole.SEP_CHAIR &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      // NOTE: For inviting SEP_CHAIR and SEP_SECRETARY we do not setUserRoles because they are set right after in separate call.
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.SEP_CHAIR;
+    } else if (
+      args.userRole === UserRole.SEP_SECRETARY &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.SEP_SECRETARY;
+    }
+
+    if (!userId) {
+      return rejection('NOT_ALLOWED');
+    } else {
+      return this.createEmailInviteResponse(userId, (agent as User).id, role);
+    }
   }
 
+  @ValidateArgs(createUserValidationSchema)
+  @EventBus(Event.USER_CREATED)
   async create(
+    agent: User | null,
     args: CreateUserArgs
-  ): Promise<{ user: User; link: string } | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        if (
-          this.createHash(args.orcid) !== args.orcidHash &&
-          !(process.env.NODE_ENV === "development")
-        ) {
-          logger.logError("ORCID hash mismatch", { args });
-          return rejection("ORCID_HASH_MISMATCH");
-        }
+  ): Promise<UserLinkResponse | Rejection> {
+    if (
+      this.createHash(args.orcid) !== args.orcidHash &&
+      !(process.env.NODE_ENV === 'development')
+    ) {
+      logger.logError('ORCID hash mismatch', { args });
 
-        const hash = this.createHash(args.password);
-        let organisationId = args.organisation;
-        // Check if user has other org and if so create it
-        if (args.otherOrganisation) {
-          organisationId = await this.dataSource.createOrganisation(
-            args.otherOrganisation,
-            false
-          );
-        }
+      return rejection('ORCID_HASH_MISMATCH');
+    }
 
-        //Check if email exist in database and if user has been invited
-        let user = await this.dataSource.getByEmail(args.email);
+    const hash = this.createHash(args.password);
+    let organisationId = args.organisation;
+    // Check if user has other org and if so create it
+    if (args.otherOrganisation) {
+      organisationId = await this.dataSource.createOrganisation(
+        args.otherOrganisation,
+        false
+      );
+    }
 
-        if (user && user.placeholder) {
-          const changePassword = await this.updatePassword(
-            user,
-            user.id,
-            args.password
-          );
-          const updatedUser = await this.update(user, {
-            id: user.id,
-            placeholder: false,
-            password: hash,
-            ...args
-          });
+    //Check if email exist in database and if user has been invited
+    let user = await this.dataSource.getByEmail(args.email);
 
-          if (isRejection(updatedUser) || !changePassword) {
-            logger.logError("Could not create user", {
-              updatedUser,
-              changePassword
-            });
-            return rejection("INTERNAL_ERROR");
-          }
-          user = updatedUser;
-        } else {
-          user = await this.dataSource.create(
-            args.user_title,
-            args.firstname,
-            args.middlename,
-            args.lastname,
-            `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
-            hash,
-            args.preferredname,
-            args.orcid,
-            args.refreshToken,
-            args.gender,
-            args.nationality,
-            args.birthdate,
-            organisationId,
-            args.department,
-            args.position,
-            args.email,
-            args.telephone,
-            args.telephone_alt
-          );
-        }
+    if (user && user.placeholder) {
+      const changePassword = await this.updatePassword(user, {
+        id: user.id,
+        password: args.password,
+      });
+      const updatedUser = await this.update(user, {
+        id: user.id,
+        placeholder: false,
+        password: hash,
+        ...args,
+      });
 
-        const [updateRolesErr] = await to(
-          this.dataSource.setUserRoles(user.id, [1])
-        );
+      if (isRejection(updatedUser) || !changePassword) {
+        logger.logError('Could not create user', {
+          updatedUser,
+          changePassword,
+        });
 
-        if (!user || updateRolesErr) {
-          logger.logError("Could not create user", { args });
-          return rejection("INTERNAL_ERROR");
-        }
-
-        const token = jsonwebtoken.sign(
-          {
-            id: user.id,
-            type: "emailVerification",
-            updated: user.updated
-          },
-          process.env.secret,
-          { expiresIn: "24h" }
-        );
-
-        // Email verification link
-        const link = process.env.baseURL + "/emailVerification/" + token;
-
-        return { user, link };
-      },
-      res => {
-        return { type: "ACCOUNT_CREATED", user: res.user, link: res.link };
+        return rejection('INTERNAL_ERROR');
       }
+      user = updatedUser;
+    } else {
+      user = await this.dataSource.create(
+        args.user_title,
+        args.firstname,
+        args.middlename,
+        args.lastname,
+        `${args.firstname}.${args.lastname}.${args.orcid}`, // This is just for now, while we decide on the final format
+        hash,
+        args.preferredname,
+        args.orcid,
+        args.refreshToken,
+        args.gender,
+        args.nationality,
+        args.birthdate,
+        organisationId,
+        args.department,
+        args.position,
+        args.email,
+        args.telephone,
+        args.telephone_alt
+      );
+    }
+
+    const roles = await this.dataSource.getUserRoles(user.id);
+
+    //If user has no role assign it the user role
+    if (!roles.length) {
+      this.dataSource.setUserRoles(user.id, [UserRole.USER]);
+    }
+
+    if (!user) {
+      logger.logError('Could not create user', { args });
+
+      return rejection('INTERNAL_ERROR');
+    }
+
+    const token = jsonwebtoken.sign(
+      {
+        id: user.id,
+        type: 'emailVerification',
+        updated: user.updated,
+      },
+      this.secret,
+      { expiresIn: '24h' }
     );
+
+    // Email verification link
+    const link = process.env.baseURL + '/emailVerification/' + token;
+
+    // NOTE: This uses UserLinkResponse class because output should be standardized for all events where we use EventBusDecorator.
+    const userLinkResponse = new UserLinkResponse(user, link);
+
+    return userLinkResponse;
   }
 
+  // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
+  @EventBus(Event.USER_UPDATED)
   async update(
     agent: User | null,
     args: UpdateUserArgs
@@ -173,40 +231,38 @@ export default class UserMutations {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, args.id))
     ) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
-    }
-
-    const checkArgs = checkUserArgs(args);
-    if (isRejection(checkArgs)) {
-      return checkArgs;
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
 
     let user = await this.dataSource.get(args.id); //Hacky
 
     if (!user) {
-      return rejection("INTERNAL_ERROR");
+      return rejection('INTERNAL_ERROR');
     }
     user = {
       ...user,
-      ...args
+      ...args,
     };
 
     if (args.roles !== undefined) {
       if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection("INSUFFICIENT_PERMISSIONS");
+        return rejection('INSUFFICIENT_PERMISSIONS');
       }
       const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
       if (err) {
-        logger.logError("Could not set user roles", { err });
-        return rejection("INTERNAL_ERROR");
+        logger.logError('Could not set user roles', { err });
+
+        return rejection('INTERNAL_ERROR');
       }
     }
+
     return this.dataSource
       .update(user)
       .then(user => user)
       .catch(err => {
-        logger.logException("Could not create user", err, { user });
-        return rejection("INTERNAL_ERROR");
+        logger.logException('Could not update user', err, { user });
+
+        return rejection('INTERNAL_ERROR');
       });
   }
 
@@ -214,48 +270,45 @@ export default class UserMutations {
     const user = await this.dataSource.getByEmail(email);
 
     if (!user) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
     const roles = await this.dataSource.getUserRoles(user.id);
     const result = await this.dataSource.getPasswordByEmail(email);
 
     if (!result) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
     const valid = bcrypt.compareSync(password, result);
 
     if (!valid) {
-      return rejection("WRONG_EMAIL_OR_PASSWORD");
+      return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
     if (!user.emailVerified) {
-      return rejection("EMAIL_NOT_VERIFIED");
+      return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-      expiresIn: process.env.tokenLife
+    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
+      expiresIn: process.env.tokenLife,
     });
 
     return token;
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async getTokenForUser(
     agent: User | null,
     userId: number
   ): Promise<string | Rejection> {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
-    }
-
     const user = await this.dataSource.get(userId);
 
     if (!user) {
-      return rejection("USER_DOES_NOT_EXIST");
+      return rejection('USER_DOES_NOT_EXIST');
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
-    const token = jsonwebtoken.sign({ user, roles }, process.env.secret, {
-      expiresIn: process.env.tokenLife
+    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
+      expiresIn: process.env.tokenLife,
     });
 
     return token;
@@ -263,116 +316,122 @@ export default class UserMutations {
 
   async token(token: string): Promise<string | Rejection> {
     try {
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const freshToken = jsonwebtoken.sign(
         { user: decoded.user, roles: decoded.roles },
-        process.env.secret,
+        this.secret,
         {
-          expiresIn: process.env.tokenLife
+          expiresIn: process.env.tokenLife,
         }
       );
+
       return freshToken;
     } catch (error) {
-      logger.logError("Bad token", { token });
-      return rejection("BAD_TOKEN");
+      logger.logError('Bad token', { token });
+
+      return rejection('BAD_TOKEN');
     }
   }
 
+  @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
+    agent: User | null,
     email: string
-  ): Promise<{ user: User; link: string } | Rejection> {
-    return this.eventBus.wrap(
-      async () => {
-        const user = await this.dataSource.getByEmail(email);
+  ): Promise<UserLinkResponse | Rejection> {
+    const user = await this.dataSource.getByEmail(email);
 
-        if (!user) {
-          logger.logInfo("Could not find user by email", { email });
-          return rejection("COULD_NOT_FIND_USER_BY_EMAIL");
-        }
+    if (!user) {
+      logger.logInfo('Could not find user by email', { email });
 
-        const token = jsonwebtoken.sign(
-          {
-            id: user.id,
-            type: "passwordReset",
-            updated: user.updated
-          },
-          process.env.secret,
-          { expiresIn: "24h" }
-        );
+      return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
+    }
 
-        const link = process.env.baseURL + "/resetPassword/" + token;
-
-        // Send reset email with link
-        return { user, link };
+    const token = jsonwebtoken.sign(
+      {
+        id: user.id,
+        type: 'passwordReset',
+        updated: user.updated,
       },
-      res => {
-        return { type: "PASSWORD_RESET_EMAIL", user: res.user, link: res.link };
-      }
+      this.secret,
+      { expiresIn: '24h' }
     );
+
+    const link = process.env.baseURL + '/resetPassword/' + token;
+
+    const userLinkResponse = new UserLinkResponse(user, link);
+
+    // Send reset email with link
+    return userLinkResponse;
   }
 
   async emailVerification(token: string) {
     // Check that token is valid
     try {
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const user = await this.dataSource.get(decoded.id);
       //Check that user exist and that it has not been updated since token creation
       if (
         user &&
         user.updated === decoded.updated &&
-        decoded.type === "emailVerification"
+        decoded.type === 'emailVerification'
       ) {
         await this.dataSource.setUserEmailVerified(user.id);
+
         return true;
       } else {
-        return rejection("COULD_NOT_VERIFY_USER");
+        return rejection('COULD_NOT_VERIFY_USER');
       }
     } catch (error) {
-      logger.logException("Could not verify email", error, { token });
-      return rejection("COULD_NOT_VERIFY_USER");
+      logger.logException('Could not verify email', error, { token });
+
+      return rejection('COULD_NOT_VERIFY_USER');
     }
   }
 
+  @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: User | null, args: AddUserRoleArgs) {
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return rejection("INSUFFICIENT_PERMISSIONS");
-    }
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
       .catch(err => {
-        logger.logException("Could not add user role", err, { agent });
-        return rejection("INTERNAL_ERROR");
+        logger.logException('Could not add user role', err, { agent });
+
+        return rejection('INTERNAL_ERROR');
       });
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.USER])
   async updatePassword(
     agent: User | null,
-    id: number,
-    password: string
+    { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.userAuth.isUser(agent, id))
     ) {
-      return rejection("NOT_ALLOWED");
+      return rejection('INSUFFICIENT_PERMISSIONS');
     }
+
     try {
       const hash = this.createHash(password);
-      let user = await this.dataSource.get(id);
+      const user = await this.dataSource.get(id);
       if (user) {
         return this.dataSource.setUserPassword(user.id, hash);
       } else {
-        logger.logError("Could not update password. Used does not exist", {
+        logger.logError('Could not update password. Used does not exist', {
           agent,
-          id
+          id,
         });
-        return rejection("USER_DOES_NOT_EXIST");
+
+        return rejection('USER_DOES_NOT_EXIST');
       }
     } catch (error) {
-      logger.logException("Could not update password", error, { agent, id });
-      return rejection("INTERNAL_ERROR");
+      logger.logException('Could not update password', error, { agent, id });
+
+      return rejection('INTERNAL_ERROR');
     }
   }
+
   async resetPassword(
     token: string,
     password: string
@@ -380,31 +439,35 @@ export default class UserMutations {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
-      const decoded = jsonwebtoken.verify(token, process.env.secret);
+      // TODO: Define verify responce type and use that instead of any.
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation
       if (
         user &&
         user.updated === decoded.updated &&
-        decoded.type === "passwordReset"
+        decoded.type === 'passwordReset'
       ) {
         return this.dataSource
           .setUserPassword(user.id, hash)
           .then(user => user)
           .catch(err => {
-            logger.logError("Could not reset password", { err });
-            return rejection("INTERNAL_ERROR");
+            logger.logError('Could not reset password', { err });
+
+            return rejection('INTERNAL_ERROR');
           });
       }
-      logger.logError("Could not reset password incomplete data", {
+      logger.logError('Could not reset password incomplete data', {
         user,
-        decoded
+        decoded,
       });
-      return rejection("INTERNAL_ERROR");
+
+      return rejection('INTERNAL_ERROR');
     } catch (error) {
-      logger.logError("Could not reset password", { error, token });
-      return rejection("INTERNAL_ERROR");
+      logger.logError('Could not reset password', { error, token });
+
+      return rejection('INTERNAL_ERROR');
     }
   }
 }

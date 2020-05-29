@@ -1,27 +1,36 @@
-class GrayLogLogger implements ILogger {
-  log = require("gelf-pro");
+export enum LEVEL {
+  INFO = 'INFO',
+  DEBUG = 'DEBUG',
+  WARN = 'WARN',
+  ERROR = 'ERROR',
+  EXCEPTION = 'EXCEPTION',
+  FATAL = 'FATAL',
+}
+
+class GrayLogLogger implements Logger {
+  log = require('gelf-pro');
 
   constructor(server: string, port: number, private environment: string) {
     this.log.setConfig({
       fields: {
-        facility: "DMSC",
-        service: "UserOfficeBackend"
+        facility: 'DMSC',
+        service: 'UserOfficeBackend',
       },
-      adapterName: "udp",
+      adapterName: 'udp',
       adapterOptions: {
         host: server,
-        port: port
-      }
+        port: port,
+      },
     });
   }
 
   private createPayload(level: LEVEL, message: string, context: object) {
     return {
-      level_str: LEVEL[level],
+      levelStr: LEVEL[level],
       title: message,
       environment: this.environment,
       stackTrace: new Error().stack,
-      context: JSON.stringify(context)
+      context: JSON.stringify(context),
     };
   }
 
@@ -54,7 +63,7 @@ class GrayLogLogger implements ILogger {
   }
 }
 
-class ConsoleLogger implements ILogger {
+class ConsoleLogger implements Logger {
   logInfo(message: string, context: object) {
     this.log(LEVEL.INFO, message, context);
   }
@@ -81,14 +90,15 @@ class ConsoleLogger implements ILogger {
         message,
         (() => {
           const { name, message, stack } = exception;
+
           return {
             exception: { name, message, stack },
-            level_str: LEVEL[LEVEL.ERROR],
-            ...context
+            levelStr: LEVEL[LEVEL.ERROR],
+            ...context,
           };
         })()
       );
-      if (typeof exception === "string" || exception instanceof String) {
+      if (typeof exception === 'string' || exception instanceof String) {
         this.logError(message, { exception, ...context });
       } else {
         this.logError(message, context || {});
@@ -101,7 +111,8 @@ class ConsoleLogger implements ILogger {
   }
 }
 
-export class MutedLogger implements ILogger {
+/* eslint-disable @typescript-eslint/no-empty-function */
+export class MutedLogger implements Logger {
   logInfo(message: string, context: object): void {}
   logWarn(message: string, context: object): void {}
   logDebug(message: string, context: object): void {}
@@ -112,17 +123,9 @@ export class MutedLogger implements ILogger {
     context?: object
   ): void {}
 }
+/* eslint-enable @typescript-eslint/no-empty-function */
 
-export enum LEVEL {
-  INFO = "INFO",
-  DEBUG = "DEBUG",
-  WARN = "WARN",
-  ERROR = "ERROR",
-  EXCEPTION = "EXCEPTION",
-  FATAL = "FATAL"
-}
-
-export interface ILogger {
+export interface Logger {
   logInfo(message: string, context: object): void;
   logWarn(message: string, context: object): void;
   logDebug(message: string, context: object): void;
@@ -135,13 +138,13 @@ export interface ILogger {
 }
 
 class LoggerFactory {
-  static logger: ILogger;
-  static getLogger(): ILogger {
+  static logger: Logger;
+  static getLogger(): Logger {
     if (this.logger) {
       return this.logger;
     }
-    const env = process.env.NODE_ENV || "unset";
-    if (env === "development") {
+    const env = process.env.NODE_ENV || 'unset';
+    if (env === 'development') {
       this.logger = new ConsoleLogger();
       /*this.logger = new GrayLogLogger(
         process.env.GRAYLOG_SERVER!,
@@ -150,7 +153,7 @@ class LoggerFactory {
       );*/
     } else {
       const server = process.env.GRAYLOG_SERVER;
-      const port = parseInt(process.env.GRAYLOG_PORT || "0");
+      const port = parseInt(process.env.GRAYLOG_PORT || '0');
       if (server && port) {
         this.logger = new GrayLogLogger(server, port, env);
       } else {

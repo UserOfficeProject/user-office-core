@@ -1,6 +1,8 @@
 module.exports = {
-  roots: ["<rootDir>/src"],
+  roots: ['<rootDir>/src'],
   transform: {
-    "^.+\\.tsx?$": "ts-jest"
-  }
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  testEnvironment: 'node',
+  collectCoverage: true,
 };

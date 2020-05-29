@@ -1,35 +1,41 @@
-import { User } from "../models/User";
-import { UserAuthorization } from "../utils/UserAuthorization";
-import { ProposalTemplate } from "../models/ProposalModel";
-import { ILogger } from "../utils/Logger";
-import { TemplateDataSource } from "../datasources/TemplateDataSource";
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
+import { Authorized } from '../decorators';
+import { TemplateStep, Question } from '../models/ProposalModel';
+import { Roles } from '../models/Role';
+import { User } from '../models/User';
+import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
 
 export default class TemplateQueries {
-  constructor(
-    private dataSource: TemplateDataSource,
-    private userAuth: UserAuthorization,
-    private logger: ILogger
-  ) {}
+  constructor(private dataSource: TemplateDataSource) {}
 
-  async getProposalTemplate(
-    agent: User | null
-  ): Promise<ProposalTemplate | null> {
-    if (!agent) {
-      return null;
-    }
-
-    return await this.dataSource.getProposalTemplate();
+  @Authorized()
+  async getComplementaryQuestions(
+    agent: User | null,
+    templateId: number
+  ): Promise<Question[] | null> {
+    return this.dataSource.getComplementaryQuestions(templateId);
   }
 
+  @Authorized()
+  async getProposalTemplateSteps(
+    agent: User | null,
+    templateId: number
+  ): Promise<TemplateStep[] | null> {
+    return this.dataSource.getProposalTemplateSteps(templateId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
-    if (!agent) {
-      return null;
-    }
+    return this.dataSource.isNaturalKeyPresent(naturalKey);
+  }
 
-    if (!(await this.userAuth.isUserOfficer(agent))) {
-      return null;
-    }
+  @Authorized([Roles.USER_OFFICER])
+  async getProposalTemplates(agent: User | null, args?: ProposalTemplatesArgs) {
+    return this.dataSource.getProposalTemplates(args);
+  }
 
-    return await this.dataSource.isNaturalKeyPresent(naturalKey);
+  @Authorized()
+  async getProposalTemplate(agent: User | null, templateId: number) {
+    return this.dataSource.getProposalTemplate(templateId);
   }
 }

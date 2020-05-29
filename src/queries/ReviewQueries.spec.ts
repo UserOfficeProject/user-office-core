@@ -1,50 +1,44 @@
-import "reflect-metadata";
-import ReviewQueries from "./ReviewQueries";
-import { EventBus } from "../events/eventBus";
-import { UserAuthorization } from "../utils/UserAuthorization";
+import 'reflect-metadata';
 import {
-  reviewDataSource,
-  dummyReview
-} from "../datasources/mockups/ReviewDataSource";
-import { ApplicationEvent } from "../events/applicationEvents";
-
+  ReviewDataSourceMock,
+  dummyReview,
+} from '../datasources/mockups/ReviewDataSource';
 import {
-  userDataSource,
+  UserDataSourceMock,
   dummyUser,
-  dummyUserNotOnProposal,
-  dummyUserOfficer
-} from "../datasources/mockups/UserDataSource";
+  dummyUserOfficer,
+} from '../datasources/mockups/UserDataSource';
+import { UserAuthorization } from '../utils/UserAuthorization';
+import ReviewQueries from './ReviewQueries';
 
-const dummyEventBus = new EventBus<ApplicationEvent>();
+// const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
-  new userDataSource(),
-  new reviewDataSource()
+  new UserDataSourceMock(),
+  new ReviewDataSourceMock()
 );
 const reviewQueries = new ReviewQueries(
-  new reviewDataSource(),
+  new ReviewDataSourceMock(),
   userAuthorization
 );
 
-//Update
-
-test("A userofficer can get a review", () => {
+test('A userofficer can get a review', () => {
   return expect(reviewQueries.get(dummyUserOfficer, 10)).resolves.toBe(
     dummyReview
   );
 });
 
-test("A user can't get a review", () => {
+test('A user can not get a review', () => {
   return expect(reviewQueries.get(dummyUser, 1)).resolves.toBe(null);
 });
 
-test("A userofficer can get reviews for a proposal", () => {
+test('A userofficer can get reviews for a proposal', () => {
   return expect(
     reviewQueries.reviewsForProposal(dummyUserOfficer, 10)
   ).resolves.toStrictEqual([dummyReview]);
 });
 
-test("A user can't reviews for a proposal", () => {
+test('A user can not get reviews for a proposal', () => {
   return expect(
     reviewQueries.reviewsForProposal(dummyUser, 10)
-  ).resolves.toStrictEqual([]);
+  ).resolves.toStrictEqual(null);
 });

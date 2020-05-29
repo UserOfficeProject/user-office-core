@@ -1,4 +1,4 @@
-var amqp = require("amqplib");
+import amqp from 'amqplib';
 
 export interface MessageBroker {
   sendMessage(message: string): void;
@@ -8,7 +8,7 @@ export class RabbitMQMessageBroker implements MessageBroker {
   conn: any;
 
   constructor() {
-    this.conn = amqp.connect("amqp://localhost");
+    this.conn = amqp.connect('amqp://localhost');
   }
 
   sendMessage(msg: string) {
@@ -17,7 +17,7 @@ export class RabbitMQMessageBroker implements MessageBroker {
         return connection.createChannel();
       })
       .then((ch: any) => {
-        ch.sendToQueue("hello", Buffer.from(msg));
+        ch.sendToQueue('hello', Buffer.from(msg));
       });
   }
 }
