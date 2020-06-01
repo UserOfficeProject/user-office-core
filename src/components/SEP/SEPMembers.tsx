@@ -7,7 +7,7 @@ import {
   withStyles,
 } from '@material-ui/core';
 import { PersonAdd, Person } from '@material-ui/icons';
-import { Formik, Form, Field } from 'formik';
+import { Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
@@ -196,118 +196,96 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         title={'SEP Secretary'}
         invitationUserRole={UserRole.SEP_SECRETARY}
       />
-      <Formik
-        validateOnChange={false}
-        validateOnBlur={false}
-        initialValues={initialValues}
-        onSubmit={(values, actions): void => {
-          actions.setSubmitting(false);
-        }}
-      >
-        {({ errors }): JSX.Element => (
-          <Form>
-            <Typography variant="h6" gutterBottom>
-              SEP Members
-            </Typography>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={5}>
-                <Field
-                  name="SEPChair"
-                  id="SEPChair"
-                  label="SEP Chair"
-                  type="text"
-                  value={
-                    initialValues.SEPChair
-                      ? `${initialValues.SEPChair.firstname} ${initialValues.SEPChair.lastname}`
-                      : ''
-                  }
-                  component={
-                    initialValues.SEPChair ? DarkerDisabledTextField : TextField
-                  }
-                  margin="none"
-                  fullWidth
-                  data-cy="SEPChair"
-                  m={0}
-                  required
-                  disabled
-                  error={errors.SEPChair !== undefined}
-                  helperText={errors.SEPChair && errors.SEPChair}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <Tooltip title="Set SEP Chair">
-                  <IconButton
-                    edge="start"
-                    onClick={() => setSepChairModalOpen(true)}
-                  >
-                    <Person />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid item xs={5}>
-                <Field
-                  name="SEPSecretary"
-                  id="SEPSecretary"
-                  label="SEP Secretary"
-                  type="text"
-                  value={
-                    initialValues.SEPSecretary
-                      ? `${initialValues.SEPSecretary.firstname} ${initialValues.SEPSecretary.lastname}`
-                      : ''
-                  }
-                  component={
-                    initialValues.SEPSecretary
-                      ? DarkerDisabledTextField
-                      : TextField
-                  }
-                  margin="none"
-                  fullWidth
-                  data-cy="SEPSecretary"
-                  required
-                  disabled
-                  error={errors.SEPSecretary !== undefined}
-                  helperText={errors.SEPSecretary && errors.SEPSecretary}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <Tooltip title="Set SEP Secretary">
-                  <IconButton
-                    edge="start"
-                    onClick={() => setSepSecretaryModalOpen(true)}
-                  >
-                    <Person />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            </Grid>
-            <Grid container spacing={3}>
-              <Grid data-cy="sep-reviewers-table" item xs={12}>
-                <MaterialTable
-                  icons={tableIcons}
-                  title={'Reviewers'}
-                  columns={columns}
-                  data={initialValues.SEPReviewers}
-                  editable={{
-                    onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
-                      removeMember(rowData),
-                  }}
-                  options={{
-                    search: false,
-                  }}
-                  actions={[
-                    {
-                      icon: AddPersonIcon,
-                      isFreeAction: true,
-                      tooltip: 'Add Member',
-                      onClick: (): void => setOpen(true),
-                    },
-                  ]}
-                />
-              </Grid>
-            </Grid>
-          </Form>
-        )}
-      </Formik>
+      <Typography variant="h6" gutterBottom>
+        SEP Members
+      </Typography>
+      <Grid container spacing={3} alignItems="center">
+        <Grid item xs={5}>
+          <Field
+            name="SEPChair"
+            id="SEPChair"
+            label="SEP Chair"
+            type="text"
+            value={
+              initialValues.SEPChair
+                ? `${initialValues.SEPChair.firstname} ${initialValues.SEPChair.lastname}`
+                : ''
+            }
+            component={
+              initialValues.SEPChair ? DarkerDisabledTextField : TextField
+            }
+            margin="none"
+            fullWidth
+            data-cy="SEPChair"
+            m={0}
+            required
+            disabled
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Tooltip title="Set SEP Chair">
+            <IconButton edge="start" onClick={() => setSepChairModalOpen(true)}>
+              <Person />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={5}>
+          <Field
+            name="SEPSecretary"
+            id="SEPSecretary"
+            label="SEP Secretary"
+            type="text"
+            value={
+              initialValues.SEPSecretary
+                ? `${initialValues.SEPSecretary.firstname} ${initialValues.SEPSecretary.lastname}`
+                : ''
+            }
+            component={
+              initialValues.SEPSecretary ? DarkerDisabledTextField : TextField
+            }
+            margin="none"
+            fullWidth
+            data-cy="SEPSecretary"
+            required
+            disabled
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Tooltip title="Set SEP Secretary">
+            <IconButton
+              edge="start"
+              onClick={() => setSepSecretaryModalOpen(true)}
+            >
+              <Person />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid data-cy="sep-reviewers-table" item xs={12}>
+          <MaterialTable
+            icons={tableIcons}
+            title={'Reviewers'}
+            columns={columns}
+            data={initialValues.SEPReviewers}
+            editable={{
+              onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
+                removeMember(rowData),
+            }}
+            options={{
+              search: false,
+            }}
+            actions={[
+              {
+                icon: AddPersonIcon,
+                isFreeAction: true,
+                tooltip: 'Add Member',
+                onClick: (): void => setOpen(true),
+              },
+            ]}
+          />
+        </Grid>
+      </Grid>
     </React.Fragment>
   );
 };

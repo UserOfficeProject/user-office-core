@@ -1,3 +1,4 @@
+import { resetPasswordByEmailValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -9,7 +10,6 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as Yup from 'yup';
 
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { FormWrapper } from '../../styles/StyledComponents';
@@ -53,11 +53,7 @@ export default function ResetPasswordEmail() {
           await requestResetEmail(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string()
-            .email('Please enter a valid email')
-            .required('Please enter an email'),
-        })}
+        validationSchema={resetPasswordByEmailValidationSchema}
       >
         <Form className={classes.form}>
           <CssBaseline />
