@@ -1,4 +1,9 @@
-import { createUserValidationSchema } from '@esss-swap/duo-validation';
+import {
+  createUserValidationSchema,
+  userPasswordFieldBEValidationSchema,
+  resetPasswordByEmailValidationSchema,
+  signInValidationSchema,
+} from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
@@ -257,20 +262,24 @@ export default class UserMutations {
       });
   }
 
-  async login(email: string, password: string): Promise<string | Rejection> {
-    const user = await this.dataSource.getByEmail(email);
+  @ValidateArgs(signInValidationSchema)
+  async login(
+    agent: UserWithRole | null,
+    args: { email: string; password: string }
+  ): Promise<string | Rejection> {
+    const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
     const roles = await this.dataSource.getUserRoles(user.id);
-    const result = await this.dataSource.getPasswordByEmail(email);
+    const result = await this.dataSource.getPasswordByEmail(args.email);
 
     if (!result) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
-    const valid = bcrypt.compareSync(password, result);
+    const valid = bcrypt.compareSync(args.password, result);
 
     if (!valid) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
@@ -357,15 +366,16 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(resetPasswordByEmailValidationSchema)
   @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
     agent: UserWithRole | null,
-    email: string
+    args: { email: string }
   ): Promise<UserLinkResponse | Rejection> {
-    const user = await this.dataSource.getByEmail(email);
+    const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
-      logger.logInfo('Could not find user by email', { email });
+      logger.logInfo('Could not find user by email', { email: args });
 
       return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
     }
@@ -456,9 +466,10 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(userPasswordFieldBEValidationSchema)
   async resetPassword(
-    token: string,
-    password: string
+    agent: UserWithRole | null,
+    { token, password }: { token: string; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     // Check that token is valid
     try {

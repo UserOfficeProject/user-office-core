@@ -1,5 +1,10 @@
+import {
+  proposalGradeValidationSchema,
+  proposalTechnicalReviewValidationSchema,
+} from '@esss-swap/duo-validation';
+
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
@@ -17,6 +22,7 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @ValidateArgs(proposalGradeValidationSchema)
   @Authorized()
   async updateReview(
     agent: UserWithRole | null,
@@ -51,6 +57,7 @@ export default class ReviewMutations {
       });
   }
 
+  @ValidateArgs(proposalTechnicalReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async setTechnicalReview(
     agent: UserWithRole | null,

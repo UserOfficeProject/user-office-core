@@ -1,8 +1,12 @@
+import {
+  generalInfoUpdateValidationSchema,
+  administrationProposalBEValidationSchema,
+} from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus, Authorized } from '../decorators';
+import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -27,11 +31,12 @@ export default class ProposalMutations {
     private logger: Logger
   ) {}
 
+  @ValidateArgs(generalInfoUpdateValidationSchema)
   @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
   async create(
     agent: UserWithRole | null,
-    callId: number
+    { callId }: { callId: number }
   ): Promise<Proposal | Rejection> {
     // Check if there is an open call
     if (!(await this.proposalDataSource.checkActiveCall(callId))) {
@@ -280,6 +285,7 @@ export default class ProposalMutations {
     return result || rejection('INTERNAL_ERROR');
   }
 
+  @ValidateArgs(administrationProposalBEValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async admin(
     agent: UserWithRole | null,

@@ -195,13 +195,18 @@ test('A userofficer can update users roles', () => {
 
 test('A user should be able to login with credentials and get a token', () => {
   return expect(
-    userMutations.login(dummyUser.email, 'Test1234!').then(data => typeof data)
+    userMutations
+      .login(null, { email: dummyUser.email, password: 'Test1234!' })
+      .then(data => typeof data)
   ).resolves.toBe('string');
 });
 
-test('A user should not be able to login with unvalid credentials', () => {
+test('A user should not be able to login with invalid credentials', () => {
   return expect(
-    userMutations.login(dummyUser.username, 'Wrong_Password!')
+    userMutations.login(null, {
+      email: dummyUser.email,
+      password: 'WrongPassword!',
+    })
   ).resolves.toHaveProperty('reason', 'WRONG_EMAIL_OR_PASSWORD');
 });
 
@@ -226,25 +231,31 @@ test('A user should be able to update a token if valid', () => {
 
 test('A user can reset its password by providing a valid email', () => {
   return expect(
-    userMutations.resetPasswordEmail(null, dummyUser.email)
+    userMutations.resetPasswordEmail(null, { email: dummyUser.email })
   ).resolves.toHaveProperty('user');
 });
 
 test('A user gets an error if providing a email not attached to a account', () => {
   return expect(
-    userMutations.resetPasswordEmail(null, 'dummyemail@ess.se')
+    userMutations.resetPasswordEmail(null, { email: 'dummyemail@ess.se' })
   ).resolves.toHaveProperty('reason', 'COULD_NOT_FIND_USER_BY_EMAIL');
 });
 
 test('A user can update its password if it has a valid token', () => {
   return expect(
-    userMutations.resetPassword(goodToken, 'Test1234!')
+    userMutations.resetPassword(null, {
+      token: goodToken,
+      password: 'Test1234!',
+    })
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
 test('A user can not update its password if it has a bad token', () => {
   return expect(
-    userMutations.resetPassword(badToken, 'Test1234!')
+    userMutations.resetPassword(null, {
+      token: badToken,
+      password: 'Test1234!',
+    })
   ).resolves.toHaveProperty('reason');
 });
 

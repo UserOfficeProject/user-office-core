@@ -195,14 +195,14 @@ test('User cannot delete a proposal', () => {
 });
 
 test('Has to be logged in to create proposal', () => {
-  return expect(proposalMutations.create(null, 1)).resolves.not.toBeInstanceOf(
-    Proposal
-  );
+  return expect(
+    proposalMutations.create(null, { callId: 1 })
+  ).resolves.not.toBeInstanceOf(Proposal);
 });
 
 test('Can create a proposal', () => {
   return expect(
-    proposalMutations.create(dummyUserWithRole, 1)
+    proposalMutations.create(dummyUserWithRole, { callId: 1 })
   ).resolves.toBeInstanceOf(Proposal);
 });
 
