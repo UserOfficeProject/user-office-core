@@ -1,8 +1,14 @@
 import {
+  deleteUserValidationSchema,
+  createUserByEmailInviteValidationSchema,
   createUserValidationSchema,
-  userPasswordFieldBEValidationSchema,
-  resetPasswordByEmailValidationSchema,
+  updateUserValidationSchema,
   signInValidationSchema,
+  getTokenForUserValidationSchema,
+  resetPasswordByEmailValidationSchema,
+  addUserRoleValidationSchema,
+  updatePasswordValidationSchema,
+  userPasswordFieldBEValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
@@ -43,11 +49,12 @@ export default class UserMutations {
     return hash;
   }
 
+  @ValidateArgs(deleteUserValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.USER_DELETED)
   async delete(
     agent: UserWithRole | null,
-    id: number
+    { id }: { id: number }
   ): Promise<User | Rejection> {
     const user = await this.dataSource.delete(id);
     if (!user) {
@@ -61,6 +68,7 @@ export default class UserMutations {
     return new EmailInviteResponse(userId, agentId, role);
   }
 
+  @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
   @Authorized()
   @EventBus(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
@@ -217,6 +225,7 @@ export default class UserMutations {
   }
 
   // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
+  @ValidateArgs(updateUserValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.USER_UPDATED)
   async update(
@@ -299,10 +308,11 @@ export default class UserMutations {
     return token;
   }
 
+  @ValidateArgs(getTokenForUserValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async getTokenForUser(
     agent: UserWithRole | null,
-    userId: number
+    { userId }: { userId: number }
   ): Promise<string | Rejection> {
     const user = await this.dataSource.get(userId);
 
@@ -422,6 +432,7 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(addUserRoleValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
     return this.dataSource
@@ -434,6 +445,7 @@ export default class UserMutations {
       });
   }
 
+  @ValidateArgs(updatePasswordValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async updatePassword(
     agent: UserWithRole | null,

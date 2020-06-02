@@ -1,5 +1,7 @@
+import { setPageTextValidationSchema } from '@esss-swap/duo-validation';
+
 import { AdminDataSource } from '../datasources/AdminDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { Page } from '../models/Admin';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -25,6 +27,7 @@ export default class AdminMutations {
     return this.dataSource.applyPatches();
   }
 
+  @ValidateArgs(setPageTextValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async setPageText(
     agent: UserWithRole | null,

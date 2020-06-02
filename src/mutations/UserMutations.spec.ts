@@ -298,10 +298,9 @@ test('A user officer can update any password ', () => {
 test('A user must not be able to obtain token for another user', async () => {
   return expect(
     isRejection(
-      await userMutations.getTokenForUser(
-        dummyUserWithRole,
-        dummyUserOfficer.id
-      )
+      await userMutations.getTokenForUser(dummyUserWithRole, {
+        userId: dummyUserOfficer.id,
+      })
     )
   ).toBe(true);
 });
@@ -309,13 +308,15 @@ test('A user must not be able to obtain token for another user', async () => {
 test('A user must not be able to delete another user', async () => {
   return expect(
     isRejection(
-      await userMutations.delete(dummyUserWithRole, dummyUserNotOnProposal.id)
+      await userMutations.delete(dummyUserWithRole, {
+        id: dummyUserNotOnProposal.id,
+      })
     )
   ).toBe(true);
 });
 
 test('A user officer can must be able to delete another user', async () => {
   return expect(
-    userMutations.delete(dummyUserOfficerWithRole, dummyUser.id)
+    userMutations.delete(dummyUserOfficerWithRole, { id: dummyUser.id })
   ).resolves.toBe(dummyUser);
 });

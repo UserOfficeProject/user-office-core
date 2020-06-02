@@ -1,6 +1,8 @@
 import {
   proposalGradeValidationSchema,
   proposalTechnicalReviewValidationSchema,
+  removeUserForReviewValidationSchema,
+  addUserForReviewValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -75,24 +77,26 @@ export default class ReviewMutations {
       });
   }
 
+  @ValidateArgs(removeUserForReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async removeUserForReview(
     agent: UserWithRole | null,
-    id: number
+    { reviewID }: { reviewID: number }
   ): Promise<Review | Rejection> {
     return this.dataSource
-      .removeUserForReview(id)
+      .removeUserForReview(reviewID)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not remove user for review', err, {
           agent,
-          id,
+          reviewID,
         });
 
         return rejection('INTERNAL_ERROR');
       });
   }
 
+  @ValidateArgs(addUserForReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserForReview(
     agent: UserWithRole | null,

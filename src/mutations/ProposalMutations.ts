@@ -1,5 +1,9 @@
 import {
   createProposalValidationSchema,
+  updateProposalValidationSchema,
+  submitProposalValidationSchema,
+  deleteProposalValidationSchema,
+  proposalNotifyValidationSchema,
   administrationProposalBEValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
@@ -15,7 +19,6 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
-import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
@@ -63,6 +66,7 @@ export default class ProposalMutations {
       });
   }
 
+  @ValidateArgs(updateProposalValidationSchema)
   @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
@@ -191,6 +195,7 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
   @Authorized()
   async updateFiles(
     agent: UserWithRole | null,
@@ -222,11 +227,13 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(submitProposalValidationSchema)
   @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(
     agent: UserWithRole | null,
-    proposalId: number
+    { proposalId }: { proposalId: number }
   ): Promise<Proposal | Rejection> {
     const proposal = await this.proposalDataSource.get(proposalId);
 
@@ -254,10 +261,11 @@ export default class ProposalMutations {
       });
   }
 
+  @ValidateArgs(deleteProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,
-    proposalId: number
+    { proposalId }: { proposalId: number }
   ): Promise<Proposal | Rejection> {
     const proposal = await this.proposalDataSource.get(proposalId);
 
@@ -269,13 +277,15 @@ export default class ProposalMutations {
 
     return result || rejection('INTERNAL_ERROR');
   }
+
+  @ValidateArgs(proposalNotifyValidationSchema)
   @EventBus(Event.PROPOSAL_NOTIFIED)
   @Authorized([Roles.USER_OFFICER])
   async notify(
     user: UserWithRole | null,
-    args: NotifyProposalArgs
+    { proposalId }: { proposalId: number }
   ): Promise<unknown> {
-    const proposal = await this.proposalDataSource.get(args.id);
+    const proposal = await this.proposalDataSource.get(proposalId);
 
     if (!proposal || proposal.notified || !proposal.finalStatus) {
       return rejection('INTERNAL_ERROR');

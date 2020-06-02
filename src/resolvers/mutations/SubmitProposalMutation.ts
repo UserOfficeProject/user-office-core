@@ -12,7 +12,7 @@ export class SubmitProposalMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.submit(context.user, id),
+      context.mutations.proposal.submit(context.user, { proposalId: id }),
       ProposalResponseWrap
     );
   }
