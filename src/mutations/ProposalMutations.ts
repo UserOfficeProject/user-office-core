@@ -1,5 +1,5 @@
 import {
-  generalInfoUpdateValidationSchema,
+  createProposalValidationSchema,
   administrationProposalBEValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
@@ -31,7 +31,7 @@ export default class ProposalMutations {
     private logger: Logger
   ) {}
 
-  @ValidateArgs(generalInfoUpdateValidationSchema)
+  @ValidateArgs(createProposalValidationSchema)
   @Authorized()
   @EventBus(Event.PROPOSAL_CREATED)
   async create(
@@ -62,6 +62,7 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
   @Authorized()
   @EventBus(Event.PROPOSAL_UPDATED)
   async update(
