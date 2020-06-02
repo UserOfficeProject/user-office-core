@@ -50,21 +50,21 @@ const AddCall: React.FC<AddCallProps> = props => {
       <Formik
         initialValues={{
           shortCode: '',
-          start: currentDay,
-          end: currentDay,
+          startCall: currentDay,
+          endCall: currentDay,
           startReview: currentDay,
           endReview: currentDay,
           startNotify: currentDay,
           endNotify: currentDay,
           cycleComment: '',
           surveyComment: '',
-          templateId: '',
+          templateId: 0,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const {
             shortCode,
-            start,
-            end,
+            startCall,
+            endCall,
             startReview,
             endReview,
             startNotify,
@@ -77,8 +77,8 @@ const AddCall: React.FC<AddCallProps> = props => {
           await api()
             .createCall({
               shortCode: shortCode,
-              startCall: start,
-              endCall: end,
+              startCall: startCall,
+              endCall: endCall,
               startReview: startReview,
               endReview: endReview,
               startNotify: startNotify,
@@ -119,7 +119,7 @@ const AddCall: React.FC<AddCallProps> = props => {
             />
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Field
-                name="start"
+                name="startCall"
                 label="Start"
                 component={FormikUICustomDatePicker}
                 margin="normal"
@@ -128,7 +128,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               />
 
               <Field
-                name="end"
+                name="endCall"
                 label="End"
                 component={FormikUICustomDatePicker}
                 margin="normal"
@@ -188,7 +188,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               label="Call template"
               items={templates.map(template => ({
                 text: template.name,
-                value: template.templateId.toString(),
+                value: template.templateId,
               }))}
               data-cy="call-template"
             />
