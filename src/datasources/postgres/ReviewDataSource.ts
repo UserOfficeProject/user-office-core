@@ -86,7 +86,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   async get(id: number): Promise<Review | null> {
     return database
       .select()
-      .from('reviews')
+      .from('SEP_Reviews')
       .where('review_id', id)
       .first()
       .then((review: ReviewRecord) => this.createReviewObject(review));
@@ -94,7 +94,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
 
   async removeUserForReview(id: number): Promise<Review> {
     return database
-      .from('reviews')
+      .from('SEP_Reviews')
       .where('review_id', id)
       .returning('*')
       .del()
@@ -113,7 +113,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         },
         ['*']
       )
-      .from('reviews')
+      .from('SEP_Reviews')
       .where('review_id', reviewID)
       .then((review: any) => {
         return new Review(
@@ -130,7 +130,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   async getProposalReviews(id: number): Promise<Review[]> {
     return database
       .select()
-      .from('reviews')
+      .from('SEP_Reviews')
       .where('proposal_id', id)
       .then((reviews: any[]) => {
         return reviews.map(
@@ -157,14 +157,14 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         status: ReviewStatus.DRAFT,
       })
       .returning('*')
-      .into('reviews')
+      .into('SEP_Reviews')
       .then((records: ReviewRecord[]) => this.createReviewObject(records[0]));
   }
 
   async getUserReviews(id: number): Promise<Review[]> {
     return database
       .select()
-      .from('reviews')
+      .from('SEP_Reviews')
       .where('user_id', id)
       .then((reviews: any[]) => {
         return reviews.map(

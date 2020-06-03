@@ -30,7 +30,12 @@ export default class SEPQueries {
     );
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async get(agent: UserWithRole | null, id: number) {
     const sep = await this.dataSource.get(id);
 
@@ -56,7 +61,12 @@ export default class SEPQueries {
     return this.dataSource.getAll(active, filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getMembers(agent: UserWithRole | null, sepId: number) {
     if ((await this.hasAccessRights(agent, sepId)) === true) {
       return this.dataSource.getMembers(sepId);
@@ -65,7 +75,12 @@ export default class SEPQueries {
     }
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposals(agent: UserWithRole | null, sepId: number) {
     if ((await this.hasAccessRights(agent, sepId)) === true) {
       return this.dataSource.getSEPProposals(sepId);

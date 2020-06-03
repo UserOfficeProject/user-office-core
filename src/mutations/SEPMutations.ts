@@ -178,7 +178,7 @@ export default class SEPMutations {
       .addSEPMembersRole({
         userID: args.memberId,
         SEPID: args.sepId,
-        roleID: UserRole.SEP_MEMBER,
+        roleID: UserRole.SEP_REVIEWER,
       })
       .then(result => result)
       .catch(err => {
