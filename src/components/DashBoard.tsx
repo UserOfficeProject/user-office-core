@@ -21,11 +21,11 @@ import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
 import PageEditor from './pages/PageEditor';
-import ProposalCreate from './proposal/ProposaCreate';
 import ProposalChooseCall from './proposal/ProposalChooseCall';
+import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalGrade from './review/ProposalGrade';
+import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
@@ -157,6 +157,7 @@ const Dashboard: React.FC = () => {
   };
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -197,7 +198,7 @@ const Dashboard: React.FC = () => {
             path="/QuestionaryEditor/:templateId"
             component={QuestionaryEditor}
           />
-          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"
@@ -215,16 +216,16 @@ const Dashboard: React.FC = () => {
               )}
             />
           )}
-          {currentRole === 'reviewer' && (
+          {['reviewer', 'SEP_Reviewer'].includes(currentRole) && (
             <Route
               render={props => (
                 <OverviewPage {...props} userRole={UserRole.REVIEWER} />
               )}
             />
           )}
-          {['SEP_Chair', 'SEP_Secretary', 'SEP_Member'].includes(
-            currentRole
-          ) && <Route component={SEPsPage} />}
+          {['SEP_Chair', 'SEP_Secretary'].includes(currentRole) && (
+            <Route component={SEPsPage} />
+          )}
         </Switch>
         <BottomNavigation className={classes.bottomNavigation}>
           <BottomNavItem

@@ -59,6 +59,7 @@ export default function ProposalGrade(props: {
             status: values.saveOnly
               ? ReviewStatus.DRAFT
               : ReviewStatus.SUBMITTED,
+            sepID: review.sepID,
           })
           .then(data => {
             if (data.addReview.error) {

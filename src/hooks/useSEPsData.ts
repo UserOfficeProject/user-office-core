@@ -7,7 +7,7 @@ export function useSEPsData(
   show: boolean,
   filter: string,
   active = true,
-  role = 'SEP_Member'
+  role = 'SEP_Reviewer'
 ): {
   loading: boolean;
   SEPsData: Sep[];

@@ -9,6 +9,7 @@ query userWithReviews {
       grade
       comment
       status
+      sepID
       proposal {
         id
         title

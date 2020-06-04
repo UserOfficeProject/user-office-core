@@ -1,4 +1,4 @@
-import { Grid, DialogContent, Dialog, makeStyles } from '@material-ui/core';
+import { Grid, DialogContent, Dialog } from '@material-ui/core';
 import { AssignmentInd } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import { Formik, Form } from 'formik';
@@ -7,25 +7,18 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { SepProposal, SepMember, SepAssignment } from '../../generated/sdk';
+import {
+  SepProposal,
+  SepMember,
+  SepAssignment,
+  ReviewStatus,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPProposalsData } from '../../hooks/useSEPProposalsData';
 import { BasicUserDetails } from '../../models/User';
 import { tableIcons } from '../../utils/materialIcons';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
+import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 
 type SEPProposalsAndAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
@@ -43,7 +36,23 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
-  const classes = useStyles();
+
+  const getGrades = (assignments: SepAssignment[]) =>
+    assignments
+      ?.filter(
+        assignment => assignment.review.status === ReviewStatus.SUBMITTED
+      )
+      .map(assignment => assignment.review.grade) ?? [];
+
+  const average = (numbers: number[]) => {
+    const sum = numbers.reduce(function(sum, value) {
+      return sum + value;
+    }, 0);
+
+    const avg = sum / numbers.length;
+
+    return avg;
+  };
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -66,22 +75,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       render: (rowData: SepProposal): string =>
         rowData.assignments ? rowData.assignments.length.toString() : '-',
     },
-  ];
-
-  const assignmentColumns = [
     {
-      title: 'First name',
-      field: 'user.firstname',
-    },
-    {
-      title: 'Last name',
-      field: 'user.lastname',
-    },
-    {
-      title: 'Date assigned',
-      field: 'dateAssigned',
-      render: (rowData: SepAssignment): string =>
-        dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+      title: 'Average grade',
+      render: (rowData: SepProposal): number =>
+        average(getGrades(rowData.assignments as SepAssignment[]) as number[]),
     },
   ];
 
@@ -159,6 +156,12 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       sepId,
     });
 
+    await api().addUserForReview({
+      proposalID: proposalId as number,
+      userID: memberUser.userId,
+      sepID: sepId,
+    });
+
     if (!assignmentResult.assignMemberToSEPProposal.error && SEPProposalsData) {
       setSEPProposalsData(
         SEPProposalsData.map(proposalItem => {
@@ -168,6 +171,13 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
               {
                 user: memberUser.user,
                 roles: memberUser.roles,
+                review: {
+                  id: 0,
+                  status: ReviewStatus.DRAFT,
+                  comment: '',
+                  grade: 0,
+                  sepID: sepId,
+                },
                 dateAssigned: Date.now(),
                 sepMemberUserId: memberUser.userId,
               },
@@ -195,35 +205,17 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
 
   const initialValues = SEPProposalsData as SepProposal[];
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
-  const ReviewersTable = (
-    rowData: SepProposal | SepProposal[]
-  ): JSX.Element => (
-    <div className={classes.root} data-cy="sep-reviewer-assignments-table">
-      <MaterialTable
-        icons={tableIcons}
-        columns={assignmentColumns}
-        title={'Assigned reviewers'}
-        data={(rowData as SepProposal).assignments as SepAssignment[]}
-        editable={{
-          onRowDelete: (rowAssignmentsData: SepAssignment): Promise<void> =>
-            removeAssignedReviewer(
-              rowAssignmentsData,
-              (rowData as SepProposal).proposalId
-            ),
-        }}
-        options={{
-          search: false,
-          paging: false,
-          toolbar: false,
-          headerStyle: { backgroundColor: '#fafafa' },
-        }}
-      />
-    </div>
-  );
 
   const proposalAssignments = initialValues.find(
     assignment => assignment.proposalId === proposalId
   )?.assignments;
+
+  const ReviewersTable = (rowData: SepProposal) => (
+    <SEPAssignedReviewersTable
+      sepProposal={rowData}
+      removeAssignedReviewer={removeAssignedReviewer}
+    />
+  );
 
   return (
     <React.Fragment>

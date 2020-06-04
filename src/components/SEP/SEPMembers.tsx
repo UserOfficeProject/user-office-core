@@ -80,7 +80,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
           case UserRole.SEP_SECRETARY:
             initialValues.SEPSecretary = member.user;
             break;
-          case UserRole.SEP_MEMBER:
+          case UserRole.SEP_REVIEWER:
             initialValues.SEPReviewers.push(member.user);
             break;
           default:
