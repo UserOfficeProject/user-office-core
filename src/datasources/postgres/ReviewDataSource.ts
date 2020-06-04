@@ -16,7 +16,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       review.user_id,
       review.comment,
       review.grade,
-      review.status
+      review.status,
+      review.sep_id
     );
   }
 
@@ -92,6 +93,17 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord) => this.createReviewObject(review));
   }
 
+  async getAssignmentReview(sepId: number, proposalId: number, userId: number) {
+    return database
+      .select()
+      .from('SEP_Reviews')
+      .where('sep_id', sepId)
+      .andWhere('proposal_id', proposalId)
+      .andWhere('user_id', userId)
+      .first()
+      .then((review: ReviewRecord) => this.createReviewObject(review));
+  }
+
   async removeUserForReview(id: number): Promise<Review> {
     return database
       .from('SEP_Reviews')
@@ -102,7 +114,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async updateReview(args: AddReviewArgs): Promise<Review> {
-    const { reviewID, comment, grade, status } = args;
+    const { reviewID, comment, grade, status, sepID } = args;
 
     return database
       .update(
@@ -115,14 +127,15 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       )
       .from('SEP_Reviews')
       .where('review_id', reviewID)
-      .then((review: any) => {
+      .then((review: ReviewRecord[]) => {
         return new Review(
           reviewID,
           review[0].proposal_id,
           review[0].user_id,
           comment,
           grade,
-          status
+          status,
+          sepID
         );
       });
   }
@@ -132,29 +145,20 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .select()
       .from('SEP_Reviews')
       .where('proposal_id', id)
-      .then((reviews: any[]) => {
-        return reviews.map(
-          review =>
-            new Review(
-              review.review_id,
-              review.proposal_id,
-              review.user_id,
-              review.comment,
-              review.grade,
-              review.status
-            )
-        );
+      .then((reviews: ReviewRecord[]) => {
+        return reviews.map(review => this.createReviewObject(review));
       });
   }
 
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { userID, proposalID } = args;
+    const { userID, proposalID, sepID } = args;
 
     return database
       .insert({
         user_id: userID,
         proposal_id: proposalID,
         status: ReviewStatus.DRAFT,
+        sep_id: sepID,
       })
       .returning('*')
       .into('SEP_Reviews')
@@ -166,18 +170,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .select()
       .from('SEP_Reviews')
       .where('user_id', id)
-      .then((reviews: any[]) => {
-        return reviews.map(
-          review =>
-            new Review(
-              review.review_id,
-              review.proposal_id,
-              review.user_id,
-              review.comment,
-              review.grade,
-              review.status
-            )
-        );
+      .then((reviews: ReviewRecord[]) => {
+        return reviews.map(review => this.createReviewObject(review));
       });
   }
 }
