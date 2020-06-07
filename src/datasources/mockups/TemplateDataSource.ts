@@ -3,7 +3,7 @@ import {
   DataType,
   FieldCondition,
   FieldDependency,
-  ProposalTemplate,
+  Template,
   Question,
   QuestionRel,
   TemplateStep,
@@ -15,19 +15,19 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
 import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
-import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
+import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
-  dummyQuestionFactory,
   dummyQuestionRelFactory,
-} from './ProposalDataSource';
+  dummyQuestionFactory,
+} from './QuestionaryDataSource';
 
-export let dummyProposalTemplate: ProposalTemplate;
+export let dummyProposalTemplate: Template;
 export let dummyTemplateSteps: TemplateStep[];
 export let dummyComplementarySteps: Question[];
 
-const dummyProposalTemplateFactory = (values?: Partial<ProposalTemplate>) => {
-  return new ProposalTemplate(
+const dummyProposalTemplateFactory = (values?: Partial<Template>) => {
+  return new Template(
     values?.templateId || 1,
     values?.name || 'Industrial template',
     values?.description || 'Industrial template description',
@@ -109,24 +109,20 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   ): Promise<Question[] | null> {
     return [dummyQuestionFactory()];
   }
-  async cloneTemplate(templateId: number): Promise<ProposalTemplate> {
+  async cloneTemplate(templateId: number): Promise<Template> {
     return dummyProposalTemplateFactory({ templateId: templateId + 1 });
   }
-  async getProposalTemplate(
-    templateId: number
-  ): Promise<ProposalTemplate | null> {
+  async getTemplate(templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
   async updateTemplate(
     values: UpdateProposalTemplateArgs
-  ): Promise<ProposalTemplate | null> {
+  ): Promise<Template | null> {
     dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
 
     return dummyProposalTemplate;
   }
-  async createQuestionRel(
-    args: CreateQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async createQuestionRel(args: CreateQuestionRelArgs): Promise<Template> {
     return dummyProposalTemplate;
   }
   async getQuestionRel(
@@ -137,9 +133,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question: { proposalQuestionId: questionId },
     });
   }
-  async deleteQuestionRel(
-    args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template> {
     dummyTemplateSteps.forEach(function(step) {
       step.fields = step.fields.filter(field => {
         return field.question.proposalQuestionId !== args.questionId;
@@ -148,9 +142,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async updateQuestionRel(
-    args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template> {
     const question = getFieldById(
       dummyTemplateSteps,
       args.questionId
@@ -160,20 +152,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async createTemplate(
-    name: string,
-    description?: string
-  ): Promise<ProposalTemplate> {
+  async createTemplate(name: string, description?: string): Promise<Template> {
     return dummyProposalTemplateFactory({ name, description });
   }
-  async deleteTemplate(templateId: number): Promise<ProposalTemplate> {
+  async deleteTemplate(templateId: number): Promise<Template> {
     return dummyProposalTemplateFactory({ templateId });
   }
-  async getProposalTemplates(
-    args?: ProposalTemplatesArgs
-  ): Promise<ProposalTemplate[]> {
+  async getTemplates(args?: TemplatesArgs): Promise<Template[]> {
     return [
-      new ProposalTemplate(
+      new Template(
         1,
         'Industrial',
         'Industrial proposal template',
@@ -221,11 +208,10 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       config?: string;
     }
   ): Promise<Question> {
-    const steps = await this.getProposalTemplateSteps();
+    const steps = await this.getTemplateSteps();
     steps.forEach(topic => {
       topic.fields!.forEach(field => {
         if (field.question.proposalQuestionId === questionId) {
-          console.log(field);
           Object.assign(field, values);
 
           return field.question;
@@ -248,7 +234,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     );
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
+  async createTopic(args: CreateTopicArgs): Promise<Template> {
     dummyTemplateSteps.splice(
       args.sortOrder,
       0,
@@ -258,7 +244,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyProposalTemplate;
   }
 
-  async getProposalTemplateSteps(): Promise<TemplateStep[]> {
+  async getTemplateSteps(): Promise<TemplateStep[]> {
     return dummyTemplateSteps;
   }
 }

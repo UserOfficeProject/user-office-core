@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
   DataType,
-  ProposalTemplate,
+  Template,
   Question,
   QuestionRel,
   TemplateStep,
@@ -12,19 +12,17 @@ import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs as UpdateTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
-import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
+import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export interface TemplateDataSource {
   // Template
-  createTemplate(name: string, description?: string): Promise<ProposalTemplate>;
-  getProposalTemplate(templateId: number): Promise<ProposalTemplate | null>;
-  getProposalTemplates(
-    args?: ProposalTemplatesArgs
-  ): Promise<ProposalTemplate[]>;
-  updateTemplate(values: UpdateTemplateArgs): Promise<ProposalTemplate | null>;
-  deleteTemplate(id: number): Promise<ProposalTemplate>;
-  cloneTemplate(templateId: number): Promise<ProposalTemplate>;
-  getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]>;
+  createTemplate(name: string, description?: string): Promise<Template>;
+  getTemplate(templateId: number): Promise<Template | null>;
+  getTemplates(args?: TemplatesArgs): Promise<Template[]>;
+  updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;
+  deleteTemplate(id: number): Promise<Template>;
+  cloneTemplate(templateId: number): Promise<Template>;
+  getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   // TemplateField
   createQuestion(
     questionId: string,
@@ -48,18 +46,18 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionRel(args: CreateQuestionRelArgs): Promise<ProposalTemplate>;
+  createQuestionRel(args: CreateQuestionRelArgs): Promise<Template>;
   getQuestionRel(
     questionId: string,
     templateId: number
   ): Promise<QuestionRel | null>;
 
-  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<ProposalTemplate>;
+  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template>;
 
-  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<ProposalTemplate>;
+  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template>;
 
   // Topic
-  createTopic(args: CreateTopicArgs): Promise<ProposalTemplate>;
+  createTopic(args: CreateTopicArgs): Promise<Template>;
   updateTopic(
     topicId: number,
     values: { title?: string; isEnabled?: boolean; sortOrder?: number }

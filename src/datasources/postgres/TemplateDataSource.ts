@@ -3,7 +3,7 @@ import to from 'await-to-js';
 
 import {
   DataType,
-  ProposalTemplate,
+  Template,
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
@@ -12,7 +12,7 @@ import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
 import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
-import { ProposalTemplatesArgs } from '../../resolvers/queries/ProposalTemplatesQuery';
+import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import { Question, QuestionRel } from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
@@ -53,10 +53,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return resultSet.map(value => createQuestionObject(value));
   }
 
-  async createTemplate(
-    name: string,
-    description?: string
-  ): Promise<ProposalTemplate> {
+  async createTemplate(name: string, description?: string): Promise<Template> {
     return database('templates')
       .insert({
         name,
@@ -74,7 +71,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async deleteTemplate(templateId: number): Promise<ProposalTemplate> {
+  async deleteTemplate(templateId: number): Promise<Template> {
     return database('templates')
       .delete()
       .where({ template_id: templateId })
@@ -90,9 +87,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getProposalTemplates(
-    args: ProposalTemplatesArgs
-  ): Promise<ProposalTemplate[]> {
+  async getTemplates(args: TemplatesArgs): Promise<Template[]> {
     return database('templates')
       .select('*')
       .where({ is_archived: args.filter?.isArchived || false })
@@ -105,7 +100,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getProposalTemplate(templateId: number) {
+  async getTemplate(templateId: number) {
     return database('templates')
       .select('*')
       .where({ template_id: templateId })
@@ -118,7 +113,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getProposalTemplateSteps(templateId: number): Promise<TemplateStep[]> {
+  async getTemplateSteps(templateId: number): Promise<TemplateStep[]> {
     const topicRecords: TopicRecord[] = await database
       .select('*')
       .from('topics')
@@ -159,7 +154,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return steps;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<ProposalTemplate> {
+  async createTopic(args: CreateTopicArgs): Promise<Template> {
     await database('topics')
       .update({ sort_order: args.sortOrder + 1 })
       .where('sort_order', '>=', args.sortOrder);
@@ -171,7 +166,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       template_id: args.templateId,
     });
 
-    const response = await this.getProposalTemplate(args.templateId);
+    const response = await this.getTemplate(args.templateId);
     if (!response) {
       throw new Error('Could not find template');
     }
@@ -235,9 +230,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return question;
   }
 
-  async createQuestionRel(
-    args: CreateQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async createQuestionRel(args: CreateQuestionRelArgs): Promise<Template> {
     const { templateId, questionId, sortOrder, topicId } = args;
     const question = await this.getQuestion(questionId);
 
@@ -253,7 +246,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       config: question.config, // default_config
     });
 
-    const returnValue = await this.getProposalTemplate(templateId);
+    const returnValue = await this.getTemplate(templateId);
     if (!returnValue) {
       throw new Error('Could not get template');
     }
@@ -261,9 +254,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return returnValue;
   }
 
-  async updateQuestionRel(
-    args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template> {
     const {
       templateId,
       questionId,
@@ -282,7 +273,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       })
       .where({ question_id: questionId, template_id: templateId });
 
-    const returnValue = await this.getProposalTemplate(templateId);
+    const returnValue = await this.getTemplate(templateId);
     if (!returnValue) {
       throw new Error('Could not get template');
     }
@@ -292,7 +283,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
   async updateTemplate(
     values: UpdateProposalTemplateArgs
-  ): Promise<ProposalTemplate | null> {
+  ): Promise<Template | null> {
     await database('templates')
       .update({
         name: values.name,
@@ -301,7 +292,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       })
       .where({ template_id: values.templateId });
 
-    return this.getProposalTemplate(values.templateId);
+    return this.getTemplate(values.templateId);
   }
 
   async createQuestion(
@@ -391,9 +382,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return createQuestionObject(row[0]);
   }
 
-  async deleteQuestionRel(
-    args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate> {
+  async deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template> {
     const rowsAffected = await database('templates_has_questions')
       .where({
         template_id: args.templateId,
@@ -406,7 +395,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         `Could not delete questionId ${args.questionId} in templateId:${args.templateId}`
       );
     }
-    const returnValue = await this.getProposalTemplate(args.templateId);
+    const returnValue = await this.getTemplate(args.templateId);
     if (!returnValue) {
       throw new Error('Could not find template');
     }
@@ -445,7 +434,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async cloneTemplate(templateId: number) {
-    const sourceTemplate = await this.getProposalTemplate(templateId);
+    const sourceTemplate = await this.getTemplate(templateId);
 
     if (!sourceTemplate) {
       logger.logError(

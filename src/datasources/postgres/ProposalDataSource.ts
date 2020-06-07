@@ -1,29 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
-
 import { Proposal } from '../../models/Proposal';
-import {
-  ProposalStatus,
-  Questionary,
-  QuestionaryStep,
-} from '../../models/ProposalModel';
+import { ProposalStatus } from '../../models/ProposalModel';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { Answer } from './../../models/ProposalModel';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
-import {
-  CallRecord,
-  createProposalObject,
-  createQuestionRelObject,
-  createTopicObject,
-  ProposalQuestionProposalTemplateRelRecord,
-  ProposalQuestionRecord,
-  ProposalRecord,
-  TopicRecord,
-} from './records';
+import { CallRecord, createProposalObject, ProposalRecord } from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  // TODO move this function to callDataSource
   public async checkActiveCall(callId: number): Promise<boolean> {
     const currentDate = new Date().toISOString();
 
@@ -102,97 +88,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     });
   }
 
-  async updateAnswer(
-    proposal_id: number,
-    question_id: string,
-    answer: string
-  ): Promise<string> {
-    const results: { count: string } = await database
-      .count()
-      .from('answers')
-      .where({
-        proposal_id,
-        question_id,
-      })
-      .first();
-
-    const hasEntry = results && results.count !== '0';
-    if (hasEntry) {
-      return database('answers')
-        .update({
-          answer: answer,
-        })
-        .where({
-          proposal_id,
-          question_id,
-        })
-        .then(() => question_id);
-    } else {
-      return database('answers')
-        .insert({
-          proposal_id,
-          question_id,
-          answer,
-        })
-        .then(() => question_id);
-    }
-  }
-
-  async insertFiles(
-    proposal_id: number,
-    question_id: string,
-    files: string[]
-  ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
-    if (!answerId) {
-      throw new Error(
-        `Could not insert files because answer does not exist. AnswerID ${answerId}`
-      );
-    }
-
-    await database('answer_has_files').insert(
-      files.map(file => ({ answer_id: answerId, file_id: file }))
-    );
-
-    return files;
-  }
-
-  async deleteFiles(
-    proposal_id: number,
-    question_id: string
-  ): Promise<string[]> {
-    const answerId = await this.getAnswerId(proposal_id, question_id);
-    if (!answerId) {
-      throw new Error(
-        `Could not delete files because answer does not exist. AnswerID ${answerId}`
-      );
-    }
-
-    return await database('answer_has_files')
-      .where({ answer_id: answerId })
-      .returning('file_id')
-      .del();
-  }
-
-  private async getAnswerId(
-    proposal_id: number,
-    question_id: string
-  ): Promise<number | null> {
-    const selectResult = await database
-      .from('answers')
-      .where({
-        proposal_id,
-        question_id,
-      })
-      .select('answer_id');
-
-    if (!selectResult || selectResult.length != 1) {
-      return null;
-    }
-
-    return selectResult[0].answer_id;
-  }
-
   async update(proposal: Proposal): Promise<Proposal> {
     return database
       .update(
@@ -232,15 +127,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async create(
-    proposerId: number,
-    callId: number,
-    templateId: number
+    proposer_id: number,
+    call_id: number,
+    questionary_id: number
   ): Promise<Proposal> {
     return database
-      .insert(
-        { proposer_id: proposerId, call_id: callId, template_id: templateId },
-        ['*']
-      )
+      .insert({ proposer_id, call_id, questionary_id }, ['*'])
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
@@ -295,107 +187,5 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposals: ProposalRecord[]) =>
         proposals.map(proposal => createProposalObject(proposal))
       );
-  }
-
-  private async getQuestionaryWithTemplateId(
-    proposalId: number,
-    templateId: number
-  ): Promise<Questionary> {
-    const topicRecords: (TopicRecord & {
-      is_complete: boolean;
-    })[] = (
-      await database.raw(`
-          SELECT 
-            topics.*, topic_completenesses.is_complete
-          FROM 
-            topics
-          LEFT JOIN
-          topic_completenesses
-          ON 
-            topics.topic_id = topic_completenesses.topic_id
-            AND topic_completenesses.proposal_id = ${proposalId}
-          WHERE
-            topics.template_id = ${templateId}
-          ORDER BY
-            topics.sort_order`)
-    ).rows;
-
-    const answerRecords: Array<ProposalQuestionRecord &
-      ProposalQuestionProposalTemplateRelRecord & { value: any }> = (
-      await database.raw(`
-            SELECT 
-              templates_has_questions.*, questions.*, answers.answer as value
-            FROM 
-              templates_has_questions
-            LEFT JOIN
-            questions 
-            ON 
-              templates_has_questions.question_id = 
-              questions.question_id
-            LEFT JOIN
-              answers
-            ON
-              templates_has_questions.question_id = 
-              answers.question_id
-            AND
-              answers.proposal_id=${proposalId}
-            ORDER BY
-             templates_has_questions.sort_order`)
-    ).rows;
-
-    const fields = answerRecords.map(record => {
-      const value = record.value ? JSON.parse(record.value).value : '';
-
-      return new Answer(createQuestionRelObject(record), value);
-    });
-
-    const steps = Array<QuestionaryStep>();
-    topicRecords.forEach(topic => {
-      steps.push(
-        new QuestionaryStep(
-          createTopicObject(topic),
-          topic.is_complete || false,
-          fields.filter(field => field.topicId === topic.topic_id)
-        )
-      );
-    });
-
-    return new Questionary(steps);
-  }
-
-  async getEmptyQuestionary(callId: number): Promise<Questionary> {
-    return await database('call')
-      .select('*')
-      .where('call_id', callId)
-      .then((rows: CallRecord[]) => {
-        const call = rows[0];
-
-        return this.getQuestionaryWithTemplateId(0, call.template_id);
-      });
-  }
-
-  async getQuestionary(proposalId: number): Promise<Questionary> {
-    const proposal = await this.get(proposalId);
-    if (!proposal) {
-      throw new Error(`No proposal with id: ${proposalId}`);
-    }
-
-    return this.getQuestionaryWithTemplateId(proposal.id, proposal.templateId);
-  }
-
-  async updateTopicCompletenesses(
-    proposalId: number,
-    topicsCompleted: number[]
-  ): Promise<void> {
-    return database.transaction(async trx => {
-      for (const topic_id of topicsCompleted) {
-        await database
-          .raw(
-            'INSERT into topic_completenesses(proposal_id, topic_id, is_complete) VALUES(?,?,?) ON CONFLICT (proposal_id, topic_id)  DO UPDATE set is_complete=true',
-            [proposalId, topic_id, true]
-          )
-          .transacting(trx);
-      }
-    });
   }
 }
