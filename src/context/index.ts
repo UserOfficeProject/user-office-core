@@ -17,6 +17,8 @@ import SEPQueries from '../queries/SEPQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import QuestionaryMutations from '../mutations/QuestionaryMutations';
+import QuestionaryQueries from '../queries/QuestionaryQueries';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -28,6 +30,7 @@ interface ResolverContextQueries {
   template: TemplateQueries;
   eventLogs: EventLogQueries;
   sep: SEPQueries;
+  questionary: QuestionaryQueries;
 }
 
 interface ResolverContextMutations {
@@ -39,6 +42,7 @@ interface ResolverContextMutations {
   admin: AdminMutations;
   template: TemplateMutations;
   sep: SEPMutations;
+  questionary: QuestionaryMutations;
 }
 
 export interface BasicResolverContext {
