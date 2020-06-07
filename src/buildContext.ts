@@ -10,6 +10,7 @@ import {
   sepDataSource,
   templateDataSource,
   userDataSource,
+  questionaryDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
@@ -30,6 +31,8 @@ import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
 import { userAuthorization } from './utils/UserAuthorization';
+import QuestionaryQueries from './queries/QuestionaryQueries';
+import QuestionaryMutations from './mutations/QuestionaryMutations';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource, userAuthorization);
@@ -42,7 +45,7 @@ const proposalQueries = new ProposalQueries(
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
-  templateDataSource,
+  questionaryDataSource,
   callDataSource,
   userAuthorization,
   logger
@@ -75,6 +78,17 @@ const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 const sepQueries = new SEPQueries(sepDataSource);
 const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
+const questionaryQueries = new QuestionaryQueries(
+  questionaryDataSource,
+  templateDataSource,
+  userAuthorization
+);
+const questionaryMutations = new QuestionaryMutations(
+  questionaryDataSource,
+  templateDataSource,
+  logger
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -87,6 +101,7 @@ const context: BasicResolverContext = {
     template: templateQueries,
     eventLogs: eventLogQueries,
     sep: sepQueries,
+    questionary: questionaryQueries,
   },
   mutations: {
     user: userMutations,
@@ -97,6 +112,7 @@ const context: BasicResolverContext = {
     admin: adminMutations,
     sep: sepMutations,
     template: templateMutations,
+    questionary: questionaryMutations,
   },
 };
 
