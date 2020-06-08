@@ -1,6 +1,6 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { GetSepProposalsQuery, SepProposal } from '../generated/sdk';
+import { SepProposal } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPProposalsData(
