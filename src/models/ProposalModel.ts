@@ -134,15 +134,11 @@ export class QuestionaryStep {
 }
 
 export class Questionary {
-  constructor(public steps: QuestionaryStep[]) {}
-
-  static fromObject(obj: any): Questionary {
-    return new Questionary(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
-        : []
-    );
-  }
+  constructor(
+    public questionaryId: number | undefined,
+    public templateId: number,
+    public created: Date
+  ) {}
 }
 
 export class TemplateStep {
@@ -156,7 +152,7 @@ export class TemplateStep {
   }
 }
 
-export class ProposalTemplate {
+export class Template {
   constructor(
     public templateId: number,
     public name: string,

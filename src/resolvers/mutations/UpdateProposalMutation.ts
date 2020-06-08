@@ -3,29 +3,13 @@ import {
   ArgsType,
   Ctx,
   Field,
-  InputType,
   Int,
   Mutation,
   Resolver,
 } from 'type-graphql';
-
 import { ResolverContext } from '../../context';
-import { DataType } from '../../models/ProposalModel';
-import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-
-@InputType()
-class ProposalAnswerInput {
-  @Field()
-  proposalQuestionId: string;
-
-  @Field(() => DataType, { nullable: true })
-  dataType: DataType;
-
-  @Field(() => String, { nullable: true })
-  value: string;
-}
 
 @ArgsType()
 export class UpdateProposalArgs {
@@ -38,20 +22,11 @@ export class UpdateProposalArgs {
   @Field(() => String, { nullable: true })
   public abstract?: string;
 
-  @Field(() => [ProposalAnswerInput], { nullable: true })
-  public answers?: ProposalAnswerInput[];
-
-  @Field(() => [Int], { nullable: true })
-  public topicsCompleted?: number[];
-
   @Field(() => [Int], { nullable: true })
   public users?: number[];
 
   @Field(() => Int, { nullable: true })
   public proposerId?: number;
-
-  @Field(() => Boolean, { nullable: true })
-  public partialSave?: boolean;
 }
 
 @Resolver()

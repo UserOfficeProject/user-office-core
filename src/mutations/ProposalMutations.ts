@@ -1,18 +1,15 @@
 import { to } from 'await-to-js';
-
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus, Authorized } from '../decorators';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
-import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
 import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
-import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -21,7 +18,7 @@ import { CallDataSource } from './../datasources/CallDataSource';
 export default class ProposalMutations {
   constructor(
     private proposalDataSource: ProposalDataSource,
-    private templateDataSource: TemplateDataSource,
+    private questionaryDataSource: QuestionaryDataSource,
     private callDataSource: CallDataSource,
     private userAuth: UserAuthorization,
     private logger: Logger
@@ -48,8 +45,12 @@ export default class ProposalMutations {
       return rejection('NOT_FOUND');
     }
 
+    const questionary = await this.questionaryDataSource.create(
+      call.templateId
+    );
+
     return this.proposalDataSource
-      .create(agent!.id, callId, call.templateId)
+      .create(agent!.id, callId, questionary.questionaryId!)
       .then(proposal => proposal)
       .catch(err => {
         logger.logException('Could not create proposal', err, { agent });
@@ -63,16 +64,7 @@ export default class ProposalMutations {
     agent: User | null,
     args: UpdateProposalArgs
   ): Promise<Proposal | Rejection> {
-    const {
-      id,
-      title,
-      abstract,
-      answers,
-      topicsCompleted,
-      users,
-      proposerId,
-      partialSave,
-    } = args;
+    const { id, title, abstract, users, proposerId } = args;
 
     // Get proposal information
     const proposal = await this.proposalDataSource.get(id); //Hacky
@@ -131,48 +123,6 @@ export default class ProposalMutations {
       proposal.proposerId = proposerId;
     }
 
-    if (answers !== undefined) {
-      for (const answer of answers) {
-        if (answer.value !== undefined) {
-          const questionRel = await this.templateDataSource.getQuestionRel(
-            answer.proposalQuestionId,
-            proposal.templateId
-          );
-          if (!questionRel) {
-            logger.logError('Could not find questionRel', {
-              proposalQuestionId: answer.proposalQuestionId,
-              templateId: proposal.templateId,
-            });
-
-            return rejection('INTERNAL_ERROR');
-          }
-          if (
-            !partialSave &&
-            !isMatchingConstraints(answer.value, questionRel)
-          ) {
-            this.logger.logError(
-              'User provided value not matching constraint',
-              { answer, templateField: questionRel }
-            );
-
-            return rejection('VALUE_CONSTRAINT_REJECTION');
-          }
-          await this.proposalDataSource.updateAnswer(
-            proposal?.id,
-            answer.proposalQuestionId,
-            answer.value
-          );
-        }
-      }
-    }
-
-    if (topicsCompleted !== undefined) {
-      await this.proposalDataSource.updateTopicCompletenesses(
-        proposal.id,
-        topicsCompleted
-      );
-    }
-
     return this.proposalDataSource
       .update(proposal)
       .then(proposal => proposal)
@@ -185,37 +135,7 @@ export default class ProposalMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
-  @Authorized()
-  async updateFiles(
-    agent: User | null,
-    args: UpdateProposalFilesArgs
-  ): Promise<string[] | Rejection> {
-    const { proposalId, questionId, files } = args;
-    const proposal = await this.proposalDataSource.get(proposalId);
 
-    if (
-      !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.userAuth.isMemberOfProposal(agent, proposal))
-    ) {
-      return rejection('NOT_ALLOWED');
-    }
-
-    await this.proposalDataSource.deleteFiles(proposalId, questionId);
-
-    return this.proposalDataSource
-      .insertFiles(proposalId, questionId, files)
-      .then(result => {
-        return result;
-      })
-      .catch(err => {
-        logger.logException('Could not update proposal files', err, {
-          agent,
-          args,
-        });
-
-        return rejection('INTERNAL_ERROR');
-      });
-  }
   @Authorized()
   @EventBus(Event.PROPOSAL_SUBMITTED)
   async submit(

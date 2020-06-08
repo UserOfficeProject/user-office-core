@@ -70,16 +70,15 @@ const createProposalPDF = async (
       throw new Error('User was not allowed to download PDF');
     }
 
-    const questionaryObj = await baseContext.queries.proposal.getQuestionary(
+    const questionarySteps = await baseContext.queries.questionary.getQuestionarySteps(
       user,
-      proposalId
+      proposal.questionaryId
     );
 
-    if (isRejection(questionaryObj) || questionaryObj == null) {
+    if (isRejection(questionarySteps) || questionarySteps == null) {
       throw new Error('Could not fetch questionary');
     }
 
-    const questionary = Questionary.fromObject(questionaryObj);
     const principalInvestigator = await baseContext.queries.user.getBasic(
       user,
       proposal.proposerId
@@ -155,14 +154,14 @@ const createProposalPDF = async (
     });
 
     // Information from each topic in proposal
-    questionary.steps.forEach(x => {
+    questionarySteps.forEach(x => {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(questionary.steps, x.topic.id);
+      const step = getQuestionaryStepByTopicId(questionarySteps, x.topic.id);
       const activeFields = step
         ? (step.fields.filter(field => {
             return areDependenciesSatisfied(
-              questionary.steps,
+              questionarySteps,
               field.question.proposalQuestionId
             );
           }) as Answer[])

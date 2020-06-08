@@ -9,12 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
+import { Template as TemplateOrigin } from '../../models/ProposalModel';
 import { Question } from './Question';
 import { TemplateStep } from './TemplateStep';
 
 @ObjectType()
-export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {
+export class Template implements Partial<TemplateOrigin> {
   @Field(() => Int)
   public templateId: number;
 
@@ -28,11 +28,11 @@ export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {
   public isArchived: boolean;
 }
 
-@Resolver(of => ProposalTemplate)
+@Resolver(of => Template)
 export class ProposalTemplateResolver {
   @FieldResolver(() => Int)
   async proposalCount(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.proposal
@@ -42,7 +42,7 @@ export class ProposalTemplateResolver {
 
   @FieldResolver(() => Int)
   async callCount(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.call
@@ -52,10 +52,10 @@ export class ProposalTemplateResolver {
 
   @FieldResolver(() => [TemplateStep])
   async steps(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<TemplateStep[] | null> {
-    return context.queries.template.getProposalTemplateSteps(
+    return context.queries.template.getTemplateSteps(
       context.user,
       template.templateId
     );
@@ -63,7 +63,7 @@ export class ProposalTemplateResolver {
 
   @FieldResolver(() => [Question])
   async complementaryQuestions(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<Question[] | null> {
     return context.queries.template.getComplementaryQuestions(

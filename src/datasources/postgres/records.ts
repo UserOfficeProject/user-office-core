@@ -10,15 +10,22 @@ import {
   Question,
   QuestionRel,
   Topic,
+  Questionary,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
-import { ProposalTemplate } from './../../models/ProposalModel';
+import { Template } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
 export interface ProposalUserRecord {
   readonly proposal_id: number;
   readonly user_id: number;
+}
+
+export interface QuestionaryRecord {
+  readonly questionary_id: number;
+  readonly template_id: number;
+  readonly created_at: Date;
 }
 
 export interface ProposalRecord {
@@ -248,7 +255,7 @@ export const createQuestionObject = (question: ProposalQuestionRecord) => {
 export const createProposalTemplateObject = (
   template: ProposalTemplateRecord
 ) => {
-  return new ProposalTemplate(
+  return new Template(
     template.template_id,
     template.name,
     template.description,
@@ -269,7 +276,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.rank_order,
     proposal.final_status,
     proposal.call_id,
-    proposal.template_id,
+    proposal.questionary_id,
     proposal.comment_for_user,
     proposal.comment_for_management,
     proposal.notified
@@ -380,5 +387,13 @@ export const createCallObject = (call: CallRecord) => {
     call.cycle_comment,
     call.survey_comment,
     call.template_id
+  );
+};
+
+export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
+  return new Questionary(
+    questionary.questionary_id,
+    questionary.template_id,
+    questionary.created_at
   );
 };

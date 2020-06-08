@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -23,11 +23,11 @@ export class CreateTopicArgs {
 
 @Resolver()
 export class CreateTopicMutation {
-  @Mutation(() => ProposalTemplateResponseWrap)
+  @Mutation(() => TemplateResponseWrap)
   createTopic(@Args() args: CreateTopicArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.template.createTopic(context.user, args),
-      ProposalTemplateResponseWrap
+      TemplateResponseWrap
     );
   }
 }

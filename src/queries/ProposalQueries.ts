@@ -43,21 +43,6 @@ export default class ProposalQueries {
     }
   }
 
-  async getQuestionary(agent: User | null, proposalId: number) {
-    const proposal = await this.dataSource.get(proposalId);
-
-    if ((await this.hasAccessRights(agent, proposal)) === false) {
-      return null;
-    }
-
-    return await this.dataSource.getQuestionary(proposalId);
-  }
-
-  async getEmptyQuestionary(user: User | null, callId: number) {
-    return await this.dataSource.getEmptyQuestionary(callId);
-  }
-
-  // NOTE: Duplicate function! We have this same function under userAuth.
   private async hasAccessRights(
     agent: User | null,
     proposal: Proposal | null

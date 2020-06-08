@@ -48,10 +48,10 @@ export class Proposal implements Partial<ProposalOrigin> {
   public finalStatus?: ProposalEndStatus;
 
   @Field(() => Int)
-  public callId?: number;
+  public callId: number;
 
   @Field(() => Int)
-  public templateId?: number;
+  public questionaryId: number;
 
   @Field(() => String, { nullable: true })
   public commentForUser: string;
@@ -119,16 +119,21 @@ export class ProposalResolver {
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
     if (proposal.status === ProposalStatus.BLANK) {
-      const questionary = await context.queries.proposal.getEmptyQuestionary(
+      const call = await context.queries.call.get(
         context.user,
-        proposal.callId!
+        proposal.callId
       );
-
-      return isRejection(questionary) ? null : questionary;
-    } else {
-      const questionary = await context.queries.proposal.getQuestionary(
+      if (!call?.templateId) {
+        return null;
+      }
+      return await context.queries.questionary.getBlankQuestionary(
         context.user,
-        proposal.id
+        call.templateId
+      );
+    } else {
+      const questionary = await context.queries.questionary.getQuestionary(
+        context.user,
+        proposal.questionaryId
       );
 
       return isRejection(questionary) ? null : questionary;

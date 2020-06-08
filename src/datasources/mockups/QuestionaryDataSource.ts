@@ -176,8 +176,10 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     }
   }
 
-  getQuestionarySteps(questionary_id: number): Promise<QuestionaryStep[]> {
-    throw new Error('Method not implemented.');
+  async getQuestionarySteps(
+    questionary_id: number
+  ): Promise<QuestionaryStep[]> {
+    return dummyQuestionarySteps;
   }
 
   async updateTopicCompletenes(

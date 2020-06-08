@@ -3,7 +3,7 @@ import { Authorized } from '../decorators';
 import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { User } from '../models/User';
-import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
+import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
@@ -17,11 +17,11 @@ export default class TemplateQueries {
   }
 
   @Authorized()
-  async getProposalTemplateSteps(
+  async getTemplateSteps(
     agent: User | null,
     templateId: number
   ): Promise<TemplateStep[] | null> {
-    return this.dataSource.getProposalTemplateSteps(templateId);
+    return this.dataSource.getTemplateSteps(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -30,12 +30,12 @@ export default class TemplateQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getProposalTemplates(agent: User | null, args?: ProposalTemplatesArgs) {
-    return this.dataSource.getProposalTemplates(args);
+  async getTemplates(agent: User | null, args?: TemplatesArgs) {
+    return this.dataSource.getTemplates(args);
   }
 
   @Authorized()
-  async getProposalTemplate(agent: User | null, templateId: number) {
-    return this.dataSource.getProposalTemplate(templateId);
+  async getTemplate(agent: User | null, templateId: number) {
+    return this.dataSource.getTemplate(templateId);
   }
 }

@@ -12,7 +12,7 @@ export class Proposal {
     public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here
     public callId: number,
-    public templateId: number,
+    public questionaryId: number,
     public commentForUser: string,
     public commentForManagement: string,
     public notified: boolean

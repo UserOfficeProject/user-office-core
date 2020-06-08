@@ -3,7 +3,7 @@ import { Authorized } from '../decorators';
 import {
   createConfig,
   DataType,
-  ProposalTemplate,
+  Template,
   Question,
   Topic,
 } from '../models/ProposalModel';
@@ -40,7 +40,7 @@ export default class TemplateMutations {
     agent: User | null,
     name: string,
     description?: string
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     const result = await this.dataSource
       .createTemplate(name, description)
       .then(result => result);
@@ -64,7 +64,7 @@ export default class TemplateMutations {
   async deleteTemplate(
     user: User | null,
     id: number
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteTemplate(id)
       .then(template => template)
@@ -79,7 +79,7 @@ export default class TemplateMutations {
   async createTopic(
     user: User | null,
     args: CreateTopicArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .createTopic(args)
       .then(response => response)
@@ -189,7 +189,7 @@ export default class TemplateMutations {
   async updateQuestionRel(
     agent: User | null,
     args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .updateQuestionRel(args)
       .then(steps => steps)
@@ -207,7 +207,7 @@ export default class TemplateMutations {
   async deleteQuestionRel(
     agent: User | null,
     args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteQuestionRel(args)
       .then(steps => steps)

@@ -5,7 +5,7 @@ import { Page } from './Admin';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Proposal } from './Proposal';
-import { ProposalTemplate } from './ProposalTemplate';
+import { Template } from './Template';
 import { Question } from './Question';
 import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
@@ -13,6 +13,8 @@ import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 import { Topic } from './Topic';
 import { User } from './User';
+import { Questionary } from './Questionary';
+import { Answer } from './Answer';
 
 @ObjectType()
 export class ResponseWrapBase<T> {
@@ -67,12 +69,17 @@ export class TechnicalReviewResponseWrap extends ResponseWrapBase<
 }
 
 @ObjectType()
-export class ProposalTemplateResponseWrap extends ResponseWrapBase<
-  ProposalTemplate
-> {
+export class TemplateResponseWrap extends ResponseWrapBase<Template> {
   @Response()
-  @Field(() => ProposalTemplate, { nullable: true })
-  public template: ProposalTemplate;
+  @Field(() => Template, { nullable: true })
+  public template: Template;
+}
+
+@ObjectType()
+export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
+  @Response()
+  @Field(() => Questionary, { nullable: true })
+  public template: Questionary;
 }
 
 @ObjectType()
@@ -136,4 +143,11 @@ export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String)
   public log: string;
+}
+
+@ObjectType()
+export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
+  @Response()
+  @Field(() => Answer)
+  public answer: Answer;
 }
