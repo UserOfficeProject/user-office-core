@@ -1,7 +1,6 @@
 import { Grid, DialogContent, Dialog, makeStyles } from '@material-ui/core';
 import { AssignmentInd } from '@material-ui/icons';
 import dateformat from 'dateformat';
-import { Formik, Form } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
@@ -247,49 +246,36 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
           />
         </DialogContent>
       </Dialog>
-      <Formik
-        validateOnChange={false}
-        validateOnBlur={false}
-        initialValues={initialValues}
-        onSubmit={(values, actions): void => {
-          actions.setSubmitting(false);
-        }}
-      >
-        {(): JSX.Element => (
-          <Form>
-            <Grid container spacing={3}>
-              <Grid data-cy="sep-assignments-table" item xs={12}>
-                <MaterialTable
-                  icons={tableIcons}
-                  columns={SEPProposalColumns}
-                  title={'SEP Proposals'}
-                  data={initialValues}
-                  detailPanel={[
-                    {
-                      tooltip: 'Show Reviewers',
-                      render: ReviewersTable,
-                    },
-                  ]}
-                  actions={[
-                    rowData => ({
-                      icon: AssignmentIndIcon,
-                      onClick: () => setProposalId(rowData.proposalId),
-                      tooltip: 'Assign SEP Member',
-                    }),
-                  ]}
-                  editable={{
-                    onRowDelete: (rowData: SepProposal): Promise<void> =>
-                      removeProposalFromSEP(rowData),
-                  }}
-                  options={{
-                    search: true,
-                  }}
-                />
-              </Grid>
-            </Grid>
-          </Form>
-        )}
-      </Formik>
+      <Grid container spacing={3}>
+        <Grid data-cy="sep-assignments-table" item xs={12}>
+          <MaterialTable
+            icons={tableIcons}
+            columns={SEPProposalColumns}
+            title={'SEP Proposals'}
+            data={initialValues}
+            detailPanel={[
+              {
+                tooltip: 'Show Reviewers',
+                render: ReviewersTable,
+              },
+            ]}
+            actions={[
+              rowData => ({
+                icon: AssignmentIndIcon,
+                onClick: () => setProposalId(rowData.proposalId),
+                tooltip: 'Assign SEP Member',
+              }),
+            ]}
+            editable={{
+              onRowDelete: (rowData: SepProposal): Promise<void> =>
+                removeProposalFromSEP(rowData),
+            }}
+            options={{
+              search: true,
+            }}
+          />
+        </Grid>
+      </Grid>
     </React.Fragment>
   );
 };

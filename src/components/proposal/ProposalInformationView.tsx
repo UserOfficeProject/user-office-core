@@ -1,9 +1,9 @@
+import { generalInfoUpdateValidationSchema } from '@esss-swap/duo-validation';
 import { makeStyles } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
-import * as Yup from 'yup';
 
 import { UserContext } from '../../context/UserContextProvider';
 import { Proposal } from '../../generated/sdk';
@@ -62,14 +62,7 @@ export default function ProposalInformationView(props: {
           });
         }
       }}
-      validationSchema={Yup.object().shape({
-        title: Yup.string()
-          .max(MAX_TITLE_LEN, 'Title must be at most 175 characters')
-          .required('Title is required'),
-        abstract: Yup.string()
-          .max(MAX_ABSTRACT_LEN, 'Abstract must be at most 1500 characters')
-          .required('Abstract is required'),
-      })}
+      validationSchema={generalInfoUpdateValidationSchema}
     >
       {({
         values,

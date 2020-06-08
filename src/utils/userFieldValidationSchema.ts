@@ -64,23 +64,6 @@ export const userFieldSchema = Yup.object().shape({
     .max(30, 'telephone must be at most 20 characters'),
 });
 
-export const userPasswordFieldSchema = Yup.object().shape({
-  password: Yup.string()
-    .required(
-      'Password must contain at least 8 characters (including upper case, lower case and numbers)'
-    )
-    .matches(
-      /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/,
-      'Password must contain at least 8 characters (including upper case, lower case and numbers)'
-    ),
-  confirmPassword: Yup.string()
-    .required()
-    .label('Confirm password')
-    .test('passwords-match', 'Passwords must match', function(value) {
-      return this.parent.password === value;
-    }),
-});
-
 export const emailFieldSchema = Yup.object().shape({
   email: Yup.string()
     .email('Please specify a valid email')
