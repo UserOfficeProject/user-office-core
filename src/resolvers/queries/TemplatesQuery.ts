@@ -23,7 +23,7 @@ export class TemplatesArgs {
 }
 @Resolver()
 export class TemplatesQuery {
-  @Query(() => [Template])
+  @Query(() => [Template], { nullable: true })
   templates(@Ctx() context: ResolverContext, @Args() args: TemplatesArgs) {
     return context.queries.template.getTemplates(context.user, args);
   }
