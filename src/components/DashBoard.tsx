@@ -162,6 +162,7 @@ const Dashboard: React.FC = () => {
   };
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
