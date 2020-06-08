@@ -13,6 +13,7 @@ import { ReviewStatus, Review } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useReviewData } from '../../hooks/useReviewData';
 import { ButtonContainer } from '../../styles/StyledComponents';
+import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -67,6 +68,7 @@ export default function ProposalGrade(props: {
             } else {
               enqueueSnackbar('Updated', { variant: 'success' });
               setReview(data.addReview.review);
+              AssignmentProvider.setReview(data.addReview.review);
             }
             props.onChange();
             actions.setSubmitting(false);

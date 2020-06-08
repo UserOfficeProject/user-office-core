@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { SepProposal, SepAssignment, ReviewStatus } from '../../generated/sdk';
 import { tableIcons } from '../../utils/materialIcons';
 import ProposalReviewModal from '../review/ProposalReviewModal';
+import AssignmentProvider from './SEPCurrentAssignmentProvider';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -29,11 +30,13 @@ type SEPAssignedReviewersTableProps = {
     assignedReviewer: SepAssignment,
     proposalId: number
   ) => Promise<void>;
+  updateView: () => void;
 };
 
 const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   sepProposal,
   removeAssignedReviewer,
+  updateView,
 }) => {
   const [editReviewID, setEditReviewID] = useState<null | number>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
@@ -70,7 +73,10 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         <ProposalReviewModal
           editReviewID={editReviewID as number}
           reviewModalOpen={reviewModalOpen}
-          setReviewModalOpen={setReviewModalOpen}
+          setReviewModalOpen={() => {
+            setReviewModalOpen(false);
+            updateView();
+          }}
         />
       )}
       <MaterialTable
@@ -90,6 +96,10 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
                 : () => <Visibility />,
             onClick: () => {
               setEditReviewID(rowData.review.id);
+              AssignmentProvider.setCurrentAssignment({
+                ...rowData,
+                proposalId: sepProposal.proposalId,
+              });
               setReviewModalOpen(true);
             },
             tooltip:
@@ -112,6 +122,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
 SEPAssignedReviewersTable.propTypes = {
   sepProposal: PropTypes.any.isRequired,
   removeAssignedReviewer: PropTypes.func.isRequired,
+  updateView: PropTypes.func.isRequired,
 };
 
 export default SEPAssignedReviewersTable;

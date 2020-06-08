@@ -1976,6 +1976,10 @@ export type AddUserForReviewMutation = (
   & { addUserForReview: (
     { __typename?: 'ReviewResponseWrap' }
     & Pick<ReviewResponseWrap, 'error'>
+    & { review: Maybe<(
+      { __typename?: 'Review' }
+      & Pick<Review, 'id'>
+    )> }
   ) }
 );
 
@@ -3441,6 +3445,9 @@ export const AddUserForReviewDocument = gql`
     mutation addUserForReview($userID: Int!, $proposalID: Int!, $sepID: Int!) {
   addUserForReview(userID: $userID, proposalID: $proposalID, sepID: $sepID) {
     error
+    review {
+      id
+    }
   }
 }
     `;

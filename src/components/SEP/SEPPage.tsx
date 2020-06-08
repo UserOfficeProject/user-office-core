@@ -7,7 +7,6 @@ import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
-import ProposalTableReviewer from '../review/ProposalTableReviewer';
 import SEPGeneralInfo from './SEPGeneralInfo';
 import SEPMembers from './SEPMembers';
 import SEPProposalsAndAssignments from './SEPProposalsAndAssignments';
