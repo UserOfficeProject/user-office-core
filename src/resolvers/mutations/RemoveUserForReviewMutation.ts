@@ -12,7 +12,7 @@ export class RemoveUserForReviewMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.review.removeUserForReview(context.user, reviewID),
+      context.mutations.review.removeUserForReview(context.user, { reviewID }),
       ReviewResponseWrap
     );
   }

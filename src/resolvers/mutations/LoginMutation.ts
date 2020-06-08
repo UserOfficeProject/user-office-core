@@ -16,12 +16,9 @@ class LoginArgs {
 @Resolver()
 export class LoginMutation {
   @Mutation(() => TokenResponseWrap)
-  login(
-    @Args() { email, password }: LoginArgs,
-    @Ctx() context: ResolverContext
-  ) {
+  login(@Args() args: LoginArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.user.login(email, password),
+      context.mutations.user.login(context.user, args),
       TokenResponseWrap
     );
   }

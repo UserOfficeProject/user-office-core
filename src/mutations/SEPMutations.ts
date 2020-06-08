@@ -1,4 +1,11 @@
-import * as yup from 'yup';
+import {
+  createSEPValidationSchema,
+  updateSEPValidationSchema,
+  updateSEPMemberValidationSchema,
+  assignProposalToSEPValidationSchema,
+  assignSEPChairOrSecretaryValidationSchema,
+  assignSEPMemberToProposalValidationSchema,
+} from '@esss-swap/duo-validation';
 
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
@@ -18,57 +25,14 @@ import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
-const createSEPValidationSchema = yup.object().shape({
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const updateSEPValidationSchema = yup.object().shape({
-  id: yup.number().required(),
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const assignSEPChairOrSecretaryValidationSchema = yup.object().shape({
-  addSEPMembersRole: yup
-    .object()
-    .shape({
-      userID: yup.number().required(),
-      roleID: yup
-        .number()
-        .oneOf([UserRole.SEP_CHAIR, UserRole.SEP_SECRETARY])
-        .required(),
-      SEPID: yup.number().required(),
-    })
-    .required(),
-});
-
-const updateSEPMemberValidationSchema = yup.object().shape({
-  memberId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignProposalToSEPValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignSEPMemberToProposalValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-  memberId: yup.number().required(),
-});
-
 export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
     private userAuth: UserAuthorization
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(createSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_CREATED)
   async create(
     agent: UserWithRole | null,
@@ -93,8 +57,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(updateSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_UPDATED)
   async update(
     agent: UserWithRole | null,
@@ -120,8 +84,8 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema(UserRole))
   @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
     agent: UserWithRole | null,
@@ -157,8 +121,8 @@ export default class SEPMutations {
     });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(updateSEPMemberValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMemberToSEP(
     agent: UserWithRole | null,
@@ -192,8 +156,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(updateSEPMemberValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED)
   async removeMemberFromSEP(
     agent: UserWithRole | null,
@@ -223,8 +187,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(assignProposalToSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_ASSIGNED)
   async assignProposalToSEP(
     agent: UserWithRole | null,
@@ -244,8 +208,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(assignProposalToSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_REMOVED)
   async removeProposalAssignment(
     agent: UserWithRole | null,
@@ -265,8 +229,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async assignMemberToSEPProposal(
     agent: UserWithRole | null,
@@ -296,8 +260,8 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromSepProposal(
     agent: UserWithRole | null,

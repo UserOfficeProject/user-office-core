@@ -12,7 +12,7 @@ export class CloneProposalTemplateMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.cloneTemplate(context.user, templateId),
+      context.mutations.template.cloneTemplate(context.user, { templateId }),
       ProposalTemplateResponseWrap
     );
   }
