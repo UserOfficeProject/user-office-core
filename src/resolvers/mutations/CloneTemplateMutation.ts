@@ -5,9 +5,9 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class CloneProposalTemplateMutation {
+export class CloneTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
-  cloneProposalTemplate(
+  cloneTemplate(
     @Arg('templateId', () => Int) templateId: number,
     @Ctx() context: ResolverContext
   ) {

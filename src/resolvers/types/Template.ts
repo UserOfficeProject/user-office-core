@@ -29,7 +29,7 @@ export class Template implements Partial<TemplateOrigin> {
 }
 
 @Resolver(of => Template)
-export class ProposalTemplateResolver {
+export class TemplateResolver {
   @FieldResolver(() => Int)
   async proposalCount(
     @Root() template: Template,

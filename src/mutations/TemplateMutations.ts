@@ -14,7 +14,7 @@ import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutatio
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
+import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
@@ -267,7 +267,7 @@ export default class TemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
+  updateTemplate(user: User | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)

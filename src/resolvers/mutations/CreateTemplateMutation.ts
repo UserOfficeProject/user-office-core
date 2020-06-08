@@ -5,9 +5,9 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class CreateProposalTemplateMutation {
+export class CreateTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
-  createProposalTemplate(
+  createTemplate(
     @Ctx() context: ResolverContext,
     @Arg('name', () => String) name: string,
     @Arg('description', () => String, { nullable: true }) description?: string

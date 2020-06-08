@@ -13,7 +13,7 @@ import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateArgs } from '../../resolvers/mutations/UpdateProposalTemplateMutation';
+import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -115,9 +115,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async getTemplate(templateId: number): Promise<Template | null> {
     return dummyProposalTemplate;
   }
-  async updateTemplate(
-    values: UpdateProposalTemplateArgs
-  ): Promise<Template | null> {
+  async updateTemplate(values: UpdateTemplateArgs): Promise<Template | null> {
     dummyProposalTemplate = { ...dummyProposalTemplate, ...values };
 
     return dummyProposalTemplate;

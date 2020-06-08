@@ -13,7 +13,7 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class UpdateProposalTemplateArgs {
+export class UpdateTemplateArgs {
   @Field(() => Int)
   public templateId: number;
 
@@ -28,14 +28,14 @@ export class UpdateProposalTemplateArgs {
 }
 
 @Resolver()
-export class UpdateProposalTemplateMutation {
+export class UpdateTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
-  updateProposalTemplate(
-    @Args() args: UpdateProposalTemplateArgs,
+  updateTemplate(
+    @Args() args: UpdateTemplateArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateProposalTemplate(context.user, args),
+      context.mutations.template.updateTemplate(context.user, args),
       TemplateResponseWrap
     );
   }

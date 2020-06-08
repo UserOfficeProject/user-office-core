@@ -5,9 +5,9 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class DeleteProposalTemplateMutation {
+export class DeleteTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
-  deleteProposalTemplate(
+  deleteTemplate(
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
