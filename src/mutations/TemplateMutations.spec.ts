@@ -6,13 +6,7 @@ import {
   dummyUserOfficer,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import {
-  DataType,
-  ProposalTemplate,
-  Question,
-  Topic,
-} from '../models/ProposalModel';
-import TemplateQueries from '../queries/TemplateQueries';
+import { DataType, Question, Template, Topic } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -56,28 +50,28 @@ test('An userofficer can create template', async () => {
     name,
     description
   );
-  expect(template instanceof ProposalTemplate).toBe(true);
-  expect((template as ProposalTemplate).name).toEqual(name);
-  expect((template as ProposalTemplate).description).toEqual(description);
+  expect(template instanceof Template).toBe(true);
+  expect((template as Template).name).toEqual(name);
+  expect((template as Template).description).toEqual(description);
 });
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
   const template = await mutations.createTemplate(dummyUser, name, description);
-  expect(template instanceof ProposalTemplate).toBe(false);
+  expect(template instanceof Template).toBe(false);
 });
 
 test('An userofficer can delete template', async () => {
   const id = 1;
   const template = await mutations.deleteTemplate(dummyUserOfficer, id);
-  expect(template instanceof ProposalTemplate).toBe(true);
-  expect((template as ProposalTemplate).templateId).toEqual(id);
+  expect(template instanceof Template).toBe(true);
+  expect((template as Template).templateId).toEqual(id);
 });
 
 test('An user can not delete template', async () => {
   const id = 1;
   const template = await mutations.deleteTemplate(dummyUser, id);
-  expect(template instanceof ProposalTemplate).toBe(false);
+  expect(template instanceof Template).toBe(false);
 });
 
 test('A user can not update topic', async () => {
@@ -129,7 +123,7 @@ test('User can not create question', async () => {
   const response = await mutations.createQuestion(dummyUser, {
     dataType: DataType.EMBELLISHMENT,
   });
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
+  expect(response).not.toBeInstanceOf(Template);
 });
 
 test('User officer can create question', async () => {
@@ -232,7 +226,7 @@ test('User officer can update proposal template', async () => {
     name: newName,
   });
   expect(isRejection(template)).toBe(false);
-  template = template as ProposalTemplate;
+  template = template as Template;
   expect(template.description).toEqual(newDescription);
   expect(template.isArchived).toEqual(newIsArchived);
   expect(template.name).toEqual(newName);
