@@ -79,7 +79,7 @@ export class TemplateResponseWrap extends ResponseWrapBase<Template> {
 export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
   @Response()
   @Field(() => Questionary, { nullable: true })
-  public template: Questionary;
+  public questionary: Questionary;
 }
 
 @ObjectType()
