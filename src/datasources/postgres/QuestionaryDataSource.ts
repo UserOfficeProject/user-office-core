@@ -23,6 +23,14 @@ export default class PostgresQuestionaryDataSource
         return createQuestionaryObject(rows[0]);
       });
   }
+  async delete(questionary_id: number): Promise<Questionary> {
+    const questionarySet: QuestionaryRecord[] = await database('questionaries')
+      .where({ questionary_id })
+      .returning(['*'])
+      .delete();
+
+    return createQuestionaryObject(questionarySet[0]);
+  }
   async updateAnswer(
     questionary_id: number,
     question_id: string,

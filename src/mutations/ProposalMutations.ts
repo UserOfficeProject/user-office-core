@@ -182,6 +182,8 @@ export default class ProposalMutations {
 
     const result = await this.proposalDataSource.deleteProposal(proposalId);
 
+    await this.questionaryDataSource.delete(result.questionaryId);
+
     return result || rejection('INTERNAL_ERROR');
   }
   @EventBus(Event.PROPOSAL_NOTIFIED)

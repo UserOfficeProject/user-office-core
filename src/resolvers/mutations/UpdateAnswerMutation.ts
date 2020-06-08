@@ -5,14 +5,12 @@ import {
   Field,
   Int,
   Mutation,
+  ObjectType,
   Resolver,
 } from 'type-graphql';
-
 import { ResolverContext } from '../../context';
-import {
-  AnswerResponseWrap,
-  BasicUserDetailsResponseWrap,
-} from '../types/CommonWrappers';
+import { Response } from '../Decorators';
+import { ResponseWrapBase } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 import { AnswerInput } from './AnswerTopicMutation';
 
@@ -24,16 +22,24 @@ export class UpdateAnswerArgs {
   @Field()
   public answer: AnswerInput;
 }
+
+@ObjectType()
+export class UpdateAnswerResponseWrap extends ResponseWrapBase<string> {
+  @Response()
+  @Field(() => String, { nullable: true })
+  public questionId: string;
+}
+
 @Resolver()
 export class UpdateAnswerMutation {
-  @Mutation(() => AnswerResponseWrap)
+  @Mutation(() => UpdateAnswerResponseWrap)
   updateAnswer(
     @Args() args: UpdateAnswerArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.questionary.updateAnswer(context.user, args),
-      BasicUserDetailsResponseWrap
+      UpdateAnswerResponseWrap
     );
   }
 }

@@ -124,6 +124,15 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  async delete(questionary_id: number): Promise<Questionary> {
+    if (dummyQuestionary.questionaryId !== questionary_id) {
+      throw new Error('Proposal does not exist');
+    }
+
+    const copy = { ...dummyQuestionary };
+    dummyQuestionary.questionaryId = -1;
+    return copy;
+  }
   public init() {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
