@@ -1,4 +1,4 @@
-fragment proposalTemplate on ProposalTemplate {
+fragment template on Template {
   steps {
     topic {
       title

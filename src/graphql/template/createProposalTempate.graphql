@@ -1,7 +1,7 @@
-mutation createProposalTemplate($name: String!, $description: String) {
-  createProposalTemplate(name: $name, description: $description) {
+mutation createTemplate($name: String!, $description: String) {
+  createTemplate(name: $name, description: $description) {
     template {
-      ...proposalTemplateMetadata
+      ...templateMetadata
     }
     error
   }

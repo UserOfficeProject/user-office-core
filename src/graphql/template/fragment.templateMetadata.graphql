@@ -1,4 +1,4 @@
-fragment proposalTemplateMetadata on ProposalTemplate {
+fragment templateMetadata on Template {
   templateId
   name
   description

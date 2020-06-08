@@ -1,17 +1,6 @@
 query getBlankProposal($callId: Int!) {
   blankProposal(callId: $callId) {
-    id
-    status
-    shortCode
-    rankOrder
-    finalStatus
-    title
-    abstract
-    created
-    updated
-    callId
-    templateId
-    notified
+    ...proposal
     proposer {
       ...basicUserDetails
     }
