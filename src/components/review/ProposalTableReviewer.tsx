@@ -5,10 +5,15 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 
-import { ReviewStatus } from '../../generated/sdk';
+import {
+  ReviewStatus,
+  SepAssignment,
+  UserWithReviewsQuery,
+} from '../../generated/sdk';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useUserWithReviewsData } from '../../hooks/useUserData';
 import { tableIcons } from '../../utils/materialIcons';
+import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
 import ProposalReviewModal from './ProposalReviewModal';
 
 type UserWithReview = {
@@ -22,7 +27,7 @@ type UserWithReview = {
 };
 
 const ProposalTableReviewer: React.FC = () => {
-  const { loading, userData } = useUserWithReviewsData();
+  const { loading, userData, setUserData } = useUserWithReviewsData();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [editReviewID, setEditReviewID] = useState(0);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
@@ -83,12 +88,37 @@ const ProposalTableReviewer: React.FC = () => {
       }) as UserWithReview[])
     : [];
 
+  const updateView = () => {
+    const currentReview = (AssignmentProvider.getCurrentAssignment()
+      .currentAssignment as SepAssignment).review;
+
+    const userDataUpdated = {
+      ...userData,
+      reviews: userData?.reviews.map(review => {
+        if (review.id === currentReview.id) {
+          return {
+            ...review,
+            grade: currentReview.grade,
+            status: currentReview.status,
+          };
+        } else {
+          return review;
+        }
+      }),
+    };
+
+    setUserData(userDataUpdated as UserWithReviewsQuery['me']);
+  };
+
   return (
     <>
       <ProposalReviewModal
         editReviewID={editReviewID}
         reviewModalOpen={reviewModalOpen}
-        setReviewModalOpen={setReviewModalOpen}
+        setReviewModalOpen={() => {
+          setReviewModalOpen(false);
+          updateView();
+        }}
       />
       <MaterialTable
         icons={tableIcons}
