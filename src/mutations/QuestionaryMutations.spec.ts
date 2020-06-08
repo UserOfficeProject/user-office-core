@@ -29,6 +29,19 @@ const queries = new QuestionaryQueries(
   dummyTemplateDataSource,
   dummyAuth
 );
+
+const getDummyUsersProposal = async () => {
+  const USER_QUESTIONARY_ID = 1;
+  const steps = await queries.getQuestionarySteps(
+    dummyUser,
+    USER_QUESTIONARY_ID
+  );
+  const firstStep = steps![0];
+  const firstAnswer = firstStep.fields[0];
+
+  return { firstAnswer, firstStep, questionaryId: USER_QUESTIONARY_ID };
+};
+
 beforeEach(() => {
   dummyQuestionaryDataSource.init();
   dummyTemplateDataSource.init();
@@ -69,14 +82,3 @@ it('User should update question', async () => {
   });
   expect(isRejection(result)).toBeFalsy();
 });
-
-const getDummyUsersProposal = async () => {
-  const USER_QUESTIONARY_ID = 1;
-  const steps = await queries.getQuestionarySteps(
-    dummyUser,
-    USER_QUESTIONARY_ID
-  );
-  const firstStep = steps![0];
-  const firstAnswer = firstStep.fields[0];
-  return { firstAnswer, firstStep, questionaryId: USER_QUESTIONARY_ID };
-};

@@ -2,19 +2,19 @@ import { Field, ObjectType } from 'type-graphql';
 
 import { Response } from '../Decorators';
 import { Page } from './Admin';
+import { Answer } from './Answer';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Proposal } from './Proposal';
-import { Template } from './Template';
 import { Question } from './Question';
+import { Questionary } from './Questionary';
 import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
+import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
-import { Questionary } from './Questionary';
-import { Answer } from './Answer';
 
 @ObjectType()
 export class ResponseWrapBase<T> {

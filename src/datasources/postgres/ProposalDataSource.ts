@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
+
 import { Proposal } from '../../models/Proposal';
 import { ProposalStatus } from '../../models/ProposalModel';
 import { ProposalDataSource } from '../ProposalDataSource';

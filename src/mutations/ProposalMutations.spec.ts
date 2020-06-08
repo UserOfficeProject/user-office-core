@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
+import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -15,7 +16,6 @@ import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
 import ProposalMutations from './ProposalMutations';
-import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 
 const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();

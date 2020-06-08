@@ -139,6 +139,7 @@ export default class PostgresQuestionaryDataSource
     if (!questionary) {
       throw new Error(`No questionary with id: ${questionary_id}`);
     }
+
     return this.getQuestionaryStepsWithTemplateId(
       questionary_id,
       questionary.templateId

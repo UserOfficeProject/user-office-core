@@ -16,6 +16,7 @@ import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
 import ProposalMutations from './mutations/ProposalMutations';
+import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SEPMutations from './mutations/SEPMutations';
 import TemplateMutations from './mutations/TemplateMutations';
@@ -25,14 +26,13 @@ import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
 import ProposalQueries from './queries/ProposalQueries';
+import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
 import { userAuthorization } from './utils/UserAuthorization';
-import QuestionaryQueries from './queries/QuestionaryQueries';
-import QuestionaryMutations from './mutations/QuestionaryMutations';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource, userAuthorization);

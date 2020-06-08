@@ -1,9 +1,9 @@
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { QuestionaryStep, Questionary } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
 
 export default class QuestionaryQueries {
   constructor(

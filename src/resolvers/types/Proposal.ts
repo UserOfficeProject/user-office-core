@@ -126,6 +126,7 @@ export class ProposalResolver {
       if (!call?.templateId) {
         return null;
       }
+
       return await context.queries.questionary.getBlankQuestionary(
         context.user,
         call.templateId

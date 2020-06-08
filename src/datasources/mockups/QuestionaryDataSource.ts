@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import {
   Answer,
