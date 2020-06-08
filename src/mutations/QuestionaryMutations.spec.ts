@@ -46,7 +46,7 @@ it('User should answer topic questions', async () => {
     answers: [
       {
         questionId: firstAnswer.question.proposalQuestionId,
-        value: 'answer',
+        value: JSON.stringify({ value: 'answer' }),
       },
     ],
   });

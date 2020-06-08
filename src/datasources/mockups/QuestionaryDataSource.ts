@@ -187,6 +187,10 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     topic_id: number,
     isComplete: boolean
   ): Promise<void> {
-    throw new Error('Not implemented');
+    if (dummyQuestionary.questionaryId === questionary_id) {
+      dummyQuestionarySteps.find(
+        step => step.topic.id === topic_id
+      )!.isCompleted = isComplete;
+    }
   }
 }
