@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { GetProposalTemplatesQuery } from '../generated/sdk';
+import { GetTemplatesQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useProposalsTemplates() {
   const api = useDataApi();
-  const [templates, setTemplates] = useState<
-    GetProposalTemplatesQuery['proposalTemplates']
-  >([]);
+  const [templates, setTemplates] = useState<GetTemplatesQuery['templates']>(
+    []
+  );
   useEffect(() => {
     api()
-      .getProposalTemplates()
+      .getTemplates()
       .then(data => {
-        if (data.proposalTemplates) {
-          setTemplates(data.proposalTemplates);
+        if (data.templates) {
+          setTemplates(data.templates);
         }
       });
   }, [api]);

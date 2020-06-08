@@ -1,5 +1,5 @@
 import {
-  ProposalTemplate,
+  Template,
   Questionary,
   DataType,
   EvaluatorOperator,
@@ -15,7 +15,7 @@ import {
   getQuestionaryStepByTopicId,
 } from './ProposalModelFunctions';
 
-export const create1TopicFieldlessTemplate = (): ProposalTemplate => {
+export const create1TopicFieldlessTemplate = (): Template => {
   return {
     templateId: 1,
     name: 'test',

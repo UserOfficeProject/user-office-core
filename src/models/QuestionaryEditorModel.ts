@@ -2,7 +2,7 @@ import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
-import { ProposalTemplate, Question, QuestionRel } from '../generated/sdk';
+import { Template, Question, QuestionRel } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
@@ -47,7 +47,7 @@ export interface Event {
 
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const { templateId } = useParams();
-  const blankInitTemplate: ProposalTemplate = {
+  const blankInitTemplate: Template = {
     steps: [],
     templateId: 0,
     callCount: 0,
@@ -57,7 +57,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
     complementaryQuestions: [],
   };
 
-  function reducer(state: ProposalTemplate, action: Event): ProposalTemplate {
+  function reducer(state: Template, action: Event): Template {
     return produce(state, draft => {
       switch (action.type) {
         case EventType.READY:
@@ -184,19 +184,21 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
     });
   }
 
-  const [state, dispatch] = useReducerWithMiddleWares<
-    Reducer<ProposalTemplate, Event>
-  >(reducer, blankInitTemplate, middlewares || []);
+  const [state, dispatch] = useReducerWithMiddleWares<Reducer<Template, Event>>(
+    reducer,
+    blankInitTemplate,
+    middlewares || []
+  );
   const memoizedDispatch = useCallback(dispatch, []); // required to avoid infinite re-render because dispatch function is recreated
   const api = useDataApi();
 
   useEffect(() => {
     api()
-      .getProposalTemplate({ templateId: parseInt(templateId!) })
+      .getTemplate({ templateId: parseInt(templateId!) })
       .then(data => {
         memoizedDispatch({
           type: EventType.READY,
-          payload: data.proposalTemplate,
+          payload: data.template,
         });
       });
   }, [api, memoizedDispatch, templateId]);

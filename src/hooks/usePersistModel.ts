@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   DataType,
   FieldDependency,
-  ProposalTemplate,
+  Template,
   QuestionRel,
   Question,
 } from '../generated/sdk';
@@ -161,12 +161,12 @@ export function usePersistModel() {
     description: string
   ) => {
     return api()
-      .updateProposalTemplate({
+      .updateTemplate({
         templateId,
         name,
         description,
       })
-      .then(data => data.updateProposalTemplate);
+      .then(data => data.updateTemplate);
   };
 
   type MonitorableServiceCall = () => Promise<{
@@ -177,7 +177,7 @@ export function usePersistModel() {
     getState,
     dispatch,
   }: {
-    getState: () => ProposalTemplate;
+    getState: () => Template;
     dispatch: React.Dispatch<Event>;
   }) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {

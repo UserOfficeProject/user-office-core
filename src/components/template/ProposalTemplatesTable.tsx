@@ -5,10 +5,7 @@ import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-import {
-  GetProposalTemplatesQuery,
-  ProposalTemplate,
-} from '../../generated/sdk';
+import { GetTemplatesQuery, Template } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
@@ -16,7 +13,7 @@ import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
 import { CallsTable } from '../call/CallsTable';
 
 type RowDataType = Pick<
-  ProposalTemplate,
+  Template,
   | 'templateId'
   | 'name'
   | 'description'
@@ -54,7 +51,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 
   useEffect(() => {
     props.dataProvider().then(data => {
-      setTemplates(data.proposalTemplates);
+      setTemplates(data.templates);
     });
   }, [props]);
   const columns: Column<RowDataType>[] = [
@@ -97,7 +94,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         props.confirm(
           () => {
             api()
-              .updateProposalTemplate({
+              .updateTemplate({
                 templateId: (data as RowDataType).templateId,
                 isArchived: false,
               })
@@ -107,10 +104,10 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                   templates.findIndex(
                     elem =>
                       elem.templateId ===
-                      response.updateProposalTemplate.template?.templateId
+                      response.updateTemplate.template?.templateId
                   ),
                   1,
-                  response.updateProposalTemplate.template!
+                  response.updateTemplate.template!
                 );
                 setTemplates(data);
               });
@@ -136,7 +133,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         props.confirm(
           () => {
             api()
-              .updateProposalTemplate({
+              .updateTemplate({
                 templateId: (data as RowDataType).templateId,
                 isArchived: true,
               })
@@ -146,10 +143,10 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                   templates.findIndex(
                     elem =>
                       elem.templateId ===
-                      response.updateProposalTemplate.template?.templateId
+                      response.updateTemplate.template?.templateId
                   ),
                   1,
-                  response.updateProposalTemplate.template!
+                  response.updateTemplate.template!
                 );
                 setTemplates(data);
               });
@@ -175,7 +172,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         props.confirm(
           () => {
             api()
-              .deleteProposalTemplate({
+              .deleteTemplate({
                 id: (data as RowDataType).templateId,
               })
               .then(response => {
@@ -184,7 +181,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
                   templates.findIndex(
                     elem =>
                       elem.templateId ===
-                      response.deleteProposalTemplate.template?.templateId
+                      response.deleteTemplate.template?.templateId
                   ),
                   1
                 );
@@ -229,12 +226,12 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
           onRowAdd: data =>
             new Promise(resolve => {
               api()
-                .createProposalTemplate({
+                .createTemplate({
                   name: data.name,
                   description: data.description,
                 })
                 .then(result => {
-                  const { template, error } = result.createProposalTemplate;
+                  const { template, error } = result.createTemplate;
 
                   if (!template) {
                     enqueueSnackbar(error || 'Error ocurred', {
@@ -267,12 +264,11 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
               props.confirm(
                 () => {
                   api()
-                    .cloneProposalTemplate({
+                    .cloneTemplate({
                       templateId: (data as RowDataType).templateId,
                     })
                     .then(result => {
-                      const clonedTemplate =
-                        result.cloneProposalTemplate.template;
+                      const clonedTemplate = result.cloneTemplate.template;
                       if (clonedTemplate) {
                         const newTemplates = [...templates];
                         newTemplates.push(clonedTemplate);
@@ -303,7 +299,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 }
 
 interface IProposalTemplatesTableProps {
-  dataProvider: () => Promise<GetProposalTemplatesQuery>;
+  dataProvider: () => Promise<GetTemplatesQuery>;
   confirm: WithConfirmType;
 }
 
