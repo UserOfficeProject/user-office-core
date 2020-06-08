@@ -1,4 +1,4 @@
-mutation(
+mutation answerTopic(
   $questionaryId: Int!
   $topicId: Int!
   $answers: [AnswerInput!]!
@@ -10,10 +10,8 @@ mutation(
     answers: $answers
     isPartialSave: $isPartialSave
   ) {
-    template {
-      steps {
-        ...questionaryStep
-      }
+    questionary {
+      ...questionary
     }
     error
   }

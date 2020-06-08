@@ -8,9 +8,7 @@ query getProposal($id: Int!) {
       ...basicUserDetails
     }
     questionary {
-      steps {
-        ...questionaryStep
-      }
+      ...questionary
     }
     technicalReview {
       id

@@ -5,9 +5,7 @@ query getBlankProposal($callId: Int!) {
       ...basicUserDetails
     }
     questionary {
-      steps {
-        ...questionaryStep
-      }
+      ...questionary
     }
     users {
       ...basicUserDetails

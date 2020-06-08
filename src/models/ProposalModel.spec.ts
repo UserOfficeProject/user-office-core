@@ -40,6 +40,9 @@ export const create1TopicFieldlessTemplate = (): Template => {
 
 export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => {
   return {
+    questionaryId: 1,
+    templateId: 1,
+    created: new Date(),
     steps: [
       {
         topic: {

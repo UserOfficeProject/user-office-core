@@ -890,7 +890,7 @@ export type Questionary = {
 export type QuestionaryResponseWrap = {
    __typename?: 'QuestionaryResponseWrap',
   error?: Maybe<Scalars['String']>,
-  template?: Maybe<Questionary>,
+  questionary?: Maybe<Questionary>,
 };
 
 export type QuestionaryStep = {
@@ -1606,10 +1606,7 @@ export type GetBlankProposalQuery = (
       & BasicUserDetailsFragment
     ), questionary: (
       { __typename?: 'Questionary' }
-      & { steps: Array<(
-        { __typename?: 'QuestionaryStep' }
-        & QuestionaryStepFragment
-      )> }
+      & QuestionaryFragment
     ), users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1642,10 +1639,7 @@ export type GetProposalQuery = (
       & BasicUserDetailsFragment
     )>, questionary: (
       { __typename?: 'Questionary' }
-      & { steps: Array<(
-        { __typename?: 'QuestionaryStep' }
-        & QuestionaryStepFragment
-      )> }
+      & QuestionaryFragment
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
@@ -1750,7 +1744,7 @@ export type UpdateProposalMutation = (
   ) }
 );
 
-export type Unnamed_1MutationVariables = {
+export type AnswerTopicMutationVariables = {
   questionaryId: Scalars['Int'],
   topicId: Scalars['Int'],
   answers: Array<AnswerInput>,
@@ -1758,17 +1752,14 @@ export type Unnamed_1MutationVariables = {
 };
 
 
-export type Unnamed_1Mutation = (
+export type AnswerTopicMutation = (
   { __typename?: 'Mutation' }
   & { answerTopic: (
     { __typename?: 'QuestionaryResponseWrap' }
     & Pick<QuestionaryResponseWrap, 'error'>
-    & { template: Maybe<(
+    & { questionary: Maybe<(
       { __typename?: 'Questionary' }
-      & { steps: Array<(
-        { __typename?: 'QuestionaryStep' }
-        & QuestionaryStepFragment
-      )> }
+      & QuestionaryFragment
     )> }
   ) }
 );
@@ -1804,6 +1795,15 @@ export type AnswerFragment = (
       { __typename?: 'FieldCondition' }
       & FieldConditionFragment
     ) }
+  )> }
+);
+
+export type QuestionaryFragment = (
+  { __typename?: 'Questionary' }
+  & Pick<Questionary, 'questionaryId' | 'templateId' | 'created'>
+  & { steps: Array<(
+    { __typename?: 'QuestionaryStep' }
+    & QuestionaryStepFragment
   )> }
 );
 
@@ -2844,6 +2844,16 @@ export const QuestionaryStepFragmentDoc = gql`
   }
 }
     ${AnswerFragmentDoc}`;
+export const QuestionaryFragmentDoc = gql`
+    fragment questionary on Questionary {
+  questionaryId
+  templateId
+  created
+  steps {
+    ...questionaryStep
+  }
+}
+    ${QuestionaryStepFragmentDoc}`;
 export const CoreReviewFragmentDoc = gql`
     fragment coreReview on Review {
   id
@@ -3203,9 +3213,7 @@ export const GetBlankProposalDocument = gql`
       ...basicUserDetails
     }
     questionary {
-      steps {
-        ...questionaryStep
-      }
+      ...questionary
     }
     users {
       ...basicUserDetails
@@ -3227,7 +3235,7 @@ export const GetBlankProposalDocument = gql`
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
-${QuestionaryStepFragmentDoc}`;
+${QuestionaryFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -3239,9 +3247,7 @@ export const GetProposalDocument = gql`
       ...basicUserDetails
     }
     questionary {
-      steps {
-        ...questionaryStep
-      }
+      ...questionary
     }
     technicalReview {
       id
@@ -3268,7 +3274,7 @@ export const GetProposalDocument = gql`
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
-${QuestionaryStepFragmentDoc}`;
+${QuestionaryFragmentDoc}`;
 export const GetProposalsDocument = gql`
     query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
@@ -3337,6 +3343,16 @@ export const UpdateProposalDocument = gql`
   }
 }
     `;
+export const AnswerTopicDocument = gql`
+    mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
+  answerTopic(questionaryId: $questionaryId, topicId: $topicId, answers: $answers, isPartialSave: $isPartialSave) {
+    questionary {
+      ...questionary
+    }
+    error
+  }
+}
+    ${QuestionaryFragmentDoc}`;
 export const GetFileMetadataDocument = gql`
     query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
@@ -3895,6 +3911,9 @@ export function getSdk(client: GraphQLClient) {
     },
     updateProposal(variables: UpdateProposalMutationVariables): Promise<UpdateProposalMutation> {
       return client.request<UpdateProposalMutation>(print(UpdateProposalDocument), variables);
+    },
+    answerTopic(variables: AnswerTopicMutationVariables): Promise<AnswerTopicMutation> {
+      return client.request<AnswerTopicMutation>(print(AnswerTopicDocument), variables);
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables);

@@ -5,7 +5,6 @@ import * as Yup from 'yup';
 
 import { DataType, Answer, QuestionaryStep } from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
-import { ProposalAnswer } from '../../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
@@ -109,7 +108,7 @@ export default function ProposalQuestionaryStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    const answers: ProposalAnswer[] = activeFields.map(field => {
+    const answers = activeFields.map(field => {
       return (({ question, value }) => ({
         proposalQuestionId: question.proposalQuestionId,
         dataType: question.dataType,

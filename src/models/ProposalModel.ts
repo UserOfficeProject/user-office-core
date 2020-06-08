@@ -1,7 +1,7 @@
 import { DataType } from '../generated/sdk';
 
-export interface ProposalAnswer {
-  proposalQuestionId: string;
+export interface Answer {
+  questionId: string;
   value: string;
   dataType: DataType;
 }

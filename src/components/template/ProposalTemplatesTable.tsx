@@ -5,6 +5,7 @@ import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+
 import { GetTemplatesQuery, Template } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { useDataApi } from '../../hooks/useDataApi';
