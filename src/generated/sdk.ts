@@ -219,7 +219,6 @@ export type Mutation = {
    __typename?: 'Mutation',
   createCall: CallResponseWrap,
   administrationProposal: ProposalResponseWrap,
-  notifyProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
@@ -239,9 +238,9 @@ export type Mutation = {
   createQuestionRel: TemplateResponseWrap,
   createTopic: TemplateResponseWrap,
   deleteQuestionRel: TemplateResponseWrap,
-  updateTemplate: TemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
   updateQuestionRel: TemplateResponseWrap,
+  updateTemplate: TemplateResponseWrap,
   updateTopic: TopicResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
@@ -260,6 +259,7 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap,
   getTokenForUser: TokenResponseWrap,
   login: TokenResponseWrap,
+  notifyProposal: ProposalResponseWrap,
   prepareDB: PrepareDbResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -295,11 +295,6 @@ export type MutationAdministrationProposalArgs = {
   finalStatus?: Maybe<ProposalEndStatus>,
   status?: Maybe<ProposalStatus>,
   rankOrder?: Maybe<Scalars['Int']>
-};
-
-
-export type MutationNotifyProposalArgs = {
-  id: Scalars['Int']
 };
 
 
@@ -436,14 +431,6 @@ export type MutationDeleteQuestionRelArgs = {
 };
 
 
-export type MutationUpdateTemplateArgs = {
-  templateId: Scalars['Int'],
-  name?: Maybe<Scalars['String']>,
-  description?: Maybe<Scalars['String']>,
-  isArchived?: Maybe<Scalars['Boolean']>
-};
-
-
 export type MutationUpdateQuestionArgs = {
   id: Scalars['String'],
   naturalKey?: Maybe<Scalars['String']>,
@@ -459,6 +446,14 @@ export type MutationUpdateQuestionRelArgs = {
   sortOrder?: Maybe<Scalars['Int']>,
   config?: Maybe<Scalars['String']>,
   dependency?: Maybe<FieldDependencyInput>
+};
+
+
+export type MutationUpdateTemplateArgs = {
+  templateId: Scalars['Int'],
+  name?: Maybe<Scalars['String']>,
+  description?: Maybe<Scalars['String']>,
+  isArchived?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -562,7 +557,7 @@ export type MutationDeleteQuestionArgs = {
 
 
 export type MutationDeleteTemplateArgs = {
-  id: Scalars['Int']
+  templateId: Scalars['Int']
 };
 
 
@@ -589,6 +584,11 @@ export type MutationGetTokenForUserArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'],
   password: Scalars['String']
+};
+
+
+export type MutationNotifyProposalArgs = {
+  id: Scalars['Int']
 };
 
 
@@ -721,6 +721,7 @@ export type ProposalResponseWrap = {
 
 export type ProposalsFilter = {
   text?: Maybe<Scalars['String']>,
+  templateIds?: Maybe<Array<Scalars['Int']>>,
 };
 
 export type ProposalsQueryResult = {
@@ -2930,6 +2931,7 @@ export const CoreReviewFragmentDoc = gql`
   status
   comment
   grade
+  sepID
 }
     `;
 export const QuestionRelFragmentDoc = gql`
@@ -3602,7 +3604,7 @@ export const DeleteQuestionRelDocument = gql`
     ${TemplateFragmentDoc}`;
 export const DeleteTemplateDocument = gql`
     mutation deleteTemplate($id: Int!) {
-  deleteTemplate(id: $id) {
+  deleteTemplate(templateId: $id) {
     template {
       templateId
       name
