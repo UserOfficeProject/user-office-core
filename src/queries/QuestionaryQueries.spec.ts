@@ -6,6 +6,7 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import {
   dummyUser,
   UserDataSourceMock,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import QuestionaryQueries from './QuestionaryQueries';
@@ -30,12 +31,6 @@ beforeEach(() => {
 
 test('Get questionary should succeed for authorized user', () => {
   return expect(
-    questionaryQueries.getQuestionary(dummyUser, 1)
+    questionaryQueries.getQuestionary(dummyUserWithRole, 1)
   ).resolves.not.toBe(null);
 });
-
-// test('Get questionary should not succeed for unauthorized user', () => {
-//   return expect(
-//     questionaryQueries.getQuestionary(dummyUserNotOnProposal, 1)
-//   ).resolves.toBe(null);
-// });

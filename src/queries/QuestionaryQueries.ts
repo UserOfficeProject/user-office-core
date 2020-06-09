@@ -1,8 +1,8 @@
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { QuestionaryStep, Questionary } from '../models/ProposalModel';
-import { User } from '../models/User';
+import { Questionary, QuestionaryStep } from '../models/ProposalModel';
+import { UserWithRole } from '../models/User';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class QuestionaryQueries {
@@ -14,7 +14,7 @@ export default class QuestionaryQueries {
 
   @Authorized()
   async getQuestionary(
-    agent: User | null,
+    agent: UserWithRole | null,
     questionaryId: number
   ): Promise<Questionary | null> {
     return this.dataSource.getQuestionary(questionaryId);
@@ -22,14 +22,14 @@ export default class QuestionaryQueries {
 
   @Authorized()
   async getQuestionarySteps(
-    agent: User | null,
+    agent: UserWithRole | null,
     questionaryId: number
   ): Promise<QuestionaryStep[] | null> {
     return this.dataSource.getQuestionarySteps(questionaryId);
   }
 
   async getBlankQuestionary(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<Questionary | null> {
     return this.templateDataSource
@@ -42,7 +42,7 @@ export default class QuestionaryQueries {
   }
 
   async getBlankQuestionarySteps(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<QuestionaryStep[]> {
     return this.dataSource.getBlankQuestionarySteps(templateId);

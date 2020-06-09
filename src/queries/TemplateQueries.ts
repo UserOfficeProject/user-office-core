@@ -9,12 +9,12 @@ export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized()
-  async getTemplate(agent: User | null, templateId: number) {
+  async getTemplate(agent: UserWithRole | null, templateId: number) {
     return this.dataSource.getTemplate(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getTemplates(agent: User | null, args?: TemplatesArgs) {
+  async getTemplates(agent: UserWithRole | null, args?: TemplatesArgs) {
     return this.dataSource.getTemplates(args);
   }
 
@@ -27,8 +27,6 @@ export default class TemplateQueries {
   }
 
   @Authorized()
-
-
   async getTemplateSteps(
     agent: UserWithRole | null,
     templateId: number

@@ -15,8 +15,8 @@ export class CreateTemplateMutation {
     return wrapResponse(
       context.mutations.template.createTemplate(context.user, {
         name,
-        description
-      ),
+        description,
+      }),
       TemplateResponseWrap
     );
   }

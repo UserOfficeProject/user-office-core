@@ -4,12 +4,6 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import {
-  DataType,
-  ProposalTemplate,
-  Question,
-  Topic,
-} from '../models/ProposalModel';
 import { DataType, Question, Template, Topic } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import TemplateMutations from './TemplateMutations';
@@ -40,8 +34,8 @@ test('An userofficer can create template', async () => {
   const description = 'The description';
   const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
     name,
-    description
-  );
+    description,
+  });
   expect(template instanceof Template).toBe(true);
   expect((template as Template).name).toEqual(name);
   expect((template as Template).description).toEqual(description);
@@ -49,20 +43,23 @@ test('An userofficer can create template', async () => {
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const template = await mutations.createTemplate(dummyUser, name, description);
+  const template = await mutations.createTemplate(dummyUserWithRole, {
+    name,
+    description,
+  });
   expect(template instanceof Template).toBe(false);
 });
 
 test('An userofficer can delete template', async () => {
   const id = 1;
-  const template = await mutations.deleteTemplate(dummyUserOfficer, id);
+  const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, id);
   expect(template instanceof Template).toBe(true);
   expect((template as Template).templateId).toEqual(id);
 });
 
 test('An user can not delete template', async () => {
   const id = 1;
-  const template = await mutations.deleteTemplate(dummyUser, id);
+  const template = await mutations.deleteTemplate(dummyUserWithRole, id);
   expect(template instanceof Template).toBe(false);
 });
 

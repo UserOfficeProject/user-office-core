@@ -1,18 +1,15 @@
 import {
+  administrationProposalBEValidationSchema,
   createProposalValidationSchema,
-  updateProposalValidationSchema,
-  submitProposalValidationSchema,
   deleteProposalValidationSchema,
   proposalNotifyValidationSchema,
-  administrationProposalBEValidationSchema,
+  submitProposalValidationSchema,
+  updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
-
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { Authorized, EventBus } from '../decorators';
-import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { EventBus, Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalStatus } from '../models/ProposalModel';
@@ -20,8 +17,6 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposal';
-import { UpdateProposalFilesArgs } from '../resolvers/mutations/UpdateProposalFilesMutation';
-import { NotifyProposalArgs } from '../resolvers/mutations/NotifyProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { Logger, logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';

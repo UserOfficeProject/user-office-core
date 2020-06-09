@@ -52,8 +52,13 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async createTemplate(
     agent: UserWithRole | null,
-    name: string,
-    description?: string
+    {
+      name,
+      description,
+    }: {
+      name: string;
+      description?: string;
+    }
   ): Promise<Template | Rejection> {
     const result = await this.dataSource
       .createTemplate(name, description)
@@ -83,7 +88,7 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
     user: UserWithRole | null,
-    id: number
+    templateId: number
   ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteTemplate(templateId)
@@ -306,7 +311,7 @@ export default class TemplateMutations {
 
   @ValidateArgs(updateProposalTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplate(user: UserWithRole | null, args: UpdateProposalTemplateArgs) {
+  updateProposalTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)
