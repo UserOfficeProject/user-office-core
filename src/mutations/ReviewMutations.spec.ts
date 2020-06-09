@@ -31,6 +31,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
       comment: 'Good proposal',
       grade: 9,
       status: ReviewStatus.DRAFT,
+      sepID: 1,
     })
   ).resolves.toBe(dummyReview);
 });
@@ -42,6 +43,7 @@ test('A user can not submit a review on a proposal', () => {
       comment: 'Good proposal',
       grade: 9,
       status: ReviewStatus.DRAFT,
+      sepID: 1,
     })
   ).resolves.toHaveProperty('reason', 'NOT_REVIEWER_OF_PROPOSAL');
 });
@@ -51,6 +53,7 @@ test('A userofficer can add a reviewer for a proposal', () => {
     reviewMutations.addUserForReview(dummyUserOfficerWithRole, {
       userID: 1,
       proposalID: 1,
+      sepID: 1,
     })
   ).resolves.toBeInstanceOf(Review);
 });
@@ -60,6 +63,7 @@ test('A user can not add a reviewer for a proposal', () => {
     reviewMutations.addUserForReview(dummyUserWithRole, {
       userID: 1,
       proposalID: 1,
+      sepID: 1,
     })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

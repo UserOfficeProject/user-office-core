@@ -11,6 +11,11 @@ export interface ReviewDataSource {
 
   getProposalReviews(id: number): Promise<Review[]>;
   getUserReviews(id: number): Promise<Review[]>;
+  getAssignmentReview(
+    sepId: number,
+    proposalId: number,
+    userId: number
+  ): Promise<Review>;
   setTechnicalReview(args: AddTechnicalReviewArgs): Promise<TechnicalReview>;
   getTechnicalReview(proposalID: number): Promise<TechnicalReview | null>;
   addUserForReview(args: AddUserForReviewArgs): Promise<Review>;

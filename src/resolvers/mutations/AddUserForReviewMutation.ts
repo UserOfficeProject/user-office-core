@@ -19,6 +19,9 @@ export class AddUserForReviewArgs {
 
   @Field(() => Int)
   public proposalID: number;
+
+  @Field(() => Int)
+  public sepID: number;
 }
 
 @Resolver()

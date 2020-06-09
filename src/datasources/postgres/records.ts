@@ -126,6 +126,7 @@ export interface ReviewRecord {
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
+  readonly sep_id: number;
 }
 
 export interface TechnicalReviewRecord {
