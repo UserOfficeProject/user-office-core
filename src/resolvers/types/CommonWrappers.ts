@@ -8,6 +8,7 @@ import { Call } from './Call';
 import { Proposal } from './Proposal';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
+import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
 import { SEP } from './SEP';
@@ -80,6 +81,15 @@ export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
   @Response()
   @Field(() => Questionary, { nullable: true })
   public questionary: Questionary;
+}
+
+@ObjectType()
+export class QuestionaryStepResponseWrap extends ResponseWrapBase<
+  QuestionaryStep
+> {
+  @Response()
+  @Field(() => QuestionaryStep, { nullable: true })
+  public questionaryStep: QuestionaryStep;
 }
 
 @ObjectType()
