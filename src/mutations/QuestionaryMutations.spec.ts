@@ -5,6 +5,7 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import {
   dummyUser,
   UserDataSourceMock,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import { isRejection } from '../rejection';
@@ -33,7 +34,7 @@ const queries = new QuestionaryQueries(
 const getDummyUsersProposal = async () => {
   const USER_QUESTIONARY_ID = 1;
   const steps = await queries.getQuestionarySteps(
-    dummyUser,
+    dummyUserWithRole,
     USER_QUESTIONARY_ID
   );
   const firstStep = steps![0];

@@ -51,15 +51,19 @@ test('An user cannot create template', async () => {
 });
 
 test('An userofficer can delete template', async () => {
-  const id = 1;
-  const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, id);
+  const templateId = 1;
+  const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, {
+    templateId,
+  });
   expect(template instanceof Template).toBe(true);
-  expect((template as Template).templateId).toEqual(id);
+  expect((template as Template).templateId).toEqual(templateId);
 });
 
 test('An user can not delete template', async () => {
-  const id = 1;
-  const template = await mutations.deleteTemplate(dummyUserWithRole, id);
+  const templateId = 1;
+  const template = await mutations.deleteTemplate(dummyUserWithRole, {
+    templateId,
+  });
   expect(template instanceof Template).toBe(false);
 });
 
@@ -206,7 +210,7 @@ test('User officer can delete question rel', async () => {
 });
 
 test('User can not update proposal template', async () => {
-  const steps = await mutations.updateProposalTemplate(dummyUserWithRole, {
+  const steps = await mutations.updateTemplate(dummyUserWithRole, {
     templateId: 1,
     description: 'New descsription',
     isArchived: false,
@@ -219,15 +223,12 @@ test('User officer can update proposal template', async () => {
   const newDescription = 'new description';
   const newName = 'new name';
   const newIsArchived = true;
-  let template = await mutations.updateProposalTemplate(
-    dummyUserOfficerWithRole,
-    {
-      templateId: 1,
-      description: newDescription,
-      isArchived: newIsArchived,
-      name: newName,
-    }
-  );
+  let template = await mutations.updateTemplate(dummyUserOfficerWithRole, {
+    templateId: 1,
+    description: newDescription,
+    isArchived: newIsArchived,
+    name: newName,
+  });
   expect(isRejection(template)).toBe(false);
   template = template as Template;
   expect(template.description).toEqual(newDescription);

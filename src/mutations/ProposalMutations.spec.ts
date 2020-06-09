@@ -35,6 +35,7 @@ const proposalMutations = new ProposalMutations(
 );
 
 beforeEach(() => {
+  dummyQuestionaryDataSource.init();
   dummyProposalDataSource.init();
 });
 
