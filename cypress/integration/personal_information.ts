@@ -183,10 +183,10 @@ context('Personal information tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Scientific evaluation panels');
+    cy.contains('Proposals to review');
 
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 2);
+      .should('have.length', 3);
   });
 });
