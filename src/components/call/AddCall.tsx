@@ -1,5 +1,6 @@
 import DateFnsUtils from '@date-io/date-fns';
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { createCallValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,7 +11,6 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
-import * as Yup from 'yup';
 
 import { useDataApi } from '../../hooks/useDataApi';
 import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
@@ -34,19 +34,6 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const createCallValidationSchema = Yup.object().shape({
-  shortCode: Yup.string().required('Short Code is required'),
-  start: Yup.date().required('Date is required'),
-  end: Yup.date().required('Date is required'),
-  startReview: Yup.date().required('Date is required'),
-  endReview: Yup.date().required('Date is required'),
-  startNotify: Yup.date().required('Date is required'),
-  endNotify: Yup.date().required('Date is required'),
-  cycleComment: Yup.string().required('Date is required'),
-  surveyComment: Yup.string().required('Date is required'),
-  templateId: Yup.number().notRequired(),
-});
-
 type AddCallProps = {
   close: () => void;
 };
@@ -63,21 +50,21 @@ const AddCall: React.FC<AddCallProps> = props => {
       <Formik
         initialValues={{
           shortCode: '',
-          start: currentDay,
-          end: currentDay,
+          startCall: currentDay,
+          endCall: currentDay,
           startReview: currentDay,
           endReview: currentDay,
           startNotify: currentDay,
           endNotify: currentDay,
           cycleComment: '',
           surveyComment: '',
-          templateId: '',
+          templateId: 0,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const {
             shortCode,
-            start,
-            end,
+            startCall,
+            endCall,
             startReview,
             endReview,
             startNotify,
@@ -90,8 +77,8 @@ const AddCall: React.FC<AddCallProps> = props => {
           await api()
             .createCall({
               shortCode: shortCode,
-              startCall: start,
-              endCall: end,
+              startCall: startCall,
+              endCall: endCall,
               startReview: startReview,
               endReview: endReview,
               startNotify: startNotify,
@@ -132,7 +119,7 @@ const AddCall: React.FC<AddCallProps> = props => {
             />
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <Field
-                name="start"
+                name="startCall"
                 label="Start"
                 component={FormikUICustomDatePicker}
                 margin="normal"
@@ -141,7 +128,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               />
 
               <Field
-                name="end"
+                name="endCall"
                 label="End"
                 component={FormikUICustomDatePicker}
                 margin="normal"
@@ -201,7 +188,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               label="Call template"
               items={templates.map(template => ({
                 text: template.name,
-                value: template.templateId.toString(),
+                value: template.templateId,
               }))}
               data-cy="call-template"
             />

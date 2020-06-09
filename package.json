@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.10",
+    "@esss-swap/duo-validation": "^1.1.3",
     "@graphql-codegen/cli": "^1.11.2",
     "@graphql-codegen/typescript": "^1.11.2",
     "@graphql-codegen/typescript-graphql-request": "^1.11.2",

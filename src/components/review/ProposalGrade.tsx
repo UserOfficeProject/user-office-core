@@ -1,3 +1,4 @@
+import { proposalGradeValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -7,7 +8,6 @@ import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect } from 'react';
-import * as Yup from 'yup';
 
 import { ReviewStatus, Review } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -74,15 +74,7 @@ export default function ProposalGrade(props: {
             actions.setSubmitting(false);
           });
       }}
-      validationSchema={Yup.object().shape({
-        comment: Yup.string()
-          .max(500, 'Too long comment')
-          .nullable(),
-        grade: Yup.number()
-          .min(0, 'Lowest grade is 0')
-          .max(10, 'Highest grade is 10')
-          .nullable(),
-      })}
+      validationSchema={proposalGradeValidationSchema}
     >
       {({ isSubmitting, setFieldValue, handleSubmit }) => (
         <Form>

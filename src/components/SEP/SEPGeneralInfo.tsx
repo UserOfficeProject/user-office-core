@@ -1,3 +1,4 @@
+import { updateSEPValidationSchema } from '@esss-swap/duo-validation';
 import {
   makeStyles,
   Typography,
@@ -16,7 +17,6 @@ import { UserContext } from '../../context/UserContextProvider';
 import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ButtonContainer } from '../../styles/StyledComponents';
-import { SEPValidationSchema } from './SEPValidationSchema';
 
 type SEPPageProps = {
   /** SEP data to be shown */
@@ -63,7 +63,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
         sendSEPUpdate(values);
         actions.setSubmitting(false);
       }}
-      validationSchema={SEPValidationSchema}
+      validationSchema={updateSEPValidationSchema}
     >
       {({
         isSubmitting,

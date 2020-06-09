@@ -1,3 +1,4 @@
+import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,7 +14,6 @@ import { Link } from 'react-router-dom';
 
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { FormWrapper } from '../../styles/StyledComponents';
-import { userPasswordFieldSchema } from '../../utils/userFieldValidationSchema';
 import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({
@@ -74,7 +74,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
           await requestResetPassword(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={userPasswordFieldSchema}
+        validationSchema={userPasswordFieldValidationSchema}
       >
         <Form className={classes.form}>
           <CssBaseline />
