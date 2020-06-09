@@ -17,6 +17,7 @@ import React, {
   useState,
 } from 'react';
 import { Prompt } from 'react-router';
+
 import { UserContext } from '../../context/UserContextProvider';
 import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
