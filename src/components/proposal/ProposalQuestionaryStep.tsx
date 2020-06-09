@@ -3,7 +3,12 @@ import { Formik } from 'formik';
 import React, { useContext, SyntheticEvent } from 'react';
 import * as Yup from 'yup';
 
-import { DataType, Answer, QuestionaryStep } from '../../generated/sdk';
+import {
+  DataType,
+  Answer,
+  QuestionaryStep,
+  AnswerInput,
+} from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
 import {
   areDependenciesSatisfied,
@@ -108,12 +113,11 @@ export default function ProposalQuestionaryStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    const answers = activeFields.map(field => {
+    const answers: AnswerInput[] = activeFields.map(field => {
       return (({ question, value }) => ({
-        proposalQuestionId: question.proposalQuestionId,
-        dataType: question.dataType,
+        questionId: question.proposalQuestionId,
         value,
-      }))(field); // convert field to answer object
+      }))(field);
     });
 
     dispatch({

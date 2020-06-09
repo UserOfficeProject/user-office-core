@@ -37,7 +37,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
       onClose={props.onClose}
     >
       <DialogContent>
-        <CallsTable data={callsData || undefined} />
+        <CallsTable data={callsData} />
       </DialogContent>
     </Dialog>
   );
@@ -52,7 +52,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 
   useEffect(() => {
     props.dataProvider().then(data => {
-      setTemplates(data.templates);
+      setTemplates(data);
     });
   }, [props]);
   const columns: Column<RowDataType>[] = [
@@ -300,7 +300,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 }
 
 interface IProposalTemplatesTableProps {
-  dataProvider: () => Promise<GetTemplatesQuery>;
+  dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
   confirm: WithConfirmType;
 }
 

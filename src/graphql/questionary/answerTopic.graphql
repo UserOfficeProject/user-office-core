@@ -10,8 +10,8 @@ mutation answerTopic(
     answers: $answers
     isPartialSave: $isPartialSave
   ) {
-    questionary {
-      ...questionary
+    questionaryStep {
+      ...questionaryStep
     }
     error
   }

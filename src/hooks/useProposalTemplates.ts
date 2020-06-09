@@ -5,9 +5,9 @@ import { useDataApi } from './useDataApi';
 
 export function useProposalsTemplates() {
   const api = useDataApi();
-  const [templates, setTemplates] = useState<GetTemplatesQuery['templates']>(
-    []
-  );
+  const [templates, setTemplates] = useState<
+    Exclude<GetTemplatesQuery['templates'], null>
+  >([]);
   useEffect(() => {
     api()
       .getTemplates()

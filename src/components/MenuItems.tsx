@@ -22,21 +22,9 @@ type MenuItemsProps = {
 };
 
 const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
-  const { loading, callsData } = useCallsData();
+  const { callsData } = useCallsData(true);
 
-  let proposalDisabled = false;
-
-  // Checks if there is a call open, during the current time
-  if (!loading) {
-    const currentTime = new Date().getTime();
-    proposalDisabled = callsData
-      ? callsData.filter(
-          call =>
-            new Date(call.startCall).getTime() < currentTime &&
-            currentTime < new Date(call.endCall).getTime()
-        ).length === 0
-      : false;
-  }
+  const proposalDisabled = callsData.length === 0;
   const user = (
     <div data-cy="user-menu-items">
       <ListItem component={Link} to="/" button>

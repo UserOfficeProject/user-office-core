@@ -221,7 +221,7 @@ export type Mutation = {
   administrationProposal: ProposalResponseWrap,
   notifyProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
-  answerTopic: QuestionaryResponseWrap,
+  answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
@@ -712,7 +712,6 @@ export type ProposalResponseWrap = {
 
 export type ProposalsFilter = {
   text?: Maybe<Scalars['String']>,
-  templateIds?: Maybe<Array<Scalars['Int']>>,
 };
 
 export type ProposalsQueryResult = {
@@ -731,7 +730,7 @@ export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
   proposals?: Maybe<ProposalsQueryResult>,
-  templates: Array<Template>,
+  templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
   call?: Maybe<Call>,
@@ -898,6 +897,12 @@ export type QuestionaryStep = {
   topic: Topic,
   isCompleted: Scalars['Boolean'],
   fields: Array<Answer>,
+};
+
+export type QuestionaryStepResponseWrap = {
+   __typename?: 'QuestionaryStepResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  questionaryStep?: Maybe<QuestionaryStep>,
 };
 
 export type QuestionRel = {
@@ -1755,11 +1760,11 @@ export type AnswerTopicMutationVariables = {
 export type AnswerTopicMutation = (
   { __typename?: 'Mutation' }
   & { answerTopic: (
-    { __typename?: 'QuestionaryResponseWrap' }
-    & Pick<QuestionaryResponseWrap, 'error'>
-    & { questionary: Maybe<(
-      { __typename?: 'Questionary' }
-      & QuestionaryFragment
+    { __typename?: 'QuestionaryStepResponseWrap' }
+    & Pick<QuestionaryStepResponseWrap, 'error'>
+    & { questionaryStep: Maybe<(
+      { __typename?: 'QuestionaryStep' }
+      & QuestionaryStepFragment
     )> }
   ) }
 );
@@ -2264,10 +2269,10 @@ export type GetTemplatesQueryVariables = {
 
 export type GetTemplatesQuery = (
   { __typename?: 'Query' }
-  & { templates: Array<(
+  & { templates: Maybe<Array<(
     { __typename?: 'Template' }
     & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
-  )> }
+  )>> }
 );
 
 export type UpdateQuestionMutationVariables = {
@@ -3346,13 +3351,13 @@ export const UpdateProposalDocument = gql`
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(questionaryId: $questionaryId, topicId: $topicId, answers: $answers, isPartialSave: $isPartialSave) {
-    questionary {
-      ...questionary
+    questionaryStep {
+      ...questionaryStep
     }
     error
   }
 }
-    ${QuestionaryFragmentDoc}`;
+    ${QuestionaryStepFragmentDoc}`;
 export const GetFileMetadataDocument = gql`
     query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
