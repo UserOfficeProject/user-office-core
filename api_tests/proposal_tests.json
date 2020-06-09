@@ -719,6 +719,86 @@
 			"response": []
 		},
 		{
+			"name": "createSep [Mutations]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7982d7e9-f944-4300-a0ff-9107ea514a60",
+						"exec": [
+							"pm.test(\"Can create proposal template\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createSEP.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createSEP.sep.id).to.be.above(0)",
+							"    pm.environment.set(\"NEW_SEP_ID\", jsonData.data.createSEP.sep.id);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Authorization}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/QuestionaryEditor"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($code: String!, $active: Boolean!, $description: String!) {\n  createSEP(code:$code, active:$active, description:$description) {\n    sep {\n      id\n    }\n    error\n  }\n}",
+						"variables": "{\n        \"code\": \"{{$randomWord}}\",\n        \"active\": true,\n        \"description\": \"{{$randomWord}}\"\n    }"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "createTemplate [Mutation]",
 			"event": [
 				{
@@ -2144,7 +2224,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionaryId: Int!, $topicId:Int!, $answers: [AnswerInput!]!) {\n  answerTopic(questionaryId:$questionaryId, topicId: $topicId,  answers:$answers) {\n    questionary{\n      steps {\n         fields {\n          question {\n            question\n          }\n        }\n      }\n    }\n    error\n  }\n}",
+						"query": "mutation ($questionaryId: Int!, $topicId:Int!, $answers: [AnswerInput!]!) {\n  answerTopic(questionaryId:$questionaryId, topicId: $topicId,  answers:$answers) {\n    questionaryStep{\n         fields {\n          question {\n            question\n          }\n        }\n    }\n    error\n  }\n}",
 						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"answers\": [{\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
 					},
 					"options": {
@@ -2628,8 +2708,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($newUserId:Int!, $newProposalId:Int!) {\n  addUserForReview(userID: $newUserId, proposalID: $newProposalId) {\n    review {\n      id\n\t}\n    error\n  }\n}\n",
-						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_ID}}\n}"
+						"query": "mutation($newUserId:Int!, $newProposalId:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalID: $newProposalId) {\n    review {\n      id\n\t}\n    error\n  }\n}\n",
+						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_ID}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
 					}
 				},
 				"url": {
@@ -2729,8 +2809,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($reviewID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    error\n  }\n}\n",
-						"variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}}\n}"
+						"query": "mutation($reviewID: Int!, $sepID: Int!) {\n  addReview(reviewID: $reviewID, comment:\"Test comment\", grade:9, status:DRAFT, sepID: $sepID) {\n    review {\n        id,\n        comment,\n        grade,\n    }\n    error\n  }\n}\n",
+						"variables": "{\n\t\"reviewID\":{{NEW_REVIEW_ID}},\n\t\"sepID\": {{NEW_SEP_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
