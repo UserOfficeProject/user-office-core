@@ -131,6 +131,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
 
     const copy = { ...dummyQuestionary };
     dummyQuestionary.questionaryId = -1;
+
     return copy;
   }
   public init() {

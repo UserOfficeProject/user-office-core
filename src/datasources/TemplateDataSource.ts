@@ -10,8 +10,8 @@ import {
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export interface TemplateDataSource {
