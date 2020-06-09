@@ -719,7 +719,7 @@
 			"response": []
 		},
 		{
-			"name": "createProposalTemplate [Mutation]",
+			"name": "createTemplate [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -728,9 +728,9 @@
 						"exec": [
 							"pm.test(\"Can create proposal template\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createProposalTemplate.error).to.be.eql(null)",
-							"    pm.expect(jsonData.data.createProposalTemplate.template.templateId).to.be.above(0)",
-							"    pm.environment.set(\"NEW_TEMPLATE_ID\", jsonData.data.createProposalTemplate.template.templateId);",
+							"    pm.expect(jsonData.data.createTemplate.error).to.be.eql(null)",
+							"    pm.expect(jsonData.data.createTemplate.template.templateId).to.be.above(0)",
+							"    pm.environment.set(\"NEW_TEMPLATE_ID\", jsonData.data.createTemplate.template.templateId);",
 							"});",
 							""
 						],
@@ -777,8 +777,86 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation  ($name: String!, $description: String) {\n  createProposalTemplate(name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
+						"query": "mutation  ($name: String!, $description: String) {\n  createTemplate(name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
 						"variables": "{\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTemplates [Query]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8fec1b22-295b-491f-bd6b-c0c08ec4de96",
+						"exec": [
+							"pm.test(\"Can create proposal template\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.templates.find(template => template.templateId === pm.environment.get(\"NEW_TEMPLATE_ID\"))).to.not.eql(undefined)",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Authorization}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/QuestionaryEditor"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n  templates(filter:{isArchived:false}) {\n\ttemplateId\n  }\n}",
+						"variables": ""
 					},
 					"options": {
 						"graphql": {}
@@ -1696,6 +1774,7 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.data.createProposal.proposal.id).to.be.above(0)",
 							"    pm.environment.set(\"NEW_PROPOSAL_ID\", jsonData.data.createProposal.proposal.id);",
+							"    pm.environment.set(\"NEW_QUESTIONARY_ID\", jsonData.data.createProposal.proposal.questionaryId);",
 							"});",
 							"",
 							""
@@ -1767,7 +1846,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
@@ -1966,8 +2045,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($id: Int!, $title: String, $abstract: String, $answers: [ProposalAnswerInput!], $users: [Int!]) {\n      updateProposal(id: $id, title: $title, abstract: $abstract, answers: $answers, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\",\n        \"answers\": [{\"proposalQuestionId\": \"{{NEW_FIELD_ID}}\", \"dataType\": \"FILE_UPLOAD\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
+						"query": "mutation ($id: Int!, $title: String, $abstract: String, $users: [Int!]) {\n      updateProposal(id: $id, title: $title, abstract: $abstract, users: $users) {\n    proposal {\n      id\n      title\n      abstract\n    }\n    error\n  }\n}\n",
+						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"title\": \"{{NEW_PROPOSAL_TITLE}}\",\n        \"abstract\": \"{{NEW_PROPOSAL_ABSTRACT}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
@@ -1988,16 +2067,16 @@
 			"response": []
 		},
 		{
-			"name": "updateProposalFiles [Mutation]",
+			"name": "answerTopic [Mutation]",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "aa6257ef-b799-4e64-8cb2-5b3b83c329ff",
+						"id": "eadbfaf3-8c24-47e6-ac19-001ec33b516a",
 						"exec": [
 							"pm.test(\"Should update proposal\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateProposalFiles.error).to.eql(null)",
+							"    pm.expect(jsonData.data.answerTopic.error).to.eql(null);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -2065,8 +2144,107 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($id: Int!, $questionId: String!) {\nupdateProposalFiles(proposalId:$id, questionId:$questionId, files:[]) {\n error\n}\n}\n",
-						"variables": "{\n        \"id\": {{NEW_PROPOSAL_ID}},\n        \"questionId\": \"{{NEW_FIELD_ID}}\"\n    }"
+						"query": "mutation ($questionaryId: Int!, $topicId:Int!, $answers: [AnswerInput!]!) {\n  answerTopic(questionaryId:$questionaryId, topicId: $topicId,  answers:$answers) {\n    questionary{\n      steps {\n         fields {\n          question {\n            question\n          }\n        }\n      }\n    }\n    error\n  }\n}",
+						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"topicId\": {{NEW_TOPIC_ID}},\n        \"answers\": [{\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}]\n    }"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateAnswer [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa6257ef-b799-4e64-8cb2-5b3b83c329ff",
+						"exec": [
+							"pm.test(\"Should update proposal\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.updateAnswer.error).to.eql(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{NEW_USER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDEwMDc5NywiZXhwIjoxNTcwNzA1NTk3fQ.VGrhlvv4eA8RqnHVEPLWRlFegdsG1IXygWJPoeJGCXA"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission/11"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($questionaryId: Int!, $answer: AnswerInput!) {\n    updateAnswer(questionaryId:$questionaryId, answer:$answer) {\n        questionId\n        error\n    }\n}\n",
+						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"answer\": {\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}\n    }"
 					}
 				},
 				"url": {
