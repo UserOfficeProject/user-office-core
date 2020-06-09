@@ -24,6 +24,7 @@ query getProposal($id: Int!) {
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname

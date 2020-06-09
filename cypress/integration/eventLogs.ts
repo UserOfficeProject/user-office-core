@@ -47,6 +47,8 @@ context('Event log tests', () => {
 
     cy.get("[data-cy='profile-page-btn']").click();
 
+    cy.contains('Profile').click();
+
     cy.get("[name='firstname']")
       .clear()
       .type(newFirstName);

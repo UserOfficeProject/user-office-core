@@ -11,6 +11,7 @@ query getProposals($filter: ProposalsFilter) {
         comment
         status
         userID
+        sepID
         reviewer {
           firstname
           lastname

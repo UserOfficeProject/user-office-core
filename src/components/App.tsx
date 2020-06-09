@@ -21,7 +21,6 @@ import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';
 import ResetPassword from './user/ResetPassword';
 import ResetPasswordEmail from './user/ResetPasswordEmail';
-import RoleSelectionPage from './user/RoleSelectionPage';
 import SignIn from './user/SignIn';
 import SignUp from './user/SignUp';
 
@@ -34,15 +33,17 @@ const PrivateRoute: React.FC<RouteProps> = ({ component, ...rest }) => {
 
   return (
     <UserContext.Consumer>
-      {({ token, currentRole }): JSX.Element => (
+      {({ roles, token, currentRole, handleRole }): JSX.Element => (
         <Route
           {...rest}
           render={(props): JSX.Element => {
             if (!token) {
               return <Redirect to="/SignIn" />;
-            } else if (token && !currentRole) {
-              return <Redirect to="/RoleSelectionPage" />;
             } else {
+              if (!currentRole) {
+                handleRole(roles[0].shortCode);
+              }
+
               return <Component {...props} />;
             }
           }}
@@ -104,10 +105,6 @@ class App extends React.Component {
                       )}
                     />
 
-                    <Route
-                      path="/RoleSelectionPage"
-                      component={RoleSelectionPage}
-                    />
                     <PrivateRoute path="/" component={DashBoard} />
                   </Switch>
                 </div>

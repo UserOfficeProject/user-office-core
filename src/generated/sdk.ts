@@ -267,6 +267,7 @@ export type Mutation = {
   setPageContent: PageResponseWrap,
   submitProposal: ProposalResponseWrap,
   token: TokenResponseWrap,
+  selectRole: TokenResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
   updateQuestionsTopicRels: UpdateQuestionsTopicRelsResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
@@ -329,7 +330,8 @@ export type MutationAddReviewArgs = {
   reviewID: Scalars['Int'],
   comment: Scalars['String'],
   grade: Scalars['Int'],
-  status: ReviewStatus
+  status: ReviewStatus,
+  sepID: Scalars['Int']
 };
 
 
@@ -344,7 +346,8 @@ export type MutationAddTechnicalReviewArgs = {
 
 export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'],
-  proposalID: Scalars['Int']
+  proposalID: Scalars['Int'],
+  sepID: Scalars['Int']
 };
 
 
@@ -618,6 +621,12 @@ export type MutationSubmitProposalArgs = {
 
 export type MutationTokenArgs = {
   token: Scalars['String']
+};
+
+
+export type MutationSelectRoleArgs = {
+  token: Scalars['String'],
+  selectedRoleId?: Maybe<Scalars['Int']>
 };
 
 
@@ -944,6 +953,7 @@ export type Review = {
   comment?: Maybe<Scalars['String']>,
   grade?: Maybe<Scalars['Int']>,
   status: ReviewStatus,
+  sepID: Scalars['Int'],
   reviewer?: Maybe<User>,
   proposal?: Maybe<Proposal>,
 };
@@ -996,6 +1006,7 @@ export type SepAssignment = {
   proposal: Proposal,
   roles: Array<Role>,
   user?: Maybe<BasicUserDetails>,
+  review: Review,
 };
 
 export type SepMember = {
@@ -1170,6 +1181,7 @@ export type User = {
   roles: Array<Role>,
   reviews: Array<Review>,
   proposals: Array<Proposal>,
+  seps: Array<Sep>,
 };
 
 export type UserQueryResult = {
@@ -1190,7 +1202,7 @@ export enum UserRole {
   REVIEWER = 'REVIEWER',
   SEP_CHAIR = 'SEP_CHAIR',
   SEP_SECRETARY = 'SEP_SECRETARY',
-  SEP_MEMBER = 'SEP_MEMBER'
+  SEP_REVIEWER = 'SEP_REVIEWER'
 }
 
 export type AssignProposalMutationVariables = {
@@ -1285,6 +1297,20 @@ export type CreateSepMutation = (
   ) }
 );
 
+export type GetUserSepsQueryVariables = {};
+
+
+export type GetUserSepsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { seps: Array<(
+      { __typename?: 'SEP' }
+      & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
+    )> }
+  )> }
+);
+
 export type GetSepQueryVariables = {
   id: Scalars['Int']
 };
@@ -1340,7 +1366,10 @@ export type GetSepProposalsQuery = (
       )>, roles: Array<(
         { __typename?: 'Role' }
         & Pick<Role, 'id' | 'shortCode' | 'title'>
-      )> }
+      )>, review: (
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'status' | 'comment' | 'grade' | 'sepID'>
+      ) }
     )>> }
   )>> }
 );
@@ -1617,7 +1646,7 @@ export type GetBlankProposalQuery = (
       & BasicUserDetailsFragment
     )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
-      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
+      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
@@ -1650,7 +1679,7 @@ export type GetProposalQuery = (
       & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
     )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
-      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
+      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
       & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
@@ -1677,7 +1706,7 @@ export type GetProposalsQuery = (
         & BasicUserDetailsFragment
       ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
-        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID'>
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
         & { reviewer: Maybe<(
           { __typename?: 'User' }
           & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
@@ -1860,7 +1889,8 @@ export type AddTechnicalReviewMutation = (
 
 export type AddUserForReviewMutationVariables = {
   userID: Scalars['Int'],
-  proposalID: Scalars['Int']
+  proposalID: Scalars['Int'],
+  sepID: Scalars['Int']
 };
 
 
@@ -1869,12 +1899,16 @@ export type AddUserForReviewMutation = (
   & { addUserForReview: (
     { __typename?: 'ReviewResponseWrap' }
     & Pick<ReviewResponseWrap, 'error'>
+    & { review: Maybe<(
+      { __typename?: 'Review' }
+      & Pick<Review, 'id'>
+    )> }
   ) }
 );
 
 export type CoreReviewFragment = (
   { __typename?: 'Review' }
-  & Pick<Review, 'id' | 'userID' | 'status' | 'comment' | 'grade'>
+  & Pick<Review, 'id' | 'userID' | 'status' | 'comment' | 'grade' | 'sepID'>
 );
 
 export type GetReviewQueryVariables = {
@@ -1915,7 +1949,8 @@ export type UpdateReviewMutationVariables = {
   reviewID: Scalars['Int'],
   grade: Scalars['Int'],
   comment: Scalars['String'],
-  status: ReviewStatus
+  status: ReviewStatus,
+  sepID: Scalars['Int']
 };
 
 
@@ -1941,7 +1976,7 @@ export type UserWithReviewsQuery = (
     & Pick<User, 'id' | 'firstname' | 'lastname' | 'organisation'>
     & { reviews: Array<(
       { __typename?: 'Review' }
-      & Pick<Review, 'id' | 'grade' | 'comment' | 'status'>
+      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'sepID'>
       & { proposal: Maybe<(
         { __typename?: 'Proposal' }
         & Pick<Proposal, 'id' | 'title' | 'shortCode'>
@@ -2487,6 +2522,21 @@ export type GetFieldsQuery = (
   )> }
 );
 
+export type GetMyRolesQueryVariables = {};
+
+
+export type GetMyRolesQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'firstname' | 'lastname'>
+    & { roles: Array<(
+      { __typename?: 'Role' }
+      & Pick<Role, 'id' | 'shortCode' | 'title'>
+    )> }
+  )> }
+);
+
 export type GetOrcIdInformationQueryVariables = {
   authorizationCode: Scalars['String']
 };
@@ -2651,6 +2701,20 @@ export type ResetPasswordEmailMutation = (
   & { resetPasswordEmail: (
     { __typename?: 'ResetPasswordEmailResponseWrap' }
     & Pick<ResetPasswordEmailResponseWrap, 'error' | 'success'>
+  ) }
+);
+
+export type SelectRoleMutationVariables = {
+  token: Scalars['String'],
+  selectedRoleId: Scalars['Int']
+};
+
+
+export type SelectRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { selectRole: (
+    { __typename?: 'TokenResponseWrap' }
+    & Pick<TokenResponseWrap, 'token' | 'error'>
   ) }
 );
 
@@ -3000,6 +3064,19 @@ export const CreateSepDocument = gql`
   }
 }
     `;
+export const GetUserSepsDocument = gql`
+    query getUserSeps {
+  me {
+    seps {
+      id
+      code
+      description
+      numberRatingsRequired
+      active
+    }
+  }
+}
+    `;
 export const GetSepDocument = gql`
     query getSEP($id: Int!) {
   sep(id: $id) {
@@ -3058,6 +3135,13 @@ export const GetSepProposalsDocument = gql`
         id
         shortCode
         title
+      }
+      review {
+        id
+        status
+        comment
+        grade
+        sepID
       }
     }
   }
@@ -3229,6 +3313,7 @@ export const GetBlankProposalDocument = gql`
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname
@@ -3268,6 +3353,7 @@ export const GetProposalDocument = gql`
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname
@@ -3294,6 +3380,7 @@ export const GetProposalsDocument = gql`
         comment
         status
         userID
+        sepID
         reviewer {
           firstname
           lastname
@@ -3380,9 +3467,12 @@ export const AddTechnicalReviewDocument = gql`
 }
     `;
 export const AddUserForReviewDocument = gql`
-    mutation addUserForReview($userID: Int!, $proposalID: Int!) {
-  addUserForReview(userID: $userID, proposalID: $proposalID) {
+    mutation addUserForReview($userID: Int!, $proposalID: Int!, $sepID: Int!) {
+  addUserForReview(userID: $userID, proposalID: $proposalID, sepID: $sepID) {
     error
+    review {
+      id
+    }
   }
 }
     `;
@@ -3409,8 +3499,8 @@ export const RemoveUserForReviewDocument = gql`
 }
     `;
 export const UpdateReviewDocument = gql`
-    mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!) {
-  addReview(reviewID: $reviewID, grade: $grade, comment: $comment, status: $status) {
+    mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!, $sepID: Int!) {
+  addReview(reviewID: $reviewID, grade: $grade, comment: $comment, status: $status, sepID: $sepID) {
     error
     review {
       ...coreReview
@@ -3430,6 +3520,7 @@ export const UserWithReviewsDocument = gql`
       grade
       comment
       status
+      sepID
       proposal {
         id
         title
@@ -3654,6 +3745,19 @@ export const GetFieldsDocument = gql`
   }
 }
     `;
+export const GetMyRolesDocument = gql`
+    query getMyRoles {
+  me {
+    firstname
+    lastname
+    roles {
+      id
+      shortCode
+      title
+    }
+  }
+}
+    `;
 export const GetOrcIdInformationDocument = gql`
     query getOrcIDInformation($authorizationCode: String!) {
   getOrcIDInformation(authorizationCode: $authorizationCode) {
@@ -3796,6 +3900,14 @@ export const ResetPasswordEmailDocument = gql`
   }
 }
     `;
+export const SelectRoleDocument = gql`
+    mutation selectRole($token: String!, $selectedRoleId: Int!) {
+  selectRole(token: $token, selectedRoleId: $selectedRoleId) {
+    token
+    error
+  }
+}
+    `;
 export const UpdatePasswordDocument = gql`
     mutation updatePassword($id: Int!, $password: String!) {
   updatePassword(id: $id, password: $password) {
@@ -3847,6 +3959,9 @@ export function getSdk(client: GraphQLClient) {
     },
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
+    },
+    getUserSeps(variables?: GetUserSepsQueryVariables): Promise<GetUserSepsQuery> {
+      return client.request<GetUserSepsQuery>(print(GetUserSepsDocument), variables);
     },
     getSEP(variables: GetSepQueryVariables): Promise<GetSepQuery> {
       return client.request<GetSepQuery>(print(GetSepDocument), variables);
@@ -4010,6 +4125,9 @@ export function getSdk(client: GraphQLClient) {
     getFields(variables?: GetFieldsQueryVariables): Promise<GetFieldsQuery> {
       return client.request<GetFieldsQuery>(print(GetFieldsDocument), variables);
     },
+    getMyRoles(variables?: GetMyRolesQueryVariables): Promise<GetMyRolesQuery> {
+      return client.request<GetMyRolesQuery>(print(GetMyRolesDocument), variables);
+    },
     getOrcIDInformation(variables: GetOrcIdInformationQueryVariables): Promise<GetOrcIdInformationQuery> {
       return client.request<GetOrcIdInformationQuery>(print(GetOrcIdInformationDocument), variables);
     },
@@ -4045,6 +4163,9 @@ export function getSdk(client: GraphQLClient) {
     },
     resetPasswordEmail(variables: ResetPasswordEmailMutationVariables): Promise<ResetPasswordEmailMutation> {
       return client.request<ResetPasswordEmailMutation>(print(ResetPasswordEmailDocument), variables);
+    },
+    selectRole(variables: SelectRoleMutationVariables): Promise<SelectRoleMutation> {
+      return client.request<SelectRoleMutation>(print(SelectRoleDocument), variables);
     },
     updatePassword(variables: UpdatePasswordMutationVariables): Promise<UpdatePasswordMutation> {
       return client.request<UpdatePasswordMutation>(print(UpdatePasswordDocument), variables);

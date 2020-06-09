@@ -1,14 +1,20 @@
-import { IconButton } from '@material-ui/core';
-import { Edit, Visibility } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@material-ui/core';
+import { Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import RateReviewIcon from '@material-ui/icons/RateReview';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
 
-import { ReviewStatus } from '../../generated/sdk';
+import {
+  ReviewStatus,
+  SepAssignment,
+  UserWithReviewsQuery,
+} from '../../generated/sdk';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useUserWithReviewsData } from '../../hooks/useUserData';
 import { tableIcons } from '../../utils/materialIcons';
+import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
+import ProposalReviewModal from './ProposalReviewModal';
 
 type UserWithReview = {
   shortCode: string;
@@ -21,10 +27,10 @@ type UserWithReview = {
 };
 
 const ProposalTableReviewer: React.FC = () => {
-  const { loading, userData } = useUserWithReviewsData();
+  const { loading, userData, setUserData } = useUserWithReviewsData();
   const downloadPDFProposal = useDownloadPDFProposal();
   const [editReviewID, setEditReviewID] = useState(0);
-  const history = useHistory();
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -32,12 +38,21 @@ const ProposalTableReviewer: React.FC = () => {
    */
   const RowActionButtons = (rowData: UserWithReview) => (
     <>
-      <IconButton onClick={() => setEditReviewID(rowData.reviewId)}>
-        {rowData.status === 'SUBMITTED' ? <Visibility /> : <Edit />}
-      </IconButton>
-      <IconButton onClick={() => downloadPDFProposal(rowData.proposalId)}>
-        <GetAppIcon />
-      </IconButton>
+      <Tooltip title="Review proposal">
+        <IconButton
+          onClick={() => {
+            setEditReviewID(rowData.reviewId);
+            setReviewModalOpen(true);
+          }}
+        >
+          {rowData.status === 'SUBMITTED' ? <Visibility /> : <RateReviewIcon />}
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Download review">
+        <IconButton onClick={() => downloadPDFProposal(rowData.proposalId)}>
+          <GetAppIcon />
+        </IconButton>
+      </Tooltip>
     </>
   );
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
@@ -54,10 +69,6 @@ const ProposalTableReviewer: React.FC = () => {
     { title: 'Grade', field: 'grade' },
     { title: 'Status', field: 'status' },
   ];
-
-  if (editReviewID) {
-    history.push(`/ProposalGrade/${editReviewID}`);
-  }
 
   if (loading) {
     return <p>Loading</p>;
@@ -77,34 +88,70 @@ const ProposalTableReviewer: React.FC = () => {
       }) as UserWithReview[])
     : [];
 
+  const updateView = () => {
+    if (AssignmentProvider.getCurrentAssignment().currentAssignment) {
+      const currentReview = (AssignmentProvider.getCurrentAssignment()
+        .currentAssignment as SepAssignment).review;
+
+      const userDataUpdated = {
+        ...userData,
+        reviews: userData?.reviews.map(review => {
+          if (review.id === currentReview.id) {
+            return {
+              ...review,
+              grade: currentReview.grade,
+              status: currentReview.status,
+            };
+          } else {
+            return review;
+          }
+        }),
+      };
+
+      setUserData(userDataUpdated as UserWithReviewsQuery['me']);
+    }
+  };
+
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={'Proposals to review'}
-      columns={columns}
-      data={reviewData}
-      options={{
-        search: false,
-        selection: true,
-      }}
-      localization={{
-        toolbar: {
-          nRowsSelected: '{0} proposal(s) selected',
-        },
-      }}
-      actions={[
-        {
-          icon: GetAppIconComponent,
-          tooltip: 'Download proposals',
-          onClick: (event, rowData) => {
-            downloadPDFProposal(
-              (rowData as UserWithReview[]).map(row => row.proposalId).join(',')
-            );
+    <>
+      <ProposalReviewModal
+        editReviewID={editReviewID}
+        reviewModalOpen={reviewModalOpen}
+        setReviewModalOpen={() => {
+          setReviewModalOpen(false);
+          updateView();
+        }}
+      />
+      <MaterialTable
+        icons={tableIcons}
+        title={'Proposals to review'}
+        columns={columns}
+        data={reviewData}
+        options={{
+          search: false,
+          selection: true,
+        }}
+        localization={{
+          toolbar: {
+            nRowsSelected: '{0} proposal(s) selected',
           },
-          position: 'toolbarOnSelect',
-        },
-      ]}
-    />
+        }}
+        actions={[
+          {
+            icon: GetAppIconComponent,
+            tooltip: 'Download proposals',
+            onClick: (event, rowData) => {
+              downloadPDFProposal(
+                (rowData as UserWithReview[])
+                  .map(row => row.proposalId)
+                  .join(',')
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+        ]}
+      />
+    </>
   );
 };
 

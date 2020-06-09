@@ -1,7 +1,8 @@
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import SimpleTabs from '../common/TabPanel';
@@ -23,6 +24,7 @@ type SEPPageProps = PropTypes.InferProps<typeof SEPPagePropTypes>;
 const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
   const [sep, setSEP] = useState<Sep | null>(null);
   const api = useDataApi();
+  const { currentRole } = useContext(UserContext);
   const loadSEP = useCallback(async () => {
     return api()
       .getSEP({ id: parseInt(match.params.id) })
@@ -39,18 +41,24 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
     return <p>Loading...</p>;
   }
 
+  const tabNames = ['General', 'Members', 'Proposals and Assignments'];
+
+  if (currentRole === 'user_officer') {
+    tabNames.push('Logs');
+  }
+
   return (
     <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={['General', 'Members', 'Proposals and Assignments', 'Logs']}
-      >
+      <SimpleTabs tabNames={tabNames}>
         <SEPGeneralInfo
           data={sep}
           onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
         />
         <SEPMembers sepId={sep.id} />
         <SEPProposalsAndAssignments sepId={sep.id} />
-        <EventLogList changedObjectId={sep.id} eventType="SEP" />
+        {currentRole === 'user_officer' && (
+          <EventLogList changedObjectId={sep.id} eventType="SEP" />
+        )}
       </SimpleTabs>
     </Container>
   );

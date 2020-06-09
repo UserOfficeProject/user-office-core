@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
 import { Card, CardContent } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -24,10 +25,7 @@ import { useGetFields } from '../../hooks/useGetFields';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
 import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
 import orcid from '../../images/orcid.png';
-import {
-  userFieldSchema,
-  userPasswordFieldSchema,
-} from '../../utils/userFieldValidationSchema';
+import { userFieldSchema } from '../../utils/userFieldValidationSchema';
 import { ErrorFocus } from '../common/ErrorFocus';
 import FormikDropdown, { Option } from '../common/FormikDropdown';
 import InformationModal from '../pages/InformationModal';
@@ -243,7 +241,9 @@ const SignUp: React.FC<SignUpProps> = props => {
           }
           actions.setSubmitting(false);
         }}
-        validationSchema={userFieldSchema.concat(userPasswordFieldSchema)}
+        validationSchema={userFieldSchema.concat(
+          userPasswordFieldValidationSchema
+        )}
       >
         {({ values }) => (
           <Form>

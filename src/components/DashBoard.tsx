@@ -1,36 +1,31 @@
 import { BottomNavigation } from '@material-ui/core';
-import AppBar from '@material-ui/core/AppBar';
-import Badge from '@material-ui/core/Badge';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import MenuIcon from '@material-ui/icons/Menu';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import { UserContext } from '../context/UserContextProvider';
 import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
+import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
 import PageEditor from './pages/PageEditor';
-import ProposalCreate from './proposal/ProposaCreate';
 import ProposalChooseCall from './proposal/ProposalChooseCall';
+import ProposalCreate from './proposal/ProposalCreate';
 import ProposalEdit from './proposal/ProposalEdit';
 import ProposalPage from './proposal/ProposalPage';
-import ProposalGrade from './review/ProposalGrade';
+import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
@@ -152,8 +147,8 @@ const useStyles = makeStyles(theme => ({
 const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-  const { user, currentRole } = useContext(UserContext);
-  const { id } = user;
+  const { currentRole } = useContext(UserContext);
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -166,44 +161,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        className={clsx(classes.appBar, open && classes.appBarShift)}
-      >
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="Open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            User Office
-          </Typography>
-          <IconButton
-            color="inherit"
-            component={Link}
-            to={`/ProfilePage/${id}`}
-            data-cy="profile-page-btn"
-          >
-            <Badge badgeContent={0} color="secondary">
-              <AccountCircle />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
         variant="permanent"
         classes={{
@@ -240,7 +198,7 @@ const Dashboard: React.FC = () => {
             path="/QuestionaryEditor/:templateId"
             component={QuestionaryEditor}
           />
-          <Route path="/ProposalGrade/:id" component={ProposalGrade} />
+          <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/Questionaries" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"
@@ -258,7 +216,9 @@ const Dashboard: React.FC = () => {
               )}
             />
           )}
-          {currentRole === 'reviewer' && (
+          {['reviewer', 'SEP_Reviewer', 'SEP_Chair', 'SEP_Secretary'].includes(
+            currentRole
+          ) && (
             <Route
               render={props => (
                 <OverviewPage {...props} userRole={UserRole.REVIEWER} />

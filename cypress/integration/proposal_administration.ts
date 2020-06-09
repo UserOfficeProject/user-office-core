@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 /// <reference types="../types" />
-var faker = require('faker');
 
 context('Proposal administration tests', () => {
+  const faker = require('faker');
+
   before(() => {
     cy.resetDB();
   });
@@ -20,7 +21,6 @@ context('Proposal administration tests', () => {
     const title = faker.random.words(3);
     const abstract = faker.random.words(8);
     cy.login('user');
-    cy.contains('User').click();
     cy.contains('New Proposal').click();
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);

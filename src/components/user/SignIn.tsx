@@ -1,4 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { signInValidationSchema } from '@esss-swap/duo-validation';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,7 +11,6 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
-import * as Yup from 'yup';
 
 import { UserContext } from '../../context/UserContextProvider';
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
@@ -104,13 +104,7 @@ export default function SignInSide() {
           await requestToken(values);
           actions.setSubmitting(false);
         }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string().email(),
-          password: Yup.string()
-            .min(8, 'Password must be at least 8 characters')
-            .max(25, 'Password must be at most 25 characters')
-            .required('Password must be at least 8 characters'),
-        })}
+        validationSchema={signInValidationSchema}
       >
         <Form className={classes.form}>
           <CssBaseline />

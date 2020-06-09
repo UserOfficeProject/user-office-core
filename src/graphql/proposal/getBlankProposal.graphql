@@ -16,6 +16,7 @@ query getBlankProposal($callId: Int!) {
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname

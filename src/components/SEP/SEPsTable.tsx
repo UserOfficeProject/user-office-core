@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Redirect } from 'react-router';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { Sep } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';
 import { ButtonContainer } from '../../styles/StyledComponents';
@@ -17,9 +18,10 @@ const useStyles = makeStyles({
   },
 });
 
-const SEPsTableOfficer: React.FC = () => {
+const SEPsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, SEPsData } = useSEPsData(show, '', false);
+  const { currentRole } = useContext(UserContext);
+  const { loading, SEPsData } = useSEPsData(show, '', false, currentRole);
   const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },
@@ -75,20 +77,22 @@ const SEPsTableOfficer: React.FC = () => {
             },
           ]}
         />
-        <ButtonContainer>
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={(): void => setShow(true)}
-          >
-            Create SEP
-          </Button>
-        </ButtonContainer>
+        {currentRole === 'user_officer' && (
+          <ButtonContainer>
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={(): void => setShow(true)}
+            >
+              Create SEP
+            </Button>
+          </ButtonContainer>
+        )}
       </div>
     </>
   );
 };
 
-export default SEPsTableOfficer;
+export default SEPsTable;

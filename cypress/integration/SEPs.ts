@@ -134,8 +134,6 @@ context('Scientific evaluation panel tests', () => {
 
     cy.login('officer');
 
-    cy.contains('User Officer').click();
-
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
       .first()
@@ -191,8 +189,6 @@ context('Scientific evaluation panel tests', () => {
   it('Officer should be able to assign SEP Reviewers to existing SEP', () => {
     cy.login('officer');
 
-    cy.contains('User Officer').click();
-
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
       .first()
@@ -234,8 +230,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('Officer should be able to remove SEP Reviewers from existing SEP', () => {
     cy.login('officer');
-
-    cy.contains('User Officer').click();
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
@@ -282,7 +276,6 @@ context('Scientific evaluation panel tests', () => {
     const title = faker.random.words(3);
     const abstract = faker.random.words(8);
     cy.login('user');
-    cy.contains('User').click();
     cy.contains('New Proposal').click();
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);
@@ -293,7 +286,6 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Logout').click();
 
     cy.login('officer');
-    cy.contains('User Officer').click();
 
     cy.get('[type="checkbox"]')
       .first()
@@ -324,7 +316,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
-      .should('have.length', 7);
+      .should('have.length', 8);
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
@@ -338,7 +330,6 @@ context('Scientific evaluation panel tests', () => {
     let selectedReviewerFirstName = '';
     let selectedReviewerLastName = '';
     cy.login('officer');
-    cy.contains('User Officer').click();
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
@@ -403,7 +394,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
-    cy.contains('User Officer').click();
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
@@ -450,7 +440,6 @@ context('Scientific evaluation panel tests', () => {
 
   it('Officer should be able to remove assigned proposal from existing SEP', () => {
     cy.login('officer');
-    cy.contains('User Officer').click();
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')

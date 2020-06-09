@@ -6,7 +6,7 @@ import ProposalContainer from './ProposalContainer';
 
 export default function ProposalCreate() {
   const { callId } = useParams();
-  const { proposal } = useBlankProposal(parseInt(callId!));
+  const { proposal } = useBlankProposal(parseInt(callId as string));
 
   if (!proposal) {
     return <p>Loading </p>;
