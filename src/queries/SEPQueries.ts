@@ -16,17 +16,22 @@ export default class SEPQueries {
     });
   }
 
-  private async hasAccessRights(
-    agent: UserWithRole | null,
-    sepId: number | null
-  ): Promise<boolean> {
-    if (sepId === null) {
-      return true;
+  private async isUserOfficer(agent: UserWithRole | null) {
+    if (agent == null) {
+      return false;
+    }
+
+    return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
+  }
+
+  private async isChairOrSecretary(agent: UserWithRole | null) {
+    if (agent == null) {
+      return false;
     }
 
     return (
-      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
-      (await this.isMemberOfSEP(agent, sepId))
+      agent?.currentRole?.shortCode === Roles.SEP_CHAIR ||
+      agent?.currentRole?.shortCode === Roles.SEP_SECRETARY
     );
   }
 
@@ -43,7 +48,10 @@ export default class SEPQueries {
       return null;
     }
 
-    if ((await this.hasAccessRights(agent, sep.id)) === true) {
+    if (
+      (await this.isUserOfficer(agent)) ||
+      (await this.isMemberOfSEP(agent, id))
+    ) {
       return sep;
     } else {
       return null;
@@ -61,29 +69,17 @@ export default class SEPQueries {
     return this.dataSource.getAll(active, filter, first, offset);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getMembers(agent: UserWithRole | null, sepId: number) {
-    if ((await this.hasAccessRights(agent, sepId)) === true) {
-      return this.dataSource.getMembers(sepId);
-    } else {
-      return null;
-    }
+    return this.dataSource.getMembers(sepId);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.SEP_CHAIR,
-    Roles.SEP_SECRETARY,
-    Roles.SEP_REVIEWER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
   async getSEPProposals(agent: UserWithRole | null, sepId: number) {
-    if ((await this.hasAccessRights(agent, sepId)) === true) {
+    if (await this.isUserOfficer(agent)) {
       return this.dataSource.getSEPProposals(sepId);
+    } else if (await this.isChairOrSecretary(agent)) {
+      return this.dataSource.getSEPProposals(sepId, agent?.id);
     } else {
       return null;
     }

@@ -174,10 +174,25 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
-  async getSEPProposals(sepId: number): Promise<SEPProposal[]> {
-    const sepProposals: SEPProposalRecord[] = await database
-      .from('SEP_Proposals')
-      .where('sep_id', sepId);
+  async getSEPProposals(
+    sepId: number,
+    userId?: number
+  ): Promise<SEPProposal[]> {
+    let sepProposals: SEPProposalRecord[];
+    if (!userId) {
+      sepProposals = await database
+        .from('SEP_Proposals')
+        .where('sep_id', sepId);
+    } else {
+      sepProposals = await database
+        .select('sp.*')
+        .from('SEP_Assignments as sa')
+        .join('SEP_Proposals as sp', { 'sa.proposal_id': 'sp.proposal_id' })
+        .where('sa.sep_id', sepId)
+        .andWhere('sa.sep_member_user_id', userId);
+    }
+
+    console.log(sepProposals);
 
     return sepProposals.map(sepProposal =>
       this.createSEPProposalObject(sepProposal)
