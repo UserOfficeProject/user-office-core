@@ -10,8 +10,9 @@ import {
 import { Formik, Form, Field } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ButtonContainer } from '../../styles/StyledComponents';
@@ -34,6 +35,7 @@ const useStyles = makeStyles({
 const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const sep = { ...data };
   const classes = useStyles();
+  const { currentRole } = useContext(UserContext);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -90,6 +92,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 data-cy="code"
                 error={touched.code && errors.code !== undefined}
                 helperText={touched.code && errors.code && errors.code}
+                disabled={currentRole !== 'user_officer'}
               />
               <Field
                 id="numberRatingsRequired"
@@ -111,6 +114,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.numberRatingsRequired &&
                   errors.numberRatingsRequired
                 }
+                disabled={currentRole !== 'user_officer'}
               />
             </Grid>
             <Grid item xs={6}>
@@ -134,6 +138,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.description &&
                   errors.description
                 }
+                disabled={currentRole !== 'user_officer'}
               />
               <FormControlLabel
                 control={
@@ -148,23 +153,26 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                       setFieldValue('active', !values.active)
                     }
                     inputProps={{ 'aria-label': 'primary checkbox' }}
+                    disabled={currentRole !== 'user_officer'}
                   />
                 }
                 label="Active"
               />
             </Grid>
           </Grid>
-          <ButtonContainer>
-            <Button
-              disabled={isSubmitting}
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-            >
-              Update SEP
-            </Button>
-          </ButtonContainer>
+          {currentRole === 'user_officer' && (
+            <ButtonContainer>
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+              >
+                Update SEP
+              </Button>
+            </ButtonContainer>
+          )}
         </Form>
       )}
     </Formik>

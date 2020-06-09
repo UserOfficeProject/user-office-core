@@ -11,8 +11,9 @@ import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { SepMember, BasicUserDetails, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPMembersData } from '../../hooks/useSEPMembersData';
@@ -53,6 +54,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   );
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const { currentRole } = useContext(UserContext);
   const initialValues: SEPMemberAssignments = {
     SEPChair: null,
     SEPSecretary: null,
@@ -164,6 +166,23 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
 
+  const hasAccessRights = [
+    'user_officer',
+    'SEP_Chair',
+    'SEP_Secretary',
+  ].includes(currentRole);
+
+  const tableActions = hasAccessRights
+    ? [
+        {
+          icon: AddPersonIcon,
+          isFreeAction: true,
+          tooltip: 'Add Member',
+          onClick: (): void => setOpen(true),
+        },
+      ]
+    : [];
+
   return (
     <React.Fragment>
       <ParticipantModal
@@ -235,14 +254,16 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                 />
               </Grid>
               <Grid item xs={1}>
-                <Tooltip title="Set SEP Chair">
-                  <IconButton
-                    edge="start"
-                    onClick={() => setSepChairModalOpen(true)}
-                  >
-                    <Person />
-                  </IconButton>
-                </Tooltip>
+                {hasAccessRights && (
+                  <Tooltip title="Set SEP Chair">
+                    <IconButton
+                      edge="start"
+                      onClick={() => setSepChairModalOpen(true)}
+                    >
+                      <Person />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Grid>
               <Grid item xs={5}>
                 <Field
@@ -270,14 +291,16 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                 />
               </Grid>
               <Grid item xs={1}>
-                <Tooltip title="Set SEP Secretary">
-                  <IconButton
-                    edge="start"
-                    onClick={() => setSepSecretaryModalOpen(true)}
-                  >
-                    <Person />
-                  </IconButton>
-                </Tooltip>
+                {hasAccessRights && (
+                  <Tooltip title="Set SEP Secretary">
+                    <IconButton
+                      edge="start"
+                      onClick={() => setSepSecretaryModalOpen(true)}
+                    >
+                      <Person />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Grid>
             </Grid>
             <Grid container spacing={3}>
@@ -287,21 +310,19 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   title={'Reviewers'}
                   columns={columns}
                   data={initialValues.SEPReviewers}
-                  editable={{
-                    onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
-                      removeMember(rowData),
-                  }}
+                  editable={
+                    hasAccessRights
+                      ? {
+                          onRowDelete: (
+                            rowData: BasicUserDetails
+                          ): Promise<void> => removeMember(rowData),
+                        }
+                      : {}
+                  }
                   options={{
                     search: false,
                   }}
-                  actions={[
-                    {
-                      icon: AddPersonIcon,
-                      isFreeAction: true,
-                      tooltip: 'Add Member',
-                      onClick: (): void => setOpen(true),
-                    },
-                  ]}
+                  actions={tableActions}
                 />
               </Grid>
             </Grid>

@@ -5,8 +5,9 @@ import { Formik, Form } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import {
   SepProposal,
   SepMember,
@@ -38,6 +39,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
+  const { currentRole } = useContext(UserContext);
 
   const getGrades = (assignments: SepAssignment[]) =>
     assignments
@@ -249,6 +251,12 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
     return newProposalsData;
   };
 
+  const hasAccessRights = [
+    'user_officer',
+    'SEP_Chair',
+    'SEP_Secretary',
+  ].includes(currentRole);
+
   const ReviewersTable = (rowData: SepProposal) => (
     <SEPAssignedReviewersTable
       sepProposal={rowData}
@@ -306,17 +314,25 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
                       render: ReviewersTable,
                     },
                   ]}
-                  actions={[
-                    rowData => ({
-                      icon: AssignmentIndIcon,
-                      onClick: () => setProposalId(rowData.proposalId),
-                      tooltip: 'Assign SEP Member',
-                    }),
-                  ]}
-                  editable={{
-                    onRowDelete: (rowData: SepProposal): Promise<void> =>
-                      removeProposalFromSEP(rowData),
-                  }}
+                  actions={
+                    hasAccessRights
+                      ? [
+                          rowData => ({
+                            icon: AssignmentIndIcon,
+                            onClick: () => setProposalId(rowData.proposalId),
+                            tooltip: 'Assign SEP Member',
+                          }),
+                        ]
+                      : []
+                  }
+                  editable={
+                    hasAccessRights
+                      ? {
+                          onRowDelete: (rowData: SepProposal): Promise<void> =>
+                            removeProposalFromSEP(rowData),
+                        }
+                      : {}
+                  }
                   options={{
                     search: true,
                   }}

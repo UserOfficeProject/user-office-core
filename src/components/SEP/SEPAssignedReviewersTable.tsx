@@ -4,8 +4,9 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { UserContext } from '../../context/UserContextProvider';
 import { SepProposal, SepAssignment, ReviewStatus } from '../../generated/sdk';
 import { tableIcons } from '../../utils/materialIcons';
 import ProposalReviewModal from '../review/ProposalReviewModal';
@@ -41,6 +42,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   const [editReviewID, setEditReviewID] = useState<null | number>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const classes = useStyles();
+  const { currentRole } = useContext(UserContext);
 
   const assignmentColumns = [
     {
@@ -67,6 +69,12 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
 
   const RateReviewIconComponent = (): JSX.Element => <RateReviewIcon />;
 
+  const hasAccessRights = [
+    'user_officer',
+    'SEP_Chair',
+    'SEP_Secretary',
+  ].includes(currentRole);
+
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">
       {editReviewID && (
@@ -84,10 +92,19 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
         columns={assignmentColumns}
         title={'Assigned reviewers'}
         data={sepProposal.assignments as SepAssignment[]}
-        editable={{
-          onRowDelete: (rowAssignmentsData: SepAssignment): Promise<void> =>
-            removeAssignedReviewer(rowAssignmentsData, sepProposal.proposalId),
-        }}
+        editable={
+          hasAccessRights
+            ? {
+                onRowDelete: (
+                  rowAssignmentsData: SepAssignment
+                ): Promise<void> =>
+                  removeAssignedReviewer(
+                    rowAssignmentsData,
+                    sepProposal.proposalId
+                  ),
+              }
+            : {}
+        }
         actions={[
           rowData => ({
             icon:
