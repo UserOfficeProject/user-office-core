@@ -88,7 +88,7 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
     user: UserWithRole | null,
-    templateId: number
+    { templateId }: { templateId: number }
   ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteTemplate(templateId)
@@ -311,7 +311,7 @@ export default class TemplateMutations {
 
   @ValidateArgs(updateProposalTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
+  updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)

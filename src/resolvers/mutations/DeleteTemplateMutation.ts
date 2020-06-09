@@ -8,11 +8,11 @@ import { wrapResponse } from '../wrapResponse';
 export class DeleteTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
   deleteTemplate(
-    @Arg('id', () => Int) id: number,
+    @Arg('templateId', () => Int) templateId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.deleteTemplate(context.user, id),
+      context.mutations.template.deleteTemplate(context.user, { templateId }),
       TemplateResponseWrap
     );
   }
