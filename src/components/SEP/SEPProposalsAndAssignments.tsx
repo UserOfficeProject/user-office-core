@@ -1,30 +1,26 @@
-import { Grid, DialogContent, Dialog, makeStyles } from '@material-ui/core';
+import { Grid, DialogContent, Dialog } from '@material-ui/core';
 import { AssignmentInd } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { SepProposal, SepMember, SepAssignment } from '../../generated/sdk';
+import { UserContext } from '../../context/UserContextProvider';
+import {
+  SepProposal,
+  SepMember,
+  SepAssignment,
+  ReviewStatus,
+  Review,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPProposalsData } from '../../hooks/useSEPProposalsData';
 import { BasicUserDetails } from '../../models/User';
 import { tableIcons } from '../../utils/materialIcons';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
+import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
+import AssignmentProvider from './SEPCurrentAssignmentProvider';
 
 type SEPProposalsAndAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
@@ -42,7 +38,24 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
-  const classes = useStyles();
+  const { currentRole } = useContext(UserContext);
+
+  const getGrades = (assignments: SepAssignment[]) =>
+    assignments
+      ?.filter(
+        assignment => assignment.review.status === ReviewStatus.SUBMITTED
+      )
+      .map(assignment => assignment.review.grade) ?? [];
+
+  const average = (numbers: number[]) => {
+    const sum = numbers.reduce(function(sum, value) {
+      return sum + value;
+    }, 0);
+
+    const avg = sum / numbers.length;
+
+    return avg.toPrecision(3);
+  };
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -65,22 +78,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       render: (rowData: SepProposal): string =>
         rowData.assignments ? rowData.assignments.length.toString() : '-',
     },
-  ];
-
-  const assignmentColumns = [
     {
-      title: 'First name',
-      field: 'user.firstname',
-    },
-    {
-      title: 'Last name',
-      field: 'user.lastname',
-    },
-    {
-      title: 'Date assigned',
-      field: 'dateAssigned',
-      render: (rowData: SepAssignment): string =>
-        dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
+      title: 'Average grade',
+      render: (rowData: SepProposal): string =>
+        average(getGrades(rowData.assignments as SepAssignment[]) as number[]),
     },
   ];
 
@@ -122,6 +123,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       memberId: assignedReviewer.sepMemberUserId as number,
     });
 
+    await api().removeUserForReview({
+      reviewID: assignedReviewer.review.id,
+    });
+
     if (SEPProposalsData) {
       setSEPProposalsData(
         SEPProposalsData.map(proposalItem => {
@@ -158,18 +163,35 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
       sepId,
     });
 
+    const addUserForReviewResilt = await api().addUserForReview({
+      proposalID: proposalId as number,
+      userID: memberUser.userId,
+      sepID: sepId,
+    });
+
+    const reviewId = !addUserForReviewResilt.addUserForReview.error
+      ? (addUserForReviewResilt.addUserForReview.review as Review).id
+      : 0;
+
     if (!assignmentResult.assignMemberToSEPProposal.error && SEPProposalsData) {
       setSEPProposalsData(
         SEPProposalsData.map(proposalItem => {
           if (proposalItem.proposalId === proposalId) {
-            const newAssignments = [
+            const newAssignments: SepAssignment[] = [
               ...(proposalItem.assignments || []),
               {
                 user: memberUser.user,
                 roles: memberUser.roles,
+                review: {
+                  id: reviewId,
+                  status: ReviewStatus.DRAFT,
+                  comment: '',
+                  grade: 0,
+                  sepID: sepId,
+                },
                 dateAssigned: Date.now(),
                 sepMemberUserId: memberUser.userId,
-              },
+              } as SepAssignment,
             ];
 
             return {
@@ -194,35 +216,57 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
 
   const initialValues = SEPProposalsData as SepProposal[];
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
-  const ReviewersTable = (
-    rowData: SepProposal | SepProposal[]
-  ): JSX.Element => (
-    <div className={classes.root} data-cy="sep-reviewer-assignments-table">
-      <MaterialTable
-        icons={tableIcons}
-        columns={assignmentColumns}
-        title={'Assigned reviewers'}
-        data={(rowData as SepProposal).assignments as SepAssignment[]}
-        editable={{
-          onRowDelete: (rowAssignmentsData: SepAssignment): Promise<void> =>
-            removeAssignedReviewer(
-              rowAssignmentsData,
-              (rowData as SepProposal).proposalId
-            ),
-        }}
-        options={{
-          search: false,
-          paging: false,
-          toolbar: false,
-          headerStyle: { backgroundColor: '#fafafa' },
-        }}
-      />
-    </div>
-  );
 
   const proposalAssignments = initialValues.find(
     assignment => assignment.proposalId === proposalId
   )?.assignments;
+
+  const updateReviewStatusAndGrade = (editingProposalData: SepProposal) => {
+    const currentAssignment = AssignmentProvider.getCurrentAssignment()
+      .currentAssignment;
+
+    const newProposalsData =
+      SEPProposalsData?.map(sepProposalsData => {
+        if (sepProposalsData.proposalId === editingProposalData.proposalId) {
+          return {
+            ...editingProposalData,
+            assignments: editingProposalData.assignments?.map(
+              proposalAssignment => {
+                if (
+                  proposalAssignment.review.id === currentAssignment?.review.id
+                ) {
+                  return currentAssignment;
+                } else {
+                  return proposalAssignment;
+                }
+              }
+            ),
+          };
+        } else {
+          return sepProposalsData;
+        }
+      }) || [];
+
+    return newProposalsData;
+  };
+
+  const hasAccessRights = [
+    'user_officer',
+    'SEP_Chair',
+    'SEP_Secretary',
+  ].includes(currentRole);
+
+  const ReviewersTable = (rowData: SepProposal) => (
+    <SEPAssignedReviewersTable
+      sepProposal={rowData}
+      removeAssignedReviewer={removeAssignedReviewer}
+      updateView={() => {
+        const newProposalsData = updateReviewStatusAndGrade(rowData);
+        setSEPProposalsData(newProposalsData);
+        AssignmentProvider.setCurrentAssignment(null);
+      }}
+    />
+  );
 
   return (
     <React.Fragment>
@@ -259,17 +303,25 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
                 render: ReviewersTable,
               },
             ]}
-            actions={[
-              rowData => ({
-                icon: AssignmentIndIcon,
-                onClick: () => setProposalId(rowData.proposalId),
-                tooltip: 'Assign SEP Member',
-              }),
-            ]}
-            editable={{
-              onRowDelete: (rowData: SepProposal): Promise<void> =>
-                removeProposalFromSEP(rowData),
-            }}
+            actions={
+              hasAccessRights
+                ? [
+                    rowData => ({
+                      icon: AssignmentIndIcon,
+                      onClick: () => setProposalId(rowData.proposalId),
+                      tooltip: 'Assign SEP Member',
+                    }),
+                  ]
+                : []
+            }
+            editable={
+              hasAccessRights
+                ? {
+                    onRowDelete: (rowData: SepProposal): Promise<void> =>
+                      removeProposalFromSEP(rowData),
+                  }
+                : {}
+            }
             options={{
               search: true,
             }}
