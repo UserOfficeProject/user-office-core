@@ -21,7 +21,7 @@ export class ResetPasswordMutation {
     @Ctx() context: ResolverContext
   ) {
     wrapResponse(
-      context.mutations.user.resetPassword(args.token, args.password),
+      context.mutations.user.resetPassword(context.user, args),
       BasicUserDetailsResponseWrap
     );
   }

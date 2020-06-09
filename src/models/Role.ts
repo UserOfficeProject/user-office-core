@@ -12,5 +12,5 @@ export enum Roles {
   REVIEWER = 'reviewer',
   SEP_CHAIR = 'SEP_Chair',
   SEP_SECRETARY = 'SEP_Secretary',
-  SEP_MEMBER = 'SEP_Member',
+  SEP_REVIEWER = 'SEP_Reviewer',
 }

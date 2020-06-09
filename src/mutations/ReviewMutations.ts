@@ -1,9 +1,16 @@
+import {
+  proposalGradeValidationSchema,
+  proposalTechnicalReviewValidationSchema,
+  removeUserForReviewValidationSchema,
+  addUserForReviewValidationSchema,
+} from '@esss-swap/duo-validation';
+
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddReviewArgs } from '../resolvers/mutations/AddReviewMutation';
 import { AddTechnicalReviewArgs } from '../resolvers/mutations/AddTechnicalReviewMutation';
@@ -17,9 +24,10 @@ export default class ReviewMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @ValidateArgs(proposalGradeValidationSchema)
   @Authorized()
   async updateReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddReviewArgs
   ): Promise<Review | Rejection> {
     const { reviewID, comment, grade } = args;
@@ -51,9 +59,10 @@ export default class ReviewMutations {
       });
   }
 
+  @ValidateArgs(proposalTechnicalReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async setTechnicalReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
     return this.dataSource
@@ -68,27 +77,29 @@ export default class ReviewMutations {
       });
   }
 
+  @ValidateArgs(removeUserForReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async removeUserForReview(
-    agent: User | null,
-    id: number
+    agent: UserWithRole | null,
+    { reviewID }: { reviewID: number }
   ): Promise<Review | Rejection> {
     return this.dataSource
-      .removeUserForReview(id)
+      .removeUserForReview(reviewID)
       .then(review => review)
       .catch(err => {
         logger.logException('Could not remove user for review', err, {
           agent,
-          id,
+          reviewID,
         });
 
         return rejection('INTERNAL_ERROR');
       });
   }
 
+  @ValidateArgs(addUserForReviewValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addUserForReview(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddUserForReviewArgs
   ): Promise<Review | Rejection> {
     const { proposalID, userID } = args;

@@ -27,6 +27,9 @@ export class AddReviewArgs {
 
   @Field(() => ReviewStatus)
   status: ReviewStatus;
+
+  @Field(() => Int)
+  public sepID: number;
 }
 
 @Resolver()

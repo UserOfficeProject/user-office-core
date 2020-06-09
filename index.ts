@@ -9,7 +9,7 @@ import { buildSchema } from 'type-graphql';
 import baseContext from './src/buildContext';
 import { ResolverContext } from './src/context';
 import { Role } from './src/models/Role';
-import { User } from './src/models/User';
+import { User, UserWithRole } from './src/models/User';
 import { registerEnums } from './src/resolvers/registerEnums';
 import files from './src/routes/files';
 import proposalDownload from './src/routes/pdf';
@@ -18,6 +18,7 @@ import { logger } from './src/utils/Logger';
 interface Req extends Request {
   user?: {
     user?: User;
+    currentRole?: Role;
     roles?: Role[];
   };
 }
@@ -84,7 +85,11 @@ async function bootstrap() {
       const userId = req.user?.user?.id as number;
 
       if (req.user) {
-        user = await baseContext.queries.user.getAgent(userId);
+        user = {
+          ...(await baseContext.queries.user.getAgent(userId)),
+          currentRole:
+            req.user.currentRole || (req.user.roles ? req.user.roles[0] : null),
+        } as UserWithRole;
       }
 
       const context: ResolverContext = { ...baseContext, user };

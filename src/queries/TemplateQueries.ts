@@ -2,7 +2,7 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export default class TemplateQueries {
@@ -20,22 +20,24 @@ export default class TemplateQueries {
 
   @Authorized()
   async getComplementaryQuestions(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<Question[] | null> {
     return this.dataSource.getComplementaryQuestions(templateId);
   }
 
   @Authorized()
+
+
   async getTemplateSteps(
-    agent: User | null,
+    agent: UserWithRole | null,
     templateId: number
   ): Promise<TemplateStep[] | null> {
     return this.dataSource.getTemplateSteps(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async isNaturalKeyPresent(agent: User | null, naturalKey: string) {
+  async isNaturalKeyPresent(agent: UserWithRole | null, naturalKey: string) {
     return this.dataSource.isNaturalKeyPresent(naturalKey);
   }
 }

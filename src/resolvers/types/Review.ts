@@ -32,6 +32,9 @@ export class Review implements Partial<ReviewOrigin> {
   public status: ReviewStatus;
 
   public proposalID: number;
+
+  @Field(() => Int)
+  public sepID: number;
 }
 
 @Resolver(() => Review)

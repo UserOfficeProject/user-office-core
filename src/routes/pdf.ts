@@ -12,7 +12,7 @@ import {
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
@@ -53,7 +53,7 @@ const getAttachments = async (attachmentId: string) => {
 
 const createProposalPDF = async (
   proposalId: number,
-  user: User,
+  user: UserWithRole,
   pageNumber: number
 ): Promise<{
   toc: any;
@@ -348,7 +348,7 @@ router.get('/proposal/download/:proposal_ids', async (req: any, res) => {
     for (const propId of proposalIds) {
       const result = await createProposalPDF(
         parseInt(propId),
-        user as User,
+        user as UserWithRole,
         pageNumber
       ).then(result => {
         pdfWriter.appendPDFPagesFromPDF(`downloads/${result.metaData.path}`);

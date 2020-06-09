@@ -1,5 +1,5 @@
 import { Role } from '../../models/Role';
-import { User, BasicUserDetails } from '../../models/User';
+import { User, BasicUserDetails, UserWithRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UserDataSource } from '../UserDataSource';
@@ -48,6 +48,12 @@ export const dummyUserOfficer = new User(
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
+
+export const dummyUserOfficerWithRole: UserWithRole = {
+  ...dummyUserOfficer,
+  currentRole: { id: 2, title: 'User Officer', shortCode: 'user_officer' },
+};
+
 export const dummyUser = new User(
   2,
   '',
@@ -72,6 +78,11 @@ export const dummyUser = new User(
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
+
+export const dummyUserWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+};
 
 export const dummyPlaceHolderUser = new User(
   2,
@@ -122,6 +133,11 @@ export const dummyUserNotOnProposal = new User(
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
 );
+
+export const dummyUserNotOnProposalWithRole: UserWithRole = {
+  ...dummyUserNotOnProposal,
+  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+};
 
 export class UserDataSourceMock implements UserDataSource {
   async delete(id: number): Promise<User | null> {

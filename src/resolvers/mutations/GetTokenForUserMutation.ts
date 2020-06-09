@@ -12,7 +12,7 @@ export class GetTokenForUserMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.user.getTokenForUser(context.user, userId),
+      context.mutations.user.getTokenForUser(context.user, { userId }),
       TokenResponseWrap
     );
   }
