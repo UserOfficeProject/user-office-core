@@ -216,15 +216,14 @@ const Dashboard: React.FC = () => {
               )}
             />
           )}
-          {['reviewer', 'SEP_Reviewer'].includes(currentRole) && (
+          {['reviewer', 'SEP_Reviewer', 'SEP_Chair', 'SEP_Secretary'].includes(
+            currentRole
+          ) && (
             <Route
               render={props => (
                 <OverviewPage {...props} userRole={UserRole.REVIEWER} />
               )}
             />
-          )}
-          {['SEP_Chair', 'SEP_Secretary'].includes(currentRole) && (
-            <Route component={SEPsPage} />
           )}
         </Switch>
         <BottomNavigation className={classes.bottomNavigation}>

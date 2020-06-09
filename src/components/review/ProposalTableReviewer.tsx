@@ -89,25 +89,27 @@ const ProposalTableReviewer: React.FC = () => {
     : [];
 
   const updateView = () => {
-    const currentReview = (AssignmentProvider.getCurrentAssignment()
-      .currentAssignment as SepAssignment).review;
+    if (AssignmentProvider.getCurrentAssignment().currentAssignment) {
+      const currentReview = (AssignmentProvider.getCurrentAssignment()
+        .currentAssignment as SepAssignment).review;
 
-    const userDataUpdated = {
-      ...userData,
-      reviews: userData?.reviews.map(review => {
-        if (review.id === currentReview.id) {
-          return {
-            ...review,
-            grade: currentReview.grade,
-            status: currentReview.status,
-          };
-        } else {
-          return review;
-        }
-      }),
-    };
+      const userDataUpdated = {
+        ...userData,
+        reviews: userData?.reviews.map(review => {
+          if (review.id === currentReview.id) {
+            return {
+              ...review,
+              grade: currentReview.grade,
+              status: currentReview.status,
+            };
+          } else {
+            return review;
+          }
+        }),
+      };
 
-    setUserData(userDataUpdated as UserWithReviewsQuery['me']);
+      setUserData(userDataUpdated as UserWithReviewsQuery['me']);
+    }
   };
 
   return (

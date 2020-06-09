@@ -137,14 +137,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
 
   const SEPRoles = (
     <div data-cy="SEPRoles-menu-items">
-      {role === 'SEP_Reviewer' && (
-        <ListItem component={Link} to="/" button>
-          <ListItemIcon>
-            <FolderOpen />
-          </ListItemIcon>
-          <ListItemText primary="Review Proposals" />
-        </ListItem>
-      )}
+      <ListItem component={Link} to="/" button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
       <ListItem component={Link} to="/SEPPage" button>
         <ListItemIcon>
           <GroupWorkIcon />
