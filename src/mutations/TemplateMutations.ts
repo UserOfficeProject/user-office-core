@@ -44,6 +44,7 @@ import {
   SelectionFromOptionsConfig,
 } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
+import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 
 export default class TemplateMutations {
   constructor(private dataSource: TemplateDataSource) {}
@@ -52,16 +53,10 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async createTemplate(
     agent: UserWithRole | null,
-    {
-      name,
-      description,
-    }: {
-      name: string;
-      description?: string;
-    }
+    args: CreateTemplateArgs
   ): Promise<Template | Rejection> {
     const result = await this.dataSource
-      .createTemplate(name, description)
+      .createTemplate(args)
       .then(result => result);
 
     return result;

@@ -3,15 +3,16 @@ import {
   DataType,
   FieldCondition,
   FieldDependency,
-  Template,
   Question,
   QuestionRel,
+  Template,
+  TemplateCategory,
   TemplateStep,
   Topic,
-  TemplateCategory,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
@@ -19,8 +20,8 @@ import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMuta
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
-  dummyQuestionRelFactory,
   dummyQuestionFactory,
+  dummyQuestionRelFactory,
 } from './QuestionaryDataSource';
 
 export let dummyProposalTemplate: Template;
@@ -30,6 +31,7 @@ export let dummyComplementarySteps: Question[];
 const dummyProposalTemplateFactory = (values?: Partial<Template>) => {
   return new Template(
     values?.templateId || 1,
+    values?.categoryId || 1,
     values?.name || 'Industrial template',
     values?.description || 'Industrial template description',
     values?.isArchived || false
@@ -151,8 +153,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async createTemplate(name: string, description?: string): Promise<Template> {
-    return dummyProposalTemplateFactory({ name, description });
+  async createTemplate(args: CreateTemplateArgs): Promise<Template> {
+    return dummyProposalTemplateFactory({ ...args });
   }
   async deleteTemplate(templateId: number): Promise<Template> {
     return dummyProposalTemplateFactory({ templateId });
@@ -160,6 +162,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   async getTemplates(args?: TemplatesArgs): Promise<Template[]> {
     return [
       new Template(
+        1,
         1,
         'Industrial',
         'Industrial proposal template',

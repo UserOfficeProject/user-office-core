@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
-
 import {
   DataType,
   Template,
+  TemplateCategory,
   TemplateStep,
   Topic,
-  TemplateCategory,
 } from '../../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
@@ -22,13 +22,13 @@ import {
   createProposalTemplateObject,
   createQuestionObject,
   createQuestionRelObject,
+  createTemplateCategoryObject,
   createTopicObject,
   ProposalQuestionProposalTemplateRelRecord,
   ProposalQuestionRecord,
   ProposalTemplateRecord,
-  TopicRecord,
-  createTemplateCategoryObject,
   TemplateCategoryRecord,
+  TopicRecord,
 } from './records';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
@@ -63,17 +63,18 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return resultSet.map(value => createQuestionObject(value));
   }
 
-  async createTemplate(name: string, description?: string): Promise<Template> {
+  async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     return database('templates')
       .insert({
-        name,
-        description,
+        category_id: args.categoryId,
+        name: args.name,
+        description: args.description,
       })
       .returning('*')
       .then((rows: ProposalTemplateRecord[]) => {
         if (rows.length !== 1) {
           throw new Error(
-            `createTemplate expected 1 result got ${rows.length}. ${name} ${description}`
+            `createTemplate expected 1 result got ${rows.length}. ${args.name} ${args.description}`
           );
         }
 
@@ -452,10 +453,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
 
       throw new Error('Could not clone template');
     }
-    const newTemplate = await this.createTemplate(
-      `Copy of ${sourceTemplate.name}`,
-      sourceTemplate.description
-    );
+    const newTemplate = await this.createTemplate({
+      categoryId: sourceTemplate.categoryId,
+      name: `Copy of ${sourceTemplate.name}`,
+      description: sourceTemplate.description,
+    });
 
     // Clone topics
     await database.raw(`

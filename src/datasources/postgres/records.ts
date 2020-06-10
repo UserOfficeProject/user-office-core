@@ -8,10 +8,10 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
-  QuestionRel,
-  Topic,
   Questionary,
+  QuestionRel,
   TemplateCategory,
+  Topic,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
@@ -87,6 +87,7 @@ export interface ProposalQuestionProposalTemplateRelRecord {
 
 export interface ProposalTemplateRecord {
   readonly template_id: number;
+  readonly category_id: number;
   readonly name: string;
   readonly description: string;
   readonly is_archived: boolean;
@@ -264,6 +265,7 @@ export const createProposalTemplateObject = (
 ) => {
   return new Template(
     template.template_id,
+    template.category_id,
     template.name,
     template.description,
     template.is_archived

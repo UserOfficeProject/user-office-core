@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
   DataType,
-  Template,
   Question,
   QuestionRel,
+  Template,
+  TemplateCategory,
   TemplateStep,
   Topic,
-  TemplateCategory,
 } from '../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
@@ -18,7 +19,7 @@ import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 export interface TemplateDataSource {
   getTemplateCategories(): Promise<TemplateCategory[]>;
   // Template
-  createTemplate(name: string, description?: string): Promise<Template>;
+  createTemplate(args: CreateTemplateArgs): Promise<Template>;
   getTemplate(templateId: number): Promise<Template | null>;
   getTemplates(args?: TemplatesArgs): Promise<Template[]>;
   updateTemplate(values: UpdateTemplateArgs): Promise<Template | null>;

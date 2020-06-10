@@ -155,6 +155,7 @@ export class TemplateStep {
 export class Template {
   constructor(
     public templateId: number,
+    public categoryId: number,
     public name: string,
     public description: string,
     public isArchived: boolean
@@ -162,7 +163,12 @@ export class Template {
 }
 
 export class TemplateCategory {
-  constructor(public categoryId: number, public name: string) {}
+  constructor(public categoryId: TemplateCategoryId, public name: string) {}
+}
+
+export enum TemplateCategoryId {
+  PROPOSAL_QUESTIONARY = 1,
+  SAMPLE_DECLARATION,
 }
 
 export class FieldCondition {
