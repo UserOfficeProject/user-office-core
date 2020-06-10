@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('UpdateTableNamingConventions.sql', 'jekabskarklins', 'Updating database naming conventions or generic templates', '2020-05-26') THEN
+	IF register_patch('UpdateTableNamingConventions.sql', 'jekabskarklins', 'Updating database naming conventions for generic templates', '2020-05-26') THEN
 	BEGIN
 
 	/* altering table names*/
