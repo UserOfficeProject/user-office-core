@@ -4,11 +4,16 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { SepProposal, SepAssignment, ReviewStatus } from '../../generated/sdk';
+import {
+  SepProposal,
+  SepAssignment,
+  ReviewStatus,
+  UserRole,
+} from '../../generated/sdk';
 import { tableIcons } from '../../utils/materialIcons';
+import { useCheckAccess } from '../common/Can';
 import ProposalReviewModal from '../review/ProposalReviewModal';
 import AssignmentProvider from './SEPCurrentAssignmentProvider';
 
@@ -42,7 +47,11 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   const [editReviewID, setEditReviewID] = useState<null | number>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const classes = useStyles();
-  const { currentRole } = useContext(UserContext);
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   const assignmentColumns = [
     {
@@ -68,12 +77,6 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   ];
 
   const RateReviewIconComponent = (): JSX.Element => <RateReviewIcon />;
-
-  const hasAccessRights = [
-    'user_officer',
-    'SEP_Chair',
-    'SEP_Secretary',
-  ].includes(currentRole);
 
   return (
     <div className={classes.root} data-cy="sep-reviewer-assignments-table">

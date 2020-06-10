@@ -11,13 +11,13 @@ import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
 import { SepMember, BasicUserDetails, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPMembersData } from '../../hooks/useSEPMembersData';
 import { tableIcons } from '../../utils/materialIcons';
+import { useCheckAccess } from '../common/Can';
 import ParticipantModal from '../proposal/ParticipantModal';
 
 type SEPMembersProps = {
@@ -54,7 +54,12 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   );
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const { currentRole } = useContext(UserContext);
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
+
   const initialValues: SEPMemberAssignments = {
     SEPChair: null,
     SEPSecretary: null,
@@ -165,12 +170,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   }
 
   const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
-
-  const hasAccessRights = [
-    'user_officer',
-    'SEP_Chair',
-    'SEP_Secretary',
-  ].includes(currentRole);
 
   const tableActions = hasAccessRights
     ? [

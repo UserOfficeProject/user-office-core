@@ -11,18 +11,16 @@ import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
+import { UserContext } from '../context/UserContextProvider';
+import { UserRole } from '../generated/sdk';
 import { useCallsData } from '../hooks/useCallsData';
 
-type MenuItemsProps = {
-  /** Logged in user role. */
-  role: string;
-};
-
-const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
+const MenuItems: React.FC = () => {
   const { loading, callsData } = useCallsData();
+  const { currentRole } = useContext(UserContext);
 
   let proposalDisabled = false;
 
@@ -158,16 +156,16 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
     </div>
   );
 
-  switch (role) {
-    case 'user':
+  switch (currentRole) {
+    case UserRole.USER:
       return user;
-    case 'user_officer':
+    case UserRole.USER_OFFICER:
       return userOfficer;
-    case 'reviewer':
+    case UserRole.REVIEWER:
       return reviewer;
-    case 'SEP_Chair':
-    case 'SEP_Secretary':
-    case 'SEP_Reviewer':
+    case UserRole.SEP_CHAIR:
+    case UserRole.SEP_SECRETARY:
+    case UserRole.SEP_REVIEWER:
       return SEPRoles;
     default:
       return null;

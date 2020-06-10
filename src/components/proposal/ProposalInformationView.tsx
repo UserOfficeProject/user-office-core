@@ -6,7 +6,7 @@ import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { Proposal } from '../../generated/sdk';
+import { Proposal, UserRole } from '../../generated/sdk';
 import { EventType } from '../../models/ProposalSubmissionModel';
 import { BasicUserDetails, User } from '../../models/User';
 import TextFieldWithCounter from '../common/TextFieldWithCounter';
@@ -52,7 +52,7 @@ export default function ProposalInformationView(props: {
         if (
           values.proposer.id !== currentUser.id &&
           !users.some((user: BasicUserDetails) => user.id === currentUser.id) &&
-          currentRole !== 'user_officer'
+          currentRole !== UserRole.USER_OFFICER
         ) {
           setUserError(true);
         } else {

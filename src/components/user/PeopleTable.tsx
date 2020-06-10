@@ -85,7 +85,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
 
   const getTitle = (): string => {
     switch (props.invitationUserRole) {
-      case UserRole.USEROFFICER:
+      case UserRole.USER_OFFICER:
         return 'Invite User';
       case UserRole.SEP_CHAIR:
         return 'Invite SEP Chair';
