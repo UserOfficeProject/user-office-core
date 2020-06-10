@@ -11,10 +11,14 @@ import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import InboxIcon from '@material-ui/icons/Inbox';
 
 import { useCallsData } from '../hooks/useCallsData';
+import { Collapse } from '@material-ui/core';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { TemplateCategory } from '../models/Templates';
 
 type MenuItemsProps = {
   /** Logged in user role. */
@@ -91,12 +95,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
-      <ListItem component={Link} to="/Questionaries" button>
-        <ListItemIcon>
-          <QuestionAnswerIcon />
-        </ListItemIcon>
-        <ListItemText primary="Questionaries" />
-      </ListItem>
+      <TemplateMenuListItem></TemplateMenuListItem>
+
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
           <ExitToApp />
@@ -160,6 +160,50 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
     default:
       return null;
   }
+};
+
+const TemplateMenuListItem = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  function toggleExpand() {
+    setIsExpanded(!isExpanded);
+  }
+  return (
+    <>
+      <ListItem button onClick={toggleExpand}>
+        <ListItemIcon>
+          {isExpanded ? <ExpandLess /> : <ExpandMore />}
+        </ListItemIcon>
+        <ListItemText primary="Templates" />
+      </ListItem>
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        style={{ paddingLeft: 10 }}
+      >
+        <ListItem
+          component={Link}
+          to={'/Questionaries/' + TemplateCategory.PROPOSAL_QUESTIONARY}
+          button
+        >
+          <ListItemIcon>
+            <QuestionAnswerIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal" />
+        </ListItem>
+        <ListItem
+          component={Link}
+          to={'/Questionaries/' + TemplateCategory.SAMPLE_DECLARATION}
+          button
+        >
+          <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>
+          <ListItemText primary="Sample declaration" />
+        </ListItem>
+      </Collapse>
+    </>
+  );
 };
 
 export default MenuItems;
