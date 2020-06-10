@@ -183,7 +183,7 @@ const TemplateMenuListItem = () => {
       >
         <ListItem
           component={Link}
-          to={'/Questionaries/' + TemplateCategory.PROPOSAL_QUESTIONARY}
+          to={'/Templates/' + TemplateCategory.PROPOSAL_QUESTIONARY}
           button
         >
           <ListItemIcon>
@@ -193,7 +193,7 @@ const TemplateMenuListItem = () => {
         </ListItem>
         <ListItem
           component={Link}
-          to={'/Questionaries/' + TemplateCategory.SAMPLE_DECLARATION}
+          to={'/Templates/' + TemplateCategory.SAMPLE_DECLARATION}
           button
         >
           <ListItemIcon>

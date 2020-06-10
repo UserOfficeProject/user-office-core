@@ -199,7 +199,7 @@ const Dashboard: React.FC = () => {
             component={QuestionaryEditor}
           />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
-          <Route path="/Questionaries" component={ProposalTemplates} />
+          <Route path="/Templates" component={ProposalTemplates} />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
