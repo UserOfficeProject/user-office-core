@@ -7,10 +7,13 @@ query getProposal($id: Int!) {
     shortCode
     rankOrder
     finalStatus
+    commentForUser
+    commentForManagement
     created
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -36,6 +39,7 @@ query getProposal($id: Int!) {
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname

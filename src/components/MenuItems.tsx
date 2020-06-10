@@ -22,7 +22,7 @@ type MenuItemsProps = {
 };
 
 const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
-  const { loading, callsData } = useCallsData(false, {});
+  const { loading, callsData } = useCallsData();
 
   let proposalDisabled = false;
 
@@ -117,6 +117,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
       </ListItem>
     </div>
   );
+
   const reviewer = (
     <div data-cy="reviewer-menu-items">
       <ListItem component={Link} to="/" button>
@@ -134,6 +135,29 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
     </div>
   );
 
+  const SEPRoles = (
+    <div data-cy="SEPRoles-menu-items">
+      <ListItem component={Link} to="/" button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
+      <ListItem component={Link} to="/SEPPage" button>
+        <ListItemIcon>
+          <GroupWorkIcon />
+        </ListItemIcon>
+        <ListItemText primary="SEPs" />
+      </ListItem>
+      <ListItem component={Link} to="/LogOut" button data-cy="logout">
+        <ListItemIcon>
+          <ExitToApp />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
+      </ListItem>
+    </div>
+  );
+
   switch (role) {
     case 'user':
       return user;
@@ -141,6 +165,10 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
       return userOfficer;
     case 'reviewer':
       return reviewer;
+    case 'SEP_Chair':
+    case 'SEP_Secretary':
+    case 'SEP_Reviewer':
+      return SEPRoles;
     default:
       return null;
   }

@@ -73,6 +73,7 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         data={users}
         search={false}
         userRole={UserRole.USER}
+        invitationUserRole={UserRole.USER}
         onRemove={removeUser}
       />
       {error && (

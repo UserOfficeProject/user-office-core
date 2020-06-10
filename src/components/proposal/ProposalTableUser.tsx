@@ -1,7 +1,8 @@
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
-import { ProposalStatus } from '../../generated/sdk';
+import { ProposalStatus, ProposalEndStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { timeAgo } from '../../utils/Time';
 import ProposalTable from './ProposalTable';
@@ -10,6 +11,8 @@ export type PartialProposalsDataType = {
   id: number;
   title: string;
   status: string;
+  finalStatus?: string;
+  notified?: boolean;
   shortCode: string;
   created: string | null;
 };
@@ -26,6 +29,17 @@ type ProposalTableUserProps = {
 
 const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
   const api = useDataApi();
+  const getProposalStatus = (proposal: {
+    status: ProposalStatus;
+    finalStatus?: ProposalEndStatus | null | undefined;
+    notified: boolean;
+  }): string => {
+    if (proposal.notified) {
+      return getTranslation(proposal.finalStatus as ResourceId);
+    } else {
+      return proposal.status === ProposalStatus.DRAFT ? 'Open' : 'Submitted';
+    }
+  };
 
   const sendUserProposalRequest = useCallback(async () => {
     return api()
@@ -44,12 +58,10 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
               return {
                 id: proposal.id,
                 title: proposal.title,
-                status:
-                  proposal.status === ProposalStatus.DRAFT
-                    ? 'Open'
-                    : 'Submitted',
+                status: getProposalStatus(proposal),
                 shortCode: proposal.shortCode,
                 created: timeAgo(proposal.created),
+                notified: proposal.notified,
               };
             }),
         };

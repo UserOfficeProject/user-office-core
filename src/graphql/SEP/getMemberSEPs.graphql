@@ -1,0 +1,11 @@
+query getUserSeps {
+  me {
+    seps {
+      id
+      code
+      description
+      numberRatingsRequired
+      active
+    }
+  }
+}

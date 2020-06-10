@@ -1,23 +1,23 @@
-import { makeStyles, Typography, Grid, Button } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Formik, Form } from 'formik';
+import {
+  Typography,
+  Grid,
+  TextField,
+  IconButton,
+  Tooltip,
+  withStyles,
+} from '@material-ui/core';
+import { PersonAdd, Person } from '@material-ui/icons';
+import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import {
-  SepMember,
-  BasicUserDetails,
-  UserRole,
-  AddSepMembersRole,
-} from '../../generated/sdk';
+import { UserContext } from '../../context/UserContextProvider';
+import { SepMember, BasicUserDetails, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPMembersData } from '../../hooks/useSEPMembersData';
-import { useUsersData } from '../../hooks/useUsersData';
-import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
-import FormikDropdown from '../common/FormikDropdown';
 import ParticipantModal from '../proposal/ParticipantModal';
 
 type SEPMembersProps = {
@@ -26,32 +26,38 @@ type SEPMembersProps = {
 };
 
 type SEPMemberAssignments = {
-  SEPChair: string;
-  SEPSecretary: string;
+  SEPChair: BasicUserDetails | null;
+  SEPSecretary: BasicUserDetails | null;
   SEPReviewers: BasicUserDetails[];
 };
 
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
+const DarkerDisabledTextField = withStyles({
+  root: {
+    marginRight: 8,
+    '& .MuiInputBase-root.Mui-disabled': {
+      color: 'rgba(0, 0, 0, 0.7)', // (default alpha is 0.38)
+    },
   },
-});
+})(TextField);
 
 const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
+  const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
+  const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
   const {
     loadingMembers,
     SEPMembersData,
     setSEPMembersData,
-  } = useSEPMembersData(sepId, modalOpen);
-  const { loading, usersData } = useUsersData('');
-  const classes = useStyles();
+  } = useSEPMembersData(
+    sepId,
+    modalOpen || sepChairModalOpen || sepSecretaryModalOpen
+  );
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const { currentRole } = useContext(UserContext);
   const initialValues: SEPMemberAssignments = {
-    SEPChair: '',
-    SEPSecretary: '',
+    SEPChair: null,
+    SEPSecretary: null,
     SEPReviewers: [],
   };
   const columns = [
@@ -71,12 +77,12 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       member.roles.forEach(role => {
         switch (role.shortCode.toUpperCase()) {
           case UserRole.SEP_CHAIR:
-            initialValues.SEPChair = member.userId.toString();
+            initialValues.SEPChair = member.user;
             break;
           case UserRole.SEP_SECRETARY:
-            initialValues.SEPSecretary = member.userId.toString();
+            initialValues.SEPSecretary = member.user;
             break;
-          case UserRole.SEP_MEMBER:
+          case UserRole.SEP_REVIEWER:
             initialValues.SEPReviewers.push(member.user);
             break;
           default:
@@ -86,35 +92,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     });
   };
 
-  const assignChairAndSecretaryToSEP = (
-    values: SEPMemberAssignments
-  ): [number[], AddSepMembersRole[]] => {
-    const memberIds = [];
-    const roleValues = [];
-
-    if (values.SEPChair) {
-      memberIds.push(+values.SEPChair);
-
-      roleValues.push({
-        userID: +values.SEPChair,
-        roleID: UserRole.SEP_CHAIR,
-        SEPID: sepId,
-      });
-    }
-
-    if (values.SEPSecretary) {
-      memberIds.push(+values.SEPSecretary);
-
-      roleValues.push({
-        userID: +values.SEPSecretary,
-        roleID: UserRole.SEP_SECRETARY,
-        SEPID: sepId,
-      });
-    }
-
-    return [memberIds, roleValues];
-  };
-
   const showNotification = (isError: boolean): void => {
     setOpen(false);
     enqueueSnackbar('Updated Information', {
@@ -122,18 +99,35 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     });
   };
 
-  const sendSEPChairAndSecretaryUpdate = async (
-    values: SEPMemberAssignments
-  ): Promise<void> => {
-    const [, roleValues] = assignChairAndSecretaryToSEP(values);
-
-    const assignChairAndSecretaryResult = await api().assignChairAndSecretary({
-      addSEPMembersRole: roleValues,
+  const sendSEPChairUpdate = async (value: BasicUserDetails): Promise<void> => {
+    const assignChairResult = await api().assignChairOrSecretary({
+      addSEPMembersRole: {
+        SEPID: sepId,
+        roleID: UserRole.SEP_CHAIR,
+        userID: value.id,
+      },
     });
 
-    showNotification(
-      !!assignChairAndSecretaryResult.assignChairAndSecretary.error
-    );
+    showNotification(!!assignChairResult.assignChairOrSecretary.error);
+    setSepChairModalOpen(false);
+  };
+
+  const sendSEPSecretaryUpdate = async (
+    value: BasicUserDetails
+  ): Promise<void> => {
+    const assignSecretaryResult = await api().assignChairOrSecretary({
+      addSEPMembersRole: {
+        SEPID: sepId,
+        roleID: UserRole.SEP_SECRETARY,
+        userID: value.id,
+      },
+    });
+
+    showNotification(!!assignSecretaryResult.assignChairOrSecretary.error);
+
+    if (!assignSecretaryResult.assignChairOrSecretary.error) {
+      setSepSecretaryModalOpen(false);
+    }
   };
 
   const addMember = async (user: BasicUserDetails): Promise<void> => {
@@ -162,22 +156,32 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     showNotification(!!removedMembersResult.removeMember.error);
   };
 
-  if (!usersData || loading || loadingMembers) {
+  if (loadingMembers) {
     return <p>Loading...</p>;
   }
-
-  const usersForDropdown = usersData.users.map(user => {
-    return {
-      text: `${user.firstname} ${user.lastname}`,
-      value: user.id.toString(),
-    };
-  });
 
   if (SEPMembersData && SEPMembersData.length > 0) {
     initializeValues(SEPMembersData as SepMember[]);
   }
 
-  const AddIcon = (): JSX.Element => <Add data-cy="add-member" />;
+  const AddPersonIcon = (): JSX.Element => <PersonAdd data-cy="add-member" />;
+
+  const hasAccessRights = [
+    'user_officer',
+    'SEP_Chair',
+    'SEP_Secretary',
+  ].includes(currentRole);
+
+  const tableActions = hasAccessRights
+    ? [
+        {
+          icon: AddPersonIcon,
+          isFreeAction: true,
+          tooltip: 'Add Member',
+          onClick: (): void => setOpen(true),
+        },
+      ]
+    : [];
 
   return (
     <React.Fragment>
@@ -189,37 +193,114 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         title={'Reviewer'}
         userRole={UserRole.REVIEWER}
       />
+      <ParticipantModal
+        show={sepChairModalOpen}
+        close={(): void => setSepChairModalOpen(false)}
+        addParticipant={sendSEPChairUpdate}
+        selectedUsers={[
+          ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
+        ].concat(initialValues.SEPChair ? [initialValues.SEPChair?.id] : [])}
+        title={'SEP Chair'}
+        invitationUserRole={UserRole.SEP_CHAIR}
+      />
+      <ParticipantModal
+        show={sepSecretaryModalOpen}
+        close={(): void => setSepSecretaryModalOpen(false)}
+        addParticipant={sendSEPSecretaryUpdate}
+        selectedUsers={[
+          ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
+        ].concat(
+          initialValues.SEPSecretary ? [initialValues.SEPSecretary?.id] : []
+        )}
+        title={'SEP Secretary'}
+        invitationUserRole={UserRole.SEP_SECRETARY}
+      />
       <Formik
         validateOnChange={false}
         validateOnBlur={false}
         initialValues={initialValues}
         onSubmit={(values, actions): void => {
-          sendSEPChairAndSecretaryUpdate(values);
           actions.setSubmitting(false);
         }}
       >
-        {({ isSubmitting, values }): JSX.Element => (
+        {({ errors }): JSX.Element => (
           <Form>
             <Typography variant="h6" gutterBottom>
               SEP Members
             </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <FormikDropdown
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={5}>
+                <Field
                   name="SEPChair"
+                  id="SEPChair"
                   label="SEP Chair"
-                  items={usersForDropdown}
+                  type="text"
+                  value={
+                    initialValues.SEPChair
+                      ? `${initialValues.SEPChair.firstname} ${initialValues.SEPChair.lastname}`
+                      : ''
+                  }
+                  component={
+                    initialValues.SEPChair ? DarkerDisabledTextField : TextField
+                  }
+                  margin="none"
+                  fullWidth
+                  data-cy="SEPChair"
+                  m={0}
                   required
-                  data-cy="sep-chair"
+                  disabled
+                  error={errors.SEPChair !== undefined}
+                  helperText={errors.SEPChair && errors.SEPChair}
                 />
               </Grid>
-              <Grid item xs={6}>
-                <FormikDropdown
+              <Grid item xs={1}>
+                {hasAccessRights && (
+                  <Tooltip title="Set SEP Chair">
+                    <IconButton
+                      edge="start"
+                      onClick={() => setSepChairModalOpen(true)}
+                    >
+                      <Person />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Grid>
+              <Grid item xs={5}>
+                <Field
                   name="SEPSecretary"
+                  id="SEPSecretary"
                   label="SEP Secretary"
-                  items={usersForDropdown}
+                  type="text"
+                  value={
+                    initialValues.SEPSecretary
+                      ? `${initialValues.SEPSecretary.firstname} ${initialValues.SEPSecretary.lastname}`
+                      : ''
+                  }
+                  component={
+                    initialValues.SEPSecretary
+                      ? DarkerDisabledTextField
+                      : TextField
+                  }
+                  margin="none"
+                  fullWidth
+                  data-cy="SEPSecretary"
                   required
+                  disabled
+                  error={errors.SEPSecretary !== undefined}
+                  helperText={errors.SEPSecretary && errors.SEPSecretary}
                 />
+              </Grid>
+              <Grid item xs={1}>
+                {hasAccessRights && (
+                  <Tooltip title="Set SEP Secretary">
+                    <IconButton
+                      edge="start"
+                      onClick={() => setSepSecretaryModalOpen(true)}
+                    >
+                      <Person />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Grid>
             </Grid>
             <Grid container spacing={3}>
@@ -229,38 +310,22 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
                   title={'Reviewers'}
                   columns={columns}
                   data={initialValues.SEPReviewers}
-                  editable={{
-                    onRowDelete: (rowData: BasicUserDetails): Promise<void> =>
-                      removeMember(rowData),
-                  }}
+                  editable={
+                    hasAccessRights
+                      ? {
+                          onRowDelete: (
+                            rowData: BasicUserDetails
+                          ): Promise<void> => removeMember(rowData),
+                        }
+                      : {}
+                  }
                   options={{
                     search: false,
                   }}
-                  actions={[
-                    {
-                      icon: AddIcon,
-                      isFreeAction: true,
-                      tooltip: 'Add Member',
-                      onClick: (): void => setOpen(true),
-                    },
-                  ]}
+                  actions={tableActions}
                 />
               </Grid>
             </Grid>
-            <ButtonContainer>
-              <Button
-                disabled={
-                  isSubmitting ||
-                  JSON.stringify(values) === JSON.stringify(initialValues)
-                }
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.button}
-              >
-                Save SEP Members
-              </Button>
-            </ButtonContainer>
           </Form>
         )}
       </Formik>

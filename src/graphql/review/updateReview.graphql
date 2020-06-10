@@ -1,5 +1,17 @@
-mutation updateReview($reviewID: Int!, $grade: Int!, $comment: String!, $status: ReviewStatus!) {
-  addReview(reviewID: $reviewID, grade: $grade, comment: $comment, status: $status) {
+mutation updateReview(
+  $reviewID: Int!
+  $grade: Int!
+  $comment: String!
+  $status: ReviewStatus!
+  $sepID: Int!
+) {
+  addReview(
+    reviewID: $reviewID
+    grade: $grade
+    comment: $comment
+    status: $status
+    sepID: $sepID
+  ) {
     error
     review {
       ...coreReview

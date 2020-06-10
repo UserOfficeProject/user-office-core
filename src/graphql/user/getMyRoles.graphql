@@ -1,0 +1,11 @@
+query getMyRoles {
+  me {
+    firstname
+    lastname
+    roles {
+      id
+      shortCode
+      title
+    }
+  }
+}

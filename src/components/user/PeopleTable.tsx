@@ -51,6 +51,7 @@ function sendUserRequest(
 type PeopleTableProps = {
   title: string;
   userRole?: UserRole;
+  invitationUserRole?: UserRole;
   actionIcon: JSX.Element;
   actionText: string;
   action: (data: any) => void;
@@ -81,15 +82,27 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
       },
     },
   })();
-  if (sendUserEmail && props.userRole) {
+
+  const getTitle = (): string => {
+    switch (props.invitationUserRole) {
+      case UserRole.USEROFFICER:
+        return 'Invite User';
+      case UserRole.SEP_CHAIR:
+        return 'Invite SEP Chair';
+      case UserRole.SEP_SECRETARY:
+        return 'Invite SEP Secretary';
+      default:
+        return 'Invite User';
+    }
+  };
+
+  if (sendUserEmail && props.invitationUserRole) {
     return (
       <InviteUserForm
-        title={
-          props.userRole === UserRole.USER ? 'Invite User' : 'Invite Reviewer'
-        }
+        title={getTitle()}
         action={props.action}
         close={() => setSendUserEmail(false)}
-        userRole={props.userRole}
+        userRole={props.invitationUserRole}
       />
     );
   }
@@ -176,6 +189,7 @@ PeopleTable.propTypes = {
   action: PropTypes.func.isRequired,
   isFreeAction: PropTypes.bool,
   userRole: PropTypes.any,
+  invitationUserRole: PropTypes.any,
   data: PropTypes.array,
   search: PropTypes.bool,
   onRemove: PropTypes.func,

@@ -11,6 +11,7 @@ query getBlankProposal($callId: Int!) {
     updated
     callId
     templateId
+    notified
     proposer {
       ...basicUserDetails
     }
@@ -28,6 +29,7 @@ query getBlankProposal($callId: Int!) {
       comment
       status
       userID
+      sepID
       reviewer {
         firstname
         lastname

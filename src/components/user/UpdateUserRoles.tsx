@@ -80,6 +80,8 @@ export default function UpdateUserRoles(props: { id: number }) {
     return <p>Loading</p>;
   }
 
+  const AddBoxIcon = (): JSX.Element => <AddBox />;
+
   return (
     <React.Fragment>
       <RoleModal show={modalOpen} close={() => setOpen(false)} add={addRole} />
@@ -95,10 +97,10 @@ export default function UpdateUserRoles(props: { id: number }) {
         }}
         actions={[
           {
-            icon: () => <AddBox />,
+            icon: AddBoxIcon,
             tooltip: 'Add Role',
             isFreeAction: true,
-            onClick: event => setOpen(true),
+            onClick: () => setOpen(true),
           },
         ]}
         editable={{

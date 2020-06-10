@@ -1,5 +1,6 @@
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Role } from '../../generated/sdk';
@@ -25,6 +26,12 @@ const RoleModal: React.FC<RoleModalProps> = ({ show, close, add }) => {
       </DialogContent>
     </Dialog>
   );
+};
+
+RoleModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired,
+  add: PropTypes.func.isRequired,
 };
 
 export default RoleModal;

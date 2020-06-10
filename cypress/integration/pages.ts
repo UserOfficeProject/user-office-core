@@ -1,8 +1,13 @@
 /// <reference types="Cypress" />
 /// <reference types="../types" />
-var faker = require('faker');
 
 context('Page tests', () => {
+  const faker = require('faker');
+
+  before(() => {
+    cy.resetDB();
+  });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);

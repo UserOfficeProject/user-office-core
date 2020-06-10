@@ -7,7 +7,7 @@ import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function ProposalChooseCall() {
-  const { callsData } = useCallsData(true, {});
+  const { callsData } = useCallsData(true);
   const history = useHistory();
 
   if (!callsData) {

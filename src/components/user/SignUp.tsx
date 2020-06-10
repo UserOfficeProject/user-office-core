@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/camelcase */
+import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
 import { Card, CardContent } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -17,16 +19,13 @@ import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { PageName } from '../../generated/sdk';
+import { PageName, CreateUserMutationVariables } from '../../generated/sdk';
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
 import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
 import orcid from '../../images/orcid.png';
-import {
-  userFieldSchema,
-  userPasswordFieldSchema,
-} from '../../utils/userFieldValidationSchema';
+import { userFieldSchema } from '../../utils/userFieldValidationSchema';
 import { ErrorFocus } from '../common/ErrorFocus';
 import FormikDropdown, { Option } from '../common/FormikDropdown';
 import InformationModal from '../pages/InformationModal';
@@ -181,26 +180,16 @@ const SignUp: React.FC<SignUpProps> = props => {
     );
   }
 
-  // FIXME: Values here should be from type CreateUserMutationVariables. For now it is OK because it needs a bit of a refactor.
-  const sendSignUpRequest = (values: any) => {
+  const sendSignUpRequest = (values: CreateUserMutationVariables) => {
     unauthorizedApi
       .createUser({
         ...values,
-        nationality: +values.nationality,
-        organisation: +values.organisation,
-        orcid: orcData?.orcid as string,
-        orcidHash: orcData?.orcidHash as string,
-        refreshToken: orcData?.refreshToken as string,
-        preferredname: values.preferredname
-          ? values.preferredname
-          : values.firstname,
-        gender: values.gender === 'other' ? values.othergender : values.gender,
       })
       .then(data => setUserID(data?.createUser?.user?.id as number));
   };
 
   if (authCodeOrcID && loading) {
-    return <p>loading</p>;
+    return <p>Loading...</p>;
   }
 
   return (
@@ -210,34 +199,51 @@ const SignUp: React.FC<SignUpProps> = props => {
         validateOnBlur={false}
         initialValues={{
           user_title: '',
-          firstname,
+          firstname: firstname as string,
           middlename: '',
-          lastname,
+          lastname: lastname as string,
           password: '',
           confirmPassword: '',
           preferredname: '',
           gender: '',
+          othergender: '',
           nationality: '',
           birthdate: '',
           organisation: '',
           department: '',
           organisation_address: '',
           position: '',
-          email: email || '',
+          email: email as string,
           telephone: '',
           telephone_alt: '',
           privacy_agreement: false,
           cookie_policy: false,
         }}
-        onSubmit={async (values, actions) => {
+        onSubmit={(values, actions) => {
           if (orcData && orcData.orcid) {
-            await sendSignUpRequest(values);
+            const newValues = {
+              ...values,
+              nationality: +values.nationality,
+              organisation: +values.organisation,
+              orcid: orcData?.orcid as string,
+              orcidHash: orcData?.orcidHash as string,
+              refreshToken: orcData?.refreshToken as string,
+              preferredname: values.preferredname
+                ? values.preferredname
+                : values.firstname,
+              gender:
+                values.gender === 'other' ? values.othergender : values.gender,
+            };
+
+            sendSignUpRequest(newValues);
           } else {
             setOrcidError(true);
           }
           actions.setSubmitting(false);
         }}
-        validationSchema={userFieldSchema.concat(userPasswordFieldSchema)}
+        validationSchema={userFieldSchema.concat(
+          userPasswordFieldValidationSchema
+        )}
       >
         {({ values }) => (
           <Form>
@@ -648,5 +654,7 @@ const SignUp: React.FC<SignUpProps> = props => {
     </Container>
   );
 };
+
+SignUp.propTypes = SignUpPropTypes;
 
 export default SignUp;

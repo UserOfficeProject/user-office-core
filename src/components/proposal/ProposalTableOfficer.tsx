@@ -1,12 +1,13 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
-import { Visibility, Delete, Assignment } from '@material-ui/icons';
+import { Visibility, Delete, Assignment, Email } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import XLSX from 'xlsx';
 
 import { Review, ReviewStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -15,11 +16,13 @@ import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
 import DialogConfirmation from '../common/DialogConfirmation';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
-
+import RankInput from './RankInput';
 const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
   const [openAssignment, setOpenAssignment] = React.useState(false);
+  const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
+
   const initalSelectedProposals: number[] = [];
   const [selectedProposals, setSelectedProposals] = React.useState(
     initalSelectedProposals
@@ -27,6 +30,20 @@ const ProposalTableOfficer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+
+  const setNewRanking = (proposalID: number, ranking: number) => {
+    api().administrationProposal({
+      id: proposalID,
+      rankOrder: ranking,
+    });
+    setProposalsData(
+      proposalsData.map(prop => {
+        if (prop.id === proposalID) prop.rankOrder = ranking;
+
+        return prop;
+      })
+    );
+  };
 
   const average = (numbers: number[]) => {
     const sum = numbers.reduce(function(sum, value) {
@@ -44,7 +61,7 @@ const ProposalTableOfficer: React.FC = () => {
     }
     numbers = numbers.sort();
 
-    return numbers[numbers.length - 1] - numbers[0];
+    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
   };
 
   const standardDeviation = (numbers: number[]) => {
@@ -95,7 +112,7 @@ const ProposalTableOfficer: React.FC = () => {
   const columns = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, width: '10%' },
+      cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
       render: RowActionButtons,
     },
@@ -105,7 +122,11 @@ const ProposalTableOfficer: React.FC = () => {
       field: 'title',
       width: 'auto',
     },
-    { title: 'Time(Days)', field: 'technicalReview.timeAllocation' },
+    {
+      title: 'Time(Days)',
+      field: 'technicalReview.timeAllocation',
+      hidden: true,
+    },
     {
       title: 'Technical status',
       render: (rowData: ProposalData): string =>
@@ -117,6 +138,7 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Deviation',
       field: 'deviation',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         standardDeviation(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
@@ -126,6 +148,7 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Absolute Difference',
       field: 'absolute',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         absoluteDifference(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
@@ -135,13 +158,62 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Average Score',
       field: 'average',
+      hidden: true,
       render: (rowData: ProposalData): number =>
         average(getGrades(rowData.reviews)),
       customSort: (a: ProposalData, b: ProposalData) =>
         (average(getGrades(a.reviews)) || 0) -
         (average(getGrades(b.reviews)) || 0),
     },
+    {
+      title: 'Final Status',
+      field: 'finalStatus',
+      render: (rowData: ProposalData): string =>
+        rowData.finalStatus
+          ? getTranslation(rowData.finalStatus as ResourceId)
+          : '',
+    },
+    {
+      title: 'Ranking',
+      field: 'rankOrder',
+      // To be refactored
+      // eslint-disable-next-line react/display-name
+      render: (rowData: ProposalData) => (
+        <RankInput
+          proposalID={rowData.id}
+          defaultvalue={rowData.rankOrder}
+          onChange={setNewRanking}
+        />
+      ),
+    },
+    { title: 'Notified', field: 'notified' },
   ];
+
+  const emailProposals = (): void => {
+    selectedProposals.forEach(id => {
+      new Promise(async resolve => {
+        await api()
+          .notifyProposal({ id })
+          .then(data => {
+            if (data.notifyProposal.error) {
+              enqueueSnackbar(
+                `Could not send email to all selected proposals`,
+                {
+                  variant: 'error',
+                }
+              );
+            } else {
+              proposalsData[
+                proposalsData.findIndex(val => val.id === id)
+              ].notified = true;
+              setProposalsData([...proposalsData]);
+            }
+          });
+
+        resolve();
+      });
+    });
+  };
 
   const deleteProposals = (): void => {
     selectedProposals.forEach(id => {
@@ -182,6 +254,7 @@ const ProposalTableOfficer: React.FC = () => {
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
   const AssignIcon = (): JSX.Element => <Assignment />;
+  const EmailIcon = (): JSX.Element => <Email />;
 
   return (
     <>
@@ -191,6 +264,13 @@ const ProposalTableOfficer: React.FC = () => {
         open={open}
         action={deleteProposals}
         handleOpen={setOpen}
+      />
+      <DialogConfirmation
+        title="Notify results"
+        text="This action will trigger emails to be sent to principal investigators"
+        open={openEmailProposals}
+        action={emailProposals}
+        handleOpen={setOpenEmailProposals}
       />
       <Dialog
         aria-labelledby="simple-modal-title"
@@ -210,11 +290,52 @@ const ProposalTableOfficer: React.FC = () => {
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        localization={{
+          toolbar: {
+            exportName: 'Export as Excel',
+          },
+        }}
         options={{
           search: true,
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
+          exportButton: true,
+          exportCsv: (columns, data: ProposalData[]) => {
+            const dataColumns = [
+              'Proposal ID',
+              'Title',
+              'Principal Investigator',
+              'Technical Status',
+              'Tehnical Comment',
+              'Time(Days)',
+              'Score difference',
+              'Average Score',
+              'Comment Management',
+              'Decision',
+              'Order',
+            ];
+            const dataToExport = data.map(proposalData => [
+              proposalData.shortCode,
+              proposalData.title,
+              `${proposalData.proposer.firstname} ${proposalData.proposer.lastname}`,
+              getTranslation(
+                proposalData.technicalReview?.status as ResourceId
+              ),
+              proposalData.technicalReview?.publicComment,
+              proposalData.technicalReview?.timeAllocation,
+              absoluteDifference(getGrades(proposalData.reviews)) || 'NA',
+              average(getGrades(proposalData.reviews)) || 'NA',
+              proposalData.commentForManagement,
+              proposalData.finalStatus,
+              proposalData.rankOrder,
+            ]);
+
+            const ws = XLSX.utils.aoa_to_sheet([dataColumns, ...dataToExport]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
+            XLSX.writeFile(wb, 'proposals.xlsx');
+          },
         }}
         actions={[
           {
@@ -243,6 +364,17 @@ const ProposalTableOfficer: React.FC = () => {
             tooltip: 'Assign proposals to SEP',
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
+              setSelectedProposals(
+                (rowData as ProposalData[]).map((row: ProposalData) => row.id)
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: EmailIcon,
+            tooltip: 'Notify users final result',
+            onClick: (event, rowData): void => {
+              setOpenEmailProposals(true);
               setSelectedProposals(
                 (rowData as ProposalData[]).map((row: ProposalData) => row.id)
               );

@@ -1,0 +1,8 @@
+mutation cloneProposalTemplate($templateId: Int!) {
+  cloneProposalTemplate(templateId: $templateId) {
+    template {
+      ...proposalTemplateMetadata
+    }
+    error
+  }
+}

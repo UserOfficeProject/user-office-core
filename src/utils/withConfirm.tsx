@@ -103,7 +103,7 @@ interface Options {
 
 export type WithConfirmType = (
   callback: () => void,
-  params: { title: string; description: string }
+  params: Options
 ) => Function;
 
 export default withConfirm;

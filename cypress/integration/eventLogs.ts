@@ -8,6 +8,7 @@ context('Event log tests', () => {
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);
@@ -35,7 +36,7 @@ context('Event log tests', () => {
     cy.get("[data-cy='view-proposal']")
       .first()
       .click();
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
     cy.contains('PROPOSAL_CREATED');
   });
 
@@ -46,14 +47,16 @@ context('Event log tests', () => {
 
     cy.get("[data-cy='profile-page-btn']").click();
 
+    cy.contains('Profile').click();
+
     cy.get("[name='firstname']")
       .clear()
       .type(newFirstName);
 
     cy.contains('Update Profile').click();
 
-    // NOTE: Minute date format is enough because we don't know the exact time in seconds when update will happen in the database.
-    const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH:MM');
+    // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
+    const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
 
     cy.contains('Logout').click();
 

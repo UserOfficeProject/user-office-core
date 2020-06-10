@@ -1,0 +1,8 @@
+mutation createProposalTemplate($name: String!, $description: String) {
+  createProposalTemplate(name: $name, description: $description) {
+    template {
+      ...proposalTemplateMetadata
+    }
+    error
+  }
+}

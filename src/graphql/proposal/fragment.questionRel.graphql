@@ -4,6 +4,9 @@ fragment questionRel on QuestionRel {
   }
   sortOrder
   topicId
+  config {
+    ...fieldConfig
+  }
   dependency {
     questionId
     dependencyId

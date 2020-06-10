@@ -12,19 +12,32 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
-import { QuestionRel } from '../../generated/sdk';
+import { Question, QuestionaryStep, QuestionRel } from '../../generated/sdk';
 import { usePersistModel } from '../../hooks/usePersistModel';
+import { getQuestionaryStepByTopicId } from '../../models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
-  EventType,
   Event,
+  EventType,
 } from '../../models/QuestionaryEditorModel';
 import { StyledPaper } from '../../styles/StyledComponents';
+import QuestionEditor from './forms/QuestionEditor';
+import QuestionRelEditor from './forms/QuestionRelEditor';
 import QuestionaryEditorTopic from './QuestionaryEditorTopic';
-import QuestionaryFieldEditor from './QuestionaryFieldEditor';
+import { QuestionPicker } from './QuestionPicker';
+import { TemplateMetadataEditor } from './TemplateMetadataEditor';
 
 export default function QuestionaryEditor() {
   const { enqueueSnackbar } = useSnackbar();
-  const [selectedField, setSelectedField] = useState<QuestionRel | null>(null);
+  const [
+    selectedQuestionRel,
+    setSelectedQuestionRel,
+  ] = useState<QuestionRel | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
+    null
+  );
+  const [questionPickerTopicId, setQuestionPickerTopicId] = useState<
+    number | null
+  >(null);
   const reducerMiddleware = () => {
     return (next: Function) => (action: Event) => {
       next(action);
@@ -33,8 +46,24 @@ export default function QuestionaryEditor() {
           enqueueSnackbar(action.payload, { variant: 'error' });
           break;
 
-        case EventType.FIELD_CREATED:
-          setSelectedField(action.payload);
+        case EventType.QUESTION_CREATED:
+          setSelectedQuestion(action.payload);
+          break;
+
+        case EventType.PICK_QUESTION_REQUESTED:
+          setQuestionPickerTopicId(action.payload.topic.id);
+          break;
+
+        case EventType.OPEN_QUESTION_EDITOR:
+          setSelectedQuestion(action.payload);
+          break;
+
+        case EventType.OPEN_QUESTIONREL_EDITOR:
+          setSelectedQuestionRel(action.payload);
+          break;
+
+        case EventType.QUESTION_PICKER_NEW_QUESTION_CLICKED:
+          setQuestionPickerTopicId(action.payload.topic.id);
           break;
       }
     };
@@ -68,10 +97,47 @@ export default function QuestionaryEditor() {
 
   const onDragEnd = (result: DropResult): void => {
     if (result.type === 'field') {
-      dispatch({
-        type: EventType.REORDER_FIELD_REQUESTED,
-        payload: { source: result.source, destination: result.destination },
-      });
+      const dragSource = result.source;
+      const dragDestination = result.destination;
+      if (result.source.droppableId === 'questionPicker') {
+        const questionId =
+          state.complementaryQuestions[dragSource.index].proposalQuestionId;
+        const topicId = dragDestination?.droppableId
+          ? +dragDestination.droppableId
+          : undefined;
+        const sortOrder = dragDestination?.index;
+        if (topicId && questionId) {
+          dispatch({
+            type: EventType.CREATE_QUESTION_REL_REQUESTED,
+            payload: {
+              topicId,
+              questionId,
+              sortOrder,
+              templateId: state.templateId,
+            },
+          });
+        }
+      } else if (result?.destination?.droppableId === 'questionPicker') {
+        const dragSource = result.source;
+        const topicId = parseInt(dragSource.droppableId);
+        const step = getQuestionaryStepByTopicId(
+          state.steps,
+          topicId
+        ) as QuestionaryStep;
+        const question = step.fields[dragSource.index].question;
+        dispatch({
+          type: EventType.DELETE_QUESTION_REL_REQUESTED,
+          payload: {
+            fieldId: question.proposalQuestionId,
+            templateId: state.templateId,
+          },
+        });
+      } else if (result?.destination && result?.source) {
+        dispatch({
+          type: EventType.REORDER_QUESTION_REL_REQUESTED,
+          payload: { source: result.source, destination: result.destination },
+        });
+      }
     }
     if (result.type === 'topic') {
       dispatch({
@@ -79,14 +145,6 @@ export default function QuestionaryEditor() {
         payload: { source: result.source, destination: result.destination },
       });
     }
-  };
-
-  const onClick = (data: QuestionRel): void => {
-    setSelectedField(data);
-  };
-
-  const handleFieldEditorClose = (): void => {
-    setSelectedField(null);
   };
 
   const getContainerStyle = (): any => {
@@ -100,8 +158,7 @@ export default function QuestionaryEditor() {
   };
 
   const progressJsx = isLoading ? <LinearProgress /> : null;
-  console.log(state);
-  const addNewTopicFallbackButton =
+  const newTopicFallbackButton =
     state.steps.length === 0 ? (
       <Button
         variant="outlined"
@@ -140,6 +197,7 @@ export default function QuestionaryEditor() {
 
   return (
     <>
+      <TemplateMetadataEditor dispatch={dispatch} template={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         {enableReorderTopicsToggle}
@@ -151,28 +209,53 @@ export default function QuestionaryEditor() {
                 ref={provided.innerRef}
                 style={getTopicListStyle(snapshot.isDraggingOver)}
               >
-                {state.steps.map((step, index) => (
-                  <QuestionaryEditorTopic
-                    data={step}
-                    dispatch={dispatch}
-                    index={index}
-                    key={step.topic.id}
-                    onItemClick={onClick}
-                    dragMode={isTopicReorderMode}
-                  />
-                ))}
+                {state.steps.map((step, index) => {
+                  const questionPicker =
+                    step.topic.id === questionPickerTopicId ? (
+                      <QuestionPicker
+                        topic={step.topic}
+                        dispatch={dispatch}
+                        template={state}
+                        key="questionPicker"
+                        closeMe={() => {
+                          setQuestionPickerTopicId(null);
+                        }}
+                        id="questionPicker"
+                      />
+                    ) : null;
+
+                  return (
+                    <>
+                      <QuestionaryEditorTopic
+                        data={step}
+                        dispatch={dispatch}
+                        index={index}
+                        key={step.topic.id}
+                        dragMode={isTopicReorderMode}
+                      />
+                      {questionPicker}
+                    </>
+                  );
+                })}
                 {provided.placeholder}
               </div>
             )}
           </Droppable>
         </DragDropContext>
-        {addNewTopicFallbackButton}
+        {newTopicFallbackButton}
       </StyledPaper>
 
-      <QuestionaryFieldEditor
-        field={selectedField}
+      <QuestionRelEditor
+        field={selectedQuestionRel}
         dispatch={dispatch}
-        closeMe={handleFieldEditorClose}
+        closeMe={() => setSelectedQuestionRel(null)}
+        template={state}
+      />
+
+      <QuestionEditor
+        field={selectedQuestion}
+        dispatch={dispatch}
+        closeMe={() => setSelectedQuestion(null)}
         template={state}
       />
     </>

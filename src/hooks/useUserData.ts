@@ -19,7 +19,7 @@ export function useUserWithReviewsData() {
       });
   }, [api]);
 
-  return { loading, userData };
+  return { loading, userData, setUserData };
 }
 
 export function useBasicUserData() {

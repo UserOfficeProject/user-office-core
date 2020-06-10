@@ -1,4 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { createSEPValidationSchema } from '@esss-swap/duo-validation';
 import { FormControlLabel } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -11,7 +12,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { useDataApi } from '../../hooks/useDataApi';
-import { SEPValidationSchema } from './SEPValidationSchema';
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
@@ -57,7 +57,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
           actions.setSubmitting(false);
           close();
         }}
-        validationSchema={SEPValidationSchema}
+        validationSchema={createSEPValidationSchema}
       >
         {({
           values,

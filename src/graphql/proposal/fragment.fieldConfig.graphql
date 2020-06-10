@@ -44,5 +44,6 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     htmlQuestion
+    isHtmlQuestion
   }
 }

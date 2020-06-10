@@ -8,10 +8,13 @@ query getProposals($filter: ProposalsFilter) {
       shortCode
       rankOrder
       finalStatus
+      commentForUser
+      commentForManagement
       created
       updated
       callId
       templateId
+      notified
       proposer {
         ...basicUserDetails
       }
@@ -21,6 +24,7 @@ query getProposals($filter: ProposalsFilter) {
         comment
         status
         userID
+        sepID
         reviewer {
           firstname
           lastname
@@ -34,6 +38,7 @@ query getProposals($filter: ProposalsFilter) {
       technicalReview {
         id
         comment
+        publicComment
         timeAllocation
         status
         proposalID

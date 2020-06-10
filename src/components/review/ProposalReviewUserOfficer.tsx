@@ -14,6 +14,7 @@ import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
 import GeneralInformation from '../proposal/GeneralInformation';
 import ParticipantModal from '../proposal/ParticipantModal';
+import ProposalAdmin from '../proposal/ProposalAdmin';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ReviewTable from './ReviewTable';
 
@@ -53,9 +54,11 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   }, [loadProposal]);
 
   const addUser = async (user: BasicUserDetails): Promise<void> => {
+    // TODO: This should be reviewed here because we wont have adding user for review outside SEPs.
     await api().addUserForReview({
       userID: user.id,
       proposalID: parseInt(match.params.id),
+      sepID: 0,
     });
     setOpen(false);
     loadProposal();
@@ -74,7 +77,9 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={['General', 'Excellence', 'Technical', 'Logs']}>
+      <SimpleTabs
+        tabNames={['General', 'Excellence', 'Technical', 'Admin', 'Logs']}
+      >
         <GeneralInformation
           data={proposal}
           onProposalChanged={(newProposal): void => setProposal(newProposal)}
@@ -100,6 +105,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           data={techReview}
           setReview={setTechReview}
         />
+        <ProposalAdmin data={proposal} />
         <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
       </SimpleTabs>
     </Container>
