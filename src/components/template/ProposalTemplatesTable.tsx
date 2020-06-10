@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, Link } from '@material-ui/core';
 import { Column } from 'material-table';
 import React, { useState } from 'react';
+
 import { GetTemplatesQuery, TemplateCategoryId } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
@@ -63,6 +64,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
         templateCategory={TemplateCategoryId.PROPOSAL_QUESTIONARY}
         isRowDeleteable={rowData => {
           const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
+
           return (
             proposalTemplateRowData.callCount === 0 &&
             proposalTemplateRowData.proposalCount === 0

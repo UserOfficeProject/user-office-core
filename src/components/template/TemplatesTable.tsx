@@ -1,18 +1,19 @@
+import { Edit, FileCopy, Archive, Delete } from '@material-ui/icons';
+import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
-import { tableIcons } from '../../utils/materialIcons';
+import { useSnackbar } from 'notistack';
+import { useState, useEffect } from 'react';
+import React from 'react';
+import { useHistory } from 'react-router';
+
 import {
   Template,
   GetTemplatesQuery,
   TemplateCategoryId,
 } from '../../generated/sdk';
-import { useState, useEffect } from 'react';
-import { Edit, FileCopy, Archive, Delete } from '@material-ui/icons';
 import { useDataApi } from '../../hooks/useDataApi';
-import { useSnackbar } from 'notistack';
-import { useHistory } from 'react-router';
+import { tableIcons } from '../../utils/materialIcons';
 import { WithConfirmType } from '../../utils/withConfirm';
-import UnarchiveIcon from '@material-ui/icons/Unarchive';
-import React from 'react';
 
 export type TemplateRowDataType = Pick<
   Template,

@@ -1,24 +1,25 @@
+import { Collapse } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
+import InboxIcon from '@material-ui/icons/Inbox';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import InboxIcon from '@material-ui/icons/Inbox';
 
-import { useCallsData } from '../hooks/useCallsData';
-import { Collapse } from '@material-ui/core';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { TemplateCategoryId } from '../generated/sdk';
+import { useCallsData } from '../hooks/useCallsData';
+
 type MenuItemsProps = {
   /** Logged in user role. */
   role: string;
@@ -166,6 +167,7 @@ const TemplateMenuListItem = () => {
   function toggleExpand() {
     setIsExpanded(!isExpanded);
   }
+
   return (
     <>
       <ListItem button onClick={toggleExpand}>
