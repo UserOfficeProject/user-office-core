@@ -114,7 +114,7 @@ describe('Test SEPMutations', () => {
       {
         addSEPMembersRole: {
           SEPID: 1,
-          roleID: UserRole.USEROFFICER,
+          roleID: UserRole.USER_OFFICER,
           userID: 2,
         },
       }
