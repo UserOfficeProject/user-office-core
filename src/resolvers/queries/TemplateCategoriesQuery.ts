@@ -1,4 +1,5 @@
 import { Args, Ctx, Query, Resolver } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { TemplateCategory } from '../types/TemplateCategory';
 

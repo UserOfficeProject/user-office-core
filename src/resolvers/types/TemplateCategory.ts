@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from 'type-graphql';
+
 import { TemplateCategory as TemplateCategoryOrigin } from '../../models/ProposalModel';
 
 @ObjectType()

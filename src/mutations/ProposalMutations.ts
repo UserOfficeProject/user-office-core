@@ -7,6 +7,7 @@ import {
   updateProposalValidationSchema,
 } from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
+
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';

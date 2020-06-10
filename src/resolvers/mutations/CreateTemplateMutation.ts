@@ -1,4 +1,5 @@
 import { Args, ArgsType, Ctx, Field, Mutation, Resolver } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/ProposalModel';
 import { TemplateResponseWrap } from '../types/CommonWrappers';

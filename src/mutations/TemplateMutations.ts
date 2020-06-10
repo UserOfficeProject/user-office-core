@@ -30,6 +30,7 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
@@ -44,7 +45,6 @@ import {
   SelectionFromOptionsConfig,
 } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
-import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 
 export default class TemplateMutations {
   constructor(private dataSource: TemplateDataSource) {}
