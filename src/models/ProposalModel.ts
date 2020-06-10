@@ -161,6 +161,10 @@ export class Template {
   ) {}
 }
 
+export class TemplateCategory {
+  constructor(public categoryId: number, public name: string) {}
+}
+
 export class FieldCondition {
   constructor(public condition: EvaluatorOperator, public params: any) {}
 

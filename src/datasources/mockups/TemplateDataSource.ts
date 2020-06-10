@@ -8,6 +8,7 @@ import {
   QuestionRel,
   TemplateStep,
   Topic,
+  TemplateCategory,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
@@ -244,5 +245,9 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async getTemplateSteps(): Promise<TemplateStep[]> {
     return dummyTemplateSteps;
+  }
+
+  async getTemplateCategories(): Promise<TemplateCategory[]> {
+    return [new TemplateCategory(1, 'Proposal Questionaries')];
   }
 }

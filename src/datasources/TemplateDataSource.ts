@@ -6,6 +6,7 @@ import {
   QuestionRel,
   TemplateStep,
   Topic,
+  TemplateCategory,
 } from '../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
@@ -15,6 +16,7 @@ import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutatio
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export interface TemplateDataSource {
+  getTemplateCategories(): Promise<TemplateCategory[]>;
   // Template
   createTemplate(name: string, description?: string): Promise<Template>;
   getTemplate(templateId: number): Promise<Template | null>;

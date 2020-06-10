@@ -38,4 +38,9 @@ export default class TemplateQueries {
   async isNaturalKeyPresent(agent: UserWithRole | null, naturalKey: string) {
     return this.dataSource.isNaturalKeyPresent(naturalKey);
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  getTemplateCategories(user: UserWithRole | null) {
+    return this.dataSource.getTemplateCategories();
+  }
 }

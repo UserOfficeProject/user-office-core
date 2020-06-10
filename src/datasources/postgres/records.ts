@@ -11,6 +11,7 @@ import {
   QuestionRel,
   Topic,
   Questionary,
+  TemplateCategory,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
@@ -230,6 +231,11 @@ export interface SEPMemberRecord {
   readonly sep_id: number;
 }
 
+export interface TemplateCategoryRecord {
+  readonly template_category_id: number;
+  readonly name: string;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -396,5 +402,14 @@ export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
     questionary.questionary_id,
     questionary.template_id,
     questionary.created_at
+  );
+};
+
+export const createTemplateCategoryObject = (
+  templateCategory: TemplateCategoryRecord
+) => {
+  return new TemplateCategory(
+    templateCategory.template_category_id,
+    templateCategory.name
   );
 };

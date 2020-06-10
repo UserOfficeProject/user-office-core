@@ -6,6 +6,7 @@ import {
   Template,
   TemplateStep,
   Topic,
+  TemplateCategory,
 } from '../../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
@@ -26,9 +27,18 @@ import {
   ProposalQuestionRecord,
   ProposalTemplateRecord,
   TopicRecord,
+  createTemplateCategoryObject,
+  TemplateCategoryRecord,
 } from './records';
 
 export default class PostgresTemplateDataSource implements TemplateDataSource {
+  async getTemplateCategories(): Promise<TemplateCategory[]> {
+    return database('template_categories')
+      .select('*')
+      .then((records: TemplateCategoryRecord[]) =>
+        records.map(record => createTemplateCategoryObject(record))
+      );
+  }
   async getComplementaryQuestions(
     templateId: number
   ): Promise<Question[] | null> {
