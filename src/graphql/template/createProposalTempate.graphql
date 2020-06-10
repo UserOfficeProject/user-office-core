@@ -1,5 +1,13 @@
-mutation createTemplate($name: String!, $description: String) {
-  createTemplate(name: $name, description: $description) {
+mutation createTemplate(
+  $categoryId: TemplateCategoryId!
+  $name: String!
+  $description: String
+) {
+  createTemplate(
+    categoryId: $categoryId
+    name: $name
+    description: $description
+  ) {
     template {
       ...templateMetadata
     }

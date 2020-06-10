@@ -18,8 +18,7 @@ import InboxIcon from '@material-ui/icons/Inbox';
 import { useCallsData } from '../hooks/useCallsData';
 import { Collapse } from '@material-ui/core';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
-import { TemplateCategory } from '../models/Templates';
-
+import { TemplateCategoryId } from '../generated/sdk';
 type MenuItemsProps = {
   /** Logged in user role. */
   role: string;
@@ -183,7 +182,7 @@ const TemplateMenuListItem = () => {
       >
         <ListItem
           component={Link}
-          to={'/Templates/' + TemplateCategory.PROPOSAL_QUESTIONARY}
+          to={'/Templates/' + TemplateCategoryId.PROPOSAL_QUESTIONARY}
           button
         >
           <ListItemIcon>
@@ -193,7 +192,7 @@ const TemplateMenuListItem = () => {
         </ListItem>
         <ListItem
           component={Link}
-          to={'/Templates/' + TemplateCategory.SAMPLE_DECLARATION}
+          to={'/Templates/' + TemplateCategoryId.SAMPLE_DECLARATION}
           button
         >
           <ListItemIcon>

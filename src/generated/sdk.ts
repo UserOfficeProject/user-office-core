@@ -242,6 +242,7 @@ export type Mutation = {
   updateQuestionRel: TemplateResponseWrap,
   updateTemplate: TemplateResponseWrap,
   updateTopic: TopicResponseWrap,
+  createTemplate: TemplateResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
@@ -250,7 +251,6 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap,
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
-  createTemplate: TemplateResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteQuestion: QuestionResponseWrap,
   deleteTemplate: TemplateResponseWrap,
@@ -464,6 +464,13 @@ export type MutationUpdateTopicArgs = {
 };
 
 
+export type MutationCreateTemplateArgs = {
+  categoryId: TemplateCategoryId,
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>
+};
+
+
 export type MutationAddUserRoleArgs = {
   userID: Scalars['Int'],
   roleID: Scalars['Int']
@@ -537,12 +544,6 @@ export type MutationCloneTemplateArgs = {
 
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int']
-};
-
-
-export type MutationCreateTemplateArgs = {
-  description?: Maybe<Scalars['String']>,
-  name: Scalars['String']
 };
 
 
@@ -758,6 +759,7 @@ export type Query = {
   sepMembers?: Maybe<Array<SepMember>>,
   sepProposals?: Maybe<Array<SepProposal>>,
   seps?: Maybe<SePsQueryResult>,
+  templateCategories?: Maybe<Array<TemplateCategory>>,
   template?: Maybe<Template>,
   user?: Maybe<User>,
   me?: Maybe<User>,
@@ -1087,6 +1089,17 @@ export type Template = {
   steps: Array<TemplateStep>,
   complementaryQuestions: Array<Question>,
 };
+
+export type TemplateCategory = {
+   __typename?: 'TemplateCategory',
+  categoryId: Scalars['Int'],
+  name: Scalars['String'],
+};
+
+export enum TemplateCategoryId {
+  PROPOSAL_QUESTIONARY = 'PROPOSAL_QUESTIONARY',
+  SAMPLE_DECLARATION = 'SAMPLE_DECLARATION'
+}
 
 export type TemplateResponseWrap = {
    __typename?: 'TemplateResponseWrap',
@@ -2004,6 +2017,7 @@ export type CloneTemplateMutation = (
 );
 
 export type CreateTemplateMutationVariables = {
+  categoryId: TemplateCategoryId,
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>
 };
@@ -3543,8 +3557,8 @@ export const CloneTemplateDocument = gql`
 }
     ${TemplateMetadataFragmentDoc}`;
 export const CreateTemplateDocument = gql`
-    mutation createTemplate($name: String!, $description: String) {
-  createTemplate(name: $name, description: $description) {
+    mutation createTemplate($categoryId: TemplateCategoryId!, $name: String!, $description: String) {
+  createTemplate(categoryId: $categoryId, name: $name, description: $description) {
     template {
       ...templateMetadata
     }
