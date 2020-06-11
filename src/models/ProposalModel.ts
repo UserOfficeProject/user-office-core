@@ -55,6 +55,7 @@ export class Topic {
 
 export class Question {
   constructor(
+    public categoryId: TemplateCategoryId,
     public proposalQuestionId: string,
     public naturalKey: string,
     public dataType: DataType,
@@ -64,6 +65,7 @@ export class Question {
 
   static fromObject(obj: any) {
     return new Question(
+      obj.category_id,
       obj.proposalQuestionId,
       obj.naturalKey,
       obj.dataType,

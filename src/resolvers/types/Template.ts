@@ -9,7 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Template as TemplateOrigin } from '../../models/ProposalModel';
+import {
+  Template as TemplateOrigin,
+  TemplateCategoryId,
+} from '../../models/ProposalModel';
 import { Question } from './Question';
 import { TemplateStep } from './TemplateStep';
 
@@ -17,6 +20,9 @@ import { TemplateStep } from './TemplateStep';
 export class Template implements Partial<TemplateOrigin> {
   @Field(() => Int)
   public templateId: number;
+
+  @Field(() => TemplateCategoryId)
+  public categoryId: TemplateCategoryId;
 
   @Field()
   public name: string;

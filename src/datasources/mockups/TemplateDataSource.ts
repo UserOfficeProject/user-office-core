@@ -9,6 +9,7 @@ import {
   TemplateCategory,
   TemplateStep,
   Topic,
+  TemplateCategoryId,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
@@ -181,6 +182,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyTopicFactory({ id });
   }
   async createQuestion(
+    categoryId: TemplateCategoryId,
     questionId: string,
     naturalKey: string,
     dataType: DataType,

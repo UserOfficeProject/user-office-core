@@ -1,6 +1,9 @@
 import { Field, ObjectType } from 'type-graphql';
 
-import { Question as QuestionOrigin } from '../../models/ProposalModel';
+import {
+  Question as QuestionOrigin,
+  TemplateCategoryId,
+} from '../../models/ProposalModel';
 import { DataType } from './../../models/ProposalModel';
 import { FieldConfigType } from './FieldConfig';
 
@@ -8,6 +11,9 @@ import { FieldConfigType } from './FieldConfig';
 export class Question implements Partial<QuestionOrigin> {
   @Field()
   public proposalQuestionId: string;
+
+  @Field(() => TemplateCategoryId)
+  public categoryId: TemplateCategoryId;
 
   @Field()
   public naturalKey: string;

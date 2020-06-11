@@ -7,6 +7,7 @@ import {
   TemplateCategory,
   TemplateStep,
   Topic,
+  TemplateCategoryId,
 } from '../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
@@ -28,6 +29,7 @@ export interface TemplateDataSource {
   getTemplateSteps(templateId: number): Promise<TemplateStep[]>;
   // TemplateField
   createQuestion(
+    categoryId: TemplateCategoryId,
     questionId: string,
     naturalKey: string,
     dataType: DataType,

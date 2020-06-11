@@ -4,13 +4,12 @@ import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
-  CallRecord,
   createQuestionaryObject,
   createQuestionRelObject,
   createTopicObject,
-  ProposalQuestionProposalTemplateRelRecord,
-  ProposalQuestionRecord,
   QuestionaryRecord,
+  QuestionRecord,
+  QuestionTemplateRelRecord,
   TopicRecord,
 } from './records';
 
@@ -192,8 +191,8 @@ export default class PostgresQuestionaryDataSource
                 topics.sort_order`)
     ).rows;
 
-    const answerRecords: Array<ProposalQuestionRecord &
-      ProposalQuestionProposalTemplateRelRecord & { value: any }> = (
+    const answerRecords: Array<QuestionRecord &
+      QuestionTemplateRelRecord & { value: any }> = (
       await database.raw(`
                 SELECT 
                   templates_has_questions.*, questions.*, answers.answer as value

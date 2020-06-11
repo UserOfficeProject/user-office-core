@@ -10,6 +10,7 @@ import {
   Questionary,
   QuestionaryStep,
   QuestionRel,
+  TemplateCategoryId,
   Topic,
 } from '../../models/ProposalModel';
 import {
@@ -41,6 +42,7 @@ export const dummyQuestionFactory = (
   values?: DeepPartial<Question>
 ): Question => {
   return new Question(
+    values?.categoryId || TemplateCategoryId.PROPOSAL_QUESTIONARY,
     values?.proposalQuestionId || 'random_field_name_' + Math.random(),
     values?.naturalKey || 'is_dangerous',
     values?.dataType || DataType.TEXT_INPUT,

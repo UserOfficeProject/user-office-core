@@ -63,7 +63,8 @@ export interface FieldDependencyRecord {
   readonly condition: string;
 }
 
-export interface ProposalQuestionRecord {
+export interface QuestionRecord {
+  readonly category_id: number;
   readonly question_id: string;
   readonly data_type: string;
   readonly question: string;
@@ -74,7 +75,7 @@ export interface ProposalQuestionRecord {
   readonly natural_key: string;
 }
 
-export interface ProposalQuestionProposalTemplateRelRecord {
+export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
   readonly template_id: string;
@@ -85,7 +86,7 @@ export interface ProposalQuestionProposalTemplateRelRecord {
   readonly dependency_condition: string;
 }
 
-export interface ProposalTemplateRecord {
+export interface TemplateRecord {
   readonly template_id: number;
   readonly category_id: number;
   readonly name: string;
@@ -250,8 +251,9 @@ export const createTopicObject = (proposal: TopicRecord) => {
   );
 };
 
-export const createQuestionObject = (question: ProposalQuestionRecord) => {
+export const createQuestionObject = (question: QuestionRecord) => {
   return new Question(
+    question.category_id,
     question.question_id,
     question.natural_key,
     question.data_type as DataType,
@@ -260,9 +262,7 @@ export const createQuestionObject = (question: ProposalQuestionRecord) => {
   );
 };
 
-export const createProposalTemplateObject = (
-  template: ProposalTemplateRecord
-) => {
+export const createProposalTemplateObject = (template: TemplateRecord) => {
   return new Template(
     template.template_id,
     template.category_id,
@@ -320,10 +320,11 @@ export const createFileMetadata = (record: FileRecord) => {
 };
 
 export const createQuestionRelObject = (
-  record: ProposalQuestionRecord & ProposalQuestionProposalTemplateRelRecord
+  record: QuestionRecord & QuestionTemplateRelRecord
 ) => {
   return new QuestionRel(
     new Question(
+      record.category_id,
       record.question_id,
       record.natural_key,
       record.data_type as DataType,

@@ -158,11 +158,12 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: CreateQuestionArgs
   ): Promise<Question | Rejection> {
-    const { dataType } = args;
+    const { dataType, categoryId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
       .createQuestion(
+        categoryId,
         newFieldId,
         newFieldId, // natural key defaults to id
         dataType,
