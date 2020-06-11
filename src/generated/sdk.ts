@@ -407,6 +407,7 @@ export type MutationUpdateSepArgs = {
 
 
 export type MutationCreateQuestionArgs = {
+  categoryId: TemplateCategoryId,
   dataType: DataType
 };
 
@@ -740,6 +741,7 @@ export enum ProposalStatus {
 export type ProposalTemplate = {
    __typename?: 'ProposalTemplate',
   templateId: Scalars['Int'],
+  categoryId: TemplateCategoryId,
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   isArchived: Scalars['Boolean'],
@@ -1099,6 +1101,7 @@ export enum TechnicalReviewStatus {
 export type Template = {
    __typename?: 'Template',
   templateId: Scalars['Int'],
+  categoryId: TemplateCategoryId,
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   isArchived: Scalars['Boolean'],
@@ -1124,7 +1127,7 @@ export type TemplateResponseWrap = {
 };
 
 export type TemplatesFilter = {
-  isArchived: Scalars['Boolean'],
+  isArchived?: Maybe<Scalars['Boolean']>,
   category?: Maybe<TemplateCategoryId>,
 };
 
@@ -2053,6 +2056,7 @@ export type CreateTemplateMutation = (
 );
 
 export type CreateQuestionMutationVariables = {
+  categoryId: TemplateCategoryId,
   dataType: DataType
 };
 
@@ -2269,7 +2273,7 @@ export type QuestionRelFragment = (
 
 export type TemplateFragment = (
   { __typename?: 'Template' }
-  & Pick<Template, 'templateId' | 'name' | 'description'>
+  & Pick<Template, 'templateId' | 'categoryId' | 'name' | 'description'>
   & { steps: Array<(
     { __typename?: 'TemplateStep' }
     & { topic: (
@@ -3012,6 +3016,7 @@ export const TemplateFragmentDoc = gql`
     }
   }
   templateId
+  categoryId
   name
   description
   complementaryQuestions {
@@ -3595,8 +3600,8 @@ export const CreateTemplateDocument = gql`
 }
     ${TemplateMetadataFragmentDoc}`;
 export const CreateQuestionDocument = gql`
-    mutation createQuestion($dataType: DataType!) {
-  createQuestion(dataType: $dataType) {
+    mutation createQuestion($categoryId: TemplateCategoryId!, $dataType: DataType!) {
+  createQuestion(categoryId: $categoryId, dataType: $dataType) {
     question {
       ...question
     }

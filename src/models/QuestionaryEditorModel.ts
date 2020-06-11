@@ -2,7 +2,12 @@ import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
-import { Template, Question, QuestionRel } from '../generated/sdk';
+import {
+  Template,
+  Question,
+  QuestionRel,
+  TemplateCategoryId,
+} from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
@@ -48,6 +53,7 @@ export interface Event {
 export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const { templateId } = useParams();
   const blankInitTemplate: Template = {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     steps: [],
     templateId: 0,
     isArchived: false,

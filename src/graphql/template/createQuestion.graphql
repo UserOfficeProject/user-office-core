@@ -1,5 +1,8 @@
-mutation createQuestion($dataType: DataType!) {
-  createQuestion(dataType: $dataType) {
+mutation createQuestion(
+  $categoryId: TemplateCategoryId!
+  $dataType: DataType!
+) {
+  createQuestion(categoryId: $categoryId, dataType: $dataType) {
     question {
       ...question
     }

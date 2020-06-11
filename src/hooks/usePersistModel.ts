@@ -6,6 +6,7 @@ import {
   Template,
   QuestionRel,
   Question,
+  TemplateCategoryId,
 } from '../generated/sdk';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
@@ -89,12 +90,16 @@ export function usePersistModel() {
       .then(data => data.updateQuestionRel);
   };
 
-  const createQuestion = async (dataType: DataType) => {
+  const createQuestion = async (
+    categoryId: TemplateCategoryId,
+    dataType: DataType
+  ) => {
     setIsLoading(true);
 
     return api()
       .createQuestion({
-        dataType: dataType,
+        categoryId,
+        dataType,
       })
       .then(questionResponse => {
         setIsLoading(false);
@@ -271,7 +276,10 @@ export function usePersistModel() {
           break;
         case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await createQuestion(action.payload.dataType);
+            const result = await createQuestion(
+              state.categoryId,
+              action.payload.dataType
+            );
             if (result.question) {
               dispatch({
                 type: EventType.QUESTION_CREATED,
