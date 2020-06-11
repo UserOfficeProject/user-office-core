@@ -3,6 +3,4 @@ fragment templateMetadata on Template {
   name
   description
   isArchived
-  proposalCount
-  callCount
 }

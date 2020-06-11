@@ -14,15 +14,15 @@ export default function ProposalTemplates() {
         <ProposalTemplatesTable
           dataProvider={() =>
             api()
-              .getTemplates({ filter: { isArchived: false } })
-              .then(data => data.templates || [])
+              .getProposalTemplates({ filter: { isArchived: false } })
+              .then(data => data.proposalTemplates || [])
           }
         />
         <ProposalTemplatesTable
           dataProvider={() =>
             api()
-              .getTemplates({ filter: { isArchived: true } })
-              .then(data => data.templates || [])
+              .getProposalTemplates({ filter: { isArchived: true } })
+              .then(data => data.proposalTemplates || [])
           }
         />
       </SimpleTabs>

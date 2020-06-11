@@ -236,13 +236,13 @@ export type Mutation = {
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
   createQuestionRel: TemplateResponseWrap,
+  createTemplate: TemplateResponseWrap,
   createTopic: TemplateResponseWrap,
   deleteQuestionRel: TemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
   updateQuestionRel: TemplateResponseWrap,
   updateTemplate: TemplateResponseWrap,
   updateTopic: TopicResponseWrap,
-  createTemplate: TemplateResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
@@ -419,6 +419,13 @@ export type MutationCreateQuestionRelArgs = {
 };
 
 
+export type MutationCreateTemplateArgs = {
+  categoryId: TemplateCategoryId,
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>
+};
+
+
 export type MutationCreateTopicArgs = {
   templateId: Scalars['Int'],
   sortOrder: Scalars['Int']
@@ -461,13 +468,6 @@ export type MutationUpdateTopicArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
   isEnabled?: Maybe<Scalars['Boolean']>
-};
-
-
-export type MutationCreateTemplateArgs = {
-  categoryId: TemplateCategoryId,
-  name: Scalars['String'],
-  description?: Maybe<Scalars['String']>
 };
 
 
@@ -737,6 +737,18 @@ export enum ProposalStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
+export type ProposalTemplate = {
+   __typename?: 'ProposalTemplate',
+  templateId: Scalars['Int'],
+  name: Scalars['String'],
+  description?: Maybe<Scalars['String']>,
+  isArchived: Scalars['Boolean'],
+  steps: Array<TemplateStep>,
+  complementaryQuestions: Array<Question>,
+  proposalCount: Scalars['Int'],
+  callCount: Scalars['Int'],
+};
+
 export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
@@ -753,6 +765,7 @@ export type Query = {
   getPageContent?: Maybe<Scalars['String']>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
+  proposalTemplates?: Maybe<Array<ProposalTemplate>>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
   sep?: Maybe<Sep>,
@@ -832,6 +845,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int']
+};
+
+
+export type QueryProposalTemplatesArgs = {
+  filter?: Maybe<TemplatesFilter>
 };
 
 
@@ -1084,8 +1102,6 @@ export type Template = {
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   isArchived: Scalars['Boolean'],
-  proposalCount: Scalars['Int'],
-  callCount: Scalars['Int'],
   steps: Array<TemplateStep>,
   complementaryQuestions: Array<Question>,
 };
@@ -1109,6 +1125,7 @@ export type TemplateResponseWrap = {
 
 export type TemplatesFilter = {
   isArchived: Scalars['Boolean'],
+  category?: Maybe<TemplateCategoryId>,
 };
 
 export type TemplateStep = {
@@ -2270,7 +2287,7 @@ export type TemplateFragment = (
 
 export type TemplateMetadataFragment = (
   { __typename?: 'Template' }
-  & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+  & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
 );
 
 export type TemplateStepFragment = (
@@ -2299,6 +2316,19 @@ export type GetIsNaturalKeyPresentQuery = (
   & Pick<Query, 'isNaturalKeyPresent'>
 );
 
+export type GetProposalTemplatesQueryVariables = {
+  filter?: Maybe<TemplatesFilter>
+};
+
+
+export type GetProposalTemplatesQuery = (
+  { __typename?: 'Query' }
+  & { proposalTemplates: Maybe<Array<(
+    { __typename?: 'ProposalTemplate' }
+    & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+  )>> }
+);
+
 export type GetTemplateQueryVariables = {
   templateId: Scalars['Int']
 };
@@ -2321,7 +2351,7 @@ export type GetTemplatesQuery = (
   { __typename?: 'Query' }
   & { templates: Maybe<Array<(
     { __typename?: 'Template' }
-    & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
+    & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
   )>> }
 );
 
@@ -2996,8 +3026,6 @@ export const TemplateMetadataFragmentDoc = gql`
   name
   description
   isArchived
-  proposalCount
-  callCount
 }
     `;
 export const TemplateStepFragmentDoc = gql`
@@ -3639,6 +3667,18 @@ export const GetIsNaturalKeyPresentDocument = gql`
   isNaturalKeyPresent(naturalKey: $naturalKey)
 }
     `;
+export const GetProposalTemplatesDocument = gql`
+    query getProposalTemplates($filter: TemplatesFilter) {
+  proposalTemplates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    proposalCount
+    callCount
+  }
+}
+    `;
 export const GetTemplateDocument = gql`
     query getTemplate($templateId: Int!) {
   template(templateId: $templateId) {
@@ -3653,8 +3693,6 @@ export const GetTemplatesDocument = gql`
     name
     description
     isArchived
-    proposalCount
-    callCount
   }
 }
     `;
@@ -4101,6 +4139,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getIsNaturalKeyPresent(variables: GetIsNaturalKeyPresentQueryVariables): Promise<GetIsNaturalKeyPresentQuery> {
       return client.request<GetIsNaturalKeyPresentQuery>(print(GetIsNaturalKeyPresentDocument), variables);
+    },
+    getProposalTemplates(variables?: GetProposalTemplatesQueryVariables): Promise<GetProposalTemplatesQuery> {
+      return client.request<GetProposalTemplatesQuery>(print(GetProposalTemplatesDocument), variables);
     },
     getTemplate(variables: GetTemplateQueryVariables): Promise<GetTemplateQuery> {
       return client.request<GetTemplateQuery>(print(GetTemplateDocument), variables);

@@ -50,10 +50,8 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
   const blankInitTemplate: Template = {
     steps: [],
     templateId: 0,
-    callCount: 0,
     isArchived: false,
     name: 'blank',
-    proposalCount: 0,
     complementaryQuestions: [],
   };
 

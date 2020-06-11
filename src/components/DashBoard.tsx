@@ -35,6 +35,7 @@ import QuestionaryEditor from './template/QuestionaryEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
+import SampleTemplates from './template/SampleTemplates';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -199,7 +200,11 @@ const Dashboard: React.FC = () => {
             component={QuestionaryEditor}
           />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
-          <Route path="/Templates" component={ProposalTemplates} />
+          <Route path="/ProposalTemplates" component={ProposalTemplates} />
+          <Route
+            path="/SampleDeclarationTemplates"
+            component={SampleTemplates}
+          />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}

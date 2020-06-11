@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, Link } from '@material-ui/core';
 import { Column } from 'material-table';
 import React, { useState } from 'react';
-
-import { GetTemplatesQuery, TemplateCategoryId } from '../../generated/sdk';
+import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
 import { CallsTable } from '../call/CallsTable';
@@ -82,7 +81,17 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 }
 
 interface IProposalTemplatesTableProps {
-  dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
+  dataProvider: () => Promise<
+    Pick<
+      ProposalTemplate,
+      | 'templateId'
+      | 'name'
+      | 'description'
+      | 'isArchived'
+      | 'callCount'
+      | 'proposalCount'
+    >[]
+  >;
   confirm: WithConfirmType;
 }
 

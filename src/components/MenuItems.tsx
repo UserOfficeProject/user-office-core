@@ -16,8 +16,6 @@ import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import { TemplateCategoryId } from '../generated/sdk';
 import { useCallsData } from '../hooks/useCallsData';
 
 type MenuItemsProps = {
@@ -95,7 +93,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
-      <TemplateMenuListItem></TemplateMenuListItem>
+      <TemplateMenuListItem />
 
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
@@ -182,21 +180,13 @@ const TemplateMenuListItem = () => {
         unmountOnExit
         style={{ paddingLeft: 10 }}
       >
-        <ListItem
-          component={Link}
-          to={'/Templates/' + TemplateCategoryId.PROPOSAL_QUESTIONARY}
-          button
-        >
+        <ListItem component={Link} to="/ProposalTemplates" button>
           <ListItemIcon>
             <QuestionAnswerIcon />
           </ListItemIcon>
           <ListItemText primary="Proposal" />
         </ListItem>
-        <ListItem
-          component={Link}
-          to={'/Templates/' + TemplateCategoryId.SAMPLE_DECLARATION}
-          button
-        >
+        <ListItem component={Link} to="/SampleDeclarationTemplates" button>
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
