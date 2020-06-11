@@ -12,7 +12,7 @@ export class CreateProposalMutation {
     @Arg('callId', () => Int) callId: number
   ) {
     return wrapResponse(
-      context.mutations.proposal.create(context.user, callId),
+      context.mutations.proposal.create(context.user, { callId }),
       ProposalResponseWrap
     );
   }

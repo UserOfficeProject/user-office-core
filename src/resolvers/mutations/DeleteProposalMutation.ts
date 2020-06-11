@@ -12,7 +12,7 @@ export class DeleteProposalMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposal.delete(context.user, id),
+      context.mutations.proposal.delete(context.user, { proposalId: id }),
       ProposalResponseWrap
     );
   }

@@ -12,7 +12,9 @@ export class DeleteProposalTemplateMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.deleteTemplate(context.user, id),
+      context.mutations.template.deleteTemplate(context.user, {
+        templateId: id,
+      }),
       ProposalTemplateResponseWrap
     );
   }

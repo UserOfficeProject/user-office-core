@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Proposal } from './Proposal';
+import { Review } from './Review';
 import { Role } from './Role';
 
 @ObjectType()
@@ -67,6 +68,20 @@ export class SEPUserResolver {
   ) {
     return sepAssignment.sepMemberUserId
       ? context.queries.user.dataSource.getBasicUserInfo(
+          sepAssignment.sepMemberUserId
+        )
+      : null;
+  }
+
+  @FieldResolver(() => Review)
+  async review(
+    @Root() sepAssignment: SEPAssignment,
+    @Ctx() context: ResolverContext
+  ) {
+    return sepAssignment.sepMemberUserId
+      ? context.queries.review.dataSource.getAssignmentReview(
+          sepAssignment.sepId,
+          sepAssignment.proposalId,
           sepAssignment.sepMemberUserId
         )
       : null;

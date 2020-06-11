@@ -1,5 +1,7 @@
+import { createCallValidationSchema } from '@esss-swap/duo-validation';
+
 import { CallDataSource } from '../datasources/CallDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { Call } from '../models/Call';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -14,6 +16,7 @@ export default class CallMutations {
     private userAuth: UserAuthorization
   ) {}
 
+  @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
