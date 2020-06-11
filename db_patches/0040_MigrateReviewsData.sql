@@ -15,6 +15,34 @@ BEGIN
     SET sep_id = (SELECT sep_id FROM inserted)
     WHERE sep_id IS NULL;
 
+    INSERT INTO "SEP_Proposals"
+    (proposal_id, sep_id)
+    SELECT DISTINCT proposal_id, sep_id FROM "SEP_Reviews";
+
+    DO
+    $$
+    BEGIN
+        IF EXISTS (SELECT user_id FROM users WHERE email='zoe.fisher@esss.se')
+            THEN
+                INSERT INTO role_user
+                (role_id, user_id, sep_id) VALUES
+                (4, (SELECT user_id FROM users WHERE email='zoe.fisher@esss.se'), 1);
+
+                INSERT INTO role_user
+                (role_id, user_id, sep_id) VALUES
+                (5, (SELECT user_id FROM users WHERE email='carina.lobley@esss.se'), 1);
+
+                INSERT INTO role_user
+                (role_id, user_id, sep_id)
+                SELECT DISTINCT 6, user_id, 1 FROM "SEP_Reviews";
+
+                INSERT INTO "SEP_Assignments"
+                (proposal_id, sep_member_user_id, sep_id)
+                SELECT DISTINCT proposal_id, user_id, 1 FROM "SEP_Reviews";
+        END IF;
+    END; 
+    $$
+
     END;
 	END IF;
 END;
