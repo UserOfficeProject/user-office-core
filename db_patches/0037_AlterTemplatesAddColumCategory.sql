@@ -5,7 +5,8 @@ BEGIN
 	BEGIN
 
 
-    INSERT INTO template_categories(name) VALUES('Proposal Questionaries');
+    INSERT INTO template_categories(name) VALUES('Proposal');
+    INSERT INTO template_categories(name) VALUES('Sample declaration');
 
     ALTER TABLE templates 
     ADD COLUMN category_id INT NOT NULL REFERENCES template_categories(template_category_id) DEFAULT 1;
