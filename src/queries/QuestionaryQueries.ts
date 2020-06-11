@@ -3,13 +3,11 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Questionary, QuestionaryStep } from '../models/ProposalModel';
 import { UserWithRole } from '../models/User';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class QuestionaryQueries {
   constructor(
     private dataSource: QuestionaryDataSource,
-    private templateDataSource: TemplateDataSource,
-    private userAuth: UserAuthorization
+    private templateDataSource: TemplateDataSource
   ) {}
 
   @Authorized()

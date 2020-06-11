@@ -8,13 +8,9 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class CallMutations {
-  constructor(
-    private dataSource: CallDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: CallDataSource) {}
 
   @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])

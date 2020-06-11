@@ -58,7 +58,7 @@ const reviewMutations = new ReviewMutations(
 );
 
 const callQueries = new CallQueries(callDataSource);
-const callMutations = new CallMutations(callDataSource, userAuthorization);
+const callMutations = new CallMutations(callDataSource);
 
 const fileQueries = new FileQueries(fileDataSource);
 const fileMutations = new FileMutations(fileDataSource);
@@ -76,8 +76,7 @@ const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,
-  templateDataSource,
-  userAuthorization
+  templateDataSource
 );
 const questionaryMutations = new QuestionaryMutations(
   questionaryDataSource,
