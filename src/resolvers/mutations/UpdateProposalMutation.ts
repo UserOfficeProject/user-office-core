@@ -11,7 +11,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { DataType } from '../../models/ProposalModel';
-import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 

@@ -1,8 +1,13 @@
 import { Page } from '../models/Admin';
+import { Institution } from '../models/Institution';
+import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
-  getInstitution(id: number): Promise<string | null>;
-  getInstitutions(): Promise<Entry[]>;
+  getInstitution(id: number): Promise<Institution | null>;
+  createInstitution(institution: Institution): Promise<Institution | null>;
+  updateInstitution(institution: Institution): Promise<Institution | null>;
+  deleteInstitution(id: number): Promise<Institution>;
+  getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
   getCountries(): Promise<Entry[]>;
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;

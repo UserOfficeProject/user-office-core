@@ -1,9 +1,12 @@
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { Authorized } from '../decorators';
 import { Page } from '../models/Admin';
+import { Institution } from '../models/Institution';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
+import { CreateInstitutionsArgs } from '../resolvers/mutations/CreateInstitutionsMutation';
+import { UpdateInstitutionsArgs } from '../resolvers/mutations/UpdateInstitutionsMutation';
 import { logger } from '../utils/Logger';
 
 export default class AdminMutations {
@@ -43,6 +46,42 @@ export default class AdminMutations {
 
         return rejection('INTERNAL_ERROR');
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateInstitutions(
+    agent: UserWithRole | null,
+    args: UpdateInstitutionsArgs
+  ) {
+    const institution = await this.dataSource.getInstitution(args.id);
+    if (!institution) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    institution.name = args.name ?? institution.name;
+    institution.verified = args.verified ?? institution.verified;
+
+    return await this.dataSource.updateInstitution(institution);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async createInstitutions(
+    agent: UserWithRole | null,
+    args: CreateInstitutionsArgs
+  ) {
+    const institution = new Institution(0, args.name, args.verified);
+
+    return await this.dataSource.createInstitution(institution);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteInstitutions(agent: UserWithRole | null, id: number) {
+    const institution = await this.dataSource.getInstitution(id);
+    if (!institution) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    return await this.dataSource.deleteInstitution(id);
   }
 
   async addClientLog(error: string) {
