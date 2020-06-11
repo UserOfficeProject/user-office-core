@@ -71,7 +71,7 @@ export default class TemplateMutations {
     }: {
       templateId: number;
     }
-  ): Promise<unknown> {
+  ) {
     const result = await this.dataSource
       .cloneTemplate(templateId)
       .then(result => result);

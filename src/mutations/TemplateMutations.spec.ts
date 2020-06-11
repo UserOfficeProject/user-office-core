@@ -8,8 +8,8 @@ import {
   DataType,
   Question,
   Template,
-  Topic,
   TemplateCategoryId,
+  Topic,
 } from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import TemplateMutations from './TemplateMutations';
@@ -254,4 +254,31 @@ test('User can not update question template', async () => {
     question: 'new text',
   });
   expect(isRejection(steps)).toBe(true);
+});
+
+test('User officer can clone template', async () => {
+  const clonedTemplate = await mutations.cloneTemplate(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+    }
+  );
+  expect(clonedTemplate.templateId).toBeGreaterThan(0);
+});
+
+test('User officer can add question to template', async () => {
+  const questionId: string = 'questionId';
+  const sortOrder: number = 0;
+  const templateId: number = 1;
+  const topicId: number = 1;
+
+  const result = await mutations.createQuestionRel(dummyUserOfficerWithRole, {
+    questionId,
+    sortOrder,
+    templateId,
+    topicId,
+  });
+
+  expect(isRejection(result)).toBeFalsy();
+  expect(result).toBeInstanceOf(Template);
 });
