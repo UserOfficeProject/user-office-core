@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, Link } from '@material-ui/core';
 import { Column } from 'material-table';
 import React, { useState } from 'react';
+
 import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';

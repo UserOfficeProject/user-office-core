@@ -7,6 +7,7 @@ import {
   FieldConfig,
   FieldDependency,
   QuestionRel,
+  TemplateCategoryId,
 } from '../generated/sdk';
 import {
   getAllFields,
@@ -18,10 +19,9 @@ import {
 export const create1TopicFieldlessTemplate = (): Template => {
   return {
     templateId: 1,
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     name: 'test',
-    callCount: 0,
     isArchived: false,
-    proposalCount: 0,
     description: 'desription',
     steps: [
       {

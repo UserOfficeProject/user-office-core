@@ -32,10 +32,10 @@ import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import QuestionaryEditor from './template/QuestionaryEditor';
+import SampleTemplates from './template/SampleTemplates';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
-import SampleTemplates from './template/SampleTemplates';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
