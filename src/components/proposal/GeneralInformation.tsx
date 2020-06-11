@@ -31,8 +31,9 @@ export default function GeneralInformation(
                 .getProposal({ id: proposal.id })
                 .then(data => {
                   const { proposal } = data;
-                  setProposal(proposal!);
-                  props.onProposalChanged && props.onProposalChanged(proposal!);
+                  setProposal(proposal as Proposal);
+                  props.onProposalChanged &&
+                    props.onProposalChanged(proposal as Proposal);
                 });
               setIsEditable(!isEditable);
             }}

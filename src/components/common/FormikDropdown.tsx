@@ -43,7 +43,7 @@ interface TProps {
 
 export interface Option {
   text: string;
-  value: string;
+  value: string | number;
 }
 
 export default FormikDropdown;

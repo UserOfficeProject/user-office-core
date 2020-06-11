@@ -1,3 +1,4 @@
+import { proposalTechnicalReviewValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -5,7 +6,6 @@ import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
-import * as Yup from 'yup';
 
 import { TechnicalReviewStatus, TechnicalReview } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
@@ -34,12 +34,7 @@ export default function ProposalTechnicalReview(props: {
       </Typography>
       <Formik
         initialValues={initialValues}
-        validationSchema={Yup.object().shape({
-          status: Yup.string().nullable(),
-          timeAllocation: Yup.number().nullable(),
-          comment: Yup.string().nullable(),
-          publicComment: Yup.string().nullable(),
-        })}
+        validationSchema={proposalTechnicalReviewValidationSchema}
         onSubmit={async (values, actions) => {
           await api()
             .addTechnicalReview({

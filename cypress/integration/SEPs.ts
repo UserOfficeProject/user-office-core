@@ -316,7 +316,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
-      .should('have.length', 7);
+      .should('have.length', 8);
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')

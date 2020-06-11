@@ -6,10 +6,14 @@ import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
+import * as yup from 'yup';
 
 import { useSEPsData } from '../../hooks/useSEPsData';
 import FormikDropdown from '../common/FormikDropdown';
-import { AssignProposalToSEPValidationSchema } from './SEPValidationSchema';
+
+const assignProposalToSEPValidationSchema = yup.object().shape({
+  selectedSEPId: yup.string().required('You must select active SEP'),
+});
 
 const useStyles = makeStyles(theme => ({
   cardHeader: {
@@ -44,7 +48,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
           assignProposalToSEP(+values.selectedSEPId);
           close();
         }}
-        validationSchema={AssignProposalToSEPValidationSchema}
+        validationSchema={assignProposalToSEPValidationSchema}
       >
         {({ isSubmitting }): JSX.Element => (
           <Form>

@@ -1,3 +1,4 @@
+import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -8,7 +9,6 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import { useDataApi } from '../../hooks/useDataApi';
-import { userPasswordFieldSchema } from '../../utils/userFieldValidationSchema';
 
 const useStyles = makeStyles({
   buttons: {
@@ -47,7 +47,7 @@ export default function UpdatePassword(props: { id: number }) {
           sendPasswordUpdate(values.password);
           actions.setSubmitting(false);
         }}
-        validationSchema={userPasswordFieldSchema}
+        validationSchema={userPasswordFieldValidationSchema}
       >
         {({ isSubmitting }) => (
           <Form>

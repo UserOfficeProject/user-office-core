@@ -1,4 +1,4 @@
-import Container from '@material-ui/core/Container';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { useParams } from 'react-router';
 
@@ -9,9 +9,13 @@ import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
 import ProposalGrade from './ProposalGrade';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 
-export default function ProposalReview() {
+type ProposalReviewProps = {
+  reviewId?: number;
+};
+
+const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
   const { id } = useParams();
-  const { reviewData } = useReviewData(parseInt(id!));
+  const { reviewData } = useReviewData(reviewId || +(id as string));
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
@@ -19,17 +23,21 @@ export default function ProposalReview() {
   }
 
   return (
-    <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={['Proposal Information', 'Technical Review', 'Grade']}
-      >
-        <ProposalQuestionaryReview data={proposalData} />
-        <TechnicalReviewInformation data={proposalData.technicalReview} />
-        <ProposalGrade
-          onChange={() => console.log('updated')}
-          reviewID={parseInt(id!)}
-        />
-      </SimpleTabs>
-    </Container>
+    <SimpleTabs
+      tabNames={['Proposal Information', 'Technical Review', 'Grade']}
+    >
+      <ProposalQuestionaryReview data={proposalData} />
+      <TechnicalReviewInformation data={proposalData.technicalReview} />
+      <ProposalGrade
+        onChange={() => console.log('updated')}
+        reviewID={reviewId || +(id as string)}
+      />
+    </SimpleTabs>
   );
-}
+};
+
+ProposalReview.propTypes = {
+  reviewId: PropTypes.number,
+};
+
+export default ProposalReview;

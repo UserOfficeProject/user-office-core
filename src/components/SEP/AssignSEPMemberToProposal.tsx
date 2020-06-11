@@ -27,7 +27,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
   const columns = [
     { title: 'Name', field: 'user.firstname' },
     { title: 'Surname', field: 'user.lastname' },
-    { title: 'Role', render: (rowData: any) => memberRole(rowData) },
+    { title: 'Role', render: (rowData: SepMember) => memberRole(rowData) },
     { title: 'Organisation', field: 'user.organisation' },
   ];
 
@@ -45,7 +45,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     }
 
     return null;
-  });
+  }) as SepMember[];
 
   const AddIcon = (): JSX.Element => <Add />;
 
@@ -53,7 +53,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     <MaterialTable
       icons={tableIcons}
       columns={columns}
-      title={'Sepect reviewers'}
+      title={'Select reviewers'}
       data={members}
       actions={[
         {

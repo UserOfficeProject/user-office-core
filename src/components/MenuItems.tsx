@@ -143,6 +143,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
 
   const SEPRoles = (
     <div data-cy="SEPRoles-menu-items">
+      <ListItem component={Link} to="/" button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="Review Proposals" />
+      </ListItem>
       <ListItem component={Link} to="/SEPPage" button>
         <ListItemIcon>
           <GroupWorkIcon />
@@ -167,7 +173,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
       return reviewer;
     case 'SEP_Chair':
     case 'SEP_Secretary':
-    case 'SEP_Member':
+    case 'SEP_Reviewer':
       return SEPRoles;
     default:
       return null;

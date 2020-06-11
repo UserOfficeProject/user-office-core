@@ -77,17 +77,19 @@ const SEPsTable: React.FC = () => {
             },
           ]}
         />
-        <ButtonContainer>
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={(): void => setShow(true)}
-          >
-            Create SEP
-          </Button>
-        </ButtonContainer>
+        {currentRole === 'user_officer' && (
+          <ButtonContainer>
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              onClick={(): void => setShow(true)}
+            >
+              Create SEP
+            </Button>
+          </ButtonContainer>
+        )}
       </div>
     </>
   );
