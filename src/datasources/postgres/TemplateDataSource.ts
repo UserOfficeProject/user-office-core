@@ -103,6 +103,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('templates')
       .select('*')
       .where({ is_archived: args.filter?.isArchived || false })
+      .where({ category_id: args.filter?.category })
       .then((resultSet: ProposalTemplateRecord[]) => {
         if (!resultSet) {
           return [];

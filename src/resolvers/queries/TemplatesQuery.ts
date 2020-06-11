@@ -10,10 +10,14 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Template } from '../types/Template';
+import { TemplateCategoryId } from '../../models/ProposalModel';
 @InputType()
 class TemplatesFilter {
-  @Field()
+  @Field({ nullable: true })
   public isArchived?: boolean;
+
+  @Field(() => TemplateCategoryId, { nullable: true })
+  public category?: TemplateCategoryId;
 }
 
 @ArgsType()

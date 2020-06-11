@@ -30,26 +30,6 @@ export class Template implements Partial<TemplateOrigin> {
 
 @Resolver(of => Template)
 export class TemplateResolver {
-  @FieldResolver(() => Int)
-  async proposalCount(
-    @Root() template: Template,
-    @Ctx() context: ResolverContext
-  ): Promise<number> {
-    return context.queries.proposal
-      .getAll(context.user, { templateIds: [template.templateId] })
-      .then(result => result?.totalCount || 0);
-  }
-
-  @FieldResolver(() => Int)
-  async callCount(
-    @Root() template: Template,
-    @Ctx() context: ResolverContext
-  ): Promise<number> {
-    return context.queries.call
-      .getAll(context.user, { templateIds: [template.templateId] })
-      .then(result => result?.length || 0);
-  }
-
   @FieldResolver(() => [TemplateStep])
   async steps(
     @Root() template: Template,
