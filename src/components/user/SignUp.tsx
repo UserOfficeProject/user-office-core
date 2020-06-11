@@ -170,11 +170,11 @@ const SignUp: React.FC<SignUpProps> = props => {
   }
 
   if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
-    setInstitutionsList(
-      fieldsContent.institutions.map(institution => {
-        return { text: institution.value, value: institution.id.toString() };
-      })
-    );
+    // setInstitutionsList(
+    //   fieldsContent.institutions.map(institution => {
+    //     return { text: institution.value, value: institution.id.toString() };
+    //   })
+    // );
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
         return { text: nationality.value, value: nationality.id.toString() };

@@ -1,0 +1,9 @@
+mutation updateInstitution($id: Int!, $verified: Boolean!) {
+  updateInstitution(id: $id, verified: $verified) {
+    institution {
+      id
+      verified
+    }
+    error
+  }
+}

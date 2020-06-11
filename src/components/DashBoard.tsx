@@ -19,6 +19,7 @@ import CallPage from './call/CallPage';
 import MenuItems from './MenuItems';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
+import InstitutionPage from './pages/InstitutionPage';
 import OverviewPage from './pages/OverviewPage';
 import PageEditor from './pages/PageEditor';
 import ProposalCreate from './proposal/ProposaCreate';
@@ -157,6 +158,7 @@ const Dashboard: React.FC = () => {
   };
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -193,6 +195,7 @@ const Dashboard: React.FC = () => {
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
+          <Route path="/InstitutionPage" component={InstitutionPage} />
           <Route
             path="/QuestionaryEditor/:templateId"
             component={QuestionaryEditor}

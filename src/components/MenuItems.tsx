@@ -103,6 +103,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
+      <ListItem component={Link} to="/InstitutionPage" button>
+        <ListItemIcon>
+          <SettingsApplications />
+        </ListItemIcon>
+        <ListItemText primary="Edit Institutions" />
+      </ListItem>
       <ListItem component={Link} to="/Questionaries" button>
         <ListItemIcon>
           <QuestionAnswerIcon />
