@@ -16,10 +16,7 @@ import QuestionaryMutations from './QuestionaryMutations';
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const dummyLogger = new MutedLogger();
-const dummyAuth = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
+
 const mutations = new QuestionaryMutations(
   dummyQuestionaryDataSource,
   dummyTemplateDataSource,
@@ -27,8 +24,7 @@ const mutations = new QuestionaryMutations(
 );
 const queries = new QuestionaryQueries(
   dummyQuestionaryDataSource,
-  dummyTemplateDataSource,
-  dummyAuth
+  dummyTemplateDataSource
 );
 
 const getDummyUsersProposal = async () => {

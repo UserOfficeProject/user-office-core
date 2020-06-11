@@ -12,14 +12,7 @@ import {
 import { UserAuthorization } from '../utils/UserAuthorization';
 import CallMutations from './CallMutations';
 
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
-const callMutations = new CallMutations(
-  new CallDataSourceMock(),
-  userAuthorization
-);
+const callMutations = new CallMutations(new CallDataSourceMock());
 
 test('A user can not create a call', () => {
   return expect(

@@ -4,7 +4,13 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { DataType, Question, Template, Topic } from '../models/ProposalModel';
+import {
+  DataType,
+  Question,
+  Template,
+  Topic,
+  TemplateCategoryId,
+} from '../models/ProposalModel';
 import { isRejection } from '../rejection';
 import TemplateMutations from './TemplateMutations';
 
@@ -32,7 +38,9 @@ test('An userofficer can update topic', async () => {
 test('An userofficer can create template', async () => {
   const name = 'The name';
   const description = 'The description';
+  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
   const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
+    categoryId,
     name,
     description,
   });
@@ -43,7 +51,9 @@ test('An userofficer can create template', async () => {
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
+  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
   const template = await mutations.createTemplate(dummyUserWithRole, {
+    categoryId,
     name,
     description,
   });
@@ -117,6 +127,7 @@ test('A user can not update question topic rel', async () => {
 
 test('User can not create question', async () => {
   const response = await mutations.createQuestion(dummyUserWithRole, {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     dataType: DataType.EMBELLISHMENT,
   });
   expect(response).not.toBeInstanceOf(Template);
@@ -124,6 +135,7 @@ test('User can not create question', async () => {
 
 test('User officer can create question', async () => {
   const response = await mutations.createQuestion(dummyUserOfficerWithRole, {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     dataType: DataType.EMBELLISHMENT,
   });
   expect(response).toBeInstanceOf(Question);

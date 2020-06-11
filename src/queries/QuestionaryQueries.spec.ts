@@ -14,14 +14,10 @@ import QuestionaryQueries from './QuestionaryQueries';
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const templateDataSource = new TemplateDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
+
 const questionaryQueries = new QuestionaryQueries(
   dummyQuestionaryDataSource,
-  templateDataSource,
-  userAuthorization
+  templateDataSource
 );
 beforeEach(() => {
   dummyProposalDataSource.init();
