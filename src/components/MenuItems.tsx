@@ -185,13 +185,16 @@ const TemplateMenuListItem = () => {
           <ListItemIcon>
             <QuestionAnswerIcon />
           </ListItemIcon>
-          <ListItemText primary="Proposal" />
+          <ListItemText primary="Proposal" title="Proposal templates" />
         </ListItem>
         <ListItem component={Link} to="/SampleDeclarationTemplates" button>
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
-          <ListItemText primary="Sample declaration" />
+          <ListItemText
+            primary="Sample declaration"
+            title="Sample declaration templates"
+          />
         </ListItem>
       </Collapse>
     </>

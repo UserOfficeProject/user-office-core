@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
-
-import { GetTemplatesQuery } from '../generated/sdk';
+import { GetProposalTemplatesQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useProposalsTemplates() {
+export function useProposalsTemplates(isArchived?: boolean) {
   const api = useDataApi();
   const [templates, setTemplates] = useState<
-    Exclude<GetTemplatesQuery['templates'], null>
+    Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>
   >([]);
   useEffect(() => {
     api()
-      .getTemplates()
+      .getProposalTemplates({ filter: { isArchived } })
       .then(data => {
-        if (data.templates) {
-          setTemplates(data.templates);
+        if (data.proposalTemplates) {
+          setTemplates(data.proposalTemplates);
         }
       });
-  }, [api]);
+  }, [api, isArchived]);
 
   return { templates, setTemplates };
 }

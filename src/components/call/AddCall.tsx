@@ -11,7 +11,6 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { useDataApi } from '../../hooks/useDataApi';
 import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
 import FormikDropdown from '../common/FormikDropdown';
@@ -42,7 +41,7 @@ const AddCall: React.FC<AddCallProps> = props => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const { templates } = useProposalsTemplates();
+  const { templates } = useProposalsTemplates(false);
   const currentDay = new Date();
 
   return (
