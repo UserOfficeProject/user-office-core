@@ -9,8 +9,8 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Template } from '../types/Template';
 import { TemplateCategoryId } from '../../models/ProposalModel';
+import { Template } from '../types/Template';
 @InputType()
 class TemplatesFilter {
   @Field({ nullable: true })

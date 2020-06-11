@@ -1,8 +1,9 @@
 import { Args, Ctx, Query, Resolver } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
+import { TemplateCategoryId } from '../../models/ProposalModel';
 import { ProposalTemplate } from '../types/ProposalTemplate';
 import { TemplatesArgs } from './TemplatesQuery';
-import { TemplateCategoryId } from '../../models/ProposalModel';
 
 @Resolver()
 export class ProposalTemplatesQuery {

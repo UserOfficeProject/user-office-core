@@ -6,8 +6,9 @@ import {
   Root,
   Ctx,
 } from 'type-graphql';
-import { Template } from './Template';
+
 import { ResolverContext } from '../../context';
+import { Template } from './Template';
 
 @ObjectType()
 export class ProposalTemplate extends Template {}
