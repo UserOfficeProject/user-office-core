@@ -7,9 +7,9 @@ import {
   QuestionRel,
   Template,
   TemplateCategory,
+  TemplateCategoryId,
   TemplateStep,
   Topic,
-  TemplateCategoryId,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
@@ -155,11 +155,19 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return dummyProposalTemplate;
   }
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
-    return dummyProposalTemplateFactory({ ...args });
+    dummyProposalTemplate = dummyProposalTemplateFactory({ ...args });
+    return dummyProposalTemplate;
   }
   async deleteTemplate(templateId: number): Promise<Template> {
-    return dummyProposalTemplateFactory({ templateId });
+    if (dummyProposalTemplate.templateId !== templateId) {
+      throw new Error(`Template with ID ${templateId} does not exist`);
+    }
+
+    const copyOfTemplate = dummyProposalTemplateFactory(dummyProposalTemplate);
+    dummyProposalTemplate.templateId = 999; // mocking deleting template with ID
+    return copyOfTemplate;
   }
+
   async getTemplates(args?: TemplatesArgs): Promise<Template[]> {
     return [
       new Template(
@@ -197,11 +205,28 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
 
   async getQuestion(questionId: string): Promise<Question | null> {
-    return dummyQuestionFactory({ proposalQuestionId: questionId });
+    const steps = await this.getTemplateSteps();
+    const allQuestions = steps.reduce((accumulated, current) => {
+      return accumulated.concat(current.fields.map(field => field.question));
+    }, new Array<Question>());
+    const question = allQuestions.find(
+      question => question.proposalQuestionId === questionId
+    );
+    if (!question) {
+      throw new Error('Question does not exist');
+    }
+    return question;
   }
 
   async deleteQuestion(questionId: string): Promise<Question> {
-    return dummyQuestionFactory({ proposalQuestionId: questionId });
+    const question = await this.getQuestion(questionId);
+    console.log(`Deleting question ${questionId} and  is it? ${question}`);
+    if (!question) {
+      throw new Error('Question does not exist');
+    }
+    const copy = dummyQuestionFactory(question);
+    question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
+    return copy;
   }
   async updateQuestion(
     questionId: string,
@@ -213,29 +238,39 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     }
   ): Promise<Question> {
     const steps = await this.getTemplateSteps();
-    steps.forEach(topic => {
-      topic.fields!.forEach(field => {
-        if (field.question.proposalQuestionId === questionId) {
-          Object.assign(field, values);
+    const allQuestions = steps.reduce((accumulated, current) => {
+      return accumulated.concat(current.fields);
+    }, new Array<QuestionRel>());
+    const questionRel = allQuestions.find(
+      curQuestion => curQuestion.question.proposalQuestionId === questionId
+    );
 
-          return field.question;
-        }
-      });
-    });
-
-    throw new Error('Not found');
+    if (questionRel) {
+      const { question } = questionRel;
+      Object.assign(question, values);
+      return question;
+    } else {
+      throw new Error('Not found');
+    }
   }
 
   async updateTopic(
     topicId: number,
     values: { title?: string; isEnabled?: boolean }
   ): Promise<Topic> {
-    return new Topic(
-      topicId,
-      values.title || 'Topic title',
-      3,
-      values.isEnabled !== undefined ? values.isEnabled : true
-    );
+    const steps = await this.getTemplateSteps();
+    const allTopics = steps.reduce((accumulated, current) => {
+      return accumulated.concat(current.topic);
+    }, new Array<Topic>());
+
+    const topic = allTopics.find(topic => topic.id === topicId);
+
+    if (!topic) {
+      throw new Error('Topic not found');
+    }
+    Object.assign(topic, values);
+
+    return topic;
   }
 
   async createTopic(args: CreateTopicArgs): Promise<Template> {

@@ -178,8 +178,10 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   async deleteFiles(proposalId: number, questionId: string): Promise<string[]> {
     return ['file_id_012345'];
   }
-  getBlankQuestionarySteps(template_id: number): Promise<QuestionaryStep[]> {
-    throw new Error('Method not implemented.');
+  async getBlankQuestionarySteps(
+    template_id: number
+  ): Promise<QuestionaryStep[]> {
+    return dummyQuestionarySteps;
   }
   async getQuestionary(questionary_id: number): Promise<Questionary> {
     if (questionary_id === dummyQuestionary.questionaryId) {
