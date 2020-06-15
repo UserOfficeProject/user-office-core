@@ -23,6 +23,7 @@ import { PageName, CreateUserMutationVariables } from '../../generated/sdk';
 import { useUnauthorizedApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
 import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { useInstitutionData } from '../../hooks/useInstitutionData';
 import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
 import orcid from '../../images/orcid.png';
 import { userFieldSchema } from '../../utils/userFieldValidationSchema';
@@ -137,6 +138,7 @@ const SignUp: React.FC<SignUpProps> = props => {
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
+  const { institutionData } = useInstitutionData();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
@@ -167,12 +169,17 @@ const SignUp: React.FC<SignUpProps> = props => {
     return <Redirect to="/" />;
   }
 
-  if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
-    // setInstitutionsList(
-    //   fieldsContent.institutions.map(institution => {
-    //     return { text: institution.value, value: institution.id.toString() };
-    //   })
-    // );
+  if (
+    institutionData &&
+    fieldsContent &&
+    !nationalitiesList.length &&
+    !institutionsList.length
+  ) {
+    setInstitutionsList(
+      institutionData.map(institution => {
+        return { text: institution.name, value: institution.id.toString() };
+      })
+    );
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
         return { text: nationality.value, value: nationality.id.toString() };

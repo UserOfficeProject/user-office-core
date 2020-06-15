@@ -1,69 +1,93 @@
-import { IconButton } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { Done } from '@material-ui/icons';
 import MaterialTable from 'material-table';
-import React, { useState, useEffect } from 'react';
+import { useSnackbar } from 'notistack';
+import React from 'react';
 
-import { Institution } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { useInstitutionData } from '../../hooks/useInstitutionData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
 
 const InstitutionPage: React.FC = () => {
   const api = useDataApi();
-  const [dataList, setData] = useState<Institution[] | undefined | null>([]);
-  const ApproveIcon = (): JSX.Element => <Done />;
+  const { enqueueSnackbar } = useSnackbar();
 
-  useEffect(() => {
-    api()
-      .getInstitutions()
-      .then(data => setData(data.institutions));
-  }, []);
+  const { institutionData, setInstitutionData } = useInstitutionData();
 
-  const verifyInstitution = (id: number) => {
+  const deleteInstitution = (id: number) => {
     api()
-      .updateInstitution({
+      .deleteInstitution({
         id: id,
-        verified: true,
       })
       .then(resp => {
-        if (!resp.updateInstitution.error && dataList) {
-          const i = dataList?.findIndex(inst => inst.id === id);
-          const tmp = [...dataList];
-          tmp[i].verified = true;
-          setData(tmp);
+        if (!resp.deleteInstitution.error && institutionData) {
+          const i = institutionData?.findIndex(inst => inst.id === id);
+          const tmp = [...institutionData];
+          tmp.splice(i, 1);
+          setInstitutionData(tmp);
+        } else {
+          enqueueSnackbar('Failed to delete', {
+            variant: 'error',
+          });
         }
       });
   };
 
-  /**
-   * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
-   * and want to hide based on propoerties like verified
-   */
-  const RowActionButtons = (rowData: Institution) => (
-    <>
-      {!rowData.verified && (
-        <IconButton
-          onClick={() => verifyInstitution((rowData as Institution).id)}
-        >
-          <ApproveIcon />
-        </IconButton>
-      )}
-    </>
-  );
+  const createInstitution = (name: string, verified: boolean) => {
+    api()
+      .createInstitution({
+        name: name,
+        verified: verified,
+      })
+      .then(resp => {
+        if (!resp.createInstitution.error && institutionData) {
+          const tmp = [...institutionData];
+          tmp.push({
+            id: resp.createInstitution.institution?.id || 0,
+            name: name,
+            verified: verified,
+          });
+          setInstitutionData(tmp);
+        } else {
+          enqueueSnackbar('Failed to create', {
+            variant: 'error',
+          });
+        }
+      });
+  };
+
+  const updateInstitution = (id: number, verified: boolean, name: string) => {
+    api()
+      .updateInstitution({
+        id: id,
+        name: name,
+        verified: verified,
+      })
+      .then(resp => {
+        if (!resp.updateInstitution.error && institutionData) {
+          const i = institutionData?.findIndex(inst => inst.id === id);
+          const tmp = [...institutionData];
+          tmp[i].verified = verified;
+          tmp[i].name = name;
+          setInstitutionData(tmp);
+        } else {
+          enqueueSnackbar('Failed to update', {
+            variant: 'error',
+          });
+        }
+      });
+  };
 
   const columns = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      render: RowActionButtons,
-    },
     { title: 'Name', field: 'name' },
-    { title: 'Verified', field: 'verified' },
+    {
+      title: 'Verified',
+      field: 'verified',
+      lookup: { true: 'true', false: 'false' },
+    },
   ];
 
-  if (!dataList) {
+  if (!institutionData) {
     return <p>Loading</p>;
   }
 
@@ -77,10 +101,40 @@ const InstitutionPage: React.FC = () => {
                 icons={tableIcons}
                 title={'Institutions'}
                 columns={columns}
-                data={dataList as Institution[]}
+                data={institutionData}
                 options={{
                   search: true,
                   debounceInterval: 400,
+                }}
+                editable={{
+                  onRowDelete: (oldData: { id: number }) =>
+                    new Promise(resolve => {
+                      deleteInstitution(oldData.id);
+                      resolve();
+                    }),
+                  onRowAdd: (newData: {
+                    verified: boolean | string;
+                    name: string;
+                  }) =>
+                    new Promise(resolve => {
+                      if (!(typeof newData.verified === 'boolean')) {
+                        newData.verified = newData.verified === 'true';
+                      }
+                      createInstitution(newData.name, newData.verified);
+                      resolve();
+                    }),
+                  onRowUpdate: (data: {
+                    id: number;
+                    name: string;
+                    verified: boolean | string;
+                  }) =>
+                    new Promise(resolve => {
+                      if (!(typeof data.verified === 'boolean')) {
+                        data.verified = data.verified === 'true';
+                      }
+                      updateInstitution(data.id, data.verified, data.name);
+                      resolve();
+                    }),
                 }}
               />
             </StyledPaper>

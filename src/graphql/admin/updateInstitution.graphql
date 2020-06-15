@@ -1,5 +1,5 @@
-mutation updateInstitution($id: Int!, $verified: Boolean!) {
-  updateInstitution(id: $id, verified: $verified) {
+mutation updateInstitution($id: Int!, $name: String!, $verified: Boolean!) {
+  updateInstitution(id: $id, name: $name,verified: $verified) {
     institution {
       id
       verified

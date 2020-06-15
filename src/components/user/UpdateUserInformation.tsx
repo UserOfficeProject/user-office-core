@@ -16,6 +16,7 @@ import { UserContext } from '../../context/UserContextProvider';
 import { UpdateUserMutationVariables } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useGetFields } from '../../hooks/useGetFields';
+import { useInstitutionData } from '../../hooks/useInstitutionData';
 import orcid from '../../images/orcid.png';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { userFieldSchema } from '../../utils/userFieldValidationSchema';
@@ -45,14 +46,20 @@ export default function UpdateUserInformation(props: { id: number }) {
   const [userData, setUserData] = useState<any>(null);
   const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
+  const { institutionData } = useInstitutionData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const { enqueueSnackbar } = useSnackbar();
 
-  if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
+  if (
+    fieldsContent &&
+    institutionData &&
+    !nationalitiesList.length &&
+    !institutionsList.length
+  ) {
     setInstitutionsList(
-      fieldsContent.institutions.map(institution => {
-        return { text: institution.value, value: institution.id.toString() };
+      institutionData.map(institution => {
+        return { text: institution.name, value: institution.id.toString() };
       })
     );
     setNationalitiesList(
@@ -136,7 +143,11 @@ export default function UpdateUserInformation(props: { id: number }) {
               values.gender === 'other' ? values.othergender : values.gender,
           };
 
-          sendUserUpdate(newValues);
+          sendUserUpdate({
+            ...newValues,
+            nationality: +newValues.nationality,
+            organisation: +newValues.organisation,
+          });
           actions.setFieldValue('oldEmail', values.email);
           actions.setSubmitting(false);
         }}

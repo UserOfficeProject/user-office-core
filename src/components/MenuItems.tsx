@@ -1,6 +1,7 @@
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToApp from '@material-ui/icons/ExitToApp';
@@ -105,7 +106,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
       </ListItem>
       <ListItem component={Link} to="/InstitutionPage" button>
         <ListItemIcon>
-          <SettingsApplications />
+          <AccountBalanceIcon />
         </ListItemIcon>
         <ListItemText primary="Edit Institutions" />
       </ListItem>
