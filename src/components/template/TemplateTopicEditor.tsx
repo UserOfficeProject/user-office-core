@@ -17,11 +17,11 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { QuestionRel, TemplateStep } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
-import QuestionaryEditorTopicItem, {
-  IQuestionaryEditorTopicData,
-} from './QuestionaryEditorTopicItem';
+import TemplateQuestionEditor, {
+  TemplateTopicEditorData,
+} from './TemplateQuestionEditor';
 
-class QuestionRelItemAdapter implements IQuestionaryEditorTopicData {
+class TemplateTopicEditor implements TemplateTopicEditorData {
   constructor(public source: QuestionRel) {}
 
   get proposalQuestionId() {
@@ -151,13 +151,13 @@ export default function QuestionaryEditorTopic(props: {
       return null;
     } else {
       return data.fields.map((item, index) => (
-        <QuestionaryEditorTopicItem
+        <TemplateQuestionEditor
           index={index}
-          data={new QuestionRelItemAdapter(item)}
+          data={new TemplateTopicEditor(item)}
           onClick={item =>
             dispatch({
               type: EventType.OPEN_QUESTIONREL_EDITOR,
-              payload: (item as QuestionRelItemAdapter).source,
+              payload: (item as TemplateTopicEditor).source,
             })
           }
           key={item.question.proposalQuestionId.toString()}

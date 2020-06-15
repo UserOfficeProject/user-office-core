@@ -1,14 +1,13 @@
 import { useCallback, useState } from 'react';
 
-import { ProposalStatus } from '../generated/sdk';
-import { Answer } from '../models/ProposalModel';
+import { ProposalStatus, Answer } from '../generated/sdk';
 import { getDataTypeSpec } from '../models/ProposalModelFunctions';
 import { useDataApi } from './useDataApi';
 
 const prepareAnswers = (answers?: Answer[]): Answer[] => {
   if (answers) {
     answers = answers.filter(
-      answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
+      answer => getDataTypeSpec(answer.question.dataType).readonly === false // filter out read only fields
     );
     answers = answers.map(answer => {
       return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations

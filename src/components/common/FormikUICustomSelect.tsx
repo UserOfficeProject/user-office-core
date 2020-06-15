@@ -14,6 +14,7 @@ const FormikUICustomSelect = ({
   availableOptions,
   id,
   label,
+  multiple,
   ...props
 }: {
   field: {
@@ -26,6 +27,7 @@ const FormikUICustomSelect = ({
   availableOptions: string[];
   id: string;
   label: string;
+  multiple?: boolean;
 }) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -49,10 +51,10 @@ const FormikUICustomSelect = ({
     <>
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <Select
-        multiple
+        multiple={multiple}
         value={field.value}
         onChange={handleChange}
-        input={<Input id="select-multiple-checkbox" />}
+        input={<Input />}
         renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={MenuProps}
         id={id}

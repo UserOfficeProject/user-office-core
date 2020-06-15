@@ -81,6 +81,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
               margin="normal"
               fullWidth
               data-cy="file_type"
+              multiple={true}
             />
             <Field
               name="config.max_files"

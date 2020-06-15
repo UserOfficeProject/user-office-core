@@ -4,6 +4,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import React from 'react';
 
 import { DataType } from '../../generated/sdk';
@@ -22,6 +23,8 @@ const getTemplateFieldIcon = (dataType: DataType) => {
       return <AttachFileIcon />;
     case DataType.EMBELLISHMENT:
       return <TextFieldsIcon />;
+    case DataType.SUBTEMPLATE:
+      return <QuestionAnswerIcon />;
 
     default:
       return null;

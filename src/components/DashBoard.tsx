@@ -31,7 +31,7 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
-import QuestionaryEditor from './template/QuestionaryEditor';
+import TemplateEditor from './template/TemplateEditor';
 import SampleTemplates from './template/SampleTemplates';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
@@ -197,7 +197,7 @@ const Dashboard: React.FC = () => {
           <Route path="/SEPPage" component={SEPsPage} />
           <Route
             path="/QuestionaryEditor/:templateId"
-            component={QuestionaryEditor}
+            component={TemplateEditor}
           />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/ProposalTemplates" component={ProposalTemplates} />

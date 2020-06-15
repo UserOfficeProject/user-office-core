@@ -1,27 +1,22 @@
-// FIXME: This file should be reviewed once more. It is too messy and lot of things are used before they are defined.
-// Maybe it should be split into multiple files or organized better.
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { LinearProgress, StepButton } from '@material-ui/core';
+import { LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
-import React, {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
-
 import { UserContext } from '../../context/UserContextProvider';
-import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
+import {
+  Answer,
+  AnswerInput,
+  ProposalStatus,
+  Questionary,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { Answer } from '../../models/ProposalModel';
+import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
   Event,
@@ -34,6 +29,7 @@ import { clamp } from '../../utils/Math';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
+import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 export interface Notification {
   variant: 'error' | 'success';
@@ -46,16 +42,19 @@ enum StepType {
   REVIEW,
 }
 
-const prepareAnswers = (answers?: Answer[]): Answer[] => {
+const prepareAnswers = (answers?: Answer[]): AnswerInput[] => {
   if (answers) {
     answers = answers.filter(
-      answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
+      answer => getDataTypeSpec(answer.question.dataType).readonly === false // filter out read only fields
     );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    const preparedAnswers = answers.map(answer => {
+      return {
+        questionId: answer.question.proposalQuestionId,
+        value: JSON.stringify({ value: answer.value }),
+      }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
     });
 
-    return answers;
+    return preparedAnswers;
   } else {
     return [];
   }
@@ -74,7 +73,9 @@ export const ProposalSubmissionContext = createContext<{
   dispatch: React.Dispatch<Event>;
 } | null>(null);
 
-export default function ProposalContainer(props: { data: Proposal }) {
+export default function ProposalContainer(props: {
+  data: ProposalSubsetSumbission;
+}) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -201,7 +202,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
               () =>
                 api()
                   .createProposal({ callId })
-                  // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
                   .then(data => data.createProposal.proposal!),
               'Saved'
             );
@@ -341,8 +341,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
     setProposalSteps(proposalSteps);
   }, [state, isSubmitted, isNonOfficer]);
 
-  // TODO
-  // this effect should be cleaned up as it is hard to read
   // The purpose of this effect is to navigate user to the
   // right step once proposal loads
   useEffect(() => {
@@ -432,46 +430,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
         </StyledPaper>
       </ProposalSubmissionContext.Provider>
     </Container>
-  );
-}
-
-function QuestionaryStepButton(
-  props: PropsWithChildren<{
-    onClick: () => Promise<void>;
-    active?: boolean;
-    completed?: boolean;
-    clickable?: boolean;
-    editable: boolean;
-  }>
-) {
-  const classes = makeStyles(theme => ({
-    active: {
-      '& SVG': {
-        color: theme.palette.secondary.main + '!important',
-      },
-    },
-    editable: {
-      '& SVG': {
-        color: theme.palette.primary.main + '!important',
-      },
-    },
-  }))();
-
-  // NOTE: Without editable because it fires console warning when passed to StepButton component.
-  const { editable, ...propsWithoutEditable } = props;
-
-  const buttonClasses = [];
-
-  if (propsWithoutEditable.active) {
-    buttonClasses.push(classes.active);
-  } else if (editable) {
-    buttonClasses.push(classes.editable);
-  }
-
-  return (
-    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
-      {props.children}
-    </StepButton>
   );
 }
 

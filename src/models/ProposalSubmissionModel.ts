@@ -1,12 +1,7 @@
 import produce from 'immer';
-import { Reducer, Dispatch } from 'react';
-
-import {
-  Proposal,
-  ProposalStatus,
-  Answer,
-  QuestionaryStep,
-} from '../generated/sdk';
+import { Dispatch, Reducer } from 'react';
+import { ProposalSubsetSumbission } from '../models/ProposalModel';
+import { Answer, ProposalStatus, QuestionaryStep } from '../generated/sdk';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
@@ -35,12 +30,12 @@ export interface Event {
 
 export interface ProposalSubmissionModelState {
   isDirty: boolean;
-  proposal: Proposal;
+  proposal: ProposalSubsetSumbission;
 }
 
 // rename this function
 export function ProposalSubmissionModel(
-  initialProposal: Proposal,
+  initialProposal: ProposalSubsetSumbission,
   middlewares?: Array<Function>
 ): {
   state: ProposalSubmissionModelState;

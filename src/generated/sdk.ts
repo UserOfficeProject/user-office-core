@@ -115,7 +115,8 @@ export enum DataType {
   EMBELLISHMENT = 'EMBELLISHMENT',
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
-  TEXT_INPUT = 'TEXT_INPUT'
+  TEXT_INPUT = 'TEXT_INPUT',
+  SUBTEMPLATE = 'SUBTEMPLATE'
 }
 
 export type DateConfig = {
@@ -904,6 +905,7 @@ export type QueryUsersArgs = {
 export type Question = {
    __typename?: 'Question',
   proposalQuestionId: Scalars['String'],
+  categoryId: TemplateCategoryId,
   naturalKey: Scalars['String'],
   dataType: DataType,
   question: Scalars['String'],
@@ -2215,7 +2217,7 @@ export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfig
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
-  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType'>
+  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType' | 'categoryId'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -2914,6 +2916,7 @@ export const QuestionFragmentDoc = gql`
   proposalQuestionId
   naturalKey
   dataType
+  categoryId
   config {
     ...fieldConfig
   }
