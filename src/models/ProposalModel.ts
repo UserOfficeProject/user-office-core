@@ -7,6 +7,7 @@ import {
   FileUploadConfig,
   SelectionFromOptionsConfig,
   TextInputConfig,
+  SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
 import JSDict from '../utils/Dictionary';
 import { EvaluatorOperator } from './ConditionEvaluator';
@@ -245,6 +246,7 @@ f.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
 f.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 f.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 f.put(DataType.TEXT_INPUT, () => new TextInputConfig());
+f.put(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,

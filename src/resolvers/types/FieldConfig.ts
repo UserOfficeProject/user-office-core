@@ -78,5 +78,15 @@ export const FieldConfigType = createUnionType({
     FileUploadConfig,
     SelectionFromOptionsConfig,
     TextInputConfig,
+    SubtemplateConfig,
   ], // function that returns array of object types classes
 });
+
+@ObjectType()
+export class SubtemplateConfig extends ConfigBase {
+  @Field(() => Int, { nullable: true })
+  maxEntries: number | null;
+
+  @Field(() => String)
+  templateId: string;
+}
