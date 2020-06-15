@@ -40,10 +40,10 @@ const InstitutionPage: React.FC = () => {
         verified: verified,
       })
       .then(resp => {
-        if (!resp.createInstitution.error && institutionData) {
+        if (resp.createInstitution.institution && institutionData) {
           const tmp = [...institutionData];
           tmp.push({
-            id: resp.createInstitution.institution?.id || 0,
+            id: resp.createInstitution.institution.id,
             name: name,
             verified: verified,
           });
