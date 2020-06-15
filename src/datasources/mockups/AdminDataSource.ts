@@ -5,10 +5,10 @@ import { AdminDataSource, Entry } from '../AdminDataSource';
 export const dummyInstitution = new Institution(1, 'ESS', true);
 
 export class AdminDataSourceMock implements AdminDataSource {
-  getInstitutionUsers(
+  async getInstitutionUsers(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails[]> {
-    throw new Error('Method not implemented.');
+    return [];
   }
   async getInstitution(
     id: number
