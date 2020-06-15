@@ -2,6 +2,7 @@ import * as fs from 'fs';
 
 import { Page } from '../../models/Admin';
 import { Institution } from '../../models/Institution';
+import { BasicUserDetails } from '../../models/User';
 import { logger } from '../../utils/Logger';
 import { AdminDataSource, Entry } from '../AdminDataSource';
 import { InstitutionsFilter } from './../../resolvers/queries/InstitutionsQuery';
@@ -13,6 +14,7 @@ import {
   NationalityRecord,
   PagetextRecord,
 } from './records';
+import { UserRecord, createBasicUserObject } from './records';
 
 export default class PostgresAdminDataSource implements AdminDataSource {
   async updateInstitution(
@@ -149,6 +151,16 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       .then(
         (int: InstitutionRecord) =>
           new Institution(int.institution_id, int.institution, int.verified)
+      );
+  }
+
+  async getInstitutionUsers(id: number): Promise<BasicUserDetails[]> {
+    return database
+      .select()
+      .from('users')
+      .where('organisation', id)
+      .then((users: UserRecord[]) =>
+        users.map(user => createBasicUserObject(user))
       );
   }
 

@@ -1,5 +1,6 @@
 import { Page } from '../models/Admin';
 import { Institution } from '../models/Institution';
+import { BasicUserDetails } from '../models/User';
 import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export interface AdminDataSource {
@@ -8,6 +9,7 @@ export interface AdminDataSource {
   updateInstitution(institution: Institution): Promise<Institution | null>;
   deleteInstitution(id: number): Promise<Institution>;
   getInstitutions(filter?: InstitutionsFilter): Promise<Institution[]>;
+  getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
   getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;

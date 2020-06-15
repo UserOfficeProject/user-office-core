@@ -84,6 +84,11 @@ export default class AdminMutations {
       return rejection('NOT_ALLOWED');
     }
 
+    const institutionUsers = await this.dataSource.getInstitutionUsers(id);
+    if (institutionUsers.length !== 0) {
+      return rejection('VALUE_CONSTRAINT_REJECTION');
+    }
+
     return await this.dataSource.deleteInstitution(id);
   }
 
