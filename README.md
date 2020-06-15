@@ -34,4 +34,4 @@ This command will create all files and CRUD operations needed for starting new e
 For example: `node .\dev-commands\crudHelper.js c instrument` will initialize all GraphQL mutations and queries for creating, reading, updating and deleting an instrument.<br>
 💡 Keep in mind that you need to go through all the generated files and add the missing parts for specific case.<br>
 
-Happy coding! 👨🏽‍💻
+Happy coding! 👨‍💻
