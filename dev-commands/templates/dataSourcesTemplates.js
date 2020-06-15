@@ -27,11 +27,11 @@ export default class Postgres${name.capitalize()}DataSource implements ${name.ca
       });
   }
 
-  async get(id: number): Promise<${name.capitalize()} | null> {
+  async get(${name}Id: number): Promise<${name.capitalize()} | null> {
     return database
       .select()
       .from('${name}s')
-      .where('${name}_id', id)
+      .where('${name}_id', ${name}Id)
       .first()
       .then((${name}: ${name.capitalize()}Record | null) =>
         ${name} ? this.create${name.capitalize()}Object(${name}) : null
@@ -81,15 +81,15 @@ export default class Postgres${name.capitalize()}DataSource implements ${name.ca
       });
   }
 
-  async delete(id: number): Promise<${name.capitalize()}> {
+  async delete(${name}Id: number): Promise<${name.capitalize()}> {
     return database('${name}s')
-      .where('${name}s.${name}_id', id)
+      .where('${name}s.${name}_id', ${name}Id)
       .del()
       .from('${name}s')
       .returning('*')
       .then((${name}: ${name.capitalize()}Record[]) => {
         if (${name} === undefined || ${name}.length !== 1) {
-          throw new Error(\`Could not delete ${name} with id: \${id} \`);
+          throw new Error(\`Could not delete ${name} with id: \${${name}Id} \`);
         }
 
         return this.create${name.capitalize()}Object(${name}[0]);
@@ -105,13 +105,13 @@ import { Create${name.capitalize()}Args } from '../resolvers/mutations/Create${n
 
 export interface ${name.capitalize()}DataSource {
   create(args: Create${name.capitalize()}Args): Promise<${name.capitalize()}>;
-  get(id: number): Promise<${name.capitalize()} | null>;
+  get(${name}Id: number): Promise<${name.capitalize()} | null>;
   getAll(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; ${name}s: ${name.capitalize()}[] }>;
   update(${name}: ${name.capitalize()}): Promise<${name.capitalize()}>;
-  delete(id: number): Promise<${name.capitalize()}>;
+  delete(${name}Id: number): Promise<${name.capitalize()}>;
 }
 `;
 
@@ -129,7 +129,7 @@ export class ${name.capitalize()}DataSourceMock implements ${name.capitalize()}D
     return dummy${name.capitalize()};
   }
 
-  async get(id: number): Promise<${name.capitalize()} | null> {
+  async get(${name}Id: number): Promise<${name.capitalize()} | null> {
     return dummy${name.capitalize()};
   }
 
@@ -144,7 +144,7 @@ export class ${name.capitalize()}DataSourceMock implements ${name.capitalize()}D
     return dummy${name.capitalize()};
   }
 
-  async delete(id: number): Promise<${name.capitalize()}> {
+  async delete(${name}Id: number): Promise<${name.capitalize()}> {
     return dummy${name.capitalize()};
   }
 }

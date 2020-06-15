@@ -7,8 +7,8 @@ export default class InstrumentQueries {
   constructor(private dataSource: InstrumentDataSource) {}
 
   @Authorized()
-  async get(agent: UserWithRole | null, id: number) {
-    const instrument = await this.dataSource.get(id);
+  async get(agent: UserWithRole | null, instrumentId: number) {
+    const instrument = await this.dataSource.get(instrumentId);
 
     return instrument;
   }

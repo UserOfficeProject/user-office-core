@@ -18,7 +18,11 @@ export default class PostgresInstrumentDataSource
 
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
     return database
-      .insert(args)
+      .insert({
+        name: args.name,
+        short_code: args.shortCode,
+        description: args.description,
+      })
       .into('instruments')
       .returning(['*'])
       .then((instrument: InstrumentRecord[]) => {
@@ -30,11 +34,11 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async get(id: number): Promise<Instrument | null> {
+  async get(instrumentId: number): Promise<Instrument | null> {
     return database
       .select()
       .from('instruments')
-      .where('instrument_id', id)
+      .where('instrument_id', instrumentId)
       .first()
       .then((instrument: InstrumentRecord | null) =>
         instrument ? this.createInstrumentObject(instrument) : null
@@ -71,7 +75,14 @@ export default class PostgresInstrumentDataSource
 
   async update(instrument: Instrument): Promise<Instrument> {
     return database
-      .update(instrument, ['*'])
+      .update(
+        {
+          name: instrument.name,
+          short_code: instrument.shortCode,
+          description: instrument.description,
+        },
+        ['*']
+      )
       .from('instruments')
       .where('instrument_id', instrument.instrumentId)
       .then((records: InstrumentRecord[]) => {
@@ -83,15 +94,17 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async delete(id: number): Promise<Instrument> {
+  async delete(instrumentId: number): Promise<Instrument> {
     return database('instruments')
-      .where('instruments.instrument_id', id)
+      .where('instruments.instrument_id', instrumentId)
       .del()
       .from('instruments')
       .returning('*')
       .then((instrument: InstrumentRecord[]) => {
         if (instrument === undefined || instrument.length !== 1) {
-          throw new Error(`Could not delete instrument with id: ${id} `);
+          throw new Error(
+            `Could not delete instrument with id: ${instrumentId} `
+          );
         }
 
         return this.createInstrumentObject(instrument[0]);

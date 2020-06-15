@@ -4,11 +4,11 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 
 export interface InstrumentDataSource {
   create(args: CreateInstrumentArgs): Promise<Instrument>;
-  get(id: number): Promise<Instrument | null>;
+  get(instrumentId: number): Promise<Instrument | null>;
   getAll(
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
   update(instrument: Instrument): Promise<Instrument>;
-  delete(id: number): Promise<Instrument>;
+  delete(instrumentId: number): Promise<Instrument>;
 }

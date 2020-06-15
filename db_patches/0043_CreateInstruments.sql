@@ -14,7 +14,7 @@ BEGIN
     CREATE TABLE IF NOT EXISTS "call_has_instrument" (
       call_id int REFERENCES call (call_id) ON UPDATE CASCADE,
       instrument_id int REFERENCES instruments (instrument_id) ON UPDATE CASCADE,
-      CONSTRAINT role_user_pkey PRIMARY KEY (call_id, instrument_id)  -- explicit pk
+      CONSTRAINT call_has_instrument_pkey PRIMARY KEY (call_id, instrument_id)  -- explicit pk
     );
 
     END;

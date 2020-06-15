@@ -14,7 +14,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
-  async get(id: number): Promise<Instrument | null> {
+  async get(instrumentId: number): Promise<Instrument | null> {
     return dummyInstrument;
   }
 
@@ -29,7 +29,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
-  async delete(id: number): Promise<Instrument> {
+  async delete(instrumentId: number): Promise<Instrument> {
     return dummyInstrument;
   }
 }
