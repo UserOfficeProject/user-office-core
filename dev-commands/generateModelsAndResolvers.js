@@ -7,7 +7,7 @@ const {
   updateMutationTemplate,
   deleteMutationTemplate,
   queriesTemplate,
-} = require('./modelAndResolversTemplates');
+} = require('./templates/modelAndResolversTemplates');
 
 const generateModelsAndResolvers = name => {
   console.info('Generating models and resolvers...');

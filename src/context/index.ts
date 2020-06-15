@@ -2,6 +2,7 @@ import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
+import InstrumentMutations from '../mutations/InstrumentMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SEPMutations from '../mutations/SEPMutations';
@@ -11,6 +12,7 @@ import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
+import InstrumentQueries from '../queries/InstrumentQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SEPQueries from '../queries/SEPQueries';
@@ -28,6 +30,7 @@ interface ResolverContextQueries {
   template: TemplateQueries;
   eventLogs: EventLogQueries;
   sep: SEPQueries;
+  instrument: InstrumentQueries;
 }
 
 interface ResolverContextMutations {
@@ -39,6 +42,7 @@ interface ResolverContextMutations {
   admin: AdminMutations;
   template: TemplateMutations;
   sep: SEPMutations;
+  instrument: InstrumentMutations;
 }
 
 export interface BasicResolverContext {

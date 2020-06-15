@@ -54,7 +54,7 @@ export default class ${name.capitalize()}Mutations {
       .catch(error => {
         logger.logException('Could not create ${name}', error, {
           agent,
-          shortCode: args.shortCode,
+          ${name}Id: args.${name}Id,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -73,7 +73,7 @@ export default class ${name.capitalize()}Mutations {
       .catch(error => {
         logger.logException('Could not update ${name}', error, {
           agent,
-          shortCode: args.shortCode,
+          ${name}Id: args.${name}Id,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -92,7 +92,7 @@ export default class ${name.capitalize()}Mutations {
       .catch(error => {
         logger.logException('Could not delete ${name}', error, {
           agent,
-          shortCode: args.shortCode,
+          ${name}Id: args.${name}Id,
         });
 
         return rejection('INTERNAL_ERROR');

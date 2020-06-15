@@ -3,7 +3,7 @@ const fs = require('fs');
 const {
   queriesTemplate,
   mutationsTemplate,
-} = require('./queriesAndMutationsTemplates');
+} = require('./templates/queriesAndMutationsTemplates');
 
 const generateQueriesAndMutations = name => {
   console.info('Generating queries and mutations...');

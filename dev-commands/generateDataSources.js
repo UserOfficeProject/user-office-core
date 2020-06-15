@@ -4,7 +4,7 @@ const {
   datasourceTemplate,
   postgresDatasourceTemplate,
   testingDatasourceTemplate,
-} = require('./dataSourcesTemplates');
+} = require('./templates/dataSourcesTemplates');
 
 const generateDataSources = name => {
   console.info('Generating datasources...');

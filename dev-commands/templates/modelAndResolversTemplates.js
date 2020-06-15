@@ -82,11 +82,11 @@ import { wrapResponse } from '../wrapResponse';
 export class Delete${name.capitalize()}Mutation {
   @Mutation(() => ${name.capitalize()}ResponseWrap)
   async delete${name.capitalize()}(
-    @Arg('id', () => Int) id: number,
+    @Arg('${name}Id', () => Int) ${name}Id: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.${name}.delete(context.user, { ${name}Id: id }),
+      context.mutations.${name}.delete(context.user, { ${name}Id }),
       ${name.capitalize()}ResponseWrap
     );
   }
