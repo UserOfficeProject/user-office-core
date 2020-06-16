@@ -213,9 +213,11 @@ const defaultConfigs = JSDict.Create<
   | FileUploadConfig
   | SelectionFromOptionsConfig
   | TextInputConfig
+  | SubtemplateConfig
 >();
 defaultConfigs.put('BooleanConfig', { ...baseDefaultConfig });
 defaultConfigs.put('DateConfig', { ...baseDefaultConfig });
+
 defaultConfigs.put('EmbellishmentConfig', {
   plain: '',
   html: '',
@@ -236,6 +238,10 @@ defaultConfigs.put('TextInputConfig', {
   multiline: false,
   isHtmlQuestion: false,
   placeholder: '',
+  ...baseDefaultConfig,
+});
+defaultConfigs.put('SubtemplateConfig', {
+  templateId: 0,
   ...baseDefaultConfig,
 });
 

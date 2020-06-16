@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import to from 'await-to-js';
-
 import {
   DataType,
   Template,
   TemplateCategory,
+  TemplateCategoryId,
   TemplateStep,
   Topic,
-  TemplateCategoryId,
 } from '../../models/ProposalModel';
 import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
@@ -26,10 +25,10 @@ import {
   createQuestionRelObject,
   createTemplateCategoryObject,
   createTopicObject,
-  QuestionTemplateRelRecord,
   QuestionRecord,
-  TemplateRecord,
+  QuestionTemplateRelRecord,
   TemplateCategoryRecord,
+  TemplateRecord,
   TopicRecord,
 } from './records';
 
@@ -108,7 +107,11 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return database('templates')
       .select('*')
       .where({ is_archived: args.filter?.isArchived || false })
-      .where({ category_id: args.filter?.category })
+      .modify(query => {
+        if (args.filter?.category) {
+          query.where({ category_id: args.filter?.category || undefined });
+        }
+      })
       .then((resultSet: TemplateRecord[]) => {
         if (!resultSet) {
           return [];

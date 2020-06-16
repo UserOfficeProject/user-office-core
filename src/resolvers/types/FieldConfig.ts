@@ -69,6 +69,15 @@ export class TextInputConfig extends ConfigBase {
   isHtmlQuestion: boolean;
 }
 
+@ObjectType()
+export class SubtemplateConfig extends ConfigBase {
+  @Field(() => Int, { nullable: true })
+  maxEntries: number | null;
+
+  @Field(() => Int)
+  templateId: number;
+}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -81,12 +90,3 @@ export const FieldConfigType = createUnionType({
     SubtemplateConfig,
   ], // function that returns array of object types classes
 });
-
-@ObjectType()
-export class SubtemplateConfig extends ConfigBase {
-  @Field(() => Int, { nullable: true })
-  maxEntries: number | null;
-
-  @Field(() => String)
-  templateId: string;
-}
