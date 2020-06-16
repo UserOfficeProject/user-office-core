@@ -2,6 +2,7 @@ import { Collapse } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -93,6 +94,18 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
           <SettingsApplications />
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
+      </ListItem>
+      <ListItem component={Link} to="/InstitutionPage" button>
+        <ListItemIcon>
+          <AccountBalanceIcon />
+        </ListItemIcon>
+        <ListItemText primary="Edit Institutions" />
+      </ListItem>
+      <ListItem component={Link} to="/Questionaries" button>
+        <ListItemIcon>
+          <QuestionAnswerIcon />
+        </ListItemIcon>
+        <ListItemText primary="Questionaries" />
       </ListItem>
       <TemplateMenuListItem />
 
