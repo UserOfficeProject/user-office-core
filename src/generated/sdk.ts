@@ -2333,7 +2333,7 @@ export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfig
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
-  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType'>
+  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType' | 'categoryId'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -3032,6 +3032,7 @@ export const QuestionFragmentDoc = gql`
   proposalQuestionId
   naturalKey
   dataType
+  categoryId
   config {
     ...fieldConfig
   }

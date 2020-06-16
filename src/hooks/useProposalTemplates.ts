@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { GetProposalTemplatesQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 

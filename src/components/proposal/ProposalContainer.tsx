@@ -21,7 +21,7 @@ import { Prompt } from 'react-router';
 import { UserContext } from '../../context/UserContextProvider';
 import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { Answer } from '../../models/ProposalModel';
+import { Answer, ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
   Event,
@@ -74,7 +74,9 @@ export const ProposalSubmissionContext = createContext<{
   dispatch: React.Dispatch<Event>;
 } | null>(null);
 
-export default function ProposalContainer(props: { data: Proposal }) {
+export default function ProposalContainer(props: {
+  data: ProposalSubsetSumbission;
+}) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
