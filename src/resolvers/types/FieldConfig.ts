@@ -76,6 +76,9 @@ export class SubtemplateConfig extends ConfigBase {
 
   @Field(() => Int)
   templateId: number;
+
+  @Field(() => String)
+  addEntryButtonLabel: string;
 }
 
 export const FieldConfigType = createUnionType({

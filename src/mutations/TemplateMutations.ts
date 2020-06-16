@@ -43,6 +43,7 @@ import {
   FieldConfigType,
   FileUploadConfig,
   SelectionFromOptionsConfig,
+  SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
 
@@ -351,6 +352,10 @@ export default class TemplateMutations {
         return createConfig<SelectionFromOptionsConfig>(
           new SelectionFromOptionsConfig()
         );
+      case DataType.SUBTEMPLATE:
+        return createConfig<SubtemplateConfig>(new SubtemplateConfig(), {
+          addEntryButtonLabel: 'Add',
+        });
       default:
         return new ConfigBase();
     }
