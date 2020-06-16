@@ -115,7 +115,8 @@ export enum DataType {
   EMBELLISHMENT = 'EMBELLISHMENT',
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
-  TEXT_INPUT = 'TEXT_INPUT'
+  TEXT_INPUT = 'TEXT_INPUT',
+  SUBTEMPLATE = 'SUBTEMPLATE'
 }
 
 export type DateConfig = {
@@ -244,6 +245,7 @@ export type Mutation = {
   updateInstitution: InstitutionResponseWrap,
   createCall: CallResponseWrap,
   administrationProposal: ProposalResponseWrap,
+  updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
@@ -276,6 +278,7 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap,
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
+  createProposalTemplate: ProposalTemplateResponseWrap,
   deleteInstitution: InstitutionResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteQuestion: QuestionResponseWrap,
@@ -337,6 +340,10 @@ export type MutationAdministrationProposalArgs = {
 };
 
 
+export type MutationUpdateProposalFilesArgs = {
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
+  files: Array<Scalars['String']>
 export type MutationUpdateProposalArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
@@ -584,6 +591,12 @@ export type MutationCloneTemplateArgs = {
 
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int']
+};
+
+
+export type MutationCreateProposalTemplateArgs = {
+  description?: Maybe<Scalars['String']>,
+  name: Scalars['String']
 };
 
 
@@ -2333,7 +2346,7 @@ export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfig
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
-  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType'>
+  & Pick<Question, 'question' | 'proposalQuestionId' | 'naturalKey' | 'dataType' | 'categoryId'>
   & { config: (
     { __typename?: 'BooleanConfig' }
     & FieldConfigBooleanConfigFragment
@@ -3032,6 +3045,7 @@ export const QuestionFragmentDoc = gql`
   proposalQuestionId
   naturalKey
   dataType
+  categoryId
   config {
     ...fieldConfig
   }

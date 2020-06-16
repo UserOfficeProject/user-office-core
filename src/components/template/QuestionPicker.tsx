@@ -17,11 +17,11 @@ import { Droppable } from 'react-beautiful-dnd';
 import { DataType, Question, Template, Topic } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
-import QuestionaryEditorTopicItem, {
-  IQuestionaryEditorTopicData,
-} from './QuestionaryEditorTopicItem';
+import TemplateQuestionEditor, {
+  TemplateTopicEditorData,
+} from './TemplateQuestionEditor';
 
-class QuestionItemAdapter implements IQuestionaryEditorTopicData {
+class QuestionItemAdapter implements TemplateTopicEditorData {
   constructor(public source: Question) {}
 
   get proposalQuestionId() {
@@ -82,7 +82,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 
   const getItems = () => {
     return template.complementaryQuestions.map((question, index) => (
-      <QuestionaryEditorTopicItem
+      <TemplateQuestionEditor
         index={index}
         data={new QuestionItemAdapter(question)}
         onClick={item => {
@@ -201,6 +201,16 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
               {getTemplateFieldIcon(DataType.BOOLEAN)!}
             </ListItemIcon>
             <Typography variant="inherit">Add Boolean</Typography>
+          </MenuItem>
+
+          <MenuItem
+            className={classes.addQuestionMenuItem}
+            onClick={() => onCreateNewQuestionClicked(DataType.SUBTEMPLATE)}
+          >
+            <ListItemIcon>
+              {getTemplateFieldIcon(DataType.SUBTEMPLATE)!}
+            </ListItemIcon>
+            <Typography variant="inherit">Add Subtemplate</Typography>
           </MenuItem>
 
           <Divider />

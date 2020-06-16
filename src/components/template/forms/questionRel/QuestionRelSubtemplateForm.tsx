@@ -11,20 +11,21 @@ import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
 import { QuestionRelFormShell } from './QuestionRelFormShell';
 
-export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
+export const QuestionRelSubtemplateForm: TFormSignature<QuestionRel> = props => {
   return (
     <QuestionRelFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="File upload"
+      label="Sub template"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
-            file_type: Yup.array(),
-            small_label: Yup.string(),
-            max_files: Yup.number(),
+            subtemplateId: Yup.array(),
+            title: Yup.array(),
+            addEntryButtonLabel: Yup.array(),
+            maxEntries: Yup.number(),
           }),
         }),
       })}
@@ -34,22 +35,9 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
             <Field
-              name="config.small_label"
-              label="Helper text"
-              placeholder="(e.g. only PDF accepted)"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="small_label"
-            />
-          </TitledContainer>
-
-          <TitledContainer label="Constraints">
-            <Field
-              name="config.file_type"
+              name="config.subtemplateId"
               label="Accepted file types (leave empty for any)"
-              id="fileType"
+              id="subtemplateId"
               component={FormikUICustomSelect}
               availableOptions={[
                 '.pdf',
@@ -61,17 +49,41 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
               ]}
               margin="normal"
               fullWidth
-              data-cy="file_type"
-              multiple={true}
+              data-cy="subtemplateId"
             />
+
             <Field
-              name="config.max_files"
-              label="Max number of files"
+              name="config.title"
+              label="Title"
+              placeholder="The title"
               type="text"
               component={TextField}
               margin="normal"
               fullWidth
-              data-cy="max_files"
+              data-cy="title"
+            />
+
+            <Field
+              name="config.addEntryButtonLabel"
+              label="Add button label"
+              placeholder='(e.g. "add new")'
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="addEntryButtonLabel"
+            />
+          </TitledContainer>
+
+          <TitledContainer label="Constraints">
+            <Field
+              name="config.maxEntries"
+              label="Max entries"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="maxEntries"
             />
           </TitledContainer>
 

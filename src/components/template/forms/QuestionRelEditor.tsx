@@ -11,6 +11,7 @@ import { QuestionRelFileUploadForm } from './questionRel/QuestionRelFileUploadFo
 import { QuestionRelMultipleChoiceForm } from './questionRel/QuestionRelMultipleChoiceForm';
 import { QuestionRelTextInputForm } from './questionRel/QuestionRelTextInputForm';
 import { TFormSignature } from './TFormSignature';
+import { QuestionRelSubtemplateForm } from './questionRel/QuestionRelSubtemplateForm';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;
@@ -28,6 +29,7 @@ export default function QuestionRelEditor(props: {
     QuestionRelMultipleChoiceForm
   );
   componentMap.put(DataType.TEXT_INPUT, QuestionRelTextInputForm);
+  componentMap.put(DataType.SUBTEMPLATE, QuestionRelSubtemplateForm);
 
   if (props.field === null) {
     return null;
