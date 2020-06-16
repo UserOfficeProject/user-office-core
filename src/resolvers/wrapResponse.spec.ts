@@ -1,6 +1,6 @@
-import { wrapResponse } from './wrapResponse';
-import { SuccessResponseWrap } from './types/CommonWrappers';
 import { rejection } from '../rejection';
+import { SuccessResponseWrap } from './types/CommonWrappers';
+import { wrapResponse } from './wrapResponse';
 
 test('Should wrap the success result', async () => {
   const result = (await wrapResponse<boolean>(
@@ -9,6 +9,7 @@ test('Should wrap the success result', async () => {
     }),
     SuccessResponseWrap
   )) as SuccessResponseWrap;
+
   return expect(result.isSuccess).toEqual(true);
 });
 
@@ -20,5 +21,6 @@ test('Should wrap the fail result', async () => {
     }),
     SuccessResponseWrap
   )) as SuccessResponseWrap;
+
   return expect(result.error).toEqual(ERROR_REASON);
 });
