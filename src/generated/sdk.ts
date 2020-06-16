@@ -244,7 +244,6 @@ export type Mutation = {
   updateInstitution: InstitutionResponseWrap,
   createCall: CallResponseWrap,
   administrationProposal: ProposalResponseWrap,
-  updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
@@ -277,7 +276,6 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap,
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
-  createProposalTemplate: ProposalTemplateResponseWrap,
   deleteInstitution: InstitutionResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteQuestion: QuestionResponseWrap,
@@ -339,10 +337,6 @@ export type MutationAdministrationProposalArgs = {
 };
 
 
-export type MutationUpdateProposalFilesArgs = {
-  proposalId: Scalars['Int'],
-  questionId: Scalars['String'],
-  files: Array<Scalars['String']>
 export type MutationUpdateProposalArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
@@ -590,12 +584,6 @@ export type MutationCloneTemplateArgs = {
 
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int']
-};
-
-
-export type MutationCreateProposalTemplateArgs = {
-  description?: Maybe<Scalars['String']>,
-  name: Scalars['String']
 };
 
 
@@ -966,6 +954,7 @@ export type QueryUsersArgs = {
 export type Question = {
    __typename?: 'Question',
   proposalQuestionId: Scalars['String'],
+  categoryId: TemplateCategoryId,
   naturalKey: Scalars['String'],
   dataType: DataType,
   question: Scalars['String'],
