@@ -5,6 +5,7 @@ import { Page } from './Admin';
 import { Answer } from './Answer';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Institution } from './Institution';
 import { Proposal } from './Proposal';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
@@ -132,6 +133,13 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
+}
+
+@ObjectType()
+export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Institution, { nullable: true })
+  public institution: Institution;
 }
 
 @ObjectType()

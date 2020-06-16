@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { DataType } from '../../models/ProposalModel';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
