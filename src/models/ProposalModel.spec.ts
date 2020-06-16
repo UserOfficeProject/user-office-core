@@ -63,6 +63,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: '',
               proposalQuestionId: 'ttl_general',
               naturalKey: 'ttl_general',
@@ -89,6 +90,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: 'Has links with industry',
               proposalQuestionId: 'has_links_with_industry',
               naturalKey: 'has_links_with_industry',
@@ -117,6 +119,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: 'If yes, please describe:',
               proposalQuestionId: 'links_with_industry',
               naturalKey: 'links_with_industry',
@@ -170,6 +173,7 @@ export const createDummyField = (values: {
   },
   sortOrder: values.sortOrder || Math.round(Math.random() * 100),
   question: values.question || {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     question: 'Some random question',
     proposalQuestionId:
       values.proposalQuestionId || 'random_field_name_' + Math.random(),
