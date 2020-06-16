@@ -194,7 +194,6 @@ export type Fields = {
    __typename?: 'Fields',
   nationalities: Array<Entry>,
   countries: Array<Entry>,
-  institutions: Array<Entry>,
 };
 
 export type FileMetadata = {
@@ -215,11 +214,38 @@ export type FileUploadConfig = {
   max_files: Scalars['Int'],
 };
 
+export type Institution = {
+   __typename?: 'Institution',
+  id: Scalars['Int'],
+  name: Scalars['String'],
+  verified: Scalars['Boolean'],
+};
+
+export type InstitutionResponseWrap = {
+   __typename?: 'InstitutionResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  institution?: Maybe<Institution>,
+};
+
+export type Institutions = {
+   __typename?: 'Institutions',
+  id: Scalars['Int'],
+  value: Scalars['String'],
+  verified: Scalars['Boolean'],
+};
+
+export type InstitutionsFilter = {
+  isVerified?: Maybe<Scalars['Boolean']>,
+};
+
 
 export type Mutation = {
    __typename?: 'Mutation',
+  createInstitution: InstitutionResponseWrap,
+  updateInstitution: InstitutionResponseWrap,
   createCall: CallResponseWrap,
   administrationProposal: ProposalResponseWrap,
+  updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
@@ -252,6 +278,8 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap,
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
+  createProposalTemplate: ProposalTemplateResponseWrap,
+  deleteInstitution: InstitutionResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteQuestion: QuestionResponseWrap,
   deleteTemplate: TemplateResponseWrap,
@@ -272,6 +300,19 @@ export type Mutation = {
   updatePassword: BasicUserDetailsResponseWrap,
   updateQuestionsTopicRels: UpdateQuestionsTopicRelsResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
+};
+
+
+export type MutationCreateInstitutionArgs = {
+  name: Scalars['String'],
+  verified: Scalars['Boolean']
+};
+
+
+export type MutationUpdateInstitutionArgs = {
+  id: Scalars['Int'],
+  name?: Maybe<Scalars['String']>,
+  verified?: Maybe<Scalars['Boolean']>
 };
 
 
@@ -299,6 +340,10 @@ export type MutationAdministrationProposalArgs = {
 };
 
 
+export type MutationUpdateProposalFilesArgs = {
+  proposalId: Scalars['Int'],
+  questionId: Scalars['String'],
+  files: Array<Scalars['String']>
 export type MutationUpdateProposalArgs = {
   id: Scalars['Int'],
   title?: Maybe<Scalars['String']>,
@@ -549,6 +594,17 @@ export type MutationCreateProposalArgs = {
 };
 
 
+export type MutationCreateProposalTemplateArgs = {
+  description?: Maybe<Scalars['String']>,
+  name: Scalars['String']
+};
+
+
+export type MutationDeleteInstitutionArgs = {
+  id: Scalars['Int']
+};
+
+
 export type MutationDeleteProposalArgs = {
   id: Scalars['Int']
 };
@@ -766,6 +822,7 @@ export type Query = {
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
   getPageContent?: Maybe<Scalars['String']>,
+  institutions?: Maybe<Array<Institution>>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
@@ -838,6 +895,11 @@ export type QueryGetOrcIdInformationArgs = {
 
 export type QueryGetPageContentArgs = {
   id: PageName
+};
+
+
+export type QueryInstitutionsArgs = {
+  filter?: Maybe<InstitutionsFilter>
 };
 
 
@@ -1517,6 +1579,54 @@ export type AddClientLogMutation = (
   ) }
 );
 
+export type CreateInstitutionMutationVariables = {
+  name: Scalars['String'],
+  verified: Scalars['Boolean']
+};
+
+
+export type CreateInstitutionMutation = (
+  { __typename?: 'Mutation' }
+  & { createInstitution: (
+    { __typename?: 'InstitutionResponseWrap' }
+    & Pick<InstitutionResponseWrap, 'error'>
+    & { institution: Maybe<(
+      { __typename?: 'Institution' }
+      & Pick<Institution, 'id' | 'verified'>
+    )> }
+  ) }
+);
+
+export type DeleteInstitutionMutationVariables = {
+  id: Scalars['Int']
+};
+
+
+export type DeleteInstitutionMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteInstitution: (
+    { __typename?: 'InstitutionResponseWrap' }
+    & Pick<InstitutionResponseWrap, 'error'>
+    & { institution: Maybe<(
+      { __typename?: 'Institution' }
+      & Pick<Institution, 'id' | 'verified'>
+    )> }
+  ) }
+);
+
+export type GetInstitutionsQueryVariables = {
+  filter?: Maybe<InstitutionsFilter>
+};
+
+
+export type GetInstitutionsQuery = (
+  { __typename?: 'Query' }
+  & { institutions: Maybe<Array<(
+    { __typename?: 'Institution' }
+    & Pick<Institution, 'id' | 'name' | 'verified'>
+  )>> }
+);
+
 export type GetPageContentQueryVariables = {
   id: PageName
 };
@@ -1541,6 +1651,25 @@ export type SetPageContentMutation = (
     & { page: Maybe<(
       { __typename?: 'Page' }
       & Pick<Page, 'id' | 'content'>
+    )> }
+  ) }
+);
+
+export type UpdateInstitutionMutationVariables = {
+  id: Scalars['Int'],
+  name: Scalars['String'],
+  verified: Scalars['Boolean']
+};
+
+
+export type UpdateInstitutionMutation = (
+  { __typename?: 'Mutation' }
+  & { updateInstitution: (
+    { __typename?: 'InstitutionResponseWrap' }
+    & Pick<InstitutionResponseWrap, 'error'>
+    & { institution: Maybe<(
+      { __typename?: 'Institution' }
+      & Pick<Institution, 'id' | 'verified'>
     )> }
   ) }
 );
@@ -2563,14 +2692,14 @@ export type GetFieldsQuery = (
   { __typename?: 'Query' }
   & { getFields: Maybe<(
     { __typename?: 'Fields' }
-    & { institutions: Array<(
-      { __typename?: 'Entry' }
-      & Pick<Entry, 'id' | 'value'>
-    )>, nationalities: Array<(
+    & { nationalities: Array<(
       { __typename?: 'Entry' }
       & Pick<Entry, 'id' | 'value'>
     )> }
-  )> }
+  )>, institutions: Maybe<Array<(
+    { __typename?: 'Institution' }
+    & Pick<Institution, 'id' | 'name'>
+  )>> }
 );
 
 export type GetMyRolesQueryVariables = {};
@@ -3261,6 +3390,37 @@ export const AddClientLogDocument = gql`
   }
 }
     `;
+export const CreateInstitutionDocument = gql`
+    mutation createInstitution($name: String!, $verified: Boolean!) {
+  createInstitution(name: $name, verified: $verified) {
+    institution {
+      id
+      verified
+    }
+    error
+  }
+}
+    `;
+export const DeleteInstitutionDocument = gql`
+    mutation deleteInstitution($id: Int!) {
+  deleteInstitution(id: $id) {
+    institution {
+      id
+      verified
+    }
+    error
+  }
+}
+    `;
+export const GetInstitutionsDocument = gql`
+    query getInstitutions($filter: InstitutionsFilter) {
+  institutions(filter: $filter) {
+    id
+    name
+    verified
+  }
+}
+    `;
 export const GetPageContentDocument = gql`
     query getPageContent($id: PageName!) {
   getPageContent(id: $id)
@@ -3272,6 +3432,17 @@ export const SetPageContentDocument = gql`
     page {
       id
       content
+    }
+    error
+  }
+}
+    `;
+export const UpdateInstitutionDocument = gql`
+    mutation updateInstitution($id: Int!, $name: String!, $verified: Boolean!) {
+  updateInstitution(id: $id, name: $name, verified: $verified) {
+    institution {
+      id
+      verified
     }
     error
   }
@@ -3796,14 +3967,14 @@ export const GetBasicUserDetailsDocument = gql`
 export const GetFieldsDocument = gql`
     query getFields {
   getFields {
-    institutions {
-      id
-      value
-    }
     nationalities {
       id
       value
     }
+  }
+  institutions {
+    id
+    name
   }
 }
     `;
@@ -4052,11 +4223,23 @@ export function getSdk(client: GraphQLClient) {
     addClientLog(variables: AddClientLogMutationVariables): Promise<AddClientLogMutation> {
       return client.request<AddClientLogMutation>(print(AddClientLogDocument), variables);
     },
+    createInstitution(variables: CreateInstitutionMutationVariables): Promise<CreateInstitutionMutation> {
+      return client.request<CreateInstitutionMutation>(print(CreateInstitutionDocument), variables);
+    },
+    deleteInstitution(variables: DeleteInstitutionMutationVariables): Promise<DeleteInstitutionMutation> {
+      return client.request<DeleteInstitutionMutation>(print(DeleteInstitutionDocument), variables);
+    },
+    getInstitutions(variables?: GetInstitutionsQueryVariables): Promise<GetInstitutionsQuery> {
+      return client.request<GetInstitutionsQuery>(print(GetInstitutionsDocument), variables);
+    },
     getPageContent(variables: GetPageContentQueryVariables): Promise<GetPageContentQuery> {
       return client.request<GetPageContentQuery>(print(GetPageContentDocument), variables);
     },
     setPageContent(variables: SetPageContentMutationVariables): Promise<SetPageContentMutation> {
       return client.request<SetPageContentMutation>(print(SetPageContentDocument), variables);
+    },
+    updateInstitution(variables: UpdateInstitutionMutationVariables): Promise<UpdateInstitutionMutation> {
+      return client.request<UpdateInstitutionMutation>(print(UpdateInstitutionDocument), variables);
     },
     createCall(variables: CreateCallMutationVariables): Promise<CreateCallMutation> {
       return client.request<CreateCallMutation>(print(CreateCallDocument), variables);
