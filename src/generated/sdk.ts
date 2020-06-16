@@ -203,12 +203,33 @@ export type FileUploadConfig = {
   max_files: Scalars['Int'],
 };
 
+export type Instrument = {
+   __typename?: 'Instrument',
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String'],
+};
+
+export type InstrumentResponseWrap = {
+   __typename?: 'InstrumentResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  instrument?: Maybe<Instrument>,
+};
+
+export type InstrumentsQueryResult = {
+   __typename?: 'InstrumentsQueryResult',
+  totalCount: Scalars['Int'],
+  instruments: Array<Instrument>,
+};
+
 
 export type Mutation = {
    __typename?: 'Mutation',
   createCall: CallResponseWrap,
+  createInstrument: InstrumentResponseWrap,
+  updateInstrument: InstrumentResponseWrap,
   administrationProposal: ProposalResponseWrap,
-  notifyProposal: ProposalResponseWrap,
   updateProposalFiles: UpdateProposalFilesResponseWrap,
   updateProposal: ProposalResponseWrap,
   addReview: ReviewResponseWrap,
@@ -240,6 +261,7 @@ export type Mutation = {
   cloneProposalTemplate: ProposalTemplateResponseWrap,
   createProposal: ProposalResponseWrap,
   createProposalTemplate: ProposalTemplateResponseWrap,
+  deleteInstrument: InstrumentResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteProposalTemplate: ProposalTemplateResponseWrap,
   deleteQuestion: QuestionResponseWrap,
@@ -248,6 +270,7 @@ export type Mutation = {
   emailVerification: EmailVerificationResponseWrap,
   getTokenForUser: TokenResponseWrap,
   login: TokenResponseWrap,
+  notifyProposal: ProposalResponseWrap,
   prepareDB: PrepareDbResponseWrap,
   removeUserForReview: ReviewResponseWrap,
   resetPasswordEmail: ResetPasswordEmailResponseWrap,
@@ -276,6 +299,21 @@ export type MutationCreateCallArgs = {
 };
 
 
+export type MutationCreateInstrumentArgs = {
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type MutationUpdateInstrumentArgs = {
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
 export type MutationAdministrationProposalArgs = {
   id: Scalars['Int'],
   commentForUser?: Maybe<Scalars['String']>,
@@ -283,11 +321,6 @@ export type MutationAdministrationProposalArgs = {
   finalStatus?: Maybe<ProposalEndStatus>,
   status?: Maybe<ProposalStatus>,
   rankOrder?: Maybe<Scalars['Int']>
-};
-
-
-export type MutationNotifyProposalArgs = {
-  id: Scalars['Int']
 };
 
 
@@ -535,6 +568,11 @@ export type MutationCreateProposalTemplateArgs = {
 };
 
 
+export type MutationDeleteInstrumentArgs = {
+  instrumentId: Scalars['Int']
+};
+
+
 export type MutationDeleteProposalArgs = {
   id: Scalars['Int']
 };
@@ -573,6 +611,11 @@ export type MutationGetTokenForUserArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'],
   password: Scalars['String']
+};
+
+
+export type MutationNotifyProposalArgs = {
+  id: Scalars['Int']
 };
 
 
@@ -762,6 +805,8 @@ export type Query = {
   getFields?: Maybe<Fields>,
   getOrcIDInformation?: Maybe<OrcIdInformation>,
   getPageContent?: Maybe<Scalars['String']>,
+  instrument?: Maybe<Instrument>,
+  instruments?: Maybe<InstrumentsQueryResult>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposalTemplate?: Maybe<ProposalTemplate>,
@@ -832,6 +877,11 @@ export type QueryGetOrcIdInformationArgs = {
 
 export type QueryGetPageContentArgs = {
   id: PageName
+};
+
+
+export type QueryInstrumentArgs = {
+  instrumentId: Scalars['Int']
 };
 
 
@@ -1268,7 +1318,7 @@ export type CreateSepMutation = (
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
       { __typename?: 'SEP' }
-      & Pick<Sep, 'id'>
+      & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
     )> }
   ) }
 );
@@ -1540,6 +1590,73 @@ export type GetEventLogsQuery = (
       & Pick<User, 'id' | 'firstname' | 'lastname' | 'email'>
     ) }
   )>> }
+);
+
+export type CreateInstrumentMutationVariables = {
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type CreateInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { createInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+    & { instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  ) }
+);
+
+export type DeleteInstrumentMutationVariables = {
+  instrumentId: Scalars['Int']
+};
+
+
+export type DeleteInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+  ) }
+);
+
+export type GetInstrumentsQueryVariables = {};
+
+
+export type GetInstrumentsQuery = (
+  { __typename?: 'Query' }
+  & { instruments: Maybe<(
+    { __typename?: 'InstrumentsQueryResult' }
+    & Pick<InstrumentsQueryResult, 'totalCount'>
+    & { instruments: Array<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  )> }
+);
+
+export type UpdateInstrumentMutationVariables = {
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type UpdateInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { updateInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+    & { instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  ) }
 );
 
 export type AdministrationProposalMutationVariables = {
@@ -2998,6 +3115,10 @@ export const CreateSepDocument = gql`
   createSEP(code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
     sep {
       id
+      code
+      description
+      numberRatingsRequired
+      active
     }
     error
   }
@@ -3199,6 +3320,52 @@ export const GetEventLogsDocument = gql`
     eventTStamp
     rowData
     changedObjectId
+  }
+}
+    `;
+export const CreateInstrumentDocument = gql`
+    mutation createInstrument($name: String!, $shortCode: String!, $description: String!) {
+  createInstrument(name: $name, shortCode: $shortCode, description: $description) {
+    instrument {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    error
+  }
+}
+    `;
+export const DeleteInstrumentDocument = gql`
+    mutation deleteInstrument($instrumentId: Int!) {
+  deleteInstrument(instrumentId: $instrumentId) {
+    error
+  }
+}
+    `;
+export const GetInstrumentsDocument = gql`
+    query getInstruments {
+  instruments {
+    instruments {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    totalCount
+  }
+}
+    `;
+export const UpdateInstrumentDocument = gql`
+    mutation updateInstrument($instrumentId: Int!, $name: String!, $shortCode: String!, $description: String!) {
+  updateInstrument(instrumentId: $instrumentId, name: $name, shortCode: $shortCode, description: $description) {
+    instrument {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    error
   }
 }
     `;
@@ -3979,6 +4146,18 @@ export function getSdk(client: GraphQLClient) {
     },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
+    },
+    createInstrument(variables: CreateInstrumentMutationVariables): Promise<CreateInstrumentMutation> {
+      return client.request<CreateInstrumentMutation>(print(CreateInstrumentDocument), variables);
+    },
+    deleteInstrument(variables: DeleteInstrumentMutationVariables): Promise<DeleteInstrumentMutation> {
+      return client.request<DeleteInstrumentMutation>(print(DeleteInstrumentDocument), variables);
+    },
+    getInstruments(variables?: GetInstrumentsQueryVariables): Promise<GetInstrumentsQuery> {
+      return client.request<GetInstrumentsQuery>(print(GetInstrumentsDocument), variables);
+    },
+    updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
+      return client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables);
     },
     administrationProposal(variables: AdministrationProposalMutationVariables): Promise<AdministrationProposalMutation> {
       return client.request<AdministrationProposalMutation>(print(AdministrationProposalDocument), variables);

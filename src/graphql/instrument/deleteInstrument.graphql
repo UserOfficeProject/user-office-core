@@ -1,0 +1,5 @@
+mutation deleteInstrument($instrumentId: Int!) {
+  deleteInstrument(instrumentId: $instrumentId) {
+    error
+  }
+}

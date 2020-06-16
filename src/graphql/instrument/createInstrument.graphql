@@ -1,0 +1,19 @@
+mutation createInstrument(
+  $name: String!
+  $shortCode: String!
+  $description: String!
+) {
+  createInstrument(
+    name: $name
+    shortCode: $shortCode
+    description: $description
+  ) {
+    instrument {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    error
+  }
+}

@@ -11,6 +11,7 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Sep } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AddSEPProps = {
-  close: () => void;
+  close: (sepAdded: Sep | null) => void;
 };
 
 const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
@@ -44,18 +45,21 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         onSubmit={async (values, actions): Promise<void> => {
           await api()
             .createSEP(values)
-            .then(data =>
-              data.createSEP.error
-                ? enqueueSnackbar(
-                    getTranslation(data.createSEP.error as ResourceId),
-                    {
-                      variant: 'error',
-                    }
-                  )
-                : null
-            );
+            .then(data => {
+              if (data.createSEP.error) {
+                enqueueSnackbar(
+                  getTranslation(data.createSEP.error as ResourceId),
+                  {
+                    variant: 'error',
+                  }
+                );
+
+                close(null);
+              } else {
+                close(data.createSEP.sep);
+              }
+            });
           actions.setSubmitting(false);
-          close();
         }}
         validationSchema={createSEPValidationSchema}
       >

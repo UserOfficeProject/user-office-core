@@ -16,6 +16,7 @@ import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
+import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './MenuItems';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
@@ -194,6 +195,7 @@ const Dashboard: React.FC = () => {
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
+          <Route path="/InstrumentPage" component={InstrumentsPage} />
           <Route
             path="/QuestionaryEditor/:templateId"
             component={QuestionaryEditor}

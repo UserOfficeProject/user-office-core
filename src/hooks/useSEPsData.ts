@@ -4,7 +4,6 @@ import { Sep } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPsData(
-  show: boolean,
   filter: string,
   active = true,
   role = 'SEP_Reviewer'
@@ -51,7 +50,7 @@ export function useSEPsData(
           setLoading(false);
         });
     }
-  }, [filter, show, active, api, role]);
+  }, [filter, active, api, role]);
 
   return { loading, SEPsData, setSEPsData };
 }
