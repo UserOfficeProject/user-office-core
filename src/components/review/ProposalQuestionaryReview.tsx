@@ -12,7 +12,6 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { FileMetaData } from '../../models/FileUpload';
 import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { getAllFields } from '../../models/ProposalModelFunctions';
-import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 
 export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {

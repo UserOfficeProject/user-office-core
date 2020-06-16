@@ -26,8 +26,7 @@ export const QuestionRelSubtemplateForm: TFormSignature<QuestionRel> = props => 
       validationSchema={Yup.object().shape({
         question: Yup.object({
           config: Yup.object({
-            subtemplateId: Yup.number(),
-            title: Yup.string(),
+            templateId: Yup.number(),
             addEntryButtonLabel: Yup.string(),
             maxEntries: Yup.number(),
           }),
@@ -39,27 +38,17 @@ export const QuestionRelSubtemplateForm: TFormSignature<QuestionRel> = props => 
           <QuestionExcerpt question={props.field.question} />
           <TitledContainer label="Options">
             <Field
-              name="config.subtemplateId"
+              name="config.templateId"
               label="Template id"
               placeholder="Choose template"
               type="text"
               component={FormikUICustomSelect}
               margin="normal"
               fullWidth
-              data-cy="subtemplateId"
+              data-cy="templateId"
               availableOptions={templates.map(template => {
                 return { value: template.templateId, label: template.name };
               })}
-            />
-            <Field
-              name="config.title"
-              label="Title"
-              placeholder="The title"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="title"
             />
             <Field
               name="config.addEntryButtonLabel"

@@ -14,7 +14,13 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-import { DataType, Question, Template, Topic } from '../../generated/sdk';
+import {
+  DataType,
+  Question,
+  Template,
+  Topic,
+  TemplateCategoryId,
+} from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import TemplateQuestionEditor, {
@@ -206,6 +212,9 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
           <MenuItem
             className={classes.addQuestionMenuItem}
             onClick={() => onCreateNewQuestionClicked(DataType.SUBTEMPLATE)}
+            disabled={
+              template.categoryId !== TemplateCategoryId.PROPOSAL_QUESTIONARY
+            }
           >
             <ListItemIcon>
               {getTemplateFieldIcon(DataType.SUBTEMPLATE)!}

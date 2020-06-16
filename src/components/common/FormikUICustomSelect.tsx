@@ -1,6 +1,20 @@
 import { InputLabel, ListItemText, MenuItem, Select } from '@material-ui/core';
 import { FormikActions } from 'formik';
 import React from 'react';
+type ValueType = string | number;
+type ItemType = { label: string; value: ValueType };
+type FormikUICustomSelectProps = {
+  field: {
+    name: string;
+    onBlur: Function;
+    onChange: Function;
+    value: ValueType;
+  };
+  form: FormikActions<any>;
+  availableOptions: ItemType[];
+  id: string;
+  label: string;
+};
 const FormikUICustomSelect = ({
   field,
   form,
@@ -8,18 +22,7 @@ const FormikUICustomSelect = ({
   id,
   label,
   ...props
-}: {
-  field: {
-    name: string;
-    onBlur: Function;
-    onChange: Function;
-    value: string[];
-  };
-  form: FormikActions<any>;
-  availableOptions: { label: string; value: string }[];
-  id: string;
-  label: string;
-}) => {
+}: FormikUICustomSelectProps) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -30,11 +33,7 @@ const FormikUICustomSelect = ({
       },
     },
   };
-  const handleChange = (
-    event: React.ChangeEvent<{
-      value: unknown;
-    }>
-  ) => {
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     form.setFieldValue(field.name, event.target.value);
   };
 

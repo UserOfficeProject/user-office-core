@@ -28,10 +28,9 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
         config: Yup.object({
-          subtemplateId: Yup.number(),
-          title: Yup.string(),
+          templateId: Yup.number().required('Template is required'),
           addEntryButtonLabel: Yup.string(),
-          maxEntries: Yup.number(),
+          maxEntries: Yup.number().nullable(),
         }),
       })}
     >
@@ -58,27 +57,17 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
 
           <TitledContainer label="Options">
             <Field
-              name="config.subtemplateId"
-              label="Template id"
+              name="config.templateId"
+              label="Template name"
               placeholder="Choose template"
               type="text"
               component={FormikUICustomSelect}
               margin="normal"
               fullWidth
-              data-cy="subtemplateId"
+              data-cy="templateId"
               availableOptions={templates.map(template => {
                 return { value: template.templateId, label: template.name };
               })}
-            />
-            <Field
-              name="config.title"
-              label="Title"
-              placeholder="The title"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="title"
             />
             <Field
               name="config.addEntryButtonLabel"
@@ -89,6 +78,16 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
               margin="normal"
               fullWidth
               data-cy="addEntryButtonLabel"
+            />
+            <Field
+              name="config.maxEntries"
+              label="Max entries"
+              placeholder="(e.g. 4, leave blank for unlimited)"
+              type="text"
+              component={TextField}
+              margin="normal"
+              fullWidth
+              data-cy="maxEntries"
             />
           </TitledContainer>
         </>

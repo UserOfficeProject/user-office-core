@@ -48,10 +48,12 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on SubtemplateConfig {
+    addEntryButtonLabel
+    maxEntries
+    templateId
+
     small_label
     required
     tooltip
-    templateId
-    maxEntries
   }
 }
