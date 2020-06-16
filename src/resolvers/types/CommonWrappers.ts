@@ -4,6 +4,7 @@ import { Response } from '../Decorators';
 import { Page } from './Admin';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Institution } from './Institution';
 import { Proposal } from './Proposal';
 import { ProposalTemplate } from './ProposalTemplate';
 import { Question } from './Question';
@@ -115,6 +116,13 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
+}
+
+@ObjectType()
+export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Institution, { nullable: true })
+  public institution: Institution;
 }
 
 @ObjectType()

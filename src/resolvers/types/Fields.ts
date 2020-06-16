@@ -13,6 +13,18 @@ import { ResolverContext } from '../../context';
 export class Fields {}
 
 @ObjectType()
+class Institutions {
+  @Field(() => Int)
+  id: number;
+
+  @Field()
+  value: string;
+
+  @Field()
+  verified: boolean;
+}
+
+@ObjectType()
 class Entry {
   @Field(() => Int)
   id: number;
@@ -31,10 +43,5 @@ export class FieldsResolver {
   @FieldResolver(() => [Entry])
   async countries(@Ctx() context: ResolverContext): Promise<Entry[]> {
     return context.queries.admin.getCountries();
-  }
-
-  @FieldResolver(() => [Entry])
-  async institutions(@Ctx() context: ResolverContext): Promise<Entry[]> {
-    return context.queries.admin.getInstitutions();
   }
 }
