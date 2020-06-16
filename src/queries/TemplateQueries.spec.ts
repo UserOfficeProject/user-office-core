@@ -4,7 +4,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ProposalTemplate, TemplateStep } from '../models/ProposalModel';
+import { Template, TemplateStep } from '../models/ProposalModel';
 import TemplateQueries from './TemplateQueries';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
@@ -15,18 +15,18 @@ beforeEach(() => {
 
 test('Non authentificated user can not get the template', () => {
   return expect(
-    templateQueries.getProposalTemplate(null, 1)
-  ).resolves.not.toBeInstanceOf(ProposalTemplate);
+    templateQueries.getTemplate(null, 1)
+  ).resolves.not.toBeInstanceOf(Template);
 });
 
 test('User officer user can get the template', () => {
   return expect(
-    templateQueries.getProposalTemplate(dummyUserOfficerWithRole, 1)
-  ).resolves.toBeInstanceOf(ProposalTemplate);
+    templateQueries.getTemplate(dummyUserOfficerWithRole, 1)
+  ).resolves.toBeInstanceOf(Template);
 });
 
 test('Proposal template should have fields', async () => {
-  let steps = await templateQueries.getProposalTemplateSteps(
+  let steps = await templateQueries.getTemplateSteps(
     dummyUserOfficerWithRole,
     1
   );
@@ -54,7 +54,7 @@ test('User should not be able to get if natural key exists', async () => {
 });
 
 test('User officer should get a list of templates', async () => {
-  const templates = await templateQueries.getProposalTemplates(
+  const templates = await templateQueries.getTemplates(
     dummyUserOfficerWithRole,
     {
       filter: { isArchived: false },

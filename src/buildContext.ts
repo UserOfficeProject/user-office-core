@@ -10,11 +10,13 @@ import {
   sepDataSource,
   templateDataSource,
   userDataSource,
+  questionaryDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
 import ProposalMutations from './mutations/ProposalMutations';
+import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SEPMutations from './mutations/SEPMutations';
 import TemplateMutations from './mutations/TemplateMutations';
@@ -24,6 +26,7 @@ import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
 import ProposalQueries from './queries/ProposalQueries';
+import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
@@ -42,7 +45,7 @@ const proposalQueries = new ProposalQueries(
 );
 const proposalMutations = new ProposalMutations(
   proposalDataSource,
-  templateDataSource,
+  questionaryDataSource,
   callDataSource,
   userAuthorization,
   logger
@@ -55,7 +58,7 @@ const reviewMutations = new ReviewMutations(
 );
 
 const callQueries = new CallQueries(callDataSource);
-const callMutations = new CallMutations(callDataSource, userAuthorization);
+const callMutations = new CallMutations(callDataSource);
 
 const fileQueries = new FileQueries(fileDataSource);
 const fileMutations = new FileMutations(fileDataSource);
@@ -71,6 +74,16 @@ const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 const sepQueries = new SEPQueries(sepDataSource);
 const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
+const questionaryQueries = new QuestionaryQueries(
+  questionaryDataSource,
+  templateDataSource
+);
+const questionaryMutations = new QuestionaryMutations(
+  questionaryDataSource,
+  templateDataSource,
+  logger
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -83,6 +96,7 @@ const context: BasicResolverContext = {
     template: templateQueries,
     eventLogs: eventLogQueries,
     sep: sepQueries,
+    questionary: questionaryQueries,
   },
   mutations: {
     user: userMutations,
@@ -93,6 +107,7 @@ const context: BasicResolverContext = {
     admin: adminMutations,
     sep: sepMutations,
     template: templateMutations,
+    questionary: questionaryMutations,
   },
 };
 

@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import 'reflect-metadata';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
+import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -19,7 +20,7 @@ import ProposalMutations from './ProposalMutations';
 
 const dummyLogger = new MutedLogger();
 const dummyProposalDataSource = new ProposalDataSourceMock();
-const dummyTemplateDataSource = new TemplateDataSourceMock();
+const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
@@ -27,13 +28,14 @@ const userAuthorization = new UserAuthorization(
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,
-  dummyTemplateDataSource,
+  dummyQuestionaryDataSource,
   dummyCallDataSource,
   userAuthorization,
   dummyLogger
 );
 
 beforeEach(() => {
+  dummyQuestionaryDataSource.init();
   dummyProposalDataSource.init();
 });
 
@@ -144,40 +146,6 @@ test('A user not on the proposal cannot submit a proposal ', () => {
 test('A non-logged in user cannot submit a proposal', () => {
   return expect(
     proposalMutations.submit(null, { proposalId: 1 })
-  ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
-});
-
-test('A user can attach files', () => {
-  const dummyFileList = ['1020597501870552'];
-
-  return expect(
-    proposalMutations.updateFiles(dummyUserWithRole, {
-      proposalId: 1,
-      questionId: 'reference_files',
-      files: dummyFileList,
-    })
-  ).resolves.toBe(dummyFileList);
-});
-
-test('A non-belonging should not be able to attach files', () => {
-  const dummyFileList = ['1020597501870552'];
-
-  return expect(
-    proposalMutations.updateFiles(dummyUserNotOnProposalWithRole, {
-      proposalId: 1,
-      questionId: 'reference_files',
-      files: dummyFileList,
-    })
-  ).resolves.not.toBe(dummyFileList);
-});
-
-test('User must have valid session to attach files', () => {
-  return expect(
-    proposalMutations.updateFiles(null, {
-      proposalId: 1,
-      questionId: 'reference_files',
-      files: ['1020597501870552'],
-    })
   ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 

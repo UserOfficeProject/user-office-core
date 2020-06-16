@@ -12,7 +12,7 @@ import {
 import { ResolverContext } from '../../context';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
-import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { FieldCondition } from '../types/FieldCondition';
 import { wrapResponse } from '../wrapResponse';
 
@@ -57,7 +57,7 @@ export class UpdateQuestionRelArgs {
 
 @Resolver()
 export class UpdateQuestionRelMutation {
-  @Mutation(() => ProposalTemplateResponseWrap)
+  @Mutation(() => TemplateResponseWrap)
   updateQuestionRel(
     @Args() args: UpdateQuestionRelArgs,
     @Ctx() context: ResolverContext
@@ -66,7 +66,7 @@ export class UpdateQuestionRelMutation {
 
     return wrapResponse(
       context.mutations.template.updateQuestionRel(context.user, args),
-      ProposalTemplateResponseWrap
+      TemplateResponseWrap
     );
   }
 

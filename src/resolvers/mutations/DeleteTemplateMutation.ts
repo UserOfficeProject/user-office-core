@@ -5,14 +5,14 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @Resolver()
-export class CloneTemplateMutation {
+export class DeleteTemplateMutation {
   @Mutation(() => TemplateResponseWrap)
-  cloneTemplate(
+  deleteTemplate(
     @Arg('templateId', () => Int) templateId: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.cloneTemplate(context.user, { templateId }),
+      context.mutations.template.deleteTemplate(context.user, { templateId }),
       TemplateResponseWrap
     );
   }

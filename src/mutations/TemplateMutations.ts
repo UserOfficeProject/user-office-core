@@ -21,7 +21,7 @@ import { Authorized, ValidateArgs } from '../decorators';
 import {
   createConfig,
   DataType,
-  ProposalTemplate,
+  Template,
   Question,
   Topic,
 } from '../models/ProposalModel';
@@ -30,11 +30,12 @@ import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
 import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
 import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
 import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
   ConfigBase,
@@ -52,16 +53,10 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async createTemplate(
     agent: UserWithRole | null,
-    {
-      name,
-      description,
-    }: {
-      name: string;
-      description?: string;
-    }
-  ): Promise<ProposalTemplate | Rejection> {
+    args: CreateTemplateArgs
+  ): Promise<Template | Rejection> {
     const result = await this.dataSource
-      .createTemplate(name, description)
+      .createTemplate(args)
       .then(result => result);
 
     return result;
@@ -76,7 +71,7 @@ export default class TemplateMutations {
     }: {
       templateId: number;
     }
-  ): Promise<unknown> {
+  ) {
     const result = await this.dataSource
       .cloneTemplate(templateId)
       .then(result => result);
@@ -88,12 +83,8 @@ export default class TemplateMutations {
   @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
     user: UserWithRole | null,
-    {
-      templateId,
-    }: {
-      templateId: number;
-    }
-  ): Promise<ProposalTemplate | Rejection> {
+    { templateId }: { templateId: number }
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteTemplate(templateId)
       .then(template => template)
@@ -112,7 +103,7 @@ export default class TemplateMutations {
   async createTopic(
     user: UserWithRole | null,
     args: CreateTopicArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .createTopic(args)
       .then(response => response)
@@ -167,11 +158,12 @@ export default class TemplateMutations {
     agent: UserWithRole | null,
     args: CreateQuestionArgs
   ): Promise<Question | Rejection> {
-    const { dataType } = args;
+    const { dataType, categoryId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
       .createQuestion(
+        categoryId,
         newFieldId,
         newFieldId, // natural key defaults to id
         dataType,
@@ -232,7 +224,7 @@ export default class TemplateMutations {
   async updateQuestionRel(
     agent: UserWithRole | null,
     args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .updateQuestionRel(args)
       .then(steps => steps)
@@ -251,7 +243,7 @@ export default class TemplateMutations {
   async deleteQuestionRel(
     agent: UserWithRole | null,
     args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .deleteQuestionRel(args)
       .then(steps => steps)
@@ -315,10 +307,7 @@ export default class TemplateMutations {
 
   @ValidateArgs(updateProposalTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateProposalTemplate(
-    user: UserWithRole | null,
-    args: UpdateProposalTemplateArgs
-  ) {
+  updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)
