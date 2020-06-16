@@ -46,4 +46,12 @@ fragment fieldConfig on FieldConfig {
     htmlQuestion
     isHtmlQuestion
   }
+
+  ... on SubtemplateConfig {
+    small_label
+    required
+    tooltip
+    templateId
+    maxEntries
+  }
 }

@@ -175,7 +175,7 @@ export type FieldConditionInput = {
   params: Scalars['String'],
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SubtemplateConfig;
 
 export type FieldDependency = {
    __typename?: 'FieldDependency',
@@ -808,6 +808,10 @@ export type ProposalTemplate = {
   callCount: Scalars['Int'],
 };
 
+export type ProposalTemplatesFilter = {
+  isArchived?: Maybe<Scalars['Boolean']>,
+};
+
 export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
@@ -914,7 +918,7 @@ export type QueryProposalArgs = {
 
 
 export type QueryProposalTemplatesArgs = {
-  filter?: Maybe<TemplatesFilter>
+  filter?: Maybe<ProposalTemplatesFilter>
 };
 
 
@@ -1131,6 +1135,15 @@ export type SePsQueryResult = {
    __typename?: 'SEPsQueryResult',
   totalCount: Scalars['Int'],
   seps: Array<Sep>,
+};
+
+export type SubtemplateConfig = {
+   __typename?: 'SubtemplateConfig',
+  small_label: Scalars['String'],
+  required: Scalars['Boolean'],
+  tooltip: Scalars['String'],
+  maxEntries?: Maybe<Scalars['Int']>,
+  templateId: Scalars['String'],
 };
 
 export type SuccessResponseWrap = {
@@ -1987,6 +2000,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
+  ) | (
+    { __typename?: 'SubtemplateConfig' }
+    & FieldConfigSubtemplateConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -2342,7 +2358,12 @@ type FieldConfigTextInputConfigFragment = (
   & Pick<TextInputConfig, 'min' | 'max' | 'multiline' | 'placeholder' | 'small_label' | 'required' | 'tooltip' | 'htmlQuestion' | 'isHtmlQuestion'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment;
+type FieldConfigSubtemplateConfigFragment = (
+  { __typename?: 'SubtemplateConfig' }
+  & Pick<SubtemplateConfig, 'small_label' | 'required' | 'tooltip' | 'templateId' | 'maxEntries'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSubtemplateConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -2365,6 +2386,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
+  ) | (
+    { __typename?: 'SubtemplateConfig' }
+    & FieldConfigSubtemplateConfigFragment
   ) }
 );
 
@@ -2392,6 +2416,9 @@ export type QuestionRelFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
+  ) | (
+    { __typename?: 'SubtemplateConfig' }
+    & FieldConfigSubtemplateConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -2452,7 +2479,7 @@ export type GetIsNaturalKeyPresentQuery = (
 );
 
 export type GetProposalTemplatesQueryVariables = {
-  filter?: Maybe<TemplatesFilter>
+  filter?: Maybe<ProposalTemplatesFilter>
 };
 
 
@@ -3036,6 +3063,13 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
     htmlQuestion
     isHtmlQuestion
+  }
+  ... on SubtemplateConfig {
+    small_label
+    required
+    tooltip
+    templateId
+    maxEntries
   }
 }
     `;
@@ -3847,7 +3881,7 @@ export const GetIsNaturalKeyPresentDocument = gql`
 }
     `;
 export const GetProposalTemplatesDocument = gql`
-    query getProposalTemplates($filter: TemplatesFilter) {
+    query getProposalTemplates($filter: ProposalTemplatesFilter) {
   proposalTemplates(filter: $filter) {
     templateId
     name

@@ -11,6 +11,7 @@ import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
 import { TFormSignature } from './TFormSignature';
+import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 
 export default function QuestionEditor(props: {
   field: Question | null;
@@ -25,6 +26,7 @@ export default function QuestionEditor(props: {
   componentMap.put(DataType.DATE, QuestionDateForm);
   componentMap.put(DataType.SELECTION_FROM_OPTIONS, QuestionMultipleChoiceForm);
   componentMap.put(DataType.TEXT_INPUT, QuestionTextInputForm);
+  componentMap.put(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
 
   if (props.field === null) {
     return null;

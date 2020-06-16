@@ -1,7 +1,14 @@
-import { InputLabel, ListItemText, MenuItem, Select } from '@material-ui/core';
+import {
+  MenuItem,
+  Select,
+  Checkbox,
+  ListItemText,
+  Input,
+  InputLabel,
+} from '@material-ui/core';
 import { FormikActions } from 'formik';
 import React from 'react';
-const FormikUICustomSelect = ({
+const FormikUICustomMultipleSelect = ({
   field,
   form,
   availableOptions,
@@ -16,7 +23,7 @@ const FormikUICustomSelect = ({
     value: string[];
   };
   form: FormikActions<any>;
-  availableOptions: { label: string; value: string }[];
+  availableOptions: string[];
   id: string;
   label: string;
 }) => {
@@ -35,22 +42,28 @@ const FormikUICustomSelect = ({
       value: unknown;
     }>
   ) => {
-    form.setFieldValue(field.name, event.target.value);
+    form.setFieldValue(field.name, event.target.value); // value is string[]
   };
 
   return (
     <>
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <Select
+        multiple
         value={field.value}
         onChange={handleChange}
+        input={<Input />}
+        renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={MenuProps}
         id={id}
         {...props}
       >
         {availableOptions.map(curOption => (
-          <MenuItem key={curOption.value} value={curOption.value}>
-            <ListItemText primary={curOption.label} />
+          <MenuItem key={curOption} value={curOption}>
+            <Checkbox
+              checked={field.value && field.value.indexOf(curOption) > -1}
+            />
+            <ListItemText primary={curOption} />
           </MenuItem>
         ))}
       </Select>
@@ -58,4 +71,4 @@ const FormikUICustomSelect = ({
   );
 };
 
-export default FormikUICustomSelect;
+export default FormikUICustomMultipleSelect;

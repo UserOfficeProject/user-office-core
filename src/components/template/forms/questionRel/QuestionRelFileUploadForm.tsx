@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 
 import { QuestionRel } from '../../../../generated/sdk';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
+import FormikUICustomMultipleSelect from '../../../common/FormikUICustomMultipleSelect';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
@@ -50,7 +50,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
-              component={FormikUICustomSelect}
+              component={FormikUICustomMultipleSelect}
               availableOptions={[
                 '.pdf',
                 '.doc',
@@ -62,7 +62,6 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
               margin="normal"
               fullWidth
               data-cy="file_type"
-              multiple={true}
             />
             <Field
               name="config.max_files"
