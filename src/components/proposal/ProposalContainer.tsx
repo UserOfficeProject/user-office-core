@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
@@ -8,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
+
 import { UserContext } from '../../context/UserContextProvider';
 import {
   Answer,

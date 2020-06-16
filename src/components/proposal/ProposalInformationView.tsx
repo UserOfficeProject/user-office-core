@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
+
 import { UserContext } from '../../context/UserContextProvider';
 import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { EventType } from '../../models/ProposalSubmissionModel';

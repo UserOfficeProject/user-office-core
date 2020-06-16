@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from 'react';
 import { makeStyles, StepButton } from '@material-ui/core';
+import React, { PropsWithChildren } from 'react';
 
 export function QuestionaryStepButton(
   props: PropsWithChildren<{

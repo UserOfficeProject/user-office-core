@@ -22,9 +22,9 @@ import QuestionaryEditorModel, {
 import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionEditor from './forms/QuestionEditor';
 import QuestionRelEditor from './forms/QuestionRelEditor';
-import QuestionaryEditorTopic from './TemplateTopicEditor';
 import { QuestionPicker } from './QuestionPicker';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
+import QuestionaryEditorTopic from './TemplateTopicEditor';
 
 export default function TemplateEditor() {
   const { enqueueSnackbar } = useSnackbar();

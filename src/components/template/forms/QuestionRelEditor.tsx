@@ -9,9 +9,9 @@ import { QuestionRelDateForm } from './questionRel/QuestionRelDateForm';
 import { QuestionRelEmbellismentForm } from './questionRel/QuestionRelEmbellismentForm';
 import { QuestionRelFileUploadForm } from './questionRel/QuestionRelFileUploadForm';
 import { QuestionRelMultipleChoiceForm } from './questionRel/QuestionRelMultipleChoiceForm';
+import { QuestionRelSubtemplateForm } from './questionRel/QuestionRelSubtemplateForm';
 import { QuestionRelTextInputForm } from './questionRel/QuestionRelTextInputForm';
 import { TFormSignature } from './TFormSignature';
-import { QuestionRelSubtemplateForm } from './questionRel/QuestionRelSubtemplateForm';
 
 export default function QuestionRelEditor(props: {
   field: QuestionRel | null;

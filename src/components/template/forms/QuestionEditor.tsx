@@ -9,9 +9,9 @@ import { QuestionDateForm } from './question/QuestionDateForm';
 import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';
 import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
+import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
 import { TFormSignature } from './TFormSignature';
-import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 
 export default function QuestionEditor(props: {
   field: Question | null;
