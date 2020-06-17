@@ -33,7 +33,7 @@ export interface UserWithRole extends User {
 
 export enum UserRole {
   USER = 1,
-  USEROFFICER = 2,
+  USER_OFFICER = 2,
   REVIEWER = 3,
   SEP_CHAIR = 4,
   SEP_SECRETARY = 5,
