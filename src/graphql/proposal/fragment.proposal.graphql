@@ -1,0 +1,16 @@
+fragment proposal on Proposal {
+  id
+  title
+  abstract
+  status
+  shortCode
+  rankOrder
+  finalStatus
+  commentForUser
+  commentForManagement
+  created
+  updated
+  callId
+  questionaryId
+  notified
+}

@@ -67,11 +67,6 @@ export function FileUploadComponent(props: {
     }
   }, [api, props.value]);
 
-  /*useEffect(() => {
-    setFiles(filesMetadata);
-  }, [filesMetadata]);
-  */
-
   const dispatchChange = (): void => {
     const inputElement: HTMLInputElement = inputRef.current!;
     const event: any = {};
@@ -225,20 +220,18 @@ export function NewFileEntry(props: {
   switch (state) {
     case UPLOAD_STATE.PRISTINE:
       return (
-        <>
-          <label>
-            <input
-              accept={props.filetype}
-              style={{ display: 'none' }}
-              type="file"
-              multiple={false}
-              onChange={onFileSelected}
-            />
-            <Button variant="outlined" component="span">
-              <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
-            </Button>
-          </label>
-        </>
+        <label>
+          <input
+            accept={props.filetype}
+            style={{ display: 'none' }}
+            type="file"
+            multiple={false}
+            onChange={onFileSelected}
+          />
+          <Button variant="outlined" component="span">
+            <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+          </Button>
+        </label>
       );
     case UPLOAD_STATE.ERROR:
       return (

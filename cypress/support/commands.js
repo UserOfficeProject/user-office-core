@@ -35,6 +35,13 @@ const resetDB = () => {
   request('/graphql', query).then(data => console.log(data));
 };
 
+const expandTemplatesSubmenu = () => {
+  cy.contains('Templates').click();
+  cy.get("[title='Proposal templates']")
+    .first()
+    .click();
+};
+
 const login = role => {
   const testCredentialStore = {
     user: {
@@ -63,6 +70,8 @@ const login = role => {
 };
 
 Cypress.Commands.add('resetDB', resetDB);
+
+Cypress.Commands.add('expandTemplatesSubmenu', expandTemplatesSubmenu);
 
 Cypress.Commands.add('login', login);
 

@@ -3,9 +3,10 @@ import { useState } from 'react';
 import {
   DataType,
   FieldDependency,
-  ProposalTemplate,
+  Template,
   QuestionRel,
   Question,
+  TemplateCategoryId,
 } from '../generated/sdk';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
@@ -89,12 +90,16 @@ export function usePersistModel() {
       .then(data => data.updateQuestionRel);
   };
 
-  const createQuestion = async (dataType: DataType) => {
+  const createQuestion = async (
+    categoryId: TemplateCategoryId,
+    dataType: DataType
+  ) => {
     setIsLoading(true);
 
     return api()
       .createQuestion({
-        dataType: dataType,
+        categoryId,
+        dataType,
       })
       .then(questionResponse => {
         setIsLoading(false);
@@ -161,12 +166,12 @@ export function usePersistModel() {
     description: string
   ) => {
     return api()
-      .updateProposalTemplate({
+      .updateTemplate({
         templateId,
         name,
         description,
       })
-      .then(data => data.updateProposalTemplate);
+      .then(data => data.updateTemplate);
   };
 
   type MonitorableServiceCall = () => Promise<{
@@ -177,7 +182,7 @@ export function usePersistModel() {
     getState,
     dispatch,
   }: {
-    getState: () => ProposalTemplate;
+    getState: () => Template;
     dispatch: React.Dispatch<Event>;
   }) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
@@ -271,7 +276,10 @@ export function usePersistModel() {
           break;
         case EventType.CREATE_QUESTION_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await createQuestion(action.payload.dataType);
+            const result = await createQuestion(
+              state.categoryId,
+              action.payload.dataType
+            );
             if (result.question) {
               dispatch({
                 type: EventType.QUESTION_CREATED,

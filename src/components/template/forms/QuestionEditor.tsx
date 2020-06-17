@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DataType, ProposalTemplate, Question } from '../../../generated/sdk';
+import { DataType, Template, Question } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 import JSDict from '../../../utils/Dictionary';
 import ModalWrapper from '../ModalWrapper';
@@ -16,7 +16,7 @@ export default function QuestionEditor(props: {
   field: Question | null;
   dispatch: React.Dispatch<Event>;
   closeMe: () => void;
-  template: ProposalTemplate;
+  template: Template;
 }) {
   const componentMap = JSDict.Create<DataType, TFormSignature<Question>>();
   componentMap.put(DataType.BOOLEAN, QuestionBooleanForm);

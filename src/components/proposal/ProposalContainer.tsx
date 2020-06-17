@@ -2,7 +2,7 @@
 // Maybe it should be split into multiple files or organized better.
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { StepButton, LinearProgress } from '@material-ui/core';
+import { LinearProgress, StepButton } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
@@ -12,21 +12,21 @@ import { useSnackbar } from 'notistack';
 import React, {
   createContext,
   PropsWithChildren,
+  useContext,
   useEffect,
   useState,
-  useContext,
 } from 'react';
 import { Prompt } from 'react-router';
 
 import { UserContext } from '../../context/UserContextProvider';
 import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { ProposalAnswer } from '../../models/ProposalModel';
+import { Answer, ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
 import {
-  ProposalSubmissionModel,
   Event,
   EventType,
+  ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from '../../models/ProposalSubmissionModel';
 import { StyledPaper } from '../../styles/StyledComponents';
@@ -46,7 +46,7 @@ enum StepType {
   REVIEW,
 }
 
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+const prepareAnswers = (answers?: Answer[]): Answer[] => {
   if (answers) {
     answers = answers.filter(
       answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
@@ -74,7 +74,9 @@ export const ProposalSubmissionContext = createContext<{
   dispatch: React.Dispatch<Event>;
 } | null>(null);
 
-export default function ProposalContainer(props: { data: Proposal }) {
+export default function ProposalContainer(props: {
+  data: ProposalSubsetSumbission;
+}) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -229,13 +231,13 @@ export default function ProposalContainer(props: { data: Proposal }) {
           await executeAndMonitorCall(
             () =>
               api()
-                .updateProposal({
-                  id: state.proposal.id,
+                .answerTopic({
+                  questionaryId: state.proposal.id,
                   answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [],
-                  partialSave: true,
+                  topicId: action.payload.topicId,
+                  isPartialSave: true,
                 })
-                .then(data => data.updateProposal),
+                .then(data => data.answerTopic),
             'Saved'
           );
           break;
@@ -244,13 +246,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
           await executeAndMonitorCall(
             () =>
               api()
-                .updateProposal({
-                  id: state.proposal.id,
+                .answerTopic({
+                  questionaryId: state.proposal.id,
                   answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [action.payload.topicId],
-                  partialSave: false,
+                  topicId: action.payload.topicId,
                 })
-                .then(data => data.updateProposal),
+                .then(data => data.answerTopic),
             'Saved'
           ).then(() => setStepIndex(clampStep(stepIndex + 1)));
           break;

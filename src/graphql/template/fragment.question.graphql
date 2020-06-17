@@ -3,6 +3,7 @@ fragment question on Question {
   proposalQuestionId
   naturalKey
   dataType
+  categoryId
   config {
     ...fieldConfig
   }

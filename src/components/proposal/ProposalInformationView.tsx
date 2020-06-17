@@ -6,7 +6,7 @@ import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { Proposal } from '../../generated/sdk';
+import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { EventType } from '../../models/ProposalSubmissionModel';
 import { BasicUserDetails, User } from '../../models/User';
 import TextFieldWithCounter from '../common/TextFieldWithCounter';
@@ -16,7 +16,7 @@ import ProposalParticipant from './ProposalParticipant';
 import ProposalParticipants from './ProposalParticipants';
 
 export default function ProposalInformationView(props: {
-  data: Proposal;
+  data: ProposalSubsetSumbission;
   readonly?: boolean;
   disabled?: boolean;
 }) {

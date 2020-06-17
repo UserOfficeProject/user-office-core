@@ -30,7 +30,7 @@ context('Proposal tests', () => {
   it('User officer can modify proposal template', () => {
     cy.login('officer');
 
-    cy.contains('Questionaries').click();
+    cy.expandTemplatesSubmenu();
 
     cy.contains('default template')
       .parent()
@@ -180,7 +180,7 @@ context('Proposal tests', () => {
   it('User officer can clone template', () => {
     cy.login('officer');
 
-    cy.contains('Questionaries').click();
+    cy.expandTemplatesSubmenu();
 
     cy.contains('default template')
       .parent()
@@ -196,7 +196,7 @@ context('Proposal tests', () => {
   it('User officer can delete template', () => {
     cy.login('officer');
 
-    cy.contains('Questionaries').click();
+    cy.expandTemplatesSubmenu();
 
     cy.contains('Copy of default template')
       .parent()
@@ -207,6 +207,34 @@ context('Proposal tests', () => {
     cy.contains('Yes').click();
 
     cy.contains('Copy of default template').should('not.exist');
+  });
+
+  it('User officer archive template', () => {
+    cy.login('officer');
+
+    cy.expandTemplatesSubmenu();
+
+    cy.contains('default template')
+      .parent()
+      .get("[title='Archive']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.contains('default template').should('not.exist');
+
+    cy.contains('Archived').click();
+
+    cy.contains('default template');
+
+    cy.contains('default template')
+      .parent()
+      .get("[title='Unarchive']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
   });
 
   it('User can create proposal', () => {
@@ -258,7 +286,7 @@ context('Proposal tests', () => {
   it('Officer can delete proposal questions', () => {
     cy.login('officer');
 
-    cy.contains('Questionaries').click();
+    cy.expandTemplatesSubmenu();
 
     cy.get("[title='Edit']")
       .first()

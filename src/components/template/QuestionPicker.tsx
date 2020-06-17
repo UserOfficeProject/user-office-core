@@ -1,4 +1,5 @@
 import {
+  Divider,
   Fade,
   Grid,
   ListItemIcon,
@@ -7,19 +8,13 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  Divider,
 } from '@material-ui/core';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-import {
-  DataType,
-  ProposalTemplate,
-  Question,
-  Topic,
-} from '../../generated/sdk';
+import { DataType, Question, Template, Topic } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import QuestionaryEditorTopicItem, {
@@ -238,7 +233,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 
 interface IQuestionPickerProps {
   topic: Topic;
-  template: ProposalTemplate;
+  template: Template;
   dispatch: React.Dispatch<Event>;
   closeMe: () => void;
   id?: string;

@@ -1,4 +1,4 @@
-query getProposalTemplates($filter: ProposalTemplatesFilter) {
+query getProposalTemplates($filter: TemplatesFilter) {
   proposalTemplates(filter: $filter) {
     templateId
     name
