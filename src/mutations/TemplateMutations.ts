@@ -279,7 +279,7 @@ export default class TemplateMutations {
 
   @ValidateArgs(updateQuestionsTopicRelsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionsTopicRels(
+  async assignQuestionsToTopic(
     agent: UserWithRole | null,
     args: {
       templateId: number;
