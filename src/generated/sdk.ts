@@ -46,6 +46,12 @@ export type AnswerResponseWrap = {
   answer: Answer,
 };
 
+export type AssignQuestionsToTopicResponseWrap = {
+   __typename?: 'AssignQuestionsToTopicResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  result?: Maybe<Array<Scalars['String']>>,
+};
+
 export type BasicUserDetails = {
    __typename?: 'BasicUserDetails',
   id: Scalars['Int'],
@@ -296,7 +302,7 @@ export type Mutation = {
   token: TokenResponseWrap,
   selectRole: TokenResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
-  updateQuestionsTopicRels: UpdateQuestionsTopicRelsResponseWrap,
+  assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
 };
 
@@ -683,10 +689,10 @@ export type MutationUpdatePasswordArgs = {
 };
 
 
-export type MutationUpdateQuestionsTopicRelsArgs = {
+export type MutationAssignQuestionsToTopicArgs = {
   templateId: Scalars['Int'],
   topicId: Scalars['Int'],
-  fieldIds?: Maybe<Array<Scalars['String']>>
+  questionIds?: Maybe<Array<Scalars['String']>>
 };
 
 
@@ -1242,12 +1248,6 @@ export type UpdateAnswerResponseWrap = {
   questionId?: Maybe<Scalars['String']>,
 };
 
-export type UpdateQuestionsTopicRelsResponseWrap = {
-   __typename?: 'UpdateQuestionsTopicRelsResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  result?: Maybe<Array<Scalars['String']>>,
-};
-
 export type UpdateTopicOrderResponseWrap = {
    __typename?: 'UpdateTopicOrderResponseWrap',
   error?: Maybe<Scalars['String']>,
@@ -1298,7 +1298,7 @@ export type UserResponseWrap = {
 
 export enum UserRole {
   USER = 'USER',
-  USEROFFICER = 'USEROFFICER',
+  USER_OFFICER = 'USER_OFFICER',
   REVIEWER = 'REVIEWER',
   SEP_CHAIR = 'SEP_CHAIR',
   SEP_SECRETARY = 'SEP_SECRETARY',
@@ -2155,6 +2155,21 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type AssignQuestionsToTopicMutationVariables = {
+  templateId: Scalars['Int'],
+  topicId: Scalars['Int'],
+  questionIds?: Maybe<Array<Scalars['String']>>
+};
+
+
+export type AssignQuestionsToTopicMutation = (
+  { __typename?: 'Mutation' }
+  & { assignQuestionsToTopic: (
+    { __typename?: 'AssignQuestionsToTopicResponseWrap' }
+    & Pick<AssignQuestionsToTopicResponseWrap, 'error'>
+  ) }
+);
+
 export type CloneTemplateMutationVariables = {
   templateId: Scalars['Int']
 };
@@ -2545,21 +2560,6 @@ export type UpdateQuestionRelMutation = (
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
-  ) }
-);
-
-export type UpdateQuestionsTopicRelsMutationVariables = {
-  templateId: Scalars['Int'],
-  topicId: Scalars['Int'],
-  fieldIds?: Maybe<Array<Scalars['String']>>
-};
-
-
-export type UpdateQuestionsTopicRelsMutation = (
-  { __typename?: 'Mutation' }
-  & { updateQuestionsTopicRels: (
-    { __typename?: 'UpdateQuestionsTopicRelsResponseWrap' }
-    & Pick<UpdateQuestionsTopicRelsResponseWrap, 'error'>
   ) }
 );
 
@@ -3777,6 +3777,13 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const AssignQuestionsToTopicDocument = gql`
+    mutation assignQuestionsToTopic($templateId: Int!, $topicId: Int!, $questionIds: [String!]) {
+  assignQuestionsToTopic(templateId: $templateId, topicId: $topicId, questionIds: $questionIds) {
+    error
+  }
+}
+    `;
 export const CloneTemplateDocument = gql`
     mutation cloneTemplate($templateId: Int!) {
   cloneTemplate(templateId: $templateId) {
@@ -3919,13 +3926,6 @@ export const UpdateQuestionRelDocument = gql`
   }
 }
     ${TemplateFragmentDoc}`;
-export const UpdateQuestionsTopicRelsDocument = gql`
-    mutation updateQuestionsTopicRels($templateId: Int!, $topicId: Int!, $fieldIds: [String!]) {
-  updateQuestionsTopicRels(templateId: $templateId, topicId: $topicId, fieldIds: $fieldIds) {
-    error
-  }
-}
-    `;
 export const UpdateTemplateDocument = gql`
     mutation updateTemplate($templateId: Int!, $name: String, $description: String, $isArchived: Boolean) {
   updateTemplate(templateId: $templateId, name: $name, description: $description, isArchived: $isArchived) {
@@ -4325,6 +4325,9 @@ export function getSdk(client: GraphQLClient) {
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables);
     },
+    assignQuestionsToTopic(variables: AssignQuestionsToTopicMutationVariables): Promise<AssignQuestionsToTopicMutation> {
+      return client.request<AssignQuestionsToTopicMutation>(print(AssignQuestionsToTopicDocument), variables);
+    },
     cloneTemplate(variables: CloneTemplateMutationVariables): Promise<CloneTemplateMutation> {
       return client.request<CloneTemplateMutation>(print(CloneTemplateDocument), variables);
     },
@@ -4369,9 +4372,6 @@ export function getSdk(client: GraphQLClient) {
     },
     updateQuestionRel(variables: UpdateQuestionRelMutationVariables): Promise<UpdateQuestionRelMutation> {
       return client.request<UpdateQuestionRelMutation>(print(UpdateQuestionRelDocument), variables);
-    },
-    updateQuestionsTopicRels(variables: UpdateQuestionsTopicRelsMutationVariables): Promise<UpdateQuestionsTopicRelsMutation> {
-      return client.request<UpdateQuestionsTopicRelsMutation>(print(UpdateQuestionsTopicRelsDocument), variables);
     },
     updateTemplate(variables: UpdateTemplateMutationVariables): Promise<UpdateTemplateMutation> {
       return client.request<UpdateTemplateMutation>(print(UpdateTemplateDocument), variables);

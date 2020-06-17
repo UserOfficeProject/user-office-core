@@ -16,18 +16,18 @@ export function usePersistModel() {
 
   const api = useDataApi();
 
-  const updateFieldTopicRel = async (
+  const assignQuestionsToTopic = async (
     templateId: number,
     topicId: number,
-    fieldIds: string[]
+    questionIds: string[]
   ) => {
     return api()
-      .updateQuestionsTopicRels({
+      .assignQuestionsToTopic({
         templateId,
         topicId,
-        fieldIds,
+        questionIds,
       })
-      .then(data => data.updateQuestionsTopicRels);
+      .then(data => data.assignQuestionsToTopic);
   };
 
   const updateTopic = async (
@@ -216,7 +216,7 @@ export function usePersistModel() {
           );
 
           executeAndMonitorCall(() =>
-            updateFieldTopicRel(
+            assignQuestionsToTopic(
               state.templateId,
               reducedTopic!.topic.id,
               reducedTopic!.fields.map(
@@ -226,7 +226,7 @@ export function usePersistModel() {
           );
           if (reducedTopicId !== extendedTopicId) {
             executeAndMonitorCall(() =>
-              updateFieldTopicRel(
+              assignQuestionsToTopic(
                 state.templateId,
                 extendedTopic!.topic.id,
                 extendedTopic!.fields.map(
