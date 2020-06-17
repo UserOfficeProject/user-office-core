@@ -23,7 +23,7 @@ class UpdateQuestionsTopicRelsArgs {
   public topicId: number;
 
   @Field(() => [String], { nullable: true })
-  public fieldIds: string[];
+  public questionIds: string[];
 }
 
 @ObjectType()
@@ -43,7 +43,7 @@ export class UpdateQuestionsTopicRelsMutation {
     return wrapResponse(
       context.mutations.template.updateQuestionsTopicRels(context.user, {
         topicId: args.topicId,
-        questionIds: args.fieldIds,
+        questionIds: args.questionIds,
         templateId: args.templateId,
       }),
       UpdateQuestionsTopicRelsResponseWrap
