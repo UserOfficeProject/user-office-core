@@ -9,11 +9,11 @@ import {
   Topic,
   TemplateCategoryId,
 } from '../models/ProposalModel';
-import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTopicRelationArgs } from '../resolvers/mutations/CreateQuestionTopicRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { DeleteQuestionTopicRelationArgs } from '../resolvers/mutations/DeleteQuestionTopicRelationMutation';
+import { UpdateQuestionTopicRelationArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -51,15 +51,21 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionRel(args: CreateQuestionRelArgs): Promise<Template>;
+  createQuestionTopicRelation(
+    args: CreateQuestionTopicRelationArgs
+  ): Promise<Template>;
   getQuestionRel(
     questionId: string,
     templateId: number
   ): Promise<QuestionRel | null>;
 
-  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template>;
+  updateQuestionTopicRelation(
+    args: UpdateQuestionTopicRelationArgs
+  ): Promise<Template>;
 
-  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template>;
+  deleteQuestionTopicRelation(
+    args: DeleteQuestionTopicRelationArgs
+  ): Promise<Template>;
 
   // Topic
   createTopic(args: CreateTopicArgs): Promise<Template>;

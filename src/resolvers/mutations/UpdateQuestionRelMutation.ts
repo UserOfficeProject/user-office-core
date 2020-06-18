@@ -35,7 +35,7 @@ export class FieldDependencyInput implements Partial<FieldDependencyOrigin> {
 }
 
 @ArgsType()
-export class UpdateQuestionRelArgs {
+export class UpdateQuestionTopicRelationArgs {
   @Field()
   public questionId: string;
 
@@ -56,16 +56,19 @@ export class UpdateQuestionRelArgs {
 }
 
 @Resolver()
-export class UpdateQuestionRelMutation {
+export class UpdateQuestionTopicRelationMutation {
   @Mutation(() => TemplateResponseWrap)
-  updateQuestionRel(
-    @Args() args: UpdateQuestionRelArgs,
+  updateQuestionTopicRelation(
+    @Args() args: UpdateQuestionTopicRelationArgs,
     @Ctx() context: ResolverContext
   ) {
     args.dependency = this.unpackDependency(args.dependency);
 
     return wrapResponse(
-      context.mutations.template.updateQuestionRel(context.user, args),
+      context.mutations.template.updateQuestionTopicRelation(
+        context.user,
+        args
+      ),
       TemplateResponseWrap
     );
   }

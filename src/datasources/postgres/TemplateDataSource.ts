@@ -9,11 +9,11 @@ import {
   TemplateStep,
   Topic,
 } from '../../models/ProposalModel';
-import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTopicRelationArgs } from '../../resolvers/mutations/CreateQuestionTopicRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { DeleteQuestionTopicRelationArgs } from '../../resolvers/mutations/DeleteQuestionTopicRelationMutation';
+import { UpdateQuestionTopicRelationArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -23,7 +23,7 @@ import database from './database';
 import {
   createProposalTemplateObject,
   createQuestionObject,
-  createQuestionRelObject,
+  createQuestionTopicRelationObject,
   createTemplateCategoryObject,
   createTopicObject,
   QuestionRecord,
@@ -159,7 +159,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     ).rows;
 
     const fields = questionRecords.map(record =>
-      createQuestionRelObject(record)
+      createQuestionTopicRelationObject(record)
     );
 
     const steps = Array<TemplateStep>();
@@ -251,7 +251,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return question;
   }
 
-  async createQuestionRel(args: CreateQuestionRelArgs): Promise<Template> {
+  async createQuestionTopicRelation(
+    args: CreateQuestionTopicRelationArgs
+  ): Promise<Template> {
     const { templateId, questionId, sortOrder, topicId } = args;
     const question = await this.getQuestion(questionId);
 
@@ -275,7 +277,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return returnValue;
   }
 
-  async updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template> {
+  async updateQuestionTopicRelation(
+    args: UpdateQuestionTopicRelationArgs
+  ): Promise<Template> {
     const {
       templateId,
       questionId,
@@ -378,7 +382,7 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
           return null;
         }
 
-        return createQuestionRelObject(resultSet[0]);
+        return createQuestionTopicRelationObject(resultSet[0]);
       });
   }
 
@@ -397,7 +401,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
     return createQuestionObject(row[0]);
   }
 
-  async deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template> {
+  async deleteQuestionTopicRelation(
+    args: DeleteQuestionTopicRelationArgs
+  ): Promise<Template> {
     const rowsAffected = await database('templates_has_questions')
       .where({
         template_id: args.templateId,

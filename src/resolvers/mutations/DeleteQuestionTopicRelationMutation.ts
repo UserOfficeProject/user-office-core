@@ -11,32 +11,28 @@ import {
 import { ResolverContext } from '../../context';
 import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-import { FieldDependencyInput } from './UpdateQuestionRelMutation';
 
 @ArgsType()
-export class CreateQuestionRelArgs {
-  @Field(() => Int)
-  templateId: number;
-
-  @Field()
+export class DeleteQuestionTopicRelationArgs {
+  @Field(() => String)
   questionId: string;
 
   @Field(() => Int)
-  sortOrder: number;
-
-  @Field(() => Int)
-  topicId: number;
+  templateId: number;
 }
 
 @Resolver()
-export class CreateQuestionRelMutation {
+export class DeleteQuestionRelMutation {
   @Mutation(() => TemplateResponseWrap)
-  createQuestionRel(
-    @Args() args: CreateQuestionRelArgs,
+  deleteQuestionTopicRelation(
+    @Args() args: DeleteQuestionTopicRelationArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createQuestionRel(context.user, args),
+      context.mutations.template.deleteQuestionTopicRelation(
+        context.user,
+        args
+      ),
       TemplateResponseWrap
     );
   }
