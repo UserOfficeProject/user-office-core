@@ -5,7 +5,7 @@ import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
   createQuestionaryObject,
-  createQuestionTopicRelationObject,
+  createQuestionTemplateRelationObject,
   createTopicObject,
   QuestionaryRecord,
   QuestionRecord,
@@ -217,7 +217,7 @@ export default class PostgresQuestionaryDataSource
     const fields = answerRecords.map(record => {
       const value = record.value ? JSON.parse(record.value).value : '';
 
-      return new Answer(createQuestionTopicRelationObject(record), value);
+      return new Answer(createQuestionTemplateRelationObject(record), value);
     });
 
     const steps = Array<QuestionaryStep>();

@@ -13,7 +13,7 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class DeleteQuestionTopicRelationArgs {
+export class DeleteQuestionTemplateRelationArgs {
   @Field(() => String)
   questionId: string;
 
@@ -22,14 +22,14 @@ export class DeleteQuestionTopicRelationArgs {
 }
 
 @Resolver()
-export class DeleteQuestionRelMutation {
+export class DeleteQuestionTemplateRelationMutation {
   @Mutation(() => TemplateResponseWrap)
-  deleteQuestionTopicRelation(
-    @Args() args: DeleteQuestionTopicRelationArgs,
+  deleteQuestionTemplateRelation(
+    @Args() args: DeleteQuestionTemplateRelationArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.deleteQuestionTopicRelation(
+      context.mutations.template.deleteQuestionTemplateRelation(
         context.user,
         args
       ),

@@ -319,7 +319,7 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionTopicRelationObject = (
+export const createQuestionTemplateRelationObject = (
   record: QuestionRecord & QuestionTemplateRelRecord
 ) => {
   return new QuestionRel(

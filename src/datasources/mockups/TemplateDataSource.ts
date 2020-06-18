@@ -12,11 +12,11 @@ import {
   Topic,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
-import { CreateQuestionTopicRelationArgs } from '../../resolvers/mutations/CreateQuestionTopicRelationMutation';
+import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionTopicRelationArgs } from '../../resolvers/mutations/DeleteQuestionTopicRelationMutation';
-import { UpdateQuestionTopicRelationArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
@@ -124,8 +124,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async createQuestionTopicRelation(
-    args: CreateQuestionTopicRelationArgs
+  async createQuestionTemplateRelation(
+    args: CreateQuestionTemplateRelationArgs
   ): Promise<Template> {
     return dummyProposalTemplate;
   }
@@ -137,8 +137,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
       question: { proposalQuestionId: questionId },
     });
   }
-  async deleteQuestionTopicRelation(
-    args: DeleteQuestionTopicRelationArgs
+  async deleteQuestionTemplateRelation(
+    args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template> {
     dummyTemplateSteps.forEach(function(step) {
       step.fields = step.fields.filter(field => {
@@ -148,8 +148,8 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async updateQuestionTopicRelation(
-    args: UpdateQuestionTopicRelationArgs
+  async updateQuestionTemplateRelation(
+    args: UpdateQuestionTemplateRelationArgs
   ): Promise<Template> {
     const question = getFieldById(
       dummyTemplateSteps,

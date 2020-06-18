@@ -218,17 +218,20 @@ test('Officer can delete a topic', async () => {
 });
 
 test('User can not update question rel', async () => {
-  const steps = await mutations.updateQuestionTopicRelation(dummyUserWithRole, {
-    templateId: 1,
-    questionId: QUESTION_ID,
-    sortOrder: 2,
-    topicId: 1,
-  });
+  const steps = await mutations.updateQuestionTemplateRelation(
+    dummyUserWithRole,
+    {
+      templateId: 1,
+      questionId: QUESTION_ID,
+      sortOrder: 2,
+      topicId: 1,
+    }
+  );
   expect(isRejection(steps)).toBe(true);
 });
 
 test('User officer can update question rel', async () => {
-  const response = await mutations.updateQuestionTopicRelation(
+  const response = await mutations.updateQuestionTemplateRelation(
     dummyUserOfficerWithRole,
     {
       templateId: 1,
@@ -240,7 +243,7 @@ test('User officer can update question rel', async () => {
 });
 
 test('User can not delete question rel', async () => {
-  const response = await mutations.deleteQuestionTopicRelation(
+  const response = await mutations.deleteQuestionTemplateRelation(
     dummyUserWithRole,
     {
       templateId: 1,
@@ -251,7 +254,7 @@ test('User can not delete question rel', async () => {
 });
 
 test('User officer can delete question rel', async () => {
-  const response = await mutations.deleteQuestionTopicRelation(
+  const response = await mutations.deleteQuestionTemplateRelation(
     dummyUserOfficerWithRole,
     {
       templateId: 1,
@@ -312,7 +315,7 @@ test('User officer can add question to template', async () => {
   const templateId = 1;
   const topicId = 1;
 
-  const result = await mutations.createQuestionTopicRelation(
+  const result = await mutations.createQuestionTemplateRelation(
     dummyUserOfficerWithRole,
     {
       questionId,

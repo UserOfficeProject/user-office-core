@@ -1,43 +1,36 @@
 import {
-  createTemplateValidationSchema,
   cloneTemplateValidationSchema,
-  deleteTemplateValidationSchema,
-  createTopicValidationSchema,
-  updateTopicValidationSchema,
-  deleteTopicValidationSchema,
   createQuestionValidationSchema,
-  updateQuestionValidationSchema,
+  createTemplateValidationSchema,
+  createTopicValidationSchema,
   deleteQuestionValidationSchema,
-  updateQuestionTopicRelationValidationSchema,
-  deleteQuestionTopicRelationValidationSchema,
-  updateTopicOrderValidationSchema,
-  updateQuestionsTopicRelsValidationSchema,
+  deleteTemplateValidationSchema,
+  deleteTopicValidationSchema,
   updateProposalTemplateValidationSchema,
-  createQuestionTopicRelationValidationSchema,
+  updateQuestionsTopicRelsValidationSchema,
+  updateQuestionValidationSchema,
+  updateTopicOrderValidationSchema,
+  updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
-
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import {
   createConfig,
   DataType,
-  Template,
   Question,
+  Template,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
-import { CreateQuestionTopicRelationArgs } from '../resolvers/mutations/CreateQuestionTopicRelationMutation';
+import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import {
-  DeleteQuestionTopicRelationArgs,
-  DeleteQuestionRelMutation,
-} from '../resolvers/mutations/DeleteQuestionTopicRelationMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
-import { UpdateQuestionTopicRelationArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
@@ -223,14 +216,14 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(updateQuestionTopicRelationValidationSchema)
+  //@ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionTopicRelation(
+  async updateQuestionTemplateRelation(
     agent: UserWithRole | null,
-    args: UpdateQuestionTopicRelationArgs
+    args: UpdateQuestionTemplateRelationArgs
   ): Promise<Template | Rejection> {
     return this.dataSource
-      .updateQuestionTopicRelation(args)
+      .updateQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
@@ -242,14 +235,14 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(deleteQuestionTopicRelationValidationSchema)
+  //@ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async deleteQuestionTopicRelation(
+  async deleteQuestionTemplateRelation(
     agent: UserWithRole | null,
-    args: DeleteQuestionTopicRelationArgs
+    args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template | Rejection> {
     return this.dataSource
-      .deleteQuestionTopicRelation(args)
+      .deleteQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not delete question rel', err, {
@@ -293,12 +286,14 @@ export default class TemplateMutations {
     let isSuccess = true;
     let index = 1;
     for (const questionId of args.questionIds) {
-      const updatedField = await this.dataSource.updateQuestionTopicRelation({
-        questionId,
-        topicId: args.topicId,
-        templateId: args.templateId,
-        sortOrder: index,
-      });
+      const updatedField = await this.dataSource.updateQuestionTemplateRelation(
+        {
+          questionId,
+          topicId: args.topicId,
+          templateId: args.templateId,
+          sortOrder: index,
+        }
+      );
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -324,14 +319,14 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(createQuestionTopicRelationValidationSchema)
+  //@ValidateArgs(createQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async createQuestionTopicRelation(
+  async createQuestionTemplateRelation(
     user: UserWithRole | null,
-    args: CreateQuestionTopicRelationArgs
+    args: CreateQuestionTemplateRelationArgs
   ) {
     return this.dataSource
-      .createQuestionTopicRelation(args)
+      .createQuestionTemplateRelation(args)
       .then(data => data)
       .catch(err => {
         logger.logException('Could not create Question Relation', err, {

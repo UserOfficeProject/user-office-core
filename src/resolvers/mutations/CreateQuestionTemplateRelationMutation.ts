@@ -12,7 +12,7 @@ import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class CreateQuestionTopicRelationArgs {
+export class CreateQuestionTemplateRelationArgs {
   @Field(() => Int)
   templateId: number;
 
@@ -29,12 +29,12 @@ export class CreateQuestionTopicRelationArgs {
 @Resolver()
 export class CreateQuestionTopicRelationMutation {
   @Mutation(() => TemplateResponseWrap)
-  createQuestionTopicRelation(
-    @Args() args: CreateQuestionTopicRelationArgs,
+  createQuestionTemplateRelation(
+    @Args() args: CreateQuestionTemplateRelationArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createQuestionTopicRelation(
+      context.mutations.template.createQuestionTemplateRelation(
         context.user,
         args
       ),
