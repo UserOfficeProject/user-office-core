@@ -4,7 +4,7 @@ import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
 export default class InstrumentQueries {
-  constructor(private dataSource: InstrumentDataSource) {}
+  constructor(public dataSource: InstrumentDataSource) {}
 
   @Authorized()
   async get(agent: UserWithRole | null, instrumentId: number) {

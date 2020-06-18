@@ -28,7 +28,7 @@
   "license": "ISC",
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.9",
-    "@esss-swap/duo-validation": "^1.1.4",
+    "@esss-swap/duo-validation": "^1.1.7",
     "@types/amqplib": "^0.5.13",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",

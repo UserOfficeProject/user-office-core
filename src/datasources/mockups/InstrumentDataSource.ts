@@ -32,4 +32,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async delete(instrumentId: number): Promise<Instrument> {
     return dummyInstrument;
   }
+
+  async getInstrumentsByCallId(callId: number): Promise<Instrument[]> {
+    return [dummyInstrument];
+  }
 }

@@ -9,6 +9,7 @@ export interface InstrumentDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
+  getInstrumentsByCallId(callId: number): Promise<Instrument[]>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
 }
