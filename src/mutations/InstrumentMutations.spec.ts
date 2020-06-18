@@ -35,24 +35,28 @@ describe('Test Instrument Mutations', () => {
   });
 
   test('A logged in user officer can create an instrument', () => {
+    const instrumentToCreate = {
+      name: 'Test Instrument',
+      shortCode: '2020-06-15',
+      description: 'Test instrument description',
+    };
+
     return expect(
-      instrumentMutations.create(dummyUserOfficerWithRole, {
-        name: 'Test Instrument',
-        shortCode: '2020-06-15',
-        description: 'Test instrument description',
-      })
-    ).resolves.toBe(dummyInstrument);
+      instrumentMutations.create(dummyUserOfficerWithRole, instrumentToCreate)
+    ).resolves.toStrictEqual({ instrumentId: 1, ...instrumentToCreate });
   });
 
   test('A logged in user officer can update instrument', () => {
+    const instrumentToUpdate = {
+      instrumentId: 1,
+      name: 'Test Instrument 1',
+      shortCode: '2020-06-15',
+      description: 'Test instrument description 1',
+    };
+
     return expect(
-      instrumentMutations.update(dummyUserOfficerWithRole, {
-        instrumentId: 1,
-        name: 'Test Instrument',
-        shortCode: '2020-06-15',
-        description: 'Test instrument description',
-      })
-    ).resolves.toBe(dummyInstrument);
+      instrumentMutations.update(dummyUserOfficerWithRole, instrumentToUpdate)
+    ).resolves.toStrictEqual({ ...instrumentToUpdate });
   });
 
   test('A logged in user officer can delete instrument', () => {

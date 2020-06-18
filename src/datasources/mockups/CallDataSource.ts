@@ -22,9 +22,17 @@ export const dummyCall = new Call(
   1
 );
 
+const dummyCalls = [dummyCall];
+
 export class CallDataSourceMock implements CallDataSource {
   async get(id: number): Promise<Call | null> {
-    return dummyCall;
+    const call = dummyCalls.find(dummyCallItem => dummyCallItem.id === id);
+
+    if (call) {
+      return call;
+    } else {
+      return null;
+    }
   }
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
@@ -32,11 +40,11 @@ export class CallDataSourceMock implements CallDataSource {
   }
 
   async create(args: CreateCallArgs) {
-    return dummyCall;
+    return { ...dummyCall, ...args };
   }
 
   async update(args: UpdateCallArgs) {
-    return dummyCall;
+    return { ...dummyCall, ...args };
   }
 
   async assignInstrumentToCall(args: AssignInstrumentToCallArgs) {

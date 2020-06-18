@@ -9,13 +9,23 @@ export const dummyInstrument = new Instrument(
   'This is test instrument.'
 );
 
+const dummyInstruments = [dummyInstrument];
+
 export class InstrumentDataSourceMock implements InstrumentDataSource {
   async create(args: CreateInstrumentArgs): Promise<Instrument> {
-    return dummyInstrument;
+    return { ...dummyInstrument, ...args };
   }
 
   async get(instrumentId: number): Promise<Instrument | null> {
-    return dummyInstrument;
+    const instrument = dummyInstruments.find(
+      dummyInstrumentItem => dummyInstrumentItem.instrumentId === instrumentId
+    );
+
+    if (instrument) {
+      return instrument;
+    } else {
+      return null;
+    }
   }
 
   async getAll(
@@ -26,7 +36,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   }
 
   async update(instrument: Instrument): Promise<Instrument> {
-    return dummyInstrument;
+    return { ...dummyInstrument, ...instrument };
   }
 
   async delete(instrumentId: number): Promise<Instrument> {
