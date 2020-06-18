@@ -113,19 +113,12 @@ export default function ProposalQuestionaryStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    const answers: AnswerInput[] = activeFields.map(field => {
-      return (({ question, value }) => ({
-        questionId: question.proposalQuestionId,
-        value,
-      }))(field);
-    });
-
     dispatch({
       type: markAsComplete
         ? EventType.FINISH_STEP_CLICKED
         : EventType.SAVE_STEP_CLICKED,
       payload: {
-        answers: answers,
+        answers: activeFields,
         topicId: props.topicId,
       },
     });
