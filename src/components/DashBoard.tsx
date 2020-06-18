@@ -196,7 +196,7 @@ const Dashboard: React.FC = () => {
           {isUserOfficer && <Route path="/PeoplePage" component={PeoplePage} />}
           <Route path="/ProposalPage" component={ProposalPage} />
           <Route path="/PageEditor" component={PageEditor} />
-          <Route path="/CallPage" component={CallPage} />
+          {isUserOfficer && <Route path="/CallPage" component={CallPage} />}
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
