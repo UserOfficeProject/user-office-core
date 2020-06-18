@@ -1,10 +1,10 @@
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Sep } from '../../generated/sdk';
+import { Sep, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { useCheckAccess } from '../common/Can';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
 import SEPGeneralInfo from './SEPGeneralInfo';
@@ -24,7 +24,7 @@ type SEPPageProps = PropTypes.InferProps<typeof SEPPagePropTypes>;
 const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
   const [sep, setSEP] = useState<Sep | null>(null);
   const api = useDataApi();
-  const { currentRole } = useContext(UserContext);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const loadSEP = useCallback(async () => {
     return api()
       .getSEP({ id: parseInt(match.params.id) })
@@ -43,7 +43,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
 
   const tabNames = ['General', 'Members', 'Proposals and Assignments'];
 
-  if (currentRole === 'user_officer') {
+  if (hasAccessRights) {
     tabNames.push('Logs');
   }
 
@@ -56,7 +56,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
         />
         <SEPMembers sepId={sep.id} />
         <SEPProposalsAndAssignments sepId={sep.id} />
-        {currentRole === 'user_officer' && (
+        {hasAccessRights && (
           <EventLogList changedObjectId={sep.id} eventType="SEP" />
         )}
       </SimpleTabs>

@@ -2,14 +2,14 @@ import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Instrument } from '../../generated/sdk';
+import { Instrument, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import Can from '../common/Can';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const useStyles = makeStyles({
@@ -21,7 +21,6 @@ const useStyles = makeStyles({
 
 const InstrumentsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { currentRole } = useContext(UserContext);
   const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
   const classes = useStyles();
   const columns = [
@@ -126,19 +125,23 @@ const InstrumentsTable: React.FC = () => {
             },
           ]}
         />
-        {currentRole === 'user_officer' && (
-          <ButtonContainer>
-            <Button
-              type="button"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              onClick={(): void => setShow(true)}
-            >
-              Create instrument
-            </Button>
-          </ButtonContainer>
-        )}
+        <Can
+          allowedRoles={[UserRole.USER_OFFICER]}
+          yes={() => (
+            <ButtonContainer>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={(): void => setShow(true)}
+              >
+                Create instrument
+              </Button>
+            </ButtonContainer>
+          )}
+          no={() => null}
+        ></Can>
       </div>
     </>
   );

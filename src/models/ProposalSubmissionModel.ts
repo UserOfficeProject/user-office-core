@@ -1,12 +1,7 @@
 import produce from 'immer';
 import { Reducer, Dispatch } from 'react';
 
-import {
-  Proposal,
-  ProposalStatus,
-  Answer,
-  QuestionaryStep,
-} from '../generated/sdk';
+import { ProposalStatus, Answer, QuestionaryStep } from '../generated/sdk';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import { ProposalSubsetSumbission } from './ProposalModel';
 import {

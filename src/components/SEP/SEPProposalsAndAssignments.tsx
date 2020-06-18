@@ -4,20 +4,21 @@ import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
 import {
   SepProposal,
   SepMember,
   SepAssignment,
   ReviewStatus,
   Review,
+  UserRole,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useSEPProposalsData } from '../../hooks/useSEPProposalsData';
 import { BasicUserDetails } from '../../models/User';
 import { tableIcons } from '../../utils/materialIcons';
+import { useCheckAccess } from '../common/Can';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 import AssignmentProvider from './SEPCurrentAssignmentProvider';
@@ -38,7 +39,11 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
-  const { currentRole } = useContext(UserContext);
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   const getGrades = (assignments: SepAssignment[]) =>
     assignments
@@ -249,12 +254,6 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
 
     return newProposalsData;
   };
-
-  const hasAccessRights = [
-    'user_officer',
-    'SEP_Chair',
-    'SEP_Secretary',
-  ].includes(currentRole);
 
   const ReviewersTable = (rowData: SepProposal) => (
     <SEPAssignedReviewersTable

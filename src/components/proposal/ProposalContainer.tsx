@@ -12,14 +12,17 @@ import { useSnackbar } from 'notistack';
 import React, {
   createContext,
   PropsWithChildren,
-  useContext,
   useEffect,
   useState,
 } from 'react';
 import { Prompt } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
+import {
+  Proposal,
+  ProposalStatus,
+  Questionary,
+  UserRole,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { Answer, ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
@@ -31,6 +34,7 @@ import {
 } from '../../models/ProposalSubmissionModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import { clamp } from '../../utils/Math';
+import { useCheckAccess } from '../common/Can';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -80,8 +84,7 @@ export default function ProposalContainer(props: {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentRole } = useContext(UserContext);
-  const isNonOfficer = currentRole !== 'user_officer';
+  const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
@@ -128,7 +131,7 @@ export default function ProposalContainer(props: {
       }
       setIsLoading(false);
 
-      return result!;
+      return result;
     });
   };
 
@@ -142,7 +145,7 @@ export default function ProposalContainer(props: {
         const proposal = await executeAndMonitorCall(() =>
           api()
             .getProposal({ id: state.proposal.id })
-            .then(data => data.proposal!)
+            .then(data => data.proposal as Proposal)
         );
         dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
 
@@ -203,8 +206,7 @@ export default function ProposalContainer(props: {
               () =>
                 api()
                   .createProposal({ callId })
-                  // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
-                  .then(data => data.createProposal.proposal!),
+                  .then(data => data.createProposal.proposal as Proposal),
               'Saved'
             );
             ({ id, status, shortCode } = result);
