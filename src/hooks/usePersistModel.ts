@@ -75,9 +75,12 @@ export function usePersistModel() {
       .then(data => data.updateQuestion);
   };
 
-  const updateQuestionRel = async (templateId: number, field: QuestionRel) => {
+  const updateQuestionTopicRelation = async (
+    templateId: number,
+    field: QuestionRel
+  ) => {
     return api()
-      .updateQuestionRel({
+      .updateQuestionTopicRelation({
         templateId,
         topicId: field.topicId,
         sortOrder: field.sortOrder,
@@ -87,7 +90,7 @@ export function usePersistModel() {
           ? prepareDependencies(field.dependency)
           : undefined,
       })
-      .then(data => data.updateQuestionRel);
+      .then(data => data.updateQuestionTopicRelation);
   };
 
   const createQuestion = async (
@@ -120,14 +123,14 @@ export function usePersistModel() {
     setIsLoading(true);
 
     return api()
-      .deleteQuestionRel({
+      .deleteQuestionTopicRelation({
         templateId,
         questionId,
       })
       .then(data => {
         setIsLoading(false);
 
-        return data.deleteQuestionRel;
+        return data.deleteQuestionTopicRelation;
       });
   };
 
@@ -154,9 +157,14 @@ export function usePersistModel() {
     sortOrder: number
   ) => {
     return api()
-      .createQuestionRel({ templateId, topicId, questionId, sortOrder })
+      .createQuestionTopicRelation({
+        templateId,
+        topicId,
+        questionId,
+        sortOrder,
+      })
       .then(data => {
-        return data.createQuestionRel;
+        return data.createQuestionTopicRelation;
       });
   };
 
@@ -263,7 +271,10 @@ export function usePersistModel() {
           executeAndMonitorCall(async () => {
             const questionRel = action.payload.field as QuestionRel;
             const templateId = action.payload.templateId;
-            const result = await updateQuestionRel(templateId, questionRel);
+            const result = await updateQuestionTopicRelation(
+              templateId,
+              questionRel
+            );
             if (result.template) {
               dispatch({
                 type: EventType.QUESTION_REL_UPDATED,

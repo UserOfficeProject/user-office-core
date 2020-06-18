@@ -267,12 +267,12 @@ export type Mutation = {
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
-  createQuestionRel: TemplateResponseWrap,
+  createQuestionTopicRelation: TemplateResponseWrap,
   createTemplate: TemplateResponseWrap,
   createTopic: TemplateResponseWrap,
-  deleteQuestionRel: TemplateResponseWrap,
+  deleteQuestionTopicRelation: TemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
-  updateQuestionRel: TemplateResponseWrap,
+  updateQuestionTopicRelation: TemplateResponseWrap,
   updateTemplate: TemplateResponseWrap,
   updateTopic: TopicResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
@@ -281,6 +281,7 @@ export type Mutation = {
   updateUser: UserResponseWrap,
   addClientLog: SuccessResponseWrap,
   applyPatches: PrepareDbResponseWrap,
+  assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap,
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
   deleteInstitution: InstitutionResponseWrap,
@@ -302,7 +303,6 @@ export type Mutation = {
   token: TokenResponseWrap,
   selectRole: TokenResponseWrap,
   updatePassword: BasicUserDetailsResponseWrap,
-  assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap,
   updateTopicOrder: UpdateTopicOrderResponseWrap,
 };
 
@@ -458,7 +458,7 @@ export type MutationCreateQuestionArgs = {
 };
 
 
-export type MutationCreateQuestionRelArgs = {
+export type MutationCreateQuestionTopicRelationArgs = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
   sortOrder: Scalars['Int'],
@@ -479,7 +479,7 @@ export type MutationCreateTopicArgs = {
 };
 
 
-export type MutationDeleteQuestionRelArgs = {
+export type MutationDeleteQuestionTopicRelationArgs = {
   questionId: Scalars['String'],
   templateId: Scalars['Int']
 };
@@ -493,7 +493,7 @@ export type MutationUpdateQuestionArgs = {
 };
 
 
-export type MutationUpdateQuestionRelArgs = {
+export type MutationUpdateQuestionTopicRelationArgs = {
   questionId: Scalars['String'],
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
@@ -581,6 +581,13 @@ export type MutationUpdateUserArgs = {
 
 export type MutationAddClientLogArgs = {
   error: Scalars['String']
+};
+
+
+export type MutationAssignQuestionsToTopicArgs = {
+  templateId: Scalars['Int'],
+  topicId: Scalars['Int'],
+  questionIds?: Maybe<Array<Scalars['String']>>
 };
 
 
@@ -686,13 +693,6 @@ export type MutationSelectRoleArgs = {
 export type MutationUpdatePasswordArgs = {
   id: Scalars['Int'],
   password: Scalars['String']
-};
-
-
-export type MutationAssignQuestionsToTopicArgs = {
-  templateId: Scalars['Int'],
-  topicId: Scalars['Int'],
-  questionIds?: Maybe<Array<Scalars['String']>>
 };
 
 
@@ -2224,7 +2224,7 @@ export type CreateQuestionMutation = (
   ) }
 );
 
-export type CreateQuestionRelMutationVariables = {
+export type CreateQuestionTopicRelationMutationVariables = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
   topicId: Scalars['Int'],
@@ -2232,9 +2232,9 @@ export type CreateQuestionRelMutationVariables = {
 };
 
 
-export type CreateQuestionRelMutation = (
+export type CreateQuestionTopicRelationMutation = (
   { __typename?: 'Mutation' }
-  & { createQuestionRel: (
+  & { createQuestionTopicRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -2279,15 +2279,15 @@ export type DeleteQuestionMutation = (
   ) }
 );
 
-export type DeleteQuestionRelMutationVariables = {
+export type DeleteQuestionTopicRelationMutationVariables = {
   questionId: Scalars['String'],
   templateId: Scalars['Int']
 };
 
 
-export type DeleteQuestionRelMutation = (
+export type DeleteQuestionTopicRelationMutation = (
   { __typename?: 'Mutation' }
-  & { deleteQuestionRel: (
+  & { deleteQuestionTopicRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -2541,7 +2541,7 @@ export type UpdateQuestionMutation = (
   ) }
 );
 
-export type UpdateQuestionRelMutationVariables = {
+export type UpdateQuestionTopicRelationMutationVariables = {
   questionId: Scalars['String'],
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
@@ -2551,9 +2551,9 @@ export type UpdateQuestionRelMutationVariables = {
 };
 
 
-export type UpdateQuestionRelMutation = (
+export type UpdateQuestionTopicRelationMutation = (
   { __typename?: 'Mutation' }
-  & { updateQuestionRel: (
+  & { updateQuestionTopicRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -3814,9 +3814,9 @@ export const CreateQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const CreateQuestionRelDocument = gql`
-    mutation createQuestionRel($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
-  createQuestionRel(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
+export const CreateQuestionTopicRelationDocument = gql`
+    mutation createQuestionTopicRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
+  createQuestionTopicRelation(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
     template {
       ...template
     }
@@ -3844,9 +3844,9 @@ export const DeleteQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const DeleteQuestionRelDocument = gql`
-    mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
-  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
+export const DeleteQuestionTopicRelationDocument = gql`
+    mutation deleteQuestionTopicRelation($questionId: String!, $templateId: Int!) {
+  deleteQuestionTopicRelation(questionId: $questionId, templateId: $templateId) {
     template {
       ...template
     }
@@ -3916,9 +3916,9 @@ export const UpdateQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const UpdateQuestionRelDocument = gql`
-    mutation updateQuestionRel($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
-  updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
+export const UpdateQuestionTopicRelationDocument = gql`
+    mutation updateQuestionTopicRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
+  updateQuestionTopicRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
     template {
       ...template
     }
@@ -4337,8 +4337,8 @@ export function getSdk(client: GraphQLClient) {
     createQuestion(variables: CreateQuestionMutationVariables): Promise<CreateQuestionMutation> {
       return client.request<CreateQuestionMutation>(print(CreateQuestionDocument), variables);
     },
-    createQuestionRel(variables: CreateQuestionRelMutationVariables): Promise<CreateQuestionRelMutation> {
-      return client.request<CreateQuestionRelMutation>(print(CreateQuestionRelDocument), variables);
+    createQuestionTopicRelation(variables: CreateQuestionTopicRelationMutationVariables): Promise<CreateQuestionTopicRelationMutation> {
+      return client.request<CreateQuestionTopicRelationMutation>(print(CreateQuestionTopicRelationDocument), variables);
     },
     createTopic(variables: CreateTopicMutationVariables): Promise<CreateTopicMutation> {
       return client.request<CreateTopicMutation>(print(CreateTopicDocument), variables);
@@ -4346,8 +4346,8 @@ export function getSdk(client: GraphQLClient) {
     deleteQuestion(variables: DeleteQuestionMutationVariables): Promise<DeleteQuestionMutation> {
       return client.request<DeleteQuestionMutation>(print(DeleteQuestionDocument), variables);
     },
-    deleteQuestionRel(variables: DeleteQuestionRelMutationVariables): Promise<DeleteQuestionRelMutation> {
-      return client.request<DeleteQuestionRelMutation>(print(DeleteQuestionRelDocument), variables);
+    deleteQuestionTopicRelation(variables: DeleteQuestionTopicRelationMutationVariables): Promise<DeleteQuestionTopicRelationMutation> {
+      return client.request<DeleteQuestionTopicRelationMutation>(print(DeleteQuestionTopicRelationDocument), variables);
     },
     deleteTemplate(variables: DeleteTemplateMutationVariables): Promise<DeleteTemplateMutation> {
       return client.request<DeleteTemplateMutation>(print(DeleteTemplateDocument), variables);
@@ -4370,8 +4370,8 @@ export function getSdk(client: GraphQLClient) {
     updateQuestion(variables: UpdateQuestionMutationVariables): Promise<UpdateQuestionMutation> {
       return client.request<UpdateQuestionMutation>(print(UpdateQuestionDocument), variables);
     },
-    updateQuestionRel(variables: UpdateQuestionRelMutationVariables): Promise<UpdateQuestionRelMutation> {
-      return client.request<UpdateQuestionRelMutation>(print(UpdateQuestionRelDocument), variables);
+    updateQuestionTopicRelation(variables: UpdateQuestionTopicRelationMutationVariables): Promise<UpdateQuestionTopicRelationMutation> {
+      return client.request<UpdateQuestionTopicRelationMutation>(print(UpdateQuestionTopicRelationDocument), variables);
     },
     updateTemplate(variables: UpdateTemplateMutationVariables): Promise<UpdateTemplateMutation> {
       return client.request<UpdateTemplateMutation>(print(UpdateTemplateDocument), variables);

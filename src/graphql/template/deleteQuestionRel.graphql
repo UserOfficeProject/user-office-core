@@ -1,5 +1,8 @@
-mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
-  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
+mutation deleteQuestionTopicRelation($questionId: String!, $templateId: Int!) {
+  deleteQuestionTopicRelation(
+    questionId: $questionId
+    templateId: $templateId
+  ) {
     template {
       ...template
     }
