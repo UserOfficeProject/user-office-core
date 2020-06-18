@@ -7,11 +7,15 @@ import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 
 export default function ProposalChooseCall() {
-  const { callsData } = useCallsData(true);
+  const { loading, callsData } = useCallsData(true);
   const history = useHistory();
 
-  if (!callsData) {
+  if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (callsData.length === 0) {
+    return <p>There are no running calls at the moment</p>;
   }
 
   if (callsData.length === 1) {
@@ -19,25 +23,23 @@ export default function ProposalChooseCall() {
   }
 
   return (
-    <React.Fragment>
-      <ContentContainer>
-        <StyledPaper margin={[0]}>
-          <Typography component="h1" variant="h4" align="center">
-            Choose call
-          </Typography>
-          <ul>
-            {callsData.map(call => {
-              const linkTo = '/ProposalCreate/' + call.id;
+    <ContentContainer>
+      <StyledPaper margin={[0]}>
+        <Typography component="h1" variant="h4" align="center">
+          Choose call
+        </Typography>
+        <ul>
+          {callsData.map(call => {
+            const linkTo = '/ProposalCreate/' + call.id;
 
-              return (
-                <li key={call.id}>
-                  <Link to={linkTo}>{call.shortCode}</Link>
-                </li>
-              );
-            })}
-          </ul>
-        </StyledPaper>
-      </ContentContainer>
-    </React.Fragment>
+            return (
+              <li key={call.id}>
+                <Link to={linkTo}>{call.shortCode}</Link>
+              </li>
+            );
+          })}
+        </ul>
+      </StyledPaper>
+    </ContentContainer>
   );
 }

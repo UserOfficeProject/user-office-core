@@ -42,7 +42,7 @@ const AddCall: React.FC<AddCallProps> = props => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const { templates } = useProposalsTemplates();
+  const { templates } = useProposalsTemplates(false);
   const currentDay = new Date();
 
   return (

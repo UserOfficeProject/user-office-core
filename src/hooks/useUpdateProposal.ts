@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 
 import { ProposalStatus } from '../generated/sdk';
-import { ProposalAnswer } from '../models/ProposalModel';
+import { Answer } from '../models/ProposalModel';
 import { getDataTypeSpec } from '../models/ProposalModelFunctions';
 import { useDataApi } from './useDataApi';
 
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
+const prepareAnswers = (answers?: Answer[]): Answer[] => {
   if (answers) {
     answers = answers.filter(
       answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
@@ -30,7 +30,7 @@ export function useUpdateProposal() {
       id: number;
       title?: string;
       abstract?: string;
-      answers?: ProposalAnswer[];
+      answers?: Answer[];
       topicsCompleted?: number[];
       status?: ProposalStatus;
       users?: number[];

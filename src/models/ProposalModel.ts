@@ -1,8 +1,7 @@
-import { DataType } from '../generated/sdk';
-// TODO cleanup this class and move functionality to other place
+import { DataType, Proposal } from '../generated/sdk';
 
-export interface ProposalAnswer {
-  proposalQuestionId: string;
+export interface Answer {
+  questionId: string;
   value: string;
   dataType: DataType;
 }
@@ -10,3 +9,16 @@ export interface ProposalAnswer {
 export interface DataTypeSpec {
   readonly: boolean;
 }
+
+export type ProposalSubsetSumbission = Pick<
+  Proposal,
+  | 'id'
+  | 'abstract'
+  | 'proposer'
+  | 'questionary'
+  | 'status'
+  | 'users'
+  | 'title'
+  | 'shortCode'
+  | 'callId'
+>;

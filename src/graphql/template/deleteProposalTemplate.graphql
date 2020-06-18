@@ -1,9 +1,0 @@
-mutation deleteProposalTemplate($id: Int!) {
-  deleteProposalTemplate(id: $id) {
-    template {
-      templateId
-      name
-    }
-    error
-  }
-}

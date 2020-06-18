@@ -14,7 +14,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   DataType,
   EvaluatorOperator,
-  ProposalTemplate,
+  Template,
   QuestionRel,
   SelectionFromOptionsConfig,
 } from '../../generated/sdk';
@@ -31,7 +31,7 @@ const FormikUICustomDependencySelector = ({
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
-  template: ProposalTemplate;
+  template: Template;
   templateField: QuestionRel;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');

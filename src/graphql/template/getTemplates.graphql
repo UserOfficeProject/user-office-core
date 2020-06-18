@@ -1,0 +1,8 @@
+query getTemplates($filter: TemplatesFilter) {
+  templates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+  }
+}
