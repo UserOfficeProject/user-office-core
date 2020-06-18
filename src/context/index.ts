@@ -4,6 +4,7 @@ import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
 import InstrumentMutations from '../mutations/InstrumentMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
+import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SEPMutations from '../mutations/SEPMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
@@ -14,6 +15,7 @@ import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
 import ProposalQueries from '../queries/ProposalQueries';
+import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SEPQueries from '../queries/SEPQueries';
 import TemplateQueries from '../queries/TemplateQueries';
@@ -31,6 +33,7 @@ interface ResolverContextQueries {
   eventLogs: EventLogQueries;
   sep: SEPQueries;
   instrument: InstrumentQueries;
+  questionary: QuestionaryQueries;
 }
 
 interface ResolverContextMutations {
@@ -43,6 +46,7 @@ interface ResolverContextMutations {
   template: TemplateMutations;
   sep: SEPMutations;
   instrument: InstrumentMutations;
+  questionary: QuestionaryMutations;
 }
 
 export interface BasicResolverContext {

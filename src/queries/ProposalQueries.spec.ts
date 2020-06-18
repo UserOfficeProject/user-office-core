@@ -47,18 +47,6 @@ test('A userofficer can get any proposal', () => {
   );
 });
 
-test('Get questionary should succeed for authorized user', () => {
-  return expect(
-    proposalQueries.getQuestionary(dummyUserWithRole, 1)
-  ).resolves.not.toBe(null);
-});
-
-test('Get questionary should not succeed for unauthorized user', () => {
-  return expect(
-    proposalQueries.getQuestionary(dummyUserNotOnProposalWithRole, 1)
-  ).resolves.toBe(null);
-});
-
 test('A userofficer can get all proposal', () => {
   return expect(
     proposalQueries.getAll(dummyUserOfficerWithRole)

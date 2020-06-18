@@ -1,4 +1,5 @@
 import { AdminDataSource } from '../datasources/AdminDataSource';
+import { InstitutionsFilter } from './../resolvers/queries/InstitutionsQuery';
 
 export default class AdminQueries {
   constructor(private dataSource: AdminDataSource) {}
@@ -13,8 +14,8 @@ export default class AdminQueries {
   async getCountries() {
     return await this.dataSource.getCountries();
   }
-  async getInstitutions() {
-    return await this.dataSource.getInstitutions();
+  async getInstitutions(filter?: InstitutionsFilter) {
+    return await this.dataSource.getInstitutions(filter);
   }
 
   async getInstitution(id: number) {

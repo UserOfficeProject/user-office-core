@@ -2,16 +2,20 @@ import { Field, ObjectType } from 'type-graphql';
 
 import { Response } from '../Decorators';
 import { Page } from './Admin';
+import { Answer } from './Answer';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
-import { ProposalTemplate } from './ProposalTemplate';
 import { Question } from './Question';
+import { Questionary } from './Questionary';
+import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionRel } from './QuestionRel';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
+import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
 
@@ -75,12 +79,26 @@ export class TechnicalReviewResponseWrap extends ResponseWrapBase<
 }
 
 @ObjectType()
-export class ProposalTemplateResponseWrap extends ResponseWrapBase<
-  ProposalTemplate
+export class TemplateResponseWrap extends ResponseWrapBase<Template> {
+  @Response()
+  @Field(() => Template, { nullable: true })
+  public template: Template;
+}
+
+@ObjectType()
+export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
+  @Response()
+  @Field(() => Questionary, { nullable: true })
+  public questionary: Questionary;
+}
+
+@ObjectType()
+export class QuestionaryStepResponseWrap extends ResponseWrapBase<
+  QuestionaryStep
 > {
   @Response()
-  @Field(() => ProposalTemplate, { nullable: true })
-  public template: ProposalTemplate;
+  @Field(() => QuestionaryStep, { nullable: true })
+  public questionaryStep: QuestionaryStep;
 }
 
 @ObjectType()
@@ -126,6 +144,13 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
 }
 
 @ObjectType()
+export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Institution, { nullable: true })
+  public institution: Institution;
+}
+
+@ObjectType()
 export class SuccessResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => Boolean, { nullable: true })
@@ -144,4 +169,11 @@ export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String)
   public log: string;
+}
+
+@ObjectType()
+export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
+  @Response()
+  @Field(() => Answer)
+  public answer: Answer;
 }

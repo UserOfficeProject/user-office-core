@@ -24,17 +24,6 @@ export default class SEPQueries {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
-  private async isChairOrSecretary(agent: UserWithRole | null) {
-    if (agent == null) {
-      return false;
-    }
-
-    return (
-      agent?.currentRole?.shortCode === Roles.SEP_CHAIR ||
-      agent?.currentRole?.shortCode === Roles.SEP_SECRETARY
-    );
-  }
-
   @Authorized([
     Roles.USER_OFFICER,
     Roles.SEP_CHAIR,
@@ -69,17 +58,28 @@ export default class SEPQueries {
     return this.dataSource.getAll(active, filter, first, offset);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getMembers(agent: UserWithRole | null, sepId: number) {
     return this.dataSource.getMembers(sepId);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposals(agent: UserWithRole | null, sepId: number) {
-    if (await this.isUserOfficer(agent)) {
+    if (
+      (await this.isUserOfficer(agent)) ||
+      (await this.isMemberOfSEP(agent, sepId))
+    ) {
       return this.dataSource.getSEPProposals(sepId);
-    } else if (await this.isChairOrSecretary(agent)) {
-      return this.dataSource.getSEPProposals(sepId, agent?.id);
     } else {
       return null;
     }

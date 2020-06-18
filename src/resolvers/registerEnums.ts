@@ -6,12 +6,14 @@ import {
   DataType,
   ProposalStatus,
   ProposalEndStatus,
+  TemplateCategoryId,
 } from '../models/ProposalModel';
 import { ReviewStatus } from '../models/Review';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import { UserRole } from '../models/User';
 
 export const registerEnums = () => {
+  registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
   registerEnumType(ProposalStatus, { name: 'ProposalStatus' });
   registerEnumType(ProposalEndStatus, { name: 'ProposalEndStatus' });
   registerEnumType(ReviewStatus, { name: 'ReviewStatus' });

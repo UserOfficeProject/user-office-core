@@ -3,12 +3,22 @@ import { Authorized } from '../decorators';
 import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { ProposalTemplatesArgs } from '../resolvers/queries/ProposalTemplatesQuery';
+import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
 export default class TemplateQueries {
   constructor(private dataSource: TemplateDataSource) {}
 
   @Authorized()
+  async getTemplate(agent: UserWithRole | null, templateId: number) {
+    return this.dataSource.getTemplate(templateId);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getTemplates(agent: UserWithRole | null, args?: TemplatesArgs) {
+    return this.dataSource.getTemplates(args);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
   async getComplementaryQuestions(
     agent: UserWithRole | null,
     templateId: number
@@ -16,12 +26,12 @@ export default class TemplateQueries {
     return this.dataSource.getComplementaryQuestions(templateId);
   }
 
-  @Authorized()
-  async getProposalTemplateSteps(
+  @Authorized([Roles.USER_OFFICER])
+  async getTemplateSteps(
     agent: UserWithRole | null,
     templateId: number
   ): Promise<TemplateStep[] | null> {
-    return this.dataSource.getProposalTemplateSteps(templateId);
+    return this.dataSource.getTemplateSteps(templateId);
   }
 
   @Authorized([Roles.USER_OFFICER])
@@ -30,15 +40,7 @@ export default class TemplateQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getProposalTemplates(
-    agent: UserWithRole | null,
-    args?: ProposalTemplatesArgs
-  ) {
-    return this.dataSource.getProposalTemplates(args);
-  }
-
-  @Authorized()
-  async getProposalTemplate(agent: UserWithRole | null, templateId: number) {
-    return this.dataSource.getProposalTemplate(templateId);
+  getTemplateCategories(user: UserWithRole | null) {
+    return this.dataSource.getTemplateCategories();
   }
 }

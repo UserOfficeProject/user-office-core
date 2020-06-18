@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 import { FieldDependencyInput } from './UpdateQuestionRelMutation';
 
@@ -30,14 +30,14 @@ export class CreateQuestionRelArgs {
 
 @Resolver()
 export class CreateQuestionRelMutation {
-  @Mutation(() => ProposalTemplateResponseWrap)
+  @Mutation(() => TemplateResponseWrap)
   createQuestionRel(
     @Args() args: CreateQuestionRelArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
       context.mutations.template.createQuestionRel(context.user, args),
-      ProposalTemplateResponseWrap
+      TemplateResponseWrap
     );
   }
 }

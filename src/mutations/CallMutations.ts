@@ -18,13 +18,9 @@ import {
   RemoveAssignedInstrumentFromCallArgs,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class CallMutations {
-  constructor(
-    private dataSource: CallDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(private dataSource: CallDataSource) {}
 
   @ValidateArgs(createCallValidationSchema)
   @Authorized([Roles.USER_OFFICER])

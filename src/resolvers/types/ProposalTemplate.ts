@@ -1,38 +1,23 @@
 import {
-  Field,
   ObjectType,
-  Int,
+  Resolver,
   FieldResolver,
+  Int,
   Root,
   Ctx,
-  Resolver,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplate as ProposalTemplateOrigin } from '../../models/ProposalModel';
-import { Question } from './Question';
-import { TemplateStep } from './TemplateStep';
+import { Template } from './Template';
 
 @ObjectType()
-export class ProposalTemplate implements Partial<ProposalTemplateOrigin> {
-  @Field(() => Int)
-  public templateId: number;
-
-  @Field()
-  public name: string;
-
-  @Field(() => String, { nullable: true })
-  public description: string;
-
-  @Field()
-  public isArchived: boolean;
-}
+export class ProposalTemplate extends Template {}
 
 @Resolver(of => ProposalTemplate)
-export class ProposalTemplateResolver {
+export class TemplateResolver {
   @FieldResolver(() => Int)
   async proposalCount(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.proposal
@@ -42,33 +27,11 @@ export class ProposalTemplateResolver {
 
   @FieldResolver(() => Int)
   async callCount(
-    @Root() template: ProposalTemplate,
+    @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.call
       .getAll(context.user, { templateIds: [template.templateId] })
       .then(result => result?.length || 0);
-  }
-
-  @FieldResolver(() => [TemplateStep])
-  async steps(
-    @Root() template: ProposalTemplate,
-    @Ctx() context: ResolverContext
-  ): Promise<TemplateStep[] | null> {
-    return context.queries.template.getProposalTemplateSteps(
-      context.user,
-      template.templateId
-    );
-  }
-
-  @FieldResolver(() => [Question])
-  async complementaryQuestions(
-    @Root() template: ProposalTemplate,
-    @Ctx() context: ResolverContext
-  ): Promise<Question[] | null> {
-    return context.queries.template.getComplementaryQuestions(
-      context.user,
-      template.templateId
-    );
   }
 }

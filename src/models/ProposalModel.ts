@@ -55,6 +55,7 @@ export class Topic {
 
 export class Question {
   constructor(
+    public categoryId: TemplateCategoryId,
     public proposalQuestionId: string,
     public naturalKey: string,
     public dataType: DataType,
@@ -64,6 +65,7 @@ export class Question {
 
   static fromObject(obj: any) {
     return new Question(
+      obj.category_id,
       obj.proposalQuestionId,
       obj.naturalKey,
       obj.dataType,
@@ -134,15 +136,11 @@ export class QuestionaryStep {
 }
 
 export class Questionary {
-  constructor(public steps: QuestionaryStep[]) {}
-
-  static fromObject(obj: any): Questionary {
-    return new Questionary(
-      obj.steps
-        ? obj.steps.map((stepObj: any) => QuestionaryStep.fromObject(stepObj))
-        : []
-    );
-  }
+  constructor(
+    public questionaryId: number | undefined,
+    public templateId: number,
+    public created: Date
+  ) {}
 }
 
 export class TemplateStep {
@@ -156,13 +154,23 @@ export class TemplateStep {
   }
 }
 
-export class ProposalTemplate {
+export class Template {
   constructor(
     public templateId: number,
+    public categoryId: number,
     public name: string,
     public description: string,
     public isArchived: boolean
   ) {}
+}
+
+export class TemplateCategory {
+  constructor(public categoryId: TemplateCategoryId, public name: string) {}
+}
+
+export enum TemplateCategoryId {
+  PROPOSAL_QUESTIONARY = 1,
+  SAMPLE_DECLARATION,
 }
 
 export class FieldCondition {
