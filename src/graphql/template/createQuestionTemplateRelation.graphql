@@ -1,10 +1,10 @@
-mutation createQuestionTopicRelation(
+mutation createQuestionTemplateRelation(
   $templateId: Int!
   $questionId: String!
   $topicId: Int!
   $sortOrder: Int!
 ) {
-  createQuestionTopicRelation(
+  createQuestionTemplateRelation(
     templateId: $templateId
     questionId: $questionId
     topicId: $topicId

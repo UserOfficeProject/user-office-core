@@ -80,7 +80,7 @@ export function usePersistModel() {
     field: QuestionRel
   ) => {
     return api()
-      .updateQuestionTopicRelation({
+      .updateQuestionTemplateRelation({
         templateId,
         topicId: field.topicId,
         sortOrder: field.sortOrder,
@@ -90,7 +90,7 @@ export function usePersistModel() {
           ? prepareDependencies(field.dependency)
           : undefined,
       })
-      .then(data => data.updateQuestionTopicRelation);
+      .then(data => data.updateQuestionTemplateRelation);
   };
 
   const createQuestion = async (
@@ -123,14 +123,14 @@ export function usePersistModel() {
     setIsLoading(true);
 
     return api()
-      .deleteQuestionTopicRelation({
+      .deleteQuestionTemplateRelation({
         templateId,
         questionId,
       })
       .then(data => {
         setIsLoading(false);
 
-        return data.deleteQuestionTopicRelation;
+        return data.deleteQuestionTemplateRelation;
       });
   };
 
@@ -157,14 +157,14 @@ export function usePersistModel() {
     sortOrder: number
   ) => {
     return api()
-      .createQuestionTopicRelation({
+      .createQuestionTemplateRelation({
         templateId,
         topicId,
         questionId,
         sortOrder,
       })
       .then(data => {
-        return data.createQuestionTopicRelation;
+        return data.createQuestionTemplateRelation;
       });
   };
 

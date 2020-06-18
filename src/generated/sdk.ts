@@ -267,12 +267,12 @@ export type Mutation = {
   createSEP: SepResponseWrap,
   updateSEP: SepResponseWrap,
   createQuestion: QuestionResponseWrap,
-  createQuestionTopicRelation: TemplateResponseWrap,
+  createQuestionTemplateRelation: TemplateResponseWrap,
   createTemplate: TemplateResponseWrap,
   createTopic: TemplateResponseWrap,
-  deleteQuestionTopicRelation: TemplateResponseWrap,
+  deleteQuestionTemplateRelation: TemplateResponseWrap,
   updateQuestion: QuestionResponseWrap,
-  updateQuestionTopicRelation: TemplateResponseWrap,
+  updateQuestionTemplateRelation: TemplateResponseWrap,
   updateTemplate: TemplateResponseWrap,
   updateTopic: TopicResponseWrap,
   addUserRole: AddUserRoleResponseWrap,
@@ -458,7 +458,7 @@ export type MutationCreateQuestionArgs = {
 };
 
 
-export type MutationCreateQuestionTopicRelationArgs = {
+export type MutationCreateQuestionTemplateRelationArgs = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
   sortOrder: Scalars['Int'],
@@ -479,7 +479,7 @@ export type MutationCreateTopicArgs = {
 };
 
 
-export type MutationDeleteQuestionTopicRelationArgs = {
+export type MutationDeleteQuestionTemplateRelationArgs = {
   questionId: Scalars['String'],
   templateId: Scalars['Int']
 };
@@ -493,7 +493,7 @@ export type MutationUpdateQuestionArgs = {
 };
 
 
-export type MutationUpdateQuestionTopicRelationArgs = {
+export type MutationUpdateQuestionTemplateRelationArgs = {
   questionId: Scalars['String'],
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
@@ -2224,7 +2224,7 @@ export type CreateQuestionMutation = (
   ) }
 );
 
-export type CreateQuestionTopicRelationMutationVariables = {
+export type CreateQuestionTemplateRelationMutationVariables = {
   templateId: Scalars['Int'],
   questionId: Scalars['String'],
   topicId: Scalars['Int'],
@@ -2232,9 +2232,9 @@ export type CreateQuestionTopicRelationMutationVariables = {
 };
 
 
-export type CreateQuestionTopicRelationMutation = (
+export type CreateQuestionTemplateRelationMutation = (
   { __typename?: 'Mutation' }
-  & { createQuestionTopicRelation: (
+  & { createQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -2279,15 +2279,15 @@ export type DeleteQuestionMutation = (
   ) }
 );
 
-export type DeleteQuestionTopicRelationMutationVariables = {
+export type DeleteQuestionTemplateRelationMutationVariables = {
   questionId: Scalars['String'],
   templateId: Scalars['Int']
 };
 
 
-export type DeleteQuestionTopicRelationMutation = (
+export type DeleteQuestionTemplateRelationMutation = (
   { __typename?: 'Mutation' }
-  & { deleteQuestionTopicRelation: (
+  & { deleteQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -2541,7 +2541,7 @@ export type UpdateQuestionMutation = (
   ) }
 );
 
-export type UpdateQuestionTopicRelationMutationVariables = {
+export type UpdateQuestionTemplateRelationMutationVariables = {
   questionId: Scalars['String'],
   templateId: Scalars['Int'],
   topicId?: Maybe<Scalars['Int']>,
@@ -2551,9 +2551,9 @@ export type UpdateQuestionTopicRelationMutationVariables = {
 };
 
 
-export type UpdateQuestionTopicRelationMutation = (
+export type UpdateQuestionTemplateRelationMutation = (
   { __typename?: 'Mutation' }
-  & { updateQuestionTopicRelation: (
+  & { updateQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
     & { template: Maybe<(
@@ -3814,9 +3814,9 @@ export const CreateQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const CreateQuestionTopicRelationDocument = gql`
-    mutation createQuestionTopicRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
-  createQuestionTopicRelation(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
+export const CreateQuestionTemplateRelationDocument = gql`
+    mutation createQuestionTemplateRelation($templateId: Int!, $questionId: String!, $topicId: Int!, $sortOrder: Int!) {
+  createQuestionTemplateRelation(templateId: $templateId, questionId: $questionId, topicId: $topicId, sortOrder: $sortOrder) {
     template {
       ...template
     }
@@ -3844,9 +3844,9 @@ export const DeleteQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const DeleteQuestionTopicRelationDocument = gql`
-    mutation deleteQuestionTopicRelation($questionId: String!, $templateId: Int!) {
-  deleteQuestionTopicRelation(questionId: $questionId, templateId: $templateId) {
+export const DeleteQuestionTemplateRelationDocument = gql`
+    mutation deleteQuestionTemplateRelation($questionId: String!, $templateId: Int!) {
+  deleteQuestionTemplateRelation(questionId: $questionId, templateId: $templateId) {
     template {
       ...template
     }
@@ -3916,9 +3916,9 @@ export const UpdateQuestionDocument = gql`
   }
 }
     ${QuestionFragmentDoc}`;
-export const UpdateQuestionTopicRelationDocument = gql`
-    mutation updateQuestionTopicRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
-  updateQuestionTopicRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
+export const UpdateQuestionTemplateRelationDocument = gql`
+    mutation updateQuestionTemplateRelation($questionId: String!, $templateId: Int!, $topicId: Int, $sortOrder: Int, $config: String, $dependency: FieldDependencyInput) {
+  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder, config: $config, dependency: $dependency) {
     template {
       ...template
     }
@@ -4337,8 +4337,8 @@ export function getSdk(client: GraphQLClient) {
     createQuestion(variables: CreateQuestionMutationVariables): Promise<CreateQuestionMutation> {
       return client.request<CreateQuestionMutation>(print(CreateQuestionDocument), variables);
     },
-    createQuestionTopicRelation(variables: CreateQuestionTopicRelationMutationVariables): Promise<CreateQuestionTopicRelationMutation> {
-      return client.request<CreateQuestionTopicRelationMutation>(print(CreateQuestionTopicRelationDocument), variables);
+    createQuestionTemplateRelation(variables: CreateQuestionTemplateRelationMutationVariables): Promise<CreateQuestionTemplateRelationMutation> {
+      return client.request<CreateQuestionTemplateRelationMutation>(print(CreateQuestionTemplateRelationDocument), variables);
     },
     createTopic(variables: CreateTopicMutationVariables): Promise<CreateTopicMutation> {
       return client.request<CreateTopicMutation>(print(CreateTopicDocument), variables);
@@ -4346,8 +4346,8 @@ export function getSdk(client: GraphQLClient) {
     deleteQuestion(variables: DeleteQuestionMutationVariables): Promise<DeleteQuestionMutation> {
       return client.request<DeleteQuestionMutation>(print(DeleteQuestionDocument), variables);
     },
-    deleteQuestionTopicRelation(variables: DeleteQuestionTopicRelationMutationVariables): Promise<DeleteQuestionTopicRelationMutation> {
-      return client.request<DeleteQuestionTopicRelationMutation>(print(DeleteQuestionTopicRelationDocument), variables);
+    deleteQuestionTemplateRelation(variables: DeleteQuestionTemplateRelationMutationVariables): Promise<DeleteQuestionTemplateRelationMutation> {
+      return client.request<DeleteQuestionTemplateRelationMutation>(print(DeleteQuestionTemplateRelationDocument), variables);
     },
     deleteTemplate(variables: DeleteTemplateMutationVariables): Promise<DeleteTemplateMutation> {
       return client.request<DeleteTemplateMutation>(print(DeleteTemplateDocument), variables);
@@ -4370,8 +4370,8 @@ export function getSdk(client: GraphQLClient) {
     updateQuestion(variables: UpdateQuestionMutationVariables): Promise<UpdateQuestionMutation> {
       return client.request<UpdateQuestionMutation>(print(UpdateQuestionDocument), variables);
     },
-    updateQuestionTopicRelation(variables: UpdateQuestionTopicRelationMutationVariables): Promise<UpdateQuestionTopicRelationMutation> {
-      return client.request<UpdateQuestionTopicRelationMutation>(print(UpdateQuestionTopicRelationDocument), variables);
+    updateQuestionTemplateRelation(variables: UpdateQuestionTemplateRelationMutationVariables): Promise<UpdateQuestionTemplateRelationMutation> {
+      return client.request<UpdateQuestionTemplateRelationMutation>(print(UpdateQuestionTemplateRelationDocument), variables);
     },
     updateTemplate(variables: UpdateTemplateMutationVariables): Promise<UpdateTemplateMutation> {
       return client.request<UpdateTemplateMutation>(print(UpdateTemplateDocument), variables);
