@@ -1283,7 +1283,7 @@ export type UserResponseWrap = {
 
 export enum UserRole {
   USER = 'USER',
-  USEROFFICER = 'USEROFFICER',
+  USER_OFFICER = 'USER_OFFICER',
   REVIEWER = 'REVIEWER',
   SEP_CHAIR = 'SEP_CHAIR',
   SEP_SECRETARY = 'SEP_SECRETARY',

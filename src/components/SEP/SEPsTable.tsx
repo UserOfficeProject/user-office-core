@@ -5,10 +5,11 @@ import React, { useState, useContext } from 'react';
 import { Redirect } from 'react-router';
 
 import { UserContext } from '../../context/UserContextProvider';
-import { Sep } from '../../generated/sdk';
+import { Sep, UserRole } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';
 import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import Can from '../common/Can';
 import AddSEP from './AddSEP';
 
 const useStyles = makeStyles({
@@ -21,7 +22,12 @@ const useStyles = makeStyles({
 const SEPsTable: React.FC = () => {
   const [show, setShow] = useState(false);
   const { currentRole } = useContext(UserContext);
-  const { loading, SEPsData } = useSEPsData(show, '', false, currentRole);
+  const { loading, SEPsData } = useSEPsData(
+    show,
+    '',
+    false,
+    currentRole as UserRole
+  );
   const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },
@@ -77,19 +83,23 @@ const SEPsTable: React.FC = () => {
             },
           ]}
         />
-        {currentRole === 'user_officer' && (
-          <ButtonContainer>
-            <Button
-              type="button"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              onClick={(): void => setShow(true)}
-            >
-              Create SEP
-            </Button>
-          </ButtonContainer>
-        )}
+        <Can
+          allowedRoles={[UserRole.USER_OFFICER]}
+          yes={() => (
+            <ButtonContainer>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                className={classes.button}
+                onClick={(): void => setShow(true)}
+              >
+                Create SEP
+              </Button>
+            </ButtonContainer>
+          )}
+          no={() => null}
+        />
       </div>
     </>
   );

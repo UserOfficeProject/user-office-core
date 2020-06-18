@@ -11,12 +11,12 @@ import {
 import { Formik, Form, Field } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Sep } from '../../generated/sdk';
+import { Sep, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ButtonContainer } from '../../styles/StyledComponents';
+import { useCheckAccess } from '../common/Can';
 
 type SEPPageProps = {
   /** SEP data to be shown */
@@ -35,9 +35,9 @@ const useStyles = makeStyles({
 const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const sep = { ...data };
   const classes = useStyles();
-  const { currentRole } = useContext(UserContext);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   const sendSEPUpdate = (values: Sep): void => {
     api()
@@ -92,7 +92,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 data-cy="code"
                 error={touched.code && errors.code !== undefined}
                 helperText={touched.code && errors.code && errors.code}
-                disabled={currentRole !== 'user_officer'}
+                disabled={!hasAccessRights}
               />
               <Field
                 id="numberRatingsRequired"
@@ -114,7 +114,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.numberRatingsRequired &&
                   errors.numberRatingsRequired
                 }
-                disabled={currentRole !== 'user_officer'}
+                disabled={!hasAccessRights}
               />
             </Grid>
             <Grid item xs={6}>
@@ -138,7 +138,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.description &&
                   errors.description
                 }
-                disabled={currentRole !== 'user_officer'}
+                disabled={!hasAccessRights}
               />
               <FormControlLabel
                 control={
@@ -153,14 +153,14 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                       setFieldValue('active', !values.active)
                     }
                     inputProps={{ 'aria-label': 'primary checkbox' }}
-                    disabled={currentRole !== 'user_officer'}
+                    disabled={!hasAccessRights}
                   />
                 }
                 label="Active"
               />
             </Grid>
           </Grid>
-          {currentRole === 'user_officer' && (
+          {hasAccessRights && (
             <ButtonContainer>
               <Button
                 disabled={isSubmitting}

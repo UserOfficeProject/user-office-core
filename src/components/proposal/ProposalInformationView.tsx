@@ -6,6 +6,7 @@ import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import { UserContext } from '../../context/UserContextProvider';
+import { UserRole } from '../../generated/sdk';
 import { ProposalSubsetSumbission } from '../../models/ProposalModel';
 import { EventType } from '../../models/ProposalSubmissionModel';
 import { BasicUserDetails, User } from '../../models/User';
@@ -52,7 +53,7 @@ export default function ProposalInformationView(props: {
         if (
           values.proposer.id !== currentUser.id &&
           !users.some((user: BasicUserDetails) => user.id === currentUser.id) &&
-          currentRole !== 'user_officer'
+          currentRole !== UserRole.USER_OFFICER
         ) {
           setUserError(true);
         } else {
