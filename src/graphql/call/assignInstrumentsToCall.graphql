@@ -1,0 +1,8 @@
+mutation assignInstrumentToCall($instrumentIds: [Int!]!, $callId: Int!) {
+  assignInstrumentToCall(instrumentIds: $instrumentIds, callId: $callId) {
+    error
+    call {
+      id
+    }
+  }
+}

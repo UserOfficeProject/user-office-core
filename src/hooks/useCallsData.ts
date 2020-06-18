@@ -4,9 +4,7 @@ import { GetCallsQuery } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useCallsData(isActive?: boolean, templateId?: number) {
-  const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>(
-    null
-  );
+  const [callsData, setCallsData] = useState<GetCallsQuery['calls'] | null>([]);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();
@@ -25,5 +23,5 @@ export function useCallsData(isActive?: boolean, templateId?: number) {
       });
   }, [api, isActive, templateId]);
 
-  return { loading, callsData };
+  return { loading, callsData, setCallsData };
 }

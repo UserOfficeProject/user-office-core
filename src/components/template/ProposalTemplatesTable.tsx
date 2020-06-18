@@ -10,11 +10,10 @@ import {
   GetProposalTemplatesQuery,
   ProposalTemplate,
 } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import { CallsTable } from '../call/CallsTable';
+import CallsTable from '../call/CallsTable';
 
 type RowDataType = Pick<
   ProposalTemplate,
@@ -27,12 +26,6 @@ type RowDataType = Pick<
 >;
 
 function CallsModal(props: { templateId?: number; onClose: () => void }) {
-  const { loading, callsData } = useCallsData(undefined, props.templateId);
-
-  if (loading) {
-    return <div>loading...</div>;
-  }
-
   return (
     <Dialog
       open={props.templateId !== undefined}
@@ -40,7 +33,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
       onClose={props.onClose}
     >
       <DialogContent>
-        <CallsTable data={callsData || undefined} />
+        <CallsTable templateId={props.templateId} />
       </DialogContent>
     </Dialog>
   );

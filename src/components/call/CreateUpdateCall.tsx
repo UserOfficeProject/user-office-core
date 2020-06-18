@@ -1,6 +1,9 @@
 import DateFnsUtils from '@date-io/date-fns';
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { createCallValidationSchema } from '@esss-swap/duo-validation';
+import {
+  createCallValidationSchema,
+  updateCallValidationSchema,
+} from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,6 +15,7 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Call } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
 import FormikDropdown from '../common/FormikDropdown';
@@ -34,73 +38,86 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type AddCallProps = {
-  close: () => void;
+type CreateUpdateCallProps = {
+  close: (call: Call | null) => void;
+  call: Call | null;
 };
 
-const AddCall: React.FC<AddCallProps> = props => {
+const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const { templates } = useProposalsTemplates();
   const currentDay = new Date();
 
+  const initialValues = call
+    ? { ...call, templateId: call.templateId || '' }
+    : {
+        shortCode: '',
+        startCall: currentDay,
+        endCall: currentDay,
+        startReview: currentDay,
+        endReview: currentDay,
+        startNotify: currentDay,
+        endNotify: currentDay,
+        cycleComment: '',
+        surveyComment: '',
+        templateId: '',
+      };
+
+  const showNotificationAndClose = (
+    error: string | null | undefined,
+    callToReturn: Call
+  ) => {
+    if (error) {
+      enqueueSnackbar(getTranslation(error as ResourceId), {
+        variant: 'error',
+      });
+      close(null);
+    } else {
+      close(callToReturn);
+    }
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <Formik
-        initialValues={{
-          shortCode: '',
-          startCall: currentDay,
-          endCall: currentDay,
-          startReview: currentDay,
-          endReview: currentDay,
-          startNotify: currentDay,
-          endNotify: currentDay,
-          cycleComment: '',
-          surveyComment: '',
-          templateId: 0,
-        }}
+        initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
-          const {
-            shortCode,
-            startCall,
-            endCall,
-            startReview,
-            endReview,
-            startNotify,
-            endNotify,
-            cycleComment,
-            surveyComment,
-            templateId,
-          } = values;
+          const { templateId } = values;
 
-          await api()
-            .createCall({
-              shortCode: shortCode,
-              startCall: startCall,
-              endCall: endCall,
-              startReview: startReview,
-              endReview: endReview,
-              startNotify: startNotify,
-              endNotify: endNotify,
-              cycleComment: cycleComment,
-              surveyComment: surveyComment,
-              templateId: templateId ? +templateId : null,
-            })
-            .then(data =>
-              data.createCall.error
-                ? enqueueSnackbar(
-                    getTranslation(data.createCall.error as ResourceId),
-                    {
-                      variant: 'error',
-                    }
-                  )
-                : null
-            );
+          if (call) {
+            await api()
+              .updateCall({
+                id: call.id,
+                ...values,
+                templateId: templateId ? +templateId : null,
+              })
+              .then(data => {
+                showNotificationAndClose(
+                  data.updateCall.error,
+                  data.updateCall.call as Call
+                );
+              });
+          } else {
+            await api()
+              .createCall({
+                ...values,
+                templateId: templateId ? +templateId : null,
+              })
+              .then(data => {
+                showNotificationAndClose(
+                  data.createCall.error,
+                  data.createCall.call as Call
+                );
+              });
+          }
+
           actions.setSubmitting(false);
-          props.close();
         }}
-        validationSchema={createCallValidationSchema}
+        validationSchema={
+          call ? updateCallValidationSchema : createCallValidationSchema
+        }
       >
         {(): JSX.Element => (
           <Form>
@@ -183,15 +200,17 @@ const AddCall: React.FC<AddCallProps> = props => {
               fullWidth
               data-cy="survey-comment"
             />
-            <FormikDropdown
-              name="templateId"
-              label="Call template"
-              items={templates.map(template => ({
-                text: template.name,
-                value: template.templateId,
-              }))}
-              data-cy="call-template"
-            />
+            {templates.length > 0 && (
+              <FormikDropdown
+                name="templateId"
+                label="Call template"
+                items={templates.map(template => ({
+                  text: template.name,
+                  value: template.templateId,
+                }))}
+                data-cy="call-template"
+              />
+            )}
 
             <Button
               type="submit"
@@ -201,7 +220,7 @@ const AddCall: React.FC<AddCallProps> = props => {
               className={classes.submit}
               data-cy="submit"
             >
-              Add Call
+              {call ? 'Update' : 'Add'} Call
             </Button>
           </Form>
         )}
@@ -210,8 +229,9 @@ const AddCall: React.FC<AddCallProps> = props => {
   );
 };
 
-AddCall.propTypes = {
+CreateUpdateCall.propTypes = {
   close: PropTypes.func.isRequired,
+  call: PropTypes.any,
 };
 
-export default AddCall;
+export default CreateUpdateCall;
