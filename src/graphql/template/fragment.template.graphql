@@ -1,4 +1,4 @@
-fragment proposalTemplate on ProposalTemplate {
+fragment template on Template {
   steps {
     topic {
       title
@@ -9,6 +9,7 @@ fragment proposalTemplate on ProposalTemplate {
     }
   }
   templateId
+  categoryId
   name
   description
   complementaryQuestions {

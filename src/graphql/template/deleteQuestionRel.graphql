@@ -1,7 +1,7 @@
 mutation deleteQuestionRel($questionId: String!, $templateId: Int!) {
   deleteQuestionRel(questionId: $questionId, templateId: $templateId) {
     template {
-      ...proposalTemplate
+      ...template
     }
     error
   }

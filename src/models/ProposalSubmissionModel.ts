@@ -8,6 +8,7 @@ import {
   QuestionaryStep,
 } from '../generated/sdk';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import { ProposalSubsetSumbission } from './ProposalModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
@@ -35,12 +36,12 @@ export interface Event {
 
 export interface ProposalSubmissionModelState {
   isDirty: boolean;
-  proposal: Proposal;
+  proposal: ProposalSubsetSumbission;
 }
 
 // rename this function
 export function ProposalSubmissionModel(
-  initialProposal: Proposal,
+  initialProposal: ProposalSubsetSumbission,
   middlewares?: Array<Function>
 ): {
   state: ProposalSubmissionModelState;

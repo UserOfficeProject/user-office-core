@@ -25,6 +25,16 @@ declare global {
        *    cy.login('user')
        */
       login: (role: string) => void;
+
+      /**
+       * Expands templates submenu
+       *
+       * @returns {typeof expandTemplatesSubmenu}
+       * @memberof Chainable
+       * @example
+       *    cy.expandTemplatesSubmenu()
+       */
+      expandTemplatesSubmenu: () => void;
     }
   }
 

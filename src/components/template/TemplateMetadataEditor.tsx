@@ -4,12 +4,12 @@ import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
-import { ProposalTemplate } from '../../generated/sdk';
+import { Template } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import { ButtonContainer } from '../../styles/StyledComponents';
 
 export function TemplateMetadataEditor(props: {
-  template: ProposalTemplate;
+  template: Template;
   dispatch: React.Dispatch<Event>;
 }) {
   const { template, dispatch } = props;

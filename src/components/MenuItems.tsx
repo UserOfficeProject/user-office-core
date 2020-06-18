@@ -1,6 +1,9 @@
+import { Collapse } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import BuildIcon from '@material-ui/icons/Build';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
@@ -8,11 +11,12 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
+import InboxIcon from '@material-ui/icons/Inbox';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useCallsData } from '../hooks/useCallsData';
@@ -23,21 +27,9 @@ type MenuItemsProps = {
 };
 
 const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
-  const { loading, callsData } = useCallsData();
+  const { callsData } = useCallsData(true);
 
-  let proposalDisabled = false;
-
-  // Checks if there is a call open, during the current time
-  if (!loading) {
-    const currentTime = new Date().getTime();
-    proposalDisabled = callsData
-      ? callsData.filter(
-          call =>
-            new Date(call.startCall).getTime() < currentTime &&
-            currentTime < new Date(call.endCall).getTime()
-        ).length === 0
-      : false;
-  }
+  const proposalDisabled = callsData.length === 0;
   const user = (
     <div data-cy="user-menu-items">
       <ListItem component={Link} to="/" button>
@@ -110,12 +102,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
         </ListItemIcon>
         <ListItemText primary="Edit Pages" />
       </ListItem>
-      <ListItem component={Link} to="/Questionaries" button>
+      <ListItem component={Link} to="/InstitutionPage" button>
         <ListItemIcon>
-          <QuestionAnswerIcon />
+          <AccountBalanceIcon />
         </ListItemIcon>
-        <ListItemText primary="Questionaries" />
+        <ListItemText primary="Edit Institutions" />
       </ListItem>
+      <TemplateMenuListItem />
+
       <ListItem component={Link} to="/LogOut" button>
         <ListItemIcon>
           <ExitToApp />
@@ -179,6 +173,46 @@ const MenuItems: React.FC<MenuItemsProps> = ({ role }) => {
     default:
       return null;
   }
+};
+
+const TemplateMenuListItem = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  function toggleExpand() {
+    setIsExpanded(!isExpanded);
+  }
+
+  return (
+    <>
+      <ListItem button onClick={toggleExpand}>
+        <ListItemIcon>
+          {isExpanded ? <ExpandLess /> : <ExpandMore />}
+        </ListItemIcon>
+        <ListItemText primary="Templates" />
+      </ListItem>
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        style={{ paddingLeft: 10 }}
+      >
+        <ListItem component={Link} to="/ProposalTemplates" button>
+          <ListItemIcon>
+            <QuestionAnswerIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal" title="Proposal templates" />
+        </ListItem>
+        <ListItem component={Link} to="/SampleDeclarationTemplates" button>
+          <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary="Sample declaration"
+            title="Sample declaration templates"
+          />
+        </ListItem>
+      </Collapse>
+    </>
+  );
 };
 
 export default MenuItems;

@@ -47,7 +47,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const { templates } = useProposalsTemplates();
+  const { templates } = useProposalsTemplates(false);
   const currentDay = new Date();
 
   const initialValues = call
