@@ -82,7 +82,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
-        title={'Assigned reviewers'}
+        title={'Assigned instruments'}
         data={call.instruments}
         editable={{
           onRowDelete: (rowAssignmentsData: Instrument): Promise<void> =>
