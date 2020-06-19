@@ -233,6 +233,14 @@ export interface SEPMemberRecord {
   readonly sep_id: number;
 }
 
+export interface InstrumentRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
 export interface TemplateCategoryRecord {
   readonly template_category_id: number;
   readonly name: string;

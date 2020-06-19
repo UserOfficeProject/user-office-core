@@ -10,11 +10,13 @@ import {
   sepDataSource,
   templateDataSource,
   userDataSource,
+  instrumentDatasource,
   questionaryDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
+import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
@@ -25,6 +27,7 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
+import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
@@ -74,6 +77,9 @@ const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 const sepQueries = new SEPQueries(sepDataSource);
 const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
+const instrumentQueries = new InstrumentQueries(instrumentDatasource);
+const instrumentMutations = new InstrumentMutations(instrumentDatasource);
+
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,
   templateDataSource
@@ -96,6 +102,7 @@ const context: BasicResolverContext = {
     template: templateQueries,
     eventLogs: eventLogQueries,
     sep: sepQueries,
+    instrument: instrumentQueries,
     questionary: questionaryQueries,
   },
   mutations: {
@@ -107,6 +114,7 @@ const context: BasicResolverContext = {
     admin: adminMutations,
     sep: sepMutations,
     template: templateMutations,
+    instrument: instrumentMutations,
     questionary: questionaryMutations,
   },
 };

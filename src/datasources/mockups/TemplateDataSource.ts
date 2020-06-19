@@ -156,6 +156,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
   }
   async createTemplate(args: CreateTemplateArgs): Promise<Template> {
     dummyProposalTemplate = dummyProposalTemplateFactory({ ...args });
+
     return dummyProposalTemplate;
   }
   async deleteTemplate(templateId: number): Promise<Template> {
@@ -165,6 +166,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     const copyOfTemplate = dummyProposalTemplateFactory(dummyProposalTemplate);
     dummyProposalTemplate.templateId = 999; // mocking deleting template with ID
+
     return copyOfTemplate;
   }
 
@@ -215,6 +217,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     if (!question) {
       throw new Error('Question does not exist');
     }
+
     return question;
   }
 
@@ -226,6 +229,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     }
     const copy = dummyQuestionFactory(question);
     question.proposalQuestionId = 'deleted_question'; //works for mocking purposes
+
     return copy;
   }
   async updateQuestion(
@@ -248,6 +252,7 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     if (questionRel) {
       const { question } = questionRel;
       Object.assign(question, values);
+
       return question;
     } else {
       throw new Error('Not found');
