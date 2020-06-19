@@ -126,6 +126,11 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  getParentQuestionary(
+    child_questionary_id: number
+  ): Promise<Questionary | null> {
+    throw new Error('Method not implemented.');
+  }
   async delete(questionary_id: number): Promise<Questionary> {
     if (dummyQuestionary.questionaryId !== questionary_id) {
       throw new Error('Proposal does not exist');

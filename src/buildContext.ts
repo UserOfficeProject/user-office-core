@@ -33,6 +33,7 @@ import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
 import { userAuthorization } from './utils/UserAuthorization';
+import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource);
@@ -76,11 +77,13 @@ const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,
-  templateDataSource
+  templateDataSource,
+  questionaryAuthorization
 );
 const questionaryMutations = new QuestionaryMutations(
   questionaryDataSource,
   templateDataSource,
+  questionaryAuthorization,
   logger
 );
 

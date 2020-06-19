@@ -164,6 +164,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             )
             .whereIn('questionaries.template_id', filter.templateIds);
         }
+        if (filter?.questionaryIds) {
+          query.whereIn('proposals.questionary_id', filter.questionaryIds);
+        }
         if (first) {
           query.limit(first);
         }

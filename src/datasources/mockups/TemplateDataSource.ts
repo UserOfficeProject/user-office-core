@@ -229,7 +229,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async deleteQuestion(questionId: string): Promise<Question> {
     const question = await this.getQuestion(questionId);
-    console.log(`Deleting question ${questionId} and  is it? ${question}`);
     if (!question) {
       throw new Error('Question does not exist');
     }

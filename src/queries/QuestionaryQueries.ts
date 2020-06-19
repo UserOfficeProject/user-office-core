@@ -3,11 +3,14 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Questionary, QuestionaryStep } from '../models/ProposalModel';
 import { UserWithRole } from '../models/User';
+import { logger } from '../utils/Logger';
+import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryQueries {
   constructor(
     private dataSource: QuestionaryDataSource,
-    private templateDataSource: TemplateDataSource
+    private templateDataSource: TemplateDataSource,
+    private authorizer: QuestionaryAuthorization
   ) {}
 
   @Authorized()
@@ -15,6 +18,14 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<Questionary | null> {
+    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    if (!hasRights) {
+      logger.logWarn(`Permissions violated trying to access questionary`, {
+        email: agent?.email,
+        questionaryId,
+      });
+      return null;
+    }
     return this.dataSource.getQuestionary(questionaryId);
   }
 
@@ -23,6 +34,15 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<QuestionaryStep[] | null> {
+    const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
+    if (!hasRights) {
+      logger.logWarn(`Permissions violated trying to access steps`, {
+        email: agent?.email,
+        questionaryId,
+      });
+      return null;
+    }
+
     return this.dataSource.getQuestionarySteps(questionaryId);
   }
 
