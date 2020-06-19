@@ -26,6 +26,7 @@ export default class QuestionaryMutations {
       logger.logError('Trying to answer non-existing questionary', {
         questionaryId,
       });
+
       return rejection('NOT_FOUND');
     }
     const template = await this.templateDataSource.getTemplate(
@@ -35,6 +36,7 @@ export default class QuestionaryMutations {
       logger.logError('Trying to answer questionary without template', {
         templateId: questionary.templateId,
       });
+
       return rejection('NOT_FOUND');
     }
 

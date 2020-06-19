@@ -12,6 +12,7 @@ import {
   updateTopicOrderValidationSchema,
   updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
+
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import {

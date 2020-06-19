@@ -18,7 +18,7 @@ export default class PostgresQuestionaryDataSource
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {
-    var subquery = database('answers_has_questionaries')
+    const subquery = database('answers_has_questionaries')
       .select('answer_id')
       .where({ questionary_id: child_questionary_id });
 
@@ -29,6 +29,7 @@ export default class PostgresQuestionaryDataSource
         if (rows.length !== 1) {
           return null;
         }
+
         return createQuestionaryObject(rows[0]);
       });
   }

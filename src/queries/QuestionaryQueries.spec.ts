@@ -3,8 +3,8 @@ import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSourc
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
-import QuestionaryQueries from './QuestionaryQueries';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import QuestionaryQueries from './QuestionaryQueries';
 
 const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();

@@ -20,12 +20,14 @@ export default class QuestionaryQueries {
   ): Promise<Questionary | null> {
     const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
     if (!hasRights) {
-      logger.logWarn(`Permissions violated trying to access questionary`, {
+      logger.logWarn('Permissions violated trying to access questionary', {
         email: agent?.email,
         questionaryId,
       });
+
       return null;
     }
+
     return this.dataSource.getQuestionary(questionaryId);
   }
 
@@ -36,10 +38,11 @@ export default class QuestionaryQueries {
   ): Promise<QuestionaryStep[] | null> {
     const hasRights = await this.authorizer.hasReadRights(agent, questionaryId);
     if (!hasRights) {
-      logger.logWarn(`Permissions violated trying to access steps`, {
+      logger.logWarn('Permissions violated trying to access steps', {
         email: agent?.email,
         questionaryId,
       });
+
       return null;
     }
 

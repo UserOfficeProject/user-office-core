@@ -9,6 +9,7 @@ import {
   Query,
   Resolver,
 } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { Proposal } from '../types/Proposal';
 

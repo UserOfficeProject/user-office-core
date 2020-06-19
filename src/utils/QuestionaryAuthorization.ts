@@ -1,4 +1,5 @@
 import { JSDict } from '@esss-swap/duo-localisation';
+
 import {
   proposalDataSource,
   questionaryDataSource,
@@ -35,6 +36,7 @@ class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
         questionaryIds: [questionaryId],
       })
     ).proposals[0];
+
     return userAuthorization.hasAccessRights(agent, proposal);
   }
 }
@@ -64,6 +66,7 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
         questionaryIds: [proposalQuestionary.questionaryId],
       })
     ).proposals[0];
+
     return userAuthorization.hasAccessRights(agent, proposal);
   }
 }
@@ -107,6 +110,7 @@ export class QuestionaryAuthorization {
       questionaryId
     );
     if (!categoryId) return null;
+
     return this.authorizers.get(categoryId);
   }
 

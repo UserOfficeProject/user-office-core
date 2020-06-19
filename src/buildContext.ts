@@ -32,8 +32,8 @@ import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
-import { userAuthorization } from './utils/UserAuthorization';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
+import { userAuthorization } from './utils/UserAuthorization';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource);
