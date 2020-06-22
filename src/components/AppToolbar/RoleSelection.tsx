@@ -67,7 +67,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
 
   const RoleAction = (rowData: Role) => (
     <>
-      {rowData.shortCode === currentRole ? (
+      {rowData.shortCode.toUpperCase() === currentRole?.valueOf() ? (
         <Button disabled>In Use</Button>
       ) : (
         <Button disabled={loading} onClick={() => selectUserRole(rowData)}>

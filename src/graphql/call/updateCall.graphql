@@ -1,4 +1,5 @@
-mutation createCall(
+mutation updateCall(
+  $id: Int!
   $shortCode: String!
   $startCall: DateTime!
   $endCall: DateTime!
@@ -10,7 +11,8 @@ mutation createCall(
   $surveyComment: String!
   $templateId: Int
 ) {
-  createCall(
+  updateCall(
+    id: $id
     shortCode: $shortCode
     startCall: $startCall
     endCall: $endCall

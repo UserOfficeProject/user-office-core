@@ -35,7 +35,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
   assignProposalToSEP,
 }) => {
   const classes = useStyles();
-  const { SEPsData } = useSEPsData(false, '', true);
+  const { SEPsData } = useSEPsData('', true);
 
   return (
     <Container component="main" maxWidth="xs">

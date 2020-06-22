@@ -1,13 +1,12 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { Sep } from '../generated/sdk';
+import { Sep, UserRole } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useSEPsData(
-  show: boolean,
   filter: string,
   active = true,
-  role = 'SEP_Reviewer'
+  role = UserRole.SEP_REVIEWER
 ): {
   loading: boolean;
   SEPsData: Sep[];
@@ -17,7 +16,7 @@ export function useSEPsData(
   const [SEPsData, setSEPsData] = useState<Sep[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (role === 'user_officer') {
+    if (role === UserRole.USER_OFFICER) {
       api()
         .getSEPs({
           filter: filter,
@@ -51,7 +50,7 @@ export function useSEPsData(
           setLoading(false);
         });
     }
-  }, [filter, show, active, api, role]);
+  }, [filter, active, api, role]);
 
   return { loading, SEPsData, setSEPsData };
 }

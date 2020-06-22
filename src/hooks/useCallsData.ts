@@ -27,5 +27,5 @@ export function useCallsData(isActive?: boolean, templateId?: number) {
       });
   }, [api, isActive, templateId]);
 
-  return { loading, callsData };
+  return { loading, callsData, setCallsData };
 }

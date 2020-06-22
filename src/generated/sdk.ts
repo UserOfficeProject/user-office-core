@@ -89,6 +89,7 @@ export type Call = {
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>,
+  instruments: Array<Instrument>,
 };
 
 export type CallResponseWrap = {
@@ -244,12 +245,37 @@ export type InstitutionsFilter = {
   isVerified?: Maybe<Scalars['Boolean']>,
 };
 
+export type Instrument = {
+   __typename?: 'Instrument',
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String'],
+};
+
+export type InstrumentResponseWrap = {
+   __typename?: 'InstrumentResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  instrument?: Maybe<Instrument>,
+};
+
+export type InstrumentsQueryResult = {
+   __typename?: 'InstrumentsQueryResult',
+  totalCount: Scalars['Int'],
+  instruments: Array<Instrument>,
+};
+
 
 export type Mutation = {
    __typename?: 'Mutation',
   createInstitution: InstitutionResponseWrap,
   updateInstitution: InstitutionResponseWrap,
   createCall: CallResponseWrap,
+  updateCall: CallResponseWrap,
+  assignInstrumentToCall: CallResponseWrap,
+  removeAssignedInstrumentFromcall: CallResponseWrap,
+  createInstrument: InstrumentResponseWrap,
+  updateInstrument: InstrumentResponseWrap,
   administrationProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
@@ -285,6 +311,7 @@ export type Mutation = {
   cloneTemplate: TemplateResponseWrap,
   createProposal: ProposalResponseWrap,
   deleteInstitution: InstitutionResponseWrap,
+  deleteInstrument: InstrumentResponseWrap,
   deleteProposal: ProposalResponseWrap,
   deleteQuestion: QuestionResponseWrap,
   deleteTemplate: TemplateResponseWrap,
@@ -331,6 +358,48 @@ export type MutationCreateCallArgs = {
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
+};
+
+
+export type MutationUpdateCallArgs = {
+  id: Scalars['Int'],
+  shortCode: Scalars['String'],
+  startCall: Scalars['DateTime'],
+  endCall: Scalars['DateTime'],
+  startReview: Scalars['DateTime'],
+  endReview: Scalars['DateTime'],
+  startNotify: Scalars['DateTime'],
+  endNotify: Scalars['DateTime'],
+  cycleComment: Scalars['String'],
+  surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>
+};
+
+
+export type MutationAssignInstrumentToCallArgs = {
+  instrumentIds: Array<Scalars['Int']>,
+  callId: Scalars['Int']
+};
+
+
+export type MutationRemoveAssignedInstrumentFromcallArgs = {
+  instrumentId: Scalars['Int'],
+  callId: Scalars['Int']
+};
+
+
+export type MutationCreateInstrumentArgs = {
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type MutationUpdateInstrumentArgs = {
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
 };
 
 
@@ -606,6 +675,11 @@ export type MutationDeleteInstitutionArgs = {
 };
 
 
+export type MutationDeleteInstrumentArgs = {
+  instrumentId: Scalars['Int']
+};
+
+
 export type MutationDeleteProposalArgs = {
   id: Scalars['Int']
 };
@@ -821,6 +895,8 @@ export type Query = {
   getOrcIDInformation?: Maybe<OrcIdInformation>,
   getPageContent?: Maybe<Scalars['String']>,
   institutions?: Maybe<Array<Institution>>,
+  instrument?: Maybe<Instrument>,
+  instruments?: Maybe<InstrumentsQueryResult>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
@@ -898,6 +974,11 @@ export type QueryGetPageContentArgs = {
 
 export type QueryInstitutionsArgs = {
   filter?: Maybe<InstitutionsFilter>
+};
+
+
+export type QueryInstrumentArgs = {
+  instrumentId: Scalars['Int']
 };
 
 
@@ -1392,7 +1473,7 @@ export type CreateSepMutation = (
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
       { __typename?: 'SEP' }
-      & Pick<Sep, 'id'>
+      & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
     )> }
   ) }
 );
@@ -1676,6 +1757,24 @@ export type UpdateInstitutionMutation = (
   ) }
 );
 
+export type AssignInstrumentToCallMutationVariables = {
+  instrumentIds: Array<Scalars['Int']>,
+  callId: Scalars['Int']
+};
+
+
+export type AssignInstrumentToCallMutation = (
+  { __typename?: 'Mutation' }
+  & { assignInstrumentToCall: (
+    { __typename?: 'CallResponseWrap' }
+    & Pick<CallResponseWrap, 'error'>
+    & { call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id'>
+    )> }
+  ) }
+);
+
 export type CreateCallMutationVariables = {
   shortCode: Scalars['String'],
   startCall: Scalars['DateTime'],
@@ -1697,7 +1796,7 @@ export type CreateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id'>
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
     )> }
   ) }
 );
@@ -1711,8 +1810,57 @@ export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'templateId'>
+    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+    & { instruments: Array<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
   )>> }
+);
+
+export type RemoveAssignedInstrumentFromcallMutationVariables = {
+  instrumentId: Scalars['Int'],
+  callId: Scalars['Int']
+};
+
+
+export type RemoveAssignedInstrumentFromcallMutation = (
+  { __typename?: 'Mutation' }
+  & { removeAssignedInstrumentFromcall: (
+    { __typename?: 'CallResponseWrap' }
+    & Pick<CallResponseWrap, 'error'>
+    & { call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id'>
+    )> }
+  ) }
+);
+
+export type UpdateCallMutationVariables = {
+  id: Scalars['Int'],
+  shortCode: Scalars['String'],
+  startCall: Scalars['DateTime'],
+  endCall: Scalars['DateTime'],
+  startReview: Scalars['DateTime'],
+  endReview: Scalars['DateTime'],
+  startNotify: Scalars['DateTime'],
+  endNotify: Scalars['DateTime'],
+  cycleComment: Scalars['String'],
+  surveyComment: Scalars['String'],
+  templateId?: Maybe<Scalars['Int']>
+};
+
+
+export type UpdateCallMutation = (
+  { __typename?: 'Mutation' }
+  & { updateCall: (
+    { __typename?: 'CallResponseWrap' }
+    & Pick<CallResponseWrap, 'error'>
+    & { call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+    )> }
+  ) }
 );
 
 export type GetEventLogsQueryVariables = {
@@ -1731,6 +1879,73 @@ export type GetEventLogsQuery = (
       & Pick<User, 'id' | 'firstname' | 'lastname' | 'email'>
     ) }
   )>> }
+);
+
+export type CreateInstrumentMutationVariables = {
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type CreateInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { createInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+    & { instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  ) }
+);
+
+export type DeleteInstrumentMutationVariables = {
+  instrumentId: Scalars['Int']
+};
+
+
+export type DeleteInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+  ) }
+);
+
+export type GetInstrumentsQueryVariables = {};
+
+
+export type GetInstrumentsQuery = (
+  { __typename?: 'Query' }
+  & { instruments: Maybe<(
+    { __typename?: 'InstrumentsQueryResult' }
+    & Pick<InstrumentsQueryResult, 'totalCount'>
+    & { instruments: Array<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  )> }
+);
+
+export type UpdateInstrumentMutationVariables = {
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String']
+};
+
+
+export type UpdateInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { updateInstrument: (
+    { __typename?: 'InstrumentResponseWrap' }
+    & Pick<InstrumentResponseWrap, 'error'>
+    & { instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    )> }
+  ) }
 );
 
 export type AdministrationProposalMutationVariables = {
@@ -3264,6 +3479,10 @@ export const CreateSepDocument = gql`
   createSEP(code: $code, description: $description, numberRatingsRequired: $numberRatingsRequired, active: $active) {
     sep {
       id
+      code
+      description
+      numberRatingsRequired
+      active
     }
     error
   }
@@ -3472,12 +3691,32 @@ export const UpdateInstitutionDocument = gql`
   }
 }
     `;
+export const AssignInstrumentToCallDocument = gql`
+    mutation assignInstrumentToCall($instrumentIds: [Int!]!, $callId: Int!) {
+  assignInstrumentToCall(instrumentIds: $instrumentIds, callId: $callId) {
+    error
+    call {
+      id
+    }
+  }
+}
+    `;
 export const CreateCallDocument = gql`
     mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
   createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
       id
+      shortCode
+      startCall
+      endCall
+      startReview
+      endReview
+      startNotify
+      endNotify
+      cycleComment
+      surveyComment
+      templateId
     }
   }
 }
@@ -3489,7 +3728,49 @@ export const GetCallsDocument = gql`
     shortCode
     startCall
     endCall
+    startReview
+    endReview
+    startNotify
+    endNotify
+    cycleComment
+    surveyComment
     templateId
+    instruments {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+  }
+}
+    `;
+export const RemoveAssignedInstrumentFromcallDocument = gql`
+    mutation removeAssignedInstrumentFromcall($instrumentId: Int!, $callId: Int!) {
+  removeAssignedInstrumentFromcall(instrumentId: $instrumentId, callId: $callId) {
+    error
+    call {
+      id
+    }
+  }
+}
+    `;
+export const UpdateCallDocument = gql`
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
+  updateCall(id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
+    error
+    call {
+      id
+      shortCode
+      startCall
+      endCall
+      startReview
+      endReview
+      startNotify
+      endNotify
+      cycleComment
+      surveyComment
+      templateId
+    }
   }
 }
     `;
@@ -3507,6 +3788,52 @@ export const GetEventLogsDocument = gql`
     eventTStamp
     rowData
     changedObjectId
+  }
+}
+    `;
+export const CreateInstrumentDocument = gql`
+    mutation createInstrument($name: String!, $shortCode: String!, $description: String!) {
+  createInstrument(name: $name, shortCode: $shortCode, description: $description) {
+    instrument {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    error
+  }
+}
+    `;
+export const DeleteInstrumentDocument = gql`
+    mutation deleteInstrument($instrumentId: Int!) {
+  deleteInstrument(instrumentId: $instrumentId) {
+    error
+  }
+}
+    `;
+export const GetInstrumentsDocument = gql`
+    query getInstruments {
+  instruments {
+    instruments {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    totalCount
+  }
+}
+    `;
+export const UpdateInstrumentDocument = gql`
+    mutation updateInstrument($instrumentId: Int!, $name: String!, $shortCode: String!, $description: String!) {
+  updateInstrument(instrumentId: $instrumentId, name: $name, shortCode: $shortCode, description: $description) {
+    instrument {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    error
   }
 }
     `;
@@ -4265,14 +4592,35 @@ export function getSdk(client: GraphQLClient) {
     updateInstitution(variables: UpdateInstitutionMutationVariables): Promise<UpdateInstitutionMutation> {
       return client.request<UpdateInstitutionMutation>(print(UpdateInstitutionDocument), variables);
     },
+    assignInstrumentToCall(variables: AssignInstrumentToCallMutationVariables): Promise<AssignInstrumentToCallMutation> {
+      return client.request<AssignInstrumentToCallMutation>(print(AssignInstrumentToCallDocument), variables);
+    },
     createCall(variables: CreateCallMutationVariables): Promise<CreateCallMutation> {
       return client.request<CreateCallMutation>(print(CreateCallDocument), variables);
     },
     getCalls(variables?: GetCallsQueryVariables): Promise<GetCallsQuery> {
       return client.request<GetCallsQuery>(print(GetCallsDocument), variables);
     },
+    removeAssignedInstrumentFromcall(variables: RemoveAssignedInstrumentFromcallMutationVariables): Promise<RemoveAssignedInstrumentFromcallMutation> {
+      return client.request<RemoveAssignedInstrumentFromcallMutation>(print(RemoveAssignedInstrumentFromcallDocument), variables);
+    },
+    updateCall(variables: UpdateCallMutationVariables): Promise<UpdateCallMutation> {
+      return client.request<UpdateCallMutation>(print(UpdateCallDocument), variables);
+    },
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
+    },
+    createInstrument(variables: CreateInstrumentMutationVariables): Promise<CreateInstrumentMutation> {
+      return client.request<CreateInstrumentMutation>(print(CreateInstrumentDocument), variables);
+    },
+    deleteInstrument(variables: DeleteInstrumentMutationVariables): Promise<DeleteInstrumentMutation> {
+      return client.request<DeleteInstrumentMutation>(print(DeleteInstrumentDocument), variables);
+    },
+    getInstruments(variables?: GetInstrumentsQueryVariables): Promise<GetInstrumentsQuery> {
+      return client.request<GetInstrumentsQuery>(print(GetInstrumentsDocument), variables);
+    },
+    updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
+      return client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables);
     },
     administrationProposal(variables: AdministrationProposalMutationVariables): Promise<AdministrationProposalMutation> {
       return client.request<AdministrationProposalMutation>(print(AdministrationProposalDocument), variables);

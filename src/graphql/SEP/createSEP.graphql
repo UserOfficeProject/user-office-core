@@ -12,6 +12,10 @@ mutation createSEP(
   ) {
     sep {
       id
+      code
+      description
+      numberRatingsRequired
+      active
     }
     error
   }

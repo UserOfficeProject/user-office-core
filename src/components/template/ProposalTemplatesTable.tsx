@@ -3,18 +3,11 @@ import { Column } from 'material-table';
 import React, { useState } from 'react';
 
 import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import { CallsTable } from '../call/CallsTable';
+import CallsTable from '../call/CallsTable';
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsModal(props: { templateId?: number; onClose: () => void }) {
-  const { loading, callsData } = useCallsData(undefined, props.templateId);
-
-  if (loading) {
-    return <div>loading...</div>;
-  }
-
   return (
     <Dialog
       open={props.templateId !== undefined}
@@ -22,7 +15,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
       onClose={props.onClose}
     >
       <DialogContent>
-        <CallsTable data={callsData} />
+        <CallsTable templateId={props.templateId} />
       </DialogContent>
     </Dialog>
   );
