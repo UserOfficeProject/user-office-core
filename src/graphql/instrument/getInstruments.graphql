@@ -1,0 +1,11 @@
+query getInstruments {
+  instruments {
+    instruments {
+      instrumentId
+      name
+      shortCode
+      description
+    }
+    totalCount
+  }
+}

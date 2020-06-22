@@ -4,6 +4,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import BuildIcon from '@material-ui/icons/Build';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToApp from '@material-ui/icons/ExitToApp';
@@ -80,6 +81,12 @@ const MenuItems: React.FC = () => {
           <People />
         </ListItemIcon>
         <ListItemText primary="View People" />
+      </ListItem>
+      <ListItem component={Link} to="/InstrumentPage" button>
+        <ListItemIcon>
+          <BuildIcon />
+        </ListItemIcon>
+        <ListItemText primary="Instruments" />
       </ListItem>
       <ListItem component={Link} to="/SEPPage" button>
         <ListItemIcon>

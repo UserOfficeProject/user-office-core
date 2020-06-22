@@ -20,14 +20,13 @@ const useStyles = makeStyles({
 });
 
 const SEPsTable: React.FC = () => {
-  const [show, setShow] = useState(false);
   const { currentRole } = useContext(UserContext);
-  const { loading, SEPsData } = useSEPsData(
-    show,
+  const { loading, SEPsData, setSEPsData } = useSEPsData(
     '',
     false,
     currentRole as UserRole
   );
+  const [show, setShow] = useState(false);
   const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },
@@ -49,6 +48,11 @@ const SEPsTable: React.FC = () => {
     return <p>Loading...</p>;
   }
 
+  const onSepAdded = (sepAdded: Sep | null) => {
+    sepAdded && setSEPsData([...SEPsData, sepAdded]);
+    setShow(false);
+  };
+
   const EditIcon = (): JSX.Element => <Edit />;
 
   return (
@@ -60,7 +64,9 @@ const SEPsTable: React.FC = () => {
         onClose={(): void => setShow(false)}
       >
         <DialogContent>
-          <AddSEP close={(): void => setShow(false)} />
+          <AddSEP
+            close={(sepAdded: Sep | null): void => onSepAdded(sepAdded)}
+          />
         </DialogContent>
       </Dialog>
       <div data-cy="SEPs-table">

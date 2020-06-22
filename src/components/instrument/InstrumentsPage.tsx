@@ -1,16 +1,16 @@
-import Grid from '@material-ui/core/Grid';
+import { Grid } from '@material-ui/core';
 import React from 'react';
 
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import CallsTable from './CallsTable';
+import InstrumentsTable from './InstrumentsTable';
 
-const CallPage: React.FC = () => {
+const InstrumentsPage: React.FC = () => {
   return (
     <ContentContainer>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <StyledPaper>
-            <CallsTable />
+            <InstrumentsTable />
           </StyledPaper>
         </Grid>
       </Grid>
@@ -18,4 +18,4 @@ const CallPage: React.FC = () => {
   );
 };
 
-export default CallPage;
+export default InstrumentsPage;

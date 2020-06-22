@@ -12,13 +12,11 @@ import { useSnackbar } from 'notistack';
 import React, {
   createContext,
   PropsWithChildren,
-  useContext,
   useEffect,
   useState,
 } from 'react';
 import { Prompt } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
 import {
   Proposal,
   ProposalStatus,
@@ -36,6 +34,7 @@ import {
 } from '../../models/ProposalSubmissionModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import { clamp } from '../../utils/Math';
+import { useCheckAccess } from '../common/Can';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -85,8 +84,7 @@ export default function ProposalContainer(props: {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentRole } = useContext(UserContext);
-  const isNonOfficer = currentRole !== UserRole.USER_OFFICER;
+  const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();

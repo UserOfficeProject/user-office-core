@@ -22,10 +22,9 @@ export default function ProposalInformationView(props: {
   disabled?: boolean;
 }) {
   const [userError, setUserError] = useState(false);
-  const { user: currentUser } = useContext(UserContext);
+  const { user: currentUser, currentRole } = useContext(UserContext);
   const { dispatch } = useContext(ProposalSubmissionContext)!;
   const [users, setUsers] = useState<BasicUserDetails[]>(props.data.users);
-  const { currentRole } = useContext(UserContext);
 
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
