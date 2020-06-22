@@ -849,6 +849,7 @@ export type ProposalResponseWrap = {
 export type ProposalsFilter = {
   text?: Maybe<Scalars['String']>,
   templateIds?: Maybe<Array<Scalars['Int']>>,
+  questionaryIds?: Maybe<Array<Scalars['Int']>>,
 };
 
 export type ProposalsQueryResult = {

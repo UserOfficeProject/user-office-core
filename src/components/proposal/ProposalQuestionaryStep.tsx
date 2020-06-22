@@ -1,14 +1,8 @@
 import { makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
-import React, { useContext, SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
-
-import {
-  DataType,
-  Answer,
-  QuestionaryStep,
-  AnswerInput,
-} from '../../generated/sdk';
+import { Answer, DataType, QuestionaryStep } from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
 import {
   areDependenciesSatisfied,

@@ -7,23 +7,11 @@ import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import React, {
-  createContext,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
-
-import { UserContext } from '../../context/UserContextProvider';
 import {
   Answer,
   AnswerInput,
-  ProposalStatus,
-  Questionary,
-} from '../../generated/sdk';
-import {
   Proposal,
   ProposalStatus,
   Questionary,
