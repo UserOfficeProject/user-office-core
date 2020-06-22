@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
+
 import { Answer, DataType, QuestionaryStep } from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
 import {

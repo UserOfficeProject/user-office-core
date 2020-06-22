@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
+
 import { Answer, DataType } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { FileMetaData } from '../../models/FileUpload';
