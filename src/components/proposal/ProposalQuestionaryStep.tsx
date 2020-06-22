@@ -26,6 +26,7 @@ import { ProposalComponentMultipleChoice } from './ProposalComponentMultipleChoi
 import { ProposalComponentTextInput } from './ProposalComponentTextInput';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
+import { ProposalComponentSubtemplate } from './ProposalComponentSubtemplate';
 
 class ComponentFactory {
   private componentMap = JSDict.Create<string, any>();
@@ -43,6 +44,7 @@ class ComponentFactory {
       DataType.EMBELLISHMENT,
       ProposalComponentEmbellishment
     );
+    this.componentMap.put(DataType.SUBTEMPLATE, ProposalComponentSubtemplate);
   }
   createComponent(
     field: Answer,
