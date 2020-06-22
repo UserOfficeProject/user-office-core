@@ -3,7 +3,7 @@ import { IconButton } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
 import { Visibility, Delete, Assignment, Email } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable from 'material-table';
+import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -12,11 +12,13 @@ import XLSX from 'xlsx';
 import { Review, ReviewStatus } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
 import DialogConfirmation from '../common/DialogConfirmation';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
 import RankInput from './RankInput';
+
 const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
@@ -30,6 +32,9 @@ const ProposalTableOfficer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [localStorageValue, setLocalStorageValue] = useLocalStorage<
+    Column<ProposalData>[] | null
+  >('proposalColumnsOfficer', null);
 
   const setNewRanking = (proposalID: number, ranking: number) => {
     api().administrationProposal({
@@ -87,7 +92,7 @@ const ProposalTableOfficer: React.FC = () => {
   const getGrades = (reviews: Review[] | null | undefined) =>
     reviews
       ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade!) ?? [];
+      .map(review => review.grade as number) ?? [];
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -109,7 +114,7 @@ const ProposalTableOfficer: React.FC = () => {
     </>
   );
 
-  const columns = [
+  const columns: Column<ProposalData>[] = localStorageValue || [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -120,7 +125,7 @@ const ProposalTableOfficer: React.FC = () => {
     {
       title: 'Title',
       field: 'title',
-      width: 'auto',
+      ...{ width: 'auto' },
     },
     {
       title: 'Time(Days)',
@@ -382,6 +387,19 @@ const ProposalTableOfficer: React.FC = () => {
             position: 'toolbarOnSelect',
           },
         ]}
+        onChangeColumnHidden={collumnChange => {
+          const proposalColumns = columns.map(
+            (proposalColumn: Column<ProposalData>) => {
+              if (proposalColumn.field === collumnChange.field) {
+                proposalColumn.hidden = collumnChange.hidden;
+              }
+
+              return proposalColumn;
+            }
+          );
+
+          setLocalStorageValue(proposalColumns);
+        }}
       />
     </>
   );
