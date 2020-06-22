@@ -857,8 +857,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation  ($name: String!, $description: String) {\n  createTemplate(name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
-						"variables": "{\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
+						"query": "mutation  ($categoryId: TemplateCategoryId!, $name: String!, $description: String) {\n  createTemplate(categoryId: $categoryId, name:$name, description:$description) {\n    template {\n      templateId\n      name\n    }\n    error\n  }\n}",
+						"variables": "{\n        \"categoryId\": \"PROPOSAL_QUESTIONARY\",\n        \"name\": \"{{$randomWord}}\",\n        \"description\": \"{{$randomWord}}\"\n    }"
 					},
 					"options": {
 						"graphql": {}
@@ -1307,8 +1307,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($dataType: DataType!) {\n  createQuestion(dataType: $dataType) {\n    question {\n\n          proposalQuestionId\n          dataType\n          question\n          config\n          {\n              ... on TextInputConfig {\n                required\n              }\n          }\n          \n\n    }\n    error\n  }\n}",
-						"variables": "{\n        \"dataType\": \"FILE_UPLOAD\",\n        \"fieldConfigFragment\":\"__typename\"\n    }"
+						"query": "mutation ($categoryId: TemplateCategoryId!, $dataType: DataType!) {\n  createQuestion(categoryId: $categoryId, dataType: $dataType) {\n    question {\n          proposalQuestionId\n          dataType\n          question\n          config\n          {\n              ... on TextInputConfig {\n                required\n              }\n          }\n          \n\n    }\n    error\n  }\n}",
+						"variables": "{\n        \"categoryId\": \"PROPOSAL_QUESTIONARY\",\n        \"dataType\": \"FILE_UPLOAD\",\n        \"fieldConfigFragment\":\"__typename\"\n    }"
 					},
 					"options": {
 						"graphql": {}
@@ -1432,7 +1432,7 @@
 			"response": []
 		},
 		{
-			"name": "createQuestionRel [Mutation]",
+			"name": "createQuestionTemplateRelation [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -1441,8 +1441,8 @@
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.createQuestionRel.template).to.not.eql(null);",
-							"    pm.expect(jsonData.data.createQuestionRel.error).to.eql(null);",
+							"    pm.expect(jsonData.data.createQuestionTemplateRelation.template).to.not.eql(null);",
+							"    pm.expect(jsonData.data.createQuestionTemplateRelation.error).to.eql(null);",
 							"});",
 							""
 						],
@@ -1513,7 +1513,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($templateId: Int!, $questionId: String!, $topicId: Int!) {\n  createQuestionRel(templateId:$templateId, questionId:$questionId, sortOrder:0, topicId:$topicId) {\n\ttemplate {\n\t\tname\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($templateId: Int!, $questionId: String!, $topicId: Int!) {\n  createQuestionTemplateRelation(templateId:$templateId, questionId:$questionId, sortOrder:0, topicId:$topicId) {\n\ttemplate {\n\t\tname\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\t\"topicId\": {{NEW_TOPIC_ID}},\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1535,7 +1535,7 @@
 			"response": []
 		},
 		{
-			"name": "updateQuestionRel [Mutation]",
+			"name": "updateQuestionTemplateRelation [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -1544,8 +1544,8 @@
 						"exec": [
 							"pm.test(\"Create field should not resut in failure\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateQuestionRel.template).to.not.eql(null);",
-							"    pm.expect(jsonData.data.updateQuestionRel.error).to.eql(null);",
+							"    pm.expect(jsonData.data.updateQuestionTemplateRelation.template).to.not.eql(null);",
+							"    pm.expect(jsonData.data.updateQuestionTemplateRelation.error).to.eql(null);",
 							"});",
 							""
 						],
@@ -1616,7 +1616,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!, $topicId: Int!, $sortOrder: Int!) {\n  updateQuestionRel(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!, $topicId: Int!, $sortOrder: Int!) {\n  updateQuestionTemplateRelation(questionId: $questionId, templateId: $templateId, topicId: $topicId, sortOrder: $sortOrder) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n          dependency {\n            questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n              condition\n              params\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"questionId\": \"{{NEW_FIELD_ID}}\",\n\"question\": \"{{$randomWords}}\",\n\"config\": \"{\\\"required\\\":true}\",\n\"topicId\": {{NEW_TOPIC_ID}},\n\"sortOrder\": 0,\n\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1638,7 +1638,7 @@
 			"response": []
 		},
 		{
-			"name": "updateQuestionsTopicRels [Mutation]",
+			"name": "assignQuestionsToTopic [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -1647,7 +1647,7 @@
 						"exec": [
 							"pm.test(\"Should update field topic relation\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.updateQuestionsTopicRels.error).to.eql(null)",
+							"    pm.expect(jsonData.data.assignQuestionsToTopic.error).to.eql(null)",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1694,8 +1694,8 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					},
 					{
 						"key": "Accept",
@@ -1717,8 +1717,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation($topicId:Int!, $fieldIds:[String!], $templateId:Int!) {\n    updateQuestionsTopicRels(topicId:$topicId, templateId:$templateId, fieldIds:$fieldIds) {\n        result\n        error\n    }\n}\n",
-						"variables": "{\n    \"topicId\": {{NEW_TOPIC_ID}},\n    \"fieldIds\": [\"{{NEW_FIELD_ID}}\"],\n    \"templateId\":{{NEW_TEMPLATE_ID}}\n}\n"
+						"query": "mutation($topicId:Int!, $questionIds:[String!], $templateId:Int!) {\n    assignQuestionsToTopic(topicId:$topicId, templateId:$templateId, questionIds:$questionIds) {\n        result\n        error\n    }\n}\n",
+						"variables": "{\n    \"topicId\": {{NEW_TOPIC_ID}},\n    \"questionIds\": [\"{{NEW_FIELD_ID}}\"],\n    \"templateId\":{{NEW_TEMPLATE_ID}}\n}\n"
 					},
 					"options": {
 						"graphql": {}
@@ -3253,6 +3253,88 @@
 			"response": []
 		},
 		{
+			"name": "proposals2 [Query]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a12a3960-a667-472a-8f8e-21c4090bc0bd",
+						"exec": [
+							"pm.test(\"Should get proposals\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.proposals.totalCount).to.be.above(0);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Authorization}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/QuestionaryEditor"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQW5kZXJzIiwibWlkZGxlbmFtZSI6IkFkYW0iLCJsYXN0bmFtZSI6IkFuZGVyc3NvbiIsInVzZXJuYW1lIjoidGVzdG9mZmljZXIiLCJwcmVmZXJyZWRuYW1lIjoiUmhpYW5ub24iLCJvcmNpZCI6Ijg3ODMyMTg5NyIsImdlbmRlciI6Im1hbGUiLCJuYXRpb25hbGl0eSI6IkZyZW5jaCIsImJpcnRoZGF0ZSI6IjE5ODEtMDgtMDRUMjI6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6IlBmYW5uZXJzdGlsbCBhbmQgU29ucyIsImRlcGFydG1lbnQiOiJJVCBkZXBhcnRtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJDb25nbywgQWxsZW5ldmlsbGUsIDM1ODIzIE11ZWxsZXIgR2xlbnMiLCJwb3NpdGlvbiI6IkxpYWlzb24iLCJlbWFpbCI6IkFhcm9uX0hhcnJpczQ5QGdtYWlsLmNvbSIsInRlbGVwaG9uZSI6IjcxMS0zMTYtNTcyOCIsInRlbGVwaG9uZV9hbHQiOiIxLTM1OS04NjQtMzQ4OSB4NzM5MCIsImNyZWF0ZWQiOiIyMDE5LTEwLTAzVDA4OjI0OjU2LjUyMFoiLCJ1cGRhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MjBaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU3MDEwMzkyMiwiZXhwIjoxNTcwNzA4NzIyfQ.VELbODuxgIO7cK7zkdEWLhNZD1EI1PyKopqCiYHonUQ"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query($questionaryIds: [Int!]) {\n  proposals(filter:{questionaryIds:$questionaryIds}) {\n    proposals{\n      id\n      shortCode\n      title\n      status\n      }\n    totalCount\n    }\n  }",
+						"variables": "{\n    \"questionaryIds\": [{{NEW_QUESTIONARY_ID}}]\n}"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "basicUserDetails [Query]",
 			"event": [
 				{
@@ -3510,7 +3592,7 @@
 			"response": []
 		},
 		{
-			"name": "deleteQuestionRel [Mutation]",
+			"name": "deleteQuestionTemplateRelation [Mutation]",
 			"event": [
 				{
 					"listen": "test",
@@ -3519,7 +3601,7 @@
 						"exec": [
 							"pm.test(\"Update delete template field\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.data.deleteQuestionRel.error).to.be.eql(null);",
+							"    pm.expect(jsonData.data.deleteQuestionTemplateRelation.error).to.be.eql(null);",
 							"});",
 							"",
 							""
@@ -3601,7 +3683,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionRel(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
+						"query": "mutation ($questionId: String!, $templateId: Int!) {\n  deleteQuestionTemplateRelation(questionId: $questionId, templateId: $templateId) {\n    template {\n      steps {\n        topic {\n          title\n          id\n        }\n        fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config {\n              ... on TextInputConfig {\n                required\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"questionId\": \"{{NEW_FIELD_ID}}\",\n        \"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
