@@ -5,13 +5,13 @@ import {
   DataType,
   FieldDependency,
   QuestionaryStep,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateStep,
 } from '../generated/sdk';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { DataTypeSpec } from './ProposalModel';
 
-type AbstractField = QuestionRel | Answer;
+type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {

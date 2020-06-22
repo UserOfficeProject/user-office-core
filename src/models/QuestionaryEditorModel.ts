@@ -5,7 +5,7 @@ import { useParams } from 'react-router';
 import {
   Template,
   Question,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategoryId,
 } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
@@ -110,7 +110,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_QUESTION_REL_REQUESTED: {
-          const questionRel: QuestionRel = action.payload.field;
+          const questionRel: QuestionTemplateRelation = action.payload.field;
           const questionRelToUpdate = getFieldById(
             draft.steps,
             questionRel.question.proposalQuestionId

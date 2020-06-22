@@ -4,7 +4,7 @@ import {
   DataType,
   FieldDependency,
   Template,
-  QuestionRel,
+  QuestionTemplateRelation,
   Question,
   TemplateCategoryId,
 } from '../generated/sdk';
@@ -77,7 +77,7 @@ export function usePersistModel() {
 
   const updateQuestionTopicRelation = async (
     templateId: number,
-    field: QuestionRel
+    field: QuestionTemplateRelation
   ) => {
     return api()
       .updateQuestionTemplateRelation({
@@ -119,7 +119,10 @@ export function usePersistModel() {
       .then(data => data.deleteQuestion);
   };
 
-  const deleteQuestionRel = async (templateId: number, questionId: string) => {
+  const deleteQuestionTemplateRelation = async (
+    templateId: number,
+    questionId: string
+  ) => {
     setIsLoading(true);
 
     return api()
@@ -150,7 +153,7 @@ export function usePersistModel() {
       });
   };
 
-  const createQuestionRel = async (
+  const createQuestionTemplateRelation = async (
     templateId: number,
     topicId: number,
     questionId: string,
@@ -269,7 +272,8 @@ export function usePersistModel() {
           break;
         case EventType.UPDATE_QUESTION_REL_REQUESTED:
           executeAndMonitorCall(async () => {
-            const questionRel = action.payload.field as QuestionRel;
+            const questionRel = action.payload
+              .field as QuestionTemplateRelation;
             const templateId = action.payload.templateId;
             const result = await updateQuestionTopicRelation(
               templateId,
@@ -303,7 +307,7 @@ export function usePersistModel() {
           break;
         case EventType.DELETE_QUESTION_REL_REQUESTED:
           executeAndMonitorCall(async () => {
-            const result = await deleteQuestionRel(
+            const result = await deleteQuestionTemplateRelation(
               state.templateId,
               action.payload.fieldId
             );
@@ -373,7 +377,7 @@ export function usePersistModel() {
           const { questionId, topicId, sortOrder, templateId } = action.payload;
 
           executeAndMonitorCall(async () => {
-            const result = await createQuestionRel(
+            const result = await createQuestionTemplateRelation(
               templateId,
               topicId,
               questionId,

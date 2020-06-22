@@ -1081,8 +1081,14 @@ export type QuestionaryStepResponseWrap = {
   questionaryStep?: Maybe<QuestionaryStep>,
 };
 
-export type QuestionRel = {
-   __typename?: 'QuestionRel',
+export type QuestionResponseWrap = {
+   __typename?: 'QuestionResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  question?: Maybe<Question>,
+};
+
+export type QuestionTemplateRelation = {
+   __typename?: 'QuestionTemplateRelation',
   question: Question,
   sortOrder: Scalars['Int'],
   topicId: Scalars['Int'],
@@ -1090,16 +1096,10 @@ export type QuestionRel = {
   dependency?: Maybe<FieldDependency>,
 };
 
-export type QuestionRelResponseWrap = {
-   __typename?: 'QuestionRelResponseWrap',
+export type QuestionTemplateRelationResponseWrap = {
+   __typename?: 'QuestionTemplateRelationResponseWrap',
   error?: Maybe<Scalars['String']>,
-  questionRel?: Maybe<QuestionRel>,
-};
-
-export type QuestionResponseWrap = {
-   __typename?: 'QuestionResponseWrap',
-  error?: Maybe<Scalars['String']>,
-  question?: Maybe<Question>,
+  questionTemplateRelation?: Maybe<QuestionTemplateRelation>,
 };
 
 export type ResetPasswordEmailResponseWrap = {
@@ -1288,7 +1288,7 @@ export type TemplatesFilter = {
 export type TemplateStep = {
    __typename?: 'TemplateStep',
   topic: Topic,
-  fields: Array<QuestionRel>,
+  fields: Array<QuestionTemplateRelation>,
 };
 
 export type TextInputConfig = {
@@ -2612,9 +2612,9 @@ export type QuestionFragment = (
   ) }
 );
 
-export type QuestionRelFragment = (
-  { __typename?: 'QuestionRel' }
-  & Pick<QuestionRel, 'sortOrder' | 'topicId'>
+export type QuestionTemplateRelationFragment = (
+  { __typename?: 'QuestionTemplateRelation' }
+  & Pick<QuestionTemplateRelation, 'sortOrder' | 'topicId'>
   & { question: (
     { __typename?: 'Question' }
     & QuestionFragment
@@ -2658,8 +2658,8 @@ export type TemplateFragment = (
       { __typename?: 'Topic' }
       & Pick<Topic, 'title' | 'id'>
     ), fields: Array<(
-      { __typename?: 'QuestionRel' }
-      & QuestionRelFragment
+      { __typename?: 'QuestionTemplateRelation' }
+      & QuestionTemplateRelationFragment
     )> }
   )>, complementaryQuestions: Array<(
     { __typename?: 'Question' }
@@ -2678,8 +2678,8 @@ export type TemplateStepFragment = (
     { __typename?: 'Topic' }
     & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
   ), fields: Array<(
-    { __typename?: 'QuestionRel' }
-    & QuestionRelFragment
+    { __typename?: 'QuestionTemplateRelation' }
+    & QuestionTemplateRelationFragment
   )> }
 );
 
@@ -3354,8 +3354,8 @@ export const CoreReviewFragmentDoc = gql`
   sepID
 }
     `;
-export const QuestionRelFragmentDoc = gql`
-    fragment questionRel on QuestionRel {
+export const QuestionTemplateRelationFragmentDoc = gql`
+    fragment questionTemplateRelation on QuestionTemplateRelation {
   question {
     ...question
   }
@@ -3384,7 +3384,7 @@ export const TemplateFragmentDoc = gql`
       id
     }
     fields {
-      ...questionRel
+      ...questionTemplateRelation
     }
   }
   templateId
@@ -3395,7 +3395,7 @@ export const TemplateFragmentDoc = gql`
     ...question
   }
 }
-    ${QuestionRelFragmentDoc}
+    ${QuestionTemplateRelationFragmentDoc}
 ${QuestionFragmentDoc}`;
 export const TemplateMetadataFragmentDoc = gql`
     fragment templateMetadata on Template {
@@ -3414,10 +3414,10 @@ export const TemplateStepFragmentDoc = gql`
     isEnabled
   }
   fields {
-    ...questionRel
+    ...questionTemplateRelation
   }
 }
-    ${QuestionRelFragmentDoc}`;
+    ${QuestionTemplateRelationFragmentDoc}`;
 export const TopicFragmentDoc = gql`
     fragment topic on Topic {
   title

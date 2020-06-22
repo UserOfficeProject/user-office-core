@@ -2,18 +2,20 @@ import { Button, makeStyles, Typography, Link } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
-import { Template, QuestionRel } from '../../../../generated/sdk';
+import { Template, QuestionTemplateRelation } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
-export const QuestionRelFormShell = (props: {
+export const QuestionTemplateRelationFormShell = (props: {
   validationSchema: any;
-  questionRel: QuestionRel;
+  questionRel: QuestionTemplateRelation;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
   label: string;
   template: Template;
-  children: (formikProps: FormikProps<QuestionRel>) => React.ReactNode;
+  children: (
+    formikProps: FormikProps<QuestionTemplateRelation>
+  ) => React.ReactNode;
 }) => {
   const classes = makeStyles(theme => ({
     container: {
