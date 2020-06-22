@@ -18,7 +18,7 @@ export default class PostgresQuestionaryDataSource
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {
-    const subquery = database('answers_has_questionaries')
+    const subquery = database('answer_has_questionaries')
       .select('answer_id')
       .where({ questionary_id: child_questionary_id });
 

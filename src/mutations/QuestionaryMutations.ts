@@ -8,6 +8,7 @@ import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 
 export default class QuestionaryMutations {
   constructor(
@@ -95,11 +96,22 @@ export default class QuestionaryMutations {
 
   @Authorized()
   async updateAnswer(agent: User | null, args: UpdateAnswerArgs) {
-    // TODO do authorization
+    const hasRights = await this.questionaryAuth.hasWriteRights(
+      agent,
+      args.questionaryId
+    );
+    if (!hasRights) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
     return this.dataSource.updateAnswer(
       args.questionaryId,
       args.answer.questionId,
       args.answer.value
     );
+  }
+
+  @Authorized()
+  async create(agent: User | null, args: CreateQuestionaryArgs) {
+    throw new Error('');
   }
 }
