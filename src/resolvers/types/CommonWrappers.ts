@@ -6,6 +6,7 @@ import { Answer } from './Answer';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
@@ -52,6 +53,13 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
   @Response()
   @Field(() => SEP, { nullable: true })
   public sep: SEP;
+}
+
+@ObjectType()
+export class InstrumentResponseWrap extends ResponseWrapBase<Instrument> {
+  @Response()
+  @Field(() => Instrument, { nullable: true })
+  public instrument: Instrument;
 }
 
 @ObjectType()

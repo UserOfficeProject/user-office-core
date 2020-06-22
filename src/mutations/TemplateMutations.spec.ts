@@ -42,7 +42,7 @@ test('An userofficer can update topic', async () => {
   expect(topic.isEnabled).toEqual(topicEnabled);
 });
 
-test('Cant update topic that does not exist', async () => {
+test('Can not update topic that does not exist', async () => {
   const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
     id: 9,
     title: '',
@@ -182,7 +182,7 @@ test('User officer can delete question', async () => {
   ).resolves.toBeInstanceOf(Question);
 });
 
-test('Cant delete non-existing question', async () => {
+test('Can not delete non-existing question', async () => {
   const result = await mutations.deleteQuestion(dummyUserOfficerWithRole, {
     questionId: NON_EXISTING_QUESTION_ID,
   });
@@ -208,13 +208,6 @@ test('User can not update topic order', async () => {
 test('User can not delete a topic', async () => {
   const topic = await mutations.deleteTopic(dummyUserWithRole, { topicId: 1 });
   expect(topic instanceof Topic).toBe(false);
-});
-
-test('Officer can delete a topic', async () => {
-  const topic = await mutations.deleteTopic(dummyUserOfficerWithRole, {
-    topicId: 1,
-  });
-  expect(topic instanceof Topic).toBe(true);
 });
 
 test('User can not update question rel', async () => {
