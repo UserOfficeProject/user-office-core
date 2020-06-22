@@ -9,7 +9,7 @@ export function useLocalStorage<T>(
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       // Get from local storage by key
-      const item = localStorage.getItem(localStorageKey);
+      const item = window.localStorage.getItem(localStorageKey);
 
       // Parse stored json or if none return initialValue
       return item ? JSON.parse(item) : initialValue;
@@ -31,7 +31,10 @@ export function useLocalStorage<T>(
       // Save state
       setStoredValue(valueToStore);
       // Save to local storage
-      localStorage.setItem(localStorageKey, JSON.stringify(valueToStore));
+      window.localStorage.setItem(
+        localStorageKey,
+        JSON.stringify(valueToStore)
+      );
     } catch (error) {
       // A more advanced implementation would handle the error case
       console.error(error);
