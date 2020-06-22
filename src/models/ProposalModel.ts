@@ -77,7 +77,7 @@ export class Question {
   }
 }
 
-export class QuestionRel {
+export class QuestionTemplateRelation {
   constructor(
     public question: Question,
     public topicId: number,
@@ -87,7 +87,7 @@ export class QuestionRel {
   ) {}
 
   public static fromObject(obj: any) {
-    return new QuestionRel(
+    return new QuestionTemplateRelation(
       Question.fromObject(obj.question),
       obj.topicId,
       obj.sortOrder,
@@ -96,8 +96,8 @@ export class QuestionRel {
     );
   }
 }
-export class Answer extends QuestionRel {
-  constructor(templateField: QuestionRel, public value?: any) {
+export class Answer extends QuestionTemplateRelation {
+  constructor(templateField: QuestionTemplateRelation, public value?: any) {
     super(
       templateField.question,
       templateField.topicId,
@@ -107,7 +107,7 @@ export class Answer extends QuestionRel {
     );
   }
   static fromObject(obj: any) {
-    const templateField = QuestionRel.fromObject(obj);
+    const templateField = QuestionTemplateRelation.fromObject(obj);
 
     return new Answer(
       templateField,
@@ -146,12 +146,12 @@ export class Questionary {
 }
 
 export class TemplateStep {
-  constructor(public topic: Topic, public fields: QuestionRel[]) {}
+  constructor(public topic: Topic, public fields: QuestionTemplateRelation[]) {}
 
   public static fromObject(obj: any) {
     return new TemplateStep(
       Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => QuestionRel.fromObject(field))
+      obj.fields.map((field: any) => QuestionTemplateRelation.fromObject(field))
     );
   }
 }

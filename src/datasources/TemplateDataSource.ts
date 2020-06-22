@@ -2,7 +2,7 @@
 import {
   DataType,
   Question,
-  QuestionRel,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateStep,
@@ -54,10 +54,10 @@ export interface TemplateDataSource {
   createQuestionTemplateRelation(
     args: CreateQuestionTemplateRelationArgs
   ): Promise<Template>;
-  getQuestionRel(
+  getQuestionTemplateRelation(
     questionId: string,
     templateId: number
-  ): Promise<QuestionRel | null>;
+  ): Promise<QuestionTemplateRelation | null>;
 
   updateQuestionTemplateRelation(
     args: UpdateQuestionTemplateRelationArgs

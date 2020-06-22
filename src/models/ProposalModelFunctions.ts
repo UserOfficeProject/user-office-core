@@ -10,10 +10,10 @@ import {
   DataTypeSpec,
   FieldDependency,
   QuestionaryStep,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateStep,
 } from './ProposalModel';
-type AbstractField = QuestionRel | Answer;
+type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
@@ -156,7 +156,10 @@ validatorMap.put(
   new SelectFromOptionsInputValidator()
 );
 
-export function isMatchingConstraints(value: any, field: QuestionRel): boolean {
+export function isMatchingConstraints(
+  value: any,
+  field: QuestionTemplateRelation
+): boolean {
   const val = JSON.parse(value).value;
   const validator =
     validatorMap.get(field.question.dataType) || new BaseValidator();
@@ -165,5 +168,5 @@ export function isMatchingConstraints(value: any, field: QuestionRel): boolean {
 }
 
 interface ConstraintValidator {
-  validate(value: any, field: QuestionRel): boolean;
+  validate(value: any, field: QuestionTemplateRelation): boolean;
 }

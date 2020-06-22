@@ -50,12 +50,12 @@ export default class QuestionaryMutations {
 
     for (const answer of answers) {
       if (answer.value !== undefined) {
-        const questionRel = await this.templateDataSource.getQuestionRel(
+        const questionTemplateRelation = await this.templateDataSource.getQuestionTemplateRelation(
           answer.questionId,
           questionary.templateId
         );
-        if (!questionRel) {
-          logger.logError('Could not find questionRel', {
+        if (!questionTemplateRelation) {
+          logger.logError('Could not find questionTemplateRelation', {
             questionId: answer.questionId,
             templateId: questionary.templateId,
           });
@@ -64,11 +64,11 @@ export default class QuestionaryMutations {
         }
         if (
           !isPartialSave &&
-          !isMatchingConstraints(answer.value, questionRel)
+          !isMatchingConstraints(answer.value, questionTemplateRelation)
         ) {
           this.logger.logError('User provided value not matching constraint', {
             answer,
-            templateField: questionRel,
+            questionTemplateRelation,
           });
 
           return rejection('VALUE_CONSTRAINT_REJECTION');

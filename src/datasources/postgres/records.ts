@@ -9,7 +9,7 @@ import {
   FieldDependency,
   Question,
   Questionary,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategory,
   Topic,
 } from '../../models/ProposalModel';
@@ -330,7 +330,7 @@ export const createFileMetadata = (record: FileRecord) => {
 export const createQuestionTemplateRelationObject = (
   record: QuestionRecord & QuestionTemplateRelRecord
 ) => {
-  return new QuestionRel(
+  return new QuestionTemplateRelation(
     new Question(
       record.category_id,
       record.question_id,

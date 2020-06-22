@@ -17,7 +17,10 @@ import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/Up
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
-import { Question, QuestionRel } from './../../models/ProposalModel';
+import {
+  Question,
+  QuestionTemplateRelation,
+} from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
 import database from './database';
 import {
@@ -360,10 +363,10 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       });
   }
 
-  async getQuestionRel(
+  async getQuestionTemplateRelation(
     questionId: string,
     templateId: number
-  ): Promise<QuestionRel | null> {
+  ): Promise<QuestionTemplateRelation | null> {
     return database('templates_has_questions')
       .where({
         'templates_has_questions.question_id': questionId,
