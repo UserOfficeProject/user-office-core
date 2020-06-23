@@ -2,8 +2,7 @@ import { makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
-
-import { Answer, DataType, QuestionaryStep } from '../../generated/sdk';
+import { QuestionaryStep } from '../../generated/sdk';
 import { useUpdateProposal } from '../../hooks/useUpdateProposal';
 import {
   areDependenciesSatisfied,
@@ -13,57 +12,12 @@ import {
   EventType,
   ProposalSubmissionModelState,
 } from '../../models/ProposalSubmissionModel';
-import JSDict from '../../utils/Dictionary';
 import submitFormAsync from '../../utils/FormikAsyncFormHandler';
 import { ErrorFocus } from '../common/ErrorFocus';
+import { QuestionaryComponentFactory } from '../questionary/QuestionaryComponentFactory';
 import { createFormikConfigObjects } from './createFormikConfigObjects';
-import { BasicComponentProps } from './IBasicComponentProps';
-import { ProposalComponentBoolean } from './ProposalComponentBoolean';
-import { ProposalComponentDatePicker } from './ProposalComponentDatePicker';
-import { ProposalComponentEmbellishment } from './ProposalComponentEmbellishment';
-import { ProposalComponentFileUpload } from './ProposalComponentFileUpload';
-import { ProposalComponentMultipleChoice } from './ProposalComponentMultipleChoice';
-import { ProposalComponentTextInput } from './ProposalComponentTextInput';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
-import { ProposalComponentSubtemplate } from './ProposalComponentSubtemplate';
-
-class ComponentFactory {
-  private componentMap = JSDict.Create<string, any>();
-
-  constructor() {
-    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
-    this.componentMap.put(
-      DataType.SELECTION_FROM_OPTIONS,
-      ProposalComponentMultipleChoice
-    );
-    this.componentMap.put(
-      DataType.EMBELLISHMENT,
-      ProposalComponentEmbellishment
-    );
-    this.componentMap.put(DataType.SUBTEMPLATE, ProposalComponentSubtemplate);
-  }
-  createComponent(
-    field: Answer,
-    props: any
-  ): React.ComponentElement<BasicComponentProps, any> {
-    props.templateField = field;
-    props.key = field.question.proposalQuestionId;
-
-    const component = this.componentMap.get(field.question.dataType);
-
-    if (!component) {
-      throw new Error(
-        `Could not create component for type ${field.question.dataType}`
-      );
-    }
-
-    return React.createElement(component, props);
-  }
-}
 
 export default function ProposalQuestionaryStep(props: {
   data: ProposalSubmissionModelState;
@@ -71,7 +25,7 @@ export default function ProposalQuestionaryStep(props: {
   readonly: boolean;
 }) {
   const { data, topicId } = props;
-  const componentFactory = new ComponentFactory();
+  const componentFactory = new QuestionaryComponentFactory();
   const { loading: formSaving } = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {

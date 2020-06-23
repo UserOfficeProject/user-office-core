@@ -280,6 +280,7 @@ export type Mutation = {
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
   updateAnswer: UpdateAnswerResponseWrap,
+  createQuestionary: QuestionaryResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
@@ -433,6 +434,11 @@ export type MutationAnswerTopicArgs = {
 export type MutationUpdateAnswerArgs = {
   questionaryId: Scalars['Int'],
   answer: AnswerInput
+};
+
+
+export type MutationCreateQuestionaryArgs = {
+  templateId: Scalars['Int']
 };
 
 
@@ -2239,6 +2245,23 @@ export type QuestionaryStepFragment = (
   )> }
 );
 
+export type CreateQuestionaryMutationVariables = {
+  templateId: Scalars['Int']
+};
+
+
+export type CreateQuestionaryMutation = (
+  { __typename?: 'Mutation' }
+  & { createQuestionary: (
+    { __typename?: 'QuestionaryResponseWrap' }
+    & Pick<QuestionaryResponseWrap, 'error'>
+    & { questionary: Maybe<(
+      { __typename?: 'Questionary' }
+      & QuestionaryFragment
+    )> }
+  ) }
+);
+
 export type GetFileMetadataQueryVariables = {
   fileIds: Array<Scalars['String']>
 };
@@ -4020,6 +4043,16 @@ export const AnswerTopicDocument = gql`
   }
 }
     ${QuestionaryStepFragmentDoc}`;
+export const CreateQuestionaryDocument = gql`
+    mutation createQuestionary($templateId: Int!) {
+  createQuestionary(templateId: $templateId) {
+    questionary {
+      ...questionary
+    }
+    error
+  }
+}
+    ${QuestionaryFragmentDoc}`;
 export const GetFileMetadataDocument = gql`
     query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
@@ -4652,6 +4685,9 @@ export function getSdk(client: GraphQLClient) {
     },
     answerTopic(variables: AnswerTopicMutationVariables): Promise<AnswerTopicMutation> {
       return client.request<AnswerTopicMutation>(print(AnswerTopicDocument), variables);
+    },
+    createQuestionary(variables: CreateQuestionaryMutationVariables): Promise<CreateQuestionaryMutation> {
+      return client.request<CreateQuestionaryMutation>(print(CreateQuestionaryDocument), variables);
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables);
