@@ -114,7 +114,7 @@ const ProposalTableOfficer: React.FC = () => {
     </>
   );
 
-  const columns: Column<ProposalData>[] = localStorageValue || [
+  let columns: Column<ProposalData>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -193,6 +193,16 @@ const ProposalTableOfficer: React.FC = () => {
     },
     { title: 'Notified', field: 'notified' },
   ];
+
+  // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
+  if (localStorageValue) {
+    columns = columns.map(column => ({
+      ...column,
+      hidden: localStorageValue?.find(
+        localStorageValueItem => localStorageValueItem.title === column.title
+      )?.hidden,
+    }));
+  }
 
   const emailProposals = (): void => {
     selectedProposals.forEach(id => {
@@ -389,13 +399,13 @@ const ProposalTableOfficer: React.FC = () => {
         ]}
         onChangeColumnHidden={collumnChange => {
           const proposalColumns = columns.map(
-            (proposalColumn: Column<ProposalData>) => {
-              if (proposalColumn.field === collumnChange.field) {
-                proposalColumn.hidden = collumnChange.hidden;
-              }
-
-              return proposalColumn;
-            }
+            (proposalColumn: Column<ProposalData>) => ({
+              hidden:
+                proposalColumn.title === collumnChange.title
+                  ? collumnChange.hidden
+                  : proposalColumn.hidden,
+              title: proposalColumn.title,
+            })
           );
 
           setLocalStorageValue(proposalColumns);
