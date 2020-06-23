@@ -14,6 +14,7 @@ import { ProposalStatus } from '../../models/ProposalModel';
 import { ProposalEndStatus } from '../../models/ProposalModel';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Instrument } from './Instrument';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { TechnicalReview } from './TechnicalReview';
@@ -109,6 +110,16 @@ export class ProposalResolver {
   ): Promise<TechnicalReview | null> {
     return await context.queries.review.technicalReviewForProposal(
       context.user,
+      proposal.id
+    );
+  }
+
+  @FieldResolver(() => Instrument, { nullable: true })
+  async instrument(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Instrument | null> {
+    return await context.queries.instrument.dataSource.getInstrumentByProposalId(
       proposal.id
     );
   }

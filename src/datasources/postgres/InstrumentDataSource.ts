@@ -113,9 +113,8 @@ export default class PostgresInstrumentDataSource
 
   async delete(instrumentId: number): Promise<Instrument> {
     return database('instruments')
-      .where('instruments.instrument_id', instrumentId)
+      .where('instrument_id', instrumentId)
       .del()
-      .from('instruments')
       .returning('*')
       .then((instrument: InstrumentRecord[]) => {
         if (instrument === undefined || instrument.length !== 1) {
@@ -125,6 +124,64 @@ export default class PostgresInstrumentDataSource
         }
 
         return this.createInstrumentObject(instrument[0]);
+      });
+  }
+
+  async assignProposalsToInstrument(
+    proposalIds: number[],
+    instrumentId: number
+  ): Promise<boolean> {
+    const dataToInsert = proposalIds.map(proposalId => ({
+      instrument_id: instrumentId,
+      proposal_id: proposalId,
+    }));
+
+    const result = await database('instrument_has_proposals').insert(
+      dataToInsert
+    );
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async removeProposalFromInstrument(
+    proposalId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    const result = await database('instrument_has_proposals')
+      .where('instrument_id', instrumentId)
+      .andWhere('proposal_id', proposalId)
+      .del();
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async getInstrumentByProposalId(
+    proposalId: number
+  ): Promise<Instrument | null> {
+    return database
+      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .from('instruments as i')
+      .join('instrument_has_proposals as ihp', {
+        'i.instrument_id': 'ihp.instrument_id',
+      })
+      .where('ihp.proposal_id', proposalId)
+      .first()
+      .then((instrument: InstrumentRecord) => {
+        if (!instrument) {
+          return null;
+        }
+
+        const result = this.createInstrumentObject(instrument);
+
+        return result;
       });
   }
 }
