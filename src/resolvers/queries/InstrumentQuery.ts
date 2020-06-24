@@ -34,4 +34,14 @@ export class InstrumentQuery {
   instruments(@Ctx() context: ResolverContext) {
     return context.queries.instrument.getAll(context.user);
   }
+
+  @Query(() => [Instrument], { nullable: true })
+  instrumentsBySep(
+    @Arg('sepId', () => Int) sepId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.getInstrumentsBySepId(context.user, {
+      sepId,
+    });
+  }
 }

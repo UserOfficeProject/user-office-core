@@ -29,6 +29,10 @@ export interface SEPDataSource {
     proposalId: number
   ): Promise<SEPAssignment[]>;
   getSEPProposals(sepId: number): Promise<SEPProposal[]>;
+  getSEPProposalsByInstrument(
+    sepId: number,
+    instrumentId: number
+  ): Promise<SEPProposal[]>;
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;

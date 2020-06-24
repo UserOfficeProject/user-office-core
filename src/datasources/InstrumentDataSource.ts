@@ -21,4 +21,5 @@ export interface InstrumentDataSource {
     instrumentId: number
   ): Promise<boolean>;
   getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
+  getInstrumentsBySepId(sepId: number): Promise<Instrument[]>;
 }

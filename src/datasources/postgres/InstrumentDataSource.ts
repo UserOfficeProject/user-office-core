@@ -184,4 +184,24 @@ export default class PostgresInstrumentDataSource
         return result;
       });
   }
+
+  async getInstrumentsBySepId(sepId: number): Promise<Instrument[]> {
+    return database
+      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .from('instruments as i')
+      .join('instrument_has_proposals as ihp', {
+        'i.instrument_id': 'ihp.instrument_id',
+      })
+      .join('SEP_Proposals as sp', {
+        'sp.proposal_id': 'ihp.proposal_id',
+      })
+      .where('sp.sep_id', sepId)
+      .then((instruments: InstrumentRecord[]) => {
+        const result = instruments.map(instrument =>
+          this.createInstrumentObject(instrument)
+        );
+
+        return result;
+      });
+  }
 }

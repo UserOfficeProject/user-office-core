@@ -84,4 +84,24 @@ export default class SEPQueries {
       return null;
     }
   }
+
+  // @Authorized([
+  //   Roles.USER_OFFICER,
+  //   Roles.SEP_CHAIR,
+  //   Roles.SEP_SECRETARY,
+  //   Roles.SEP_REVIEWER,
+  // ])
+  async getSEPProposalsByInstrument(
+    agent: UserWithRole | null,
+    { sepId, instrumentId }: { sepId: number; instrumentId: number }
+  ) {
+    return this.dataSource.getSEPProposalsByInstrument(sepId, instrumentId);
+    // if (
+    //   (await this.isUserOfficer(agent)) ||
+    //   (await this.isMemberOfSEP(agent, sepId))
+    // ) {
+    // } else {
+    //   return null;
+    // }
+  }
 }

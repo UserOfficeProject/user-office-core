@@ -66,4 +66,8 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   ): Promise<Instrument | null> {
     return dummyInstrument;
   }
+
+  async getInstrumentsBySepId(sepId: number): Promise<Instrument[]> {
+    return [dummyInstrument];
+  }
 }
