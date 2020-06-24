@@ -267,6 +267,8 @@ export type Mutation = {
   updateCall: CallResponseWrap,
   assignInstrumentToCall: CallResponseWrap,
   removeAssignedInstrumentFromcall: CallResponseWrap,
+  assignProposalsToInstrument: SuccessResponseWrap,
+  removeProposalFromInstrument: SuccessResponseWrap,
   createInstrument: InstrumentResponseWrap,
   updateInstrument: InstrumentResponseWrap,
   administrationProposal: ProposalResponseWrap,
@@ -378,6 +380,18 @@ export type MutationAssignInstrumentToCallArgs = {
 export type MutationRemoveAssignedInstrumentFromcallArgs = {
   instrumentId: Scalars['Int'],
   callId: Scalars['Int']
+};
+
+
+export type MutationAssignProposalsToInstrumentArgs = {
+  proposalIds: Array<Scalars['Int']>,
+  instrumentId: Scalars['Int']
+};
+
+
+export type MutationRemoveProposalFromInstrumentArgs = {
+  proposalId: Scalars['Int'],
+  instrumentId: Scalars['Int']
 };
 
 
@@ -823,6 +837,7 @@ export type Proposal = {
   proposer: BasicUserDetails,
   reviews?: Maybe<Array<Review>>,
   technicalReview?: Maybe<TechnicalReview>,
+  instrument?: Maybe<Instrument>,
   questionary: Questionary,
 };
 
@@ -1866,6 +1881,20 @@ export type GetEventLogsQuery = (
   )>> }
 );
 
+export type AssignProposalsToInstrumentMutationVariables = {
+  proposalIds: Array<Scalars['Int']>,
+  instrumentId: Scalars['Int']
+};
+
+
+export type AssignProposalsToInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { assignProposalsToInstrument: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
+);
+
 export type CreateInstrumentMutationVariables = {
   name: Scalars['String'],
   shortCode: Scalars['String'],
@@ -1911,6 +1940,20 @@ export type GetInstrumentsQuery = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
     )> }
   )> }
+);
+
+export type RemoveProposalFromInstrumentMutationVariables = {
+  proposalId: Scalars['Int'],
+  instrumentId: Scalars['Int']
+};
+
+
+export type RemoveProposalFromInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { removeProposalFromInstrument: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
 );
 
 export type UpdateInstrumentMutationVariables = {
@@ -2084,6 +2127,9 @@ export type GetProposalsQuery = (
       )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
         & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+      )>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'instrumentId' | 'name'>
       )> }
       & ProposalFragment
     )> }
@@ -3754,6 +3800,14 @@ export const GetEventLogsDocument = gql`
   }
 }
     `;
+export const AssignProposalsToInstrumentDocument = gql`
+    mutation assignProposalsToInstrument($proposalIds: [Int!]!, $instrumentId: Int!) {
+  assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    error
+    isSuccess
+  }
+}
+    `;
 export const CreateInstrumentDocument = gql`
     mutation createInstrument($name: String!, $shortCode: String!, $description: String!) {
   createInstrument(name: $name, shortCode: $shortCode, description: $description) {
@@ -3784,6 +3838,14 @@ export const GetInstrumentsDocument = gql`
       description
     }
     totalCount
+  }
+}
+    `;
+export const RemoveProposalFromInstrumentDocument = gql`
+    mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
+  removeProposalFromInstrument(proposalId: $proposalId, instrumentId: $instrumentId) {
+    error
+    isSuccess
   }
 }
     `;
@@ -3935,6 +3997,10 @@ export const GetProposalsDocument = gql`
         timeAllocation
         status
         proposalID
+      }
+      instrument {
+        instrumentId
+        name
       }
     }
     totalCount
@@ -4573,6 +4639,9 @@ export function getSdk(client: GraphQLClient) {
     getEventLogs(variables: GetEventLogsQueryVariables): Promise<GetEventLogsQuery> {
       return client.request<GetEventLogsQuery>(print(GetEventLogsDocument), variables);
     },
+    assignProposalsToInstrument(variables: AssignProposalsToInstrumentMutationVariables): Promise<AssignProposalsToInstrumentMutation> {
+      return client.request<AssignProposalsToInstrumentMutation>(print(AssignProposalsToInstrumentDocument), variables);
+    },
     createInstrument(variables: CreateInstrumentMutationVariables): Promise<CreateInstrumentMutation> {
       return client.request<CreateInstrumentMutation>(print(CreateInstrumentDocument), variables);
     },
@@ -4581,6 +4650,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getInstruments(variables?: GetInstrumentsQueryVariables): Promise<GetInstrumentsQuery> {
       return client.request<GetInstrumentsQuery>(print(GetInstrumentsDocument), variables);
+    },
+    removeProposalFromInstrument(variables: RemoveProposalFromInstrumentMutationVariables): Promise<RemoveProposalFromInstrumentMutation> {
+      return client.request<RemoveProposalFromInstrumentMutation>(print(RemoveProposalFromInstrumentDocument), variables);
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
       return client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables);

@@ -4,7 +4,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import BuildIcon from '@material-ui/icons/Build';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ExitToApp from '@material-ui/icons/ExitToApp';
@@ -22,6 +21,7 @@ import { Link } from 'react-router-dom';
 import { UserContext } from '../context/UserContextProvider';
 import { UserRole } from '../generated/sdk';
 import { useCallsData } from '../hooks/useCallsData';
+import ScienceIcon from './common/ScienceIcon';
 
 const MenuItems: React.FC = () => {
   const { callsData } = useCallsData(true);
@@ -84,7 +84,7 @@ const MenuItems: React.FC = () => {
       </ListItem>
       <ListItem component={Link} to="/InstrumentPage" button>
         <ListItemIcon>
-          <BuildIcon />
+          <ScienceIcon />
         </ListItemIcon>
         <ListItemText primary="Instruments" />
       </ListItem>

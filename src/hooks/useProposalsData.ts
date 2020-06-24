@@ -23,7 +23,7 @@ export function useProposalsData(filter: string) {
                   proposal.status === ProposalStatus.DRAFT
                     ? 'Open'
                     : 'Submitted',
-              };
+              } as ProposalData;
             })
           );
         }

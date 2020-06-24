@@ -1,0 +1,9 @@
+mutation assignProposalsToInstrument(
+  $proposalIds: [Int!]!
+  $instrumentId: Int!
+) {
+  assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    error
+    isSuccess
+  }
+}
