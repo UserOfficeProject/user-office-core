@@ -12,4 +12,13 @@ export interface InstrumentDataSource {
   getInstrumentsByCallId(callId: number): Promise<Instrument[]>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
+  assignProposalsToInstrument(
+    proposalIds: number[],
+    instrumentId: number
+  ): Promise<boolean>;
+  removeProposalFromInstrument(
+    proposalId: number,
+    instrumentId: number
+  ): Promise<boolean>;
+  getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
 }
