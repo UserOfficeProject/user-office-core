@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { IconButton } from '@material-ui/core';
+import { IconButton, Tooltip } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
-import { Visibility, Delete, Assignment, Email } from '@material-ui/icons';
+import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
@@ -9,20 +9,35 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import XLSX from 'xlsx';
 
-import { Review, ReviewStatus } from '../../generated/sdk';
+import { Review, ReviewStatus, Instrument } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
 import { tableIcons } from '../../utils/materialIcons';
 import DialogConfirmation from '../common/DialogConfirmation';
+import ScienceIconAdd from '../common/ScienceIconAdd';
+import ScienceIconRemove from '../common/ScienceIconRemove';
+import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
 import RankInput from './RankInput';
 
 const ProposalTableOfficer: React.FC = () => {
   const { loading, proposalsData, setProposalsData } = useProposalsData('');
   const [open, setOpen] = React.useState(false);
+  const [openRemoveInstrument, setOpenRemoveInstrument] = React.useState(false);
   const [openAssignment, setOpenAssignment] = React.useState(false);
+  const [proposalAndInstrumentId, setProposalAndInstrumentId] = React.useState<{
+    proposalId: number | null;
+    instrumentId: number | null;
+  }>({
+    proposalId: null,
+    instrumentId: null,
+  });
+  const [
+    openInstrumentAssignment,
+    setOpenInstrumentAssignment,
+  ] = React.useState(false);
   const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
 
   const initalSelectedProposals: number[] = [];
@@ -94,6 +109,43 @@ const ProposalTableOfficer: React.FC = () => {
       ?.filter(review => review.status === ReviewStatus.SUBMITTED)
       .map(review => review.grade as number) ?? [];
 
+  const removeProposalFromInstrument = async () => {
+    if (
+      proposalAndInstrumentId.instrumentId &&
+      proposalAndInstrumentId.proposalId
+    ) {
+      const result = await api().removeProposalFromInstrument({
+        proposalId: proposalAndInstrumentId.proposalId,
+        instrumentId: proposalAndInstrumentId.instrumentId,
+      });
+
+      const isError = !!result.removeProposalFromInstrument.error;
+
+      if (!isError) {
+        setProposalsData(
+          proposalsData.map(prop => {
+            if (prop.id === proposalAndInstrumentId.proposalId) {
+              prop.instrument = null;
+            }
+
+            return prop;
+          })
+        );
+      }
+
+      const message = isError
+        ? 'Could not remove proposal from the instrument'
+        : 'Proposal removed from the instrument';
+      enqueueSnackbar(message, {
+        variant: isError ? 'error' : 'success',
+      });
+
+      setProposalAndInstrumentId({ proposalId: null, instrumentId: null });
+    }
+  };
+
+  const RemoveScienceIcon = (): JSX.Element => <ScienceIconRemove />;
+
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -111,6 +163,22 @@ const ProposalTableOfficer: React.FC = () => {
       <IconButton onClick={() => downloadPDFProposal(rowData.id)}>
         <GetAppIcon />
       </IconButton>
+
+      {rowData.instrument && (
+        <Tooltip title="Remove assigned instrument">
+          <IconButton
+            onClick={() => {
+              setProposalAndInstrumentId({
+                proposalId: rowData.id,
+                instrumentId: rowData.instrument?.instrumentId as number,
+              });
+              setOpenRemoveInstrument(true);
+            }}
+          >
+            <RemoveScienceIcon />
+          </IconButton>
+        </Tooltip>
+      )}
     </>
   );
 
@@ -192,6 +260,11 @@ const ProposalTableOfficer: React.FC = () => {
       ),
     },
     { title: 'Notified', field: 'notified' },
+    {
+      title: 'Instrument',
+      render: (rowData: ProposalData): string =>
+        rowData.instrument ? rowData.instrument.name : '-',
+    },
   ];
 
   const emailProposals = (): void => {
@@ -252,14 +325,63 @@ const ProposalTableOfficer: React.FC = () => {
     });
   };
 
+  const assignProposalsToInstrument = async (
+    instrument: Instrument
+  ): Promise<void> => {
+    const selectedProposalsWithInstrument = proposalsData.filter(
+      proposalDataItem =>
+        selectedProposals.includes(proposalDataItem.id) &&
+        proposalDataItem.instrument
+    );
+
+    if (selectedProposalsWithInstrument.length === 0) {
+      const result = await api().assignProposalsToInstrument({
+        proposalIds: selectedProposals,
+        instrumentId: instrument.instrumentId,
+      });
+      const isError = !!result.assignProposalsToInstrument.error;
+
+      if (!isError) {
+        setProposalsData(
+          proposalsData.map(prop => {
+            if (
+              selectedProposals.find(
+                selectedProposalId => selectedProposalId === prop.id
+              )
+            ) {
+              prop.instrument = instrument;
+            }
+
+            return prop;
+          })
+        );
+      }
+
+      const message = isError
+        ? 'Could not assign all selected proposals to the instrument'
+        : 'Proposal/s assigned to the selected instrument';
+      enqueueSnackbar(message, {
+        variant: isError ? 'error' : 'success',
+      });
+    } else {
+      enqueueSnackbar(
+        'One or more of your selected proposals already have instrument assigned',
+        {
+          variant: 'error',
+        }
+      );
+    }
+  };
+
   if (loading) {
     return <p>Loading</p>;
   }
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
-  const AssignIcon = (): JSX.Element => <Assignment />;
+  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
+  const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
 
   return (
     <>
@@ -269,6 +391,13 @@ const ProposalTableOfficer: React.FC = () => {
         open={open}
         action={deleteProposals}
         handleOpen={setOpen}
+      />
+      <DialogConfirmation
+        title="Remove assigned instrument"
+        text="This action will remove assigned instrument from proposal"
+        open={openRemoveInstrument}
+        action={removeProposalFromInstrument}
+        handleOpen={setOpenRemoveInstrument}
       />
       <DialogConfirmation
         title="Notify results"
@@ -285,8 +414,21 @@ const ProposalTableOfficer: React.FC = () => {
       >
         <DialogContent>
           <AssignProposalToSEP
-            assignProposalToSEP={(sepId: number) => assignProposalToSEP(sepId)}
+            assignProposalToSEP={assignProposalToSEP}
             close={(): void => setOpenAssignment(false)}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openInstrumentAssignment}
+        onClose={(): void => setOpenInstrumentAssignment(false)}
+      >
+        <DialogContent>
+          <AssignProposalsToInstrument
+            assignProposalsToInstrument={assignProposalsToInstrument}
+            close={(): void => setOpenInstrumentAssignment(false)}
           />
         </DialogContent>
       </Dialog>
@@ -365,10 +507,21 @@ const ProposalTableOfficer: React.FC = () => {
             position: 'toolbarOnSelect',
           },
           {
-            icon: AssignIcon,
+            icon: GroupWorkIcon,
             tooltip: 'Assign proposals to SEP',
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
+              setSelectedProposals(
+                (rowData as ProposalData[]).map((row: ProposalData) => row.id)
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: AddScienceIcon,
+            tooltip: 'Assign proposals to instrument',
+            onClick: (event, rowData): void => {
+              setOpenInstrumentAssignment(true);
               setSelectedProposals(
                 (rowData as ProposalData[]).map((row: ProposalData) => row.id)
               );

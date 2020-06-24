@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from '@material-ui/core';
-import { Add, Edit, Assignment } from '@material-ui/icons';
+import { Add, Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Call, Instrument } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';
+import ScienceIconAdd from '../common/ScienceIconAdd';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
@@ -118,7 +119,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
 
   const AddIcon = (): JSX.Element => <Add data-cy="add-call" />;
   const EditIcon = (): JSX.Element => <Edit />;
-  const AssignemntIcon = (): JSX.Element => <Assignment />;
+  const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
 
   const AssignedInstruments = (rowData: Call) => (
     <AssignedInstrumentsTable
@@ -194,7 +195,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
             position: 'row',
           },
           {
-            icon: AssignemntIcon,
+            icon: ScienceIconComponent,
             tooltip: 'Assign Instrument',
             onClick: (event, rowData): void =>
               setAssigningInstrumentsCallId((rowData as Call).id),
