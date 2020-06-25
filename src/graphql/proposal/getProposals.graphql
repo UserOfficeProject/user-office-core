@@ -30,6 +30,10 @@ query getProposals($filter: ProposalsFilter) {
         status
         proposalID
       }
+      instrument {
+        instrumentId
+        name
+      }
     }
     totalCount
   }

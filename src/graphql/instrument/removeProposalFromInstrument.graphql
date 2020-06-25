@@ -1,0 +1,9 @@
+mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
+  removeProposalFromInstrument(
+    proposalId: $proposalId
+    instrumentId: $instrumentId
+  ) {
+    error
+    isSuccess
+  }
+}
