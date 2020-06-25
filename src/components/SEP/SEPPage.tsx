@@ -8,6 +8,7 @@ import { useCheckAccess } from '../common/Can';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
 import SEPGeneralInfo from './SEPGeneralInfo';
+import SEPMeetingComponents from './SEPMeetingComponents';
 import SEPMembers from './SEPMembers';
 import SEPProposalsAndAssignments from './SEPProposalsAndAssignments';
 
@@ -41,7 +42,12 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
     return <p>Loading...</p>;
   }
 
-  const tabNames = ['General', 'Members', 'Proposals and Assignments'];
+  const tabNames = [
+    'General',
+    'Members',
+    'Proposals and Assignments',
+    'SEP Meeting Components',
+  ];
 
   if (hasAccessRights) {
     tabNames.push('Logs');
@@ -56,6 +62,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
         />
         <SEPMembers sepId={sep.id} />
         <SEPProposalsAndAssignments sepId={sep.id} />
+        <SEPMeetingComponents sepId={sep.id} />
         {hasAccessRights && (
           <EventLogList changedObjectId={sep.id} eventType="SEP" />
         )}
