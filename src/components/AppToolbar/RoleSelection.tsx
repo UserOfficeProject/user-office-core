@@ -9,6 +9,7 @@ import { Redirect, useHistory } from 'react-router';
 import { UserContext } from '../../context/UserContextProvider';
 import { Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { getUniqueArrayBy } from '../../utils/helperFunctions';
 import { tableIcons } from '../../utils/materialIcons';
 
 type RoleSelectionProps = {
@@ -25,32 +26,15 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Role[]>([]);
 
-  /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
-   *  which is used to determine if the user with that role is member of a SEP.
-   */
-  const getUniqueRoles = (roles: Role[]): Role[] => {
-    const result = [];
-    const map = new Map<number, boolean>();
-    for (const item of roles) {
-      if (!map.has(item.id)) {
-        map.set(item.id, true);
-        result.push({
-          id: item.id,
-          shortCode: item.shortCode,
-          title: item.title,
-        });
-      }
-    }
-
-    return result;
-  };
-
   useEffect(() => {
     const getUserInformation = async () => {
       const data = await api().getMyRoles();
 
       if (data?.me) {
-        setRoles(getUniqueRoles(data.me?.roles));
+        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
+         *  which is used to determine if the user with that role is member of a SEP.
+         */
+        setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
       }
     };
     getUserInformation();

@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { useRenewToken } from '../../hooks/useRenewToken';
 import { tableIcons } from '../../utils/materialIcons';
 import RoleModal from './RoleModal';
 
@@ -29,13 +30,14 @@ export default function UpdateUserRoles(props: { id: number }) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Array<Role>>([]);
+  const { setRenewTokenValue } = useRenewToken();
 
-  const addRole = (role: Role) => {
+  const addRole = async (role: Role) => {
     setRoles([...roles, role]);
     setOpen(false);
   };
 
-  const removeRole = (role: any) => {
+  const removeRole = (role: Pick<Role, 'id' | 'title'>) => {
     const newRoles = [...roles];
     newRoles.splice(
       newRoles.findIndex(element => role.id === element.id),
@@ -44,18 +46,18 @@ export default function UpdateUserRoles(props: { id: number }) {
     setRoles(newRoles);
   };
 
-  const sendUserUpdate = () => {
+  const sendUserUpdate = async () => {
     const variables = {
       id: props.id,
       roles: roles.map(role => role.id),
     };
-    api()
-      .updateUserRoles(variables)
-      .then(response =>
-        enqueueSnackbar('Updated Roles', {
-          variant: response.updateUser.error ? 'error' : 'success',
-        })
-      );
+
+    const userUpdateResult = await api().updateUserRoles(variables);
+    setRenewTokenValue();
+
+    enqueueSnackbar('Updated Roles', {
+      variant: userUpdateResult.updateUser.error ? 'error' : 'success',
+    });
   };
 
   useEffect(() => {
@@ -64,15 +66,15 @@ export default function UpdateUserRoles(props: { id: number }) {
         .getUserWithRoles({ id: props.id })
         .then(data => {
           if (data?.user) {
-            setUserData({ ...data.user! });
-            setRoles(data.user!.roles);
+            setUserData({ ...data.user });
+            setRoles(data.user.roles);
           }
         });
     };
     getUserInformation();
   }, [props.id, api]);
 
-  const columns = [{ title: 'Name', field: 'name' }];
+  const columns = [{ title: 'Name', field: 'title' }];
 
   const classes = useStyles();
 
@@ -90,7 +92,7 @@ export default function UpdateUserRoles(props: { id: number }) {
         columns={columns}
         icons={tableIcons}
         data={roles.map((role: Role) => {
-          return { name: role.title, id: role.id };
+          return { title: role.title, id: role.id };
         })}
         options={{
           search: false,

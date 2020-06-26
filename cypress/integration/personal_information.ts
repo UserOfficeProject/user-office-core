@@ -57,6 +57,8 @@ context('Personal information tests', () => {
 
     cy.contains('Update Profile').click();
 
+    cy.wait(1000);
+
     cy.reload();
 
     cy.get("[name='firstname']")
@@ -86,46 +88,6 @@ context('Personal information tests', () => {
     cy.get("[name='telephone']")
       .invoke('val')
       .should('eq', newTelephone);
-  });
-
-  it('Should be able to see user officer role in use', () => {
-    cy.login('officer');
-
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Roles').click();
-
-    cy.wait(1000);
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .first()
-      .should(element => {
-        expect(element.text()).to.contain('User Officer');
-
-        expect(element.text()).to.contain('In Use');
-      });
-  });
-
-  it('Should be able to see user role in use', () => {
-    cy.login('user');
-
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Roles').click();
-
-    cy.wait(1000);
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .first()
-      .should(element => {
-        expect(element.text()).to.contain('User');
-
-        expect(element.text()).to.contain('In Use');
-      });
   });
 
   it('User Officer should be able to see all and change roles if we have multiple', () => {
@@ -188,5 +150,25 @@ context('Personal information tests', () => {
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')
       .should('have.length', 3);
+  });
+
+  it('Should be able to see user officer role in use', () => {
+    cy.login('officer');
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.wait(1000);
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .first()
+      .should(element => {
+        expect(element.text()).to.contain('User Officer');
+
+        expect(element.text()).to.contain('In Use');
+      });
   });
 });
