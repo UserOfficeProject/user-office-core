@@ -1797,6 +1797,10 @@ export type CreateCallMutation = (
     & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & { instruments: Array<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      )> }
     )> }
   ) }
 );
@@ -1859,6 +1863,10 @@ export type UpdateCallMutation = (
     & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & { instruments: Array<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      )> }
     )> }
   ) }
 );
@@ -3726,6 +3734,12 @@ export const CreateCallDocument = gql`
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+      }
     }
   }
 }
@@ -3779,6 +3793,12 @@ export const UpdateCallDocument = gql`
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+      }
     }
   }
 }
