@@ -5,10 +5,10 @@ export default function ModalWrapper(props: {
   closeMe: () => void;
   children: React.ReactNode;
 }) {
-  const classes = makeStyles(() => ({
+  const classes = makeStyles(theme => ({
     container: {
       backgroundColor: 'white',
-      padding: '20px',
+      padding: theme.spacing(3),
       maxWidth: '700px',
       maxHeight: '100%',
       overflowY: 'auto',

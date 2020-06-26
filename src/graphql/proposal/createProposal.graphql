@@ -4,6 +4,7 @@ mutation createProposal($callId: Int!) {
       id
       status
       shortCode
+      questionaryId
     }
     error
   }

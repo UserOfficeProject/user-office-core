@@ -17,7 +17,7 @@ import {
   QuestionaryStep,
   QuestionTemplateRelation,
 } from '../../generated/sdk';
-import { usePersistModel } from '../../hooks/usePersistModel';
+import { usePersistQuestionaryEditorModel } from '../../hooks/usePersistQuestionaryEditorModel';
 import { getQuestionaryStepByTopicId } from '../../models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
   Event,
@@ -72,7 +72,7 @@ export default function TemplateEditor() {
       }
     };
   };
-  const { persistModel, isLoading } = usePersistModel();
+  const { persistModel, isLoading } = usePersistQuestionaryEditorModel();
   const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
     reducerMiddleware,

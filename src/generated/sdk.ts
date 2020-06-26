@@ -907,6 +907,7 @@ export type Query = {
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
+  questionary?: Maybe<Questionary>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
   sep?: Maybe<Sep>,
@@ -1001,6 +1002,11 @@ export type QueryProposalArgs = {
 
 export type QueryProposalTemplatesArgs = {
   filter?: Maybe<ProposalTemplatesFilter>
+};
+
+
+export type QueryQuestionaryArgs = {
+  questionaryId: Scalars['Int']
 };
 
 
@@ -1989,7 +1995,7 @@ export type CreateProposalMutation = (
     & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'status' | 'shortCode'>
+      & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
     )> }
   ) }
 );
@@ -2187,6 +2193,23 @@ export type AnswerTopicMutation = (
   ) }
 );
 
+export type CreateQuestionaryMutationVariables = {
+  templateId: Scalars['Int']
+};
+
+
+export type CreateQuestionaryMutation = (
+  { __typename?: 'Mutation' }
+  & { createQuestionary: (
+    { __typename?: 'QuestionaryResponseWrap' }
+    & Pick<QuestionaryResponseWrap, 'error'>
+    & { questionary: Maybe<(
+      { __typename?: 'Questionary' }
+      & QuestionaryFragment
+    )> }
+  ) }
+);
+
 export type AnswerFragment = (
   { __typename?: 'Answer' }
   & Pick<Answer, 'sortOrder' | 'topicId' | 'value'>
@@ -2245,23 +2268,6 @@ export type QuestionaryStepFragment = (
   )> }
 );
 
-export type CreateQuestionaryMutationVariables = {
-  templateId: Scalars['Int']
-};
-
-
-export type CreateQuestionaryMutation = (
-  { __typename?: 'Mutation' }
-  & { createQuestionary: (
-    { __typename?: 'QuestionaryResponseWrap' }
-    & Pick<QuestionaryResponseWrap, 'error'>
-    & { questionary: Maybe<(
-      { __typename?: 'Questionary' }
-      & QuestionaryFragment
-    )> }
-  ) }
-);
-
 export type GetFileMetadataQueryVariables = {
   fileIds: Array<Scalars['String']>
 };
@@ -2273,6 +2279,19 @@ export type GetFileMetadataQuery = (
     { __typename?: 'FileMetadata' }
     & Pick<FileMetadata, 'fileId' | 'originalFileName' | 'mimeType' | 'sizeInBytes' | 'createdDate'>
   )>> }
+);
+
+export type GetQuestionaryQueryVariables = {
+  questionaryId: Scalars['Int']
+};
+
+
+export type GetQuestionaryQuery = (
+  { __typename?: 'Query' }
+  & { questionary: Maybe<(
+    { __typename?: 'Questionary' }
+    & QuestionaryFragment
+  )> }
 );
 
 export type AddTechnicalReviewMutationVariables = {
@@ -3878,6 +3897,7 @@ export const CreateProposalDocument = gql`
       id
       status
       shortCode
+      questionaryId
     }
     error
   }
@@ -4064,6 +4084,13 @@ export const GetFileMetadataDocument = gql`
   }
 }
     `;
+export const GetQuestionaryDocument = gql`
+    query getQuestionary($questionaryId: Int!) {
+  questionary(questionaryId: $questionaryId) {
+    ...questionary
+  }
+}
+    ${QuestionaryFragmentDoc}`;
 export const AddTechnicalReviewDocument = gql`
     mutation addTechnicalReview($proposalID: Int!, $timeAllocation: Int, $comment: String, $publicComment: String, $status: TechnicalReviewStatus) {
   addTechnicalReview(proposalID: $proposalID, timeAllocation: $timeAllocation, comment: $comment, publicComment: $publicComment, status: $status) {
@@ -4691,6 +4718,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables);
+    },
+    getQuestionary(variables: GetQuestionaryQueryVariables): Promise<GetQuestionaryQuery> {
+      return client.request<GetQuestionaryQuery>(print(GetQuestionaryDocument), variables);
     },
     addTechnicalReview(variables: AddTechnicalReviewMutationVariables): Promise<AddTechnicalReviewMutation> {
       return client.request<AddTechnicalReviewMutation>(print(AddTechnicalReviewDocument), variables);

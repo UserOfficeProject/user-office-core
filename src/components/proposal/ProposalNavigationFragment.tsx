@@ -13,7 +13,7 @@ const ProposalNavigationFragment = (props: {
   reset?: ButtonConfig;
   save?: ButtonConfig;
   saveAndNext?: ButtonConfig;
-  isLoading: boolean;
+  isLoading?: boolean;
   disabled?: boolean;
 }): JSX.Element => {
   if (props.disabled === true) {

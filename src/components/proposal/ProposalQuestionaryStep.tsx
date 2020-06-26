@@ -38,7 +38,7 @@ export default function ProposalQuestionaryStep(props: {
   })();
   const { dispatch } = useContext(ProposalSubmissionContext)!;
 
-  if (data == null) {
+  if (data === null) {
     return <div>loading...</div>;
   }
 

@@ -15,4 +15,5 @@ export type ProposalSubsetSumbission = Pick<
   | 'title'
   | 'shortCode'
   | 'callId'
+  | 'questionaryId'
 >;

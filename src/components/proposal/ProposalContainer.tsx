@@ -9,10 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
 import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
-
 import {
-  Answer,
-  AnswerInput,
   Proposal,
   ProposalStatus,
   Questionary,
@@ -20,7 +17,7 @@ import {
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { ProposalSubsetSumbission } from '../../models/ProposalModel';
-import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
+import { prepareAnswers } from '../../models/ProposalModelFunctions';
 import {
   Event,
   EventType,
@@ -45,24 +42,6 @@ enum StepType {
   QUESTIONARY,
   REVIEW,
 }
-
-const prepareAnswers = (answers?: Answer[]): AnswerInput[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.question.dataType).readonly === false // filter out read only fields
-    );
-    const preparedAnswers = answers.map(answer => {
-      return {
-        questionId: answer.question.proposalQuestionId,
-        value: JSON.stringify({ value: answer.value }),
-      }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-
-    return preparedAnswers;
-  } else {
-    return [];
-  }
-};
 
 class QuestionaryUIStep {
   constructor(
@@ -198,7 +177,7 @@ export default function ProposalContainer(props: {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          let { id, status, shortCode } = state.proposal;
+          let { id, status, shortCode, questionaryId } = state.proposal;
           const { callId } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
@@ -208,10 +187,10 @@ export default function ProposalContainer(props: {
                   .then(data => data.createProposal.proposal!),
               'Saved'
             );
-            ({ id, status, shortCode } = result);
+            ({ id, status, shortCode, questionaryId } = result);
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode },
+              payload: { id, status, shortCode, questionaryId },
             });
           }
           await executeAndMonitorCall(
@@ -233,7 +212,7 @@ export default function ProposalContainer(props: {
             () =>
               api()
                 .answerTopic({
-                  questionaryId: state.proposal.id,
+                  questionaryId: state.proposal.questionaryId,
                   answers: prepareAnswers(action.payload.answers),
                   topicId: action.payload.topicId,
                   isPartialSave: true,

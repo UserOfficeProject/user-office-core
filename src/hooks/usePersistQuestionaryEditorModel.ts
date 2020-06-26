@@ -11,7 +11,7 @@ import {
 import { Event, EventType } from '../models/QuestionaryEditorModel';
 import { useDataApi } from './useDataApi';
 
-export function usePersistModel() {
+export function usePersistQuestionaryEditorModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const api = useDataApi();
