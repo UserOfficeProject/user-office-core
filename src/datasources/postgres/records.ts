@@ -26,11 +26,11 @@ export interface ProposalUserRecord {
 export interface QuestionaryRecord {
   readonly questionary_id: number;
   readonly template_id: number;
+  readonly creator_id: number;
   readonly created_at: Date;
 }
 
 export interface ProposalRecord {
-  [x: string]: any;
   readonly proposal_id: number;
   readonly title: string;
   readonly abstract: string;
@@ -40,10 +40,13 @@ export interface ProposalRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly short_code: string;
+  readonly rank_order: number;
+  readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
   readonly technical_score: number;
   readonly call_id: number;
+  readonly questionary_id: number;
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
@@ -412,6 +415,7 @@ export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
   return new Questionary(
     questionary.questionary_id,
     questionary.template_id,
+    questionary.creator_id,
     questionary.created_at
   );
 };

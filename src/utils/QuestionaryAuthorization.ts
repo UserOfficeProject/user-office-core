@@ -57,6 +57,14 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     if (!agent) {
       return false;
     }
+
+    const sampleDeclarationQuestionary = await this.questionaryDataSource.getQuestionary(
+      questionaryId
+    );
+    if (sampleDeclarationQuestionary?.creator_id === agent.id) {
+      return true;
+    }
+
     const proposalQuestionary = await this.questionaryDataSource.getParentQuestionary(
       questionaryId
     );

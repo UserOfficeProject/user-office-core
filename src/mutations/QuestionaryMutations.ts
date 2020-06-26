@@ -112,6 +112,6 @@ export default class QuestionaryMutations {
 
   @Authorized()
   async create(agent: User | null, args: CreateQuestionaryArgs) {
-    throw new Error('');
+    return this.dataSource.create(agent!.id, args.templateId);
   }
 }

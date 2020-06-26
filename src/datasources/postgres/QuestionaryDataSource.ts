@@ -33,9 +33,9 @@ export default class PostgresQuestionaryDataSource
         return createQuestionaryObject(rows[0]);
       });
   }
-  create(template_id: number): Promise<Questionary> {
+  create(creator_id: number, template_id: number): Promise<Questionary> {
     return database('questionaries')
-      .insert({ template_id }, '*')
+      .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {
         return createQuestionaryObject(rows[0]);
       });

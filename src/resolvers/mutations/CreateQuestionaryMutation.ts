@@ -15,9 +15,6 @@ import { wrapResponse } from '../wrapResponse';
 export class CreateQuestionaryArgs {
   @Field(() => Int)
   templateId: number;
-
-  @Field(() => Int, { nullable: true })
-  answerId?: number;
 }
 
 @Resolver()

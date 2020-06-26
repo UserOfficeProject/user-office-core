@@ -57,7 +57,7 @@ export default class QuestionaryQueries {
       .getTemplate(templateId)
       .then(template =>
         template
-          ? new Questionary(undefined, template.templateId, new Date())
+          ? new Questionary(undefined, template.templateId, -1, new Date())
           : null
       );
   }

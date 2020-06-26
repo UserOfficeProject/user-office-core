@@ -19,5 +19,5 @@ export interface QuestionaryDataSource {
     topic_id: number,
     isComplete: boolean
   ): Promise<void>;
-  create(template_id: number): Promise<Questionary>;
+  create(creator_id: number, template_id: number): Promise<Questionary>;
 }

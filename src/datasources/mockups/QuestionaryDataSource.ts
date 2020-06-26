@@ -36,7 +36,7 @@ export const dummyConfigFactory = (values?: any): typeof FieldConfigType => {
 };
 
 const createDummyQuestionary = () => {
-  return new Questionary(1, 1, new Date());
+  return new Questionary(1, 1, 1, new Date());
 };
 export const dummyQuestionFactory = (
   values?: DeepPartial<Question>
@@ -146,8 +146,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     dummyQuestionary = createDummyQuestionary();
   }
 
-  async create(template_id: number): Promise<Questionary> {
-    return new Questionary(1, template_id, new Date());
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
+    return new Questionary(1, template_id, creator_id, new Date());
   }
 
   async updateAnswer(
