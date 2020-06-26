@@ -1,5 +1,6 @@
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
+
 import { Answer, Questionary } from '../generated/sdk';
 import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
 import { getFieldById } from './ProposalModelFunctions';

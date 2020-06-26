@@ -1,10 +1,11 @@
 import { useState } from 'react';
+
+import { prepareAnswers } from '../models/ProposalModelFunctions';
 import {
   SubquestionarySubmissionModelState,
   EventType,
   Event,
 } from '../models/SubquestionarySubmissionModel';
-import { prepareAnswers } from '../models/ProposalModelFunctions';
 import { useDataApi } from './useDataApi';
 
 export function usePersistSubquestionaryModel() {
@@ -35,5 +36,6 @@ export function usePersistSubquestionaryModel() {
       }
     };
   };
+
   return { isLoading, persistModel };
 }

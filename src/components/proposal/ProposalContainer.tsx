@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
 import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
+
 import {
   Proposal,
   ProposalStatus,

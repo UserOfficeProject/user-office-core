@@ -113,7 +113,7 @@ export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
     const preparedAnswers = answers.map(answer => {
       return {
         questionId: answer.question.proposalQuestionId,
-        value: prepareValue(answer),
+        value: JSON.stringify({ value: answer.value }),
       }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
     });
 
@@ -121,8 +121,4 @@ export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
   } else {
     return [];
   }
-}
-
-function prepareValue(answer: Answer) {
-  return JSON.stringify({ value: answer.value });
 }

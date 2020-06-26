@@ -16,6 +16,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import DescriptionIcon from '@material-ui/icons/Description';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+
 import { Questionary, SubtemplateConfig } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { stringToNumericArray } from '../../utils/ArrayUtils';
@@ -163,6 +164,7 @@ export function ProposalComponentSubtemplate(props: BasicComponentProps) {
                       variant: 'error',
                     }
                   );
+
                   return;
                 }
                 setSelectedQuestionary(response.questionary);
@@ -188,6 +190,7 @@ export function ProposalComponentSubtemplate(props: BasicComponentProps) {
                   enqueueSnackbar(response.createQuestionary.error, {
                     variant: 'error',
                   });
+
                   return;
                 }
                 const newQuestionaryId =

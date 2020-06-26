@@ -1,14 +1,15 @@
 import { JSDict } from '@esss-swap/duo-localisation';
+import React from 'react';
+
 import { DataType, Answer } from '../../generated/sdk';
-import { ProposalComponentTextInput } from '../proposal/ProposalComponentTextInput';
+import { BasicComponentProps } from '../proposal/IBasicComponentProps';
 import { ProposalComponentBoolean } from '../proposal/ProposalComponentBoolean';
 import { ProposalComponentDatePicker } from '../proposal/ProposalComponentDatePicker';
+import { ProposalComponentEmbellishment } from '../proposal/ProposalComponentEmbellishment';
 import { ProposalComponentFileUpload } from '../proposal/ProposalComponentFileUpload';
 import { ProposalComponentMultipleChoice } from '../proposal/ProposalComponentMultipleChoice';
-import { ProposalComponentEmbellishment } from '../proposal/ProposalComponentEmbellishment';
 import { ProposalComponentSubtemplate } from '../proposal/ProposalComponentSubtemplate';
-import { BasicComponentProps } from '../proposal/IBasicComponentProps';
-import React from 'react';
+import { ProposalComponentTextInput } from '../proposal/ProposalComponentTextInput';
 
 export class QuestionaryComponentFactory {
   private componentMap = JSDict.Create<string, any>();
