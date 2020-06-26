@@ -3,7 +3,7 @@ import React from 'react';
 import { DataType, Template, Question } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 import JSDict from '../../../utils/Dictionary';
-import ModalWrapper from '../ModalWrapper';
+import ModalWrapper from '../../common/ModalWrapper';
 import { QuestionBooleanForm } from './question/QuestionBooleanForm';
 import { QuestionDateForm } from './question/QuestionDateForm';
 import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';

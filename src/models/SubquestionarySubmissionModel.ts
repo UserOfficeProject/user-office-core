@@ -2,13 +2,17 @@ import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
 
 import { Answer, Questionary } from '../generated/sdk';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import {
+  useReducerWithMiddleWares,
+  ReducerMiddleware,
+} from '../utils/useReducerWithMiddleWares';
 import { getFieldById } from './ProposalModelFunctions';
 
 export enum EventType {
   SAVE_CLICKED = 'SAVE_CLICKED',
   FIELD_CHANGED = 'FIELD_CHANGED',
   CANCEL_CLICKED = 'CANCEL_CLICKED',
+  MODEL_SAVED = 'MODEL_SAVED',
 }
 export interface Event {
   type: EventType;
@@ -19,17 +23,12 @@ export interface SubquestionarySubmissionModelState {
   isDirty: boolean;
   questionary: Questionary;
 }
-export type MiddlewareSignature = ({
-  getState,
-  dispatch,
-}: {
-  getState: () => SubquestionarySubmissionModelState;
-  dispatch: React.Dispatch<Event>;
-}) => (next: Function) => (action: Event) => void;
 
 export function SubquestionarySubmissionModel(
   initialState: SubquestionarySubmissionModelState,
-  middlewares?: Array<MiddlewareSignature>
+  middlewares?: Array<
+    ReducerMiddleware<SubquestionarySubmissionModelState, Event>
+  >
 ): {
   state: SubquestionarySubmissionModelState;
   dispatch: Dispatch<Event>;

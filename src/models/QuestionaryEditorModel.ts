@@ -9,7 +9,10 @@ import {
   TemplateCategoryId,
 } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import {
+  useReducerWithMiddleWares,
+  ReducerMiddleware,
+} from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
@@ -50,7 +53,9 @@ export interface Event {
   payload: any;
 }
 
-export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
+export default function QuestionaryEditorModel(
+  middlewares?: Array<ReducerMiddleware<Template, Event>>
+) {
   const { templateId } = useParams();
   const blankInitTemplate: Template = {
     categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,

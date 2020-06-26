@@ -3,7 +3,7 @@ import { Dispatch, Reducer } from 'react';
 
 import { Answer, ProposalStatus, QuestionaryStep } from '../generated/sdk';
 import { ProposalSubsetSumbission } from '../models/ProposalModel';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import { useReducerWithMiddleWares } from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,

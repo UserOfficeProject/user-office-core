@@ -1,10 +1,9 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { makeStyles, Typography } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import { Formik } from 'formik';
 import React, { SyntheticEvent } from 'react';
 import * as Yup from 'yup';
-
 import { Questionary } from '../../generated/sdk';
 import { usePersistSubquestionaryModel } from '../../hooks/usePersistSubquestionaryModel';
 import { areDependenciesSatisfied } from '../../models/ProposalModelFunctions';
@@ -12,8 +11,9 @@ import {
   Event,
   EventType,
   SubquestionarySubmissionModel,
-  SubquestionarySubmissionModelState,
 } from '../../models/SubquestionarySubmissionModel';
+import submitFormAsync from '../../utils/FormikAsyncFormHandler';
+import { NavigButton } from '../common/NavigButton';
 import { createFormikConfigObjects } from '../proposal/createFormikConfigObjects';
 import { QuestionaryComponentFactory } from './QuestionaryComponentFactory';
 
@@ -22,30 +22,25 @@ export function SubquestionarySubmissionContainer(props: {
   questionaryEditDone?: () => void;
   title: string;
 }) {
-  const containerMiddleware = ({
-    getState,
-  }: {
-    getState: () => SubquestionarySubmissionModelState;
-    dispatch: React.Dispatch<Event>;
-  }) => {
+  function handleEvents() {
     return (next: Function) => async (action: Event) => {
       next(action);
       switch (action.type) {
         case EventType.CANCEL_CLICKED:
-        case EventType.SAVE_CLICKED:
+        case EventType.MODEL_SAVED:
           props.questionaryEditDone?.();
           break;
       }
     };
-  };
+  }
 
-  const { isLoading, persistModel } = usePersistSubquestionaryModel();
+  const { isSavingModel, persistModel } = usePersistSubquestionaryModel();
   const { state, dispatch } = SubquestionarySubmissionModel(
     {
       isDirty: false,
       questionary: props.questionary,
     },
-    [containerMiddleware, persistModel]
+    [handleEvents, persistModel]
   );
 
   const classes = makeStyles(theme => ({
@@ -81,10 +76,6 @@ export function SubquestionarySubmissionContainer(props: {
   const { initialValues, validationSchema } = createFormikConfigObjects(
     activeFields
   );
-
-  if (isLoading) {
-    return <span>loading...</span>;
-  }
 
   return (
     <>
@@ -124,7 +115,7 @@ export function SubquestionarySubmissionContainer(props: {
             })}
 
             <div className={classes.buttonContainer}>
-              <Button
+              <NavigButton
                 onClick={() => dispatch({ type: EventType.CANCEL_CLICKED })}
                 type="button"
                 color="primary"
@@ -132,17 +123,26 @@ export function SubquestionarySubmissionContainer(props: {
                 className={classes.button}
               >
                 Cancel
-              </Button>
-              <Button
-                onClick={() => dispatch({ type: EventType.SAVE_CLICKED })}
+              </NavigButton>
+              <NavigButton
+                onClick={() =>
+                  submitFormAsync(submitForm, validateForm).then(
+                    (isValid: boolean) => {
+                      if (isValid) {
+                        dispatch({ type: EventType.SAVE_CLICKED });
+                      }
+                    }
+                  )
+                }
                 type="button"
                 variant="contained"
                 color="primary"
                 startIcon={<CheckIcon />}
                 className={classes.button}
+                isbusy={isSavingModel}
               >
                 Save
-              </Button>
+              </NavigButton>
             </div>
           </form>
         )}

@@ -21,7 +21,7 @@ import { Questionary, SubtemplateConfig } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { stringToNumericArray } from '../../utils/ArrayUtils';
 import { SubquestionarySubmissionContainer } from '../questionary/SubquestionarySubmissionContainer';
-import ModalWrapper from '../template/ModalWrapper';
+import ModalWrapper from '../common/ModalWrapper';
 import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalErrorLabel } from './ProposalErrorLabel';
 
@@ -63,7 +63,7 @@ function QuestionariesList(props: {
   addButtonLabel?: string;
 }) {
   const classes = makeStyles(() => ({
-    list: {
+    questionariesList: {
       maxWidth: '300px',
       listStyle: 'none',
       padding: 0,
@@ -75,7 +75,7 @@ function QuestionariesList(props: {
   }))();
 
   return (
-    <List component="ul" className={classes.list}>
+    <List component="ul" className={classes.questionariesList}>
       {props.questionariesIds.map((questionaryId, idx) => {
         return (
           <QuestionariesListItem

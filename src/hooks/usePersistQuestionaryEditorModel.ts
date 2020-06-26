@@ -1,14 +1,14 @@
 import { useState } from 'react';
-
 import {
   DataType,
   FieldDependency,
-  Template,
-  QuestionTemplateRelation,
   Question,
+  QuestionTemplateRelation,
+  Template,
   TemplateCategoryId,
 } from '../generated/sdk';
 import { Event, EventType } from '../models/QuestionaryEditorModel';
+import { MiddlewareInputParams } from '../utils/useReducerWithMiddleWares';
 import { useDataApi } from './useDataApi';
 
 export function usePersistQuestionaryEditorModel() {
@@ -192,10 +192,7 @@ export function usePersistQuestionaryEditorModel() {
   const persistModel = ({
     getState,
     dispatch,
-  }: {
-    getState: () => Template;
-    dispatch: React.Dispatch<Event>;
-  }) => {
+  }: MiddlewareInputParams<Template, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
       call().then(result => {

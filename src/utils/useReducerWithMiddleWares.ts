@@ -13,7 +13,7 @@ function compose(...fns: any): any {
   return fns.reduce((a: any, b: any) => (...args: any): any => a(b(...args)));
 }
 
-function useReducerWithMiddleWares<R extends Reducer<any, any>>(
+export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   reducer: R,
   initialState: ReducerState<R>,
   middlewares: Array<Function> = []
@@ -40,4 +40,10 @@ function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   return [state, enhancedDispatch];
 }
 
-export default useReducerWithMiddleWares;
+export interface MiddlewareInputParams<T, A> {
+  getState: () => T;
+  dispatch: React.Dispatch<A>;
+}
+export type ReducerMiddleware<T, A> = (
+  params: MiddlewareInputParams<T, A>
+) => (next: Function) => (action: A) => void;
