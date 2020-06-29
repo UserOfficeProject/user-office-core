@@ -66,4 +66,28 @@ describe('Test Instrument Mutations', () => {
       })
     ).resolves.toBe(dummyInstrument);
   });
+
+  test('A logged in user officer can assign proposal/s to instrument', () => {
+    return expect(
+      instrumentMutations.assignProposalsToInstrument(
+        dummyUserOfficerWithRole,
+        {
+          proposalIds: [1, 2],
+          instrumentId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
+
+  test('A logged in user officer can remove assigned proposal from instrument', () => {
+    return expect(
+      instrumentMutations.removeProposalFromInstrument(
+        dummyUserOfficerWithRole,
+        {
+          proposalId: 1,
+          instrumentId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
 });

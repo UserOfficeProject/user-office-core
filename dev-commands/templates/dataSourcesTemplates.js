@@ -83,9 +83,8 @@ export default class Postgres${name.capitalize()}DataSource implements ${name.ca
 
   async delete(${name}Id: number): Promise<${name.capitalize()}> {
     return database('${name}s')
-      .where('${name}s.${name}_id', ${name}Id)
+      .where('${name}_id', ${name}Id)
       .del()
-      .from('${name}s')
       .returning('*')
       .then((${name}: ${name.capitalize()}Record[]) => {
         if (${name} === undefined || ${name}.length !== 1) {

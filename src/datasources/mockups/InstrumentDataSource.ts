@@ -46,4 +46,24 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
   async getInstrumentsByCallId(callId: number): Promise<Instrument[]> {
     return [dummyInstrument];
   }
+
+  async assignProposalsToInstrument(
+    proposalIds: number[],
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async removeProposalFromInstrument(
+    proposalId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async getInstrumentByProposalId(
+    proposalId: number
+  ): Promise<Instrument | null> {
+    return dummyInstrument;
+  }
 }
