@@ -26,7 +26,7 @@ context('Instrument tests', () => {
     userMenuItems.should('not.contain', 'Instruments');
   });
 
-  it('User Officer should able to create Instrument', () => {
+  it('User Officer should be able to create Instrument', () => {
     const name = faker.random.words(2);
     const shortCode = faker.random.words(1);
     const description = faker.random.words(8);
@@ -49,7 +49,7 @@ context('Instrument tests', () => {
     instrumentsTable.should('contain', description);
   });
 
-  it('User Officer should able to update Instrument', () => {
+  it('User Officer should be able to update Instrument', () => {
     const name = faker.random.words(2);
     const shortCode = faker.random.words(1);
     const description = faker.random.words(8);
@@ -74,7 +74,57 @@ context('Instrument tests', () => {
     instrumentsTable.should('contain', description);
   });
 
-  it('User Officer should able to delete Instrument', () => {
+  it('User Officer should be able to assign proposal to existing instrument', () => {
+    const title = faker.random.words(3);
+    const abstract = faker.random.words(8);
+    cy.login('user');
+    cy.contains('New Proposal').click();
+    cy.get('#title').type(title);
+    cy.get('#abstract').type(abstract);
+    cy.contains('Save and continue').click();
+    cy.wait(500);
+    cy.contains('Submit').click();
+    cy.contains('OK').click();
+    cy.contains('Logout').click();
+
+    cy.login('officer');
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get("[title='Assign proposals to instrument']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.wait(500);
+
+    cy.get('[title="Remove assigned instrument"]').should('exist');
+  });
+
+  it('User Officer should be able to remove assigned proposal from instrument', () => {
+    cy.login('officer');
+
+    cy.get('[title="Remove assigned instrument"]').click();
+
+    cy.contains('Yes').click();
+
+    cy.wait(500);
+
+    cy.get('[title="Remove assigned instrument"]').should('not.exist');
+  });
+
+  it('User Officer should be able to delete Instrument', () => {
     cy.login('officer');
 
     cy.contains('Instruments').click();

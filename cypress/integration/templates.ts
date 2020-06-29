@@ -335,6 +335,27 @@ context('Template tests', () => {
     cy.contains('Submitted');
   });
 
+  it('Officer can save proposal column selection', () => {
+    cy.login('officer');
+
+    cy.contains('View Proposals').click();
+
+    cy.get("[title='Show Columns']")
+      .first()
+      .click();
+    cy.contains('Deviation').click();
+
+    cy.get('body').click();
+
+    cy.contains('View Calls').click();
+
+    cy.wait(500);
+
+    cy.contains('View Proposals').click();
+
+    cy.contains('Deviation');
+  });
+
   it('Officer can delete proposal', () => {
     cy.login('officer');
 
