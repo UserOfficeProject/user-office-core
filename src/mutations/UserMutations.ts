@@ -156,7 +156,6 @@ export default class UserMutations {
       const updatedUser = (await this.update(user, {
         id: user.id,
         placeholder: false,
-        password: hash,
         ...args,
       })) as UserWithRole;
 
