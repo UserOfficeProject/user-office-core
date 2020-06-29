@@ -31,6 +31,7 @@ const goodToken = jsonwebtoken.sign(
 );
 asd;
 asdas;
+asdasdas;
 const badToken = jsonwebtoken.sign(
   {
     id: dummyUser.id,
