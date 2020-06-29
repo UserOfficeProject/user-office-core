@@ -1,18 +1,20 @@
 import {
   cloneTemplateValidationSchema,
+  createQuestionTemplateRelationValidationSchema,
   createQuestionValidationSchema,
   createTemplateValidationSchema,
   createTopicValidationSchema,
+  deleteQuestionTemplateRelationValidationSchema,
   deleteQuestionValidationSchema,
   deleteTemplateValidationSchema,
   deleteTopicValidationSchema,
-  updateProposalTemplateValidationSchema,
   updateQuestionsTopicRelsValidationSchema,
+  updateQuestionTemplateRelationValidationSchema,
   updateQuestionValidationSchema,
+  updateTemplateValidationSchema,
   updateTopicOrderValidationSchema,
   updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
-
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import {
@@ -217,7 +219,7 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(updateQuestionTemplateRelationValidationSchema)
+  @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateQuestionTemplateRelation(
     agent: UserWithRole | null,
@@ -236,7 +238,7 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
+  @ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestionTemplateRelation(
     agent: UserWithRole | null,
@@ -305,7 +307,7 @@ export default class TemplateMutations {
     return args.questionIds;
   }
 
-  @ValidateArgs(updateProposalTemplateValidationSchema)
+  @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
@@ -320,7 +322,7 @@ export default class TemplateMutations {
       });
   }
 
-  //@ValidateArgs(createQuestionTemplateRelationValidationSchema)
+  @ValidateArgs(createQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createQuestionTemplateRelation(
     user: UserWithRole | null,
