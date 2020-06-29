@@ -1,4 +1,5 @@
 import { Arg, Ctx, Int, Query, Resolver } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { Questionary } from '../types/Questionary';
 

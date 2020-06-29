@@ -5,10 +5,10 @@ import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
+import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 
 export default class QuestionaryMutations {
   constructor(
@@ -103,6 +103,7 @@ export default class QuestionaryMutations {
     if (!hasRights) {
       return rejection('INSUFFICIENT_PERMISSIONS');
     }
+
     return this.dataSource.updateAnswer(
       args.questionaryId,
       args.answer.questionId,
