@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Instrument } from '../models/Instrument';
+import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
 export interface InstrumentDataSource {
@@ -20,5 +21,14 @@ export interface InstrumentDataSource {
     proposalId: number,
     instrumentId: number
   ): Promise<boolean>;
+  assignScientistsToInstrument(
+    scientistIds: number[],
+    instrumentId: number
+  ): Promise<boolean>;
+  removeScientistFromInstrument(
+    scientistId: number,
+    instrumentId: number
+  ): Promise<boolean>;
+  getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
   getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
 }
