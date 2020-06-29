@@ -1,28 +1,19 @@
-import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
+import { Button, Dialog, DialogContent } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
-
 import { Instrument, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
-
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
 
 const InstrumentsTable: React.FC = () => {
   const [show, setShow] = useState(false);
   const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
-  const classes = useStyles();
   const columns = [
     { title: 'Instrument ID', field: 'instrumentId' },
     { title: 'Name', field: 'name' },
@@ -93,7 +84,7 @@ const InstrumentsTable: React.FC = () => {
         <DialogContent>
           <CreateUpdateInstrument
             instrument={editInstrument as Instrument}
-            close={(instrument: Instrument | null): void =>
+            close={(instrument: Instrument | null) =>
               !!editInstrument
                 ? onInstrumentUpdated(instrument)
                 : onInstrumentCreated(instrument)
@@ -119,7 +110,7 @@ const InstrumentsTable: React.FC = () => {
             {
               icon: EditIcon,
               tooltip: 'Edit Instrument',
-              onClick: (event, rowData): void =>
+              onClick: (event, rowData) =>
                 setEditInstrument(rowData as Instrument),
               position: 'row',
             },
@@ -128,17 +119,16 @@ const InstrumentsTable: React.FC = () => {
         <Can
           allowedRoles={[UserRole.USER_OFFICER]}
           yes={() => (
-            <ButtonContainer>
+            <ActionButtonContainer>
               <Button
                 type="button"
                 variant="contained"
                 color="primary"
-                className={classes.button}
-                onClick={(): void => setShow(true)}
+                onClick={() => setShow(true)}
               >
                 Create instrument
               </Button>
-            </ButtonContainer>
+            </ActionButtonContainer>
           )}
           no={() => null}
         ></Can>
