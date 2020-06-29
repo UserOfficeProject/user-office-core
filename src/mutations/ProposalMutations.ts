@@ -55,6 +55,7 @@ export default class ProposalMutations {
     }
 
     const questionary = await this.questionaryDataSource.create(
+      agent!.id,
       call.templateId
     );
 

@@ -4,7 +4,7 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
-  QuestionRel,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateCategoryId,
@@ -12,17 +12,17 @@ import {
   Topic,
 } from '../../models/ProposalModel';
 import { getFieldById } from '../../models/ProposalModelFunctions';
-import { CreateQuestionRelArgs } from '../../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateQuestionRelArgs } from '../../resolvers/mutations/UpdateQuestionRelMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
 import {
   dummyQuestionFactory,
-  dummyQuestionRelFactory,
+  dummyQuestionTemplateRelationFactory,
 } from './QuestionaryDataSource';
 
 export let dummyProposalTemplate: Template;
@@ -49,13 +49,13 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
 };
 
 const dummyTemplateStepsFactory = () => {
-  const hasLinksToField = dummyQuestionRelFactory({
+  const hasLinksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       proposalQuestionId: 'has_links_to_field',
       dataType: DataType.SELECTION_FROM_OPTIONS,
     }),
   });
-  const linksToField = dummyQuestionRelFactory({
+  const linksToField = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       proposalQuestionId: 'links_to_field',
       dataType: DataType.TEXT_INPUT,
@@ -68,7 +68,7 @@ const dummyTemplateStepsFactory = () => {
     ),
   });
 
-  const enableCrystallization = dummyQuestionRelFactory({
+  const enableCrystallization = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       proposalQuestionId: 'enable_crystallization',
       dataType: DataType.BOOLEAN,
@@ -77,7 +77,7 @@ const dummyTemplateStepsFactory = () => {
     }),
   });
 
-  const hasLinksWithIndustry = dummyQuestionRelFactory({
+  const hasLinksWithIndustry = dummyQuestionTemplateRelationFactory({
     question: dummyQuestionFactory({
       proposalQuestionId: 'has_links_with_industry',
       dataType: DataType.BOOLEAN,
@@ -124,18 +124,22 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async createQuestionRel(args: CreateQuestionRelArgs): Promise<Template> {
+  async createQuestionTemplateRelation(
+    args: CreateQuestionTemplateRelationArgs
+  ): Promise<Template> {
     return dummyProposalTemplate;
   }
-  async getQuestionRel(
+  async getQuestionTemplateRelation(
     questionId: string,
     templateId: number
-  ): Promise<QuestionRel | null> {
-    return dummyQuestionRelFactory({
+  ): Promise<QuestionTemplateRelation | null> {
+    return dummyQuestionTemplateRelationFactory({
       question: { proposalQuestionId: questionId },
     });
   }
-  async deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template> {
+  async deleteQuestionTemplateRelation(
+    args: DeleteQuestionTemplateRelationArgs
+  ): Promise<Template> {
     dummyTemplateSteps.forEach(function(step) {
       step.fields = step.fields.filter(field => {
         return field.question.proposalQuestionId !== args.questionId;
@@ -144,11 +148,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
     return dummyProposalTemplate;
   }
-  async updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template> {
+  async updateQuestionTemplateRelation(
+    args: UpdateQuestionTemplateRelationArgs
+  ): Promise<Template> {
     const question = getFieldById(
       dummyTemplateSteps,
       args.questionId
-    ) as QuestionRel;
+    ) as QuestionTemplateRelation;
     question.sortOrder = args.sortOrder || 0;
     question.topicId = args.topicId || 1;
 
@@ -223,7 +229,6 @@ export class TemplateDataSourceMock implements TemplateDataSource {
 
   async deleteQuestion(questionId: string): Promise<Question> {
     const question = await this.getQuestion(questionId);
-    console.log(`Deleting question ${questionId} and  is it? ${question}`);
     if (!question) {
       throw new Error('Question does not exist');
     }
@@ -244,13 +249,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     const steps = await this.getTemplateSteps();
     const allQuestions = steps.reduce((accumulated, current) => {
       return accumulated.concat(current.fields);
-    }, new Array<QuestionRel>());
-    const questionRel = allQuestions.find(
+    }, new Array<QuestionTemplateRelation>());
+    const questionTemplateRelation = allQuestions.find(
       curQuestion => curQuestion.question.proposalQuestionId === questionId
     );
 
-    if (questionRel) {
-      const { question } = questionRel;
+    if (questionTemplateRelation) {
+      const { question } = questionTemplateRelation;
       Object.assign(question, values);
 
       return question;

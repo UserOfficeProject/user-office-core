@@ -1,13 +1,13 @@
 import {
-  Query,
-  Ctx,
-  Resolver,
-  ArgsType,
-  Field,
-  Int,
   Args,
-  ObjectType,
+  ArgsType,
+  Ctx,
+  Field,
   InputType,
+  Int,
+  ObjectType,
+  Query,
+  Resolver,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -20,6 +20,9 @@ export class ProposalsFilter {
 
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
+  public questionaryIds?: number[];
 }
 
 @ArgsType()

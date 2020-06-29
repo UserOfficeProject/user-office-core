@@ -107,7 +107,7 @@ export default class ProposalQueries {
       0,
       ProposalEndStatus.UNSET,
       call?.id,
-      call?.templateId,
+      -1,
       '',
       '',
       false

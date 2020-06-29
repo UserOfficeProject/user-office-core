@@ -1,30 +1,36 @@
 import 'reflect-metadata';
+import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUser,
-  UserDataSourceMock,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import { isRejection } from '../rejection';
 import { MutedLogger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryMutations from './QuestionaryMutations';
 
+const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const dummyLogger = new MutedLogger();
-
+const questionaryAuth = new QuestionaryAuthorization(
+  dummyProposalDataSource,
+  dummyQuestionaryDataSource,
+  dummyTemplateDataSource
+);
 const mutations = new QuestionaryMutations(
   dummyQuestionaryDataSource,
   dummyTemplateDataSource,
+  questionaryAuth,
   dummyLogger
 );
 const queries = new QuestionaryQueries(
   dummyQuestionaryDataSource,
-  dummyTemplateDataSource
+  dummyTemplateDataSource,
+  questionaryAuth
 );
 
 const getDummyUsersProposal = async () => {
@@ -42,6 +48,7 @@ const getDummyUsersProposal = async () => {
 beforeEach(() => {
   dummyQuestionaryDataSource.init();
   dummyTemplateDataSource.init();
+  dummyProposalDataSource.init();
 });
 
 it('User should answer topic questions', async () => {

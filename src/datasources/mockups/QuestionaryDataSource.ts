@@ -9,7 +9,7 @@ import {
   Question,
   Questionary,
   QuestionaryStep,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
 } from '../../models/ProposalModel';
@@ -36,7 +36,7 @@ export const dummyConfigFactory = (values?: any): typeof FieldConfigType => {
 };
 
 const createDummyQuestionary = () => {
-  return new Questionary(1, 1, new Date());
+  return new Questionary(1, 1, 1, new Date());
 };
 export const dummyQuestionFactory = (
   values?: DeepPartial<Question>
@@ -51,10 +51,10 @@ export const dummyQuestionFactory = (
   );
 };
 
-export const dummyQuestionRelFactory = (
-  values?: DeepPartial<QuestionRel>
-): QuestionRel => {
-  return new QuestionRel(
+export const dummyQuestionTemplateRelationFactory = (
+  values?: DeepPartial<QuestionTemplateRelation>
+): QuestionTemplateRelation => {
+  return new QuestionTemplateRelation(
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
@@ -66,7 +66,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
       new Answer(
-        dummyQuestionRelFactory({
+        dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'ttl_general',
             naturalKey: 'ttl_general',
@@ -84,7 +84,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
-        dummyQuestionRelFactory({
+        dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'has_links_with_industry',
             naturalKey: 'has_links_with_industry',
@@ -102,7 +102,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
-        dummyQuestionRelFactory({
+        dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'links_with_industry',
             naturalKey: 'links_with_industry',
@@ -126,6 +126,11 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  getParentQuestionary(
+    child_questionary_id: number
+  ): Promise<Questionary | null> {
+    throw new Error('Method not implemented.');
+  }
   async delete(questionary_id: number): Promise<Questionary> {
     if (dummyQuestionary.questionaryId !== questionary_id) {
       throw new Error('Proposal does not exist');
@@ -141,8 +146,8 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     dummyQuestionary = createDummyQuestionary();
   }
 
-  async create(template_id: number): Promise<Questionary> {
-    return new Questionary(1, template_id, new Date());
+  async create(creator_id: number, template_id: number): Promise<Questionary> {
+    return new Questionary(1, template_id, creator_id, new Date());
   }
 
   async updateAnswer(

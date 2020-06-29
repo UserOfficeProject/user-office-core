@@ -5,7 +5,7 @@ import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
   createQuestionaryObject,
-  createQuestionRelObject,
+  createQuestionTemplateRelationObject,
   createTopicObject,
   QuestionaryRecord,
   QuestionRecord,
@@ -15,9 +15,27 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  create(template_id: number): Promise<Questionary> {
+  getParentQuestionary(
+    child_questionary_id: number
+  ): Promise<Questionary | null> {
+    const subquery = database('answer_has_questionaries')
+      .select('answer_id')
+      .where({ questionary_id: child_questionary_id });
+
     return database('questionaries')
-      .insert({ template_id }, '*')
+      .select('*')
+      .whereIn('questionary_id', subquery)
+      .then((rows: QuestionaryRecord[]) => {
+        if (rows.length !== 1) {
+          return null;
+        }
+
+        return createQuestionaryObject(rows[0]);
+      });
+  }
+  create(creator_id: number, template_id: number): Promise<Questionary> {
+    return database('questionaries')
+      .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {
         return createQuestionaryObject(rows[0]);
       });
@@ -127,7 +145,7 @@ export default class PostgresQuestionaryDataSource
     return this.getQuestionaryStepsWithTemplateId(0, template_id);
   }
 
-  async getQuestionary(questionary_id: number): Promise<Questionary> {
+  async getQuestionary(questionary_id: number): Promise<Questionary | null> {
     return database('questionaries')
       .select('*')
       .where({ questionary_id })
@@ -135,7 +153,7 @@ export default class PostgresQuestionaryDataSource
         if (rows && rows.length === 1) {
           return createQuestionaryObject(rows[0]);
         } else {
-          throw new Error(`No questionary with id: ${questionary_id}`);
+          return null;
         }
       });
   }
@@ -144,7 +162,7 @@ export default class PostgresQuestionaryDataSource
   ): Promise<QuestionaryStep[]> {
     const questionary = await this.getQuestionary(questionary_id);
     if (!questionary) {
-      throw new Error(`No questionary with id: ${questionary_id}`);
+      return [];
     }
 
     return this.getQuestionaryStepsWithTemplateId(
@@ -217,7 +235,7 @@ export default class PostgresQuestionaryDataSource
     const fields = answerRecords.map(record => {
       const value = record.value ? JSON.parse(record.value).value : '';
 
-      return new Answer(createQuestionRelObject(record), value);
+      return new Answer(createQuestionTemplateRelationObject(record), value);
     });
 
     const steps = Array<QuestionaryStep>();
