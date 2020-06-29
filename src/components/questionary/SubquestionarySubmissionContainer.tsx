@@ -4,6 +4,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Formik } from 'formik';
 import React, { SyntheticEvent } from 'react';
 import * as Yup from 'yup';
+
 import { Questionary } from '../../generated/sdk';
 import { usePersistSubquestionaryModel } from '../../hooks/usePersistSubquestionaryModel';
 import { areDependenciesSatisfied } from '../../models/ProposalModelFunctions';

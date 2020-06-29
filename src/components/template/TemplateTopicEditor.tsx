@@ -1,4 +1,5 @@
 import {
+  AppBar,
   Divider,
   Fade,
   Grid,
@@ -6,11 +7,12 @@ import {
   makeStyles,
   Menu,
   MenuItem,
+  Toolbar,
   Typography,
   useTheme,
 } from '@material-ui/core';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import React, { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
@@ -64,6 +66,7 @@ export default function QuestionaryEditorTopic(props: {
       color: theme.palette.grey[600],
       fontWeight: 600,
       width: '100%',
+      height: '36px',
     },
     itemContainer: {
       minHeight: '180px',
@@ -71,10 +74,8 @@ export default function QuestionaryEditorTopic(props: {
     topic: {
       fontSize: '15px',
       padding: '0 5px',
-      marginBottom: '16px',
-      color: theme.palette.grey[600],
+      color: '#777',
       fontWeight: 600,
-      background: 'white',
       whiteSpace: 'nowrap',
       overflow: 'hidden',
       textOverflow: 'ellipsis',
@@ -84,6 +85,7 @@ export default function QuestionaryEditorTopic(props: {
     },
     showMoreButton: {
       cursor: 'pointer',
+      color: '#777',
     },
     addIcon: {
       textAlign: 'right',
@@ -94,6 +96,15 @@ export default function QuestionaryEditorTopic(props: {
       padding: '5px',
       borderWidth: '1px',
       borderStyle: 'dashed',
+    },
+    toolbar: {
+      minHeight: '36px',
+      padding: '0 6px',
+    },
+    appbar: {
+      background: 'transparent',
+      boxShadow: 'none',
+      paddingRight: 0,
     },
   }))();
 
@@ -187,76 +198,80 @@ export default function QuestionaryEditorTopic(props: {
           )}
           {...provided.dragHandleProps}
         >
-          <Grid item xs={10} className={classes.topic}>
-            {titleJsx}
-          </Grid>
-          <Grid item xs={2} className={classes.addIcon}>
-            <MoreHorizIcon
-              onClick={(event: React.MouseEvent<SVGSVGElement>) =>
-                setAnchorEl(event.currentTarget)
-              }
-              className={classes.showMoreButton}
-              data-cy="show-more-button"
-            />
-            <Menu
-              anchorEl={anchorEl}
-              keepMounted
-              open={open}
-              onClose={() => setAnchorEl(null)}
-              TransitionComponent={Fade}
-            >
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() => {
-                  dispatch({
-                    type: EventType.PICK_QUESTION_REQUESTED,
-                    payload: {
-                      sortOrder: index + 1,
-                      topic: props.data.topic,
-                    },
-                    // +1 means - add immediately after this topic
-                  });
-                  setAnchorEl(null);
-                }}
-              >
-                <ListItemIcon>
-                  <PlaylistAddIcon />
-                </ListItemIcon>
-                <Typography variant="inherit">Add question</Typography>
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() =>
-                  dispatch({
-                    type: EventType.DELETE_TOPIC_REQUESTED,
-                    payload: data.topic.id,
-                  })
-                }
-              >
-                <ListItemIcon>
-                  <DeleteRoundedIcon />
-                </ListItemIcon>
-                <Typography variant="inherit">Delete topic</Typography>
-              </MenuItem>
+          <AppBar position="static" className={classes.appbar}>
+            <Toolbar className={classes.toolbar}>
+              <Grid item xs={10} className={classes.topic}>
+                {titleJsx}
+              </Grid>
+              <Grid item xs={2} className={classes.addIcon}>
+                <MoreVertIcon
+                  onClick={(event: React.MouseEvent<SVGSVGElement>) =>
+                    setAnchorEl(event.currentTarget)
+                  }
+                  className={classes.showMoreButton}
+                  data-cy="show-more-button"
+                />
+                <Menu
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={() => setAnchorEl(null)}
+                  TransitionComponent={Fade}
+                >
+                  <MenuItem
+                    className={classes.addQuestionMenuItem}
+                    onClick={() => {
+                      dispatch({
+                        type: EventType.PICK_QUESTION_REQUESTED,
+                        payload: {
+                          sortOrder: index + 1,
+                          topic: props.data.topic,
+                        },
+                        // +1 means - add immediately after this topic
+                      });
+                      setAnchorEl(null);
+                    }}
+                  >
+                    <ListItemIcon>
+                      <PlaylistAddIcon />
+                    </ListItemIcon>
+                    <Typography variant="inherit">Add question</Typography>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    className={classes.addQuestionMenuItem}
+                    onClick={() =>
+                      dispatch({
+                        type: EventType.DELETE_TOPIC_REQUESTED,
+                        payload: data.topic.id,
+                      })
+                    }
+                  >
+                    <ListItemIcon>
+                      <DeleteRoundedIcon />
+                    </ListItemIcon>
+                    <Typography variant="inherit">Delete topic</Typography>
+                  </MenuItem>
 
-              <MenuItem
-                className={classes.addQuestionMenuItem}
-                onClick={() =>
-                  dispatch({
-                    type: EventType.CREATE_TOPIC_REQUESTED,
-                    payload: { sortOrder: index + 1 },
-                    // +1 means - add immediately after this topic
-                  })
-                }
-              >
-                <ListItemIcon>
-                  <PlaylistAddIcon />
-                </ListItemIcon>
-                <Typography variant="inherit">Add topic</Typography>
-              </MenuItem>
-            </Menu>
-          </Grid>
+                  <MenuItem
+                    className={classes.addQuestionMenuItem}
+                    onClick={() =>
+                      dispatch({
+                        type: EventType.CREATE_TOPIC_REQUESTED,
+                        payload: { sortOrder: index + 1 },
+                        // +1 means - add immediately after this topic
+                      })
+                    }
+                  >
+                    <ListItemIcon>
+                      <PlaylistAddIcon />
+                    </ListItemIcon>
+                    <Typography variant="inherit">Add topic</Typography>
+                  </MenuItem>
+                </Menu>
+              </Grid>
+            </Toolbar>
+          </AppBar>
 
           <Droppable droppableId={data.topic.id.toString()} type="field">
             {(provided, snapshot) => (

@@ -1,4 +1,3 @@
-import React, { Component } from 'react';
 import {
   StandardProps,
   ButtonProps,
@@ -6,6 +5,7 @@ import {
   Button,
   CircularProgress,
 } from '@material-ui/core';
+import React, { Component } from 'react';
 
 export class NavigButton extends Component<
   StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>

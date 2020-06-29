@@ -20,8 +20,8 @@ import React, { useEffect, useState } from 'react';
 import { Questionary, SubtemplateConfig } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { stringToNumericArray } from '../../utils/ArrayUtils';
-import { SubquestionarySubmissionContainer } from '../questionary/SubquestionarySubmissionContainer';
 import ModalWrapper from '../common/ModalWrapper';
+import { SubquestionarySubmissionContainer } from '../questionary/SubquestionarySubmissionContainer';
 import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalErrorLabel } from './ProposalErrorLabel';
 

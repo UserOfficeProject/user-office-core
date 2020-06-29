@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { prepareAnswers } from '../models/ProposalModelFunctions';
 import {
   Event,
@@ -33,6 +34,7 @@ export function usePersistSubquestionaryModel() {
           break;
       }
     };
+
     return reducer;
   };
 
