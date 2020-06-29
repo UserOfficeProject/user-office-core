@@ -68,33 +68,29 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
       backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
     },
+    appbar: {
+      background: 'transparent',
+      boxShadow: 'none',
+      paddingRight: 0,
+    },
+    toolbar: {
+      minHeight: '36px',
+      padding: '0 6px',
+    },
+    title: {
+      flexGrow: 1,
+      color: theme.palette.grey[600],
+      fontWeight: 'bold',
+    },
     itemContainer: {
       minHeight: '180px',
     },
     addQuestionMenuItem: {
       minHeight: 0,
     },
-    showMoreButton: {
+    toolbarButton: {
       cursor: 'pointer',
-      color: '#777',
-    },
-    addIcon: {
-      textAlign: 'right',
-      paddingRight: '8px',
-    },
-    toolbar: {
-      minHeight: '36px',
-      padding: '0 6px',
-    },
-    appbar: {
-      background: 'transparent',
-      boxShadow: 'none',
-      paddingRight: 0,
-    },
-    title: {
-      flexGrow: 1,
-      color: '#777',
-      fontWeight: 'bold',
+      color: theme.palette.grey[600],
     },
   }))();
 
@@ -155,13 +151,13 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
             onClick={(event: React.MouseEvent<SVGSVGElement>) =>
               setAnchorEl(event.currentTarget)
             }
-            className={classes.showMoreButton}
+            className={classes.toolbarButton}
             data-cy="show-more-button"
           />
           <CloseIcon
             onClick={closeMe}
-            className={classes.showMoreButton}
-            data-cy="show-more-button"
+            className={classes.toolbarButton}
+            data-cy="close-button"
           />
           <Menu
             anchorEl={anchorEl}

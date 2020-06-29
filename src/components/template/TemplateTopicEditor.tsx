@@ -61,6 +61,15 @@ export default function QuestionaryEditorTopic(props: {
       background: '#FFF',
       flexBasis: '100%',
     },
+    appbar: {
+      background: 'transparent',
+      boxShadow: 'none',
+      paddingRight: 0,
+    },
+    toolbar: {
+      minHeight: '36px',
+      padding: '0 6px',
+    },
     inputHeading: {
       fontSize: '15px',
       color: theme.palette.grey[600],
@@ -74,7 +83,7 @@ export default function QuestionaryEditorTopic(props: {
     topic: {
       fontSize: '15px',
       padding: '0 5px',
-      color: '#777',
+      color: theme.palette.grey[600],
       fontWeight: 600,
       whiteSpace: 'nowrap',
       overflow: 'hidden',
@@ -83,9 +92,9 @@ export default function QuestionaryEditorTopic(props: {
     addQuestionMenuItem: {
       minHeight: 0,
     },
-    showMoreButton: {
+    toolbarButton: {
       cursor: 'pointer',
-      color: '#777',
+      color: theme.palette.grey[600],
     },
     addIcon: {
       textAlign: 'right',
@@ -96,15 +105,6 @@ export default function QuestionaryEditorTopic(props: {
       padding: '5px',
       borderWidth: '1px',
       borderStyle: 'dashed',
-    },
-    toolbar: {
-      minHeight: '36px',
-      padding: '0 6px',
-    },
-    appbar: {
-      background: 'transparent',
-      boxShadow: 'none',
-      paddingRight: 0,
     },
   }))();
 
@@ -208,7 +208,7 @@ export default function QuestionaryEditorTopic(props: {
                   onClick={(event: React.MouseEvent<SVGSVGElement>) =>
                     setAnchorEl(event.currentTarget)
                   }
-                  className={classes.showMoreButton}
+                  className={classes.toolbarButton}
                   data-cy="show-more-button"
                 />
                 <Menu
