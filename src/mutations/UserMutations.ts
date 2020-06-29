@@ -331,10 +331,11 @@ export default class UserMutations {
   async token(token: string): Promise<string | Rejection> {
     try {
       const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const roles = await this.dataSource.getUserRoles(decoded.user.id);
       const freshToken = jsonwebtoken.sign(
         {
           user: decoded.user,
-          roles: decoded.roles,
+          roles,
           currentRole: decoded.currentRole,
         },
         this.secret,
