@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from '@material-ui/core';
+import { Dialog, DialogContent, Button } from '@material-ui/core';
 import { Add, Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
@@ -12,6 +12,7 @@ import ScienceIconAdd from '../common/ScienceIconAdd';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 
 type CallsTableProps = {
   templateId?: number;
@@ -117,7 +118,6 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
     }
   };
 
-  const AddIcon = (): JSX.Element => <Add data-cy="add-call" />;
   const EditIcon = (): JSX.Element => <Edit />;
   const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
 
@@ -183,12 +183,6 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
         }}
         actions={[
           {
-            icon: AddIcon,
-            isFreeAction: true,
-            tooltip: 'Add Call',
-            onClick: (): void => setShow(true),
-          },
-          {
             icon: EditIcon,
             tooltip: 'Edit Call',
             onClick: (event, rowData): void => setEditCall(rowData as Call),
@@ -203,6 +197,17 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
           },
         ]}
       />
+      <ActionButtonContainer>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={() => setShow(true)}
+          data-cy="add-call"
+        >
+          Add call
+        </Button>
+      </ActionButtonContainer>
     </>
   );
 };
