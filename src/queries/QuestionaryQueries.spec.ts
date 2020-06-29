@@ -3,19 +3,25 @@ import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSourc
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
+import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 import QuestionaryQueries from './QuestionaryQueries';
 
 const dummyProposalDataSource = new ProposalDataSourceMock();
-const templateDataSource = new TemplateDataSourceMock();
+const dummyTemplateDataSource = new TemplateDataSourceMock();
 const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
-
+const questionaryAuth = new QuestionaryAuthorization(
+  dummyProposalDataSource,
+  dummyQuestionaryDataSource,
+  dummyTemplateDataSource
+);
 const questionaryQueries = new QuestionaryQueries(
   dummyQuestionaryDataSource,
-  templateDataSource
+  dummyTemplateDataSource,
+  questionaryAuth
 );
 beforeEach(() => {
   dummyProposalDataSource.init();
-  templateDataSource.init();
+  dummyTemplateDataSource.init();
   dummyQuestionaryDataSource.init();
 });
 
