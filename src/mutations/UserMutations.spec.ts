@@ -30,6 +30,7 @@ const goodToken = jsonwebtoken.sign(
   { expiresIn: '24h' }
 );
 asd;
+asdas;
 const badToken = jsonwebtoken.sign(
   {
     id: dummyUser.id,
