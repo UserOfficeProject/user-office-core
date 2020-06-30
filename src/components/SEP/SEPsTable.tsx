@@ -3,6 +3,7 @@ import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router';
+
 import { UserContext } from '../../context/UserContextProvider';
 import { Sep, UserRole } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';

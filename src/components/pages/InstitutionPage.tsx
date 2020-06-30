@@ -1,3 +1,4 @@
+import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
@@ -7,10 +8,9 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { useInstitutionData } from '../../hooks/useInstitutionData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import InputDialog from '../common/InputDialog';
 import CreateInstitution from './CreateInstitution';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import { Button } from '@material-ui/core';
 
 const InstitutionPage: React.FC = () => {
   const api = useDataApi();

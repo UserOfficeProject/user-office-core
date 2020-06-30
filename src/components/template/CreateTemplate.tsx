@@ -2,14 +2,15 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createTemplateValidationSchema } from '@esss-swap/duo-validation';
 import { Button, Typography } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
+
 import {
   TemplateCategoryId,
   TemplateMetadataFragment,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { TextField } from 'formik-material-ui';
 
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment | null) => void;
@@ -18,6 +19,7 @@ const CreateTemplate = (props: {
   const { onComplete, categoryId } = props;
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
+
   return (
     <>
       <Typography variant="h6">Create new template</Typography>

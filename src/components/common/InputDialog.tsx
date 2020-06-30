@@ -15,6 +15,7 @@ const useStyles = makeStyles(theme => ({
 
 function InputDialog(props: DialogProps) {
   const classes = useStyles();
+
   return (
     <Dialog maxWidth="sm" {...props}>
       <DialogContent className={classes.content}>

@@ -4,6 +4,7 @@ import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
+
 import {
   GetTemplatesQuery,
   Template,

@@ -1,6 +1,7 @@
-import { ButtonContainer } from '../../styles/StyledComponents';
-import React, { PropsWithChildren } from 'react';
 import { makeStyles } from '@material-ui/core';
+import React, { PropsWithChildren } from 'react';
+
+import { ButtonContainer } from '../../styles/StyledComponents';
 
 export function ActionButtonContainer(props: PropsWithChildren<{}>) {
   const classes = makeStyles(theme => ({
@@ -12,6 +13,7 @@ export function ActionButtonContainer(props: PropsWithChildren<{}>) {
       },
     },
   }))();
+
   return (
     <ButtonContainer className={classes.buttonContainer}>
       {props.children}
