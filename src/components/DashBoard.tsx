@@ -8,9 +8,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
+import { UserContext } from '../context/UserContextProvider';
 import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import AppToolbar from './AppToolbar/AppToolbar';
@@ -151,6 +152,7 @@ const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { currentRole } = useContext(UserContext);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -240,13 +242,14 @@ const Dashboard: React.FC = () => {
                       UserRole.SEP_REVIEWER,
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
+                      UserRole.INSTRUMENT_SCIENTIST,
                     ]}
                     yes={() => (
                       <Route
                         render={props => (
                           <OverviewPage
                             {...props}
-                            userRole={UserRole.REVIEWER}
+                            userRole={currentRole as UserRole}
                           />
                         )}
                       />

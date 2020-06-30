@@ -35,6 +35,12 @@ mutation createCall(
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+      }
     }
   }
 }

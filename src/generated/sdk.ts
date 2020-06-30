@@ -1841,6 +1841,10 @@ export type CreateCallMutation = (
     & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & { instruments: Array<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      )> }
     )> }
   ) }
 );
@@ -1907,6 +1911,10 @@ export type UpdateCallMutation = (
     & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & { instruments: Array<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      )> }
     )> }
   ) }
 );
@@ -1938,6 +1946,20 @@ export type AssignProposalsToInstrumentMutationVariables = {
 export type AssignProposalsToInstrumentMutation = (
   { __typename?: 'Mutation' }
   & { assignProposalsToInstrument: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
+);
+
+export type AssignScientistsToInstrumentMutationVariables = {
+  scientistIds: Array<Scalars['Int']>,
+  instrumentId: Scalars['Int']
+};
+
+
+export type AssignScientistsToInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { assignScientistsToInstrument: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
@@ -1990,6 +2012,10 @@ export type GetInstrumentsQuery = (
     & { instruments: Array<(
       { __typename?: 'Instrument' }
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      & { scientists: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+      )> }
     )> }
   )> }
 );
@@ -2003,6 +2029,20 @@ export type RemoveProposalFromInstrumentMutationVariables = {
 export type RemoveProposalFromInstrumentMutation = (
   { __typename?: 'Mutation' }
   & { removeProposalFromInstrument: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
+);
+
+export type RemoveScientistFromInstrumentMutationVariables = {
+  scientistId: Scalars['Int'],
+  instrumentId: Scalars['Int']
+};
+
+
+export type RemoveScientistFromInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { removeScientistFromInstrument: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
@@ -3835,6 +3875,12 @@ export const CreateCallDocument = gql`
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+      }
     }
   }
 }
@@ -3891,6 +3937,12 @@ export const UpdateCallDocument = gql`
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+      }
     }
   }
 }
@@ -3915,6 +3967,14 @@ export const GetEventLogsDocument = gql`
 export const AssignProposalsToInstrumentDocument = gql`
     mutation assignProposalsToInstrument($proposalIds: [Int!]!, $instrumentId: Int!) {
   assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    error
+    isSuccess
+  }
+}
+    `;
+export const AssignScientistsToInstrumentDocument = gql`
+    mutation assignScientistsToInstrument($scientistIds: [Int!]!, $instrumentId: Int!) {
+  assignScientistsToInstrument(scientistIds: $scientistIds, instrumentId: $instrumentId) {
     error
     isSuccess
   }
@@ -3951,6 +4011,13 @@ export const GetInstrumentsDocument = gql`
       name
       shortCode
       description
+      scientists {
+        id
+        firstname
+        lastname
+        organisation
+        position
+      }
     }
     totalCount
   }
@@ -3959,6 +4026,14 @@ export const GetInstrumentsDocument = gql`
 export const RemoveProposalFromInstrumentDocument = gql`
     mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
   removeProposalFromInstrument(proposalId: $proposalId, instrumentId: $instrumentId) {
+    error
+    isSuccess
+  }
+}
+    `;
+export const RemoveScientistFromInstrumentDocument = gql`
+    mutation removeScientistFromInstrument($scientistId: Int!, $instrumentId: Int!) {
+  removeScientistFromInstrument(scientistId: $scientistId, instrumentId: $instrumentId) {
     error
     isSuccess
   }
@@ -4778,6 +4853,9 @@ export function getSdk(client: GraphQLClient) {
     assignProposalsToInstrument(variables: AssignProposalsToInstrumentMutationVariables): Promise<AssignProposalsToInstrumentMutation> {
       return client.request<AssignProposalsToInstrumentMutation>(print(AssignProposalsToInstrumentDocument), variables);
     },
+    assignScientistsToInstrument(variables: AssignScientistsToInstrumentMutationVariables): Promise<AssignScientistsToInstrumentMutation> {
+      return client.request<AssignScientistsToInstrumentMutation>(print(AssignScientistsToInstrumentDocument), variables);
+    },
     createInstrument(variables: CreateInstrumentMutationVariables): Promise<CreateInstrumentMutation> {
       return client.request<CreateInstrumentMutation>(print(CreateInstrumentDocument), variables);
     },
@@ -4789,6 +4867,9 @@ export function getSdk(client: GraphQLClient) {
     },
     removeProposalFromInstrument(variables: RemoveProposalFromInstrumentMutationVariables): Promise<RemoveProposalFromInstrumentMutation> {
       return client.request<RemoveProposalFromInstrumentMutation>(print(RemoveProposalFromInstrumentDocument), variables);
+    },
+    removeScientistFromInstrument(variables: RemoveScientistFromInstrumentMutationVariables): Promise<RemoveScientistFromInstrumentMutation> {
+      return client.request<RemoveScientistFromInstrumentMutation>(print(RemoveScientistFromInstrumentDocument), variables);
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
       return client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables);

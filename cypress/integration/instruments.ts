@@ -124,6 +124,64 @@ context('Instrument tests', () => {
     cy.get('[title="Remove assigned instrument"]').should('not.exist');
   });
 
+  it('User Officer should be able to assign scientist to instrument', () => {
+    const firstName = faker.name.firstName();
+    const lastName = faker.name.lastName();
+    var randomEmail = faker.internet.email();
+    cy.login('officer');
+
+    cy.contains('Instruments').click();
+    cy.wait(500);
+
+    cy.get('[title="Assign scientist"]').click();
+    cy.wait(500);
+
+    cy.get('[title="Add by email"]').click();
+
+    cy.get('[name="name"]').type(firstName);
+    cy.get('[name="lastname"]').type(lastName);
+    cy.get('[name="email"]').type(randomEmail);
+
+    cy.contains('Invite User').click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="instruments-table"] table tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('1');
+      });
+  });
+
+  it('User Officer should be able to remove assigned scientist from instrument', () => {
+    cy.login('officer');
+
+    cy.contains('Instruments').click();
+    cy.wait(500);
+
+    cy.get('[title="Show Instruments"]')
+      .first()
+      .click();
+
+    cy.get(
+      '[data-cy="instrument-scientist-assignments-table"] [title="Delete"]'
+    )
+      .first()
+      .click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.get('[data-cy="instruments-table"] table tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('-');
+      });
+  });
+
   it('User Officer should be able to delete Instrument', () => {
     cy.login('officer');
 
