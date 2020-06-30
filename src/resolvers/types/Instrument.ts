@@ -1,6 +1,17 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import {
+  ObjectType,
+  Field,
+  Int,
+  Resolver,
+  FieldResolver,
+  Root,
+  Ctx,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
+import { isRejection } from '../../rejection';
+import { BasicUserDetails } from './BasicUserDetails';
 
 @ObjectType()
 export class Instrument implements Partial<InstrumentOrigin> {
@@ -15,4 +26,19 @@ export class Instrument implements Partial<InstrumentOrigin> {
 
   @Field()
   public description: string;
+}
+
+@Resolver(() => Instrument)
+export class InstrumentResolver {
+  @FieldResolver(() => [BasicUserDetails])
+  async scientists(
+    @Root() instrument: Instrument,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails[] | null> {
+    const scientists = context.queries.instrument.dataSource.getInstrumentScientists(
+      instrument.instrumentId
+    );
+
+    return isRejection(scientists) ? [] : scientists;
+  }
 }

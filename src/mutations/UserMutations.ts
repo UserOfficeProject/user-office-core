@@ -111,6 +111,12 @@ export default class UserMutations {
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.SEP_SECRETARY;
+    } else if (
+      args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.INSTRUMENT_SCIENTIST;
     }
 
     if (!userId) {

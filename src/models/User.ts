@@ -38,6 +38,7 @@ export enum UserRole {
   SEP_CHAIR = 4,
   SEP_SECRETARY = 5,
   SEP_REVIEWER = 6,
+  INSTRUMENT_SCIENTIST = 7,
 }
 
 export class BasicUserDetails {

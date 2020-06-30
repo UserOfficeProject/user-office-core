@@ -90,4 +90,28 @@ describe('Test Instrument Mutations', () => {
       )
     ).resolves.toBe(true);
   });
+
+  test('A logged in user officer can assign scientist/s to instrument', () => {
+    return expect(
+      instrumentMutations.assignScientsitsToInstrument(
+        dummyUserOfficerWithRole,
+        {
+          scientistIds: [1, 2],
+          instrumentId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
+
+  test('A logged in user officer can remove assigned scientist from instrument', () => {
+    return expect(
+      instrumentMutations.removeScientistFromInstrument(
+        dummyUserOfficerWithRole,
+        {
+          scientistId: 1,
+          instrumentId: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
 });

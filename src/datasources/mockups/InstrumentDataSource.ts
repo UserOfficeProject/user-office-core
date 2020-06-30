@@ -1,6 +1,8 @@
 import { Instrument } from '../../models/Instrument';
+import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
+import { basicDummyUser } from './UserDataSource';
 
 export const dummyInstrument = new Instrument(
   1,
@@ -65,5 +67,23 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     proposalId: number
   ): Promise<Instrument | null> {
     return dummyInstrument;
+  }
+
+  async assignScientistsToInstrument(
+    scientistIds: number[],
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async removeScientistFromInstrument(
+    scientistId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async getInstrumentScientists(): Promise<BasicUserDetails[]> {
+    return [basicDummyUser];
   }
 }
