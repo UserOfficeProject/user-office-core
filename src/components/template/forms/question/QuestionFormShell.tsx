@@ -4,8 +4,8 @@ import React from 'react';
 
 import { Question } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
-import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 import { ActionButtonContainer } from '../../../common/ActionButtonContainer';
+import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
 export const QuestionFormShell = (props: {
   validationSchema: any;

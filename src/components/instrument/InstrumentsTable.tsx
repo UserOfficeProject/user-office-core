@@ -3,6 +3,7 @@ import { AssignmentInd, Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
+
 import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
