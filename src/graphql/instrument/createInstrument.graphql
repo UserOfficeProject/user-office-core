@@ -13,6 +13,13 @@ mutation createInstrument(
       name
       shortCode
       description
+      scientists {
+        id
+        firstname
+        lastname
+        organisation
+        position
+      }
     }
     error
   }

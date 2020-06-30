@@ -157,6 +157,23 @@ const MenuItems: React.FC = () => {
     </div>
   );
 
+  const instrumentScientist = (
+    <div data-cy="instrument-scientist-menu-items">
+      <ListItem component={Link} to="/InstrumentPage" button>
+        <ListItemIcon>
+          <GroupWorkIcon />
+        </ListItemIcon>
+        <ListItemText primary="Instruments" />
+      </ListItem>
+      <ListItem component={Link} to="/LogOut" button data-cy="logout">
+        <ListItemIcon>
+          <ExitToApp />
+        </ListItemIcon>
+        <ListItemText primary="Logout" />
+      </ListItem>
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -164,6 +181,8 @@ const MenuItems: React.FC = () => {
       return userOfficer;
     case UserRole.REVIEWER:
       return reviewer;
+    case UserRole.INSTRUMENT_SCIENTIST:
+      return instrumentScientist;
     case UserRole.SEP_CHAIR:
     case UserRole.SEP_SECRETARY:
     case UserRole.SEP_REVIEWER:
