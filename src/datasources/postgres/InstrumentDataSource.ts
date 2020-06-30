@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Instrument } from '../../models/Instrument';
+import {
+  Instrument,
+  InstrumentWithAvailabilityTime,
+} from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
 import database from './database';
-import { InstrumentRecord, UserRecord, createBasicUserObject } from './records';
+import {
+  InstrumentRecord,
+  UserRecord,
+  createBasicUserObject,
+  InstrumentWithAvailabilityTimeRecord,
+} from './records';
 
 export default class PostgresInstrumentDataSource
   implements InstrumentDataSource {
@@ -14,6 +22,18 @@ export default class PostgresInstrumentDataSource
       instrument.name,
       instrument.short_code,
       instrument.description
+    );
+  }
+
+  private createInstrumentWithAvailabilityTimeObject(
+    instrument: InstrumentWithAvailabilityTimeRecord
+  ) {
+    return new InstrumentWithAvailabilityTime(
+      instrument.instrument_id,
+      instrument.name,
+      instrument.short_code,
+      instrument.description,
+      instrument.availability_time
     );
   }
 
@@ -74,17 +94,25 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async getInstrumentsByCallId(callId: number): Promise<Instrument[]> {
+  async getInstrumentsByCallId(
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
     return database
-      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .select([
+        'i.instrument_id',
+        'name',
+        'short_code',
+        'description',
+        'chi.availability_time',
+      ])
       .from('instruments as i')
-      .join('call_has_instrument as chi', {
+      .join('call_has_instruments as chi', {
         'i.instrument_id': 'chi.instrument_id',
       })
       .where('chi.call_id', callId)
-      .then((instruments: InstrumentRecord[]) => {
+      .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const result = instruments.map(instrument =>
-          this.createInstrumentObject(instrument)
+          this.createInstrumentWithAvailabilityTimeObject(instrument)
         );
 
         return result;
@@ -238,5 +266,25 @@ export default class PostgresInstrumentDataSource
 
         return users;
       });
+  }
+
+  async setAvailabilityTimeOnInstrument(
+    callId: number,
+    instrumentId: number,
+    availabilityTime: number
+  ): Promise<boolean> {
+    const result = await database.raw(
+      `${database('call_has_instruments').insert({
+        instrument_id: instrumentId,
+        call_id: callId,
+        availability_time: availabilityTime,
+      })} ON CONFLICT (instrument_id, call_id) DO UPDATE SET availability_time=${availabilityTime}`
+    );
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

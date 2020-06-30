@@ -108,7 +108,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       call_id: args.callId,
     }));
 
-    await database.insert(valuesToInsert).into('call_has_instrument');
+    await database.insert(valuesToInsert).into('call_has_instruments');
 
     const callUpdated = await this.get(args.callId);
 
@@ -122,7 +122,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   async removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallArgs
   ): Promise<Call> {
-    await database('call_has_instrument')
+    await database('call_has_instruments')
       .del()
       .where('instrument_id', args.instrumentId)
       .andWhere('call_id', args.callId);

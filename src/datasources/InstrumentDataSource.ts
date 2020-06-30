@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Instrument } from '../models/Instrument';
+import {
+  Instrument,
+  InstrumentWithAvailabilityTime,
+} from '../models/Instrument';
 import { BasicUserDetails } from '../models/User';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
 
@@ -10,7 +13,9 @@ export interface InstrumentDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
-  getInstrumentsByCallId(callId: number): Promise<Instrument[]>;
+  getInstrumentsByCallId(
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
   assignProposalsToInstrument(
@@ -31,4 +36,9 @@ export interface InstrumentDataSource {
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
   getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
+  setAvailabilityTimeOnInstrument(
+    callId: number,
+    instrumentId: number,
+    availabilityTime: number
+  ): Promise<boolean>;
 }

@@ -13,7 +13,7 @@ export default class CallQueries {
     return call;
   }
 
-  @Authorized()
+  // @Authorized()
   async getAll(agent: UserWithRole | null, filter?: CallsFilter) {
     const calls = await this.dataSource.getCalls(filter);
 

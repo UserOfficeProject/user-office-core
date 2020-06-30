@@ -244,6 +244,15 @@ export interface InstrumentRecord {
   readonly full_count: number;
 }
 
+export interface InstrumentWithAvailabilityTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly availability_time: number;
+  readonly full_count: number;
+}
+
 export interface TemplateCategoryRecord {
   readonly template_category_id: number;
   readonly name: string;

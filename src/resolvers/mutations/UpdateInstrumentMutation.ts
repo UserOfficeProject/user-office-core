@@ -9,7 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InstrumentResponseWrap } from '../types/CommonWrappers';
+import {
+  InstrumentResponseWrap,
+  SuccessResponseWrap,
+} from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -27,6 +30,18 @@ export class UpdateInstrumentArgs {
   public description: string;
 }
 
+@ArgsType()
+export class InstrumentAvailabilityTimeArgs {
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public callId: number;
+
+  @Field(() => Int)
+  public availabilityTime: number;
+}
+
 @Resolver()
 export class UpdateInstrumentMutation {
   @Mutation(() => InstrumentResponseWrap)
@@ -37,6 +52,20 @@ export class UpdateInstrumentMutation {
     return wrapResponse(
       context.mutations.instrument.update(context.user, args),
       InstrumentResponseWrap
+    );
+  }
+
+  @Mutation(() => SuccessResponseWrap)
+  async setInstrumentAvailabilityTime(
+    @Args() args: InstrumentAvailabilityTimeArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.instrument.setAvailabilityTimeOnInstrument(
+        context.user,
+        args
+      ),
+      SuccessResponseWrap
     );
   }
 }

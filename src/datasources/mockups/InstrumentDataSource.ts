@@ -1,4 +1,7 @@
-import { Instrument } from '../../models/Instrument';
+import {
+  Instrument,
+  InstrumentWithAvailabilityTime,
+} from '../../models/Instrument';
 import { BasicUserDetails } from '../../models/User';
 import { CreateInstrumentArgs } from '../../resolvers/mutations/CreateInstrumentMutation';
 import { InstrumentDataSource } from '../InstrumentDataSource';
@@ -9,6 +12,14 @@ export const dummyInstrument = new Instrument(
   'Dummy instrument 1',
   'instrument_1',
   'This is test instrument.'
+);
+
+export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilityTime(
+  1,
+  'Dummy instrument 1',
+  'instrument_1',
+  'This is test instrument.',
+  10
 );
 
 const dummyInstruments = [dummyInstrument];
@@ -45,8 +56,10 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
-  async getInstrumentsByCallId(callId: number): Promise<Instrument[]> {
-    return [dummyInstrument];
+  async getInstrumentsByCallId(
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
+    return [dummyInstrumentWithAvailabilityTime];
   }
 
   async assignProposalsToInstrument(
@@ -85,5 +98,13 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async getInstrumentScientists(): Promise<BasicUserDetails[]> {
     return [basicDummyUser];
+  }
+
+  async setAvailabilityTimeOnInstrument(
+    callId: number,
+    instrumentId: number,
+    availabilityTime: number
+  ): Promise<boolean> {
+    return true;
   }
 }
