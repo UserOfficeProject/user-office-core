@@ -1,19 +1,18 @@
-import { Dialog, DialogContent, Button } from '@material-ui/core';
-import { Add, Edit } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-
 import { Call, Instrument } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import InputDialog from '../common/InputDialog';
 import ScienceIconAdd from '../common/ScienceIconAdd';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import UOSDialog from '../common/UOSDialog';
 
 type CallsTableProps = {
   templateId?: number;
@@ -135,7 +134,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
 
   return (
     <>
-      <UOSDialog
+      <InputDialog
         maxWidth="xs"
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
@@ -148,9 +147,9 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
             !!editCall ? onCallUpdated(call) : onCallCreated(call);
           }}
         />
-      </UOSDialog>
+      </InputDialog>
       {assigningInstrumentsCallId && (
-        <UOSDialog
+        <InputDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
@@ -163,7 +162,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
               assignInstrumentsToCall(instruments)
             }
           />
-        </UOSDialog>
+        </InputDialog>
       )}
       <MaterialTable
         icons={tableIcons}
@@ -203,7 +202,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
           onClick={() => setShow(true)}
           data-cy="add-call"
         >
-          Add call
+          Create call
         </Button>
       </ActionButtonContainer>
     </>

@@ -4,7 +4,6 @@ import {
   updateInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
@@ -12,15 +11,10 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
-
 import { Instrument } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 
 const useStyles = makeStyles(theme => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -92,41 +86,28 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
           : createInstrumentValidationSchema
       }
     >
-      {({ values, errors, handleChange, touched }): JSX.Element => (
+      {() => (
         <Form>
-          <Typography className={classes.cardHeader}>
-            Create new instrument
-          </Typography>
-
+          <Typography variant="h6">Create new instrument</Typography>
           <Field
             name="name"
             id="name"
             label="Name"
             type="text"
-            value={values.name}
-            onChange={handleChange}
             component={TextField}
             margin="normal"
             fullWidth
             data-cy="name"
-            error={touched.name && errors.name !== undefined}
-            helperText={touched.name && errors.name && errors.name}
           />
           <Field
             name="shortCode"
             id="shortCode"
             label="Short code"
             type="text"
-            value={values.shortCode}
-            onChange={handleChange}
             component={TextField}
             margin="normal"
             fullWidth
             data-cy="shortCode"
-            error={touched.shortCode && errors.shortCode !== undefined}
-            helperText={
-              touched.shortCode && errors.shortCode && errors.shortCode
-            }
           />
           <Field
             id="description"
@@ -139,13 +120,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             multiline
             rowsMax="16"
             rows="3"
-            onChange={handleChange}
-            value={values.description}
             data-cy="description"
-            error={touched.description && errors.description !== undefined}
-            helperText={
-              touched.description && errors.description && errors.description
-            }
           />
 
           <Button
@@ -156,7 +131,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             className={classes.submit}
             data-cy="submit"
           >
-            {instrument ? 'Update' : 'Create'} Instrument
+            {instrument ? 'Update' : 'Create'}
           </Button>
         </Form>
       )}

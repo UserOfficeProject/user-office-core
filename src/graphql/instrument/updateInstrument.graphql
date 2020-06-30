@@ -15,6 +15,9 @@ mutation updateInstrument(
       name
       shortCode
       description
+      scientists {
+        ...basicUserDetails
+      }
     }
     error
   }

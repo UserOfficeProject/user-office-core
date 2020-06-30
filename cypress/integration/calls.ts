@@ -136,7 +136,7 @@ context('Calls tests', () => {
     cy.get('#name').type(name);
     cy.get('#shortCode').type(shortCode);
     cy.get('#description').type(description);
-    cy.contains('Create Instrument').click();
+    cy.get('[data-cy="submit"]').click();
 
     cy.wait(1000);
 

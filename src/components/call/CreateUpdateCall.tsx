@@ -99,8 +99,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     >
       {(): JSX.Element => (
         <Form>
-          <Typography variant="h6">Call information</Typography>
-
+          <Typography variant="h6">
+            {call ? 'Update the call' : 'Create new call'}
+          </Typography>
           <Field
             name="shortCode"
             label="Short Code"

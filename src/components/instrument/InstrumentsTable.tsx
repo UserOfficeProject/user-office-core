@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
@@ -9,6 +9,7 @@ import { useInstrumentsData } from '../../hooks/useInstrumentsData';
 import { tableIcons } from '../../utils/materialIcons';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
+import InputDialog from '../common/InputDialog';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const InstrumentsTable: React.FC = () => {
@@ -73,7 +74,7 @@ const InstrumentsTable: React.FC = () => {
 
   return (
     <>
-      <Dialog
+      <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!editInstrument || show}
@@ -81,17 +82,15 @@ const InstrumentsTable: React.FC = () => {
           !!editInstrument ? setEditInstrument(null) : setShow(false)
         }
       >
-        <DialogContent>
-          <CreateUpdateInstrument
-            instrument={editInstrument as Instrument}
-            close={(instrument: Instrument | null) =>
-              !!editInstrument
-                ? onInstrumentUpdated(instrument)
-                : onInstrumentCreated(instrument)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateUpdateInstrument
+          instrument={editInstrument as Instrument}
+          close={(instrument: Instrument | null) =>
+            !!editInstrument
+              ? onInstrumentUpdated(instrument)
+              : onInstrumentCreated(instrument)
+          }
+        />
+      </InputDialog>
       <div data-cy="instruments-table">
         <MaterialTable
           icons={tableIcons}

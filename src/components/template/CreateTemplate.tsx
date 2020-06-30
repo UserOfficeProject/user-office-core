@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createTemplateValidationSchema } from '@esss-swap/duo-validation';
-import { Container, TextField, Button, Typography } from '@material-ui/core';
-import { Formik, Field, Form } from 'formik';
+import { Button, Typography } from '@material-ui/core';
+import { Field, Form, Formik } from 'formik';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import {
@@ -9,17 +9,18 @@ import {
   TemplateMetadataFragment,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { TextField } from 'formik-material-ui';
 
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment | null) => void;
   categoryId: TemplateCategoryId;
 }) => {
-  const { onComplete: complete, categoryId } = props;
+  const { onComplete, categoryId } = props;
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   return (
     <>
-      <Typography variant="h6">Create template</Typography>
+      <Typography variant="h6">Create new template</Typography>
       <Formik
         initialValues={{
           name: '',
@@ -36,44 +37,30 @@ const CreateTemplate = (props: {
               variant: 'error',
             });
           }
-          complete(template);
+          onComplete(template);
         }}
         validationSchema={createTemplateValidationSchema}
       >
-        {({ values, errors, handleChange, touched }): JSX.Element => (
+        {() => (
           <Form>
             <Field
               name="name"
-              id="name"
               label="Name"
-              type="text"
-              value={values.name}
-              onChange={handleChange}
               component={TextField}
               margin="normal"
               fullWidth
               data-cy="name"
-              error={touched.name && errors.name !== undefined}
-              helperText={touched.name && errors.name && errors.name}
             />
             <Field
-              id="description"
               name="description"
               label="Description"
-              type="text"
               component={TextField}
               margin="normal"
               fullWidth
               multiline
               rowsMax="16"
               rows="3"
-              onChange={handleChange}
-              value={values.description}
               data-cy="description"
-              error={touched.description && errors.description !== undefined}
-              helperText={
-                touched.description && errors.description && errors.description
-              }
             />
             <Button
               type="submit"

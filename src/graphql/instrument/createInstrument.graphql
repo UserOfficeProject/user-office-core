@@ -13,6 +13,9 @@ mutation createInstrument(
       name
       shortCode
       description
+      scientists {
+        ...basicUserDetails
+      }
     }
     error
   }

@@ -2,7 +2,6 @@ import { Button } from '@material-ui/core';
 import { Archive, Delete, Edit, FileCopy } from '@material-ui/icons';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
-import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 import {
@@ -14,7 +13,7 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import { WithConfirmType } from '../../utils/withConfirm';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import UOSDialog from '../common/UOSDialog';
+import InputDialog from '../common/InputDialog';
 import CreateTemplate from './CreateTemplate';
 
 export type TemplateRowDataType = Pick<
@@ -32,7 +31,6 @@ interface TemplatesTableProps {
 export function TemplatesTable(props: TemplatesTableProps) {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
   const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const [show, setShow] = useState(false);
 
@@ -181,7 +179,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
 
   return (
     <>
-      <UOSDialog open={show} onClose={() => setShow(false)}>
+      <InputDialog open={show} onClose={() => setShow(false)}>
         <CreateTemplate
           onComplete={template => {
             if (template) {
@@ -191,7 +189,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
           }}
           categoryId={props.templateCategory}
         />
-      </UOSDialog>
+      </InputDialog>
       <MaterialTable
         icons={tableIcons}
         title="Proposal templates"
@@ -247,6 +245,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
           variant="contained"
           color="primary"
           onClick={() => setShow(true)}
+          data-cy="create-new-button"
         >
           Create template
         </Button>
