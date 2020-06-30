@@ -15,6 +15,7 @@ import React, { useState } from 'react';
 
 import { SepMember, BasicUserDetails, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { useRenewToken } from '../../hooks/useRenewToken';
 import { useSEPMembersData } from '../../hooks/useSEPMembersData';
 import { tableIcons } from '../../utils/materialIcons';
 import { useCheckAccess } from '../common/Can';
@@ -44,6 +45,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
+  const { setRenewTokenValue } = useRenewToken();
   const {
     loadingMembers,
     SEPMembersData,
@@ -115,6 +117,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
     showNotification(!!assignChairResult.assignChairOrSecretary.error);
     setSepChairModalOpen(false);
+    setRenewTokenValue();
   };
 
   const sendSEPSecretaryUpdate = async (
@@ -133,6 +136,8 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     if (!assignSecretaryResult.assignChairOrSecretary.error) {
       setSepSecretaryModalOpen(false);
     }
+
+    setRenewTokenValue();
   };
 
   const addMember = async (user: BasicUserDetails): Promise<void> => {

@@ -158,7 +158,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
         >
           <DialogContent>
             <AssignInstrumentsToCall
-              assignedInstruments={callAssignments?.instruments}
+              assignedInstruments={callAssignments?.instruments as Instrument[]}
               callId={assigningInstrumentsCallId}
               assignInstrumentsToCall={(instruments: Instrument[]) =>
                 assignInstrumentsToCall(instruments)

@@ -5,9 +5,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 import * as yup from 'yup';
 
+import { UserContext } from '../../context/UserContextProvider';
+import { UserRole } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';
 import FormikDropdown from '../common/FormikDropdown';
 
@@ -35,7 +37,8 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
   assignProposalToSEP,
 }) => {
   const classes = useStyles();
-  const { SEPsData } = useSEPsData('', true);
+  const { currentRole } = useContext(UserContext);
+  const { SEPsData } = useSEPsData('', true, currentRole as UserRole);
 
   return (
     <Container component="main" maxWidth="xs">
