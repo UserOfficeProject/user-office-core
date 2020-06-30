@@ -3,17 +3,20 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { EmbellishmentConfig, QuestionRel } from '../../../../generated/sdk';
+import {
+  EmbellishmentConfig,
+  QuestionTemplateRelation,
+} from '../../../../generated/sdk';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';
 
-export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props => {
+export const QuestionTemplateRelationEmbellismentForm: TFormSignature<QuestionTemplateRelation> = props => {
   return (
-    <QuestionRelFormShell
+    <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
@@ -81,6 +84,6 @@ export const QuestionRelEmbellismentForm: TFormSignature<QuestionRel> = props =>
           </TitledContainer>
         </>
       )}
-    </QuestionRelFormShell>
+    </QuestionTemplateRelationFormShell>
   );
 };

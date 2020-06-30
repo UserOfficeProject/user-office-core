@@ -1,10 +1,4 @@
-import { DataType, Proposal } from '../generated/sdk';
-
-export interface Answer {
-  questionId: string;
-  value: string;
-  dataType: DataType;
-}
+import { Proposal } from '../generated/sdk';
 
 export interface DataTypeSpec {
   readonly: boolean;
@@ -21,4 +15,5 @@ export type ProposalSubsetSumbission = Pick<
   | 'title'
   | 'shortCode'
   | 'callId'
+  | 'questionaryId'
 >;

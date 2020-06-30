@@ -3,12 +3,13 @@ import React from 'react';
 import { DataType, Template, Question } from '../../../generated/sdk';
 import { Event } from '../../../models/QuestionaryEditorModel';
 import JSDict from '../../../utils/Dictionary';
-import ModalWrapper from '../ModalWrapper';
+import ModalWrapper from '../../common/ModalWrapper';
 import { QuestionBooleanForm } from './question/QuestionBooleanForm';
 import { QuestionDateForm } from './question/QuestionDateForm';
 import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';
 import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
+import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
 import { TFormSignature } from './TFormSignature';
 
@@ -25,6 +26,7 @@ export default function QuestionEditor(props: {
   componentMap.put(DataType.DATE, QuestionDateForm);
   componentMap.put(DataType.SELECTION_FROM_OPTIONS, QuestionMultipleChoiceForm);
   componentMap.put(DataType.TEXT_INPUT, QuestionTextInputForm);
+  componentMap.put(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
 
   if (props.field === null) {
     return null;

@@ -3,17 +3,17 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { QuestionRel } from '../../../../generated/sdk';
+import { QuestionTemplateRelation } from '../../../../generated/sdk';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
+import FormikUICustomMultipleSelect from '../../../common/FormikUICustomMultipleSelect';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';
 
-export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
+export const QuestionTemplateRelationFileUploadForm: TFormSignature<QuestionTemplateRelation> = props => {
   return (
-    <QuestionRelFormShell
+    <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
@@ -50,7 +50,7 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
-              component={FormikUICustomSelect}
+              component={FormikUICustomMultipleSelect}
               availableOptions={[
                 '.pdf',
                 '.doc',
@@ -87,6 +87,6 @@ export const QuestionRelFileUploadForm: TFormSignature<QuestionRel> = props => {
           </TitledContainer>
         </>
       )}
-    </QuestionRelFormShell>
+    </QuestionTemplateRelationFormShell>
   );
 };

@@ -5,11 +5,14 @@ import { useParams } from 'react-router';
 import {
   Template,
   Question,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategoryId,
 } from '../generated/sdk';
 import { useDataApi } from '../hooks/useDataApi';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import {
+  useReducerWithMiddleWares,
+  ReducerMiddleware,
+} from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
@@ -50,7 +53,9 @@ export interface Event {
   payload: any;
 }
 
-export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
+export default function QuestionaryEditorModel(
+  middlewares?: Array<ReducerMiddleware<Template, Event>>
+) {
   const { templateId } = useParams();
   const blankInitTemplate: Template = {
     categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
@@ -110,7 +115,7 @@ export default function QuestionaryEditorModel(middlewares?: Array<Function>) {
 
           return draft;
         case EventType.UPDATE_QUESTION_REL_REQUESTED: {
-          const questionRel: QuestionRel = action.payload.field;
+          const questionRel: QuestionTemplateRelation = action.payload.field;
           const questionRelToUpdate = getFieldById(
             draft.steps,
             questionRel.question.proposalQuestionId

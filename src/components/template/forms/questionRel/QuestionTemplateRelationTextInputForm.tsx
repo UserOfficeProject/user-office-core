@@ -4,22 +4,25 @@ import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
-import { QuestionRel, TextInputConfig } from '../../../../generated/sdk';
+import {
+  QuestionTemplateRelation,
+  TextInputConfig,
+} from '../../../../generated/sdk';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';
 
-export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
+export const QuestionTemplateRelationTextInputForm: TFormSignature<QuestionTemplateRelation> = props => {
   const [isRichQuestion, setIsRichQuestion] = useState<boolean>(
     (props.field.config as TextInputConfig).isHtmlQuestion
   );
 
   return (
-    <QuestionRelFormShell
+    <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
@@ -135,6 +138,6 @@ export const QuestionRelTextInputForm: TFormSignature<QuestionRel> = props => {
           </TitledContainer>
         </>
       )}
-    </QuestionRelFormShell>
+    </QuestionTemplateRelationFormShell>
   );
 };

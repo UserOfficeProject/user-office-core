@@ -34,7 +34,7 @@ declare global {
        * @example
        *    cy.expandTemplatesSubmenu()
        */
-      expandTemplatesSubmenu: () => void;
+      navigateToTemplatesSubmenu: (submenuName: string) => void;
     }
   }
 

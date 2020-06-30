@@ -1,17 +1,17 @@
-// FIXME: This should be fixed for sure. It produces compile errors and ts-ignore should never be used.
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import {
   Answer,
   DataType,
   FieldDependency,
   QuestionaryStep,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateStep,
+  AnswerInput,
 } from '../generated/sdk';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { DataTypeSpec } from './ProposalModel';
 
-type AbstractField = QuestionRel | Answer;
+type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
@@ -103,4 +103,22 @@ export function areDependenciesSatisfied(
   }
 
   return isDependencySatisfied(questionary, field.dependency);
+}
+
+export function prepareAnswers(answers?: Answer[]): AnswerInput[] {
+  if (answers) {
+    answers = answers.filter(
+      answer => getDataTypeSpec(answer.question.dataType).readonly === false // filter out read only fields
+    );
+    const preparedAnswers = answers.map(answer => {
+      return {
+        questionId: answer.question.proposalQuestionId,
+        value: JSON.stringify({ value: answer.value }),
+      }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
+    });
+
+    return preparedAnswers;
+  } else {
+    return [];
+  }
 }

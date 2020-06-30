@@ -1,0 +1,5 @@
+query getQuestionary($questionaryId: Int!) {
+  questionary(questionaryId: $questionaryId) {
+    ...questionary
+  }
+}

@@ -12,8 +12,12 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 
-import { Question, QuestionaryStep, QuestionRel } from '../../generated/sdk';
-import { usePersistModel } from '../../hooks/usePersistModel';
+import {
+  Question,
+  QuestionaryStep,
+  QuestionTemplateRelation,
+} from '../../generated/sdk';
+import { usePersistQuestionaryEditorModel } from '../../hooks/usePersistQuestionaryEditorModel';
 import { getQuestionaryStepByTopicId } from '../../models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
   Event,
@@ -21,17 +25,17 @@ import QuestionaryEditorModel, {
 } from '../../models/QuestionaryEditorModel';
 import { StyledPaper } from '../../styles/StyledComponents';
 import QuestionEditor from './forms/QuestionEditor';
-import QuestionRelEditor from './forms/QuestionRelEditor';
-import QuestionaryEditorTopic from './QuestionaryEditorTopic';
+import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
 import { QuestionPicker } from './QuestionPicker';
 import { TemplateMetadataEditor } from './TemplateMetadataEditor';
+import QuestionaryEditorTopic from './TemplateTopicEditor';
 
-export default function QuestionaryEditor() {
+export default function TemplateEditor() {
   const { enqueueSnackbar } = useSnackbar();
   const [
-    selectedQuestionRel,
-    setSelectedQuestionRel,
-  ] = useState<QuestionRel | null>(null);
+    selectedQuestionTemplateRelation,
+    setSelectedQuestionTemplateRelation,
+  ] = useState<QuestionTemplateRelation | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
     null
   );
@@ -59,7 +63,7 @@ export default function QuestionaryEditor() {
           break;
 
         case EventType.OPEN_QUESTIONREL_EDITOR:
-          setSelectedQuestionRel(action.payload);
+          setSelectedQuestionTemplateRelation(action.payload);
           break;
 
         case EventType.QUESTION_PICKER_NEW_QUESTION_CLICKED:
@@ -68,7 +72,7 @@ export default function QuestionaryEditor() {
       }
     };
   };
-  const { persistModel, isLoading } = usePersistModel();
+  const { persistModel, isLoading } = usePersistQuestionaryEditorModel();
   const { state, dispatch } = QuestionaryEditorModel([
     persistModel,
     reducerMiddleware,
@@ -245,10 +249,10 @@ export default function QuestionaryEditor() {
         {newTopicFallbackButton}
       </StyledPaper>
 
-      <QuestionRelEditor
-        field={selectedQuestionRel}
+      <QuestionTemplateRelationEditor
+        field={selectedQuestionTemplateRelation}
         dispatch={dispatch}
-        closeMe={() => setSelectedQuestionRel(null)}
+        closeMe={() => setSelectedQuestionTemplateRelation(null)}
         template={state}
       />
 

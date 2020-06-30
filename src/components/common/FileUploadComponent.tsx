@@ -37,7 +37,7 @@ export function FileUploadComponent(props: {
   const api = useDataApi();
 
   const classes = makeStyles(() => ({
-    list: {
+    questionariesList: {
       listStyle: 'none',
       padding: 0,
       marginBottom: 0,
@@ -108,7 +108,7 @@ export function FileUploadComponent(props: {
         ref={inputRef}
       />
       {amountFilesInfo}
-      <List component="ul" className={classes.list}>
+      <List component="ul" className={classes.questionariesList}>
         {files.map &&
           files.map((metaData: FileMetaData) => {
             return (

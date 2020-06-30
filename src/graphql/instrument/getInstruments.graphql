@@ -5,6 +5,13 @@ query getInstruments {
       name
       shortCode
       description
+      scientists {
+        id
+        firstname
+        lastname
+        organisation
+        position
+      }
     }
     totalCount
   }

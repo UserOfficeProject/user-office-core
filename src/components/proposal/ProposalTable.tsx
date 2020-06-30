@@ -70,11 +70,11 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
         rowData => {
           return {
             icon:
-              rowData.status === 'Submitted'
+              rowData.status === 'Submitted' || rowData.status === 'Accepted'
                 ? () => <Visibility />
                 : () => <Edit />,
             tooltip:
-              rowData.status === 'Submitted'
+              rowData.status === 'Submitted' || rowData.status === 'Accepted'
                 ? 'View proposal'
                 : 'Edit proposal',
             onClick: (event, rowData) =>

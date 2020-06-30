@@ -9,6 +9,7 @@ import { Redirect, useHistory } from 'react-router';
 import { UserContext } from '../../context/UserContextProvider';
 import { Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { getUniqueArrayBy } from '../../utils/helperFunctions';
 import { tableIcons } from '../../utils/materialIcons';
 
 type RoleSelectionProps = {
@@ -30,7 +31,10 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
       const data = await api().getMyRoles();
 
       if (data?.me) {
-        setRoles(data.me?.roles as Role[]);
+        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
+         *  which is used to determine if the user with that role is member of a SEP.
+         */
+        setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
       }
     };
     getUserInformation();

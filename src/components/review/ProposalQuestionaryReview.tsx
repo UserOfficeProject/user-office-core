@@ -1,15 +1,14 @@
 import {
-  Table,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
   makeStyles,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
 
-import { Answer } from '../../generated/sdk';
-import { DataType } from '../../generated/sdk';
+import { Answer, DataType } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { FileMetaData } from '../../models/FileUpload';
 import { ProposalSubsetSumbission } from '../../models/ProposalModel';

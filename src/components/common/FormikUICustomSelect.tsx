@@ -1,13 +1,20 @@
-import {
-  MenuItem,
-  Select,
-  Checkbox,
-  ListItemText,
-  Input,
-  InputLabel,
-} from '@material-ui/core';
+import { InputLabel, ListItemText, MenuItem, Select } from '@material-ui/core';
 import { FormikActions } from 'formik';
 import React from 'react';
+type ValueType = string | number;
+type ItemType = { label: string; value: ValueType };
+type FormikUICustomSelectProps = {
+  field: {
+    name: string;
+    onBlur: Function;
+    onChange: Function;
+    value: ValueType;
+  };
+  form: FormikActions<any>;
+  availableOptions: ItemType[];
+  id: string;
+  label: string;
+};
 const FormikUICustomSelect = ({
   field,
   form,
@@ -15,18 +22,7 @@ const FormikUICustomSelect = ({
   id,
   label,
   ...props
-}: {
-  field: {
-    name: string;
-    onBlur: Function;
-    onChange: Function;
-    value: string[];
-  };
-  form: FormikActions<any>;
-  availableOptions: string[];
-  id: string;
-  label: string;
-}) => {
+}: FormikUICustomSelectProps) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const MenuProps = {
@@ -37,33 +33,23 @@ const FormikUICustomSelect = ({
       },
     },
   };
-  const handleChange = (
-    event: React.ChangeEvent<{
-      value: unknown;
-    }>
-  ) => {
-    form.setFieldValue(field.name, event.target.value); // value is string[]
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    form.setFieldValue(field.name, event.target.value);
   };
 
   return (
     <>
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <Select
-        multiple
         value={field.value}
         onChange={handleChange}
-        input={<Input id="select-multiple-checkbox" />}
-        renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={MenuProps}
         id={id}
         {...props}
       >
         {availableOptions.map(curOption => (
-          <MenuItem key={curOption} value={curOption}>
-            <Checkbox
-              checked={field.value && field.value.indexOf(curOption) > -1}
-            />
-            <ListItemText primary={curOption} />
+          <MenuItem key={curOption.value} value={curOption.value}>
+            <ListItemText primary={curOption.label} />
           </MenuItem>
         ))}
       </Select>

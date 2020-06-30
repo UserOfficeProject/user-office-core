@@ -1,0 +1,8 @@
+mutation createQuestionary($templateId: Int!) {
+  createQuestionary(templateId: $templateId) {
+    questionary {
+      ...questionary
+    }
+    error
+  }
+}

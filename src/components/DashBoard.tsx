@@ -8,9 +8,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
+import { UserContext } from '../context/UserContextProvider';
 import { PageName, UserRole } from '../generated/sdk';
 import { useGetPageContent } from '../hooks/useGetPageContent';
 import AppToolbar from './AppToolbar/AppToolbar';
@@ -33,8 +34,8 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
-import QuestionaryEditor from './template/QuestionaryEditor';
 import SampleTemplates from './template/SampleTemplates';
+import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
@@ -151,6 +152,7 @@ const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { currentRole } = useContext(UserContext);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -204,7 +206,7 @@ const Dashboard: React.FC = () => {
           <Route path="/InstitutionPage" component={InstitutionPage} />
           <Route
             path="/QuestionaryEditor/:templateId"
-            component={QuestionaryEditor}
+            component={TemplateEditor}
           />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
           <Route path="/ProposalTemplates" component={ProposalTemplates} />
@@ -240,13 +242,14 @@ const Dashboard: React.FC = () => {
                       UserRole.SEP_REVIEWER,
                       UserRole.SEP_CHAIR,
                       UserRole.SEP_SECRETARY,
+                      UserRole.INSTRUMENT_SCIENTIST,
                     ]}
                     yes={() => (
                       <Route
                         render={props => (
                           <OverviewPage
                             {...props}
-                            userRole={UserRole.REVIEWER}
+                            userRole={currentRole as UserRole}
                           />
                         )}
                       />

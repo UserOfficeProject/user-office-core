@@ -1,9 +1,9 @@
 import produce from 'immer';
-import { Reducer, Dispatch } from 'react';
+import { Dispatch, Reducer } from 'react';
 
-import { ProposalStatus, Answer, QuestionaryStep } from '../generated/sdk';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
-import { ProposalSubsetSumbission } from './ProposalModel';
+import { Answer, ProposalStatus, QuestionaryStep } from '../generated/sdk';
+import { ProposalSubsetSumbission } from '../models/ProposalModel';
+import { useReducerWithMiddleWares } from '../utils/useReducerWithMiddleWares';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,

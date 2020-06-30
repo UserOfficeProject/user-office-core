@@ -15,7 +15,7 @@ import {
   DataType,
   EvaluatorOperator,
   Template,
-  QuestionRel,
+  QuestionTemplateRelation,
   SelectionFromOptionsConfig,
 } from '../../generated/sdk';
 import {
@@ -32,7 +32,7 @@ const FormikUICustomDependencySelector = ({
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
   template: Template;
-  templateField: QuestionRel;
+  templateField: QuestionTemplateRelation;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(

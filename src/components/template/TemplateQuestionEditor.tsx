@@ -11,10 +11,10 @@ import {
 } from '../../generated/sdk';
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 
-export default function QuestionaryEditorTopicItem(props: {
-  data: IQuestionaryEditorTopicData;
+export default function TemplateQuestionEditor(props: {
+  data: TemplateTopicEditorData;
   index: number;
-  onClick: { (data: IQuestionaryEditorTopicData): void };
+  onClick: { (data: TemplateTopicEditorData): void };
 }) {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
@@ -138,7 +138,7 @@ export default function QuestionaryEditorTopicItem(props: {
   );
 }
 
-export interface IQuestionaryEditorTopicData {
+export interface TemplateTopicEditorData {
   proposalQuestionId: string;
   question: string;
   naturalKey: string;

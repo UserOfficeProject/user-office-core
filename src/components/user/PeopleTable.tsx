@@ -91,6 +91,8 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
         return 'Invite SEP Chair';
       case UserRole.SEP_SECRETARY:
         return 'Invite SEP Secretary';
+      case UserRole.INSTRUMENT_SCIENTIST:
+        return 'Invite Instrument Scientist';
       default:
         return 'Invite User';
     }

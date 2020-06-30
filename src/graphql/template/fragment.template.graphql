@@ -5,7 +5,7 @@ fragment template on Template {
       id
     }
     fields {
-      ...questionRel
+      ...questionTemplateRelation
     }
   }
   templateId
