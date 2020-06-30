@@ -134,6 +134,7 @@ context('Instrument tests', () => {
     cy.wait(500);
 
     cy.get('[title="Assign scientist"]').click();
+    cy.wait(500);
 
     cy.get('[title="Add by email"]').click();
 
