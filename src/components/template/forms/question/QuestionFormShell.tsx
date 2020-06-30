@@ -5,6 +5,7 @@ import React from 'react';
 import { Question } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
+import { ActionButtonContainer } from '../../../common/ActionButtonContainer';
 
 export const QuestionFormShell = (props: {
   validationSchema: any;
@@ -58,10 +59,10 @@ export const QuestionFormShell = (props: {
           <Form style={{ flexGrow: 1 }}>
             {props.children(formikProps)}
 
-            <div className={classes.actions}>
+            <ActionButtonContainer>
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 data-cy="delete"
                 onClick={() => {
@@ -82,7 +83,7 @@ export const QuestionFormShell = (props: {
               >
                 Save
               </Button>
-            </div>
+            </ActionButtonContainer>
           </Form>
         )}
       </Formik>
