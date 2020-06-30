@@ -13,6 +13,7 @@ import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import UOSDialog from '../common/UOSDialog';
 
 type CallsTableProps = {
   templateId?: number;
@@ -134,38 +135,35 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
 
   return (
     <>
-      <Dialog
+      <UOSDialog
+        maxWidth="xs"
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!editCall || show}
         onClose={(): void => (!!editCall ? setEditCall(null) : setShow(false))}
       >
-        <DialogContent>
-          <CreateUpdateCall
-            call={editCall}
-            close={(call): void => {
-              !!editCall ? onCallUpdated(call) : onCallCreated(call);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateUpdateCall
+          call={editCall}
+          close={(call): void => {
+            !!editCall ? onCallUpdated(call) : onCallCreated(call);
+          }}
+        />
+      </UOSDialog>
       {assigningInstrumentsCallId && (
-        <Dialog
+        <UOSDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
         >
-          <DialogContent>
-            <AssignInstrumentsToCall
-              assignedInstruments={callAssignments?.instruments}
-              callId={assigningInstrumentsCallId}
-              assignInstrumentsToCall={(instruments: Instrument[]) =>
-                assignInstrumentsToCall(instruments)
-              }
-            />
-          </DialogContent>
-        </Dialog>
+          <AssignInstrumentsToCall
+            assignedInstruments={callAssignments?.instruments}
+            callId={assigningInstrumentsCallId}
+            assignInstrumentsToCall={(instruments: Instrument[]) =>
+              assignInstrumentsToCall(instruments)
+            }
+          />
+        </UOSDialog>
       )}
       <MaterialTable
         icons={tableIcons}

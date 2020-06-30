@@ -1,19 +1,21 @@
-import { Edit, FileCopy, Archive, Delete } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { Archive, Delete, Edit, FileCopy } from '@material-ui/icons';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
-import { useState, useEffect } from 'react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
-
 import {
-  Template,
   GetTemplatesQuery,
+  Template,
   TemplateCategoryId,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { tableIcons } from '../../utils/materialIcons';
 import { WithConfirmType } from '../../utils/withConfirm';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import UOSDialog from '../common/UOSDialog';
+import CreateTemplate from './CreateTemplate';
 
 export type TemplateRowDataType = Pick<
   Template,
@@ -32,6 +34,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     props.dataProvider().then(data => {
@@ -177,85 +180,77 @@ export function TemplatesTable(props: TemplatesTableProps) {
   };
 
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title="Proposal templates"
-      columns={props.columns}
-      data={templates}
-      editable={{
-        onRowAdd: data =>
-          new Promise(resolve => {
-            api()
-              .createTemplate({
-                categoryId: props.templateCategory,
-                name: data.name,
-                description: data.description,
-              })
-              .then(result => {
-                const { template, error } = result.createTemplate;
-
-                if (!template) {
-                  enqueueSnackbar(error || 'Error ocurred', {
-                    variant: 'error',
-                  });
-                } else {
-                  const newTemplates = [...templates];
-                  newTemplates.push(template!);
-                  setTemplates(newTemplates);
+    <>
+      <UOSDialog open={show} onClose={() => setShow(false)}>
+        <CreateTemplate
+          onComplete={template => {
+            if (template) {
+              setTemplates([...templates, template]);
+            }
+            setShow(false);
+          }}
+          categoryId={props.templateCategory}
+        />
+      </UOSDialog>
+      <MaterialTable
+        icons={tableIcons}
+        title="Proposal templates"
+        columns={props.columns}
+        data={templates}
+        actions={[
+          {
+            icon: () => <Edit />,
+            tooltip: 'Edit',
+            onClick: (event, data) => {
+              history.push(
+                `/QuestionaryEditor/${(data as TemplateRowDataType).templateId}`
+              );
+            },
+          },
+          {
+            icon: () => <FileCopy />,
+            hidden: false,
+            tooltip: 'Clone',
+            onClick: (event, data) => {
+              props.confirm(
+                () => {
+                  api()
+                    .cloneTemplate({
+                      templateId: (data as TemplateRowDataType).templateId,
+                    })
+                    .then(result => {
+                      const clonedTemplate = result.cloneTemplate.template;
+                      if (clonedTemplate) {
+                        const newTemplates = [...templates];
+                        newTemplates.push(clonedTemplate);
+                        setTemplates(newTemplates);
+                      }
+                    });
+                },
+                {
+                  title: 'Are you sure?',
+                  description: `Are you sure you want to clone ${
+                    (data as TemplateRowDataType).name
+                  }`,
+                  confirmationText: 'Yes',
+                  cancellationText: 'Cancel',
                 }
-                resolve();
-              });
-          }),
-      }}
-      actions={[
-        {
-          icon: () => <Edit />,
-          tooltip: 'Edit',
-          onClick: (
-            event: any,
-            data: TemplateRowDataType | TemplateRowDataType[]
-          ) => {
-            history.push(
-              `/QuestionaryEditor/${(data as TemplateRowDataType).templateId}`
-            );
+              )();
+            },
           },
-        },
-        {
-          icon: () => <FileCopy />,
-          hidden: false,
-          tooltip: 'Clone',
-          onClick: (
-            event: any,
-            data: TemplateRowDataType | TemplateRowDataType[]
-          ) => {
-            props.confirm(
-              () => {
-                api()
-                  .cloneTemplate({
-                    templateId: (data as TemplateRowDataType).templateId,
-                  })
-                  .then(result => {
-                    const clonedTemplate = result.cloneTemplate.template;
-                    if (clonedTemplate) {
-                      const newTemplates = [...templates];
-                      newTemplates.push(clonedTemplate);
-                      setTemplates(newTemplates);
-                    }
-                  });
-              },
-              {
-                title: 'Are you sure?',
-                description: `Are you sure you want to clone ${
-                  (data as TemplateRowDataType).name
-                }`,
-                confirmationText: 'Yes',
-                cancellationText: 'Cancel',
-              }
-            )();
-          },
-        },
-        rowData => getMaintenanceButton(rowData),
-      ]}
-    />
+          rowData => getMaintenanceButton(rowData),
+        ]}
+      />
+      <ActionButtonContainer>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={() => setShow(true)}
+        >
+          Create template
+        </Button>
+      </ActionButtonContainer>
+    </>
   );
 }

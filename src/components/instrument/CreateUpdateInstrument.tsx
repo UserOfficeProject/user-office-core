@@ -45,124 +45,122 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
       };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values, actions): Promise<void> => {
-          if (!instrument) {
-            await api()
-              .createInstrument(values)
-              .then(data => {
-                if (data.createInstrument.error) {
-                  enqueueSnackbar(
-                    getTranslation(data.createInstrument.error as ResourceId),
-                    {
-                      variant: 'error',
-                    }
-                  );
-                  close(null);
-                } else {
-                  close(data.createInstrument.instrument);
-                }
-              });
-          } else {
-            await api()
-              .updateInstrument({
-                instrumentId: instrument.instrumentId,
-                ...values,
-              })
-              .then(data => {
-                if (data.updateInstrument.error) {
-                  enqueueSnackbar(
-                    getTranslation(data.updateInstrument.error as ResourceId),
-                    {
-                      variant: 'error',
-                    }
-                  );
-                  close(null);
-                } else {
-                  close(data.updateInstrument.instrument);
-                }
-              });
-          }
-          actions.setSubmitting(false);
-        }}
-        validationSchema={
-          instrument
-            ? updateInstrumentValidationSchema
-            : createInstrumentValidationSchema
+    <Formik
+      initialValues={initialValues}
+      onSubmit={async (values, actions): Promise<void> => {
+        if (!instrument) {
+          await api()
+            .createInstrument(values)
+            .then(data => {
+              if (data.createInstrument.error) {
+                enqueueSnackbar(
+                  getTranslation(data.createInstrument.error as ResourceId),
+                  {
+                    variant: 'error',
+                  }
+                );
+                close(null);
+              } else {
+                close(data.createInstrument.instrument);
+              }
+            });
+        } else {
+          await api()
+            .updateInstrument({
+              instrumentId: instrument.instrumentId,
+              ...values,
+            })
+            .then(data => {
+              if (data.updateInstrument.error) {
+                enqueueSnackbar(
+                  getTranslation(data.updateInstrument.error as ResourceId),
+                  {
+                    variant: 'error',
+                  }
+                );
+                close(null);
+              } else {
+                close(data.updateInstrument.instrument);
+              }
+            });
         }
-      >
-        {({ values, errors, handleChange, touched }): JSX.Element => (
-          <Form>
-            <Typography className={classes.cardHeader}>
-              Create new instrument
-            </Typography>
+        actions.setSubmitting(false);
+      }}
+      validationSchema={
+        instrument
+          ? updateInstrumentValidationSchema
+          : createInstrumentValidationSchema
+      }
+    >
+      {({ values, errors, handleChange, touched }): JSX.Element => (
+        <Form>
+          <Typography className={classes.cardHeader}>
+            Create new instrument
+          </Typography>
 
-            <Field
-              name="name"
-              id="name"
-              label="Name"
-              type="text"
-              value={values.name}
-              onChange={handleChange}
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="name"
-              error={touched.name && errors.name !== undefined}
-              helperText={touched.name && errors.name && errors.name}
-            />
-            <Field
-              name="shortCode"
-              id="shortCode"
-              label="Short code"
-              type="text"
-              value={values.shortCode}
-              onChange={handleChange}
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="shortCode"
-              error={touched.shortCode && errors.shortCode !== undefined}
-              helperText={
-                touched.shortCode && errors.shortCode && errors.shortCode
-              }
-            />
-            <Field
-              id="description"
-              name="description"
-              label="Description"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              multiline
-              rowsMax="16"
-              rows="3"
-              onChange={handleChange}
-              value={values.description}
-              data-cy="description"
-              error={touched.description && errors.description !== undefined}
-              helperText={
-                touched.description && errors.description && errors.description
-              }
-            />
+          <Field
+            name="name"
+            id="name"
+            label="Name"
+            type="text"
+            value={values.name}
+            onChange={handleChange}
+            component={TextField}
+            margin="normal"
+            fullWidth
+            data-cy="name"
+            error={touched.name && errors.name !== undefined}
+            helperText={touched.name && errors.name && errors.name}
+          />
+          <Field
+            name="shortCode"
+            id="shortCode"
+            label="Short code"
+            type="text"
+            value={values.shortCode}
+            onChange={handleChange}
+            component={TextField}
+            margin="normal"
+            fullWidth
+            data-cy="shortCode"
+            error={touched.shortCode && errors.shortCode !== undefined}
+            helperText={
+              touched.shortCode && errors.shortCode && errors.shortCode
+            }
+          />
+          <Field
+            id="description"
+            name="description"
+            label="Description"
+            type="text"
+            component={TextField}
+            margin="normal"
+            fullWidth
+            multiline
+            rowsMax="16"
+            rows="3"
+            onChange={handleChange}
+            value={values.description}
+            data-cy="description"
+            error={touched.description && errors.description !== undefined}
+            helperText={
+              touched.description && errors.description && errors.description
+            }
+          />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              data-cy="submit"
-            >
-              {instrument ? 'Update' : 'Create'} Instrument
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Container>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            data-cy="submit"
+          >
+            {instrument ? 'Update' : 'Create'} Instrument
+          </Button>
+        </Form>
+      )}
+    </Formik>
   );
 };
 
