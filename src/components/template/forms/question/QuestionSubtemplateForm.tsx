@@ -1,4 +1,4 @@
-import { MenuItem } from '@material-ui/core';
+import { FormControl, InputLabel, Link, MenuItem } from '@material-ui/core';
 import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 import React from 'react';
@@ -56,24 +56,28 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
           />
 
           <TitledContainer label="Options">
-            <Field
-              name="config.templateId"
-              label="Template name"
-              placeholder="Choose template"
-              type="text"
-              component={Select}
-              margin="normal"
-              fullWidth
-              data-cy="templateId"
-            >
-              {templates.map(template => {
-                return (
-                  <MenuItem value={template.templateId}>
-                    {template.name}
-                  </MenuItem>
-                );
-              })}
-            </Field>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="age-simple">Template name</InputLabel>
+              <Field
+                name="config.templateId"
+                type="text"
+                component={Select}
+                margin="normal"
+                data-cy="templateId"
+              >
+                {templates.map(template => {
+                  return (
+                    <MenuItem value={template.templateId}>
+                      {template.name}
+                    </MenuItem>
+                  );
+                })}
+              </Field>
+              <Link href="/SampleDeclarationTemplates/" target="blank">
+                View all templates
+              </Link>
+            </FormControl>
+
             <Field
               name="config.addEntryButtonLabel"
               label="Add button label"
