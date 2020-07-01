@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 
+import { ProposalsFilter } from '../generated/sdk';
 import { ProposalStatus } from '../generated/sdk';
 import { Proposal } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useProposalsData(filter: string) {
+export function useProposalsData(filter: ProposalsFilter) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     api()
       .getProposals({
-        filter: { text: filter },
+        filter,
       })
       .then(data => {
         if (data.proposals) {

@@ -284,8 +284,8 @@ export type Mutation = {
   administrationProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
-  updateAnswer: UpdateAnswerResponseWrap,
   createQuestionary: QuestionaryResponseWrap,
+  updateAnswer: UpdateAnswerResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
@@ -460,14 +460,14 @@ export type MutationAnswerTopicArgs = {
 };
 
 
-export type MutationUpdateAnswerArgs = {
-  questionaryId: Scalars['Int'],
-  answer: AnswerInput
+export type MutationCreateQuestionaryArgs = {
+  templateId: Scalars['Int']
 };
 
 
-export type MutationCreateQuestionaryArgs = {
-  templateId: Scalars['Int']
+export type MutationUpdateAnswerArgs = {
+  questionaryId: Scalars['Int'],
+  answer: AnswerInput
 };
 
 
@@ -886,6 +886,8 @@ export type ProposalsFilter = {
   text?: Maybe<Scalars['String']>,
   templateIds?: Maybe<Array<Scalars['Int']>>,
   questionaryIds?: Maybe<Array<Scalars['Int']>>,
+  callId?: Maybe<Scalars['Int']>,
+  instrumentId?: Maybe<Scalars['Int']>,
 };
 
 export type ProposalsQueryResult = {
