@@ -5,7 +5,7 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { Call, Instrument } from '../../generated/sdk';
+import { Call, InstrumentWithAvailabilityTime } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
@@ -75,7 +75,9 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
     setEditCall(null);
   };
 
-  const assignInstrumentsToCall = (instruments: Instrument[]) => {
+  const assignInstrumentsToCall = (
+    instruments: InstrumentWithAvailabilityTime[]
+  ) => {
     if (callsData) {
       const newCallsData = callsData.map(callItem => {
         if (callItem.id === assigningInstrumentsCallId) {
@@ -94,20 +96,15 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
   };
 
   const removeAssignedInstrumentFromCall = (
-    instrumentToRemoveId: number,
+    updatedInstruments: InstrumentWithAvailabilityTime[],
     callToRemoveFromId: number
   ) => {
     if (callsData) {
       const newCallsData = callsData.map(callItem => {
         if (callItem.id === callToRemoveFromId) {
-          const newInstruments = callItem.instruments.filter(
-            instrumentItem =>
-              instrumentItem.instrumentId !== instrumentToRemoveId
-          );
-
           return {
             ...callItem,
-            instruments: newInstruments,
+            instruments: updatedInstruments,
           };
         } else {
           return callItem;
@@ -119,6 +116,26 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
     }
   };
 
+  const setInstrumentAvailabilityTime = (
+    updatedInstruments: InstrumentWithAvailabilityTime[],
+    updatingCallId: number
+  ) => {
+    if (callsData) {
+      const newCallsData = callsData.map(callItem => {
+        if (callItem.id === updatingCallId) {
+          return {
+            ...callItem,
+            instruments: updatedInstruments,
+          };
+        } else {
+          return callItem;
+        }
+      });
+
+      setCallsData(newCallsData);
+    }
+  };
+
   const EditIcon = (): JSX.Element => <Edit />;
   const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
 
@@ -126,6 +143,7 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
     <AssignedInstrumentsTable
       call={rowData}
       removeAssignedInstrumentFromCall={removeAssignedInstrumentFromCall}
+      setInstrumentAvailabilityTime={setInstrumentAvailabilityTime}
     />
   );
 
@@ -157,11 +175,13 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
           onClose={(): void => setAssigningInstrumentsCallId(null)}
         >
           <AssignInstrumentsToCall
-            assignedInstruments={callAssignments?.instruments}
-            callId={assigningInstrumentsCallId}
-            assignInstrumentsToCall={(instruments: Instrument[]) =>
-              assignInstrumentsToCall(instruments)
+            assignedInstruments={
+              callAssignments?.instruments as InstrumentWithAvailabilityTime[]
             }
+            callId={assigningInstrumentsCallId}
+            assignInstrumentsToCall={(
+              instruments: InstrumentWithAvailabilityTime[]
+            ) => assignInstrumentsToCall(instruments)}
           />
         </InputDialog>
       )}

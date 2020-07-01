@@ -5,15 +5,20 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument } from '../../generated/sdk';
+import {
+  Instrument,
+  InstrumentWithAvailabilityTime,
+} from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
 import { tableIcons } from '../../utils/materialIcons';
 
 type AssignInstrumentsToCallProps = {
-  assignInstrumentsToCall: (instruments: Instrument[]) => void;
+  assignInstrumentsToCall: (
+    instruments: InstrumentWithAvailabilityTime[]
+  ) => void;
   callId: number;
-  assignedInstruments?: Instrument[] | null;
+  assignedInstruments?: InstrumentWithAvailabilityTime[] | null;
 };
 
 const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
@@ -49,7 +54,9 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     return null;
   }) as Instrument[];
 
-  const onAssignButtonClick = async (instrumentsToAssign: Instrument[]) => {
+  const onAssignButtonClick = async (
+    instrumentsToAssign: InstrumentWithAvailabilityTime[]
+  ) => {
     const assignInstrumentToCallResult = await api().assignInstrumentToCall({
       callId,
       instrumentIds: instrumentsToAssign.map(
@@ -85,7 +92,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           icon: AssignIcon,
           tooltip: 'Assign instruments to call',
           onClick: (event, rowData): void => {
-            onAssignButtonClick(rowData as Instrument[]);
+            onAssignButtonClick(rowData as InstrumentWithAvailabilityTime[]);
           },
           position: 'toolbarOnSelect',
         },
