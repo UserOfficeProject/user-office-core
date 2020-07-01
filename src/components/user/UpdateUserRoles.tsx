@@ -1,26 +1,13 @@
 import Button from '@material-ui/core/Button';
-import AddBox from '@material-ui/icons/AddBox';
-import { makeStyles } from '@material-ui/styles';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
-
 import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useRenewToken } from '../../hooks/useRenewToken';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import RoleModal from './RoleModal';
-
-const useStyles = makeStyles({
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
 
 export default function UpdateUserRoles(props: { id: number }) {
   const [userData, setUserData] = useState<
@@ -33,7 +20,9 @@ export default function UpdateUserRoles(props: { id: number }) {
   const { setRenewTokenValue } = useRenewToken();
 
   const addRole = async (role: Role) => {
-    setRoles([...roles, role]);
+    const newRoles = [...roles, role];
+    setRoles(newRoles);
+    await sendUpdateRoles(newRoles);
     setOpen(false);
   };
 
@@ -44,12 +33,13 @@ export default function UpdateUserRoles(props: { id: number }) {
       1
     );
     setRoles(newRoles);
+    return newRoles;
   };
 
-  const sendUserUpdate = async () => {
+  const sendUpdateRoles = async (newRoles: Role[]) => {
     const variables = {
       id: props.id,
-      roles: roles.map(role => role.id),
+      roles: newRoles.map(role => role.id),
     };
 
     const userUpdateResult = await api().updateUserRoles(variables);
@@ -76,13 +66,9 @@ export default function UpdateUserRoles(props: { id: number }) {
 
   const columns = [{ title: 'Name', field: 'title' }];
 
-  const classes = useStyles();
-
   if (!userData) {
     return <p>Loading</p>;
   }
-
-  const AddBoxIcon = (): JSX.Element => <AddBox />;
 
   return (
     <React.Fragment>
@@ -97,34 +83,26 @@ export default function UpdateUserRoles(props: { id: number }) {
         options={{
           search: false,
         }}
-        actions={[
-          {
-            icon: AddBoxIcon,
-            tooltip: 'Add Role',
-            isFreeAction: true,
-            onClick: () => setOpen(true),
-          },
-        ]}
         editable={{
           onRowDelete: oldData =>
-            new Promise(resolve => {
+            new Promise(async resolve => {
+              const newRoles = removeRole(oldData);
+              await sendUpdateRoles(newRoles);
               resolve();
-              removeRole(oldData);
             }),
         }}
       />
 
-      <div className={classes.buttons}>
+      <ActionButtonContainer>
         <Button
-          type="submit"
+          type="button"
           variant="contained"
           color="primary"
-          className={classes.button}
-          onClick={() => sendUserUpdate()}
+          onClick={() => setOpen(true)}
         >
-          Update Roles
+          Add role
         </Button>
-      </div>
+      </ActionButtonContainer>
     </React.Fragment>
   );
 }
