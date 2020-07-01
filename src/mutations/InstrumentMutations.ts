@@ -6,6 +6,7 @@ import {
   removeProposalFromInstrumentValidationSchema,
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
+  setAvailabilityTimeOnInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -23,7 +24,10 @@ import {
   AssignScientistsToInstrumentArgs,
 } from '../resolvers/mutations/AssignScientistsToInstrument';
 import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMutation';
-import { UpdateInstrumentArgs } from '../resolvers/mutations/UpdateInstrumentMutation';
+import {
+  UpdateInstrumentArgs,
+  InstrumentAvailabilityTimeArgs,
+} from '../resolvers/mutations/UpdateInstrumentMutation';
 import { logger } from '../utils/Logger';
 
 export default class InstrumentMutations {
@@ -169,6 +173,33 @@ export default class InstrumentMutations {
       .catch(error => {
         logger.logException(
           'Could not remove assigned scientist/s from instrument',
+          error,
+          {
+            agent,
+            args,
+          }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @ValidateArgs(setAvailabilityTimeOnInstrumentValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async setAvailabilityTimeOnInstrument(
+    agent: UserWithRole | null,
+    args: InstrumentAvailabilityTimeArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .setAvailabilityTimeOnInstrument(
+        args.callId,
+        args.instrumentId,
+        args.availabilityTime
+      )
+      .then(result => result)
+      .catch(error => {
+        logger.logException(
+          'Could not set availability time on instrument',
           error,
           {
             agent,
