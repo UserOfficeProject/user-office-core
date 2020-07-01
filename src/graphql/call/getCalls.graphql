@@ -16,6 +16,7 @@ query getCalls($filter: CallsFilter) {
       name
       shortCode
       description
+      availabilityTime
     }
   }
 }

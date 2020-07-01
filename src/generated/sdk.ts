@@ -89,7 +89,7 @@ export type Call = {
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>,
-  instruments: Array<Instrument>,
+  instruments: Array<InstrumentWithAvailabilityTime>,
 };
 
 export type CallResponseWrap = {
@@ -266,6 +266,16 @@ export type InstrumentsQueryResult = {
   instruments: Array<Instrument>,
 };
 
+export type InstrumentWithAvailabilityTime = {
+   __typename?: 'InstrumentWithAvailabilityTime',
+  instrumentId: Scalars['Int'],
+  name: Scalars['String'],
+  shortCode: Scalars['String'],
+  description: Scalars['String'],
+  scientists: Array<BasicUserDetails>,
+  availabilityTime?: Maybe<Scalars['Int']>,
+};
+
 
 export type Mutation = {
    __typename?: 'Mutation',
@@ -281,11 +291,12 @@ export type Mutation = {
   removeScientistFromInstrument: SuccessResponseWrap,
   createInstrument: InstrumentResponseWrap,
   updateInstrument: InstrumentResponseWrap,
+  setInstrumentAvailabilityTime: SuccessResponseWrap,
   administrationProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
-  updateAnswer: UpdateAnswerResponseWrap,
   createQuestionary: QuestionaryResponseWrap,
+  updateAnswer: UpdateAnswerResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
@@ -433,6 +444,13 @@ export type MutationUpdateInstrumentArgs = {
 };
 
 
+export type MutationSetInstrumentAvailabilityTimeArgs = {
+  instrumentId: Scalars['Int'],
+  callId: Scalars['Int'],
+  availabilityTime: Scalars['Int']
+};
+
+
 export type MutationAdministrationProposalArgs = {
   id: Scalars['Int'],
   commentForUser?: Maybe<Scalars['String']>,
@@ -460,14 +478,14 @@ export type MutationAnswerTopicArgs = {
 };
 
 
-export type MutationUpdateAnswerArgs = {
-  questionaryId: Scalars['Int'],
-  answer: AnswerInput
+export type MutationCreateQuestionaryArgs = {
+  templateId: Scalars['Int']
 };
 
 
-export type MutationCreateQuestionaryArgs = {
-  templateId: Scalars['Int']
+export type MutationUpdateAnswerArgs = {
+  questionaryId: Scalars['Int'],
+  answer: AnswerInput
 };
 
 
@@ -919,12 +937,12 @@ export type ProposalTemplatesFilter = {
 
 export type Query = {
    __typename?: 'Query',
-  calls?: Maybe<Array<Call>>,
   proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
   call?: Maybe<Call>,
+  calls?: Maybe<Array<Call>>,
   checkEmailExist?: Maybe<Scalars['Boolean']>,
   eventLogs?: Maybe<Array<EventLog>>,
   fileMetadata?: Maybe<Array<FileMetadata>>,
@@ -952,11 +970,6 @@ export type Query = {
 };
 
 
-export type QueryCallsArgs = {
-  filter?: Maybe<CallsFilter>
-};
-
-
 export type QueryProposalsArgs = {
   filter?: Maybe<ProposalsFilter>,
   first?: Maybe<Scalars['Int']>,
@@ -981,6 +994,11 @@ export type QueryBlankProposalArgs = {
 
 export type QueryCallArgs = {
   id: Scalars['Int']
+};
+
+
+export type QueryCallsArgs = {
+  filter?: Maybe<CallsFilter>
 };
 
 
@@ -1842,8 +1860,8 @@ export type CreateCallMutation = (
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
-        { __typename?: 'Instrument' }
-        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+        { __typename?: 'InstrumentWithAvailabilityTime' }
+        & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
       )> }
     )> }
   ) }
@@ -1860,8 +1878,8 @@ export type GetCallsQuery = (
     { __typename?: 'Call' }
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
     & { instruments: Array<(
-      { __typename?: 'Instrument' }
-      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      { __typename?: 'InstrumentWithAvailabilityTime' }
+      & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
     )> }
   )>> }
 );
@@ -1908,8 +1926,8 @@ export type UpdateCallMutation = (
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
-        { __typename?: 'Instrument' }
-        & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+        { __typename?: 'InstrumentWithAvailabilityTime' }
+        & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
       )> }
     )> }
   ) }
@@ -2039,6 +2057,21 @@ export type RemoveScientistFromInstrumentMutationVariables = {
 export type RemoveScientistFromInstrumentMutation = (
   { __typename?: 'Mutation' }
   & { removeScientistFromInstrument: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
+);
+
+export type SetInstrumentAvailabilityTimeMutationVariables = {
+  callId: Scalars['Int'],
+  instrumentId: Scalars['Int'],
+  availabilityTime: Scalars['Int']
+};
+
+
+export type SetInstrumentAvailabilityTimeMutation = (
+  { __typename?: 'Mutation' }
+  & { setInstrumentAvailabilityTime: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
@@ -3875,6 +3908,7 @@ export const CreateCallDocument = gql`
         name
         shortCode
         description
+        availabilityTime
       }
     }
   }
@@ -3899,6 +3933,7 @@ export const GetCallsDocument = gql`
       name
       shortCode
       description
+      availabilityTime
     }
   }
 }
@@ -3934,6 +3969,7 @@ export const UpdateCallDocument = gql`
         name
         shortCode
         description
+        availabilityTime
       }
     }
   }
@@ -4030,6 +4066,14 @@ export const RemoveProposalFromInstrumentDocument = gql`
 export const RemoveScientistFromInstrumentDocument = gql`
     mutation removeScientistFromInstrument($scientistId: Int!, $instrumentId: Int!) {
   removeScientistFromInstrument(scientistId: $scientistId, instrumentId: $instrumentId) {
+    error
+    isSuccess
+  }
+}
+    `;
+export const SetInstrumentAvailabilityTimeDocument = gql`
+    mutation setInstrumentAvailabilityTime($callId: Int!, $instrumentId: Int!, $availabilityTime: Int!) {
+  setInstrumentAvailabilityTime(callId: $callId, instrumentId: $instrumentId, availabilityTime: $availabilityTime) {
     error
     isSuccess
   }
@@ -4870,6 +4914,9 @@ export function getSdk(client: GraphQLClient) {
     },
     removeScientistFromInstrument(variables: RemoveScientistFromInstrumentMutationVariables): Promise<RemoveScientistFromInstrumentMutation> {
       return client.request<RemoveScientistFromInstrumentMutation>(print(RemoveScientistFromInstrumentDocument), variables);
+    },
+    setInstrumentAvailabilityTime(variables: SetInstrumentAvailabilityTimeMutationVariables): Promise<SetInstrumentAvailabilityTimeMutation> {
+      return client.request<SetInstrumentAvailabilityTimeMutation>(print(SetInstrumentAvailabilityTimeDocument), variables);
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
       return client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables);
