@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Template, QuestionTemplateRelation } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
+import { ActionButtonContainer } from '../../../common/ActionButtonContainer';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
 export const QuestionTemplateRelationFormShell = (props: {
@@ -30,11 +31,6 @@ export const QuestionTemplateRelationFormShell = (props: {
       '& SVG': {
         marginRight: theme.spacing(1),
       },
-    },
-    actions: {
-      marginTop: theme.spacing(4),
-      display: 'flex',
-      justifyContent: 'space-between',
     },
     naturalKey: {
       fontSize: '16px',
@@ -80,10 +76,10 @@ export const QuestionTemplateRelationFormShell = (props: {
         {formikProps => (
           <Form style={{ flexGrow: 1 }}>
             {props.children(formikProps)}
-            <div className={classes.actions}>
+            <ActionButtonContainer>
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 data-cy="delete"
                 onClick={() => {
@@ -107,7 +103,7 @@ export const QuestionTemplateRelationFormShell = (props: {
               >
                 Update
               </Button>
-            </div>
+            </ActionButtonContainer>
           </Form>
         )}
       </Formik>

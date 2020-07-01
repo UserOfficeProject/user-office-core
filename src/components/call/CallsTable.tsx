@@ -1,5 +1,5 @@
-import { Dialog, DialogContent } from '@material-ui/core';
-import { Add, Edit } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -8,6 +8,8 @@ import React, { useState } from 'react';
 import { Call, Instrument } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import InputDialog from '../common/InputDialog';
 import ScienceIconAdd from '../common/ScienceIconAdd';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
@@ -117,7 +119,6 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
     }
   };
 
-  const AddIcon = (): JSX.Element => <Add data-cy="add-call" />;
   const EditIcon = (): JSX.Element => <Edit />;
   const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
 
@@ -134,38 +135,35 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
 
   return (
     <>
-      <Dialog
+      <InputDialog
+        maxWidth="xs"
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!editCall || show}
         onClose={(): void => (!!editCall ? setEditCall(null) : setShow(false))}
       >
-        <DialogContent>
-          <CreateUpdateCall
-            call={editCall}
-            close={(call): void => {
-              !!editCall ? onCallUpdated(call) : onCallCreated(call);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateUpdateCall
+          call={editCall}
+          close={(call): void => {
+            !!editCall ? onCallUpdated(call) : onCallCreated(call);
+          }}
+        />
+      </InputDialog>
       {assigningInstrumentsCallId && (
-        <Dialog
+        <InputDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
         >
-          <DialogContent>
-            <AssignInstrumentsToCall
-              assignedInstruments={callAssignments?.instruments as Instrument[]}
-              callId={assigningInstrumentsCallId}
-              assignInstrumentsToCall={(instruments: Instrument[]) =>
-                assignInstrumentsToCall(instruments)
-              }
-            />
-          </DialogContent>
-        </Dialog>
+          <AssignInstrumentsToCall
+            assignedInstruments={callAssignments?.instruments}
+            callId={assigningInstrumentsCallId}
+            assignInstrumentsToCall={(instruments: Instrument[]) =>
+              assignInstrumentsToCall(instruments)
+            }
+          />
+        </InputDialog>
       )}
       <MaterialTable
         icons={tableIcons}
@@ -183,12 +181,6 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
         }}
         actions={[
           {
-            icon: AddIcon,
-            isFreeAction: true,
-            tooltip: 'Add Call',
-            onClick: (): void => setShow(true),
-          },
-          {
             icon: EditIcon,
             tooltip: 'Edit Call',
             onClick: (event, rowData): void => setEditCall(rowData as Call),
@@ -203,6 +195,17 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
           },
         ]}
       />
+      <ActionButtonContainer>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={() => setShow(true)}
+          data-cy="add-call"
+        >
+          Create call
+        </Button>
+      </ActionButtonContainer>
     </>
   );
 };

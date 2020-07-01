@@ -1,23 +1,17 @@
-import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router';
 
 import { UserContext } from '../../context/UserContextProvider';
 import { Sep, UserRole } from '../../generated/sdk';
 import { useSEPsData } from '../../hooks/useSEPsData';
-import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
+import InputDialog from '../common/InputDialog';
 import AddSEP from './AddSEP';
-
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
 
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
@@ -27,7 +21,6 @@ const SEPsTable: React.FC = () => {
     currentRole as UserRole
   );
   const [show, setShow] = useState(false);
-  const classes = useStyles();
   const columns = [
     { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
@@ -57,18 +50,14 @@ const SEPsTable: React.FC = () => {
 
   return (
     <>
-      <Dialog
+      <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
         onClose={(): void => setShow(false)}
       >
-        <DialogContent>
-          <AddSEP
-            close={(sepAdded: Sep | null): void => onSepAdded(sepAdded)}
-          />
-        </DialogContent>
-      </Dialog>
+        <AddSEP close={(sepAdded: Sep | null) => onSepAdded(sepAdded)} />
+      </InputDialog>
       <div data-cy="SEPs-table">
         <MaterialTable
           icons={tableIcons}
@@ -92,17 +81,16 @@ const SEPsTable: React.FC = () => {
         <Can
           allowedRoles={[UserRole.USER_OFFICER]}
           yes={() => (
-            <ButtonContainer>
+            <ActionButtonContainer>
               <Button
                 type="button"
                 variant="contained"
                 color="primary"
-                className={classes.button}
-                onClick={(): void => setShow(true)}
+                onClick={() => setShow(true)}
               >
                 Create SEP
               </Button>
-            </ButtonContainer>
+            </ActionButtonContainer>
           )}
           no={() => null}
         />

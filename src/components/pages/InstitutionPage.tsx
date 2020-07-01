@@ -1,15 +1,20 @@
+import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstitutionData } from '../../hooks/useInstitutionData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import InputDialog from '../common/InputDialog';
+import CreateInstitution from './CreateInstitution';
 
 const InstitutionPage: React.FC = () => {
   const api = useDataApi();
+  const [show, setShow] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const { institutionData, setInstitutionData } = useInstitutionData();
@@ -27,29 +32,6 @@ const InstitutionPage: React.FC = () => {
           setInstitutionData(tmp);
         } else {
           enqueueSnackbar('Failed to delete', {
-            variant: 'error',
-          });
-        }
-      });
-  };
-
-  const createInstitution = (name: string, verified: boolean) => {
-    api()
-      .createInstitution({
-        name: name,
-        verified: verified,
-      })
-      .then(resp => {
-        if (resp.createInstitution.institution && institutionData) {
-          const tmp = [...institutionData];
-          tmp.push({
-            id: resp.createInstitution.institution.id,
-            name: name,
-            verified: verified,
-          });
-          setInstitutionData(tmp);
-        } else {
-          enqueueSnackbar('Failed to create', {
             variant: 'error',
           });
         }
@@ -93,6 +75,16 @@ const InstitutionPage: React.FC = () => {
 
   return (
     <>
+      <InputDialog open={show} onClose={() => setShow(false)}>
+        <CreateInstitution
+          onComplete={newInstitution => {
+            if (newInstitution) {
+              setInstitutionData([...institutionData, newInstitution]);
+            }
+            setShow(false);
+          }}
+        />
+      </InputDialog>
       <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -112,17 +104,6 @@ const InstitutionPage: React.FC = () => {
                       deleteInstitution(oldData.id);
                       resolve();
                     }),
-                  onRowAdd: (newData: {
-                    verified: boolean | string;
-                    name: string;
-                  }) =>
-                    new Promise(resolve => {
-                      if (!(typeof newData.verified === 'boolean')) {
-                        newData.verified = newData.verified === 'true';
-                      }
-                      createInstitution(newData.name, newData.verified);
-                      resolve();
-                    }),
                   onRowUpdate: (data: {
                     id: number;
                     name: string;
@@ -137,6 +118,16 @@ const InstitutionPage: React.FC = () => {
                     }),
                 }}
               />
+              <ActionButtonContainer>
+                <Button
+                  type="button"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setShow(true)}
+                >
+                  Create institution
+                </Button>
+              </ActionButtonContainer>
             </StyledPaper>
           </Grid>
         </Grid>

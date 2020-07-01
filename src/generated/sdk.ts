@@ -284,8 +284,8 @@ export type Mutation = {
   administrationProposal: ProposalResponseWrap,
   updateProposal: ProposalResponseWrap,
   answerTopic: QuestionaryStepResponseWrap,
-  updateAnswer: UpdateAnswerResponseWrap,
   createQuestionary: QuestionaryResponseWrap,
+  updateAnswer: UpdateAnswerResponseWrap,
   addReview: ReviewResponseWrap,
   addTechnicalReview: TechnicalReviewResponseWrap,
   addUserForReview: ReviewResponseWrap,
@@ -460,14 +460,14 @@ export type MutationAnswerTopicArgs = {
 };
 
 
-export type MutationUpdateAnswerArgs = {
-  questionaryId: Scalars['Int'],
-  answer: AnswerInput
+export type MutationCreateQuestionaryArgs = {
+  templateId: Scalars['Int']
 };
 
 
-export type MutationCreateQuestionaryArgs = {
-  templateId: Scalars['Int']
+export type MutationUpdateAnswerArgs = {
+  questionaryId: Scalars['Int'],
+  answer: AnswerInput
 };
 
 
@@ -1719,7 +1719,7 @@ export type CreateInstitutionMutation = (
     & Pick<InstitutionResponseWrap, 'error'>
     & { institution: Maybe<(
       { __typename?: 'Institution' }
-      & Pick<Institution, 'id' | 'verified'>
+      & Pick<Institution, 'id' | 'name' | 'verified'>
     )> }
   ) }
 );
@@ -1862,6 +1862,10 @@ export type GetCallsQuery = (
     & { instruments: Array<(
       { __typename?: 'Instrument' }
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      & { scientists: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
     )> }
   )>> }
 );
@@ -1978,7 +1982,7 @@ export type CreateInstrumentMutation = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )> }
     )> }
   ) }
@@ -2062,7 +2066,7 @@ export type UpdateInstrumentMutation = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )> }
     )> }
   ) }
@@ -3791,6 +3795,7 @@ export const CreateInstitutionDocument = gql`
   createInstitution(name: $name, verified: $verified) {
     institution {
       id
+      name
       verified
     }
     error
@@ -3899,10 +3904,13 @@ export const GetCallsDocument = gql`
       name
       shortCode
       description
+      scientists {
+        ...basicUserDetails
+      }
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const RemoveAssignedInstrumentFromcallDocument = gql`
     mutation removeAssignedInstrumentFromcall($instrumentId: Int!, $callId: Int!) {
   removeAssignedInstrumentFromcall(instrumentId: $instrumentId, callId: $callId) {
@@ -3981,17 +3989,13 @@ export const CreateInstrumentDocument = gql`
       shortCode
       description
       scientists {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
     }
     error
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const DeleteInstrumentDocument = gql`
     mutation deleteInstrument($instrumentId: Int!) {
   deleteInstrument(instrumentId: $instrumentId) {
@@ -4044,17 +4048,13 @@ export const UpdateInstrumentDocument = gql`
       shortCode
       description
       scientists {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
     }
     error
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const AdministrationProposalDocument = gql`
     mutation administrationProposal($id: Int!, $rankOrder: Int, $finalStatus: ProposalEndStatus, $status: ProposalStatus, $commentForUser: String, $commentForManagement: String) {
   administrationProposal(id: $id, rankOrder: $rankOrder, finalStatus: $finalStatus, status: $status, commentForUser: $commentForUser, commentForManagement: $commentForManagement) {

@@ -52,7 +52,7 @@ export default function QuestionTemplateRelationEditor(props: {
   }
 
   return (
-    <ModalWrapper closeMe={props.closeMe} isOpen={props.field != null}>
+    <ModalWrapper close={props.closeMe} isOpen={props.field != null}>
       {React.createElement(componentMap.get(props.field.question.dataType)!, {
         field: props.field,
         dispatch: props.dispatch,

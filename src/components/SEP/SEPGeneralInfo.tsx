@@ -168,6 +168,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 variant="contained"
                 color="primary"
                 className={classes.button}
+                data-cy="submit"
               >
                 Update SEP
               </Button>
