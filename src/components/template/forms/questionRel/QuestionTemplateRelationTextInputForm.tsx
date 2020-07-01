@@ -3,7 +3,6 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
-
 import {
   QuestionTemplateRelation,
   TextInputConfig,
@@ -23,10 +22,10 @@ export const QuestionTemplateRelationTextInputForm: TFormSignature<QuestionTempl
 
   return (
     <QuestionTemplateRelationFormShell
+      label="Text input"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Text input"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({

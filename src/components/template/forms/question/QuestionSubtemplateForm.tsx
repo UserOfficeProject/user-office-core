@@ -1,12 +1,11 @@
+import { MenuItem } from '@material-ui/core';
 import { Field } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Select, TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
-
 import { Question, TemplateCategoryId } from '../../../../generated/sdk';
 import { useTemplates } from '../../../../hooks/useTemplates';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
@@ -62,14 +61,19 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
               label="Template name"
               placeholder="Choose template"
               type="text"
-              component={FormikUICustomSelect}
+              component={Select}
               margin="normal"
               fullWidth
               data-cy="templateId"
-              availableOptions={templates.map(template => {
-                return { value: template.templateId, label: template.name };
+            >
+              {templates.map(template => {
+                return (
+                  <MenuItem value={template.templateId}>
+                    {template.name}
+                  </MenuItem>
+                );
               })}
-            />
+            </Field>
             <Field
               name="config.addEntryButtonLabel"
               label="Add button label"
