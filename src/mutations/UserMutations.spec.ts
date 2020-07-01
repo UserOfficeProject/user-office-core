@@ -11,12 +11,11 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-
-import UserMutations from './UserMutations';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { BasicUserDetails, UserRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import UserMutations from './UserMutations';
 
 const secret = process.env.secret as string;
 
