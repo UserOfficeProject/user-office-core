@@ -1,30 +1,24 @@
-import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
-import { Edit, AssignmentInd } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { AssignmentInd, Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { Instrument, UserRole, BasicUserDetails } from '../../generated/sdk';
+import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
+import InputDialog from '../common/InputDialog';
 import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
-
 const InstrumentsTable: React.FC = () => {
   const [show, setShow] = useState(false);
   const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
-  const classes = useStyles();
+
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
@@ -174,7 +168,7 @@ const InstrumentsTable: React.FC = () => {
 
   return (
     <>
-      <Dialog
+      <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!editInstrument || show}
@@ -182,17 +176,15 @@ const InstrumentsTable: React.FC = () => {
           !!editInstrument ? setEditInstrument(null) : setShow(false)
         }
       >
-        <DialogContent>
-          <CreateUpdateInstrument
-            instrument={editInstrument as Instrument}
-            close={(instrument: Instrument | null): void =>
-              !!editInstrument
-                ? onInstrumentUpdated(instrument)
-                : onInstrumentCreated(instrument)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateUpdateInstrument
+          instrument={editInstrument as Instrument}
+          close={(instrument: Instrument | null) =>
+            !!editInstrument
+              ? onInstrumentUpdated(instrument)
+              : onInstrumentCreated(instrument)
+          }
+        />
+      </InputDialog>
       <ParticipantModal
         show={!!assigningInstrumentId}
         close={(): void => setAssigningInstrumentId(null)}
@@ -228,7 +220,7 @@ const InstrumentsTable: React.FC = () => {
             {
               icon: EditIcon,
               tooltip: 'Edit Instrument',
-              onClick: (event, rowData): void =>
+              onClick: (event, rowData) =>
                 setEditInstrument(rowData as Instrument),
               position: 'row',
             },
@@ -244,17 +236,16 @@ const InstrumentsTable: React.FC = () => {
         <Can
           allowedRoles={[UserRole.USER_OFFICER]}
           yes={() => (
-            <ButtonContainer>
+            <ActionButtonContainer>
               <Button
                 type="button"
                 variant="contained"
                 color="primary"
-                className={classes.button}
-                onClick={(): void => setShow(true)}
+                onClick={() => setShow(true)}
               >
                 Create instrument
               </Button>
-            </ButtonContainer>
+            </ActionButtonContainer>
           )}
           no={() => null}
         ></Can>

@@ -937,12 +937,12 @@ export type ProposalTemplatesFilter = {
 
 export type Query = {
    __typename?: 'Query',
+  calls?: Maybe<Array<Call>>,
   proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
   call?: Maybe<Call>,
-  calls?: Maybe<Array<Call>>,
   checkEmailExist?: Maybe<Scalars['Boolean']>,
   eventLogs?: Maybe<Array<EventLog>>,
   fileMetadata?: Maybe<Array<FileMetadata>>,
@@ -970,6 +970,11 @@ export type Query = {
 };
 
 
+export type QueryCallsArgs = {
+  filter?: Maybe<CallsFilter>
+};
+
+
 export type QueryProposalsArgs = {
   filter?: Maybe<ProposalsFilter>,
   first?: Maybe<Scalars['Int']>,
@@ -994,11 +999,6 @@ export type QueryBlankProposalArgs = {
 
 export type QueryCallArgs = {
   id: Scalars['Int']
-};
-
-
-export type QueryCallsArgs = {
-  filter?: Maybe<CallsFilter>
 };
 
 
@@ -1737,7 +1737,7 @@ export type CreateInstitutionMutation = (
     & Pick<InstitutionResponseWrap, 'error'>
     & { institution: Maybe<(
       { __typename?: 'Institution' }
-      & Pick<Institution, 'id' | 'verified'>
+      & Pick<Institution, 'id' | 'name' | 'verified'>
     )> }
   ) }
 );
@@ -1880,6 +1880,10 @@ export type GetCallsQuery = (
     & { instruments: Array<(
       { __typename?: 'InstrumentWithAvailabilityTime' }
       & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+      & { scientists: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
     )> }
   )>> }
 );
@@ -1996,7 +2000,7 @@ export type CreateInstrumentMutation = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )> }
     )> }
   ) }
@@ -2095,7 +2099,7 @@ export type UpdateInstrumentMutation = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )> }
     )> }
   ) }
@@ -3824,6 +3828,7 @@ export const CreateInstitutionDocument = gql`
   createInstitution(name: $name, verified: $verified) {
     institution {
       id
+      name
       verified
     }
     error
@@ -3934,10 +3939,13 @@ export const GetCallsDocument = gql`
       shortCode
       description
       availabilityTime
+      scientists {
+        ...basicUserDetails
+      }
     }
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const RemoveAssignedInstrumentFromcallDocument = gql`
     mutation removeAssignedInstrumentFromcall($instrumentId: Int!, $callId: Int!) {
   removeAssignedInstrumentFromcall(instrumentId: $instrumentId, callId: $callId) {
@@ -4017,17 +4025,13 @@ export const CreateInstrumentDocument = gql`
       shortCode
       description
       scientists {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
     }
     error
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const DeleteInstrumentDocument = gql`
     mutation deleteInstrument($instrumentId: Int!) {
   deleteInstrument(instrumentId: $instrumentId) {
@@ -4088,17 +4092,13 @@ export const UpdateInstrumentDocument = gql`
       shortCode
       description
       scientists {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
     }
     error
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const AdministrationProposalDocument = gql`
     mutation administrationProposal($id: Int!, $rankOrder: Int, $finalStatus: ProposalEndStatus, $status: ProposalStatus, $commentForUser: String, $commentForManagement: String) {
   administrationProposal(id: $id, rankOrder: $rankOrder, finalStatus: $finalStatus, status: $status, commentForUser: $commentForUser, commentForManagement: $commentForManagement) {

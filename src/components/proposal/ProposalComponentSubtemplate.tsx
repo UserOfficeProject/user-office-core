@@ -211,7 +211,7 @@ export function ProposalComponentSubtemplate(props: BasicComponentProps) {
       </FormControl>
 
       <ModalWrapper
-        closeMe={() => setSelectedQuestionary(null)}
+        close={() => setSelectedQuestionary(null)}
         isOpen={selectedQuestionary !== null}
       >
         <SubquestionarySubmissionContainer

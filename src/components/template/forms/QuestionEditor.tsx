@@ -33,7 +33,7 @@ export default function QuestionEditor(props: {
   }
 
   return (
-    <ModalWrapper closeMe={props.closeMe} isOpen={props.field != null}>
+    <ModalWrapper close={props.closeMe} isOpen={props.field != null}>
       {React.createElement(componentMap.get(props.field.dataType)!, {
         field: props.field,
         dispatch: props.dispatch,

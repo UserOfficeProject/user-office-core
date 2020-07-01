@@ -35,23 +35,13 @@ context('Template tests', () => {
 
     cy.navigateToTemplatesSubmenu('Sample declaration templates');
 
-    cy.get("[title='Add']")
-      .first()
-      .click();
+    cy.get('[data-cy="create-new-button"]').click();
 
-    cy.get("[placeholder='Name']")
-      .first()
-      .click()
-      .type(sampleDeclarationName);
+    cy.get('[data-cy="name"]').type(sampleDeclarationName);
 
-    cy.get("[placeholder='Description']")
-      .first()
-      .click()
-      .type(sampleDeclarationDescription);
+    cy.get('[data-cy="description"]').type(sampleDeclarationDescription);
 
-    cy.get("[title='Save']")
-      .first()
-      .click();
+    cy.get('[data-cy="submit"]').click();
 
     cy.contains(sampleDeclarationName);
 
