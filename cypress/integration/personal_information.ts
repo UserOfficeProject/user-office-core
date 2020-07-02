@@ -106,18 +106,13 @@ context('Personal information tests', () => {
 
     cy.wait(1000);
 
-    cy.get('[title="Add Role"]').click();
+    cy.get('[data-cy="add-role-button"]').click();
 
-    cy.wait(1000);
-
-    cy.contains('Add Role');
-
-    cy.get('.MuiDialog-root table tbody tr')
-      .eq(3)
+    cy.get('[data-cy="role-modal"]')
+      .contains('SEP Chair')
+      .parent()
       .find('[title="Select role"]')
       .click();
-
-    cy.contains('Update Roles').click();
 
     cy.wait(1000);
 

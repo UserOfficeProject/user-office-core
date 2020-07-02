@@ -20,6 +20,7 @@ const RoleModal: React.FC<RoleModalProps> = ({ show, close, add }) => {
       open={show}
       onClose={() => close()}
       disableScrollLock={true}
+      data-cy="role-modal"
     >
       <DialogContent>
         <RoleTable add={add} />

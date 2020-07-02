@@ -98,6 +98,7 @@ export default function UpdateUserRoles(props: { id: number }) {
           type="button"
           variant="contained"
           color="primary"
+          data-cy="add-role-button"
           onClick={() => setOpen(true)}
         >
           Add role
