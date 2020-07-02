@@ -1,4 +1,3 @@
-import DateFnsUtils from '@date-io/date-fns';
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createCallValidationSchema,
@@ -12,21 +11,20 @@ import {
   Theme,
   StepLabel,
   Grid,
+  FormHelperText,
 } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Form, Formik, FormikErrors } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Call } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
-import FormikDropdown from '../common/FormikDropdown';
-import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
+import CallCycleInfo from './CallCycleInfo';
+import CallGeneralInfo from './CallGeneralInfo';
+import CallReviewAndNotification from './CallReviewAndNotification';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,6 +37,13 @@ const useStyles = makeStyles((theme: Theme) =>
     instructions: {
       marginTop: theme.spacing(1),
       marginBottom: theme.spacing(1),
+    },
+    stepper: {
+      padding: '20px 0 0',
+    },
+    formErrors: {
+      color: theme.palette.error.main,
+      marginBottom: '10px',
     },
   })
 );
@@ -53,144 +58,27 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const api = useDataApi();
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const { templates } = useProposalsTemplates(false);
   const currentDay = new Date();
+  let isLastStep = false;
 
-  const getSteps = () => {
-    return ['General info', 'Review and notification', 'Cycle info'];
-  };
+  const steps = ['General info', 'Review and notification', 'Cycle info'];
 
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
-        return (
-          <>
-            <Field
-              name="shortCode"
-              label="Short Code"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="short-code"
-            />
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Field
-                name="startCall"
-                label="Start"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="start-date"
-              />
-
-              <Field
-                name="endCall"
-                label="End"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="end-date"
-              />
-            </MuiPickersUtilsProvider>
-            {templates.length > 0 && (
-              <FormikDropdown
-                name="templateId"
-                label="Call template"
-                items={templates.map(template => ({
-                  text: template.name,
-                  value: template.templateId,
-                }))}
-                data-cy="call-template"
-              />
-            )}
-          </>
-        );
+        return <CallGeneralInfo />;
       case 1:
-        return (
-          <>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Field
-                name="startReview"
-                label="Start of review"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="start-review"
-              />
-              <Field
-                name="endReview"
-                label="End of review"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-              />
-              <Field
-                name="startNotify"
-                label="Start of notification period"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-              />
-              <Field
-                name="endNotify"
-                label="End of notification period"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-              />
-            </MuiPickersUtilsProvider>
-            <Field
-              name="surveyComment"
-              label="Survey Comment"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="survey-comment"
-            />
-          </>
-        );
+        return <CallReviewAndNotification />;
       case 2:
-        return (
-          <>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Field
-                name="startCycle"
-                label="Start of cycle"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="start-cycle"
-              />
-              <Field
-                name="endCycle"
-                label="End of cycle"
-                component={FormikUICustomDatePicker}
-                margin="normal"
-                fullWidth
-                data-cy="end-cycle"
-              />
-            </MuiPickersUtilsProvider>
-            <Field
-              name="cycleComment"
-              label="Cycle comment"
-              type="text"
-              component={TextField}
-              margin="normal"
-              fullWidth
-              data-cy="cycle-comment"
-            />
-          </>
-        );
+        return <CallCycleInfo />;
       default:
         return 'Unknown step';
     }
   };
 
-  const steps = getSteps();
+  const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
 
-  const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
 
@@ -212,6 +100,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endReview: currentDay,
         startNotify: currentDay,
         endNotify: currentDay,
+        startCycle: currentDay,
+        endCycle: currentDay,
         cycleComment: '',
         surveyComment: '',
         templateId: '',
@@ -231,12 +121,43 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     }
   };
 
+  if (activeStep + 1 === steps.length) {
+    isLastStep = true;
+  }
+
+  const showFormErrors = (errors: FormikErrors<Call>): JSX.Element | null => {
+    const errorsToShow: string[] = [];
+
+    for (const [key, value] of Object.entries(errors)) {
+      if (errors.hasOwnProperty(key)) {
+        if (value) {
+          errorsToShow.push(value.toString());
+        }
+      }
+    }
+
+    if (errorsToShow.length > 0) {
+      return (
+        <FormHelperText className={classes.formErrors}>
+          {errorsToShow.map((errorToShow, index) => (
+            <span key={index}>
+              {errorToShow}
+              <br />
+            </span>
+          ))}
+        </FormHelperText>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <>
       <Typography variant="h6">
         {call ? 'Update the call' : 'Create new call'}
       </Typography>
-      <Stepper nonLinear activeStep={activeStep}>
+      <Stepper nonLinear activeStep={activeStep} className={classes.stepper}>
         {steps.map((label, index) => {
           const stepProps: { completed?: boolean; onClick: () => void } = {
             onClick: handleStep(index),
@@ -287,44 +208,37 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           call ? updateCallValidationSchema : createCallValidationSchema
         }
       >
-        <Form>
-          {getStepContent(activeStep)}
-          <Grid container spacing={2}>
-            <Grid item xs={3}>
-              <Button
-                disabled={activeStep === 0}
-                onClick={handleBack}
-                fullWidth
-                className={classes.button}
-              >
-                Back
-              </Button>
-            </Grid>
-            <Grid item xs={9}>
-              {activeStep !== steps.length - 1 ? (
+        {({ errors }): JSX.Element => (
+          <Form>
+            {getStepContent(activeStep)}
+            {activeStep === 2 && showFormErrors(errors)}
+            <Grid container spacing={2}>
+              <Grid item xs={3}>
                 <Button
-                  variant="contained"
-                  color="primary"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
                   fullWidth
-                  onClick={handleNext}
                   className={classes.button}
                 >
-                  Next
+                  Back
                 </Button>
-              ) : (
+              </Grid>
+              <Grid item xs={9}>
                 <Button
-                  type="submit"
                   variant="contained"
                   color="primary"
-                  fullWidth
                   data-cy="submit"
+                  type={isLastStep ? 'submit' : 'button'}
+                  fullWidth
+                  onClick={isLastStep ? () => null : handleNext}
+                  className={classes.button}
                 >
-                  {call ? 'Update' : 'Add'} Call
+                  {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
                 </Button>
-              )}
+              </Grid>
             </Grid>
-          </Grid>
-        </Form>
+          </Form>
+        )}
       </Formik>
     </>
   );
