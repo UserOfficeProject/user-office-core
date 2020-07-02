@@ -23,6 +23,12 @@ export class ProposalsFilter {
 
   @Field(() => [Int], { nullable: true })
   public questionaryIds?: number[];
+
+  @Field(() => Int, { nullable: true })
+  public callId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public instrumentId?: number;
 }
 
 @ArgsType()
