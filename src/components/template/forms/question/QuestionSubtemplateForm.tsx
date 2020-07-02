@@ -3,6 +3,7 @@ import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
+
 import { Question, TemplateCategoryId } from '../../../../generated/sdk';
 import { useTemplates } from '../../../../hooks/useTemplates';
 import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
@@ -67,7 +68,10 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
               >
                 {templates.map(template => {
                   return (
-                    <MenuItem value={template.templateId}>
+                    <MenuItem
+                      value={template.templateId}
+                      key={template.templateId}
+                    >
                       {template.name}
                     </MenuItem>
                   );

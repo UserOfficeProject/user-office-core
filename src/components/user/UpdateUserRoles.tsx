@@ -2,6 +2,7 @@ import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
+
 import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useRenewToken } from '../../hooks/useRenewToken';
@@ -19,6 +20,20 @@ export default function UpdateUserRoles(props: { id: number }) {
   const [roles, setRoles] = useState<Array<Role>>([]);
   const { setRenewTokenValue } = useRenewToken();
 
+  const sendUpdateRoles = async (newRoles: Role[]) => {
+    const variables = {
+      id: props.id,
+      roles: newRoles.map(role => role.id),
+    };
+
+    const userUpdateResult = await api().updateUserRoles(variables);
+    setRenewTokenValue();
+
+    enqueueSnackbar('Updated Roles', {
+      variant: userUpdateResult.updateUser.error ? 'error' : 'success',
+    });
+  };
+
   const addRole = async (role: Role) => {
     const newRoles = [...roles, role];
     setRoles(newRoles);
@@ -33,21 +48,8 @@ export default function UpdateUserRoles(props: { id: number }) {
       1
     );
     setRoles(newRoles);
+
     return newRoles;
-  };
-
-  const sendUpdateRoles = async (newRoles: Role[]) => {
-    const variables = {
-      id: props.id,
-      roles: newRoles.map(role => role.id),
-    };
-
-    const userUpdateResult = await api().updateUserRoles(variables);
-    setRenewTokenValue();
-
-    enqueueSnackbar('Updated Roles', {
-      variant: userUpdateResult.updateUser.error ? 'error' : 'success',
-    });
   };
 
   useEffect(() => {

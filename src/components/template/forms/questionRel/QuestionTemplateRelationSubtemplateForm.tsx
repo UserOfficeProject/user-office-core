@@ -3,6 +3,7 @@ import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
+
 import {
   QuestionTemplateRelation,
   TemplateCategoryId,
@@ -19,6 +20,7 @@ export const QuestionTemplateRelationSubtemplateForm: TFormSignature<QuestionTem
     false,
     TemplateCategoryId.SAMPLE_DECLARATION
   );
+
   return (
     <QuestionTemplateRelationFormShell
       label="Sub template"
@@ -76,7 +78,10 @@ export const QuestionTemplateRelationSubtemplateForm: TFormSignature<QuestionTem
               >
                 {templates.map(template => {
                   return (
-                    <MenuItem value={template.templateId}>
+                    <MenuItem
+                      value={template.templateId}
+                      key={template.templateId}
+                    >
                       {template.name}
                     </MenuItem>
                   );
