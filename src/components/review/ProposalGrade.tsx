@@ -124,8 +124,13 @@ export default function ProposalGrade(props: {
               variant="contained"
               color="secondary"
               onClick={() => {
-                setFieldValue('saveOnly', false, false);
-                handleSubmit();
+                const confirmed = window.confirm(
+                  'I am aware that no futhure changes to the grade is possible after submission.'
+                );
+                if (confirmed) {
+                  setFieldValue('saveOnly', false, false);
+                  handleSubmit();
+                }
               }}
             >
               Submit
