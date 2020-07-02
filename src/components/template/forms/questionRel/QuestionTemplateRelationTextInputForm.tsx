@@ -23,10 +23,10 @@ export const QuestionTemplateRelationTextInputForm: TFormSignature<QuestionTempl
 
   return (
     <QuestionTemplateRelationFormShell
+      label="Text input"
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
-      label="Text input"
       template={props.template}
       validationSchema={Yup.object().shape({
         question: Yup.object({
