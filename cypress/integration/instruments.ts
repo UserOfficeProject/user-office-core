@@ -173,6 +173,8 @@ context('Instrument tests', () => {
 
     cy.get('[title="Save"]').click();
 
+    cy.wait(1000);
+
     cy.get('[data-cy="instruments-table"] table tbody tr')
       .first()
       .find('td')
