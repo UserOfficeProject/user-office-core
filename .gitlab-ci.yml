@@ -50,7 +50,6 @@ autodeploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - until ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/backend/autodeploy.sh dev"; do sleep 5; done
   tags:
-    - docker
     - dind
   only:
     - develop
