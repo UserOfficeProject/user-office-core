@@ -86,6 +86,8 @@ export type Call = {
   endReview: Scalars['DateTime'],
   startNotify: Scalars['DateTime'],
   endNotify: Scalars['DateTime'],
+  startCycle: Scalars['DateTime'],
+  endCycle: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>,
@@ -372,6 +374,8 @@ export type MutationCreateCallArgs = {
   endReview: Scalars['DateTime'],
   startNotify: Scalars['DateTime'],
   endNotify: Scalars['DateTime'],
+  startCycle: Scalars['DateTime'],
+  endCycle: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
@@ -387,6 +391,8 @@ export type MutationUpdateCallArgs = {
   endReview: Scalars['DateTime'],
   startNotify: Scalars['DateTime'],
   endNotify: Scalars['DateTime'],
+  startCycle: Scalars['DateTime'],
+  endCycle: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
@@ -1847,6 +1853,8 @@ export type CreateCallMutationVariables = {
   endReview: Scalars['DateTime'],
   startNotify: Scalars['DateTime'],
   endNotify: Scalars['DateTime'],
+  startCycle: Scalars['DateTime'],
+  endCycle: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
@@ -1860,7 +1868,7 @@ export type CreateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
         & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
@@ -1878,7 +1886,7 @@ export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
     & { instruments: Array<(
       { __typename?: 'InstrumentWithAvailabilityTime' }
       & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
@@ -1917,6 +1925,8 @@ export type UpdateCallMutationVariables = {
   endReview: Scalars['DateTime'],
   startNotify: Scalars['DateTime'],
   endNotify: Scalars['DateTime'],
+  startCycle: Scalars['DateTime'],
+  endCycle: Scalars['DateTime'],
   cycleComment: Scalars['String'],
   surveyComment: Scalars['String'],
   templateId?: Maybe<Scalars['Int']>
@@ -1930,7 +1940,7 @@ export type UpdateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
         & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
@@ -3895,8 +3905,8 @@ export const AssignInstrumentToCallDocument = gql`
 }
     `;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
-  createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
+  createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
       id
@@ -3907,6 +3917,8 @@ export const CreateCallDocument = gql`
       endReview
       startNotify
       endNotify
+      startCycle
+      endCycle
       cycleComment
       surveyComment
       templateId
@@ -3932,6 +3944,8 @@ export const GetCallsDocument = gql`
     endReview
     startNotify
     endNotify
+    startCycle
+    endCycle
     cycleComment
     surveyComment
     templateId
@@ -3959,8 +3973,8 @@ export const RemoveAssignedInstrumentFromcallDocument = gql`
 }
     `;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
-  updateCall(id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
+  updateCall(id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
       id
@@ -3971,6 +3985,8 @@ export const UpdateCallDocument = gql`
       endReview
       startNotify
       endNotify
+      startCycle
+      endCycle
       cycleComment
       surveyComment
       templateId
