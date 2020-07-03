@@ -5,6 +5,7 @@ import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { Column, Options } from 'material-table';
 import { useSnackbar } from 'notistack';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import XLSX from 'xlsx';
@@ -21,13 +22,17 @@ import ScienceIconAdd from '../common/ScienceIconAdd';
 import ScienceIconRemove from '../common/ScienceIconRemove';
 import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
-import ProposalFilterBar from './ProposalFilterBar';
 import RankInput from './RankInput';
 
-const ProposalTableOfficer: React.FC = () => {
-  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>(
-    {}
-  );
+type ProposalTableOfficerProps = {
+  proposalFilter: ProposalsFilter;
+  Toolbar: (data: Options) => JSX.Element;
+};
+
+const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
+  proposalFilter,
+  Toolbar,
+}) => {
   const { loading, proposalsData, setProposalsData } = useProposalsData(
     proposalFilter
   );
@@ -399,13 +404,6 @@ const ProposalTableOfficer: React.FC = () => {
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
   const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
-  const Toolbar = (data: Options): JSX.Element => (
-    <ProposalFilterBar
-      data={data}
-      onChange={setProposalFilter}
-      filter={proposalFilter}
-    />
-  );
 
   return (
     <>
@@ -583,6 +581,11 @@ const ProposalTableOfficer: React.FC = () => {
       />
     </>
   );
+};
+
+ProposalTableOfficer.propTypes = {
+  Toolbar: PropTypes.func.isRequired,
+  proposalFilter: PropTypes.any,
 };
 
 export default ProposalTableOfficer;
