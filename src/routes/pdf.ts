@@ -210,7 +210,7 @@ const createProposalPDF = async (
 
     // General information
     let attachmentIds: string[] = []; // Save attachments for appendix
-    let subQuestionaryMetadatas: SubquestionaryMetadata[] = []; // Save attachments for appendix
+    let subQuestionaryMetadatas: SubquestionaryMetadata[] = []; // Save subquestionary metadata for appendix
     doc.image('./images/ESS.png', 15, 15, { width: 100 });
 
     writeHeading(`Proposal: ${proposal.title}`, doc);
