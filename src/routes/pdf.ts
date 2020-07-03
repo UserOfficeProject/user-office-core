@@ -1,12 +1,10 @@
-import fs, { existsSync, unlink } from 'fs';
-
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import express from 'express';
+import fs, { existsSync, unlink } from 'fs';
 import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
-
 import baseContext from '../buildContext';
-import { Answer, DataType, Questionary } from '../models/ProposalModel';
+import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
@@ -23,6 +21,11 @@ const hummus = require('hummus');
 
 const router = express.Router();
 
+interface SubquestionaryMetadata {
+  questionaryId: number;
+  question: string;
+}
+
 //Helper functions
 const write = (text: string, doc: PDFKit.PDFDocument) => {
   return doc
@@ -34,6 +37,13 @@ const write = (text: string, doc: PDFKit.PDFDocument) => {
 const writeBold = (text: string, doc: PDFKit.PDFDocument) => {
   return doc
     .font('fonts/Calibri_Bold.ttf')
+    .fontSize(11)
+    .text(text);
+};
+
+const writeItalic = (text: string, doc: PDFKit.PDFDocument) => {
+  return doc
+    .font('fonts/Calibri_Italic.ttf')
     .fontSize(11)
     .text(text);
 };
@@ -51,6 +61,83 @@ const getAttachments = async (attachmentId: string) => {
   return baseContext.queries.file.getFileMetadata([attachmentId]);
 };
 
+const writeAnswer = (answer: Answer, doc: PDFKit.PDFDocument) => {
+  const notAnswered = 'Left blank';
+
+  if (answer.question.dataType === DataType.EMBELLISHMENT) {
+    const conf = answer.question.config as EmbellishmentConfig;
+    if (!conf.omitFromPdf) {
+      writeBold(conf.plain!, doc);
+    }
+  } else if (
+    answer.question.dataType === DataType.FILE_UPLOAD ||
+    answer.question.dataType === DataType.SUBTEMPLATE
+  ) {
+    writeBold(answer.question.question, doc);
+    if (answer.value) {
+      writeItalic('See appendix', doc);
+    } else {
+      write(notAnswered, doc);
+    }
+    // Default case, a ordinary question type
+  } else if (answer.question.dataType === DataType.DATE) {
+    writeBold(answer.question.question, doc);
+    write(
+      answer.value
+        ? new Date(answer.value).toISOString().split('T')[0]
+        : notAnswered,
+      doc
+    );
+  } else if (answer.question.dataType === DataType.BOOLEAN) {
+    writeBold(answer.question.question, doc);
+    if (answer.value) {
+      write('Yes', doc);
+    } else {
+      write('No', doc);
+    }
+  } else {
+    writeBold(answer.question.question, doc);
+    write(answer.value ? answer.value : notAnswered, doc);
+  }
+  doc.moveDown(0.5);
+};
+
+const getFileAttachmentIds = (answer: Answer) => {
+  if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
+    return answer.value.split(',');
+  }
+  return [];
+};
+
+const getSubquestionaryMetadata = (
+  answer: Answer
+): SubquestionaryMetadata[] => {
+  if (answer.question.dataType === DataType.SUBTEMPLATE && answer.value) {
+    return answer.value.split(',').map((questionaryId: string) => {
+      return {
+        question: answer.question.question,
+        questionaryId: parseInt(questionaryId),
+      };
+    });
+  }
+  return [];
+};
+
+const getTopicActiveAnswers = (
+  questionarySteps: QuestionaryStep[],
+  topicId: number
+) => {
+  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
+  return step
+    ? (step.fields.filter(field => {
+        return areDependenciesSatisfied(
+          questionarySteps,
+          field.question.proposalQuestionId
+        );
+      }) as Answer[])
+    : [];
+};
+
 const createProposalPDF = async (
   proposalId: number,
   user: UserWithRole,
@@ -61,7 +148,6 @@ const createProposalPDF = async (
   metaData: { year: number; path: string; pi: string; shortCode: string };
 }> => {
   try {
-    const notAnswered = 'Left blank';
     const UserAuthorization = baseContext.userAuthorization;
     const proposal = await baseContext.queries.proposal.get(user, proposalId);
     const toc: any = [];
@@ -70,7 +156,9 @@ const createProposalPDF = async (
       throw new Error('User was not allowed to download PDF');
     }
 
-    const questionarySteps = await baseContext.queries.questionary.getQuestionarySteps(
+    const queries = baseContext.queries.questionary;
+
+    const questionarySteps = await queries.getQuestionarySteps(
       user,
       proposal.questionaryId
     );
@@ -117,6 +205,7 @@ const createProposalPDF = async (
 
     // General information
     let attachmentIds: string[] = []; // Save attachments for appendix
+    let subQuestionaryMetadatas: SubquestionaryMetadata[] = []; // Save attachments for appendix
     doc.image('./images/ESS.png', 15, 15, { width: 100 });
 
     writeHeading(`Proposal: ${proposal.title}`, doc);
@@ -154,69 +243,58 @@ const createProposalPDF = async (
     });
 
     // Information from each topic in proposal
-    questionarySteps.forEach(x => {
+    questionarySteps.forEach(step => {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(questionarySteps, x.topic.id);
-      const activeFields = step
-        ? (step.fields.filter(field => {
-            return areDependenciesSatisfied(
-              questionarySteps,
-              field.question.proposalQuestionId
-            );
-          }) as Answer[])
-        : [];
+
       if (!step) {
         throw 'Could not download generated PDF';
       }
-      writeBold(step.topic.title, doc);
+
+      writeHeading(step.topic.title, doc);
       toc.push({
         title: step.topic.title,
         page: pageNumber,
         children: [],
       });
+
       doc.moveDown();
-      activeFields.forEach(field => {
-        if (field.question.dataType === DataType.EMBELLISHMENT) {
-          const conf = field.question.config as EmbellishmentConfig;
-          if (!conf.omitFromPdf) {
-            writeBold(conf.plain!, doc);
-          }
-        } else if (field.question.dataType === DataType.FILE_UPLOAD) {
-          writeBold(field.question.question, doc);
-          if (field.value) {
-            const fieldAttachmentArray: string[] = field.value.split(',');
-            attachmentIds = attachmentIds.concat(fieldAttachmentArray);
-            write('This document has been appended to the proposal', doc);
-          } else {
-            write(notAnswered, doc);
-          }
-          // Default case, a ordinary question type
-        } else if (field.question.dataType === DataType.DATE) {
-          writeBold(field.question.question, doc);
-          write(
-            field.value
-              ? new Date(field.value).toISOString().split('T')[0]
-              : notAnswered,
-            doc
-          );
-        } else if (field.question.dataType === DataType.BOOLEAN) {
-          writeBold(field.question.question, doc);
-          if (field.value) {
-            write('Yes', doc);
-          } else {
-            write('No', doc);
-          }
-        } else {
-          writeBold(field.question.question, doc);
-          write(field.value ? field.value : notAnswered, doc);
-        }
-        doc.moveDown(0.5);
+      const topic = step.topic;
+      const answers = getTopicActiveAnswers(questionarySteps, topic.id);
+      answers.forEach(answer => {
+        attachmentIds = attachmentIds.concat(getFileAttachmentIds(answer));
+        subQuestionaryMetadatas = subQuestionaryMetadatas.concat(
+          getSubquestionaryMetadata(answer)
+        );
+        writeAnswer(answer, doc);
       });
     });
 
-    doc.end();
+    // Subquestionaries
+    for (const subquestionaryMetadata of subQuestionaryMetadatas) {
+      doc.addPage();
+      writeHeading(subquestionaryMetadata.question, doc);
+      toc.push({
+        title: subquestionaryMetadata.question,
+        page: pageNumber,
+        children: [],
+      });
+      const subquestionarySteps = await queries.getQuestionarySteps(
+        user,
+        subquestionaryMetadata.questionaryId
+      );
+      const firstStepTopicId = subquestionarySteps![0].topic.id; // NOTE: for now only the first topic
+      const answers = getTopicActiveAnswers(
+        subquestionarySteps!,
+        firstStepTopicId
+      );
+      answers.forEach(answer => {
+        attachmentIds = attachmentIds.concat(getFileAttachmentIds(answer));
+        writeAnswer(answer, doc);
+      });
+    }
     pageNumber++;
+    doc.end();
 
     // Stitch together PDF proposal with attachments
     return new Promise(resolve => {
