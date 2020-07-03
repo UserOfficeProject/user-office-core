@@ -1,8 +1,10 @@
+import fs, { existsSync, unlink } from 'fs';
+
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import express from 'express';
-import fs, { existsSync, unlink } from 'fs';
 import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
+
 import baseContext from '../buildContext';
 import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
@@ -106,6 +108,7 @@ const getFileAttachmentIds = (answer: Answer) => {
   if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
     return answer.value.split(',');
   }
+
   return [];
 };
 
@@ -120,6 +123,7 @@ const getSubquestionaryMetadata = (
       };
     });
   }
+
   return [];
 };
 
@@ -128,6 +132,7 @@ const getTopicActiveAnswers = (
   topicId: number
 ) => {
   const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
+
   return step
     ? (step.fields.filter(field => {
         return areDependenciesSatisfied(
