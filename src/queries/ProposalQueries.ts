@@ -58,7 +58,7 @@ export default class ProposalQueries {
     );
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  // @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,

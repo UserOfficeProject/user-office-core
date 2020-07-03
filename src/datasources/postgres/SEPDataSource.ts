@@ -207,6 +207,22 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       );
   }
 
+  async getSEPByProposalId(proposalId: number): Promise<SEP | null> {
+    return database
+      .select()
+      .from('SEPs as s')
+      .join('SEP_Proposals as sp', { 's.sep_id': 'sp.sep_id' })
+      .where('sp.proposal_id', proposalId)
+      .first()
+      .then((sep: SEPRecord) => {
+        if (sep) {
+          return this.createSEPObject(sep);
+        }
+
+        return null;
+      });
+  }
+
   async addSEPMembersRole(userWithRoles: AddSEPMembersRole) {
     const roleToInsert = {
       user_id: userWithRoles.userID,
