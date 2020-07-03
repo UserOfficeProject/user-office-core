@@ -4,26 +4,26 @@ import { Instrument } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useInstrumentsData(): {
-  loading: boolean;
+  loadingInstruments: boolean;
   instrumentsData: Instrument[];
   setInstrumentsData: Dispatch<SetStateAction<Instrument[]>>;
 } {
   const [instrumentsData, setInstrumentsData] = useState<Instrument[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingInstruments, setLoadingInstruments] = useState(true);
 
   const api = useDataApi();
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingInstruments(true);
     api()
       .getInstruments()
       .then(data => {
         if (data.instruments) {
           setInstrumentsData(data.instruments.instruments as Instrument[]);
         }
-        setLoading(false);
+        setLoadingInstruments(false);
       });
   }, [api]);
 
-  return { loading, instrumentsData, setInstrumentsData };
+  return { loadingInstruments, instrumentsData, setInstrumentsData };
 }

@@ -6,9 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { MTableToolbar, Options } from 'material-table';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { ProposalsFilter } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
+import { ProposalsFilter, Call, Instrument } from '../../generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -20,13 +18,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 export default function ProposalFilterBar(props: {
+  callsData: Call[];
+  instrumentsData: Instrument[];
   data: Options;
   onChange: Dispatch<SetStateAction<ProposalsFilter>>;
   filter: ProposalsFilter;
 }) {
-  const { callsData } = useCallsData(undefined);
-  const { instrumentsData } = useInstrumentsData();
-
   const classes = useStyles();
 
   return (
@@ -45,7 +42,7 @@ export default function ProposalFilterBar(props: {
           defaultValue={0}
         >
           <MenuItem value={0}>All</MenuItem>
-          {callsData.map(call => (
+          {props.callsData.map(call => (
             <MenuItem key={call.id} value={call.id}>
               {call.shortCode}
             </MenuItem>
@@ -65,7 +62,7 @@ export default function ProposalFilterBar(props: {
           defaultValue={0}
         >
           <MenuItem value={0}>All</MenuItem>
-          {instrumentsData.map(instrument => (
+          {props.instrumentsData.map(instrument => (
             <MenuItem
               key={instrument.instrumentId}
               value={instrument.instrumentId}

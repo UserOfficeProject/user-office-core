@@ -17,7 +17,11 @@ import CreateUpdateInstrument from './CreateUpdateInstrument';
 
 const InstrumentsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
+  const {
+    loadingInstruments,
+    instrumentsData,
+    setInstrumentsData,
+  } = useInstrumentsData();
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -36,7 +40,7 @@ const InstrumentsTable: React.FC = () => {
     number | null
   >(null);
 
-  if (loading) {
+  if (loadingInstruments) {
     return <p>Loading...</p>;
   }
 

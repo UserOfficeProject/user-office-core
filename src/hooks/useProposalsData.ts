@@ -9,10 +9,13 @@ export function useProposalsData(filter: ProposalsFilter) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { callId, instrumentId, questionaryIds, templateIds, text } = filter;
+
   useEffect(() => {
     api()
       .getProposals({
-        filter,
+        filter: { callId, instrumentId, questionaryIds, templateIds, text },
       })
       .then(data => {
         if (data.proposals) {
@@ -30,7 +33,7 @@ export function useProposalsData(filter: ProposalsFilter) {
         }
         setLoading(false);
       });
-  }, [filter, api]);
+  }, [callId, instrumentId, questionaryIds, templateIds, text, api]);
 
   return { loading, proposalsData, setProposalsData };
 }
