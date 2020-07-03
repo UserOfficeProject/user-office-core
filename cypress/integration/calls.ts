@@ -60,9 +60,13 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
@@ -111,9 +115,13 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
