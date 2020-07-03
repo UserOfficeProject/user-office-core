@@ -8,6 +8,8 @@ export class Call {
     public endReview: Date,
     public startNotify: Date,
     public endNotify: Date,
+    public startCycle: Date,
+    public endCycle: Date,
     public cycleComment: string,
     public surveyComment: string,
     public templateId?: number
