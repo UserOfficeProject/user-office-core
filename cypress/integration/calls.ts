@@ -72,7 +72,9 @@ context('Calls tests', () => {
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });
@@ -127,7 +129,9 @@ context('Calls tests', () => {
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });
