@@ -11,7 +11,7 @@ import { Proposal } from './Proposal';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
-import { QuestionRel } from './QuestionRel';
+import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
@@ -116,14 +116,18 @@ export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
 }
 
 @ObjectType()
-export class QuestionRelResponseWrap extends ResponseWrapBase<QuestionRel> {
+export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<
+  QuestionTemplateRelation
+> {
   @Response()
-  @Field(() => QuestionRel, { nullable: true })
-  public questionRel: QuestionRel;
+  @Field(() => QuestionTemplateRelation, { nullable: true })
+  public questionTemplateRelation: QuestionTemplateRelation;
 }
 
 @ObjectType()
-export class QuestionResponseWrap extends ResponseWrapBase<QuestionRel> {
+export class QuestionResponseWrap extends ResponseWrapBase<
+  QuestionTemplateRelation
+> {
   @Response()
   @Field(() => Question, { nullable: true })
   public question: Question;

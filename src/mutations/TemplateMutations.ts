@@ -1,19 +1,19 @@
 import {
-  createTemplateValidationSchema,
   cloneTemplateValidationSchema,
-  deleteTemplateValidationSchema,
-  createTopicValidationSchema,
-  updateTopicValidationSchema,
-  deleteTopicValidationSchema,
+  createQuestionTemplateRelationValidationSchema,
   createQuestionValidationSchema,
-  updateQuestionValidationSchema,
+  createTemplateValidationSchema,
+  createTopicValidationSchema,
+  deleteQuestionTemplateRelationValidationSchema,
   deleteQuestionValidationSchema,
-  updateQuestionRelValidationSchema,
-  deleteQuestionRelValidationSchema,
-  updateTopicOrderValidationSchema,
+  deleteTemplateValidationSchema,
+  deleteTopicValidationSchema,
   updateQuestionsTopicRelsValidationSchema,
-  updateProposalTemplateValidationSchema,
-  createQuestionRelValidationSchema,
+  updateQuestionTemplateRelationValidationSchema,
+  updateQuestionValidationSchema,
+  updateTemplateValidationSchema,
+  updateTopicOrderValidationSchema,
+  updateTopicValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -21,20 +21,20 @@ import { Authorized, ValidateArgs } from '../decorators';
 import {
   createConfig,
   DataType,
-  Template,
   Question,
+  Template,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
-import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
-import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
@@ -43,6 +43,7 @@ import {
   FieldConfigType,
   FileUploadConfig,
   SelectionFromOptionsConfig,
+  SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
 
@@ -219,14 +220,14 @@ export default class TemplateMutations {
       });
   }
 
-  @ValidateArgs(updateQuestionRelValidationSchema)
+  @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionRel(
+  async updateQuestionTemplateRelation(
     agent: UserWithRole | null,
-    args: UpdateQuestionRelArgs
+    args: UpdateQuestionTemplateRelationArgs
   ): Promise<Template | Rejection> {
     return this.dataSource
-      .updateQuestionRel(args)
+      .updateQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
@@ -238,14 +239,14 @@ export default class TemplateMutations {
       });
   }
 
-  @ValidateArgs(deleteQuestionRelValidationSchema)
+  @ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async deleteQuestionRel(
+  async deleteQuestionTemplateRelation(
     agent: UserWithRole | null,
-    args: DeleteQuestionRelArgs
+    args: DeleteQuestionTemplateRelationArgs
   ): Promise<Template | Rejection> {
     return this.dataSource
-      .deleteQuestionRel(args)
+      .deleteQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not delete question rel', err, {
@@ -278,7 +279,7 @@ export default class TemplateMutations {
 
   @ValidateArgs(updateQuestionsTopicRelsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionsTopicRels(
+  async assignQuestionsToTopic(
     agent: UserWithRole | null,
     args: {
       templateId: number;
@@ -289,12 +290,14 @@ export default class TemplateMutations {
     let isSuccess = true;
     let index = 1;
     for (const questionId of args.questionIds) {
-      const updatedField = await this.dataSource.updateQuestionRel({
-        questionId,
-        topicId: args.topicId,
-        templateId: args.templateId,
-        sortOrder: index,
-      });
+      const updatedField = await this.dataSource.updateQuestionTemplateRelation(
+        {
+          questionId,
+          topicId: args.topicId,
+          templateId: args.templateId,
+          sortOrder: index,
+        }
+      );
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -305,7 +308,7 @@ export default class TemplateMutations {
     return args.questionIds;
   }
 
-  @ValidateArgs(updateProposalTemplateValidationSchema)
+  @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
@@ -320,14 +323,14 @@ export default class TemplateMutations {
       });
   }
 
-  @ValidateArgs(createQuestionRelValidationSchema)
+  @ValidateArgs(createQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async createQuestionRel(
+  async createQuestionTemplateRelation(
     user: UserWithRole | null,
-    args: CreateQuestionRelArgs
+    args: CreateQuestionTemplateRelationArgs
   ) {
     return this.dataSource
-      .createQuestionRel(args)
+      .createQuestionTemplateRelation(args)
       .then(data => data)
       .catch(err => {
         logger.logException('Could not create Question Relation', err, {
@@ -351,6 +354,10 @@ export default class TemplateMutations {
         return createConfig<SelectionFromOptionsConfig>(
           new SelectionFromOptionsConfig()
         );
+      case DataType.SUBTEMPLATE:
+        return createConfig<SubtemplateConfig>(new SubtemplateConfig(), {
+          addEntryButtonLabel: 'Add',
+        });
       default:
         return new ConfigBase();
     }

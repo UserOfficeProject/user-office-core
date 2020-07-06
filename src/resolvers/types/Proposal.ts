@@ -14,9 +14,11 @@ import { ProposalStatus } from '../../models/ProposalModel';
 import { ProposalEndStatus } from '../../models/ProposalModel';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Call } from './Call';
 import { Instrument } from './Instrument';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
+import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 
 @ObjectType()
@@ -66,7 +68,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public proposerId: number;
 }
 
-@Resolver(of => Proposal)
+@Resolver(() => Proposal)
 export class ProposalResolver {
   @FieldResolver(() => [BasicUserDetails])
   async users(
@@ -122,6 +124,22 @@ export class ProposalResolver {
     return await context.queries.instrument.dataSource.getInstrumentByProposalId(
       proposal.id
     );
+  }
+
+  @FieldResolver(() => SEP, { nullable: true })
+  async sep(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<SEP | null> {
+    return await context.queries.sep.dataSource.getSEPByProposalId(proposal.id);
+  }
+
+  @FieldResolver(() => Call, { nullable: true })
+  async call(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Call | null> {
+    return await context.queries.call.dataSource.get(proposal.callId);
   }
 
   @FieldResolver(() => Questionary)

@@ -21,7 +21,7 @@ const secret = process.env.secret as string;
 
 const goodToken = jsonwebtoken.sign(
   {
-    id: dummyUser.id,
+    user: { id: dummyUser.id },
     type: 'passwordReset',
     updated: dummyUser.updated,
   },

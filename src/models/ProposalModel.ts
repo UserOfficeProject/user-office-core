@@ -7,6 +7,7 @@ import {
   FileUploadConfig,
   SelectionFromOptionsConfig,
   TextInputConfig,
+  SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
 import JSDict from '../utils/Dictionary';
 import { EvaluatorOperator } from './ConditionEvaluator';
@@ -38,6 +39,7 @@ export enum DataType {
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
+  SUBTEMPLATE = 'SUBTEMPLATE',
 }
 
 export class Topic {
@@ -75,7 +77,7 @@ export class Question {
   }
 }
 
-export class QuestionRel {
+export class QuestionTemplateRelation {
   constructor(
     public question: Question,
     public topicId: number,
@@ -85,7 +87,7 @@ export class QuestionRel {
   ) {}
 
   public static fromObject(obj: any) {
-    return new QuestionRel(
+    return new QuestionTemplateRelation(
       Question.fromObject(obj.question),
       obj.topicId,
       obj.sortOrder,
@@ -94,8 +96,8 @@ export class QuestionRel {
     );
   }
 }
-export class Answer extends QuestionRel {
-  constructor(templateField: QuestionRel, public value?: any) {
+export class Answer extends QuestionTemplateRelation {
+  constructor(templateField: QuestionTemplateRelation, public value?: any) {
     super(
       templateField.question,
       templateField.topicId,
@@ -105,7 +107,7 @@ export class Answer extends QuestionRel {
     );
   }
   static fromObject(obj: any) {
-    const templateField = QuestionRel.fromObject(obj);
+    const templateField = QuestionTemplateRelation.fromObject(obj);
 
     return new Answer(
       templateField,
@@ -139,17 +141,18 @@ export class Questionary {
   constructor(
     public questionaryId: number | undefined,
     public templateId: number,
+    public creator_id: number,
     public created: Date
   ) {}
 }
 
 export class TemplateStep {
-  constructor(public topic: Topic, public fields: QuestionRel[]) {}
+  constructor(public topic: Topic, public fields: QuestionTemplateRelation[]) {}
 
   public static fromObject(obj: any) {
     return new TemplateStep(
       Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => QuestionRel.fromObject(field))
+      obj.fields.map((field: any) => QuestionTemplateRelation.fromObject(field))
     );
   }
 }
@@ -211,9 +214,11 @@ const defaultConfigs = JSDict.Create<
   | FileUploadConfig
   | SelectionFromOptionsConfig
   | TextInputConfig
+  | SubtemplateConfig
 >();
 defaultConfigs.put('BooleanConfig', { ...baseDefaultConfig });
 defaultConfigs.put('DateConfig', { ...baseDefaultConfig });
+
 defaultConfigs.put('EmbellishmentConfig', {
   plain: '',
   html: '',
@@ -236,6 +241,10 @@ defaultConfigs.put('TextInputConfig', {
   placeholder: '',
   ...baseDefaultConfig,
 });
+defaultConfigs.put('SubtemplateConfig', {
+  templateId: 0,
+  ...baseDefaultConfig,
+});
 
 const f = JSDict.Create<string, () => typeof FieldConfigType>();
 f.put(DataType.BOOLEAN, () => new BooleanConfig());
@@ -244,6 +253,7 @@ f.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
 f.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 f.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 f.put(DataType.TEXT_INPUT, () => new TextInputConfig());
+f.put(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,

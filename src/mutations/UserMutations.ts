@@ -111,6 +111,12 @@ export default class UserMutations {
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.SEP_SECRETARY;
+    } else if (
+      args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.INSTRUMENT_SCIENTIST;
     }
 
     if (!userId) {
@@ -156,7 +162,6 @@ export default class UserMutations {
       const updatedUser = (await this.update(user, {
         id: user.id,
         placeholder: false,
-        password: hash,
         ...args,
       })) as UserWithRole;
 
@@ -331,10 +336,11 @@ export default class UserMutations {
   async token(token: string): Promise<string | Rejection> {
     try {
       const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const roles = await this.dataSource.getUserRoles(decoded.user.id);
       const freshToken = jsonwebtoken.sign(
         {
           user: decoded.user,
-          roles: decoded.roles,
+          roles,
           currentRole: decoded.currentRole,
         },
         this.secret,

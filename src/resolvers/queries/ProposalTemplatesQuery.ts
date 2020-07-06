@@ -1,16 +1,34 @@
-import { Args, Ctx, Query, Resolver } from 'type-graphql';
+import {
+  Args,
+  Ctx,
+  Query,
+  Resolver,
+  InputType,
+  Field,
+  ArgsType,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/ProposalModel';
 import { ProposalTemplate } from '../types/ProposalTemplate';
-import { TemplatesArgs } from './TemplatesQuery';
+@InputType()
+class ProposalTemplatesFilter {
+  @Field({ nullable: true })
+  public isArchived?: boolean;
+}
+
+@ArgsType()
+export class ProposalTemplatesArgs {
+  @Field(() => ProposalTemplatesFilter, { nullable: true })
+  public filter?: ProposalTemplatesFilter;
+}
 
 @Resolver()
 export class ProposalTemplatesQuery {
   @Query(() => [ProposalTemplate], { nullable: true })
   proposalTemplates(
     @Ctx() context: ResolverContext,
-    @Args() args: TemplatesArgs
+    @Args() args: ProposalTemplatesArgs
   ) {
     return context.queries.template.getTemplates(context.user, {
       filter: {

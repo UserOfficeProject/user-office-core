@@ -5,31 +5,58 @@ import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
+import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryMutations {
   constructor(
     private dataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
+    private questionaryAuth: QuestionaryAuthorization,
     private logger: Logger
   ) {}
 
   @Authorized()
   async answerTopic(agent: User | null, args: AnswerTopicArgs) {
     const { questionaryId, topicId, answers, isPartialSave } = args;
-    // TODO do authorization
+
     const questionary = await this.dataSource.getQuestionary(questionaryId);
+    if (!questionary) {
+      logger.logError('Trying to answer non-existing questionary', {
+        questionaryId,
+      });
+
+      return rejection('NOT_FOUND');
+    }
+    const template = await this.templateDataSource.getTemplate(
+      questionary.templateId
+    );
+    if (!template) {
+      logger.logError('Trying to answer questionary without template', {
+        templateId: questionary.templateId,
+      });
+
+      return rejection('NOT_FOUND');
+    }
+
+    const hasRights = await this.questionaryAuth.hasWriteRights(
+      agent,
+      questionaryId
+    );
+    if (!hasRights) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
 
     for (const answer of answers) {
       if (answer.value !== undefined) {
-        const questionRel = await this.templateDataSource.getQuestionRel(
+        const questionTemplateRelation = await this.templateDataSource.getQuestionTemplateRelation(
           answer.questionId,
           questionary.templateId
         );
-        if (!questionRel) {
-          logger.logError('Could not find questionRel', {
+        if (!questionTemplateRelation) {
+          logger.logError('Could not find questionTemplateRelation', {
             questionId: answer.questionId,
             templateId: questionary.templateId,
           });
@@ -38,11 +65,11 @@ export default class QuestionaryMutations {
         }
         if (
           !isPartialSave &&
-          !isMatchingConstraints(answer.value, questionRel)
+          !isMatchingConstraints(answer.value, questionTemplateRelation)
         ) {
           this.logger.logError('User provided value not matching constraint', {
             answer,
-            templateField: questionRel,
+            questionTemplateRelation,
           });
 
           return rejection('VALUE_CONSTRAINT_REJECTION');
@@ -69,11 +96,23 @@ export default class QuestionaryMutations {
 
   @Authorized()
   async updateAnswer(agent: User | null, args: UpdateAnswerArgs) {
-    // TODO do authorization
+    const hasRights = await this.questionaryAuth.hasWriteRights(
+      agent,
+      args.questionaryId
+    );
+    if (!hasRights) {
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     return this.dataSource.updateAnswer(
       args.questionaryId,
       args.answer.questionId,
       args.answer.value
     );
+  }
+
+  @Authorized()
+  async create(agent: User | null, args: CreateQuestionaryArgs) {
+    return this.dataSource.create(agent!.id, args.templateId);
   }
 }

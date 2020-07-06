@@ -2,18 +2,18 @@
 import {
   DataType,
   Question,
-  QuestionRel,
+  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateStep,
   Topic,
   TemplateCategoryId,
 } from '../models/ProposalModel';
-import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 
@@ -51,15 +51,21 @@ export interface TemplateDataSource {
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
 
   // TemplateField rel
-  createQuestionRel(args: CreateQuestionRelArgs): Promise<Template>;
-  getQuestionRel(
+  createQuestionTemplateRelation(
+    args: CreateQuestionTemplateRelationArgs
+  ): Promise<Template>;
+  getQuestionTemplateRelation(
     questionId: string,
     templateId: number
-  ): Promise<QuestionRel | null>;
+  ): Promise<QuestionTemplateRelation | null>;
 
-  updateQuestionRel(args: UpdateQuestionRelArgs): Promise<Template>;
+  updateQuestionTemplateRelation(
+    args: UpdateQuestionTemplateRelationArgs
+  ): Promise<Template>;
 
-  deleteQuestionRel(args: DeleteQuestionRelArgs): Promise<Template>;
+  deleteQuestionTemplateRelation(
+    args: DeleteQuestionTemplateRelationArgs
+  ): Promise<Template>;
 
   // Topic
   createTopic(args: CreateTopicArgs): Promise<Template>;

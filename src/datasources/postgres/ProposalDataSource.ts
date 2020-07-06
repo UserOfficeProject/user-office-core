@@ -148,7 +148,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposals')
-      .orderBy('proposal_id', 'desc')
+      .orderBy('proposals.proposal_id', 'desc')
       .modify(query => {
         if (filter?.text) {
           query
@@ -164,6 +164,25 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             )
             .whereIn('questionaries.template_id', filter.templateIds);
         }
+        if (filter?.questionaryIds) {
+          query.whereIn('proposals.questionary_id', filter.questionaryIds);
+        }
+        if (filter?.callId) {
+          query.where('proposals.call_id', filter.callId);
+        }
+        if (filter?.instrumentId) {
+          query
+            .leftJoin(
+              'instrument_has_proposals',
+              'instrument_has_proposals.proposal_id',
+              'proposals.proposal_id'
+            )
+            .where(
+              'instrument_has_proposals.instrument_id',
+              filter.instrumentId
+            );
+        }
+
         if (first) {
           query.limit(first);
         }

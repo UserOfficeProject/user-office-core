@@ -3,13 +3,10 @@ import {
   CallDataSourceMock,
   dummyCall,
 } from '../datasources/mockups/CallDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import {
-  UserDataSourceMock,
   dummyUserWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import CallMutations from './CallMutations';
 
 const callMutations = new CallMutations(new CallDataSourceMock());
@@ -25,6 +22,8 @@ describe('Test Call Mutations', () => {
         endReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
+        startCycle: new Date('2019-02-19'),
+        endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
       })
@@ -41,6 +40,8 @@ describe('Test Call Mutations', () => {
         endReview: new Date('2019-02-19'),
         startNotify: new Date('2019-02-19'),
         endNotify: new Date('2019-02-19'),
+        startCycle: new Date('2019-02-19'),
+        endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
       })
@@ -56,6 +57,8 @@ describe('Test Call Mutations', () => {
       endReview: new Date('2019-02-19'),
       startNotify: new Date('2019-02-19'),
       endNotify: new Date('2019-02-19'),
+      startCycle: new Date('2019-02-19'),
+      endCycle: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
     };
@@ -76,6 +79,8 @@ describe('Test Call Mutations', () => {
         endReview: new Date('2020-06-18'),
         startNotify: new Date('2020-06-18'),
         endNotify: new Date('2020-06-18'),
+        startCycle: new Date('2020-06-18'),
+        endCycle: new Date('2020-06-18'),
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
       })
@@ -92,6 +97,8 @@ describe('Test Call Mutations', () => {
       endReview: new Date('2020-06-18'),
       startNotify: new Date('2020-06-18'),
       endNotify: new Date('2020-06-18'),
+      startCycle: new Date('2020-06-18'),
+      endCycle: new Date('2020-06-18'),
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
     };

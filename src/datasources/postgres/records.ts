@@ -9,7 +9,7 @@ import {
   FieldDependency,
   Question,
   Questionary,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategory,
   Topic,
 } from '../../models/ProposalModel';
@@ -26,11 +26,11 @@ export interface ProposalUserRecord {
 export interface QuestionaryRecord {
   readonly questionary_id: number;
   readonly template_id: number;
+  readonly creator_id: number;
   readonly created_at: Date;
 }
 
 export interface ProposalRecord {
-  [x: string]: any;
   readonly proposal_id: number;
   readonly title: string;
   readonly abstract: string;
@@ -40,10 +40,13 @@ export interface ProposalRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly short_code: string;
+  readonly rank_order: number;
+  readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
   readonly technical_score: number;
   readonly call_id: number;
+  readonly questionary_id: number;
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
@@ -157,6 +160,8 @@ export interface CallRecord {
   readonly end_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
+  readonly start_cycle: Date;
+  readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly template_id: number;
@@ -238,6 +243,15 @@ export interface InstrumentRecord {
   readonly name: string;
   readonly short_code: string;
   readonly description: string;
+  readonly full_count: number;
+}
+
+export interface InstrumentWithAvailabilityTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly availability_time: number;
   readonly full_count: number;
 }
 
@@ -327,10 +341,10 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionRelObject = (
+export const createQuestionTemplateRelationObject = (
   record: QuestionRecord & QuestionTemplateRelRecord
 ) => {
-  return new QuestionRel(
+  return new QuestionTemplateRelation(
     new Question(
       record.category_id,
       record.question_id,
@@ -402,6 +416,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_review,
     call.start_notify,
     call.end_notify,
+    call.start_cycle,
+    call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
     call.template_id
@@ -412,6 +428,7 @@ export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
   return new Questionary(
     questionary.questionary_id,
     questionary.template_id,
+    questionary.creator_id,
     questionary.created_at
   );
 };

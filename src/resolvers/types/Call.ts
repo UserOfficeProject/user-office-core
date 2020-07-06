@@ -38,6 +38,12 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endNotify: Date;
 
+  @Field(() => Date)
+  public startCycle: Date;
+
+  @Field(() => Date)
+  public endCycle: Date;
+
   @Field()
   public cycleComment: string;
 
@@ -48,9 +54,15 @@ export class Call implements Partial<CallOrigin> {
   public templateId?: number;
 }
 
+@ObjectType()
+class InstrumentWithAvailabilityTime extends Instrument {
+  @Field(() => Int, { nullable: true })
+  public availabilityTime: number;
+}
+
 @Resolver(() => Call)
 export class CallInstrumentsResolver {
-  @FieldResolver(() => [Instrument])
+  @FieldResolver(() => [InstrumentWithAvailabilityTime])
   async instruments(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.instrument.dataSource.getInstrumentsByCallId(
       call.id
