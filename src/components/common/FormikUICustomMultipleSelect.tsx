@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core';
 import { FormikActions } from 'formik';
 import React from 'react';
-const FormikUICustomSelect = ({
+const FormikUICustomMultipleSelect = ({
   field,
   form,
   availableOptions,
@@ -52,7 +52,7 @@ const FormikUICustomSelect = ({
         multiple
         value={field.value}
         onChange={handleChange}
-        input={<Input id="select-multiple-checkbox" />}
+        input={<Input />}
         renderValue={selected => (selected as string[]).join(', ')}
         MenuProps={MenuProps}
         id={id}
@@ -71,4 +71,4 @@ const FormikUICustomSelect = ({
   );
 };
 
-export default FormikUICustomSelect;
+export default FormikUICustomMultipleSelect;

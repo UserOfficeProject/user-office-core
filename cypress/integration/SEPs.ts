@@ -36,7 +36,7 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Create SEP').click();
     cy.get('#code').type(code);
     cy.get('#description').type(description);
-    cy.contains('Add SEP').click();
+    cy.get('[data-cy="submit"]').click();
 
     cy.wait(1000);
 
@@ -58,7 +58,7 @@ context('Scientific evaluation panel tests', () => {
       .click();
     cy.get('#code').type(code);
     cy.get('#description').type(description);
-    cy.contains('Update SEP').click();
+    cy.get('[data-cy="submit"]').click();
 
     cy.wait(1000);
 

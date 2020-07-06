@@ -7,6 +7,8 @@ mutation updateCall(
   $endReview: DateTime!
   $startNotify: DateTime!
   $endNotify: DateTime!
+  $startCycle: DateTime!
+  $endCycle: DateTime!
   $cycleComment: String!
   $surveyComment: String!
   $templateId: Int
@@ -20,6 +22,8 @@ mutation updateCall(
     endReview: $endReview
     startNotify: $startNotify
     endNotify: $endNotify
+    startCycle: $startCycle
+    endCycle: $endCycle
     cycleComment: $cycleComment
     surveyComment: $surveyComment
     templateId: $templateId
@@ -34,9 +38,18 @@ mutation updateCall(
       endReview
       startNotify
       endNotify
+      startCycle
+      endCycle
       cycleComment
       surveyComment
       templateId
+      instruments {
+        instrumentId
+        name
+        shortCode
+        description
+        availabilityTime
+      }
     }
   }
 }

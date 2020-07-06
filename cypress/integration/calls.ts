@@ -60,15 +60,21 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });
@@ -111,15 +117,21 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });
@@ -136,7 +148,7 @@ context('Calls tests', () => {
     cy.get('#name').type(name);
     cy.get('#shortCode').type(shortCode);
     cy.get('#description').type(description);
-    cy.contains('Create Instrument').click();
+    cy.get('[data-cy="submit"]').click();
 
     cy.wait(1000);
 
@@ -164,7 +176,60 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
-      .should('have.length', 5);
+      .should('have.length', 6);
+  });
+
+  it('A user-officer should not be able to set negative availability time on instrument per call', () => {
+    cy.login('officer');
+
+    cy.contains('View Calls').click();
+
+    cy.get('[title="Show Instruments"]')
+      .first()
+      .click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('[data-cy="availability-time"]').type('-10');
+
+    cy.get('[title="Save"]')
+      .first()
+      .click();
+
+    cy.wait(1000);
+
+    cy.contains('Time available must be positive number');
+  });
+
+  it('A user-officer should be able to set availability time on instrument per call', () => {
+    cy.login('officer');
+
+    cy.contains('View Calls').click();
+
+    cy.get('[title="Show Instruments"]')
+      .first()
+      .click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('[data-cy="availability-time"]').type('10');
+
+    cy.get('[title="Save"]')
+      .first()
+      .click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="call-instrument-assignments-table"]')
+      .find('tbody td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('10');
+      });
   });
 
   it('A user-officer should be able to remove instrument from a call', () => {

@@ -3,13 +3,15 @@ import { IconButton, Tooltip } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
 import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable, { Column } from 'material-table';
+import MaterialTable, { Column, Options } from 'material-table';
 import { useSnackbar } from 'notistack';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import XLSX from 'xlsx';
 
 import { Review, ReviewStatus, Instrument } from '../../generated/sdk';
+import { ProposalsFilter } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
@@ -22,8 +24,18 @@ import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrume
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
 import RankInput from './RankInput';
 
-const ProposalTableOfficer: React.FC = () => {
-  const { loading, proposalsData, setProposalsData } = useProposalsData('');
+type ProposalTableOfficerProps = {
+  proposalFilter: ProposalsFilter;
+  Toolbar: (data: Options) => JSX.Element;
+};
+
+const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
+  proposalFilter,
+  Toolbar,
+}) => {
+  const { loading, proposalsData, setProposalsData } = useProposalsData(
+    proposalFilter
+  );
   const [open, setOpen] = React.useState(false);
   const [openRemoveInstrument, setOpenRemoveInstrument] = React.useState(false);
   const [openAssignment, setOpenAssignment] = React.useState(false);
@@ -455,6 +467,9 @@ const ProposalTableOfficer: React.FC = () => {
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        components={{
+          Toolbar: Toolbar,
+        }}
         localization={{
           toolbar: {
             exportName: 'Export as Excel',
@@ -574,6 +589,11 @@ const ProposalTableOfficer: React.FC = () => {
       />
     </>
   );
+};
+
+ProposalTableOfficer.propTypes = {
+  Toolbar: PropTypes.func.isRequired,
+  proposalFilter: PropTypes.any,
 };
 
 export default ProposalTableOfficer;

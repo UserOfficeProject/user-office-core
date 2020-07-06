@@ -2,17 +2,17 @@ import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { QuestionRel } from '../../../../generated/sdk';
+import { QuestionTemplateRelation } from '../../../../generated/sdk';
 import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
 import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
 import TitledContainer from '../../../common/TitledContainer';
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
-import { QuestionRelFormShell } from './QuestionRelFormShell';
+import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';
 
-export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
+export const QuestionTemplateRelationBooleanForm: TFormSignature<QuestionTemplateRelation> = props => {
   return (
-    <QuestionRelFormShell
+    <QuestionTemplateRelationFormShell
       closeMe={props.closeMe}
       dispatch={props.dispatch}
       questionRel={props.field}
@@ -53,6 +53,6 @@ export const QuestionRelBooleanForm: TFormSignature<QuestionRel> = props => {
           </TitledContainer>
         </>
       )}
-    </QuestionRelFormShell>
+    </QuestionTemplateRelationFormShell>
   );
 };

@@ -2,13 +2,13 @@ import { Backdrop, Fade, Grid, makeStyles, Modal } from '@material-ui/core';
 import React from 'react';
 export default function ModalWrapper(props: {
   isOpen: boolean;
-  closeMe: () => void;
+  close: () => void;
   children: React.ReactNode;
 }) {
-  const classes = makeStyles(() => ({
+  const classes = makeStyles(theme => ({
     container: {
       backgroundColor: 'white',
-      padding: '20px',
+      padding: theme.spacing(3),
       maxWidth: '700px',
       maxHeight: '100%',
       overflowY: 'auto',
@@ -24,7 +24,7 @@ export default function ModalWrapper(props: {
     <Modal
       className={classes.modal}
       open={props.isOpen}
-      onClose={props.closeMe}
+      onClose={props.close}
       closeAfterTransition
       BackdropComponent={Backdrop}
       BackdropProps={{

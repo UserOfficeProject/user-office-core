@@ -6,7 +6,7 @@ import {
   Question,
   FieldConfig,
   FieldDependency,
-  QuestionRel,
+  QuestionTemplateRelation,
   TemplateCategoryId,
 } from '../generated/sdk';
 import {
@@ -162,7 +162,7 @@ export const createDummyField = (values: {
   question?: Question;
   config?: FieldConfig;
   dependency?: FieldDependency;
-}): QuestionRel => ({
+}): QuestionTemplateRelation => ({
   topicId: values.id || 1,
   config: values.config || {
     required: false,

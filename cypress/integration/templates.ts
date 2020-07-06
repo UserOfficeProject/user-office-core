@@ -3,7 +3,7 @@
 
 const addItemToTopic = element => {};
 
-context('Proposal tests', () => {
+context('Template tests', () => {
   const faker = require('faker');
 
   before(() => {
@@ -27,10 +27,65 @@ context('Proposal tests', () => {
   const abstract = faker.random.words(8);
   const textAnswer = faker.random.words(5);
 
+  const sampleDeclarationName = faker.random.words(2);
+  const sampleDeclarationDescription = faker.random.words(5);
+
+  it('User officer can create sample declaration template', () => {
+    cy.login('officer');
+
+    cy.navigateToTemplatesSubmenu('Sample declaration templates');
+
+    cy.get('[data-cy="create-new-button"]').click();
+
+    cy.get('[data-cy="name"]').type(sampleDeclarationName);
+
+    cy.get('[data-cy="description"]').type(sampleDeclarationDescription);
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains(sampleDeclarationName);
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
+
+    cy.contains('Add topic').click();
+
+    cy.get('[data-cy=topic-title]').click();
+
+    cy.get('[data-cy=topic-title-input]')
+      .clear()
+      .type(`${faker.random.words(1)}{enter}`);
+
+    cy.get('[data-cy=show-more-button]').click();
+
+    cy.contains('Add question').click();
+
+    /* Add Text Input */
+    cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
+
+    cy.contains('Add Text input').click();
+
+    cy.get('[data-cy=question]')
+      .clear()
+      .type(textQuestion);
+
+    cy.contains('Is required').click();
+
+    cy.contains('Save').click();
+
+    cy.contains(textQuestion)
+      .siblings("[data-cy='proposal-question-id']")
+      .invoke('html')
+      .then(fieldId => {
+        textId = fieldId;
+      });
+  });
+
   it('User officer can modify proposal template', () => {
     cy.login('officer');
 
-    cy.expandTemplatesSubmenu();
+    cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.contains('default template')
       .parent()
@@ -180,7 +235,7 @@ context('Proposal tests', () => {
   it('User officer can clone template', () => {
     cy.login('officer');
 
-    cy.expandTemplatesSubmenu();
+    cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.contains('default template')
       .parent()
@@ -196,7 +251,7 @@ context('Proposal tests', () => {
   it('User officer can delete template', () => {
     cy.login('officer');
 
-    cy.expandTemplatesSubmenu();
+    cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.contains('Copy of default template')
       .parent()
@@ -212,7 +267,7 @@ context('Proposal tests', () => {
   it('User officer archive template', () => {
     cy.login('officer');
 
-    cy.expandTemplatesSubmenu();
+    cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.contains('default template')
       .parent()
@@ -307,7 +362,7 @@ context('Proposal tests', () => {
   it('Officer can delete proposal questions', () => {
     cy.login('officer');
 
-    cy.expandTemplatesSubmenu();
+    cy.navigateToTemplatesSubmenu('Proposal templates');
 
     cy.get("[title='Edit']")
       .first()

@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 
+import { ProposalsFilter } from '../generated/sdk';
 import { ProposalStatus } from '../generated/sdk';
 import { Proposal } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
-export function useProposalsData(filter: string) {
+export function useProposalsData(filter: ProposalsFilter) {
   const api = useDataApi();
   const [proposalsData, setProposalsData] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { callId, instrumentId, questionaryIds, templateIds, text } = filter;
+
   useEffect(() => {
     api()
       .getProposals({
-        filter: { text: filter },
+        filter: { callId, instrumentId, questionaryIds, templateIds, text },
       })
       .then(data => {
         if (data.proposals) {
@@ -29,7 +33,7 @@ export function useProposalsData(filter: string) {
         }
         setLoading(false);
       });
-  }, [filter, api]);
+  }, [callId, instrumentId, questionaryIds, templateIds, text, api]);
 
   return { loading, proposalsData, setProposalsData };
 }

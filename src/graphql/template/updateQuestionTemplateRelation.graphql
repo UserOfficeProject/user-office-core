@@ -1,4 +1,4 @@
-mutation updateQuestionRel(
+mutation updateQuestionTemplateRelation(
   $questionId: String!
   $templateId: Int!
   $topicId: Int
@@ -6,7 +6,7 @@ mutation updateQuestionRel(
   $config: String
   $dependency: FieldDependencyInput
 ) {
-  updateQuestionRel(
+  updateQuestionTemplateRelation(
     questionId: $questionId
     templateId: $templateId
     topicId: $topicId

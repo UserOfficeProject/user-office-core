@@ -35,9 +35,9 @@ const resetDB = () => {
   request('/graphql', query).then(data => console.log(data));
 };
 
-const expandTemplatesSubmenu = () => {
+const navigateToTemplatesSubmenu = submenuName => {
   cy.contains('Templates').click();
-  cy.get("[title='Proposal templates']")
+  cy.get(`[title='${submenuName}']`)
     .first()
     .click();
 };
@@ -71,7 +71,7 @@ const login = role => {
 
 Cypress.Commands.add('resetDB', resetDB);
 
-Cypress.Commands.add('expandTemplatesSubmenu', expandTemplatesSubmenu);
+Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('login', login);
 

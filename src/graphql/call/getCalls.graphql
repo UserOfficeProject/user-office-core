@@ -8,6 +8,8 @@ query getCalls($filter: CallsFilter) {
     endReview
     startNotify
     endNotify
+    startCycle
+    endCycle
     cycleComment
     surveyComment
     templateId
@@ -16,6 +18,10 @@ query getCalls($filter: CallsFilter) {
       name
       shortCode
       description
+      availabilityTime
+      scientists {
+        ...basicUserDetails
+      }
     }
   }
 }

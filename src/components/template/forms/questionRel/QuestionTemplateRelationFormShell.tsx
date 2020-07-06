@@ -2,18 +2,21 @@ import { Button, makeStyles, Typography, Link } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
-import { Template, QuestionRel } from '../../../../generated/sdk';
+import { Template, QuestionTemplateRelation } from '../../../../generated/sdk';
 import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
+import { ActionButtonContainer } from '../../../common/ActionButtonContainer';
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
-export const QuestionRelFormShell = (props: {
+export const QuestionTemplateRelationFormShell = (props: {
   validationSchema: any;
-  questionRel: QuestionRel;
+  questionRel: QuestionTemplateRelation;
   dispatch: React.Dispatch<Event>;
   closeMe: Function;
   label: string;
   template: Template;
-  children: (formikProps: FormikProps<QuestionRel>) => React.ReactNode;
+  children: (
+    formikProps: FormikProps<QuestionTemplateRelation>
+  ) => React.ReactNode;
 }) => {
   const classes = makeStyles(theme => ({
     container: {
@@ -28,11 +31,6 @@ export const QuestionRelFormShell = (props: {
       '& SVG': {
         marginRight: theme.spacing(1),
       },
-    },
-    actions: {
-      marginTop: theme.spacing(4),
-      display: 'flex',
-      justifyContent: 'space-between',
     },
     naturalKey: {
       fontSize: '16px',
@@ -78,10 +76,10 @@ export const QuestionRelFormShell = (props: {
         {formikProps => (
           <Form style={{ flexGrow: 1 }}>
             {props.children(formikProps)}
-            <div className={classes.actions}>
+            <ActionButtonContainer>
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 data-cy="delete"
                 onClick={() => {
@@ -105,7 +103,7 @@ export const QuestionRelFormShell = (props: {
               >
                 Update
               </Button>
-            </div>
+            </ActionButtonContainer>
           </Form>
         )}
       </Formik>

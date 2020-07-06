@@ -1,20 +1,13 @@
-// FIXME: This file should be reviewed once more. It is too messy and lot of things are used before they are defined.
-// Maybe it should be split into multiple files or organized better.
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { LinearProgress, StepButton } from '@material-ui/core';
+import { LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
-import React, {
-  createContext,
-  PropsWithChildren,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import {
@@ -24,8 +17,8 @@ import {
   UserRole,
 } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
-import { Answer, ProposalSubsetSumbission } from '../../models/ProposalModel';
-import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
+import { ProposalSubsetSumbission } from '../../models/ProposalModel';
+import { prepareAnswers } from '../../models/ProposalModelFunctions';
 import {
   Event,
   EventType,
@@ -38,6 +31,7 @@ import { useCheckAccess } from '../common/Can';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
+import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 export interface Notification {
   variant: 'error' | 'success';
@@ -49,21 +43,6 @@ enum StepType {
   QUESTIONARY,
   REVIEW,
 }
-
-const prepareAnswers = (answers?: Answer[]): Answer[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
-    );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-
-    return answers;
-  } else {
-    return [];
-  }
-};
 
 class QuestionaryUIStep {
   constructor(
@@ -199,20 +178,20 @@ export default function ProposalContainer(props: {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          let { id, status, shortCode } = state.proposal;
+          let { id, status, shortCode, questionaryId } = state.proposal;
           const { callId } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
               () =>
                 api()
                   .createProposal({ callId })
-                  .then(data => data.createProposal.proposal as Proposal),
+                  .then(data => data.createProposal.proposal!),
               'Saved'
             );
-            ({ id, status, shortCode } = result);
+            ({ id, status, shortCode, questionaryId } = result);
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode },
+              payload: { id, status, shortCode, questionaryId },
             });
           }
           await executeAndMonitorCall(
@@ -234,7 +213,7 @@ export default function ProposalContainer(props: {
             () =>
               api()
                 .answerTopic({
-                  questionaryId: state.proposal.id,
+                  questionaryId: state.proposal.questionaryId,
                   answers: prepareAnswers(action.payload.answers),
                   topicId: action.payload.topicId,
                   isPartialSave: true,
@@ -345,8 +324,6 @@ export default function ProposalContainer(props: {
     setProposalSteps(proposalSteps);
   }, [state, isSubmitted, isNonOfficer]);
 
-  // TODO
-  // this effect should be cleaned up as it is hard to read
   // The purpose of this effect is to navigate user to the
   // right step once proposal loads
   useEffect(() => {
@@ -436,46 +413,6 @@ export default function ProposalContainer(props: {
         </StyledPaper>
       </ProposalSubmissionContext.Provider>
     </Container>
-  );
-}
-
-function QuestionaryStepButton(
-  props: PropsWithChildren<{
-    onClick: () => Promise<void>;
-    active?: boolean;
-    completed?: boolean;
-    clickable?: boolean;
-    editable: boolean;
-  }>
-) {
-  const classes = makeStyles(theme => ({
-    active: {
-      '& SVG': {
-        color: theme.palette.secondary.main + '!important',
-      },
-    },
-    editable: {
-      '& SVG': {
-        color: theme.palette.primary.main + '!important',
-      },
-    },
-  }))();
-
-  // NOTE: Without editable because it fires console warning when passed to StepButton component.
-  const { editable, ...propsWithoutEditable } = props;
-
-  const buttonClasses = [];
-
-  if (propsWithoutEditable.active) {
-    buttonClasses.push(classes.active);
-  } else if (editable) {
-    buttonClasses.push(classes.editable);
-  }
-
-  return (
-    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
-      {props.children}
-    </StepButton>
   );
 }
 

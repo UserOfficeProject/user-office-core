@@ -1,39 +1,46 @@
-import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+import { AssignmentInd, Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { Instrument, UserRole } from '../../generated/sdk';
+import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { ButtonContainer } from '../../styles/StyledComponents';
 import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
+import InputDialog from '../common/InputDialog';
+import ParticipantModal from '../proposal/ParticipantModal';
+import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
-
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
 
 const InstrumentsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
-  const classes = useStyles();
+  const {
+    loadingInstruments,
+    instrumentsData,
+    setInstrumentsData,
+  } = useInstrumentsData();
+
   const columns = [
-    { title: 'Instrument ID', field: 'instrumentId' },
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
+    {
+      title: 'Scientists',
+      render: (rowData: Instrument) =>
+        rowData.scientists.length > 0 ? rowData.scientists.length : '-',
+    },
   ];
   const [editInstrument, setEditInstrument] = useState<Instrument | null>(null);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [assigningInstrumentId, setAssigningInstrumentId] = useState<
+    number | null
+  >(null);
 
-  if (loading) {
+  if (loadingInstruments) {
     return <p>Loading...</p>;
   }
 
@@ -78,11 +85,94 @@ const InstrumentsTable: React.FC = () => {
     }
   };
 
+  const assignScientistsToInstrument = async (scientist: BasicUserDetails) => {
+    const assignScientistToInstrumentResult = await api().assignScientistsToInstrument(
+      {
+        instrumentId: assigningInstrumentId as number,
+        scientistIds: [scientist.id],
+      }
+    );
+
+    if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
+      if (!scientist.organisation) {
+        scientist.organisation = 'Other';
+      }
+
+      if (instrumentsData) {
+        const newInstrumentsData = instrumentsData.map(instrumentItem => {
+          if (instrumentItem.instrumentId === assigningInstrumentId) {
+            return {
+              ...instrumentItem,
+              scientists: [...instrumentItem.scientists, { ...scientist }],
+            };
+          } else {
+            return instrumentItem;
+          }
+        });
+
+        setInstrumentsData(newInstrumentsData);
+      }
+    }
+
+    const errorMessage = assignScientistToInstrumentResult
+      .assignScientistsToInstrument.error
+      ? 'Could not assign scientist to instrument'
+      : 'Scientist assigned to instrument';
+
+    enqueueSnackbar(errorMessage, {
+      variant: assignScientistToInstrumentResult.assignScientistsToInstrument
+        .error
+        ? 'error'
+        : 'success',
+    });
+
+    setAssigningInstrumentId(null);
+  };
+
+  const removeAssignedScientistFromInstrument = (
+    scientistToRemoveId: number,
+    instrumentToRemoveFromId: number
+  ) => {
+    if (instrumentsData) {
+      const newInstrumentsData = instrumentsData.map(instrumentItem => {
+        if (instrumentItem.instrumentId === instrumentToRemoveFromId) {
+          const newScientists = instrumentItem.scientists.filter(
+            scientistItem => scientistItem.id !== scientistToRemoveId
+          );
+
+          return {
+            ...instrumentItem,
+            scientists: newScientists,
+          };
+        } else {
+          return instrumentItem;
+        }
+      });
+
+      setInstrumentsData(newInstrumentsData);
+      setAssigningInstrumentId(null);
+    }
+  };
+
   const EditIcon = (): JSX.Element => <Edit />;
+  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
+
+  const AssignedScientists = (rowData: Instrument) => (
+    <AssignedScientistsTable
+      instrument={rowData}
+      removeAssignedScientistFromInstrument={
+        removeAssignedScientistFromInstrument
+      }
+    />
+  );
+
+  const instrumentAssignments = instrumentsData?.find(
+    instrumentItem => instrumentItem.instrumentId === assigningInstrumentId
+  );
 
   return (
     <>
-      <Dialog
+      <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={!!editInstrument || show}
@@ -90,23 +180,38 @@ const InstrumentsTable: React.FC = () => {
           !!editInstrument ? setEditInstrument(null) : setShow(false)
         }
       >
-        <DialogContent>
-          <CreateUpdateInstrument
-            instrument={editInstrument as Instrument}
-            close={(instrument: Instrument | null): void =>
-              !!editInstrument
-                ? onInstrumentUpdated(instrument)
-                : onInstrumentCreated(instrument)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+        <CreateUpdateInstrument
+          instrument={editInstrument as Instrument}
+          close={(instrument: Instrument | null) =>
+            !!editInstrument
+              ? onInstrumentUpdated(instrument)
+              : onInstrumentCreated(instrument)
+          }
+        />
+      </InputDialog>
+      <ParticipantModal
+        show={!!assigningInstrumentId}
+        close={(): void => setAssigningInstrumentId(null)}
+        addParticipant={assignScientistsToInstrument}
+        selectedUsers={instrumentAssignments?.scientists.map(
+          scientist => scientist.id
+        )}
+        userRole={UserRole.INSTRUMENT_SCIENTIST}
+        title={'Instrument scientist'}
+        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+      />
       <div data-cy="instruments-table">
         <MaterialTable
           icons={tableIcons}
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
+          detailPanel={[
+            {
+              tooltip: 'Show Instruments',
+              render: AssignedScientists,
+            },
+          ]}
           options={{
             search: true,
             debounceInterval: 400,
@@ -119,8 +224,15 @@ const InstrumentsTable: React.FC = () => {
             {
               icon: EditIcon,
               tooltip: 'Edit Instrument',
-              onClick: (event, rowData): void =>
+              onClick: (event, rowData) =>
                 setEditInstrument(rowData as Instrument),
+              position: 'row',
+            },
+            {
+              icon: AssignmentIndIcon,
+              tooltip: 'Assign scientist',
+              onClick: (event, rowData): void =>
+                setAssigningInstrumentId((rowData as Instrument).instrumentId),
               position: 'row',
             },
           ]}
@@ -128,17 +240,16 @@ const InstrumentsTable: React.FC = () => {
         <Can
           allowedRoles={[UserRole.USER_OFFICER]}
           yes={() => (
-            <ButtonContainer>
+            <ActionButtonContainer>
               <Button
                 type="button"
                 variant="contained"
                 color="primary"
-                className={classes.button}
-                onClick={(): void => setShow(true)}
+                onClick={() => setShow(true)}
               >
                 Create instrument
               </Button>
-            </ButtonContainer>
+            </ActionButtonContainer>
           )}
           no={() => null}
         ></Can>

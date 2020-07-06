@@ -109,6 +109,7 @@ const reducer = (
 
       return {
         ...state,
+        roles: newToken.roles,
         token: action.payload,
         expToken: newToken.exp,
       };
