@@ -1,0 +1,20 @@
+query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!) {
+  sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId) {
+    proposal {
+      id
+      title
+      shortCode
+      rankOrder
+      status
+      reviews {
+        id
+        comment
+        grade
+      }
+      technicalReview {
+        publicComment
+        status
+      }
+    }
+  }
+}
