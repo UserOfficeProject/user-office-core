@@ -277,6 +277,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       render: (rowData: ProposalData): string =>
         rowData.instrument ? rowData.instrument.name : '-',
     },
+    {
+      title: 'Call',
+      render: (rowData: ProposalData): string =>
+        rowData.call ? rowData.call.shortCode : '-',
+      hidden: true,
+    },
+    {
+      title: 'SEP',
+      render: (rowData: ProposalData): string =>
+        rowData.sep ? rowData.sep.code : '-',
+      hidden: true,
+    },
   ];
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.

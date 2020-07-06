@@ -890,6 +890,8 @@ export type Proposal = {
   reviews?: Maybe<Array<Review>>,
   technicalReview?: Maybe<TechnicalReview>,
   instrument?: Maybe<Instrument>,
+  sep?: Maybe<Sep>,
+  call?: Maybe<Call>,
   questionary: Questionary,
 };
 
@@ -946,7 +948,6 @@ export type ProposalTemplatesFilter = {
 export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
-  proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
@@ -962,6 +963,7 @@ export type Query = {
   instruments?: Maybe<InstrumentsQueryResult>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
+  proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
   questionary?: Maybe<Questionary>,
   review?: Maybe<Review>,
@@ -980,13 +982,6 @@ export type Query = {
 
 export type QueryCallsArgs = {
   filter?: Maybe<CallsFilter>
-};
-
-
-export type QueryProposalsArgs = {
-  filter?: Maybe<ProposalsFilter>,
-  first?: Maybe<Scalars['Int']>,
-  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -1053,6 +1048,13 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int']
+};
+
+
+export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -2271,6 +2273,12 @@ export type GetProposalsQuery = (
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'instrumentId' | 'name'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
+      )>, sep: Maybe<(
+        { __typename?: 'SEP' }
+        & Pick<Sep, 'id' | 'code'>
       )> }
       & ProposalFragment
     )> }
@@ -4257,6 +4265,14 @@ export const GetProposalsDocument = gql`
       instrument {
         instrumentId
         name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
       }
     }
     totalCount
