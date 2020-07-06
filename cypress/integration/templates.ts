@@ -334,13 +334,12 @@ context('Template tests', () => {
       .first()
       .click();
     cy.contains('Deviation').click();
-    cy.get("[title='Show Columns']")
-      .first()
-      .click();
     cy.get('.MuiPopover-paper')
       .contains('Call')
       .click();
-    cy.contains('SEP').click();
+    cy.get('.MuiPopover-paper')
+      .contains('SEP')
+      .click();
 
     cy.get('body').click();
 
