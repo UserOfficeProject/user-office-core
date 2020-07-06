@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import fs, { existsSync, unlink } from 'fs';
 
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
@@ -6,6 +7,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
+import { questionaryDataSource } from '../datasources';
 import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
@@ -17,7 +19,6 @@ import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
 import { createToC } from './pdfTableofContents/index';
-import { questionaryDataSource } from '../datasources';
 
 type PDFDocument = PDFKit.PDFDocument;
 
@@ -59,10 +60,34 @@ const writeHeading = (text: string, doc: PDFDocument) => {
     .text(text);
 };
 
+const getFileAttachmentIds = (answer: Answer) => {
+  if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
+    return (answer.value as string).split(',');
+  }
+
+  return [];
+};
+
 const getAttachment = async (attachmentId: string) => {
   await baseContext.mutations.file.prepare(attachmentId);
 
   return baseContext.queries.file.getFileMetadata([attachmentId]);
+};
+
+const getTopicActiveAnswers = (
+  questionarySteps: QuestionaryStep[],
+  topicId: number
+) => {
+  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
+
+  return step
+    ? (step.fields.filter(field => {
+        return areDependenciesSatisfied(
+          questionarySteps,
+          field.question.proposalQuestionId
+        );
+      }) as Answer[])
+    : [];
 };
 
 const writeEmbellishment = (answer: Answer, doc: PDFDocument) => {
@@ -100,6 +125,24 @@ const writeBoolean = (answer: Answer, doc: PDFDocument) => {
   }
 };
 
+const writeAnswer = async (answer: Answer, doc: PDFDocument) => {
+  if (answer.question.dataType === DataType.EMBELLISHMENT) {
+    writeEmbellishment(answer, doc);
+  } else if (answer.question.dataType === DataType.FILE_UPLOAD) {
+    writeFileUpload(answer, doc);
+  } else if (answer.question.dataType === DataType.DATE) {
+    writeDate(answer, doc);
+  } else if (answer.question.dataType === DataType.BOOLEAN) {
+    writeBoolean(answer, doc);
+  } else if (answer.question.dataType === DataType.SUBTEMPLATE) {
+    await writeSubtemplate(answer, doc);
+  } else {
+    writeBold(answer.question.question, doc);
+    write(answer.value ? answer.value : NOT_ANSWERED, doc);
+  }
+  doc.moveDown(0.5);
+};
+
 const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
   writeBold(answer.question.question, doc);
   doc.moveDown();
@@ -126,49 +169,6 @@ const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
   }
   doc.moveDown();
 };
-
-const writeAnswer = async (answer: Answer, doc: PDFDocument) => {
-  if (answer.question.dataType === DataType.EMBELLISHMENT) {
-    writeEmbellishment(answer, doc);
-  } else if (answer.question.dataType === DataType.FILE_UPLOAD) {
-    writeFileUpload(answer, doc);
-  } else if (answer.question.dataType === DataType.DATE) {
-    writeDate(answer, doc);
-  } else if (answer.question.dataType === DataType.BOOLEAN) {
-    writeBoolean(answer, doc);
-  } else if (answer.question.dataType === DataType.SUBTEMPLATE) {
-    await writeSubtemplate(answer, doc);
-  } else {
-    writeBold(answer.question.question, doc);
-    write(answer.value ? answer.value : NOT_ANSWERED, doc);
-  }
-  doc.moveDown(0.5);
-};
-
-const getFileAttachmentIds = (answer: Answer) => {
-  if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
-    return (answer.value as string).split(',');
-  }
-
-  return [];
-};
-
-const getTopicActiveAnswers = (
-  questionarySteps: QuestionaryStep[],
-  topicId: number
-) => {
-  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
-
-  return step
-    ? (step.fields.filter(field => {
-        return areDependenciesSatisfied(
-          questionarySteps,
-          field.question.proposalQuestionId
-        );
-      }) as Answer[])
-    : [];
-};
-
 const createProposalPDF = async (
   proposalId: number,
   user: UserWithRole,
