@@ -18,6 +18,7 @@ export interface SEPDataSource {
   ): Promise<SEP>;
   get(id: number): Promise<SEP | null>;
   getUserSeps(id: number): Promise<SEP[]>;
+  getSEPByProposalId(proposalId: number): Promise<SEP | null>;
   getAll(
     active: boolean,
     filter?: string,
