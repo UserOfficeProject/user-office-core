@@ -18,7 +18,6 @@ import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
 import { createToC } from './pdfTableofContents/index';
 import { questionaryDataSource } from '../datasources';
-import {} from 'pdfkit';
 
 type PDFDocument = PDFKit.PDFDocument;
 
