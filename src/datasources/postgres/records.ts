@@ -160,6 +160,8 @@ export interface CallRecord {
   readonly end_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
+  readonly start_cycle: Date;
+  readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly template_id: number;
@@ -414,6 +416,8 @@ export const createCallObject = (call: CallRecord) => {
     call.end_review,
     call.start_notify,
     call.end_notify,
+    call.start_cycle,
+    call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
     call.template_id

@@ -4,7 +4,7 @@ import { UserWithRole } from '../models/User';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
 export default class CallQueries {
-  constructor(private dataSource: CallDataSource) {}
+  constructor(public dataSource: CallDataSource) {}
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {

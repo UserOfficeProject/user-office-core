@@ -38,6 +38,12 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endNotify: Date;
 
+  @Field(() => Date)
+  public startCycle: Date;
+
+  @Field(() => Date)
+  public endCycle: Date;
+
   @Field()
   public cycleComment: string;
 

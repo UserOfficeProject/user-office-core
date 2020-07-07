@@ -39,6 +39,12 @@ export class UpdateCallArgs {
   public endNotify: Date;
 
   @Field()
+  public startCycle: Date;
+
+  @Field()
+  public endCycle: Date;
+
+  @Field()
   public cycleComment: string;
 
   @Field()
