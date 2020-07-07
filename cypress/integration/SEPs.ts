@@ -111,7 +111,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -169,7 +169,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -206,7 +206,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -246,7 +246,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -368,7 +368,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -415,7 +415,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 
@@ -455,7 +455,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('Logs').click();
+    cy.contains('Logs').click({ force: true });
 
     cy.wait(1000);
 

@@ -21,7 +21,6 @@ import { tableIcons } from '../../utils/materialIcons';
 import { useCheckAccess } from '../common/Can';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
-import AssignmentProvider from './SEPCurrentAssignmentProvider';
 
 type SEPProposalsAndAssignmentsProps = {
   /** Id of the SEP we are assigning members to */
@@ -226,10 +225,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
     assignment => assignment.proposalId === proposalId
   )?.assignments;
 
-  const updateReviewStatusAndGrade = (editingProposalData: SepProposal) => {
-    const currentAssignment = AssignmentProvider.getCurrentAssignment()
-      .currentAssignment;
-
+  const updateReviewStatusAndGrade = (
+    editingProposalData: SepProposal,
+    currentAssignment: SepAssignment
+  ) => {
     const newProposalsData =
       SEPProposalsData?.map(sepProposalsData => {
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
@@ -259,10 +258,12 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
     <SEPAssignedReviewersTable
       sepProposal={rowData}
       removeAssignedReviewer={removeAssignedReviewer}
-      updateView={() => {
-        const newProposalsData = updateReviewStatusAndGrade(rowData);
+      updateView={currentAssignment => {
+        const newProposalsData = updateReviewStatusAndGrade(
+          rowData,
+          currentAssignment
+        );
         setSEPProposalsData(newProposalsData);
-        AssignmentProvider.setCurrentAssignment(null);
       }}
     />
   );
