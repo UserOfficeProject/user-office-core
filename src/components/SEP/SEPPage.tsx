@@ -7,10 +7,10 @@ import { useDataApi } from '../../hooks/useDataApi';
 import { useCheckAccess } from '../common/Can';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
-import SEPGeneralInfo from './SEPGeneralInfo';
-import SEPMeetingComponents from './SEPMeetingComponents';
-import SEPMembers from './SEPMembers';
-import SEPProposalsAndAssignments from './SEPProposalsAndAssignments';
+import SEPGeneralInfo from './General/SEPGeneralInfo';
+import SEPMeetingComponents from './MeetingComponents/SEPMeetingComponents';
+import SEPMembers from './Members/SEPMembers';
+import SEPProposalsAndAssignments from './Proposals/SEPProposalsAndAssignments';
 
 const SEPPagePropTypes = {
   match: PropTypes.shape({
@@ -46,7 +46,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
     'General',
     'Members',
     'Proposals and Assignments',
-    'SEP Meeting Components',
+    'Meeting Components',
   ];
 
   if (hasAccessRights) {

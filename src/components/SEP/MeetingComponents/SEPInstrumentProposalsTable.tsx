@@ -4,9 +4,9 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument, SepProposal } from '../../generated/sdk';
-import { useSEPProposalsByInstrument } from '../../hooks/useSEPProposalsByInstrument';
-import { tableIcons } from '../../utils/materialIcons';
+import { Instrument, SepProposal } from '../../../generated/sdk';
+import { useSEPProposalsByInstrument } from '../../../hooks/useSEPProposalsByInstrument';
+import { tableIcons } from '../../../utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({

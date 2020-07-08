@@ -10,8 +10,8 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Sep } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
+import { Sep } from '../../../generated/sdk';
+import { useDataApi } from '../../../hooks/useDataApi';
 
 const useStyles = makeStyles(theme => ({
   submit: {

@@ -3,9 +3,9 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument } from '../../generated/sdk';
-import { useInstrumentsBySEPData } from '../../hooks/useInstrumentsBySEPData';
-import { tableIcons } from '../../utils/materialIcons';
+import { Instrument } from '../../../generated/sdk';
+import { useInstrumentsBySEPData } from '../../../hooks/useInstrumentsBySEPData';
+import { tableIcons } from '../../../utils/materialIcons';
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingComponentsProps = {

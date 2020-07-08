@@ -6,16 +6,16 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
-import { ReviewAndAssignmentContext } from '../../context/ReviewAndAssignmentContextProvider';
+import { ReviewAndAssignmentContext } from '../../../context/ReviewAndAssignmentContextProvider';
 import {
   SepProposal,
   SepAssignment,
   ReviewStatus,
   UserRole,
-} from '../../generated/sdk';
-import { tableIcons } from '../../utils/materialIcons';
-import { useCheckAccess } from '../common/Can';
-import ProposalReviewModal from '../review/ProposalReviewModal';
+} from '../../../generated/sdk';
+import { tableIcons } from '../../../utils/materialIcons';
+import { useCheckAccess } from '../../common/Can';
+import ProposalReviewModal from '../../review/ProposalReviewModal';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({

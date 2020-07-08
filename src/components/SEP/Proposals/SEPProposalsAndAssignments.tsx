@@ -13,12 +13,12 @@ import {
   ReviewStatus,
   Review,
   UserRole,
-} from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useSEPProposalsData } from '../../hooks/useSEPProposalsData';
-import { BasicUserDetails } from '../../models/User';
-import { tableIcons } from '../../utils/materialIcons';
-import { useCheckAccess } from '../common/Can';
+} from '../../../generated/sdk';
+import { useDataApi } from '../../../hooks/useDataApi';
+import { useSEPProposalsData } from '../../../hooks/useSEPProposalsData';
+import { BasicUserDetails } from '../../../models/User';
+import { tableIcons } from '../../../utils/materialIcons';
+import { useCheckAccess } from '../../common/Can';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 

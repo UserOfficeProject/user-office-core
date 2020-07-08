@@ -21,7 +21,7 @@ import DialogConfirmation from '../common/DialogConfirmation';
 import ScienceIconAdd from '../common/ScienceIconAdd';
 import ScienceIconRemove from '../common/ScienceIconRemove';
 import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
-import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
+import AssignProposalToSEP from '../SEP/Proposals/AssignProposalToSEP';
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
