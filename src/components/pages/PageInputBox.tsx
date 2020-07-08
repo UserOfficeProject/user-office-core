@@ -6,9 +6,9 @@ import { Editor } from '@tinymce/tinymce-react';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect } from 'react';
 
-import { PageName } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useGetPageContent } from '../../hooks/useGetPageContent';
+import { PageName } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { useGetPageContent } from 'hooks/useGetPageContent';
 // It is important to import the Editor which accepts plugins.
 import 'tinymce/tinymce';
 import 'tinymce/themes/silver/theme';

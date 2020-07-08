@@ -10,24 +10,20 @@ import { useSnackbar } from 'notistack';
 import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
-import {
-  Proposal,
-  ProposalStatus,
-  Questionary,
-  UserRole,
-} from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ProposalSubsetSumbission } from '../../models/ProposalModel';
-import { prepareAnswers } from '../../models/ProposalModelFunctions';
+import { useCheckAccess } from 'components/common/Can';
+import { Proposal, ProposalStatus, Questionary, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
-} from '../../models/ProposalSubmissionModel';
-import { StyledPaper } from '../../styles/StyledComponents';
-import { clamp } from '../../utils/Math';
-import { useCheckAccess } from '../common/Can';
+} from 'models/ProposalSubmissionModel';
+import { StyledPaper } from 'styles/StyledComponents';
+import { clamp } from 'utils/Math';
+
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';

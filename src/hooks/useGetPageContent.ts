@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { PageName } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { PageName } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useGetPageContent(pageName: PageName) {
   const [pageContent, setPageContent] = useState<string>('');

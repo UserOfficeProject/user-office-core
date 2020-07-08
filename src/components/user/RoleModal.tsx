@@ -3,7 +3,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Role } from '../../generated/sdk';
+import { Role } from 'generated/sdk';
+
 import RoleTable from './RoleTable';
 
 type RoleModalProps = {

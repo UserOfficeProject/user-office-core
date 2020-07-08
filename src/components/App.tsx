@@ -11,11 +11,9 @@ import {
   RouteProps,
 } from 'react-router-dom';
 
-import {
-  UserContext,
-  UserContextProvider,
-} from '../context/UserContextProvider';
-import { useUnauthorizedApi } from '../hooks/useDataApi';
+import { UserContext, UserContextProvider } from 'context/UserContextProvider';
+import { useUnauthorizedApi } from 'hooks/useDataApi';
+
 import { getTheme } from '../theme';
 import DashBoard from './DashBoard';
 import EmailVerification from './user/EmailVerification';

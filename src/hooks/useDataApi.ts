@@ -4,8 +4,8 @@ import { decode } from 'jsonwebtoken';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
 import { useCallback, useContext } from 'react';
 
-import { UserContext } from '../context/UserContextProvider';
-import { getSdk } from '../generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { getSdk } from 'generated/sdk';
 
 const endpoint = '/graphql';
 

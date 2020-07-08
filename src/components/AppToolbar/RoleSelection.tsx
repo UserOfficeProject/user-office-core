@@ -6,11 +6,11 @@ import PropTypes from 'prop-types';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { getUniqueArrayBy } from '../../utils/helperFunctions';
-import { tableIcons } from '../../utils/materialIcons';
+import { UserContext } from 'context/UserContextProvider';
+import { Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { getUniqueArrayBy } from 'utils/helperFunctions';
+import { tableIcons } from 'utils/materialIcons';
 
 type RoleSelectionProps = {
   close: () => void;

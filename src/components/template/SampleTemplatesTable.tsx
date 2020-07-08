@@ -1,8 +1,9 @@
 import { Column } from 'material-table';
 import React from 'react';
 
-import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
-import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
+import { ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 type SampleTemplateRowDataType = TemplateRowDataType & {};

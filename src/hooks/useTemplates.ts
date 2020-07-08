@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetTemplatesQuery, TemplateCategoryId } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetTemplatesQuery, TemplateCategoryId } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useTemplates(
   isArchived?: boolean,

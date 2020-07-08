@@ -44,7 +44,7 @@
         ],
         "pathGroups": [
           {
-            "pattern": "src/**",
+            "pattern": "+(components|context|generated|graphql|hooks|images|models|styles|utils)/**",
             "group": "internal",
             "position": "after"
           }

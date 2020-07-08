@@ -2,13 +2,13 @@ import Grid from '@material-ui/core/Grid';
 import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { PageName, UserRole } from '../../generated/sdk';
-import { useGetPageContent } from '../../hooks/useGetPageContent';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import InstrumentsTable from '../instrument/InstrumentsTable';
-import ProposalTableUser from '../proposal/ProposalTableUser';
-import ProposalTableReviewer from '../review/ProposalTableReviewer';
+import InstrumentsTable from 'components/instrument/InstrumentsTable';
+import ProposalTableUser from 'components/proposal/ProposalTableUser';
+import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
+import { UserContext } from 'context/UserContextProvider';
+import { PageName, UserRole } from 'generated/sdk';
+import { useGetPageContent } from 'hooks/useGetPageContent';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function OverviewPage(props: { userRole: UserRole }) {
   const { user } = useContext(UserContext);

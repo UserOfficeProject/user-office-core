@@ -1,7 +1,7 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { Instrument } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { Instrument } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useInstrumentsData(): {
   loadingInstruments: boolean;

@@ -1,4 +1,4 @@
-import { Answer } from '../../generated/sdk';
+import { Answer } from 'generated/sdk';
 
 export interface BasicComponentProps {
   templateField: Answer;

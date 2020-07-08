@@ -1,7 +1,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { SepProposal } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { SepProposal } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useSEPProposalsData(
   sepId: number

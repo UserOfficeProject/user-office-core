@@ -8,9 +8,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
-import { Instrument } from '../../generated/sdk';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { Instrument } from 'generated/sdk';
+import { useInstrumentsData } from 'hooks/useInstrumentsData';
 
 const assignProposalToInstrumentValidationSchema = yup.object().shape({
   selectedInstrumentId: yup.string().required('You must select instrument'),

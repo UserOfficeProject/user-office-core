@@ -3,9 +3,9 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
-import { GetRolesQuery, Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { GetRolesQuery, Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
 
 type RoleTableProps = {
   add: (values: Role) => void;

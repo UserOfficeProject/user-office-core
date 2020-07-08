@@ -7,9 +7,9 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { Institution } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { Institution } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 type CreateInstitutionProps = {
   onComplete?: (institution: Institution | null) => void;

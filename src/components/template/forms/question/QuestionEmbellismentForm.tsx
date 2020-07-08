@@ -3,10 +3,11 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { EmbellishmentConfig, Question } from '../../../../generated/sdk';
-import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
-import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
+import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
+import { EmbellishmentConfig, Question } from 'generated/sdk';
+import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 

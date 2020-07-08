@@ -3,8 +3,8 @@ import React from 'react';
 import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { useCallsData } from '../../hooks/useCallsData';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import { useCallsData } from 'hooks/useCallsData';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function ProposalChooseCall() {
   const { loading, callsData } = useCallsData(true);

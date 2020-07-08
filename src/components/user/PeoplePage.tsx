@@ -4,9 +4,10 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 
-import { UserRole } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import { UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+
 import { InviteUserForm } from './InviteUserForm';
 import PeopleTable from './PeopleTable';
 

@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 
-import { ProposalStatus, Answer } from '../generated/sdk';
-import { getDataTypeSpec } from '../models/ProposalModelFunctions';
-import { useDataApi } from './useDataApi';
+import { ProposalStatus, Answer } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { getDataTypeSpec } from 'models/ProposalModelFunctions';
 
 const prepareAnswers = (answers?: Answer[]): Answer[] => {
   if (answers) {

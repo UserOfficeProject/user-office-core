@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { useProposalData } from '../../hooks/useProposalData';
-import { useReviewData } from '../../hooks/useReviewData';
-import SimpleTabs from '../common/TabPanel';
-import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
+import SimpleTabs from 'components/common/TabPanel';
+import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
+import { useProposalData } from 'hooks/useProposalData';
+import { useReviewData } from 'hooks/useReviewData';
+
 import ProposalGrade from './ProposalGrade';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 

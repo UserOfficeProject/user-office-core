@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { EventLog, User } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { EventLog, User } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useEventLogsData(eventType: string, changedObjectId: string) {
   const api = useDataApi();

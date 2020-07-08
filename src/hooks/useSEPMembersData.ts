@@ -1,7 +1,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { GetSepMembersQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetSepMembersQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useSEPMembersData(
   sepId: number,

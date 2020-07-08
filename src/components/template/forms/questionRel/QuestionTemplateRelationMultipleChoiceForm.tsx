@@ -2,12 +2,13 @@ import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { QuestionTemplateRelation } from '../../../../generated/sdk';
-import FormikDropdown from '../../../common/FormikDropdown';
-import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
-import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import FormikUICustomTable from '../../../common/FormikUICustomTable';
-import TitledContainer from '../../../common/TitledContainer';
+import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
+import FormikUICustomTable from 'components/common/FormikUICustomTable';
+import TitledContainer from 'components/common/TitledContainer';
+import { QuestionTemplateRelation } from 'generated/sdk';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';

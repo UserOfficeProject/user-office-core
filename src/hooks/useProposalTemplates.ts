@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetProposalTemplatesQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetProposalTemplatesQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useProposalsTemplates(isArchived?: boolean) {
   const api = useDataApi();

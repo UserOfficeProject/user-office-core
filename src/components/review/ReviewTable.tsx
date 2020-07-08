@@ -3,8 +3,9 @@ import { Visibility, People, ArrowBack } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 
-import { Review } from '../../generated/sdk';
-import { tableIcons } from '../../utils/materialIcons';
+import { Review } from 'generated/sdk';
+import { tableIcons } from 'utils/materialIcons';
+
 import ProposalGrade from './ProposalGrade';
 export default function ReviewTable(props: {
   data: Review[];

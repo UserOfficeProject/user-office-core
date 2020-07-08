@@ -7,11 +7,11 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
-import { Proposal } from '../../generated/sdk';
-import { ProposalEndStatus, ProposalStatus } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { Proposal } from 'generated/sdk';
+import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalAdmin(props: { data: Proposal }) {
   const api = useDataApi();

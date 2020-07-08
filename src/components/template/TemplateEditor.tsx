@@ -16,14 +16,15 @@ import {
   Question,
   QuestionaryStep,
   QuestionTemplateRelation,
-} from '../../generated/sdk';
-import { usePersistQuestionaryEditorModel } from '../../hooks/usePersistQuestionaryEditorModel';
-import { getQuestionaryStepByTopicId } from '../../models/ProposalModelFunctions';
+} from 'generated/sdk';
+import { usePersistQuestionaryEditorModel } from 'hooks/usePersistQuestionaryEditorModel';
+import { getQuestionaryStepByTopicId } from 'models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
   Event,
   EventType,
-} from '../../models/QuestionaryEditorModel';
-import { StyledPaper } from '../../styles/StyledComponents';
+} from 'models/QuestionaryEditorModel';
+import { StyledPaper } from 'styles/StyledComponents';
+
 import QuestionEditor from './forms/QuestionEditor';
 import QuestionTemplateRelationEditor from './forms/QuestionTemplateRelationEditor';
 import { QuestionPicker } from './QuestionPicker';

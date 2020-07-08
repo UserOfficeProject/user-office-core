@@ -2,9 +2,10 @@ import { Dialog, DialogContent, Link } from '@material-ui/core';
 import { Column } from 'material-table';
 import React, { useState } from 'react';
 
-import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
-import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import CallsTable from '../call/CallsTable';
+import CallsTable from 'components/call/CallsTable';
+import { ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsModal(props: { templateId?: number; onClose: () => void }) {

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { prepareAnswers } from '../models/ProposalModelFunctions';
+import { useDataApi } from 'hooks/useDataApi';
+import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   SubquestionarySubmissionModelState,
-} from '../models/SubquestionarySubmissionModel';
-import { MiddlewareInputParams } from '../utils/useReducerWithMiddleWares';
-import { useDataApi } from './useDataApi';
+} from 'models/SubquestionarySubmissionModel';
+import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistSubquestionaryModel() {
   const [isSavingModel, setIsSavingModel] = useState<boolean>(false);
@@ -25,7 +25,7 @@ export function usePersistSubquestionaryModel() {
           const step = questionary.steps[0];
           setIsSavingModel(true);
           await api().answerTopic({
-            questionaryId: questionary.questionaryId!,
+            questionaryId: questionary.questionaryId as number,
             topicId: step.topic.id,
             answers: prepareAnswers(step.fields),
           });

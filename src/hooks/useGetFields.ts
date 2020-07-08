@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetFieldsQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetFieldsQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useGetFields() {
   const [fieldContent, setFieldContent] = useState<

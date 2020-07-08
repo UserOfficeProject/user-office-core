@@ -12,14 +12,15 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState, useContext } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { UpdateUserMutationVariables } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useGetFields } from '../../hooks/useGetFields';
-import { useInstitutionData } from '../../hooks/useInstitutionData';
-import orcid from '../../images/orcid.png';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import { userFieldSchema } from '../../utils/userFieldValidationSchema';
+import { UserContext } from 'context/UserContextProvider';
+import { UpdateUserMutationVariables } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { useGetFields } from 'hooks/useGetFields';
+import { useInstitutionData } from 'hooks/useInstitutionData';
+import orcid from 'images/orcid.png';
+import { ButtonContainer } from 'styles/StyledComponents';
+import { userFieldSchema } from 'utils/userFieldValidationSchema';
+
 import FormikDropdown, { Option } from '../common/FormikDropdown';
 import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
 

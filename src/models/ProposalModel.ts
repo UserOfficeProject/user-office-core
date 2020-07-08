@@ -1,4 +1,4 @@
-import { Proposal } from '../generated/sdk';
+import { Proposal } from 'generated/sdk';
 
 export interface DataTypeSpec {
   readonly: boolean;

@@ -3,10 +3,11 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
-import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useRenewToken } from '../../hooks/useRenewToken';
-import { tableIcons } from '../../utils/materialIcons';
+import { GetUserWithRolesQuery, Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { useRenewToken } from 'hooks/useRenewToken';
+import { tableIcons } from 'utils/materialIcons';
+
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import RoleModal from './RoleModal';
 

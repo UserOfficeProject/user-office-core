@@ -4,13 +4,11 @@ import { Select, TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import {
-  QuestionTemplateRelation,
-  TemplateCategoryId,
-} from '../../../../generated/sdk';
-import { useTemplates } from '../../../../hooks/useTemplates';
-import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../../common/TitledContainer';
+import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
+import TitledContainer from 'components/common/TitledContainer';
+import { QuestionTemplateRelation, TemplateCategoryId } from 'generated/sdk';
+import { useTemplates } from 'hooks/useTemplates';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';

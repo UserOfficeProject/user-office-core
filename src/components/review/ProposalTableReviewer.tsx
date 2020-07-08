@@ -9,10 +9,11 @@ import {
   ReviewStatus,
   SepAssignment,
   UserWithReviewsQuery,
-} from '../../generated/sdk';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useUserWithReviewsData } from '../../hooks/useUserData';
-import { tableIcons } from '../../utils/materialIcons';
+} from 'generated/sdk';
+import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
+import { useUserWithReviewsData } from 'hooks/useUserData';
+import { tableIcons } from 'utils/materialIcons';
+
 import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
 import ProposalReviewModal from './ProposalReviewModal';
 

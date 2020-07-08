@@ -18,15 +18,16 @@ import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { PageName, CreateUserMutationVariables } from '../../generated/sdk';
-import { useUnauthorizedApi } from '../../hooks/useDataApi';
-import { useGetFields } from '../../hooks/useGetFields';
-import { useGetPageContent } from '../../hooks/useGetPageContent';
-import { useInstitutionData } from '../../hooks/useInstitutionData';
-import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
-import orcid from '../../images/orcid.png';
-import { userFieldSchema } from '../../utils/userFieldValidationSchema';
+import { UserContext } from 'context/UserContextProvider';
+import { PageName, CreateUserMutationVariables } from 'generated/sdk';
+import { useUnauthorizedApi } from 'hooks/useDataApi';
+import { useGetFields } from 'hooks/useGetFields';
+import { useGetPageContent } from 'hooks/useGetPageContent';
+import { useInstitutionData } from 'hooks/useInstitutionData';
+import { useOrcIDInformation } from 'hooks/useOrcIDInformation';
+import orcid from 'images/orcid.png';
+import { userFieldSchema } from 'utils/userFieldValidationSchema';
+
 import { ErrorFocus } from '../common/ErrorFocus';
 import FormikDropdown, { Option } from '../common/FormikDropdown';
 import InformationModal from '../pages/InformationModal';

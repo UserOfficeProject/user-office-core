@@ -8,7 +8,8 @@ import {
   EmbellishmentConfig,
   FieldConfig,
   FieldDependency,
-} from '../../generated/sdk';
+} from 'generated/sdk';
+
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 
 export default function TemplateQuestionEditor(props: {

@@ -20,8 +20,9 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Call } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
+import { Call } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+
 import CallCycleInfo from './CallCycleInfo';
 import CallGeneralInfo from './CallGeneralInfo';
 import CallReviewAndNotification from './CallReviewAndNotification';

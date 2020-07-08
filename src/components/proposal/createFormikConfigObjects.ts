@@ -5,8 +5,8 @@ import {
   Answer,
   SelectionFromOptionsConfig,
   TextInputConfig,
-} from '../../generated/sdk';
-import { DataType } from '../../generated/sdk';
+} from 'generated/sdk';
+import { DataType } from 'generated/sdk';
 
 const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
   let config: FieldConfig;

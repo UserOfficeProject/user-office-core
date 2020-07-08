@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router';
 
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { tableIcons } from '../../utils/materialIcons';
+import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
+import { tableIcons } from 'utils/materialIcons';
+
 import {
   UserProposalDataType,
   PartialProposalsDataType,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { FileMetaData } from '../models/FileUpload';
+import { FileMetaData } from 'models/FileUpload';
 
 export enum UPLOAD_STATE {
   PRISTINE,

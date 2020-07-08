@@ -7,17 +7,17 @@ import {
   Question,
   QuestionTemplateRelation,
   TemplateCategoryId,
-} from '../generated/sdk';
-import { useDataApi } from '../hooks/useDataApi';
-import {
-  useReducerWithMiddleWares,
-  ReducerMiddleware,
-} from '../utils/useReducerWithMiddleWares';
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
   getTopicById,
-} from './ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
+import {
+  useReducerWithMiddleWares,
+  ReducerMiddleware,
+} from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   READY,

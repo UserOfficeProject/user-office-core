@@ -2,19 +2,20 @@ import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
+import SimpleTabs from 'components/common/TabPanel';
+import EventLogList from 'components/eventLog/EventLogList';
+import GeneralInformation from 'components/proposal/GeneralInformation';
+import ParticipantModal from 'components/proposal/ParticipantModal';
+import ProposalAdmin from 'components/proposal/ProposalAdmin';
 import {
   Proposal,
   TechnicalReview,
   UserRole,
   Review,
   BasicUserDetails,
-} from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import SimpleTabs from '../common/TabPanel';
-import EventLogList from '../eventLog/EventLogList';
-import GeneralInformation from '../proposal/GeneralInformation';
-import ParticipantModal from '../proposal/ParticipantModal';
-import ProposalAdmin from '../proposal/ProposalAdmin';
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ReviewTable from './ReviewTable';
 
@@ -41,10 +42,10 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
     return api()
       .getProposal({ id: parseInt(match.params.id) })
       .then(data => {
-        setProposal(data.proposal);
+        setProposal(data.proposal as Proposal);
         if (data.proposal) {
           setTechReview(data.proposal.technicalReview);
-          setReviews(data.proposal.reviews || []);
+          setReviews((data.proposal.reviews as Review[]) || []);
         }
       });
   }, [api, match.params.id]);

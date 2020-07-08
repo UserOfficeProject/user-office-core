@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { UserWithReviewsQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { UserWithReviewsQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useUserWithReviewsData() {
   const api = useDataApi();

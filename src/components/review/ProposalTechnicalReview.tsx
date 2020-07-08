@@ -7,10 +7,10 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
-import { TechnicalReviewStatus, TechnicalReview } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { TechnicalReviewStatus, TechnicalReview } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalTechnicalReview(props: {
   data: TechnicalReview | null | undefined;

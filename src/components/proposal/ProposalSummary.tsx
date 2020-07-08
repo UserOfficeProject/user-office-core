@@ -1,15 +1,16 @@
 import { Button, makeStyles } from '@material-ui/core';
 import React, { useContext } from 'react';
 
-import { ProposalStatus } from '../../generated/sdk';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useSubmitProposal } from '../../hooks/useSubmitProposal';
+import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
+import { ProposalStatus } from 'generated/sdk';
+import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
+import { useSubmitProposal } from 'hooks/useSubmitProposal';
 import {
   EventType,
   ProposalSubmissionModelState,
-} from '../../models/ProposalSubmissionModel';
-import withConfirm from '../../utils/withConfirm';
-import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
+} from 'models/ProposalSubmissionModel';
+import withConfirm from 'utils/withConfirm';
+
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 

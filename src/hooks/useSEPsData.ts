@@ -1,7 +1,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { Sep, UserRole } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { Sep, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useSEPsData(
   filter: string,

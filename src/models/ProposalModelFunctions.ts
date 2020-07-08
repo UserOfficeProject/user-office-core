@@ -7,9 +7,9 @@ import {
   QuestionTemplateRelation,
   TemplateStep,
   AnswerInput,
-} from '../generated/sdk';
-import { ConditionEvaluator } from './ConditionEvaluator';
-import { DataTypeSpec } from './ProposalModel';
+} from 'generated/sdk';
+import { ConditionEvaluator } from 'models/ConditionEvaluator';
+import { DataTypeSpec } from 'models/ProposalModel';
 
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];

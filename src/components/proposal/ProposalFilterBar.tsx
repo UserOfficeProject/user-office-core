@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { MTableToolbar, Options } from 'material-table';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { ProposalsFilter, Call, Instrument } from '../../generated/sdk';
+import { ProposalsFilter, Call, Instrument } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {

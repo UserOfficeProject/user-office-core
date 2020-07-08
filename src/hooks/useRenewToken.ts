@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 
-import { UserContext } from '../context/UserContextProvider';
-import { useDataApi } from './useDataApi';
+import { UserContext } from 'context/UserContextProvider';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useRenewToken() {
   const [renewToken, setRenewToken] = useState<string | null | undefined>(null);

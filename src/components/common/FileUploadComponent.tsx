@@ -18,10 +18,10 @@ import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { useDataApi } from '../../hooks/useDataApi';
-import { UPLOAD_STATE, useFileUpload } from '../../hooks/useFileUpload';
-import { usePrevious } from '../../hooks/usePrevious';
-import { FileMetaData } from '../../models/FileUpload';
+import { useDataApi } from 'hooks/useDataApi';
+import { UPLOAD_STATE, useFileUpload } from 'hooks/useFileUpload';
+import { usePrevious } from 'hooks/usePrevious';
+import { FileMetaData } from 'models/FileUpload';
 
 export function FileUploadComponent(props: {
   maxFiles?: number;

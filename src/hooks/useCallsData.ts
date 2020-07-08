@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetCallsQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetCallsQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useCallsData(isActive?: boolean, templateId?: number) {
   const [callsData, setCallsData] = useState<

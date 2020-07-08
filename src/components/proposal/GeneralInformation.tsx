@@ -1,9 +1,10 @@
 import { Switch, FormControlLabel } from '@material-ui/core';
 import React, { HTMLAttributes, useState } from 'react';
 
-import { Proposal } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import ProposalQuestionaryReview from '../review/ProposalQuestionaryReview';
+import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
+import { Proposal } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+
 import ProposalContainer from './ProposalContainer';
 
 export default function GeneralInformation(

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { GetOrcIdInformationQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
+import { GetOrcIdInformationQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
 
 export function useOrcIDInformation(authorizationCode?: string | null) {
   const [orcData, setOrcData] = useState<

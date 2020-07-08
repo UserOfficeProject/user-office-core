@@ -7,10 +7,10 @@ import {
   QuestionTemplateRelation,
   Template,
   TemplateCategoryId,
-} from '../generated/sdk';
-import { Event, EventType } from '../models/QuestionaryEditorModel';
-import { MiddlewareInputParams } from '../utils/useReducerWithMiddleWares';
-import { useDataApi } from './useDataApi';
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistQuestionaryEditorModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);

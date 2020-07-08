@@ -2,9 +2,10 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
-import { ProposalStatus, ProposalEndStatus } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { timeAgo } from '../../utils/Time';
+import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { timeAgo } from 'utils/Time';
+
 import ProposalTable from './ProposalTable';
 
 export type PartialProposalsDataType = {

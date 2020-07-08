@@ -4,12 +4,13 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { useDataApi } from '../../hooks/useDataApi';
-import { useInstitutionData } from '../../hooks/useInstitutionData';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { useDataApi } from 'hooks/useDataApi';
+import { useInstitutionData } from 'hooks/useInstitutionData';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { tableIcons } from 'utils/materialIcons';
+
 import CreateInstitution from './CreateInstitution';
 
 const InstitutionPage: React.FC = () => {

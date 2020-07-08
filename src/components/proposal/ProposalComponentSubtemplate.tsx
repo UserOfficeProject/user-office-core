@@ -17,11 +17,12 @@ import DescriptionIcon from '@material-ui/icons/Description';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
-import { Questionary, SubtemplateConfig } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { stringToNumericArray } from '../../utils/ArrayUtils';
-import ModalWrapper from '../common/ModalWrapper';
-import { SubquestionarySubmissionContainer } from '../questionary/SubquestionarySubmissionContainer';
+import ModalWrapper from 'components/common/ModalWrapper';
+import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
+import { Questionary, SubtemplateConfig } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { stringToNumericArray } from 'utils/ArrayUtils';
+
 import { BasicComponentProps } from './IBasicComponentProps';
 import { ProposalErrorLabel } from './ProposalErrorLabel';
 
