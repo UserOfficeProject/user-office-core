@@ -2291,7 +2291,13 @@ export type GetProposalQuery = (
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )>> }
+    )>>, instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode'>
+    )>, call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id' | 'shortCode'>
+    )> }
     & ProposalFragment
   )> }
 );
@@ -4302,6 +4308,15 @@ export const GetProposalDocument = gql`
         username
         id
       }
+    }
+    instrument {
+      instrumentId
+      name
+      shortCode
+    }
+    call {
+      id
+      shortCode
     }
   }
 }

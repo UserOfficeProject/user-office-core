@@ -2,11 +2,12 @@ import { makeStyles } from '@material-ui/core';
 import { Visibility } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Instrument, SepProposal } from '../../../generated/sdk';
 import { useSEPProposalsByInstrument } from '../../../hooks/useSEPProposalsByInstrument';
 import { tableIcons } from '../../../utils/materialIcons';
+import SEPMeetingProposalViewModal from './SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -35,6 +36,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     loadingInstrumentProposals,
   } = useSEPProposalsByInstrument(sepInstrument.instrumentId, sepId);
   const classes = useStyles();
+  const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
   if (loadingInstrumentProposals) {
     return <div>Loading...</div>;
@@ -74,6 +76,13 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
   return (
     <div className={classes.root} data-cy="sep-instrument-proposals-table">
+      {openProposalId && (
+        <SEPMeetingProposalViewModal
+          proposalViewModalOpen={!!openProposalId}
+          setProposalViewModalOpen={() => setOpenProposalId(null)}
+          proposalId={openProposalId}
+        />
+      )}
       <MaterialTable
         icons={tableIcons}
         columns={assignmentColumns}
@@ -82,8 +91,8 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         actions={[
           {
             icon: ViewIcon,
-            onClick: (event, data: SepProposal | SepProposal[]) => {
-              console.log('View proposal details', data);
+            onClick: (event, data) => {
+              setOpenProposalId((data as SepProposal).proposal.id);
             },
             tooltip: 'View proposal details',
           },
