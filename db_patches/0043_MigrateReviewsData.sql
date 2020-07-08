@@ -23,19 +23,19 @@ BEGIN
         THEN
             INSERT INTO role_user
             (role_id, user_id, sep_id) VALUES
-            (4, (SELECT user_id FROM users WHERE email='zoe.fisher@esss.se'), 1);
+            (4, (SELECT user_id FROM users WHERE email='zoe.fisher@esss.se'), (SELECT sep_id from "SEPs" where code = 'SEP_1'));
 
             INSERT INTO role_user
             (role_id, user_id, sep_id) VALUES
-            (5, (SELECT user_id FROM users WHERE email='carina.lobley@esss.se'), 1);
+            (5, (SELECT user_id FROM users WHERE email='carina.lobley@esss.se'), (SELECT sep_id from "SEPs" where code = 'SEP_1'));
 
             INSERT INTO role_user
             (role_id, user_id, sep_id)
-            SELECT DISTINCT 6, user_id, 1 FROM "SEP_Reviews";
+            SELECT DISTINCT 6, user_id, (SELECT sep_id from "SEPs" where code = 'SEP_1') FROM "SEP_Reviews";
 
             INSERT INTO "SEP_Assignments"
             (proposal_id, sep_member_user_id, sep_id)
-            SELECT DISTINCT proposal_id, user_id, 1 FROM "SEP_Reviews";
+            SELECT DISTINCT proposal_id, user_id, (SELECT sep_id from "SEPs" where code = 'SEP_1') FROM "SEP_Reviews";
     END IF;
 
     END;
