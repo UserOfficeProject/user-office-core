@@ -85,23 +85,98 @@ BEGIN
 	ALTER TABLE answers RENAME CONSTRAINT proposal_answers_answer_id_key TO answers_answer_id_key;
 
 	/* altering constraints to point to questionary_id */
+	/* proposals(questionary_id) */
+	ALTER TABLE public.proposals DROP CONSTRAINT proposals_template_id_fkey;
+
+	CREATE OR REPLACE FUNCTION CreateQuestionary()
+	RETURNS integer AS $func$
+	declare
+		q_id integer;
+	BEGIN
+	insert into questionaries(template_id) values(1) returning questionary_id into q_id;
+	RETURN q_id;
+	END;
+	$func$ LANGUAGE plpgsql;
+
+	CREATE OR REPLACE FUNCTION UpdateProposalsTable() 
+	RETURNS VOID 
+	AS
+	$func$
+	DECLARE 
+	t_row proposals%rowtype;
+	BEGIN
+		FOR t_row in SELECT * FROM proposals LOOP
+			update proposals
+				set questionary_id = CreateQuestionary()
+			where proposal_id = t_row.proposal_id;
+		END LOOP;
+	END;
+	$func$ 
+	LANGUAGE plpgsql;
+
+	PERFORM UpdateProposalsTable();   /* Create new questionary for each proposal */
+
+	ALTER TABLE public.proposals
+	ADD CONSTRAINT proposals_questionary_id_fkey FOREIGN KEY (questionary_id)
+		REFERENCES public.questionaries (questionary_id) MATCH SIMPLE
+		ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+		
+	/* topic_completenesses(questionary_id) */
 	ALTER TABLE topic_completenesses DROP CONSTRAINT proposal_topic_completenesses_proposal_id_fkey;
+	
+	CREATE OR REPLACE FUNCTION UpdateCompletenesses() 
+	RETURNS VOID 
+	AS
+	$func$
+	DECLARE 
+	t_row topic_completenesses%rowtype;
+	BEGIN
+		FOR t_row in SELECT * FROM topic_completenesses LOOP
+			update topic_completenesses TC
+				set questionary_id = (SELECT questionary_id from proposals P where TC.questionary_id = P.proposal_id)
+			where 
+				questionary_id = t_row.questionary_id AND 
+				topic_id = t_row.topic_id ;
+		END LOOP;
+	END;
+	$func$ 
+	LANGUAGE plpgsql;
+
+	PERFORM UpdateCompletenesses();
+	
 	ALTER TABLE topic_completenesses
 	ADD CONSTRAINT topic_completenesses_questionary_id_fkey FOREIGN KEY (questionary_id)
 		REFERENCES questionaries (questionary_id) MATCH SIMPLE
 		ON UPDATE NO ACTION ON DELETE CASCADE;
 	
+
+	/* answers(questionary_id)*/
 	ALTER TABLE answers DROP CONSTRAINT proposal_answers_proposal_id_fkey;
+
+	CREATE OR REPLACE FUNCTION UpdateAnswers() 
+	RETURNS VOID 
+	AS
+	$func$
+	DECLARE 
+	t_row answers%rowtype;
+	BEGIN
+		FOR t_row in SELECT * FROM answers LOOP
+			update answers A
+				set questionary_id = (SELECT questionary_id from proposals P where A.questionary_id = P.proposal_id)
+			where 
+				answer_id = t_row.answer_id;
+		END LOOP;
+	END;
+	$func$ 
+	LANGUAGE plpgsql;
+
+	PERFORM UpdateAnswers();
+	
 	ALTER TABLE answers
 	ADD CONSTRAINT answers_questionary_id_fkey FOREIGN KEY (questionary_id)
 		REFERENCES questionaries (questionary_id) MATCH SIMPLE
 		ON UPDATE NO ACTION ON DELETE CASCADE;
-
-	ALTER TABLE public.proposals DROP CONSTRAINT proposals_template_id_fkey;
-	ALTER TABLE public.proposals
-	ADD CONSTRAINT proposals_questionary_id_fkey FOREIGN KEY (questionary_id)
-		REFERENCES public.questionaries (questionary_id) MATCH SIMPLE
-		ON UPDATE NO ACTION ON DELETE NO ACTION;
 
     END;
 	END IF;
