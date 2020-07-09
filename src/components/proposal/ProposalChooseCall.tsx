@@ -9,11 +9,12 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import { NavigateNext } from '@material-ui/icons';
+import dateformat from 'dateformat';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
+
 import { useCallsData } from '../../hooks/useCallsData';
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import dateformat from 'dateformat';
 import { daysRemaining } from '../../utils/Time';
 
 const useStyles = makeStyles(theme => ({
@@ -63,6 +64,7 @@ export default function ProposalChooseCall() {
               daysRemainingNum > 0 && daysRemainingNum < 30
                 ? `(${daysRemainingNum} days remaining)`
                 : '';
+
             return (
               <>
                 <ListItem
