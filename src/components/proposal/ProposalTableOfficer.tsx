@@ -28,7 +28,6 @@ import ScienceIconRemove from '../common/ScienceIconRemove';
 import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
 import ProposalFilterBar from './ProposalFilterBar';
-import { TestComponent } from './ProposalTableHOC';
 import RankInput from './RankInput';
 const ProposalTableOfficer: React.FC = () => {
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>(
@@ -371,7 +370,6 @@ const ProposalTableOfficer: React.FC = () => {
 
   return (
     <>
-      <TestComponent />
       <DialogConfirmation
         title="Delete proposals"
         text="This action will delete proposals and all data associated with them"

@@ -2,7 +2,7 @@ import { Grid } from '@material-ui/core';
 import React from 'react';
 
 import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import InstrumentsTable from './InstrumentsTable';
+import InstrumentsTable from './InstrumentsTableHoC';
 
 const InstrumentsPage: React.FC = () => {
   return (
