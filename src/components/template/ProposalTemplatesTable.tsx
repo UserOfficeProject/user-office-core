@@ -1,23 +1,60 @@
-import { Dialog, DialogContent, Link } from '@material-ui/core';
-import { Column } from 'material-table';
+import { Button, Link } from '@material-ui/core';
+import dateformat from 'dateformat';
+import MaterialTable, { Column } from 'material-table';
 import React, { useState } from 'react';
-
-import { ProposalTemplate, TemplateCategoryId } from '../../generated/sdk';
+import {
+  Call,
+  ProposalTemplate,
+  TemplateCategoryId,
+} from '../../generated/sdk';
+import { useCallsData } from '../../hooks/useCallsData';
+import { tableIcons } from '../../utils/materialIcons';
 import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import CallsTable from '../call/CallsTable';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import InputDialog from '../common/InputDialog';
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
+
+function CallsList(props: { filterTemplateId: number }) {
+  const { callsData } = useCallsData(undefined, props.filterTemplateId);
+  const columns = [
+    { title: 'Short Code', field: 'shortCode' },
+    {
+      title: 'Start Date',
+      field: 'startCall',
+      render: (rowData: Call) =>
+        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+    },
+    {
+      title: 'End Date',
+      field: 'endCall',
+      render: (rowData: Call) =>
+        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+    },
+  ];
+  return (
+    <MaterialTable
+      icons={tableIcons}
+      title="Calls"
+      columns={columns}
+      data={callsData}
+    />
+  );
+}
 
 function CallsModal(props: { templateId?: number; onClose: () => void }) {
   return (
-    <Dialog
+    <InputDialog
       open={props.templateId !== undefined}
-      fullWidth={true}
       onClose={props.onClose}
+      fullWidth={true}
     >
-      <DialogContent>
-        <CallsTable templateId={props.templateId} />
-      </DialogContent>
-    </Dialog>
+      <CallsList filterTemplateId={props.templateId!} />
+      <ActionButtonContainer>
+        <Button variant="text" onClick={() => props.onClose()}>
+          Close
+        </Button>
+      </ActionButtonContainer>
+    </InputDialog>
   );
 }
 type ProposalTemplateRowDataType = TemplateRowDataType & {

@@ -2,9 +2,7 @@ import { Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-
 import { Call, InstrumentWithAvailabilityTime } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';
@@ -15,16 +13,9 @@ import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
 
-type CallsTableProps = {
-  templateId?: number;
-};
-
-const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
+const CallsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData, setCallsData } = useCallsData(
-    undefined,
-    templateId
-  );
+  const { loading, callsData, setCallsData } = useCallsData(undefined);
   const [editCall, setEditCall] = useState<Call | null>(null);
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
@@ -228,10 +219,6 @@ const CallsTable: React.FC<CallsTableProps> = ({ templateId }) => {
       </ActionButtonContainer>
     </>
   );
-};
-
-CallsTable.propTypes = {
-  templateId: PropTypes.number,
 };
 
 export default CallsTable;
