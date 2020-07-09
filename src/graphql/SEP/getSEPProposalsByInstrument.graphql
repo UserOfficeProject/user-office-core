@@ -1,5 +1,13 @@
-query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!) {
-  sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId) {
+query sepProposalsByInstrument(
+  $instrumentId: Int!
+  $sepId: Int!
+  $callId: Int!
+) {
+  sepProposalsByInstrument(
+    instrumentId: $instrumentId
+    sepId: $sepId
+    callId: $callId
+  ) {
     proposal {
       id
       title
@@ -10,10 +18,12 @@ query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!) {
         id
         comment
         grade
+        status
       }
       technicalReview {
         publicComment
         status
+        timeAllocation
       }
     }
   }

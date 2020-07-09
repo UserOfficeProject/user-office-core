@@ -5,7 +5,8 @@ import { useDataApi } from './useDataApi';
 
 export function useSEPProposalsByInstrument(
   instrumentId: number,
-  sepId: number
+  sepId: number,
+  callId: number
 ): {
   loadingInstrumentProposals: boolean;
   instrumentProposalsData: SepProposal[];
@@ -23,7 +24,7 @@ export function useSEPProposalsByInstrument(
   useEffect(() => {
     setLoadingInstrumentProposals(true);
     api()
-      .sepProposalsByInstrument({ instrumentId, sepId })
+      .sepProposalsByInstrument({ instrumentId, sepId, callId })
       .then(data => {
         if (data.sepProposalsByInstrument) {
           setInstrumentProposalsData(
@@ -32,7 +33,7 @@ export function useSEPProposalsByInstrument(
         }
         setLoadingInstrumentProposals(false);
       });
-  }, [api, sepId, instrumentId]);
+  }, [api, sepId, instrumentId, callId]);
 
   return {
     loadingInstrumentProposals,

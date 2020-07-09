@@ -3,7 +3,7 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument } from '../../../generated/sdk';
+import { InstrumentWithAvailabilityTime } from '../../../generated/sdk';
 import { useInstrumentsBySEPData } from '../../../hooks/useInstrumentsBySEPData';
 import { tableIcons } from '../../../utils/materialIcons';
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
@@ -15,8 +15,12 @@ type SEPMeetingComponentsProps = {
 const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
   sepId,
 }) => {
+  // TODO: Make this selectable from a dropdown.
+  const selectedCallId = 1;
+
   const { loadingInstruments, instrumentsData } = useInstrumentsBySEPData(
-    sepId
+    sepId,
+    selectedCallId
   );
 
   if (loadingInstruments) {
@@ -28,17 +32,20 @@ const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
     {
-      title: 'Instrument scientist',
-      render: (rowData: Instrument) =>
-        // TODO: This should be reviewed! Maybe we will need some kind of responsible IS for an instrument.
-        rowData.scientists && rowData.scientists.length > 0
-          ? `${rowData.scientists[0].firstname} ${rowData.scientists[0].lastname}`
-          : '-',
+      title: 'Availability time',
+      render: (rowData: InstrumentWithAvailabilityTime) =>
+        rowData.availabilityTime ? rowData.availabilityTime : '-',
     },
   ];
 
-  const SEPInstrumentProposalsTableComponent = (instrument: Instrument) => (
-    <SEPInstrumentProposalsTable sepId={sepId} sepInstrument={instrument} />
+  const SEPInstrumentProposalsTableComponent = (
+    instrument: InstrumentWithAvailabilityTime
+  ) => (
+    <SEPInstrumentProposalsTable
+      sepId={sepId}
+      sepInstrument={instrument}
+      selectedCallId={selectedCallId}
+    />
   );
 
   const DoneAllIcon = (): JSX.Element => <DoneAll />;
@@ -53,7 +60,12 @@ const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
         actions={[
           {
             icon: DoneAllIcon,
-            onClick: (event, data: Instrument | Instrument[]) => {
+            onClick: (
+              event,
+              data:
+                | InstrumentWithAvailabilityTime
+                | InstrumentWithAvailabilityTime[]
+            ) => {
               console.log('Submit', data);
             },
             tooltip: 'Submit instrument',

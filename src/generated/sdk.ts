@@ -962,7 +962,7 @@ export type Query = {
   institutions?: Maybe<Array<Institution>>,
   instrument?: Maybe<Instrument>,
   instruments?: Maybe<InstrumentsQueryResult>,
-  instrumentsBySep?: Maybe<Array<Instrument>>,
+  instrumentsBySep?: Maybe<Array<InstrumentWithAvailabilityTime>>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
@@ -1051,6 +1051,7 @@ export type QueryInstrumentArgs = {
 
 
 export type QueryInstrumentsBySepArgs = {
+  callId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -1096,6 +1097,7 @@ export type QuerySepProposalsArgs = {
 
 
 export type QuerySepProposalsByInstrumentArgs = {
+  callId: Scalars['Int'],
   instrumentId: Scalars['Int'],
   sepId: Scalars['Int']
 };
@@ -1564,15 +1566,16 @@ export type CreateSepMutation = (
 );
 
 export type GetInstrumentsBySepQueryVariables = {
-  sepId: Scalars['Int']
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
 };
 
 
 export type GetInstrumentsBySepQuery = (
   { __typename?: 'Query' }
   & { instrumentsBySep: Maybe<Array<(
-    { __typename?: 'Instrument' }
-    & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+    { __typename?: 'InstrumentWithAvailabilityTime' }
+    & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
     & { scientists: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1659,7 +1662,8 @@ export type GetSepProposalsQuery = (
 
 export type SepProposalsByInstrumentQueryVariables = {
   instrumentId: Scalars['Int'],
-  sepId: Scalars['Int']
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
 };
 
 
@@ -1672,10 +1676,10 @@ export type SepProposalsByInstrumentQuery = (
       & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder' | 'status'>
       & { reviews: Maybe<Array<(
         { __typename?: 'Review' }
-        & Pick<Review, 'id' | 'comment' | 'grade'>
+        & Pick<Review, 'id' | 'comment' | 'grade' | 'status'>
       )>>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
-        & Pick<TechnicalReview, 'publicComment' | 'status'>
+        & Pick<TechnicalReview, 'publicComment' | 'status' | 'timeAllocation'>
       )> }
     ) }
   )>> }
@@ -3753,12 +3757,13 @@ export const CreateSepDocument = gql`
 }
     `;
 export const GetInstrumentsBySepDocument = gql`
-    query getInstrumentsBySEP($sepId: Int!) {
-  instrumentsBySep(sepId: $sepId) {
+    query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
+  instrumentsBySep(sepId: $sepId, callId: $callId) {
     instrumentId
     name
     shortCode
     description
+    availabilityTime
     scientists {
       ...basicUserDetails
     }
@@ -3849,8 +3854,8 @@ export const GetSepProposalsDocument = gql`
 }
     `;
 export const SepProposalsByInstrumentDocument = gql`
-    query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!) {
-  sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId) {
+    query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!, $callId: Int!) {
+  sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId, callId: $callId) {
     proposal {
       id
       title
@@ -3861,10 +3866,12 @@ export const SepProposalsByInstrumentDocument = gql`
         id
         comment
         grade
+        status
       }
       technicalReview {
         publicComment
         status
+        timeAllocation
       }
     }
   }

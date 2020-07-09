@@ -1,9 +1,10 @@
-query getInstrumentsBySEP($sepId: Int!) {
-  instrumentsBySep(sepId: $sepId) {
+query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
+  instrumentsBySep(sepId: $sepId, callId: $callId) {
     instrumentId
     name
     shortCode
     description
+    availabilityTime
     scientists {
       ...basicUserDetails
     }

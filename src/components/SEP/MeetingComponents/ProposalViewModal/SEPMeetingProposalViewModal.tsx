@@ -11,12 +11,19 @@ import {
   IconButton,
   Typography,
   DialogContent,
+  Grid,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
-import SEPMeetingProposalView from './SEPMeetingProposalView';
+import { TechnicalReview, Review } from '../../../../generated/sdk';
+import { useProposalData } from '../../../../hooks/useProposalData';
+import { ContentContainer } from '../../../../styles/StyledComponents';
+import ExternalReviews from './ExternalReviews';
+import FinalRankingForm from './FinalRankingForm';
+import ProposalDetails from './ProposalDetails';
+import TechnicalReviewInfo from './TechnicalReviewInfo';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,6 +55,11 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
   proposalId,
 }) => {
   const classes = useStyles();
+  const { proposalData, loading } = useProposalData(proposalId);
+
+  if (!proposalId) {
+    return null;
+  }
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
@@ -77,7 +89,30 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
           </Toolbar>
         </AppBar>
         <DialogContent>
-          <SEPMeetingProposalView proposalId={proposalId} />
+          <ContentContainer>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <div data-cy="SEP-meeting-components-proposal-view">
+                  {loading || !proposalData ? (
+                    <div>Loading...</div>
+                  ) : (
+                    <>
+                      <FinalRankingForm closeModal={handleClose} />
+                      <ProposalDetails proposal={proposalData} />
+                      <TechnicalReviewInfo
+                        technicalReview={
+                          proposalData.technicalReview as TechnicalReview
+                        }
+                      />
+                      <ExternalReviews
+                        reviews={proposalData.reviews as Review[]}
+                      />
+                    </>
+                  )}
+                </div>
+              </Grid>
+            </Grid>
+          </ContentContainer>
         </DialogContent>
       </Dialog>
     </>

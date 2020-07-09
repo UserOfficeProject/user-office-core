@@ -1,16 +1,21 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { Instrument } from '../generated/sdk';
+import { InstrumentWithAvailabilityTime } from '../generated/sdk';
 import { useDataApi } from './useDataApi';
 
 export function useInstrumentsBySEPData(
-  sepId: number
+  sepId: number,
+  callId: number
 ): {
   loadingInstruments: boolean;
-  instrumentsData: Instrument[];
-  setInstrumentsData: Dispatch<SetStateAction<Instrument[]>>;
+  instrumentsData: InstrumentWithAvailabilityTime[];
+  setInstrumentsData: Dispatch<
+    SetStateAction<InstrumentWithAvailabilityTime[]>
+  >;
 } {
-  const [instrumentsData, setInstrumentsData] = useState<Instrument[]>([]);
+  const [instrumentsData, setInstrumentsData] = useState<
+    InstrumentWithAvailabilityTime[]
+  >([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
 
   const api = useDataApi();
@@ -18,14 +23,16 @@ export function useInstrumentsBySEPData(
   useEffect(() => {
     setLoadingInstruments(true);
     api()
-      .getInstrumentsBySEP({ sepId })
+      .getInstrumentsBySEP({ sepId, callId })
       .then(data => {
         if (data.instrumentsBySep) {
-          setInstrumentsData(data.instrumentsBySep as Instrument[]);
+          setInstrumentsData(
+            data.instrumentsBySep as InstrumentWithAvailabilityTime[]
+          );
         }
         setLoadingInstruments(false);
       });
-  }, [api, sepId]);
+  }, [api, sepId, callId]);
 
   return { loadingInstruments, instrumentsData, setInstrumentsData };
 }
