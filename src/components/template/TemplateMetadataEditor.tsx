@@ -3,10 +3,10 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
-
 import { Template } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import { ButtonContainer } from '../../styles/StyledComponents';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 
 export function TemplateMetadataEditor(props: {
   template: Template;
@@ -99,10 +99,10 @@ export function TemplateMetadataEditor(props: {
             fullWidth
             data-cy="description"
           />
-          <ButtonContainer>
+          <ActionButtonContainer>
             <Button
               disabled={isSubmitting}
-              variant="contained"
+              variant="text"
               color="secondary"
               onClick={() => setIsEditMode(false)}
               className={classes.button}
@@ -118,7 +118,7 @@ export function TemplateMetadataEditor(props: {
             >
               Update
             </Button>
-          </ButtonContainer>
+          </ActionButtonContainer>
         </Form>
       )}
     </Formik>
