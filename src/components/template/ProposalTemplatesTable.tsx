@@ -66,10 +66,9 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
   const columns: Column<ProposalTemplateRowDataType>[] = [
-    { title: 'Template ID', field: 'templateId', editable: 'never' },
-    { title: 'Name', field: 'name', editable: 'always' },
-    { title: 'Description', field: 'description', editable: 'always' },
-    { title: '# proposals', field: 'proposalCount', editable: 'never' },
+    { title: 'Name', field: 'name' },
+    { title: 'Description', field: 'description' },
+    { title: '# proposals', field: 'proposalCount' },
     {
       title: '# calls',
       field: 'callCount',
@@ -92,7 +91,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
       <TemplatesTable
         columns={columns}
         templateCategory={TemplateCategoryId.PROPOSAL_QUESTIONARY}
-        isRowDeleteable={rowData => {
+        isRowRemovable={rowData => {
           const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
 
           return (
