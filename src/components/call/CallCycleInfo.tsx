@@ -28,7 +28,7 @@ const CallCycleInfo: React.FC = () => (
     </MuiPickersUtilsProvider>
     <Field
       name="cycleComment"
-      label="Cycle comment"
+      label="Cycle comment (public)"
       type="text"
       component={TextField}
       margin="normal"

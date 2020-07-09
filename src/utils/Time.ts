@@ -82,3 +82,13 @@ export function timeAgo(dateParam: Date): string | null {
 
   return getFormattedDate(date); // 10. January 2017. at 10:20
 }
+
+export function daysRemaining(date: Date) {
+  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+  const firstDate = new Date();
+  const secondDate = date;
+
+  return Math.round(
+    Math.abs((firstDate.getTime() - secondDate.getTime()) / oneDay)
+  );
+}
