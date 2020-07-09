@@ -35,11 +35,13 @@ export class SEPQuery {
   async sepProposalsByInstrument(
     @Arg('sepId', () => Int) sepId: number,
     @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('callId', () => Int) callId: number,
     @Ctx() context: ResolverContext
   ): Promise<SEPProposal[] | null> {
     return context.queries.sep.getSEPProposalsByInstrument(context.user, {
       sepId,
       instrumentId,
+      callId,
     });
   }
 }

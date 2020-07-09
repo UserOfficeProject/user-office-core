@@ -214,9 +214,18 @@ export default class PostgresInstrumentDataSource
       });
   }
 
-  async getInstrumentsBySepId(sepId: number): Promise<Instrument[]> {
+  async getInstrumentsBySepId(
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
     return database
-      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .select([
+        'i.instrument_id',
+        'name',
+        'i.short_code',
+        'description',
+        'chi.availability_time',
+      ])
       .from('instruments as i')
       .join('instrument_has_proposals as ihp', {
         'i.instrument_id': 'ihp.instrument_id',
@@ -224,10 +233,15 @@ export default class PostgresInstrumentDataSource
       .join('SEP_Proposals as sp', {
         'sp.proposal_id': 'ihp.proposal_id',
       })
+      .join('call_has_instruments as chi', {
+        'chi.instrument_id': 'i.instrument_id',
+        'chi.call_id': callId,
+      })
       .where('sp.sep_id', sepId)
-      .then((instruments: InstrumentRecord[]) => {
+      .distinct('i.instrument_id')
+      .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const result = instruments.map(instrument =>
-          this.createInstrumentObject(instrument)
+          this.createInstrumentWithAvailabilityTimeObject(instrument)
         );
 
         return result;

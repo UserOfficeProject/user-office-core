@@ -85,23 +85,31 @@ export default class SEPQueries {
     }
   }
 
-  // @Authorized([
-  //   Roles.USER_OFFICER,
-  //   Roles.SEP_CHAIR,
-  //   Roles.SEP_SECRETARY,
-  //   Roles.SEP_REVIEWER,
-  // ])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.SEP_CHAIR,
+    Roles.SEP_SECRETARY,
+    Roles.SEP_REVIEWER,
+  ])
   async getSEPProposalsByInstrument(
     agent: UserWithRole | null,
-    { sepId, instrumentId }: { sepId: number; instrumentId: number }
+    {
+      sepId,
+      instrumentId,
+      callId,
+    }: { sepId: number; instrumentId: number; callId: number }
   ) {
-    return this.dataSource.getSEPProposalsByInstrument(sepId, instrumentId);
-    // if (
-    //   (await this.isUserOfficer(agent)) ||
-    //   (await this.isMemberOfSEP(agent, sepId))
-    // ) {
-    // } else {
-    //   return null;
-    // }
+    if (
+      (await this.isUserOfficer(agent)) ||
+      (await this.isMemberOfSEP(agent, sepId))
+    ) {
+      return this.dataSource.getSEPProposalsByInstrument(
+        sepId,
+        instrumentId,
+        callId
+      );
+    } else {
+      return null;
+    }
   }
 }

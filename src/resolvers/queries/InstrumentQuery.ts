@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { InstrumentWithAvailabilityTime } from '../types/Instrument';
 import { Instrument } from '../types/Instrument';
 
 @ObjectType()
@@ -35,13 +36,15 @@ export class InstrumentQuery {
     return context.queries.instrument.getAll(context.user);
   }
 
-  @Query(() => [Instrument], { nullable: true })
+  @Query(() => [InstrumentWithAvailabilityTime], { nullable: true })
   instrumentsBySep(
     @Arg('sepId', () => Int) sepId: number,
+    @Arg('callId', () => Int) callId: number,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.instrument.getInstrumentsBySepId(context.user, {
       sepId,
+      callId,
     });
   }
 }

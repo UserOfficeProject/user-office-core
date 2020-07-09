@@ -82,8 +82,11 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrument;
   }
 
-  async getInstrumentsBySepId(sepId: number): Promise<Instrument[]> {
-    return [dummyInstrument];
+  async getInstrumentsBySepId(
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
+    return [dummyInstrumentWithAvailabilityTime];
   }
 
   async assignScientistsToInstrument(

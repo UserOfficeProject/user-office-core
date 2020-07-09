@@ -36,7 +36,10 @@ export interface InstrumentDataSource {
   ): Promise<boolean>;
   getInstrumentScientists(instrumentId: number): Promise<BasicUserDetails[]>;
   getInstrumentByProposalId(proposalId: number): Promise<Instrument | null>;
-  getInstrumentsBySepId(sepId: number): Promise<Instrument[]>;
+  getInstrumentsBySepId(
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]>;
   setAvailabilityTimeOnInstrument(
     callId: number,
     instrumentId: number,

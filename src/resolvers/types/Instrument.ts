@@ -28,6 +28,12 @@ export class Instrument implements Partial<InstrumentOrigin> {
   public description: string;
 }
 
+@ObjectType()
+export class InstrumentWithAvailabilityTime extends Instrument {
+  @Field(() => Int, { nullable: true })
+  public availabilityTime: number;
+}
+
 @Resolver(() => Instrument)
 export class InstrumentResolver {
   @FieldResolver(() => [BasicUserDetails])
