@@ -29,7 +29,7 @@ export interface SEPDataSource {
     sepId: number,
     proposalId: number
   ): Promise<SEPAssignment[]>;
-  getSEPProposals(sepId: number): Promise<SEPProposal[]>;
+  getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]>;
   getSEPProposalsByInstrument(
     sepId: number,
     instrumentId: number,

@@ -74,12 +74,15 @@ export default class SEPQueries {
     Roles.SEP_SECRETARY,
     Roles.SEP_REVIEWER,
   ])
-  async getSEPProposals(agent: UserWithRole | null, sepId: number) {
+  async getSEPProposals(
+    agent: UserWithRole | null,
+    { sepId, callId }: { sepId: number; callId: number }
+  ) {
     if (
       (await this.isUserOfficer(agent)) ||
       (await this.isMemberOfSEP(agent, sepId))
     ) {
-      return this.dataSource.getSEPProposals(sepId);
+      return this.dataSource.getSEPProposals(sepId, callId);
     } else {
       return null;
     }
