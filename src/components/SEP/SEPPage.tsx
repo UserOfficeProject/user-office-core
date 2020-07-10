@@ -8,9 +8,9 @@ import { useCheckAccess } from '../common/Can';
 import SimpleTabs from '../common/TabPanel';
 import EventLogList from '../eventLog/EventLogList';
 import SEPGeneralInfo from './General/SEPGeneralInfo';
-import SEPMeetingComponents from './MeetingComponents/SEPMeetingComponents';
+import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsView';
 import SEPMembers from './Members/SEPMembers';
-import SEPProposalsAndAssignments from './Proposals/SEPProposalsAndAssignments';
+import SEPProposalsAndAssignmentsView from './Proposals/SEPProposalsAndAssignmentsView';
 
 const SEPPagePropTypes = {
   match: PropTypes.shape({
@@ -61,8 +61,8 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
           onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
         />
         <SEPMembers sepId={sep.id} />
-        <SEPProposalsAndAssignments sepId={sep.id} />
-        <SEPMeetingComponents sepId={sep.id} />
+        <SEPProposalsAndAssignmentsView sepId={sep.id} />
+        <SEPMeetingComponentsView sepId={sep.id} />
         {hasAccessRights && (
           <EventLogList changedObjectId={sep.id} eventType="SEP" />
         )}

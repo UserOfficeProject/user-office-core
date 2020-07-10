@@ -1,5 +1,5 @@
 import { DoneAll } from '@material-ui/icons';
-import MaterialTable from 'material-table';
+import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -8,16 +8,17 @@ import { useInstrumentsBySEPData } from '../../../hooks/useInstrumentsBySEPData'
 import { tableIcons } from '../../../utils/materialIcons';
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
-type SEPMeetingComponentsProps = {
+type SEPMeetingInstrumentsTableProps = {
   sepId: number;
+  Toolbar: (data: Options) => JSX.Element;
+  selectedCallId: number;
 };
 
-const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
+const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
   sepId,
+  selectedCallId,
+  Toolbar,
 }) => {
-  // TODO: Make this selectable from a dropdown.
-  const selectedCallId = 1;
-
   const { loadingInstruments, instrumentsData } = useInstrumentsBySEPData(
     sepId,
     selectedCallId
@@ -56,6 +57,9 @@ const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
         icons={tableIcons}
         title={'Instruments with proposals'}
         columns={columns}
+        components={{
+          Toolbar: Toolbar,
+        }}
         data={instrumentsData}
         actions={[
           {
@@ -86,8 +90,10 @@ const SEPMeetingComponents: React.FC<SEPMeetingComponentsProps> = ({
   );
 };
 
-SEPMeetingComponents.propTypes = {
+SEPMeetingInstrumentsTable.propTypes = {
   sepId: PropTypes.number.isRequired,
+  selectedCallId: PropTypes.number.isRequired,
+  Toolbar: PropTypes.func.isRequired,
 };
 
-export default SEPMeetingComponents;
+export default SEPMeetingInstrumentsTable;

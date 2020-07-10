@@ -57,10 +57,6 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
   const classes = useStyles();
   const { proposalData, loading } = useProposalData(proposalId);
 
-  if (!proposalId) {
-    return null;
-  }
-
   const handleClose = () => {
     setProposalViewModalOpen(false);
   };
@@ -97,7 +93,10 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                     <div>Loading...</div>
                   ) : (
                     <>
-                      <FinalRankingForm closeModal={handleClose} />
+                      <FinalRankingForm
+                        closeModal={handleClose}
+                        proposalData={proposalData}
+                      />
                       <ProposalDetails proposal={proposalData} />
                       <TechnicalReviewInfo
                         technicalReview={

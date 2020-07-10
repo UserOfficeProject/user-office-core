@@ -9,16 +9,22 @@ import { Formik, Form, Field } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Proposal, ProposalEndStatus } from '../../../../generated/sdk';
 import {
   StyledPaper,
   ButtonContainer,
 } from '../../../../styles/StyledComponents';
+import FormikDropdown from '../../../common/FormikDropdown';
 
 type FinalRankingFormProps = {
   closeModal: () => void;
+  proposalData: Proposal;
 };
 
-const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
+const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
+  closeModal,
+  proposalData,
+}) => {
   const classes = makeStyles(() => ({
     button: {
       marginTop: '25px',
@@ -26,11 +32,18 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
     },
   }))();
 
+  const initialData = {
+    finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
+    commentForUser: proposalData.commentForUser,
+    commentForManagement: proposalData.commentForManagement,
+    finalRank: '',
+  };
+
   const handleSubmit = (
     values: {
-      commentForUser: string;
-      commentForManagement: string;
-      recommendation: string;
+      commentForUser: string | null | undefined;
+      commentForManagement: string | null | undefined;
+      finalStatus: string;
       finalRank: string;
     },
     setSubmitting: Function,
@@ -51,12 +64,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
         <Formik
           validateOnChange={false}
           validateOnBlur={false}
-          initialValues={{
-            commentForUser: '',
-            commentForManagement: '',
-            recommendation: '',
-            finalRank: '',
-          }}
+          initialValues={initialData}
           onSubmit={(values, actions): void => {
             handleSubmit(values, actions.setSubmitting, false);
           }}
@@ -68,6 +76,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
             touched,
             handleChange,
             setSubmitting,
+            isValid,
           }): JSX.Element => (
             <Form>
               <Typography variant="h6" gutterBottom>
@@ -98,7 +107,22 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
                       errors.commentForUser &&
                       errors.commentForUser
                     }
+                    required
                   />
+                  <FormikDropdown
+                    name="finalStatus"
+                    label="Recommendation"
+                    data-cy="proposalFinalStatus"
+                    items={[
+                      { text: 'Unset', value: ProposalEndStatus.UNSET },
+                      { text: 'Accepted', value: ProposalEndStatus.ACCEPTED },
+                      { text: 'Reserved', value: ProposalEndStatus.RESERVED },
+                      { text: 'Rejected', value: ProposalEndStatus.REJECTED },
+                    ]}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={6}>
                   <Field
                     id="commentForManagement"
                     name="commentForManagement"
@@ -122,32 +146,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
                       errors.commentForManagement &&
                       errors.commentForManagement
                     }
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <Field
-                    id="recommendation"
-                    name="recommendation"
-                    label="Recommendation"
-                    type="text"
-                    component={TextField}
-                    margin="normal"
-                    fullWidth
-                    multiline
-                    rowsMax="16"
-                    rows="3"
-                    onChange={handleChange}
-                    value={values.recommendation}
-                    data-cy="recommendation"
-                    error={
-                      touched.recommendation &&
-                      errors.recommendation !== undefined
-                    }
-                    helperText={
-                      touched.recommendation &&
-                      errors.recommendation &&
-                      errors.recommendation
-                    }
+                    required
                   />
                   <Field
                     id="finalRank"
@@ -164,6 +163,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
                     helperText={
                       touched.finalRank && errors.finalRank && errors.finalRank
                     }
+                    required
                   />
                 </Grid>
               </Grid>
@@ -182,7 +182,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
                   disabled={isSubmitting}
                   type="button"
                   variant="contained"
-                  onClick={() => handleSubmit(values, setSubmitting, true)}
+                  onClick={() => {
+                    if (isValid) {
+                      handleSubmit(values, setSubmitting, true);
+                    }
+                  }}
                   color="primary"
                   className={classes.button}
                   data-cy="saveAndContinue"
@@ -210,6 +214,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({ closeModal }) => {
 
 FinalRankingForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  proposalData: PropTypes.any.isRequired,
 };
 
 export default FinalRankingForm;

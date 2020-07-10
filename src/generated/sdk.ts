@@ -1092,6 +1092,7 @@ export type QuerySepMembersArgs = {
 
 
 export type QuerySepProposalsArgs = {
+  callId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -1631,7 +1632,8 @@ export type GetSepMembersQuery = (
 );
 
 export type GetSepProposalsQueryVariables = {
-  sepId: Scalars['Int']
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
 };
 
 
@@ -3816,8 +3818,8 @@ export const GetSepMembersDocument = gql`
 }
     `;
 export const GetSepProposalsDocument = gql`
-    query getSEPProposals($sepId: Int!) {
-  sepProposals(sepId: $sepId) {
+    query getSEPProposals($sepId: Int!, $callId: Int!) {
+  sepProposals(sepId: $sepId, callId: $callId) {
     proposalId
     dateAssigned
     sepId

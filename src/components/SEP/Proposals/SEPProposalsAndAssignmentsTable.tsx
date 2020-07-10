@@ -1,7 +1,7 @@
 import { Grid, DialogContent, Dialog } from '@material-ui/core';
 import { AssignmentInd } from '@material-ui/icons';
 import dateformat from 'dateformat';
-import MaterialTable from 'material-table';
+import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -22,19 +22,25 @@ import { useCheckAccess } from '../../common/Can';
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 
-type SEPProposalsAndAssignmentsProps = {
+type SEPProposalsAndAssignmentsTableProps = {
   /** Id of the SEP we are assigning members to */
   sepId: number;
+  /** Toolbar component shown in the table */
+  Toolbar: (data: Options) => JSX.Element;
+  /** Call id that we want to filter by */
+  selectedCallId: number;
 };
 
-const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
+const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableProps> = ({
   sepId,
+  selectedCallId,
+  Toolbar,
 }) => {
   const {
     loadingSEPProposals,
     SEPProposalsData,
     setSEPProposalsData,
-  } = useSEPProposalsData(sepId);
+  } = useSEPProposalsData(sepId, selectedCallId);
   const { enqueueSnackbar } = useSnackbar();
   const api = useDataApi();
   const [proposalId, setProposalId] = useState<null | number>(null);
@@ -295,6 +301,9 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
           <MaterialTable
             icons={tableIcons}
             columns={SEPProposalColumns}
+            components={{
+              Toolbar: Toolbar,
+            }}
             title={'SEP Proposals'}
             data={initialValues}
             detailPanel={[
@@ -332,8 +341,10 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   );
 };
 
-SEPProposalsAndAssignments.propTypes = {
+SEPProposalsAndAssignmentsTable.propTypes = {
   sepId: PropTypes.number.isRequired,
+  selectedCallId: PropTypes.number.isRequired,
+  Toolbar: PropTypes.func.isRequired,
 };
 
-export default SEPProposalsAndAssignments;
+export default SEPProposalsAndAssignmentsTable;

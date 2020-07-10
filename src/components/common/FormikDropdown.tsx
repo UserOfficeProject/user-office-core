@@ -28,7 +28,7 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
       select
       margin="normal"
       component={TextField}
-      InputLabel={{
+      InputLabelProps={{
         shrink: true,
       }}
       fullWidth
@@ -61,7 +61,7 @@ FormikDropdown.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
-  ]).isRequired,
+  ]),
 };
 
 export default FormikDropdown;
