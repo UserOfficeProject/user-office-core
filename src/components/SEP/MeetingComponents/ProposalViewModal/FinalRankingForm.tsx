@@ -80,7 +80,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           }): JSX.Element => (
             <Form>
               <Typography variant="h6" gutterBottom>
-                Scientific evaluation panel
+                SEP Meeting form
               </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={6}>

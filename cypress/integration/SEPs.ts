@@ -392,6 +392,95 @@ context('Scientific evaluation panel tests', () => {
     });
   });
 
+  it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
+    const name = faker.random.words(2);
+    const shortCode = faker.random.words(1);
+    const description = faker.random.words(8);
+
+    cy.login('officer');
+
+    cy.contains('Instruments').click();
+    cy.contains('Create instrument').click();
+    cy.get('#name').type(name);
+    cy.get('#shortCode').type(shortCode);
+    cy.get('#description').type(description);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
+
+    cy.contains('View Proposals').click();
+
+    cy.wait(500);
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get("[title='Assign proposals to instrument']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.wait(500);
+
+    cy.get('[title="Remove assigned instrument"]').should('exist');
+
+    cy.contains('View Calls').click();
+
+    cy.wait(500);
+
+    cy.get('[title="Assign Instrument"]')
+      .first()
+      .click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.get('[title="Assign instruments to call"]')
+      .first()
+      .click();
+
+    cy.wait(500);
+
+    cy.contains('SEPs').click();
+
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.wait(1000);
+
+    cy.contains(name);
+
+    cy.get("[title='Submit instrument']").should('exist');
+
+    cy.get("[title='Show proposals']")
+      .first()
+      .click();
+
+    cy.get(
+      '[data-cy="sep-instrument-proposals-table"] [title="View proposal details"]'
+    ).click();
+
+    cy.wait(500);
+
+    cy.contains('SEP Meeting form');
+    cy.contains('Proposal details');
+    cy.contains('External reviews');
+  });
+
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
 
