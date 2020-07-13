@@ -10,7 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Call as CallOrigin } from '../../models/Call';
-import { Instrument } from './Instrument';
+import { InstrumentWithAvailabilityTime } from './Instrument';
 
 @ObjectType()
 export class Call implements Partial<CallOrigin> {
@@ -52,12 +52,6 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;
-}
-
-@ObjectType()
-class InstrumentWithAvailabilityTime extends Instrument {
-  @Field(() => Int, { nullable: true })
-  public availabilityTime: number;
 }
 
 @Resolver(() => Call)

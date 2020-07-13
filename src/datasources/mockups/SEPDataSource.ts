@@ -137,7 +137,15 @@ export class SEPDataSourceMock implements SEPDataSource {
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
 
-  async getSEPProposals(sepId: number) {
+  async getSEPProposals(sepId: number, callId: number) {
+    return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
+  }
+
+  async getSEPProposalsByInstrument(
+    sepId: number,
+    instrumentId: number,
+    callId: number
+  ) {
     return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
   }
 
