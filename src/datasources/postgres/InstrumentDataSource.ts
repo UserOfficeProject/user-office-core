@@ -130,10 +130,10 @@ export default class PostgresInstrumentDataSource
         ['*']
       )
       .from('instruments')
-      .where('instrument_id', instrument.instrumentId)
+      .where('instrument_id', instrument.id)
       .then((records: InstrumentRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Instrument not found ${instrument.instrumentId}`);
+          throw new Error(`Instrument not found ${instrument.id}`);
         }
 
         return this.createInstrumentObject(records[0]);
