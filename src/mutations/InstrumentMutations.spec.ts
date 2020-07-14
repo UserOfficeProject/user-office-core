@@ -43,7 +43,7 @@ describe('Test Instrument Mutations', () => {
 
     return expect(
       instrumentMutations.create(dummyUserOfficerWithRole, instrumentToCreate)
-    ).resolves.toStrictEqual({ instrumentId: 1, ...instrumentToCreate });
+    ).resolves.toStrictEqual({ id: 1, ...instrumentToCreate });
   });
 
   test('A logged in user officer can update instrument', () => {
