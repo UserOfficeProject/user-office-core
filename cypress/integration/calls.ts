@@ -10,6 +10,11 @@ context('Calls tests', () => {
 
   beforeEach(() => {
     cy.visit('/');
+    cy.viewport(1100, 1000);
+  });
+
+  afterEach(() => {
+    cy.wait(500);
   });
 
   it('A user should not be able to see/visit calls', () => {
@@ -19,7 +24,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 4);
+      .should('have.length', 3);
 
     cy.visit('/CallPage');
     cy.contains('Your proposals');

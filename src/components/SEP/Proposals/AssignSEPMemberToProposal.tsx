@@ -3,10 +3,10 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepMember } from '../../generated/sdk';
-import { useSEPMembersData } from '../../hooks/useSEPMembersData';
-import { BasicUserDetails } from '../../models/User';
-import { tableIcons } from '../../utils/materialIcons';
+import { SepMember } from '../../../generated/sdk';
+import { useSEPMembersData } from '../../../hooks/useSEPMembersData';
+import { BasicUserDetails } from '../../../models/User';
+import { tableIcons } from '../../../utils/materialIcons';
 
 type AssignSEPMemberToProposalProps = {
   sepId: number;

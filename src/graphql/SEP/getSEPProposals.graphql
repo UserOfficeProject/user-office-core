@@ -1,5 +1,5 @@
-query getSEPProposals($sepId: Int!) {
-  sepProposals(sepId: $sepId) {
+query getSEPProposals($sepId: Int!, $callId: Int!) {
+  sepProposals(sepId: $sepId, callId: $callId) {
     proposalId
     dateAssigned
     sepId

@@ -1,5 +1,5 @@
 import Grid from '@material-ui/core/Grid';
-import { Options } from 'material-table';
+import { Options, MTableToolbar } from 'material-table';
 import React from 'react';
 
 import { ProposalsFilter } from '../../generated/sdk';
@@ -20,13 +20,15 @@ export default function ProposalPage() {
     loading || loadingInstruments ? (
       <div>Loading...</div>
     ) : (
-      <ProposalFilterBar
-        callsData={callsData}
-        instrumentsData={instrumentsData}
-        data={data}
-        onChange={setProposalFilter}
-        filter={proposalFilter}
-      />
+      <>
+        <MTableToolbar {...data} />
+        <ProposalFilterBar
+          callsData={callsData}
+          instrumentsData={instrumentsData}
+          onChange={setProposalFilter}
+          filter={proposalFilter}
+        />
+      </>
     );
 
   return (

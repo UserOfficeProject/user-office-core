@@ -961,6 +961,7 @@ export type Query = {
   institutions?: Maybe<Array<Institution>>,
   instrument?: Maybe<Instrument>,
   instruments?: Maybe<InstrumentsQueryResult>,
+  instrumentsBySep?: Maybe<Array<InstrumentWithAvailabilityTime>>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
   proposals?: Maybe<ProposalsQueryResult>,
@@ -971,6 +972,7 @@ export type Query = {
   sep?: Maybe<Sep>,
   sepMembers?: Maybe<Array<SepMember>>,
   sepProposals?: Maybe<Array<SepProposal>>,
+  sepProposalsByInstrument?: Maybe<Array<SepProposal>>,
   seps?: Maybe<SePsQueryResult>,
   templateCategories?: Maybe<Array<TemplateCategory>>,
   template?: Maybe<Template>,
@@ -1041,6 +1043,12 @@ export type QueryInstrumentArgs = {
 };
 
 
+export type QueryInstrumentsBySepArgs = {
+  callId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
 export type QueryIsNaturalKeyPresentArgs = {
   naturalKey: Scalars['String']
 };
@@ -1084,6 +1092,14 @@ export type QuerySepMembersArgs = {
 
 
 export type QuerySepProposalsArgs = {
+  callId: Scalars['Int'],
+  sepId: Scalars['Int']
+};
+
+
+export type QuerySepProposalsByInstrumentArgs = {
+  callId: Scalars['Int'],
+  instrumentId: Scalars['Int'],
   sepId: Scalars['Int']
 };
 
@@ -1550,6 +1566,24 @@ export type CreateSepMutation = (
   ) }
 );
 
+export type GetInstrumentsBySepQueryVariables = {
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
+};
+
+
+export type GetInstrumentsBySepQuery = (
+  { __typename?: 'Query' }
+  & { instrumentsBySep: Maybe<Array<(
+    { __typename?: 'InstrumentWithAvailabilityTime' }
+    & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+    & { scientists: Array<(
+      { __typename?: 'BasicUserDetails' }
+      & BasicUserDetailsFragment
+    )> }
+  )>> }
+);
+
 export type GetUserSepsQueryVariables = {};
 
 
@@ -1598,7 +1632,8 @@ export type GetSepMembersQuery = (
 );
 
 export type GetSepProposalsQueryVariables = {
-  sepId: Scalars['Int']
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
 };
 
 
@@ -1624,6 +1659,31 @@ export type GetSepProposalsQuery = (
         & Pick<Review, 'id' | 'status' | 'comment' | 'grade' | 'sepID'>
       ) }
     )>> }
+  )>> }
+);
+
+export type SepProposalsByInstrumentQueryVariables = {
+  instrumentId: Scalars['Int'],
+  sepId: Scalars['Int'],
+  callId: Scalars['Int']
+};
+
+
+export type SepProposalsByInstrumentQuery = (
+  { __typename?: 'Query' }
+  & { sepProposalsByInstrument: Maybe<Array<(
+    { __typename?: 'SEPProposal' }
+    & { proposal: (
+      { __typename?: 'Proposal' }
+      & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder' | 'status'>
+      & { reviews: Maybe<Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'comment' | 'grade' | 'status'>
+      )>>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & Pick<TechnicalReview, 'publicComment' | 'status' | 'timeAllocation'>
+      )> }
+    ) }
   )>> }
 );
 
@@ -2046,7 +2106,7 @@ export type GetInstrumentsQuery = (
       & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
-        & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+        & BasicUserDetailsFragment
       )> }
     )> }
   )> }
@@ -2237,7 +2297,13 @@ export type GetProposalQuery = (
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )>> }
+    )>>, instrument: Maybe<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode'>
+    )>, call: Maybe<(
+      { __typename?: 'Call' }
+      & Pick<Call, 'id' | 'shortCode'>
+    )> }
     & ProposalFragment
   )> }
 );
@@ -3698,6 +3764,20 @@ export const CreateSepDocument = gql`
   }
 }
     `;
+export const GetInstrumentsBySepDocument = gql`
+    query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
+  instrumentsBySep(sepId: $sepId, callId: $callId) {
+    instrumentId
+    name
+    shortCode
+    description
+    availabilityTime
+    scientists {
+      ...basicUserDetails
+    }
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const GetUserSepsDocument = gql`
     query getUserSeps {
   me {
@@ -3744,8 +3824,8 @@ export const GetSepMembersDocument = gql`
 }
     `;
 export const GetSepProposalsDocument = gql`
-    query getSEPProposals($sepId: Int!) {
-  sepProposals(sepId: $sepId) {
+    query getSEPProposals($sepId: Int!, $callId: Int!) {
+  sepProposals(sepId: $sepId, callId: $callId) {
     proposalId
     dateAssigned
     sepId
@@ -3776,6 +3856,30 @@ export const GetSepProposalsDocument = gql`
         comment
         grade
         sepID
+      }
+    }
+  }
+}
+    `;
+export const SepProposalsByInstrumentDocument = gql`
+    query sepProposalsByInstrument($instrumentId: Int!, $sepId: Int!, $callId: Int!) {
+  sepProposalsByInstrument(instrumentId: $instrumentId, sepId: $sepId, callId: $callId) {
+    proposal {
+      id
+      title
+      shortCode
+      rankOrder
+      status
+      reviews {
+        id
+        comment
+        grade
+        status
+      }
+      technicalReview {
+        publicComment
+        status
+        timeAllocation
       }
     }
   }
@@ -4074,17 +4178,13 @@ export const GetInstrumentsDocument = gql`
       shortCode
       description
       scientists {
-        id
-        firstname
-        lastname
-        organisation
-        position
+        ...basicUserDetails
       }
     }
     totalCount
   }
 }
-    `;
+    ${BasicUserDetailsFragmentDoc}`;
 export const RemoveProposalFromInstrumentDocument = gql`
     mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
   removeProposalFromInstrument(proposalId: $proposalId, instrumentId: $instrumentId) {
@@ -4223,6 +4323,15 @@ export const GetProposalDocument = gql`
         username
         id
       }
+    }
+    instrument {
+      instrumentId
+      name
+      shortCode
+    }
+    call {
+      id
+      shortCode
     }
   }
 }
@@ -4862,6 +4971,9 @@ export function getSdk(client: GraphQLClient) {
     createSEP(variables: CreateSepMutationVariables): Promise<CreateSepMutation> {
       return client.request<CreateSepMutation>(print(CreateSepDocument), variables);
     },
+    getInstrumentsBySEP(variables: GetInstrumentsBySepQueryVariables): Promise<GetInstrumentsBySepQuery> {
+      return client.request<GetInstrumentsBySepQuery>(print(GetInstrumentsBySepDocument), variables);
+    },
     getUserSeps(variables?: GetUserSepsQueryVariables): Promise<GetUserSepsQuery> {
       return client.request<GetUserSepsQuery>(print(GetUserSepsDocument), variables);
     },
@@ -4873,6 +4985,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getSEPProposals(variables: GetSepProposalsQueryVariables): Promise<GetSepProposalsQuery> {
       return client.request<GetSepProposalsQuery>(print(GetSepProposalsDocument), variables);
+    },
+    sepProposalsByInstrument(variables: SepProposalsByInstrumentQueryVariables): Promise<SepProposalsByInstrumentQuery> {
+      return client.request<SepProposalsByInstrumentQuery>(print(SepProposalsByInstrumentDocument), variables);
     },
     getSEPs(variables: GetSePsQueryVariables): Promise<GetSePsQuery> {
       return client.request<GetSePsQuery>(print(GetSePsDocument), variables);

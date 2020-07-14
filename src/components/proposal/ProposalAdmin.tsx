@@ -20,8 +20,8 @@ export default function ProposalAdmin(props: { data: Proposal }) {
   const initialValues = {
     finalStatus: props.data.finalStatus || ProposalEndStatus.UNSET,
     proposalStatus: props.data.status,
-    commentForUser: props.data.commentForUser,
-    commentForManagement: props.data.commentForManagement,
+    commentForUser: props.data.commentForUser || '',
+    commentForManagement: props.data.commentForManagement || '',
   };
 
   return (

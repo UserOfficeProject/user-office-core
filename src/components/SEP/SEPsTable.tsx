@@ -11,7 +11,7 @@ import { tableIcons } from '../../utils/materialIcons';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import Can from '../common/Can';
 import InputDialog from '../common/InputDialog';
-import AddSEP from './AddSEP';
+import AddSEP from './General/AddSEP';
 
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
