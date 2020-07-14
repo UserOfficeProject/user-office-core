@@ -51,7 +51,9 @@ export const userFieldSchema = Yup.object().shape({
         request('/graphql', query, {
           email: value,
         })
-          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
+          .then((data: any) =>
+            data.checkEmailExist ? resolve(false) : resolve(true)
+          )
           .catch(() => resolve(false));
       });
     }),
@@ -82,7 +84,9 @@ export const emailFieldSchema = Yup.object().shape({
         request('/graphql', query, {
           email: value,
         })
-          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
+          .then((data: any) =>
+            data.checkEmailExist ? resolve(false) : resolve(true)
+          )
           .catch(() => resolve(false));
       });
     }),

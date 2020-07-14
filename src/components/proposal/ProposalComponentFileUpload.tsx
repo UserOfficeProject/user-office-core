@@ -5,7 +5,7 @@ import { FileUploadComponent } from 'components/common/FileUploadComponent';
 import { FileUploadConfig } from 'generated/sdk';
 
 import { BasicComponentProps } from './IBasicComponentProps';
-import { ProposalErrorLabel } from './ProposalErrorLabel';
+import ProposalErrorLabel from './ProposalErrorLabel';
 
 export function ProposalComponentFileUpload(
   props: BasicComponentProps & { files: string[] }

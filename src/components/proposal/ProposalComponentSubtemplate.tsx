@@ -24,7 +24,7 @@ import { useDataApi } from 'hooks/useDataApi';
 import { stringToNumericArray } from 'utils/ArrayUtils';
 
 import { BasicComponentProps } from './IBasicComponentProps';
-import { ProposalErrorLabel } from './ProposalErrorLabel';
+import ProposalErrorLabel from './ProposalErrorLabel';
 
 function QuestionariesListItem(props: {
   questionaryId: number;

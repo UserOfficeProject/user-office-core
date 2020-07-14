@@ -14,7 +14,7 @@ export function useReviewData(id: number) {
     api()
       .getReview({ id })
       .then(data => {
-        setReviewData(data.review);
+        setReviewData(data.review as Review);
         setLoading(false);
       });
   }, [id, api]);

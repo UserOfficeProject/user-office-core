@@ -27,7 +27,7 @@ import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<object>) => JSX.Element;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({

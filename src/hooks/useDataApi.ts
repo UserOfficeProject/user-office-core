@@ -51,7 +51,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
       }
 
       return error;
-    });
+    }) as T;
   }
 }
 
@@ -105,7 +105,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
       this.error && this.error(error);
 
       return error;
-    });
+    }) as T;
   }
 
   private getRenewalDate(token: string): number {

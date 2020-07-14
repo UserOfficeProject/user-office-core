@@ -27,7 +27,7 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Id of the SEP we are assigning members to */
   sepId: number;
   /** Toolbar component shown in the table */
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<object>) => JSX.Element;
   /** Call id that we want to filter by */
   selectedCallId: number;
 };

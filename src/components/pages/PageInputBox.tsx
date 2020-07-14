@@ -1,3 +1,14 @@
+// It is important to import the Editor which accepts plugins.
+import 'tinymce/tinymce';
+import 'tinymce/themes/silver/theme';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/ui/oxide/content.min.css';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/preview';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/code';
+import 'tinymce/icons/default/icons';
+
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,15 +20,6 @@ import React, { useState, useEffect } from 'react';
 import { PageName } from 'generated/sdk';
 import { useDataApi } from 'hooks/useDataApi';
 import { useGetPageContent } from 'hooks/useGetPageContent';
-// It is important to import the Editor which accepts plugins.
-import 'tinymce/tinymce';
-import 'tinymce/themes/silver/theme';
-import 'tinymce/skins/ui/oxide/skin.min.css';
-import 'tinymce/skins/ui/oxide/content.min.css';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/preview';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/code';
 
 const useStyles = makeStyles(() => ({
   buttons: {

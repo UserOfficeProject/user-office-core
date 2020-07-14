@@ -11,7 +11,7 @@ import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
-  Toolbar: (data: Options) => JSX.Element;
+  Toolbar: (data: Options<object>) => JSX.Element;
   selectedCallId: number;
 };
 

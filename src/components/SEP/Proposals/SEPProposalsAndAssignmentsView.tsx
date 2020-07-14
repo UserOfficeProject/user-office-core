@@ -18,7 +18,7 @@ const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   const { loading, callsData } = useCallsData();
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const Toolbar = (data: Options<object>): JSX.Element =>
     loading ? (
       <div>Loading...</div>
     ) : (

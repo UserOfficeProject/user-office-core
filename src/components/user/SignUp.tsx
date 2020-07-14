@@ -17,6 +17,7 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
+import { ObjectSchema } from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -249,7 +250,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           actions.setSubmitting(false);
         }}
         validationSchema={userFieldSchema.concat(
-          userPasswordFieldValidationSchema
+          userPasswordFieldValidationSchema as ObjectSchema<object>
         )}
       >
         {({ values }) => (

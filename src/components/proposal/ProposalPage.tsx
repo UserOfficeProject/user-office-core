@@ -17,7 +17,7 @@ export default function ProposalPage() {
   const { loading, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const Toolbar = (data: Options<object>): JSX.Element =>
     loading || loadingInstruments ? (
       <div>Loading...</div>
     ) : (
