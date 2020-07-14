@@ -21,7 +21,7 @@ import DialogConfirmation from '../common/DialogConfirmation';
 import ScienceIconAdd from '../common/ScienceIconAdd';
 import ScienceIconRemove from '../common/ScienceIconRemove';
 import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
-import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
+import AssignProposalToSEP from '../SEP/Proposals/AssignProposalToSEP';
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
@@ -162,37 +162,45 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalData) => (
-    <>
-      <IconButton data-cy="view-proposal">
-        <Link
-          to={`/ProposalReviewUserOfficer/${rowData.id}`}
-          style={{ color: 'inherit', textDecoration: 'inherit' }}
-        >
-          <Visibility />
-        </Link>
-      </IconButton>
-      <IconButton onClick={() => downloadPDFProposal(rowData.id)}>
-        <GetAppIcon />
-      </IconButton>
+  const RowActionButtons = (rowData: ProposalData) => {
+    const iconButtonStyle = { padding: '7px' };
 
-      {rowData.instrument && (
-        <Tooltip title="Remove assigned instrument">
-          <IconButton
-            onClick={() => {
-              setProposalAndInstrumentId({
-                proposalId: rowData.id,
-                instrumentId: rowData.instrument?.instrumentId as number,
-              });
-              setOpenRemoveInstrument(true);
-            }}
+    return (
+      <>
+        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+          <Link
+            to={`/ProposalReviewUserOfficer/${rowData.id}`}
+            style={{ color: 'inherit', textDecoration: 'inherit' }}
           >
-            <RemoveScienceIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </>
-  );
+            <Visibility />
+          </Link>
+        </IconButton>
+        <IconButton
+          onClick={() => downloadPDFProposal(rowData.id)}
+          style={iconButtonStyle}
+        >
+          <GetAppIcon />
+        </IconButton>
+
+        {rowData.instrument && (
+          <Tooltip title="Remove assigned instrument">
+            <IconButton
+              style={iconButtonStyle}
+              onClick={() => {
+                setProposalAndInstrumentId({
+                  proposalId: rowData.id,
+                  instrumentId: rowData.instrument?.instrumentId as number,
+                });
+                setOpenRemoveInstrument(true);
+              }}
+            >
+              <RemoveScienceIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </>
+    );
+  };
 
   let columns: Column<ProposalData>[] = [
     {

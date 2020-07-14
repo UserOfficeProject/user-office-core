@@ -13,7 +13,7 @@ context('Instrument tests', () => {
   });
 
   afterEach(() => {
-    cy.wait(1000);
+    cy.wait(500);
   });
 
   it('User should not be able to see Instruments page', () => {

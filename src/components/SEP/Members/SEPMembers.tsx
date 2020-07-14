@@ -13,13 +13,13 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { SepMember, BasicUserDetails, UserRole } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useRenewToken } from '../../hooks/useRenewToken';
-import { useSEPMembersData } from '../../hooks/useSEPMembersData';
-import { tableIcons } from '../../utils/materialIcons';
-import { useCheckAccess } from '../common/Can';
-import ParticipantModal from '../proposal/ParticipantModal';
+import { SepMember, BasicUserDetails, UserRole } from '../../../generated/sdk';
+import { useDataApi } from '../../../hooks/useDataApi';
+import { useRenewToken } from '../../../hooks/useRenewToken';
+import { useSEPMembersData } from '../../../hooks/useSEPMembersData';
+import { tableIcons } from '../../../utils/materialIcons';
+import { useCheckAccess } from '../../common/Can';
+import ParticipantModal from '../../proposal/ParticipantModal';
 
 type SEPMembersProps = {
   /** Id of the SEP we are assigning members to */
