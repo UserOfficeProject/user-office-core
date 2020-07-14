@@ -948,6 +948,7 @@ export type ProposalTemplatesFilter = {
 export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
+  proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
@@ -964,7 +965,6 @@ export type Query = {
   instrumentsBySep?: Maybe<Array<InstrumentWithAvailabilityTime>>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
-  proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
   questionary?: Maybe<Questionary>,
   review?: Maybe<Review>,
@@ -984,6 +984,13 @@ export type Query = {
 
 export type QueryCallsArgs = {
   filter?: Maybe<CallsFilter>
+};
+
+
+export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -1056,13 +1063,6 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int']
-};
-
-
-export type QueryProposalsArgs = {
-  filter?: Maybe<ProposalsFilter>,
-  first?: Maybe<Scalars['Int']>,
-  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -1306,6 +1306,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'],
   maxEntries?: Maybe<Scalars['Int']>,
   templateId: Scalars['Int'],
+  templateCategory: Scalars['Int'],
   addEntryButtonLabel: Scalars['String'],
 };
 
@@ -1351,8 +1352,9 @@ export type Template = {
 
 export type TemplateCategory = {
    __typename?: 'TemplateCategory',
-  categoryId: Scalars['Int'],
+  categoryId: TemplateCategoryId,
   name: Scalars['String'],
+  categoryIdAsInt: Scalars['Int'],
 };
 
 export enum TemplateCategoryId {
@@ -2855,7 +2857,7 @@ type FieldConfigTextInputConfigFragment = (
 
 type FieldConfigSubtemplateConfigFragment = (
   { __typename?: 'SubtemplateConfig' }
-  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'small_label' | 'required' | 'tooltip'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSubtemplateConfigFragment;
@@ -2997,6 +2999,17 @@ export type GetTemplateQuery = (
     { __typename?: 'Template' }
     & TemplateFragment
   )> }
+);
+
+export type GetTemplateCategoriesQueryVariables = {};
+
+
+export type GetTemplateCategoriesQuery = (
+  { __typename?: 'Query' }
+  & { templateCategories: Maybe<Array<(
+    { __typename?: 'TemplateCategory' }
+    & Pick<TemplateCategory, 'categoryId' | 'categoryIdAsInt' | 'name'>
+  )>> }
 );
 
 export type GetTemplatesQueryVariables = {
@@ -3548,6 +3561,7 @@ export const FieldConfigFragmentDoc = gql`
     addEntryButtonLabel
     maxEntries
     templateId
+    templateCategory
     small_label
     required
     tooltip
@@ -4650,6 +4664,15 @@ export const GetTemplateDocument = gql`
   }
 }
     ${TemplateFragmentDoc}`;
+export const GetTemplateCategoriesDocument = gql`
+    query getTemplateCategories {
+  templateCategories {
+    categoryId
+    categoryIdAsInt
+    name
+  }
+}
+    `;
 export const GetTemplatesDocument = gql`
     query getTemplates($filter: TemplatesFilter) {
   templates(filter: $filter) {
@@ -5165,6 +5188,9 @@ export function getSdk(client: GraphQLClient) {
     },
     getTemplate(variables: GetTemplateQueryVariables): Promise<GetTemplateQuery> {
       return client.request<GetTemplateQuery>(print(GetTemplateDocument), variables);
+    },
+    getTemplateCategories(variables?: GetTemplateCategoriesQueryVariables): Promise<GetTemplateCategoriesQuery> {
+      return client.request<GetTemplateCategoriesQuery>(print(GetTemplateCategoriesDocument), variables);
     },
     getTemplates(variables?: GetTemplatesQueryVariables): Promise<GetTemplatesQuery> {
       return client.request<GetTemplatesQuery>(print(GetTemplatesDocument), variables);
