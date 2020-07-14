@@ -14,7 +14,7 @@ query getCalls($filter: CallsFilter) {
     surveyComment
     templateId
     instruments {
-      instrumentId
+      id
       name
       shortCode
       description

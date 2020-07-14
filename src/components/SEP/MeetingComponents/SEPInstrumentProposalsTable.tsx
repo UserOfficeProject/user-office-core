@@ -41,11 +41,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const {
     instrumentProposalsData,
     loadingInstrumentProposals,
-  } = useSEPProposalsByInstrument(
-    sepInstrument.instrumentId,
-    sepId,
-    selectedCallId
-  );
+  } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 

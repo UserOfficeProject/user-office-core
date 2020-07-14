@@ -151,7 +151,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               onClick={() => {
                 setProposalAndInstrumentId({
                   proposalId: rowData.id,
-                  instrumentId: rowData.instrument?.instrumentId as number,
+                  instrumentId: rowData.instrument?.id as number,
                 });
                 setOpenRemoveInstrument(true);
               }}
@@ -341,7 +341,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (selectedProposalsWithInstrument.length === 0) {
       const result = await api().assignProposalsToInstrument({
         proposalIds: selectedProposals,
-        instrumentId: instrument.instrumentId,
+        instrumentId: instrument.id,
       });
       const isError = !!result.assignProposalsToInstrument.error;
 

@@ -48,8 +48,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
           actions.setSubmitting(false);
 
           const selectedInstrument = instrumentsData.find(
-            instrument =>
-              instrument.instrumentId === +values.selectedInstrumentId
+            instrument => instrument.id === +values.selectedInstrumentId
           );
 
           assignProposalsToInstrument(selectedInstrument as Instrument);
@@ -69,7 +68,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                   name="selectedInstrumentId"
                   label="Select instrument"
                   items={instrumentsData.map(instrument => ({
-                    value: instrument.instrumentId.toString(),
+                    value: instrument.id.toString(),
                     text: instrument.name,
                   }))}
                   required

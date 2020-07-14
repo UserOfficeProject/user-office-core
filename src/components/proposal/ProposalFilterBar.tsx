@@ -52,10 +52,7 @@ export default function ProposalFilterBar(props: {
         >
           <MenuItem value={0}>All</MenuItem>
           {props.instrumentsData.map(instrument => (
-            <MenuItem
-              key={instrument.instrumentId}
-              value={instrument.instrumentId}
-            >
+            <MenuItem key={instrument.id} value={instrument.id}>
               {instrument.name}
             </MenuItem>
           ))}

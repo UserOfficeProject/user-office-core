@@ -31,7 +31,7 @@ const InstrumentsTable: React.FC = () => {
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     const deleteInstrumentResult = await api().deleteInstrument({
-      instrumentId: instrumentDeletedId,
+      id: instrumentDeletedId,
     });
 
     const isError = !!deleteInstrumentResult.deleteInstrument.error;
@@ -54,7 +54,7 @@ const InstrumentsTable: React.FC = () => {
 
       if (instrumentsData) {
         const newInstrumentsData = instrumentsData.map(instrumentItem => {
-          if (instrumentItem.instrumentId === assigningInstrumentId) {
+          if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
               scientists: [...instrumentItem.scientists, { ...scientist }],
@@ -89,7 +89,7 @@ const InstrumentsTable: React.FC = () => {
   ) => {
     if (instrumentsData) {
       const newInstrumentsData = instrumentsData.map(instrumentItem => {
-        if (instrumentItem.instrumentId === instrumentToRemoveFromId) {
+        if (instrumentItem.id === instrumentToRemoveFromId) {
           const newScientists = instrumentItem.scientists.filter(
             scientistItem => scientistItem.id !== scientistToRemoveId
           );
@@ -132,7 +132,7 @@ const InstrumentsTable: React.FC = () => {
     />
   );
   const instrumentAssignments = instrumentsData?.find(
-    instrumentItem => instrumentItem.instrumentId === assigningInstrumentId
+    instrumentItem => instrumentItem.id === assigningInstrumentId
   );
   const InstrumentTable = withCRUD(MaterialTable);
 
@@ -172,7 +172,7 @@ const InstrumentsTable: React.FC = () => {
               icon: AssignmentIndIcon,
               tooltip: 'Assign scientist',
               onClick: (_event: unknown, rowData: unknown): void =>
-                setAssigningInstrumentId((rowData as Instrument).instrumentId),
+                setAssigningInstrumentId((rowData as Instrument).id),
             },
           ]}
         />
