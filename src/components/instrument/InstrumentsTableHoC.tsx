@@ -11,7 +11,7 @@ import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 const InstrumentsTable: React.FC = () => {
-  const { loading, instrumentsData, setInstrumentsData } = useInstrumentsData();
+  const { instrumentsData, setInstrumentsData } = useInstrumentsData();
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -28,10 +28,6 @@ const InstrumentsTable: React.FC = () => {
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     const deleteInstrumentResult = await api().deleteInstrument({

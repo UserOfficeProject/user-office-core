@@ -1,0 +1,30 @@
+query sepProposalsByInstrument(
+  $instrumentId: Int!
+  $sepId: Int!
+  $callId: Int!
+) {
+  sepProposalsByInstrument(
+    instrumentId: $instrumentId
+    sepId: $sepId
+    callId: $callId
+  ) {
+    proposal {
+      id
+      title
+      shortCode
+      rankOrder
+      status
+      reviews {
+        id
+        comment
+        grade
+        status
+      }
+      technicalReview {
+        publicComment
+        status
+        timeAllocation
+      }
+    }
+  }
+}

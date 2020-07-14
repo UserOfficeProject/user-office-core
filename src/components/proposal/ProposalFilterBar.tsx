@@ -3,12 +3,10 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
-import { MTableToolbar, Options } from 'material-table';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { ProposalsFilter } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
+import { ProposalsFilter, Call, Instrument } from '../../generated/sdk';
+import SelectedCallFilter from '../common/SelectedCallFilter';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -20,38 +18,26 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 export default function ProposalFilterBar(props: {
-  data: Options;
+  callsData: Call[];
+  instrumentsData: Instrument[];
   onChange: Dispatch<SetStateAction<ProposalsFilter>>;
   filter: ProposalsFilter;
 }) {
-  const { callsData } = useCallsData(undefined);
-  const { instrumentsData } = useInstrumentsData();
-
   const classes = useStyles();
 
   return (
     <>
-      <MTableToolbar {...props.data} />
-      <FormControl className={classes.formControl}>
-        <InputLabel>Call</InputLabel>
-        <Select
-          onChange={call =>
-            props.onChange({
-              ...props.filter,
-              callId: call.target.value as number,
-            })
-          }
-          value={props.filter.callId}
-          defaultValue={0}
-        >
-          <MenuItem value={0}>All</MenuItem>
-          {callsData.map(call => (
-            <MenuItem key={call.id} value={call.id}>
-              {call.shortCode}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <SelectedCallFilter
+        callId={props.filter.callId as number}
+        callsData={props.callsData}
+        shouldShowAll={true}
+        onChange={callId =>
+          props.onChange({
+            ...props.filter,
+            callId,
+          })
+        }
+      />
       <FormControl className={classes.formControl}>
         <InputLabel>Instrument</InputLabel>
         <Select
@@ -65,7 +51,7 @@ export default function ProposalFilterBar(props: {
           defaultValue={0}
         >
           <MenuItem value={0}>All</MenuItem>
-          {instrumentsData.map(instrument => (
+          {props.instrumentsData.map(instrument => (
             <MenuItem
               key={instrument.instrumentId}
               value={instrument.instrumentId}

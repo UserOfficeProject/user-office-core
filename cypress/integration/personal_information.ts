@@ -144,7 +144,7 @@ context('Personal information tests', () => {
 
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 3);
+      .should('have.length', 2);
   });
 
   it('Should be able to see user officer role in use', () => {

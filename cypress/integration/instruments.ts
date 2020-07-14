@@ -13,7 +13,7 @@ context('Instrument tests', () => {
   });
 
   afterEach(() => {
-    cy.wait(1000);
+    cy.wait(500);
   });
 
   it('User should not be able to see Instruments page', () => {
@@ -29,7 +29,7 @@ context('Instrument tests', () => {
   it('User Officer should be able to create Instrument', () => {
     const name = faker.random.words(2);
     const shortCode = faker.random.words(1);
-    const description = faker.random.words(8);
+    const description = faker.random.words(5);
 
     cy.login('officer');
 
@@ -52,7 +52,7 @@ context('Instrument tests', () => {
   it('User Officer should be able to update Instrument', () => {
     const name = faker.random.words(2);
     const shortCode = faker.random.words(1);
-    const description = faker.random.words(8);
+    const description = faker.random.words(5);
 
     cy.login('officer');
 
@@ -76,7 +76,7 @@ context('Instrument tests', () => {
 
   it('User Officer should be able to assign proposal to existing instrument', () => {
     const title = faker.random.words(3);
-    const abstract = faker.random.words(8);
+    const abstract = faker.random.words(5);
     cy.login('user');
     cy.contains('New Proposal').click();
     cy.get('#title').type(title);

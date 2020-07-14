@@ -11,6 +11,7 @@ import {
   RouteProps,
 } from 'react-router-dom';
 
+import { ReviewAndAssignmentContextProvider } from '../context/ReviewAndAssignmentContextProvider';
 import {
   UserContext,
   UserContextProvider,
@@ -75,40 +76,42 @@ class App extends React.Component {
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
               maxSnack={1}
             >
-              <Router>
-                <div className="App">
-                  <Switch>
-                    <Route path="/SignUp" component={SignUp} />
-                    <Route path="/SignIn" component={SignIn} />
-                    <Route
-                      path="/ResetPasswordEmail"
-                      component={ResetPasswordEmail}
-                    />
-                    <Route
-                      path="/ResetPassword/:token"
-                      component={ResetPassword}
-                    />
-                    <Route
-                      path="/EmailVerification/:token"
-                      component={EmailVerification}
-                    />
-                    <Route
-                      path="/LogOut"
-                      render={(): JSX.Element => (
-                        <UserContext.Consumer>
-                          {({ handleLogout }): JSX.Element => {
-                            handleLogout();
+              <ReviewAndAssignmentContextProvider>
+                <Router>
+                  <div className="App">
+                    <Switch>
+                      <Route path="/SignUp" component={SignUp} />
+                      <Route path="/SignIn" component={SignIn} />
+                      <Route
+                        path="/ResetPasswordEmail"
+                        component={ResetPasswordEmail}
+                      />
+                      <Route
+                        path="/ResetPassword/:token"
+                        component={ResetPassword}
+                      />
+                      <Route
+                        path="/EmailVerification/:token"
+                        component={EmailVerification}
+                      />
+                      <Route
+                        path="/LogOut"
+                        render={(): JSX.Element => (
+                          <UserContext.Consumer>
+                            {({ handleLogout }): JSX.Element => {
+                              handleLogout();
 
-                            return <Redirect to="/" />;
-                          }}
-                        </UserContext.Consumer>
-                      )}
-                    />
+                              return <Redirect to="/" />;
+                            }}
+                          </UserContext.Consumer>
+                        )}
+                      />
 
-                    <PrivateRoute path="/" component={DashBoard} />
-                  </Switch>
-                </div>
-              </Router>
+                      <PrivateRoute path="/" component={DashBoard} />
+                    </Switch>
+                  </div>
+                </Router>
+              </ReviewAndAssignmentContextProvider>
             </SnackbarProvider>
           </UserContextProvider>
         </CookiesProvider>

@@ -26,7 +26,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   callId,
   assignedInstruments,
 }) => {
-  const { loading, instrumentsData } = useInstrumentsData();
+  const { loadingInstruments, instrumentsData } = useInstrumentsData();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -37,7 +37,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     { title: 'Description', field: 'description' },
   ];
 
-  if (loading || !instrumentsData) {
+  if (loadingInstruments || !instrumentsData) {
     return <div>Loading...</div>;
   }
 

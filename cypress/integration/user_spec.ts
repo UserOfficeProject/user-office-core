@@ -13,7 +13,7 @@ context('User tests', () => {
   });
 
   afterEach(() => {
-    cy.wait(1000);
+    cy.wait(500);
   });
 
   // Login details

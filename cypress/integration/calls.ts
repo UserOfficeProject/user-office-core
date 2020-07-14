@@ -10,6 +10,11 @@ context('Calls tests', () => {
 
   beforeEach(() => {
     cy.visit('/');
+    cy.viewport(1100, 1000);
+  });
+
+  afterEach(() => {
+    cy.wait(500);
   });
 
   it('A user should not be able to see/visit calls', () => {
@@ -19,7 +24,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 4);
+      .should('have.length', 3);
 
     cy.visit('/CallPage');
     cy.contains('Your proposals');
@@ -60,15 +65,21 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });
@@ -111,15 +122,21 @@ context('Calls tests', () => {
       .type(endDate)
       .should('have.value', endDate);
 
+    cy.contains('Next').click();
+
     cy.get('[data-cy=survey-comment] input').type(
       faker.random.word().split(' ')[0]
     );
+
+    cy.contains('Next').click();
 
     cy.get('[data-cy=cycle-comment] input').type(
       faker.random.word().split(' ')[0]
     );
 
-    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.contains(shortCode);
   });

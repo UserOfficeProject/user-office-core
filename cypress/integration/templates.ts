@@ -334,6 +334,12 @@ context('Template tests', () => {
       .first()
       .click();
     cy.contains('Deviation').click();
+    cy.get('.MuiPopover-paper')
+      .contains('Call')
+      .click();
+    cy.get('.MuiPopover-paper')
+      .contains('SEP')
+      .click();
 
     cy.get('body').click();
 
@@ -344,6 +350,8 @@ context('Template tests', () => {
     cy.contains('View Proposals').click();
 
     cy.contains('Deviation');
+    cy.contains('Call');
+    cy.contains('SEP');
   });
 
   it('Officer can delete proposal', () => {

@@ -32,5 +32,14 @@ query getProposal($id: Int!) {
         id
       }
     }
+    instrument {
+      instrumentId
+      name
+      shortCode
+    }
+    call {
+      id
+      shortCode
+    }
   }
 }

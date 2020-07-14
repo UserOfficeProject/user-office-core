@@ -1,4 +1,9 @@
-import { BottomNavigation } from '@material-ui/core';
+import {
+  BottomNavigation,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -6,10 +11,12 @@ import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { UserContext } from '../context/UserContextProvider';
 import { PageName, UserRole } from '../generated/sdk';
@@ -163,6 +170,15 @@ const Dashboard: React.FC = () => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
+  const logoutMenuListItem = (
+    <ListItem component={Link} to="/LogOut" button data-cy="logout">
+      <ListItemIcon>
+        <ExitToApp />
+      </ListItemIcon>
+      <ListItemText primary="Logout" />
+    </ListItem>
+  );
+
   // TODO: Check who can see what and modify the access controll here.
   return (
     <div className={classes.root}>
@@ -183,6 +199,7 @@ const Dashboard: React.FC = () => {
         <Divider />
         <List>
           <MenuItems />
+          {logoutMenuListItem}
         </List>
         <Divider />
       </Drawer>

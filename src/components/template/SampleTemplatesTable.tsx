@@ -9,10 +9,9 @@ type SampleTemplateRowDataType = TemplateRowDataType & {};
 
 function SampleTemplatesTable(props: SampleTemplatesTableProps) {
   const columns: Column<SampleTemplateRowDataType>[] = [
-    { title: 'Template ID', field: 'templateId', editable: 'never' },
-    { title: 'Name', field: 'name', editable: 'always' },
-    { title: 'Description', field: 'description', editable: 'always' },
-    { title: '# samples', field: 'proposalCount', editable: 'never' },
+    { title: 'Name', field: 'name' },
+    { title: 'Description', field: 'description' },
+    { title: '# samples', field: 'proposalCount' },
   ];
 
   return (
@@ -20,7 +19,7 @@ function SampleTemplatesTable(props: SampleTemplatesTableProps) {
       <TemplatesTable
         columns={columns}
         templateCategory={TemplateCategoryId.SAMPLE_DECLARATION}
-        isRowDeleteable={rowData => {
+        isRowRemovable={rowData => {
           return true;
         }}
         dataProvider={props.dataProvider}

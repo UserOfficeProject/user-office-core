@@ -41,10 +41,10 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
     return api()
       .getProposal({ id: parseInt(match.params.id) })
       .then(data => {
-        setProposal(data.proposal);
+        setProposal(data.proposal as Proposal);
         if (data.proposal) {
           setTechReview(data.proposal.technicalReview);
-          setReviews(data.proposal.reviews || []);
+          setReviews((data.proposal.reviews as Review[]) || []);
         }
       });
   }, [api, match.params.id]);
