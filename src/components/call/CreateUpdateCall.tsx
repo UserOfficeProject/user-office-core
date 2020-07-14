@@ -4,14 +4,13 @@ import {
   updateCallValidationSchema,
 } from '@esss-swap/duo-validation';
 import {
-  Stepper,
-  Step,
   createStyles,
-  makeStyles,
-  Theme,
-  StepLabel,
-  Grid,
   FormHelperText,
+  makeStyles,
+  Step,
+  StepLabel,
+  Stepper,
+  Theme,
 } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -22,6 +21,7 @@ import React from 'react';
 
 import { Call } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
+import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import CallCycleInfo from './CallCycleInfo';
 import CallGeneralInfo from './CallGeneralInfo';
 import CallReviewAndNotification from './CallReviewAndNotification';
@@ -44,6 +44,9 @@ const useStyles = makeStyles((theme: Theme) =>
     formErrors: {
       color: theme.palette.error.main,
       marginBottom: '10px',
+    },
+    step: {
+      cursor: 'pointer',
     },
   })
 );
@@ -165,7 +168,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           const labelProps: { optional?: React.ReactNode } = {};
 
           return (
-            <Step key={label} {...stepProps}>
+            <Step key={label} {...stepProps} className={classes.step}>
               <StepLabel {...labelProps}>{label}</StepLabel>
             </Step>
           );
@@ -212,31 +215,27 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
           <Form>
             {getStepContent(activeStep)}
             {activeStep === 2 && showFormErrors(errors)}
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  fullWidth
-                  className={classes.button}
-                >
-                  Back
-                </Button>
-              </Grid>
-              <Grid item xs={9}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  data-cy="submit"
-                  type={isLastStep ? 'submit' : 'button'}
-                  fullWidth
-                  onClick={isLastStep ? () => null : handleNext}
-                  className={classes.button}
-                >
-                  {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
-                </Button>
-              </Grid>
-            </Grid>
+            <ActionButtonContainer>
+              <Button
+                disabled={activeStep === 0}
+                onClick={handleBack}
+                fullWidth
+                className={classes.button}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                data-cy="submit"
+                type={isLastStep ? 'submit' : 'button'}
+                fullWidth
+                onClick={isLastStep ? () => null : handleNext}
+                className={classes.button}
+              >
+                {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
+              </Button>
+            </ActionButtonContainer>
           </Form>
         )}
       </Formik>
