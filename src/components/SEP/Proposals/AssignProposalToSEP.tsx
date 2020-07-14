@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import * as yup from 'yup';
 
-import { UserContext } from '../../../context/UserContextProvider';
-import { UserRole } from '../../../generated/sdk';
-import { useSEPsData } from '../../../hooks/useSEPsData';
-import FormikDropdown from '../../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { UserContext } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
+import { useSEPsData } from 'hooks/useSEPsData';
 
 const assignProposalToSEPValidationSchema = yup.object().shape({
   selectedSEPId: yup.string().required('You must select active SEP'),

@@ -13,10 +13,10 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Sep, UserRole } from '../../../generated/sdk';
-import { useDataApi } from '../../../hooks/useDataApi';
-import { ButtonContainer } from '../../../styles/StyledComponents';
-import { useCheckAccess } from '../../common/Can';
+import { useCheckAccess } from 'components/common/Can';
+import { Sep, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 type SEPPageProps = {
   /** SEP data to be shown */

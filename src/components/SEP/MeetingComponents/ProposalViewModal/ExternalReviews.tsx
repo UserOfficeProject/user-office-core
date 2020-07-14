@@ -9,8 +9,8 @@ import {
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Review } from '../../../../generated/sdk';
-import { StyledPaper } from '../../../../styles/StyledComponents';
+import { Review } from 'generated/sdk';
+import { StyledPaper } from 'styles/StyledComponents';
 
 type ExternalReviewsProps = {
   reviews: Review[];

@@ -18,6 +18,9 @@ import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
+import { ErrorFocus } from 'components/common/ErrorFocus';
+import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import InformationModal from 'components/pages/InformationModal';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, CreateUserMutationVariables } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/useDataApi';
@@ -27,10 +30,6 @@ import { useInstitutionData } from 'hooks/useInstitutionData';
 import { useOrcIDInformation } from 'hooks/useOrcIDInformation';
 import orcid from 'images/orcid.png';
 import { userFieldSchema } from 'utils/userFieldValidationSchema';
-
-import { ErrorFocus } from '../common/ErrorFocus';
-import FormikDropdown, { Option } from '../common/FormikDropdown';
-import InformationModal from '../pages/InformationModal';
 
 const useStyles = makeStyles(theme => ({
   '@global': {

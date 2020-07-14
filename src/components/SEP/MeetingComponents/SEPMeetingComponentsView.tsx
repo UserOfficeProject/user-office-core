@@ -2,8 +2,9 @@ import { Options, MTableToolbar } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { useCallsData } from '../../../hooks/useCallsData';
-import SelectedCallFilter from '../../common/SelectedCallFilter';
+import SelectedCallFilter from 'components/common/SelectedCallFilter';
+import { useCallsData } from 'hooks/useCallsData';
+
 import SEPMeetingInstrumentsTable from './SEPMeetingInstrumentsTable';
 
 type SEPMeetingComponentsViewProps = {

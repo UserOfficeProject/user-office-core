@@ -9,12 +9,9 @@ import { Formik, Form, Field } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Proposal, ProposalEndStatus } from '../../../../generated/sdk';
-import {
-  StyledPaper,
-  ButtonContainer,
-} from '../../../../styles/StyledComponents';
-import FormikDropdown from '../../../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { Proposal, ProposalEndStatus } from 'generated/sdk';
+import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 
 type FinalRankingFormProps = {
   closeModal: () => void;

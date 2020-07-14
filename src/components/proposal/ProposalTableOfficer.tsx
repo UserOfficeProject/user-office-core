@@ -10,18 +10,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import XLSX from 'xlsx';
 
-import { Review, ReviewStatus, Instrument } from '../../generated/sdk';
-import { ProposalsFilter } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
-import { tableIcons } from '../../utils/materialIcons';
-import DialogConfirmation from '../common/DialogConfirmation';
-import ScienceIconAdd from '../common/ScienceIconAdd';
-import ScienceIconRemove from '../common/ScienceIconRemove';
-import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
-import AssignProposalToSEP from '../SEP/Proposals/AssignProposalToSEP';
+import DialogConfirmation from 'components/common/DialogConfirmation';
+import ScienceIconAdd from 'components/common/ScienceIconAdd';
+import ScienceIconRemove from 'components/common/ScienceIconRemove';
+import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
+import { Review, ReviewStatus, Instrument } from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
+import { useDataApi } from 'hooks/useDataApi';
+import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
+import { useLocalStorage } from 'hooks/useLocalStorage';
+import { useProposalsData, ProposalData } from 'hooks/useProposalsData';
+import { tableIcons } from 'utils/materialIcons';
+
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
