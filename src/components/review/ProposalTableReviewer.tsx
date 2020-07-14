@@ -3,8 +3,9 @@ import { Visibility } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import RateReviewIcon from '@material-ui/icons/RateReview';
 import MaterialTable from 'material-table';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
   SepAssignment,
@@ -14,7 +15,6 @@ import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/useUserData';
 import { tableIcons } from 'utils/materialIcons';
 
-import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
 import ProposalReviewModal from './ProposalReviewModal';
 
 type UserWithReview = {
@@ -32,6 +32,7 @@ const ProposalTableReviewer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const [editReviewID, setEditReviewID] = useState(0);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const { currentAssignment } = useContext(ReviewAndAssignmentContext);
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -90,9 +91,8 @@ const ProposalTableReviewer: React.FC = () => {
     : [];
 
   const updateView = () => {
-    if (AssignmentProvider.getCurrentAssignment().currentAssignment) {
-      const currentReview = (AssignmentProvider.getCurrentAssignment()
-        .currentAssignment as SepAssignment).review;
+    if (currentAssignment) {
+      const currentReview = (currentAssignment as SepAssignment).review;
 
       const userDataUpdated = {
         ...userData,

@@ -3,9 +3,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
-import { MTableToolbar, Options } from 'material-table';
 import React, { Dispatch, SetStateAction } from 'react';
 
+import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { ProposalsFilter, Call, Instrument } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
@@ -20,7 +20,6 @@ const useStyles = makeStyles(theme => ({
 export default function ProposalFilterBar(props: {
   callsData: Call[];
   instrumentsData: Instrument[];
-  data: Options;
   onChange: Dispatch<SetStateAction<ProposalsFilter>>;
   filter: ProposalsFilter;
 }) {
@@ -28,27 +27,17 @@ export default function ProposalFilterBar(props: {
 
   return (
     <>
-      <MTableToolbar {...props.data} />
-      <FormControl className={classes.formControl}>
-        <InputLabel>Call</InputLabel>
-        <Select
-          onChange={call =>
-            props.onChange({
-              ...props.filter,
-              callId: call.target.value as number,
-            })
-          }
-          value={props.filter.callId}
-          defaultValue={0}
-        >
-          <MenuItem value={0}>All</MenuItem>
-          {props.callsData.map(call => (
-            <MenuItem key={call.id} value={call.id}>
-              {call.shortCode}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <SelectedCallFilter
+        callId={props.filter.callId as number}
+        callsData={props.callsData}
+        shouldShowAll={true}
+        onChange={callId =>
+          props.onChange({
+            ...props.filter,
+            callId,
+          })
+        }
+      />
       <FormControl className={classes.formControl}>
         <InputLabel>Instrument</InputLabel>
         <Select

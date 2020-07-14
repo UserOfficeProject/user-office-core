@@ -6,7 +6,6 @@ import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import CalendarToday from '@material-ui/icons/CalendarToday';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import ExitToApp from '@material-ui/icons/ExitToApp';
 import FolderOpen from '@material-ui/icons/FolderOpen';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
@@ -53,12 +52,6 @@ const MenuItems: React.FC = () => {
           <Help />
         </ListItemIcon>
         <ListItemText primary="Help" />
-      </ListItem>
-      <ListItem component={Link} to="/LogOut" button>
-        <ListItemIcon>
-          <ExitToApp />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
       </ListItem>
     </div>
   );
@@ -108,13 +101,6 @@ const MenuItems: React.FC = () => {
         <ListItemText primary="Edit Institutions" />
       </ListItem>
       <TemplateMenuListItem />
-
-      <ListItem component={Link} to="/LogOut" button>
-        <ListItemIcon>
-          <ExitToApp />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
-      </ListItem>
     </div>
   );
 
@@ -125,12 +111,6 @@ const MenuItems: React.FC = () => {
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
-      </ListItem>
-      <ListItem component={Link} to="/LogOut" button data-cy="logout">
-        <ListItemIcon>
-          <ExitToApp />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
       </ListItem>
     </div>
   );
@@ -149,12 +129,6 @@ const MenuItems: React.FC = () => {
         </ListItemIcon>
         <ListItemText primary="SEPs" />
       </ListItem>
-      <ListItem component={Link} to="/LogOut" button data-cy="logout">
-        <ListItemIcon>
-          <ExitToApp />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
-      </ListItem>
     </div>
   );
 
@@ -165,12 +139,6 @@ const MenuItems: React.FC = () => {
           <GroupWorkIcon />
         </ListItemIcon>
         <ListItemText primary="Instruments" />
-      </ListItem>
-      <ListItem component={Link} to="/LogOut" button data-cy="logout">
-        <ListItemIcon>
-          <ExitToApp />
-        </ListItemIcon>
-        <ListItemText primary="Logout" />
       </ListItem>
     </div>
   );

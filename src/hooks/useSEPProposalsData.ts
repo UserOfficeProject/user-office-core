@@ -4,7 +4,8 @@ import { SepProposal } from 'generated/sdk';
 import { useDataApi } from 'hooks/useDataApi';
 
 export function useSEPProposalsData(
-  sepId: number
+  sepId: number,
+  callId: number
 ): {
   loadingSEPProposals: boolean;
   SEPProposalsData: SepProposal[] | null;
@@ -17,12 +18,12 @@ export function useSEPProposalsData(
   const [loadingSEPProposals, setLoadingSEPProposals] = useState(true);
   useEffect(() => {
     api()
-      .getSEPProposals({ sepId })
+      .getSEPProposals({ sepId, callId })
       .then(data => {
         setSEPProposalsData(data.sepProposals as SepProposal[]);
         setLoadingSEPProposals(false);
       });
-  }, [sepId, api]);
+  }, [sepId, api, callId]);
 
   return { loadingSEPProposals, SEPProposalsData, setSEPProposalsData };
 }

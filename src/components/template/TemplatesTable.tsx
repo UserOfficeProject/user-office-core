@@ -23,7 +23,7 @@ interface TemplatesTableProps {
   columns: Column<any>[];
   templateCategory: TemplateCategoryId;
   dataProvider: () => Promise<Exclude<GetTemplatesQuery['templates'], null>>;
-  isRowDeleteable: (row: TemplateRowDataType) => boolean;
+  isRowRemovable: (row: TemplateRowDataType) => boolean;
   confirm: WithConfirmType;
 }
 export function TemplatesTable(props: TemplatesTableProps) {
@@ -166,8 +166,8 @@ export function TemplatesTable(props: TemplatesTableProps) {
     if (rowData.isArchived) {
       return getUnarchiveButton();
     } else {
-      const isDeleteable = props.isRowDeleteable(rowData);
-      if (isDeleteable) {
+      const isRemovable = props.isRowRemovable(rowData);
+      if (isRemovable) {
         return getDeleteButton();
       } else {
         return getArchiveButton();

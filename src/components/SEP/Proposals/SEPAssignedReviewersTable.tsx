@@ -4,18 +4,18 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
+import { ReviewAndAssignmentContext } from '../../../context/ReviewAndAssignmentContextProvider';
 import {
   SepProposal,
   SepAssignment,
   ReviewStatus,
   UserRole,
-} from '../../generated/sdk';
-import { tableIcons } from '../../utils/materialIcons';
-import { useCheckAccess } from '../common/Can';
-import ProposalReviewModal from '../review/ProposalReviewModal';
-import AssignmentProvider from './SEPCurrentAssignmentProvider';
+} from '../../../generated/sdk';
+import { tableIcons } from '../../../utils/materialIcons';
+import { useCheckAccess } from '../../common/Can';
+import ProposalReviewModal from '../../review/ProposalReviewModal';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -36,7 +36,7 @@ type SEPAssignedReviewersTableProps = {
     assignedReviewer: SepAssignment,
     proposalId: number
   ) => Promise<void>;
-  updateView: () => void;
+  updateView: (currentAssignment: SepAssignment) => void;
 };
 
 const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
@@ -47,6 +47,9 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
   const [editReviewID, setEditReviewID] = useState<null | number>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const classes = useStyles();
+  const { setCurrentAssignment, currentAssignment } = useContext(
+    ReviewAndAssignmentContext
+  );
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
@@ -86,7 +89,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
           reviewModalOpen={reviewModalOpen}
           setReviewModalOpen={() => {
             setReviewModalOpen(false);
-            updateView();
+            updateView(currentAssignment as SepAssignment);
           }}
         />
       )}
@@ -116,7 +119,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
                 : () => <Visibility />,
             onClick: () => {
               setEditReviewID(rowData.review.id);
-              AssignmentProvider.setCurrentAssignment({
+              setCurrentAssignment({
                 ...rowData,
                 proposalId: sepProposal.proposalId,
               });
