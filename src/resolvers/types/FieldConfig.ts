@@ -77,6 +77,9 @@ export class SubtemplateConfig extends ConfigBase {
   @Field(() => Int)
   templateId: number;
 
+  @Field(() => Int)
+  templateCategory: number;
+
   @Field(() => String)
   addEntryButtonLabel: string;
 }

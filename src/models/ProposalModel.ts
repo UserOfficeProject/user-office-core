@@ -243,6 +243,7 @@ defaultConfigs.put('TextInputConfig', {
 });
 defaultConfigs.put('SubtemplateConfig', {
   templateId: 0,
+  templateCategory: TemplateCategoryId.SAMPLE_DECLARATION,
   ...baseDefaultConfig,
 });
 
