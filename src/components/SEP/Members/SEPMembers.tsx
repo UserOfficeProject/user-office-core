@@ -16,9 +16,9 @@ import React, { useState } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { SepMember, BasicUserDetails, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useRenewToken } from 'hooks/useRenewToken';
-import { useSEPMembersData } from 'hooks/useSEPMembersData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useRenewToken } from 'hooks/common/useRenewToken';
+import { useSEPMembersData } from 'hooks/SEP/useSEPMembersData';
 import { tableIcons } from 'utils/materialIcons';
 
 type SEPMembersProps = {

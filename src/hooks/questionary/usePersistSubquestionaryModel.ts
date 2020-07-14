@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,

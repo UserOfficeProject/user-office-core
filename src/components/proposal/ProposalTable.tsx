@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router';
 
-import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { tableIcons } from 'utils/materialIcons';
 
 import {

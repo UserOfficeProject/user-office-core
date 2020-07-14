@@ -3,7 +3,7 @@ import React from 'react';
 import { useParams } from 'react-router';
 
 import SimpleTabs from 'components/common/TabPanel';
-import { useProposalData } from 'hooks/useProposalData';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 
 import ProposalContainer from './ProposalContainer';
 

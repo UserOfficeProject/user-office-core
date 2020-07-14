@@ -9,7 +9,7 @@ import Can from 'components/common/Can';
 import InputDialog from 'components/common/InputDialog';
 import { UserContext } from 'context/UserContextProvider';
 import { Sep, UserRole } from 'generated/sdk';
-import { useSEPsData } from 'hooks/useSEPsData';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 import { tableIcons } from 'utils/materialIcons';
 
 import AddSEP from './General/AddSEP';

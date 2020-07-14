@@ -9,7 +9,7 @@ import React, { Fragment } from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { TechnicalReviewStatus, TechnicalReview } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalTechnicalReview(props: {

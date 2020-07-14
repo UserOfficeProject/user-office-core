@@ -18,8 +18,8 @@ import { useSnackbar } from 'notistack';
 import React, { useState, useEffect } from 'react';
 
 import { PageName } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useGetPageContent } from 'hooks/useGetPageContent';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles(() => ({
   buttons: {

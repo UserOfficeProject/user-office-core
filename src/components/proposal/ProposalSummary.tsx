@@ -3,8 +3,8 @@ import React, { useContext } from 'react';
 
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { ProposalStatus } from 'generated/sdk';
-import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
-import { useSubmitProposal } from 'hooks/useSubmitProposal';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import {
   EventType,
   ProposalSubmissionModelState,

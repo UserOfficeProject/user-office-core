@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
 import { GetRolesQuery, Role } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
 type RoleTableProps = {

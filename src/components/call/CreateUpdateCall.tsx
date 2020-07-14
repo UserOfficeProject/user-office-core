@@ -21,7 +21,7 @@ import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { Call } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import CallCycleInfo from './CallCycleInfo';
 import CallGeneralInfo from './CallGeneralInfo';

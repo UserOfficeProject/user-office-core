@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetUsersQuery } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useUsersData(filter: string) {
   const [usersData, setUsersData] = useState<GetUsersQuery['users'] | null>(

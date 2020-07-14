@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { Institution } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 type CreateInstitutionProps = {
   onComplete?: (institution: Institution | null) => void;

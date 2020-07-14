@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { useBlankProposal } from 'hooks/useBlankProposal';
+import { useBlankProposal } from 'hooks/proposal/useBlankProposal';
 
 import ProposalContainer from './ProposalContainer';
 

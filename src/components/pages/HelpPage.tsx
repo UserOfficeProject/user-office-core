@@ -3,7 +3,7 @@ import parse from 'html-react-parser';
 import React from 'react';
 
 import { PageName } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/useGetPageContent';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 const HelpPage: React.FC = () => {

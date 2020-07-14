@@ -7,7 +7,7 @@ import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/useGetPageContent';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function OverviewPage(props: { userRole: UserRole }) {

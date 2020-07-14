@@ -11,7 +11,7 @@ import * as yup from 'yup';
 import FormikDropdown from 'components/common/FormikDropdown';
 import { UserContext } from 'context/UserContextProvider';
 import { UserRole } from 'generated/sdk';
-import { useSEPsData } from 'hooks/useSEPsData';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
 
 const assignProposalToSEPValidationSchema = yup.object().shape({
   selectedSEPId: yup.string().required('You must select active SEP'),

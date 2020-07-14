@@ -6,7 +6,7 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 
 import { UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { emailFieldSchema } from 'utils/userFieldValidationSchema';
 export function InviteUserForm(props: {
   action: Function;

@@ -8,7 +8,7 @@ import { Redirect, useHistory } from 'react-router';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Role } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 

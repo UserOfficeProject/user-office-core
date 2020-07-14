@@ -11,8 +11,8 @@ import {
   SepAssignment,
   UserWithReviewsQuery,
 } from 'generated/sdk';
-import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
-import { useUserWithReviewsData } from 'hooks/useUserData';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { tableIcons } from 'utils/materialIcons';
 
 import ProposalReviewModal from './ProposalReviewModal';

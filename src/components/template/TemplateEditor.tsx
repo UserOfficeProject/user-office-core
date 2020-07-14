@@ -17,7 +17,7 @@ import {
   QuestionaryStep,
   QuestionTemplateRelation,
 } from 'generated/sdk';
-import { usePersistQuestionaryEditorModel } from 'hooks/usePersistQuestionaryEditorModel';
+import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import { getQuestionaryStepByTopicId } from 'models/ProposalModelFunctions';
 import QuestionaryEditorModel, {
   Event,

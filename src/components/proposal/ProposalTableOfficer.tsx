@@ -17,17 +17,20 @@ import AssignProposalsToInstrument from 'components/instrument/AssignProposalsTo
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import { Review, ReviewStatus, Instrument } from 'generated/sdk';
 import { ProposalsFilter } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useDownloadPDFProposal } from 'hooks/useDownloadPDFProposal';
-import { useLocalStorage } from 'hooks/useLocalStorage';
-import { useProposalsData, ProposalData } from 'hooks/useProposalsData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import {
+  useProposalsData,
+  ProposalData,
+} from 'hooks/proposal/useProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
-  Toolbar: (data: Options<object>) => JSX.Element;
+  Toolbar: (data: Options) => JSX.Element;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
@@ -208,6 +211,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
+      removable: false,
       render: RowActionButtons,
     },
     { title: 'Proposal ID', field: 'shortCode' },

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { SepMember } from 'generated/sdk';
-import { useSEPMembersData } from 'hooks/useSEPMembersData';
+import { useSEPMembersData } from 'hooks/SEP/useSEPMembersData';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 

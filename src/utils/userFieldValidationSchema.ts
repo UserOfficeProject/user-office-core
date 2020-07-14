@@ -1,7 +1,7 @@
 import { request } from 'graphql-request';
 import * as Yup from 'yup';
 
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export const userFieldSchema = Yup.object().shape({
   firstname: Yup.string()

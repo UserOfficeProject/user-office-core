@@ -10,7 +10,7 @@ import {
   ReviewStatus,
   InstrumentWithAvailabilityTime,
 } from 'generated/sdk';
-import { useSEPProposalsByInstrument } from 'hooks/useSEPProposalsByInstrument';
+import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';

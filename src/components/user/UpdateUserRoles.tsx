@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { GetUserWithRolesQuery, Role } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useRenewToken } from 'hooks/useRenewToken';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useRenewToken } from 'hooks/common/useRenewToken';
 import { tableIcons } from 'utils/materialIcons';
 
 import RoleModal from './RoleModal';

@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { UserRole } from 'generated/sdk';
-import { useCallsData } from 'hooks/useCallsData';
+import { useCallsData } from 'hooks/call/useCallsData';
 
 import ScienceIcon from './common/ScienceIcon';
 

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Sep } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles(theme => ({
   submit: {

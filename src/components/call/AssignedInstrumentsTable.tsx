@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, { useState, ChangeEvent } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.

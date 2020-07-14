@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetBlankProposalQuery } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useBlankProposal(callId: number) {
   const [proposal, setProposal] = useState<

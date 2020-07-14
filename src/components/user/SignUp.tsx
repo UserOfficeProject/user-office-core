@@ -24,11 +24,11 @@ import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import InformationModal from 'components/pages/InformationModal';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, CreateUserMutationVariables } from 'generated/sdk';
-import { useUnauthorizedApi } from 'hooks/useDataApi';
-import { useGetFields } from 'hooks/useGetFields';
-import { useGetPageContent } from 'hooks/useGetPageContent';
-import { useInstitutionData } from 'hooks/useInstitutionData';
-import { useOrcIDInformation } from 'hooks/useOrcIDInformation';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { useGetFields } from 'hooks/user/useGetFields';
+import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
 import orcid from 'images/orcid.png';
 import { userFieldSchema } from 'utils/userFieldValidationSchema';
 

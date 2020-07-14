@@ -14,7 +14,7 @@ import {
   Review,
   BasicUserDetails,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ReviewTable from './ReviewTable';

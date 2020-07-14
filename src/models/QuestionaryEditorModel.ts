@@ -8,7 +8,7 @@ import {
   QuestionTemplateRelation,
   TemplateCategoryId,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,

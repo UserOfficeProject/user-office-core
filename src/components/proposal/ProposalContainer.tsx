@@ -12,7 +12,7 @@ import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
 import { Proposal, ProposalStatus, Questionary, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {

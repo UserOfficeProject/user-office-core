@@ -20,7 +20,7 @@ import React, { useEffect, useState } from 'react';
 import ModalWrapper from 'components/common/ModalWrapper';
 import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
 import { Questionary, SubtemplateConfig } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { stringToNumericArray } from 'utils/ArrayUtils';
 
 import { BasicComponentProps } from './IBasicComponentProps';

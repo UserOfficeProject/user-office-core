@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
 import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { timeAgo } from 'utils/Time';
 
 import ProposalTable from './ProposalTable';

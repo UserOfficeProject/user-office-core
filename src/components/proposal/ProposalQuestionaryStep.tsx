@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
-import { useUpdateProposal } from 'hooks/useUpdateProposal';
+import { useUpdateProposal } from 'hooks/proposal/useUpdateProposal';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,

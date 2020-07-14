@@ -10,7 +10,7 @@ import * as yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { Instrument } from 'generated/sdk';
-import { useInstrumentsData } from 'hooks/useInstrumentsData';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
 const assignProposalToInstrumentValidationSchema = yup.object().shape({
   selectedInstrumentId: yup.string().required('You must select instrument'),

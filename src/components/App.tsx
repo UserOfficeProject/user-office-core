@@ -13,7 +13,7 @@ import {
 
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
-import { useUnauthorizedApi } from 'hooks/useDataApi';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
 import DashBoard from './DashBoard';

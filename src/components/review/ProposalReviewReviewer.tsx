@@ -4,8 +4,8 @@ import { useParams } from 'react-router';
 
 import SimpleTabs from 'components/common/TabPanel';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { useProposalData } from 'hooks/useProposalData';
-import { useReviewData } from 'hooks/useReviewData';
+import { useProposalData } from 'hooks/proposal/useProposalData';
+import { useReviewData } from 'hooks/review/useReviewData';
 
 import ProposalGrade from './ProposalGrade';
 import TechnicalReviewInformation from './TechnicalReviewInformation';

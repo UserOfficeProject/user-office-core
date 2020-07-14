@@ -15,8 +15,8 @@ import {
   Review,
   UserRole,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useSEPProposalsData } from 'hooks/useSEPProposalsData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -27,7 +27,7 @@ type SEPProposalsAndAssignmentsTableProps = {
   /** Id of the SEP we are assigning members to */
   sepId: number;
   /** Toolbar component shown in the table */
-  Toolbar: (data: Options<object>) => JSX.Element;
+  Toolbar: (data: Options) => JSX.Element;
   /** Call id that we want to filter by */
   selectedCallId: number;
 };

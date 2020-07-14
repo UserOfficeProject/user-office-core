@@ -6,7 +6,7 @@ import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Sep, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import SEPGeneralInfo from './General/SEPGeneralInfo';
 import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsView';

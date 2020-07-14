@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useState } from 'react';
 
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { Proposal } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalContainer from './ProposalContainer';
 

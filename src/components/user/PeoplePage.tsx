@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 
 import { UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 import { InviteUserForm } from './InviteUserForm';

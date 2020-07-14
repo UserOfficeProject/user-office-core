@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useSubmitProposal() {
   const [isLoading, setIsLoading] = useState<boolean>(false);

@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelation, TemplateCategoryId } from 'generated/sdk';
-import { useTemplates } from 'hooks/useTemplates';
+import { useTemplates } from 'hooks/template/useTemplates';
 
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';

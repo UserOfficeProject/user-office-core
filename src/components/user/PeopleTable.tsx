@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { UserRole, GetUsersQuery } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 

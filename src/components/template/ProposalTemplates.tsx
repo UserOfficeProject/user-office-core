@@ -2,7 +2,7 @@ import { Container } from '@material-ui/core';
 import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTemplatesTable from './ProposalTemplatesTable';
 

@@ -8,7 +8,7 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles({
   buttons: {

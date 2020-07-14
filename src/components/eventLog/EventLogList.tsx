@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { EventLog } from 'generated/sdk';
-import { useEventLogsData } from 'hooks/useEventLogsData';
+import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
 import { tableIcons } from 'utils/materialIcons';
 
 type EventLogListProps = {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
-import { useCallsData } from 'hooks/useCallsData';
+import { useCallsData } from 'hooks/call/useCallsData';
 
 import SEPMeetingInstrumentsTable from './SEPMeetingInstrumentsTable';
 
@@ -18,7 +18,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
   // NOTE: Default call is with id=1
   const [selectedCallId, setSelectedCallId] = useState<number>(1);
 
-  const Toolbar = (data: Options<object>): JSX.Element =>
+  const Toolbar = (data: Options): JSX.Element =>
     loading ? (
       <div>Loading...</div>
     ) : (

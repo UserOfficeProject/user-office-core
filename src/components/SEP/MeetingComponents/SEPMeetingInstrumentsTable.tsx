@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { InstrumentWithAvailabilityTime } from 'generated/sdk';
-import { useInstrumentsBySEPData } from 'hooks/useInstrumentsBySEPData';
+import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
 import { tableIcons } from 'utils/materialIcons';
 
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {
   sepId: number;
-  Toolbar: (data: Options<object>) => JSX.Element;
+  Toolbar: (data: Options) => JSX.Element;
   selectedCallId: number;
 };
 

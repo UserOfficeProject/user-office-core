@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { NavigButton } from 'components/common/NavigButton';
 import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
 import { Questionary } from 'generated/sdk';
-import { usePersistSubquestionaryModel } from 'hooks/usePersistSubquestionaryModel';
+import { usePersistSubquestionaryModel } from 'hooks/questionary/usePersistSubquestionaryModel';
 import { areDependenciesSatisfied } from 'models/ProposalModelFunctions';
 import {
   Event,

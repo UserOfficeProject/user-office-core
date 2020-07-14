@@ -17,7 +17,7 @@ import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
 import { TechnicalReview, Review } from 'generated/sdk';
-import { useProposalData } from 'hooks/useProposalData';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';

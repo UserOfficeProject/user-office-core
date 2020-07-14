@@ -3,7 +3,7 @@ import React from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
 import { TemplateCategoryId } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 import SampleTemplatesTable from './SampleTemplatesTable';
 

@@ -35,7 +35,7 @@
     "http-proxy-middleware": "^0.20.0",
     "immer": "^4.0.2",
     "jsonwebtoken": "^8.5.1",
-    "material-table": "^1.57.2",
+    "material-table": "~1.64.0",
     "notistack": "^0.9.7",
     "path": "^0.12.7",
     "query-string": "^6.9.0",

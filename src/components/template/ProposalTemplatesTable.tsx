@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import { Call, ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
-import { useCallsData } from 'hooks/useCallsData';
+import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 

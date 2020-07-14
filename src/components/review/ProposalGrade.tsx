@@ -11,8 +11,8 @@ import React, { useState, useEffect, useContext } from 'react';
 
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { ReviewStatus, Review } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useReviewData } from 'hooks/useReviewData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useReviewData } from 'hooks/review/useReviewData';
 import { ButtonContainer } from 'styles/StyledComponents';
 
 const useStyles = makeStyles(() => ({

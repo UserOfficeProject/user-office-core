@@ -15,7 +15,7 @@ import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { Sep, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
 type SEPPageProps = {

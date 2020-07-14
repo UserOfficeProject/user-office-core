@@ -6,8 +6,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
-import { useInstrumentsData } from 'hooks/useInstrumentsData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { tableIcons } from 'utils/materialIcons';
 
 type AssignInstrumentsToCallProps = {

@@ -6,8 +6,8 @@ import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
-import { useDataApi } from 'hooks/useDataApi';
-import { useInstitutionData } from 'hooks/useInstitutionData';
+import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 

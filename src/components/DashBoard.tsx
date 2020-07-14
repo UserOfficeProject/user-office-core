@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
-import { useGetPageContent } from 'hooks/useGetPageContent';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';

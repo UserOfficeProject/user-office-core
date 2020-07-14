@@ -13,7 +13,7 @@ import dateformat from 'dateformat';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
-import { useCallsData } from 'hooks/useCallsData';
+import { useCallsData } from 'hooks/call/useCallsData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { daysRemaining } from 'utils/Time';
 

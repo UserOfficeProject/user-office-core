@@ -18,9 +18,9 @@ import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { useDataApi } from 'hooks/useDataApi';
-import { UPLOAD_STATE, useFileUpload } from 'hooks/useFileUpload';
-import { usePrevious } from 'hooks/usePrevious';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
+import { usePrevious } from 'hooks/common/usePrevious';
 import { FileMetaData } from 'models/FileUpload';
 
 export function FileUploadComponent(props: {

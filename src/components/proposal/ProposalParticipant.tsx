@@ -3,7 +3,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import React, { useState, useEffect } from 'react';
 
 import { UserRole } from 'generated/sdk';
-import { useBasicUserData, BasicUserData } from 'hooks/useUserData';
+import { useBasicUserData, BasicUserData } from 'hooks/user/useUserData';
 import { User } from 'models/User';
 
 import ParticipantModal from './ParticipantModal';

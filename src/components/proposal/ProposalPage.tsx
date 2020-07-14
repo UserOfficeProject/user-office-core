@@ -3,8 +3,8 @@ import { Options, MTableToolbar } from 'material-table';
 import React from 'react';
 
 import { ProposalsFilter } from 'generated/sdk';
-import { useCallsData } from 'hooks/useCallsData';
-import { useInstrumentsData } from 'hooks/useInstrumentsData';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalFilterBar from './ProposalFilterBar';
@@ -17,7 +17,7 @@ export default function ProposalPage() {
   const { loading, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
 
-  const Toolbar = (data: Options<object>): JSX.Element =>
+  const Toolbar = (data: Options): JSX.Element =>
     loading || loadingInstruments ? (
       <div>Loading...</div>
     ) : (

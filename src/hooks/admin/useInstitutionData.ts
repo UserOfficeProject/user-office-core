@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Institution } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useInstitutionData() {
   const [institutionData, setInstitutionData] = useState<Institution[] | null>(

@@ -7,7 +7,7 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import { TemplateCategoryId, TemplateMetadataFragment } from 'generated/sdk';
-import { useDataApi } from 'hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const CreateTemplate = (props: {
   onComplete: (template: TemplateMetadataFragment | null) => void;
