@@ -4,6 +4,7 @@ cache:
   key: "alpine"
   paths:
     - node_modules/
+    - package-lock.json
 
 stages:
   - test
