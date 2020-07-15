@@ -3,16 +3,13 @@ import dateformat from 'dateformat';
 import MaterialTable, { Column } from 'material-table';
 import React, { useState } from 'react';
 
-import {
-  Call,
-  ProposalTemplate,
-  TemplateCategoryId,
-} from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
-import { tableIcons } from '../../utils/materialIcons';
-import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { Call, ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { tableIcons } from 'utils/materialIcons';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {

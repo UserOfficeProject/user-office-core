@@ -2,8 +2,9 @@ import { makeStyles } from '@material-ui/core';
 import { getIn } from 'formik';
 import React, { ChangeEvent, useState, useEffect } from 'react';
 
-import { TextInputConfig } from '../../generated/sdk';
-import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
+import { TextInputConfig } from 'generated/sdk';
+
 import { BasicComponentProps } from './IBasicComponentProps';
 
 export function ProposalComponentTextInput(props: BasicComponentProps) {

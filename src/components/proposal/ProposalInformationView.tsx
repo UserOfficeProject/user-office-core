@@ -5,12 +5,13 @@ import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { UserRole } from '../../generated/sdk';
-import { ProposalSubsetSumbission } from '../../models/ProposalModel';
-import { EventType } from '../../models/ProposalSubmissionModel';
-import { BasicUserDetails, User } from '../../models/User';
-import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
+import { UserContext } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { EventType } from 'models/ProposalSubmissionModel';
+import { BasicUserDetails, User } from 'models/User';
+
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 import ProposalParticipant from './ProposalParticipant';

@@ -1,6 +1,8 @@
 import { makeStyles } from '@material-ui/core';
-import React from 'react';
-export function ProposalErrorLabel(props: any) {
+import PropTypes from 'prop-types';
+import React, { PropsWithChildren } from 'react';
+
+const ProposalErrorLabel: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const classes = makeStyles(theme => ({
     error: {
       color: theme.palette.error.main,
@@ -9,5 +11,14 @@ export function ProposalErrorLabel(props: any) {
     },
   }))();
 
-  return <span className={classes.error}>{props.children}</span>;
-}
+  return <span className={classes.error}>{children}</span>;
+};
+
+ProposalErrorLabel.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]),
+};
+
+export default ProposalErrorLabel;

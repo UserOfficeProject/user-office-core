@@ -333,7 +333,6 @@ context('Template tests', () => {
     cy.get("[title='Show Columns']")
       .first()
       .click();
-    cy.contains('Deviation').click();
     cy.get('.MuiPopover-paper')
       .contains('Call')
       .click();
@@ -349,7 +348,6 @@ context('Template tests', () => {
 
     cy.contains('View Proposals').click();
 
-    cy.contains('Deviation');
     cy.contains('Call');
     cy.contains('SEP');
   });

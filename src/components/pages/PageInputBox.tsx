@@ -1,14 +1,3 @@
-import Button from '@material-ui/core/Button';
-import Divider from '@material-ui/core/Divider';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import { Editor } from '@tinymce/tinymce-react';
-import { useSnackbar } from 'notistack';
-import React, { useState, useEffect } from 'react';
-
-import { PageName } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useGetPageContent } from '../../hooks/useGetPageContent';
 // It is important to import the Editor which accepts plugins.
 import 'tinymce/tinymce';
 import 'tinymce/themes/silver/theme';
@@ -18,6 +7,19 @@ import 'tinymce/plugins/link';
 import 'tinymce/plugins/preview';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+import 'tinymce/icons/default/icons';
+
+import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
+import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import { Editor } from '@tinymce/tinymce-react';
+import { useSnackbar } from 'notistack';
+import React, { useState, useEffect } from 'react';
+
+import { PageName } from 'generated/sdk';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles(() => ({
   buttons: {

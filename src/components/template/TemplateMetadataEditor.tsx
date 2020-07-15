@@ -4,10 +4,10 @@ import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
-import { Template } from '../../generated/sdk';
-import { Event, EventType } from '../../models/QuestionaryEditorModel';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { Template } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 export function TemplateMetadataEditor(props: {
   template: Template;

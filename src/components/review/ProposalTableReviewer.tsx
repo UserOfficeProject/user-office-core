@@ -5,15 +5,16 @@ import RateReviewIcon from '@material-ui/icons/RateReview';
 import MaterialTable from 'material-table';
 import React, { useState, useContext } from 'react';
 
-import { ReviewAndAssignmentContext } from '../../context/ReviewAndAssignmentContextProvider';
+import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import {
   ReviewStatus,
   SepAssignment,
   UserWithReviewsQuery,
-} from '../../generated/sdk';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useUserWithReviewsData } from '../../hooks/useUserData';
-import { tableIcons } from '../../utils/materialIcons';
+} from 'generated/sdk';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { useUserWithReviewsData } from 'hooks/user/useUserData';
+import { tableIcons } from 'utils/materialIcons';
+
 import ProposalReviewModal from './ProposalReviewModal';
 
 type UserWithReview = {

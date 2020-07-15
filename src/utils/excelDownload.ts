@@ -1,7 +1,8 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import XLSX from 'xlsx';
 
-import { ProposalData } from '../hooks/useProposalsData';
+import { ProposalData } from 'hooks/proposal/useProposalsData';
+
 import { absoluteDifference, average, getGrades } from './mathFunctions';
 
 export const excelDownload = (data: ProposalData[]) => {

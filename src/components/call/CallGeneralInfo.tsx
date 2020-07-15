@@ -4,9 +4,9 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 
-import { useProposalsTemplates } from '../../hooks/useProposalTemplates';
-import FormikDropdown from '../common/FormikDropdown';
-import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
+import FormikDropdown from 'components/common/FormikDropdown';
+import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
+import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 
 const CallGeneralInfo: React.FC = () => {
   const { templates } = useProposalsTemplates(false);

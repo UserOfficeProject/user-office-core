@@ -1,7 +1,8 @@
 import { Grid } from '@material-ui/core';
 import React from 'react';
 
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+
 import SEPsTable from './SEPsTable';
 
 const SEPsPage: React.FC = () => {

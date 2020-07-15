@@ -4,11 +4,12 @@ import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
-import { Question, TextInputConfig } from '../../../../generated/sdk';
-import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
-import FormikUICustomEditor from '../../../common/FormikUICustomEditor';
-import TitledContainer from '../../../common/TitledContainer';
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
+import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
+import TitledContainer from 'components/common/TitledContainer';
+import { Question, TextInputConfig } from 'generated/sdk';
+import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 

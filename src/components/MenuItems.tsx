@@ -17,9 +17,10 @@ import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { UserContext } from '../context/UserContextProvider';
-import { UserRole } from '../generated/sdk';
-import { useCallsData } from '../hooks/useCallsData';
+import { UserContext } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+
 import ScienceIcon from './common/ScienceIcon';
 
 const MenuItems: React.FC = () => {

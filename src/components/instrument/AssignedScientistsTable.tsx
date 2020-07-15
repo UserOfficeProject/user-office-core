@@ -5,9 +5,9 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument, BasicUserDetails } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { Instrument, BasicUserDetails } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({

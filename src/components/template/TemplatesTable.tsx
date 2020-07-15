@@ -5,16 +5,13 @@ import MaterialTable, { Column } from 'material-table';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
-import {
-  GetTemplatesQuery,
-  Template,
-  TemplateCategoryId,
-} from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
-import { WithConfirmType } from '../../utils/withConfirm';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { GetTemplatesQuery, Template, TemplateCategoryId } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
+import { WithConfirmType } from 'utils/withConfirm';
+
 import CreateTemplate from './CreateTemplate';
 
 export type TemplateRowDataType = Pick<

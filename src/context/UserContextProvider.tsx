@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role, UserRole } from '../generated/sdk';
-import { User, dummyUser } from '../models/User';
+import { Role, UserRole } from 'generated/sdk';
+import { User, dummyUser } from 'models/User';
 
 interface UserContextData {
   user: User;

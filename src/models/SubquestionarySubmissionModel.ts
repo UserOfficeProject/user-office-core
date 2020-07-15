@@ -1,12 +1,12 @@
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
 
-import { Answer, Questionary } from '../generated/sdk';
+import { Answer, Questionary } from 'generated/sdk';
+import { getFieldById } from 'models/ProposalModelFunctions';
 import {
   useReducerWithMiddleWares,
   ReducerMiddleware,
-} from '../utils/useReducerWithMiddleWares';
-import { getFieldById } from './ProposalModelFunctions';
+} from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   SAVE_CLICKED = 'SAVE_CLICKED',

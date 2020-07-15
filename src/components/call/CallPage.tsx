@@ -1,7 +1,8 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+
 import CallsTable from './CallsTable';
 
 const CallPage: React.FC = () => {

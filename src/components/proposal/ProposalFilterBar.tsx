@@ -5,8 +5,8 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { ProposalsFilter, Call, Instrument } from '../../generated/sdk';
-import SelectedCallFilter from '../common/SelectedCallFilter';
+import SelectedCallFilter from 'components/common/SelectedCallFilter';
+import { ProposalsFilter, Call, Instrument } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {

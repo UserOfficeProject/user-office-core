@@ -3,11 +3,12 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
-import { GetUserWithRolesQuery, Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useRenewToken } from '../../hooks/useRenewToken';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { GetUserWithRolesQuery, Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useRenewToken } from 'hooks/common/useRenewToken';
+import { tableIcons } from 'utils/materialIcons';
+
 import RoleModal from './RoleModal';
 
 export default function UpdateUserRoles(props: { id: number }) {

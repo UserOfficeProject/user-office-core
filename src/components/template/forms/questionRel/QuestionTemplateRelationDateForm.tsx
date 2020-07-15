@@ -3,10 +3,11 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { QuestionTemplateRelation } from '../../../../generated/sdk';
-import FormikUICustomCheckbox from '../../../common/FormikUICustomCheckbox';
-import FormikUICustomDependencySelector from '../../../common/FormikUICustomDependencySelector';
-import TitledContainer from '../../../common/TitledContainer';
+import FormikUICustomCheckbox from 'components/common/FormikUICustomCheckbox';
+import FormikUICustomDependencySelector from 'components/common/FormikUICustomDependencySelector';
+import TitledContainer from 'components/common/TitledContainer';
+import { QuestionTemplateRelation } from 'generated/sdk';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionExcerpt } from './QuestionExcerpt';
 import { QuestionTemplateRelationFormShell } from './QuestionTemplateRelationFormShell';

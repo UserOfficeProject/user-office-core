@@ -9,8 +9,9 @@ import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { getUniqueArrayBy } from '../../utils/helperFunctions';
+import { UserContext } from 'context/UserContextProvider';
+import { getUniqueArrayBy } from 'utils/helperFunctions';
+
 import RoleSelection from './RoleSelection';
 
 const AccountActionButton: React.FC = () => {

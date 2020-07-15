@@ -1,13 +1,10 @@
 import React from 'react';
 
-import {
-  DataType,
-  Template,
-  QuestionTemplateRelation,
-} from '../../../generated/sdk';
-import { Event } from '../../../models/QuestionaryEditorModel';
-import JSDict from '../../../utils/Dictionary';
-import ModalWrapper from '../../common/ModalWrapper';
+import ModalWrapper from 'components/common/ModalWrapper';
+import { DataType, Template, QuestionTemplateRelation } from 'generated/sdk';
+import { Event } from 'models/QuestionaryEditorModel';
+import JSDict from 'utils/Dictionary';
+
 import { QuestionTemplateRelationBooleanForm } from './questionRel/QuestionTemplateRelationBooleanForm';
 import { QuestionTemplateRelationDateForm } from './questionRel/QuestionTemplateRelationDateForm';
 import { QuestionTemplateRelationEmbellismentForm } from './questionRel/QuestionTemplateRelationEmbellismentForm';

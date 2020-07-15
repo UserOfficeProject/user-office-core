@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { SepAssignment, Review } from '../generated/sdk';
+import { SepAssignment, Review } from 'generated/sdk';
 
 interface ReviewAndAssignmentData {
   currentAssignment: SepAssignment | null;

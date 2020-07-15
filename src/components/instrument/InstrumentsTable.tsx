@@ -4,14 +4,15 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import Can from '../common/Can';
-import InputDialog from '../common/InputDialog';
-import ParticipantModal from '../proposal/ParticipantModal';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import Can from 'components/common/Can';
+import InputDialog from 'components/common/InputDialog';
+import ParticipantModal from 'components/proposal/ParticipantModal';
+import { BasicUserDetails, Instrument, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { tableIcons } from 'utils/materialIcons';
+
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 

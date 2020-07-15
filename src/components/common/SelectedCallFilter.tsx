@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 
-import { Call } from '../../generated/sdk';
+import { Call } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {

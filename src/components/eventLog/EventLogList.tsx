@@ -3,9 +3,9 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { EventLog } from '../../generated/sdk';
-import { useEventLogsData } from '../../hooks/useEventLogsData';
-import { tableIcons } from '../../utils/materialIcons';
+import { EventLog } from 'generated/sdk';
+import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
+import { tableIcons } from 'utils/materialIcons';
 
 type EventLogListProps = {
   /** Id of the changed object that we want to list event logs for. */

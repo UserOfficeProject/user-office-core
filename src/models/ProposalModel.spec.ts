@@ -8,13 +8,13 @@ import {
   FieldDependency,
   QuestionTemplateRelation,
   TemplateCategoryId,
-} from '../generated/sdk';
+} from 'generated/sdk';
 import {
   getAllFields,
   getFieldById,
   getTopicById,
   getQuestionaryStepByTopicId,
-} from './ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
 
 export const create1TopicFieldlessTemplate = (): Template => {
   return {
