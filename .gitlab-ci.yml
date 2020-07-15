@@ -1,7 +1,7 @@
 image: node:10.17.0-alpine
 
 cache:
-  key: 'alpine'
+  key: "alpine"
   paths:
     - node_modules/
 
@@ -14,7 +14,7 @@ stages:
 test:
   stage: test
   script:
-    - rm -rf node_modules && rm -rf package-lock.json && npm install
+    - npm install
     - NODE_ENV=ci npm run test
   tags:
     - docker
@@ -33,7 +33,7 @@ docker build:
 e2etest:
   image: tiangolo/docker-with-compose
   stage: e2etest
-  script:
+  script: 
     - apk add git
     - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
@@ -62,3 +62,7 @@ autodeploy:
     - dind
   only:
     - develop
+
+
+
+
