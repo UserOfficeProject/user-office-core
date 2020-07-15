@@ -56,7 +56,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   const removeAssignedScientist = async (scientistId: number) => {
     const result = await api().removeScientistFromInstrument({
       scientistId,
-      instrumentId: instrument.instrumentId,
+      instrumentId: instrument.id,
     });
 
     if (result.removeScientistFromInstrument.error) {
@@ -69,10 +69,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
         }
       );
     } else {
-      removeAssignedScientistFromInstrument(
-        scientistId,
-        instrument.instrumentId
-      );
+      removeAssignedScientistFromInstrument(scientistId, instrument.id);
     }
   };
 

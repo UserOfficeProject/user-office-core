@@ -9,7 +9,7 @@ mutation createInstrument(
     description: $description
   ) {
     instrument {
-      instrumentId
+      id
       name
       shortCode
       description

@@ -43,6 +43,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
+        console.log(values);
         if (!instrument) {
           await api()
             .createInstrument(values)
@@ -62,7 +63,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
         } else {
           await api()
             .updateInstrument({
-              instrumentId: instrument.instrumentId,
+              id: instrument.id,
               ...values,
             })
             .then(data => {
@@ -89,7 +90,9 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
     >
       {() => (
         <Form>
-          <Typography variant="h6">Create new instrument</Typography>
+          <Typography variant="h6">
+            {instrument ? 'Update' : 'Create new'} instrument
+          </Typography>
           <Field
             name="name"
             id="name"

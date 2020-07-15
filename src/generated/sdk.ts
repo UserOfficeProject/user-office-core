@@ -249,7 +249,7 @@ export type InstitutionsFilter = {
 
 export type Instrument = {
    __typename?: 'Instrument',
-  instrumentId: Scalars['Int'],
+  id: Scalars['Int'],
   name: Scalars['String'],
   shortCode: Scalars['String'],
   description: Scalars['String'],
@@ -270,7 +270,7 @@ export type InstrumentsQueryResult = {
 
 export type InstrumentWithAvailabilityTime = {
    __typename?: 'InstrumentWithAvailabilityTime',
-  instrumentId: Scalars['Int'],
+  id: Scalars['Int'],
   name: Scalars['String'],
   shortCode: Scalars['String'],
   description: Scalars['String'],
@@ -443,7 +443,7 @@ export type MutationCreateInstrumentArgs = {
 
 
 export type MutationUpdateInstrumentArgs = {
-  instrumentId: Scalars['Int'],
+  id: Scalars['Int'],
   name: Scalars['String'],
   shortCode: Scalars['String'],
   description: Scalars['String']
@@ -735,7 +735,7 @@ export type MutationDeleteInstitutionArgs = {
 
 
 export type MutationDeleteInstrumentArgs = {
-  instrumentId: Scalars['Int']
+  id: Scalars['Int']
 };
 
 
@@ -948,6 +948,7 @@ export type ProposalTemplatesFilter = {
 export type Query = {
    __typename?: 'Query',
   calls?: Maybe<Array<Call>>,
+  proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
@@ -964,7 +965,6 @@ export type Query = {
   instrumentsBySep?: Maybe<Array<InstrumentWithAvailabilityTime>>,
   isNaturalKeyPresent?: Maybe<Scalars['Boolean']>,
   proposal?: Maybe<Proposal>,
-  proposals?: Maybe<ProposalsQueryResult>,
   proposalTemplates?: Maybe<Array<ProposalTemplate>>,
   questionary?: Maybe<Questionary>,
   review?: Maybe<Review>,
@@ -984,6 +984,13 @@ export type Query = {
 
 export type QueryCallsArgs = {
   filter?: Maybe<CallsFilter>
+};
+
+
+export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>,
+  first?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -1056,13 +1063,6 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int']
-};
-
-
-export type QueryProposalsArgs = {
-  filter?: Maybe<ProposalsFilter>,
-  first?: Maybe<Scalars['Int']>,
-  offset?: Maybe<Scalars['Int']>
 };
 
 
@@ -1576,7 +1576,7 @@ export type GetInstrumentsBySepQuery = (
   { __typename?: 'Query' }
   & { instrumentsBySep: Maybe<Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
-    & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+    & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
     & { scientists: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -1933,7 +1933,7 @@ export type CreateCallMutation = (
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
-        & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+        & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
       )> }
     )> }
   ) }
@@ -1951,7 +1951,7 @@ export type GetCallsQuery = (
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
     & { instruments: Array<(
       { __typename?: 'InstrumentWithAvailabilityTime' }
-      & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+      & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2005,7 +2005,7 @@ export type UpdateCallMutation = (
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
-        & Pick<InstrumentWithAvailabilityTime, 'instrumentId' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+        & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
       )> }
     )> }
   ) }
@@ -2071,7 +2071,7 @@ export type CreateInstrumentMutation = (
     & Pick<InstrumentResponseWrap, 'error'>
     & { instrument: Maybe<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2081,7 +2081,7 @@ export type CreateInstrumentMutation = (
 );
 
 export type DeleteInstrumentMutationVariables = {
-  instrumentId: Scalars['Int']
+  id: Scalars['Int']
 };
 
 
@@ -2103,7 +2103,7 @@ export type GetInstrumentsQuery = (
     & Pick<InstrumentsQueryResult, 'totalCount'>
     & { instruments: Array<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2156,7 +2156,7 @@ export type SetInstrumentAvailabilityTimeMutation = (
 );
 
 export type UpdateInstrumentMutationVariables = {
-  instrumentId: Scalars['Int'],
+  id: Scalars['Int'],
   name: Scalars['String'],
   shortCode: Scalars['String'],
   description: Scalars['String']
@@ -2170,7 +2170,7 @@ export type UpdateInstrumentMutation = (
     & Pick<InstrumentResponseWrap, 'error'>
     & { instrument: Maybe<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode' | 'description'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2299,7 +2299,7 @@ export type GetProposalQuery = (
       )> }
     )>>, instrument: Maybe<(
       { __typename?: 'Instrument' }
-      & Pick<Instrument, 'instrumentId' | 'name' | 'shortCode'>
+      & Pick<Instrument, 'id' | 'name' | 'shortCode'>
     )>, call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode'>
@@ -2338,7 +2338,7 @@ export type GetProposalsQuery = (
         & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
       )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
-        & Pick<Instrument, 'instrumentId' | 'name'>
+        & Pick<Instrument, 'id' | 'name'>
       )>, call: Maybe<(
         { __typename?: 'Call' }
         & Pick<Call, 'id' | 'shortCode'>
@@ -3767,7 +3767,7 @@ export const CreateSepDocument = gql`
 export const GetInstrumentsBySepDocument = gql`
     query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
   instrumentsBySep(sepId: $sepId, callId: $callId) {
-    instrumentId
+    id
     name
     shortCode
     description
@@ -4035,7 +4035,7 @@ export const CreateCallDocument = gql`
       surveyComment
       templateId
       instruments {
-        instrumentId
+        id
         name
         shortCode
         description
@@ -4062,7 +4062,7 @@ export const GetCallsDocument = gql`
     surveyComment
     templateId
     instruments {
-      instrumentId
+      id
       name
       shortCode
       description
@@ -4103,7 +4103,7 @@ export const UpdateCallDocument = gql`
       surveyComment
       templateId
       instruments {
-        instrumentId
+        id
         name
         shortCode
         description
@@ -4150,7 +4150,7 @@ export const CreateInstrumentDocument = gql`
     mutation createInstrument($name: String!, $shortCode: String!, $description: String!) {
   createInstrument(name: $name, shortCode: $shortCode, description: $description) {
     instrument {
-      instrumentId
+      id
       name
       shortCode
       description
@@ -4163,8 +4163,8 @@ export const CreateInstrumentDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const DeleteInstrumentDocument = gql`
-    mutation deleteInstrument($instrumentId: Int!) {
-  deleteInstrument(instrumentId: $instrumentId) {
+    mutation deleteInstrument($id: Int!) {
+  deleteInstrument(id: $id) {
     error
   }
 }
@@ -4173,7 +4173,7 @@ export const GetInstrumentsDocument = gql`
     query getInstruments {
   instruments {
     instruments {
-      instrumentId
+      id
       name
       shortCode
       description
@@ -4210,10 +4210,10 @@ export const SetInstrumentAvailabilityTimeDocument = gql`
 }
     `;
 export const UpdateInstrumentDocument = gql`
-    mutation updateInstrument($instrumentId: Int!, $name: String!, $shortCode: String!, $description: String!) {
-  updateInstrument(instrumentId: $instrumentId, name: $name, shortCode: $shortCode, description: $description) {
+    mutation updateInstrument($id: Int!, $name: String!, $shortCode: String!, $description: String!) {
+  updateInstrument(id: $id, name: $name, shortCode: $shortCode, description: $description) {
     instrument {
-      instrumentId
+      id
       name
       shortCode
       description
@@ -4325,7 +4325,7 @@ export const GetProposalDocument = gql`
       }
     }
     instrument {
-      instrumentId
+      id
       name
       shortCode
     }
@@ -4372,7 +4372,7 @@ export const GetProposalsDocument = gql`
         proposalID
       }
       instrument {
-        instrumentId
+        id
         name
       }
       call {

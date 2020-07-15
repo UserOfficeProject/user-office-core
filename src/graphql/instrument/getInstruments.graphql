@@ -1,7 +1,7 @@
 query getInstruments {
   instruments {
     instruments {
-      instrumentId
+      id
       name
       shortCode
       description
