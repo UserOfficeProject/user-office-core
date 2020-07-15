@@ -3,6 +3,7 @@ import { Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
+
 import { Call, InstrumentWithAvailabilityTime } from '../../generated/sdk';
 import { useCallsData } from '../../hooks/useCallsData';
 import { tableIcons } from '../../utils/materialIcons';

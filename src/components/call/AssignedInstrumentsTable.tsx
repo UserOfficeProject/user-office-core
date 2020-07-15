@@ -109,7 +109,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       );
     } else {
       const dataUpdate = call.instruments.filter(
-        instrumentItem => instrumentItem.instrumentId !== instrumentId
+        instrumentItem => instrumentItem.id !== instrumentId
       );
       removeAssignedInstrumentFromCall(dataUpdate, call.id);
     }
@@ -121,7 +121,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ) => {
     const result = await api().setInstrumentAvailabilityTime({
       callId: call.id,
-      instrumentId: newData.instrumentId,
+      instrumentId: newData.id,
       availabilityTime: +(newData.availabilityTime as number),
     });
 
@@ -153,8 +153,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
         editable={{
           onRowDelete: (
             rowAssignmentsData: InstrumentWithAvailabilityTime
-          ): Promise<void> =>
-            removeAssignedInstrument(rowAssignmentsData.instrumentId),
+          ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
           onRowUpdate: (newData, oldData) =>
             new Promise(async (resolve, reject) => {
               if (

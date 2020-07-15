@@ -3,6 +3,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
+
 import { Template } from '../../generated/sdk';
 import { Event, EventType } from '../../models/QuestionaryEditorModel';
 import { ButtonContainer } from '../../styles/StyledComponents';

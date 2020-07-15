@@ -1,17 +1,17 @@
 mutation updateInstrument(
-  $instrumentId: Int!
+  $id: Int!
   $name: String!
   $shortCode: String!
   $description: String!
 ) {
   updateInstrument(
-    instrumentId: $instrumentId
+    id: $id
     name: $name
     shortCode: $shortCode
     description: $description
   ) {
     instrument {
-      instrumentId
+      id
       name
       shortCode
       description

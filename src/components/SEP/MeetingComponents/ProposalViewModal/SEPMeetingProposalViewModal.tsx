@@ -1,5 +1,3 @@
-import { TransitionProps } from '@material-ui/core/transitions/transition';
-
 import {
   makeStyles,
   Theme,
@@ -13,6 +11,7 @@ import {
   DialogContent,
   Grid,
 } from '@material-ui/core';
+import { TransitionProps } from '@material-ui/core/transitions/transition';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React, { Ref } from 'react';

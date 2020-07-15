@@ -42,7 +42,7 @@ mutation createCall(
       surveyComment
       templateId
       instruments {
-        instrumentId
+        id
         name
         shortCode
         description

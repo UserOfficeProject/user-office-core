@@ -44,8 +44,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   const instruments = instrumentsData.filter(instrument => {
     if (
       !assignedInstruments?.find(
-        assignedInstrument =>
-          assignedInstrument.instrumentId === instrument.instrumentId
+        assignedInstrument => assignedInstrument.id === instrument.id
       )
     ) {
       return instrument;
@@ -60,7 +59,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     const assignInstrumentToCallResult = await api().assignInstrumentToCall({
       callId,
       instrumentIds: instrumentsToAssign.map(
-        instrumentToAssign => instrumentToAssign.instrumentId
+        instrumentToAssign => instrumentToAssign.id
       ),
     });
 

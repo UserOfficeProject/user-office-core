@@ -8,15 +8,21 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import XLSX from 'xlsx';
 
-import { Review, ReviewStatus, Instrument } from '../../generated/sdk';
+import { Instrument } from '../../generated/sdk';
 import { ProposalsFilter } from '../../generated/sdk';
 import { useDataApi } from '../../hooks/useDataApi';
 import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
+import { excelDownload } from '../../utils/excelDownload';
 import { tableIcons } from '../../utils/materialIcons';
+import {
+  average,
+  absoluteDifference,
+  standardDeviation,
+  getGrades,
+} from '../../utils/mathFunctions';
 import DialogConfirmation from '../common/DialogConfirmation';
 import ScienceIconAdd from '../common/ScienceIconAdd';
 import ScienceIconRemove from '../common/ScienceIconRemove';
@@ -76,50 +82,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       })
     );
   };
-
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / numbers.length;
-
-    return avg;
-  };
-
-  const absoluteDifference = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
-    }
-    numbers = numbers.sort();
-
-    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
-  };
-
-  const standardDeviation = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
-    }
-    const avg = average(numbers);
-
-    const squareDiffs = numbers?.map(function(value) {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-
-    return stdDev;
-  };
-
-  const getGrades = (reviews: Review[] | null | undefined) =>
-    reviews
-      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade as number) ?? [];
 
   const removeProposalFromInstrument = async () => {
     if (
@@ -189,7 +151,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               onClick={() => {
                 setProposalAndInstrumentId({
                   proposalId: rowData.id,
-                  instrumentId: rowData.instrument?.instrumentId as number,
+                  instrumentId: rowData.instrument?.id as number,
                 });
                 setOpenRemoveInstrument(true);
               }}
@@ -379,7 +341,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (selectedProposalsWithInstrument.length === 0) {
       const result = await api().assignProposalsToInstrument({
         proposalIds: selectedProposals,
-        instrumentId: instrument.instrumentId,
+        instrumentId: instrument.id,
       });
       const isError = !!result.assignProposalsToInstrument.error;
 
@@ -493,41 +455,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           debounceInterval: 400,
           columnsButton: true,
           exportButton: true,
-          exportCsv: (columns, data: ProposalData[]) => {
-            const dataColumns = [
-              'Proposal ID',
-              'Title',
-              'Principal Investigator',
-              'Technical Status',
-              'Tehnical Comment',
-              'Time(Days)',
-              'Score difference',
-              'Average Score',
-              'Comment Management',
-              'Decision',
-              'Order',
-            ];
-            const dataToExport = data.map(proposalData => [
-              proposalData.shortCode,
-              proposalData.title,
-              `${proposalData.proposer.firstname} ${proposalData.proposer.lastname}`,
-              getTranslation(
-                proposalData.technicalReview?.status as ResourceId
-              ),
-              proposalData.technicalReview?.publicComment,
-              proposalData.technicalReview?.timeAllocation,
-              absoluteDifference(getGrades(proposalData.reviews)) || 'NA',
-              average(getGrades(proposalData.reviews)) || 'NA',
-              proposalData.commentForManagement,
-              proposalData.finalStatus,
-              proposalData.rankOrder,
-            ]);
-
-            const ws = XLSX.utils.aoa_to_sheet([dataColumns, ...dataToExport]);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
-            XLSX.writeFile(wb, 'proposals.xlsx');
-          },
+          exportCsv: excelDownload,
         }}
         actions={[
           {

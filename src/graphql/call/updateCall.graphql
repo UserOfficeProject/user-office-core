@@ -44,7 +44,7 @@ mutation updateCall(
       surveyComment
       templateId
       instruments {
-        instrumentId
+        id
         name
         shortCode
         description

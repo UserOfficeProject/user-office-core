@@ -2,6 +2,7 @@ import { Button, Link } from '@material-ui/core';
 import dateformat from 'dateformat';
 import MaterialTable, { Column } from 'material-table';
 import React, { useState } from 'react';
+
 import {
   Call,
   ProposalTemplate,
@@ -31,6 +32,7 @@ function CallsList(props: { filterTemplateId: number }) {
         dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
     },
   ];
+
   return (
     <MaterialTable
       icons={tableIcons}
