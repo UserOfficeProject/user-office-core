@@ -64,7 +64,7 @@ export default class InstrumentMutations {
       .catch(error => {
         logger.logException('Could not update instrument', error, {
           agent,
-          instrumentId: args.instrumentId,
+          instrumentId: args.id,
         });
 
         return rejection('INTERNAL_ERROR');
@@ -75,15 +75,15 @@ export default class InstrumentMutations {
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,
-    args: { instrumentId: number }
+    args: { id: number }
   ): Promise<Instrument | Rejection> {
     return this.dataSource
-      .delete(args.instrumentId)
+      .delete(args.id)
       .then(result => result)
       .catch(error => {
         logger.logException('Could not delete instrument', error, {
           agent,
-          instrumentId: args.instrumentId,
+          instrumentId: args.id,
         });
 
         return rejection('INTERNAL_ERROR');

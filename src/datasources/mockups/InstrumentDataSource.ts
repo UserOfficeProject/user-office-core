@@ -31,7 +31,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async get(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
-      dummyInstrumentItem => dummyInstrumentItem.instrumentId === instrumentId
+      dummyInstrumentItem => dummyInstrumentItem.id === instrumentId
     );
 
     if (instrument) {

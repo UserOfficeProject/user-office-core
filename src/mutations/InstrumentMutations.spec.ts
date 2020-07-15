@@ -43,12 +43,12 @@ describe('Test Instrument Mutations', () => {
 
     return expect(
       instrumentMutations.create(dummyUserOfficerWithRole, instrumentToCreate)
-    ).resolves.toStrictEqual({ instrumentId: 1, ...instrumentToCreate });
+    ).resolves.toStrictEqual({ id: 1, ...instrumentToCreate });
   });
 
   test('A logged in user officer can update instrument', () => {
     const instrumentToUpdate = {
-      instrumentId: 1,
+      id: 1,
       name: 'Test Instrument 1',
       shortCode: '2020-06-15',
       description: 'Test instrument description 1',
@@ -62,7 +62,7 @@ describe('Test Instrument Mutations', () => {
   test('A logged in user officer can delete instrument', () => {
     return expect(
       instrumentMutations.delete(dummyUserOfficerWithRole, {
-        instrumentId: 1,
+        id: 1,
       })
     ).resolves.toBe(dummyInstrument);
   });
