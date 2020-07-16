@@ -72,10 +72,6 @@ const ProposalTableReviewer: React.FC = () => {
     { title: 'Status', field: 'status' },
   ];
 
-  if (loading) {
-    return <p>Loading</p>;
-  }
-
   const reviewData = userData
     ? (userData.reviews.map(review => {
         return {
@@ -128,6 +124,7 @@ const ProposalTableReviewer: React.FC = () => {
         title={'Proposals to review'}
         columns={columns}
         data={reviewData}
+        isLoading={loading}
         options={{
           search: false,
           selection: true,

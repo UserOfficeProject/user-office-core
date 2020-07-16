@@ -18,7 +18,11 @@ const InstitutionPage: React.FC = () => {
   const [show, setShow] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { institutionData, setInstitutionData } = useInstitutionData();
+  const {
+    loadingInstitutions,
+    institutionData,
+    setInstitutionData,
+  } = useInstitutionData();
 
   const deleteInstitution = (id: number) => {
     api()
@@ -70,10 +74,6 @@ const InstitutionPage: React.FC = () => {
     },
   ];
 
-  if (!institutionData) {
-    return <p>Loading</p>;
-  }
-
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
@@ -95,6 +95,7 @@ const InstitutionPage: React.FC = () => {
                 title={'Institutions'}
                 columns={columns}
                 data={institutionData}
+                isLoading={loadingInstitutions}
                 options={{
                   search: true,
                   debounceInterval: 400,

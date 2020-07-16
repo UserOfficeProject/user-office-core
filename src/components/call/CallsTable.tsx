@@ -23,10 +23,6 @@ const CallsTable: React.FC = () => {
     number | null
   >(null);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
@@ -183,6 +179,7 @@ const CallsTable: React.FC = () => {
         title="Calls"
         columns={columns}
         data={callsData as Call[]}
+        isLoading={loading}
         detailPanel={[
           {
             tooltip: 'Show Instruments',

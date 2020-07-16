@@ -402,10 +402,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     }
   };
 
-  if (loading) {
-    return <p>Loading</p>;
-  }
-
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
   const GroupWorkIcon = (): JSX.Element => <GroupWork />;
@@ -466,6 +462,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        isLoading={loading}
         components={{
           Toolbar: Toolbar,
         }}
