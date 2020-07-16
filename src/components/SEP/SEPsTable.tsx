@@ -23,7 +23,6 @@ const SEPsTable: React.FC = () => {
   );
   const [show, setShow] = useState(false);
   const columns = [
-    { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },
     {

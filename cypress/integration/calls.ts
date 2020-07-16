@@ -167,9 +167,7 @@ context('Calls tests', () => {
       .first()
       .check();
 
-    cy.get('[title="Assign instruments to call"]')
-      .first()
-      .click();
+    cy.contains('Assign instrument').click();
 
     cy.wait(1000);
 
@@ -181,7 +179,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
-      .should('have.length', 6);
+      .should('have.length', 5);
   });
 
   it('A user-officer should not be able to set negative availability time on instrument per call', () => {

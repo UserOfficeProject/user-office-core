@@ -446,9 +446,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .check();
 
-    cy.get('[title="Assign instruments to call"]')
-      .first()
-      .click();
+    cy.contains('Assign instrument').click();
 
     cy.wait(500);
 

@@ -13,10 +13,7 @@ type RoleTableProps = {
 
 const RoleTable: React.FC<RoleTableProps> = ({ add }) => {
   const api = useDataApi();
-  const columns = [
-    { title: 'Title', field: 'title' },
-    { title: 'ID', field: 'id' },
-  ];
+  const columns = [{ title: 'Role', field: 'title' }];
   const [roles, setRoles] = useState<GetRolesQuery['roles']>([]);
 
   useEffect(() => {
