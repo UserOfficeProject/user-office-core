@@ -225,6 +225,12 @@ export default class PostgresInstrumentDataSource
         'i.short_code',
         'description',
         'chi.availability_time',
+        database.raw(
+          `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) as proposal_count`
+        ),
+        database.raw(
+          `count(*) filter (where sp.call_id = ${callId}) as full_count`
+        ),
       ])
       .from('instruments as i')
       .join('instrument_has_proposals as ihp', {
@@ -237,12 +243,24 @@ export default class PostgresInstrumentDataSource
         'chi.instrument_id': 'i.instrument_id',
         'chi.call_id': callId,
       })
-      .where('sp.sep_id', sepId)
-      .distinct('i.instrument_id')
-      .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
-        const result = instruments.map(instrument =>
-          this.createInstrumentWithAvailabilityTimeObject(instrument)
-        );
+      .groupBy(['i.instrument_id', 'chi.availability_time'])
+      .having(
+        database.raw(
+          `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) > 0`
+        )
+      )
+      .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
+        const result = instruments.map(instrument => {
+          const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
+            (instrument.proposal_count / instrument.full_count) *
+              instrument.availability_time
+          );
+
+          return this.createInstrumentWithAvailabilityTimeObject({
+            ...instrument,
+            availability_time: calculatedInstrumentAvailabilityTimePerSEP,
+          });
+        });
 
         return result;
       });
