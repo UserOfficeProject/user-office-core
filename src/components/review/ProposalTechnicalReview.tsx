@@ -14,7 +14,7 @@ import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalTechnicalReview(props: {
   data: TechnicalReview | null | undefined;
-  setReview: any;
+  setReview: (data: TechnicalReview) => void;
   id: number;
 }) {
   const api = useDataApi();
@@ -39,8 +39,8 @@ export default function ProposalTechnicalReview(props: {
           await api()
             .addTechnicalReview({
               proposalID: props.id,
-              timeAllocation: +values.timeAllocation!,
-              comment: values.comment!,
+              timeAllocation: +values.timeAllocation,
+              comment: values.comment,
               publicComment: values.publicComment,
               status:
                 TechnicalReviewStatus[values.status as TechnicalReviewStatus],
@@ -51,12 +51,13 @@ export default function ProposalTechnicalReview(props: {
               })
             );
           props.setReview({
-            proposalID: props?.data?.proposalID!,
-            timeAllocation: +values.timeAllocation!,
-            comment: values.comment!,
+            proposalID: props?.data?.proposalID,
+            timeAllocation: +values.timeAllocation,
+            comment: values.comment,
+            publicComment: values.publicComment,
             status:
               TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-          });
+          } as TechnicalReview);
           actions.setSubmitting(false);
         }}
       >
