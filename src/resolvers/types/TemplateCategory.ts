@@ -14,16 +14,8 @@ import {
 @ObjectType()
 export class TemplateCategory implements Partial<TemplateCategoryOrigin> {
   @Field(() => TemplateCategoryId)
-  public categoryId: number;
+  public categoryId: TemplateCategoryId;
 
   @Field()
   public name: string;
-}
-
-@Resolver(() => TemplateCategory)
-export class TemplateCategoryResolver {
-  @FieldResolver(() => Int)
-  categoryIdAsInt(@Root() category: TemplateCategory) {
-    return category.categoryId;
-  }
 }

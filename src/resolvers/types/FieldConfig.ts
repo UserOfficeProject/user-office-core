@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
+import { TemplateCategoryId } from '../../models/ProposalModel';
 
 @ObjectType()
 export class ConfigBase {
@@ -77,8 +78,8 @@ export class SubtemplateConfig extends ConfigBase {
   @Field(() => Int)
   templateId: number;
 
-  @Field(() => Int)
-  templateCategory: number;
+  @Field(() => TemplateCategoryId)
+  templateCategory: TemplateCategoryId;
 
   @Field(() => String)
   addEntryButtonLabel: string;
