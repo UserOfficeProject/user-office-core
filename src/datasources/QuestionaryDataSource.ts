@@ -14,7 +14,7 @@ export interface QuestionaryDataSource {
     question_id: string,
     answer: string
   ): Promise<string>;
-  updateTopicCompletenes(
+  updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
     isComplete: boolean

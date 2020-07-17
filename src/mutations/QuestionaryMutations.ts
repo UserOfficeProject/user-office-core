@@ -82,7 +82,7 @@ export default class QuestionaryMutations {
       }
     }
     if (!isPartialSave) {
-      await this.dataSource.updateTopicCompletenes(
+      await this.dataSource.updateTopicCompleteness(
         questionaryId,
         topicId,
         true

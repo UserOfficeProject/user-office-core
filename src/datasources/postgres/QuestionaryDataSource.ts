@@ -171,7 +171,7 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async updateTopicCompletenes(
+  async updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
     is_complete: boolean
