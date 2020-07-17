@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
-import InstrumentsTable from './InstrumentsTable';
+import InstrumentsTable from './InstrumentTableNew';
 
 const InstrumentsPage: React.FC = () => {
   return (
