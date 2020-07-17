@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core';
+import { useTheme } from '@material-ui/core/styles';
 import { Visibility } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -44,6 +45,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     loadingInstrumentProposals,
   } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
+  const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
   if (loadingInstrumentProposals) {
@@ -65,6 +67,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     return avg.toPrecision(3);
   };
 
+  let allocationTimeSum = 0;
   const proposalsWithAverageScore = instrumentProposalsData
     .map(proposalData => {
       const proposalAverageScore = +average(
@@ -76,7 +79,28 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         proposalAverageScore,
       };
     })
-    .sort((a, b) => (a.proposalAverageScore < b.proposalAverageScore ? 1 : -1));
+    .sort((a, b) => (a.proposalAverageScore < b.proposalAverageScore ? 1 : -1))
+    .map(proposalData => {
+      const proposalAllocationTime =
+        proposalData.proposal.technicalReview?.timeAllocation || 0;
+
+      if (
+        allocationTimeSum + proposalAllocationTime >
+        (sepInstrument.availabilityTime as number)
+      ) {
+        return {
+          isAvailable: false,
+          ...proposalData,
+        };
+      } else {
+        allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+        return {
+          isAvailable: true,
+          ...proposalData,
+        };
+      }
+    });
   // TODO: Should add this currentRank on proposal or SepProposal.
   // .sort((a, b) => (a.currentRank > b.currentRank ? 1 : -1));
 
@@ -152,6 +176,15 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           paging: false,
           toolbar: false,
           headerStyle: { backgroundColor: '#fafafa' },
+          rowStyle: (
+            rowData: SepProposal & {
+              proposalAverageScore: number;
+              isAvailable: boolean;
+            }
+          ) =>
+            rowData.isAvailable
+              ? {}
+              : { backgroundColor: theme.palette.error.light },
         }}
       />
     </div>
