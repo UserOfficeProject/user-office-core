@@ -3,9 +3,9 @@ import { Edit } from '@material-ui/icons';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
 
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { tableIcons } from 'utils/materialIcons';
 
 interface SuperProps<RowData extends object> {
   createModal: (
