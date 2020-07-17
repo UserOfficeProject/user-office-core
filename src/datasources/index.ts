@@ -9,6 +9,7 @@ import PostgresReviewDataSource from './postgres/ReviewDataSource';
 import PostgresSEPDataSource from './postgres/SEPDataSource';
 import PostgresTemplateDataSource from './postgres/TemplateDataSource';
 import PostgresUserDataSource from './postgres/UserDataSource';
+import PostgresSampleDataSource from './postgres/SampleDataSource';
 
 export const userDataSource = new PostgresUserDataSource();
 export const proposalDataSource = new PostgresProposalDataSource();
@@ -21,3 +22,4 @@ export const eventLogsDataSource = new PostgresEventLogsDataSource();
 export const sepDataSource = new PostgresSEPDataSource();
 export const instrumentDatasource = new PostgresInstrumentDataSource();
 export const questionaryDataSource = new PostgresQuestionaryDataSource();
+export const sampleDataSource = new PostgresSampleDataSource();
