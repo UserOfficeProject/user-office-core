@@ -89,14 +89,14 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         (sepInstrument.availabilityTime as number)
       ) {
         return {
-          isAvailable: false,
+          isInAvailabilityZone: false,
           ...proposalData,
         };
       } else {
         allocationTimeSum = allocationTimeSum + proposalAllocationTime;
 
         return {
-          isAvailable: true,
+          isInAvailabilityZone: true,
           ...proposalData,
         };
       }
@@ -179,10 +179,10 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           rowStyle: (
             rowData: SepProposal & {
               proposalAverageScore: number;
-              isAvailable: boolean;
+              isInAvailabilityZone: boolean;
             }
           ) =>
-            rowData.isAvailable
+            rowData.isInAvailabilityZone
               ? {}
               : { backgroundColor: theme.palette.error.light },
         }}
