@@ -7,32 +7,34 @@ import { tableIcons } from '../../utils/materialIcons';
 import { ActionButtonContainer } from '../common/ActionButtonContainer';
 import InputDialog from '../common/InputDialog';
 
-interface SuperProps {
+interface SuperProps<RowData extends object> {
   createModal: (
-    onUpdate: (object: unknown) => void,
-    onCreate: (object: unknown) => void,
-    object: unknown
+    onUpdate: (object: RowData) => void,
+    onCreate: (object: RowData) => void,
+    object: RowData | null
   ) => React.ReactNode;
   delete: (id: number) => Promise<boolean>;
   setData: Function;
-  actions: [any];
-  data: any;
+  data: RowData[];
 }
 
-export default function SuperMaterialTable(
-  props: MaterialTableProps<any> & SuperProps
+interface EntryID {
+  id: number;
+}
+
+export default function SuperMaterialTable<Entry extends EntryID>(
+  props: MaterialTableProps<Entry> & SuperProps<Entry>
 ) {
   const [show, setShow] = useState(false);
-  const [editObject, setEditObject] = useState(null);
+  const [editObject, setEditObject] = useState<Entry | null>(null);
 
-  const onCreated = (objectAdded: unknown) => {
+  const onCreated = (objectAdded: Entry) => {
     props.setData([...props.data, objectAdded]);
     setShow(false);
   };
 
-  const onUpdated = (objectUpdated: any | null) => {
-    console.log(objectUpdated);
-    const newObjectsArray = props.data.map((objectItem: { id: number }) =>
+  const onUpdated = (objectUpdated: Entry) => {
+    const newObjectsArray = props.data.map(objectItem =>
       objectItem.id === objectUpdated.id ? objectUpdated : objectItem
     );
     props.setData(newObjectsArray);
@@ -45,13 +47,20 @@ export default function SuperMaterialTable(
 
     if (!deleteResult) {
       const newObjectsArray = props.data.filter(
-        (objectItem: { id: number }) => objectItem.id !== deletedId
+        objectItem => objectItem.id !== deletedId
       );
       props.setData(newObjectsArray);
     }
   };
 
   const EditIcon = (): JSX.Element => <Edit />;
+  let actions: (
+    | import('material-table').Action<Entry>
+    | ((rowData: Entry) => import('material-table').Action<Entry>)
+  )[] = [];
+  if (props.actions) {
+    actions = props.actions;
+  }
 
   return (
     <>
@@ -70,20 +79,19 @@ export default function SuperMaterialTable(
         {...props}
         icons={tableIcons}
         editable={{
-          onRowDelete: (rowData: any): Promise<void> => onDelete(rowData.id),
+          onRowDelete: (rowData: Entry): Promise<void> => onDelete(rowData.id),
         }}
         actions={[
           {
             icon: EditIcon,
             tooltip: 'Edit',
-            onClick: (_event: any, rowData: any) => {
+            onClick: (_event: unknown, rowData: Entry | Entry[]) => {
               setShow(true);
-              console.log('asdadadasda');
-              setEditObject(rowData);
+              setEditObject(rowData as Entry);
             },
             position: 'row',
           },
-          ...props.actions,
+          ...actions,
         ]}
       />
       <ActionButtonContainer>

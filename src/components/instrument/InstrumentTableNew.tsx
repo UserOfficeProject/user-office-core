@@ -24,7 +24,7 @@ const InstrumentsTable: React.FC = () => {
     { title: 'Description', field: 'description' },
     {
       title: 'Scientists',
-      render: (rowData: Record<string, any>) =>
+      render: (rowData: Instrument) =>
         rowData.scientists.length > 0 ? rowData.scientists.length : '-',
     },
   ];
@@ -130,9 +130,9 @@ const InstrumentsTable: React.FC = () => {
 
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
-  const AssignedScientists = (rowData: Record<string, any>) => (
+  const AssignedScientists = (rowData: Instrument) => (
     <AssignedScientistsTable
-      instrument={rowData as Instrument}
+      instrument={rowData}
       removeAssignedScientistFromInstrument={
         removeAssignedScientistFromInstrument
       }
@@ -142,10 +142,10 @@ const InstrumentsTable: React.FC = () => {
   const createModal = (
     onUpdate: Function,
     onCreate: Function,
-    editInstrument: any
+    editInstrument: Instrument | null
   ) => (
     <CreateUpdateInstrument
-      instrument={editInstrument as Instrument}
+      instrument={editInstrument}
       close={(instrument: Instrument | null) =>
         !!editInstrument ? onUpdate(instrument) : onCreate(instrument)
       }
