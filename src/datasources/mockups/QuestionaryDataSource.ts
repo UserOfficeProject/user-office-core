@@ -66,6 +66,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
       new Answer(
+        1,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'ttl_general',
@@ -84,6 +85,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
+        2,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'has_links_with_industry',
@@ -102,6 +104,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
+        3,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'links_with_industry',
@@ -202,7 +205,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return dummyQuestionarySteps;
   }
 
-  async updateTopicCompletenes(
+  async updateTopicCompleteness(
     questionary_id: number, // TODO name this questionary_id
     topic_id: number,
     isComplete: boolean

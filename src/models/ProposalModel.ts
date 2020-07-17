@@ -97,7 +97,11 @@ export class QuestionTemplateRelation {
   }
 }
 export class Answer extends QuestionTemplateRelation {
-  constructor(templateField: QuestionTemplateRelation, public value?: any) {
+  constructor(
+    public answerId: number,
+    templateField: QuestionTemplateRelation,
+    public value?: any
+  ) {
     super(
       templateField.question,
       templateField.topicId,
@@ -110,6 +114,7 @@ export class Answer extends QuestionTemplateRelation {
     const templateField = QuestionTemplateRelation.fromObject(obj);
 
     return new Answer(
+      obj.answer_id,
       templateField,
       obj.value
         ? obj.value

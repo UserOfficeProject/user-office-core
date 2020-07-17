@@ -210,10 +210,10 @@ export default class PostgresQuestionaryDataSource
     ).rows;
 
     const answerRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { value: any }> = (
+      QuestionTemplateRelRecord & { value: any; answer_id: number }> = (
       await database.raw(`
                 SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value
+                  templates_has_questions.*, questions.*, answers.answer as value, answer.answer_id
                 FROM 
                   templates_has_questions
                 LEFT JOIN
@@ -235,7 +235,11 @@ export default class PostgresQuestionaryDataSource
     const fields = answerRecords.map(record => {
       const value = record.value ? JSON.parse(record.value).value : '';
 
-      return new Answer(createQuestionTemplateRelationObject(record), value);
+      return new Answer(
+        record.answer_id,
+        createQuestionTemplateRelationObject(record),
+        value
+      );
     });
 
     const steps = Array<QuestionaryStep>();

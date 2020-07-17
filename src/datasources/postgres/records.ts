@@ -15,6 +15,7 @@ import {
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
+import { Sample } from '../../models/Sample';
 
 // Interfaces corresponding exactly to database tables
 
@@ -76,6 +77,14 @@ export interface QuestionRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly natural_key: string;
+}
+
+export interface AnswerRecord {
+  readonly answer_id: number;
+  readonly questionary_id: number;
+  readonly question_id: string;
+  readonly answer: string;
+  readonly created_at: Date;
 }
 
 export interface QuestionTemplateRelRecord {
@@ -260,6 +269,15 @@ export interface TemplateCategoryRecord {
   readonly name: string;
 }
 
+export interface SampleRecord {
+  readonly id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly questionary_id: number;
+  readonly status: number;
+  readonly created: Date;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -439,5 +457,16 @@ export const createTemplateCategoryObject = (
   return new TemplateCategory(
     templateCategory.template_category_id,
     templateCategory.name
+  );
+};
+
+export const createSampleObject = (sample: SampleRecord) => {
+  return new Sample(
+    sample.id,
+    sample.title,
+    sample.creator_id,
+    sample.questionary_id,
+    sample.status,
+    sample.created
   );
 };
