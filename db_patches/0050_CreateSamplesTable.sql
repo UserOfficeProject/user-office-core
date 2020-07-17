@@ -8,11 +8,11 @@ BEGIN
             sample_id serial PRIMARY KEY
           , title varchar(100)
           , creator_id int REFERENCES users (user_id)
-          , questionary_id int REFERENCES questionaries (questionary_id) ON DELETE CASCADE
+          , questionary_id int UNIQUE REFERENCES questionaries (questionary_id) ON DELETE CASCADE
           , status int NOT NULL DEFAULT 0
           , created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       ); 
-      
+
 
     END;
 	END IF;
