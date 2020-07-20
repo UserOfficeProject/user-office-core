@@ -294,11 +294,13 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async assignProposal(proposalId: number, sepId: number) {
-    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
     await database.raw(
       `${database('SEP_Proposals').insert({
         proposal_id: proposalId,
         sep_id: sepId,
+        call_id: database('proposals')
+          .select('call_id')
+          .where('proposal_id', proposalId),
       })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW()`
     );
 
