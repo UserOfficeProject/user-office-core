@@ -32,6 +32,7 @@ export type Answer = {
   topicId: Scalars['Int'],
   config: FieldConfig,
   dependency?: Maybe<FieldDependency>,
+  answerId: Scalars['Int'],
   value?: Maybe<Scalars['IntStringDateBool']>,
 };
 
@@ -43,7 +44,7 @@ export type AnswerInput = {
 export type AnswerResponseWrap = {
    __typename?: 'AnswerResponseWrap',
   error?: Maybe<Scalars['String']>,
-  answer: Answer,
+  answer?: Maybe<Answer>,
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
@@ -324,6 +325,7 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap,
   createUser: UserResponseWrap,
   updateUser: UserResponseWrap,
+  createSample: SampleResponseWrap,
   addClientLog: SuccessResponseWrap,
   applyPatches: PrepareDbResponseWrap,
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap,
@@ -707,6 +709,12 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationCreateSampleArgs = {
+  title: Scalars['String'],
+  templateId: Scalars['Int']
+};
+
+
 export type MutationAddClientLogArgs = {
   error: Scalars['String']
 };
@@ -866,7 +874,7 @@ export type PageResponseWrap = {
 export type PrepareDbResponseWrap = {
    __typename?: 'PrepareDBResponseWrap',
   error?: Maybe<Scalars['String']>,
-  log: Scalars['String'],
+  log?: Maybe<Scalars['String']>,
 };
 
 export type Proposal = {
@@ -950,6 +958,7 @@ export type Query = {
   calls?: Maybe<Array<Call>>,
   proposals?: Maybe<ProposalsQueryResult>,
   templates?: Maybe<Array<Template>>,
+  samples?: Maybe<Array<Sample>>,
   basicUserDetails?: Maybe<BasicUserDetails>,
   blankProposal?: Maybe<Proposal>,
   call?: Maybe<Call>,
@@ -969,6 +978,8 @@ export type Query = {
   questionary?: Maybe<Questionary>,
   review?: Maybe<Review>,
   roles?: Maybe<Array<Role>>,
+  samplesByAnswerId?: Maybe<Array<Sample>>,
+  samplesByCallId?: Maybe<Array<Sample>>,
   sep?: Maybe<Sep>,
   sepMembers?: Maybe<Array<SepMember>>,
   sepProposals?: Maybe<Array<SepProposal>>,
@@ -996,6 +1007,11 @@ export type QueryProposalsArgs = {
 
 export type QueryTemplatesArgs = {
   filter?: Maybe<TemplatesFilter>
+};
+
+
+export type QuerySamplesArgs = {
+  filter?: Maybe<SamplesFilter>
 };
 
 
@@ -1078,6 +1094,16 @@ export type QueryQuestionaryArgs = {
 
 export type QueryReviewArgs = {
   id: Scalars['Int']
+};
+
+
+export type QuerySamplesByAnswerIdArgs = {
+  callId: Scalars['Int']
+};
+
+
+export type QuerySamplesByCallIdArgs = {
+  callId: Scalars['Int']
 };
 
 
@@ -1229,6 +1255,35 @@ export type Role = {
   title: Scalars['String'],
 };
 
+export type Sample = {
+   __typename?: 'Sample',
+  id: Scalars['Int'],
+  title: Scalars['String'],
+  creatorId: Scalars['Int'],
+  questionaryId: Scalars['Int'],
+  status: SampleStatus,
+  created: Scalars['DateTime'],
+};
+
+export type SampleResponseWrap = {
+   __typename?: 'SampleResponseWrap',
+  error?: Maybe<Scalars['String']>,
+  sample?: Maybe<Sample>,
+};
+
+export type SamplesFilter = {
+  title?: Maybe<Scalars['String']>,
+  creatorId?: Maybe<Scalars['Int']>,
+  questionaryId?: Maybe<Scalars['Int']>,
+  status?: Maybe<SampleStatus>,
+};
+
+export enum SampleStatus {
+  NONE = 'NONE',
+  SAFE = 'SAFE',
+  UNSAFE = 'UNSAFE'
+}
+
 export type SelectionFromOptionsConfig = {
    __typename?: 'SelectionFromOptionsConfig',
   small_label: Scalars['String'],
@@ -1306,7 +1361,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'],
   maxEntries?: Maybe<Scalars['Int']>,
   templateId: Scalars['Int'],
-  templateCategory: Scalars['Int'],
+  templateCategory: TemplateCategoryId,
   addEntryButtonLabel: Scalars['String'],
 };
 
@@ -1354,7 +1409,6 @@ export type TemplateCategory = {
    __typename?: 'TemplateCategory',
   categoryId: TemplateCategoryId,
   name: Scalars['String'],
-  categoryIdAsInt: Scalars['Int'],
 };
 
 export enum TemplateCategoryId {
@@ -3008,7 +3062,7 @@ export type GetTemplateCategoriesQuery = (
   { __typename?: 'Query' }
   & { templateCategories: Maybe<Array<(
     { __typename?: 'TemplateCategory' }
-    & Pick<TemplateCategory, 'categoryId' | 'categoryIdAsInt' | 'name'>
+    & Pick<TemplateCategory, 'categoryId' | 'name'>
   )>> }
 );
 
@@ -4668,7 +4722,6 @@ export const GetTemplateCategoriesDocument = gql`
     query getTemplateCategories {
   templateCategories {
     categoryId
-    categoryIdAsInt
     name
   }
 }

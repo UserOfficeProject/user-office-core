@@ -1,7 +1,6 @@
 query getTemplateCategories {
   templateCategories {
     categoryId
-    categoryIdAsInt
     name
   }
 }
