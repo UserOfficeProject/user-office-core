@@ -16,7 +16,7 @@ import { BasicUserDetails } from './BasicUserDetails';
 @ObjectType()
 export class Instrument implements Partial<InstrumentOrigin> {
   @Field(() => Int)
-  public instrumentId: number;
+  public id: number;
 
   @Field()
   public name: string;
@@ -42,7 +42,7 @@ export class InstrumentResolver {
     @Ctx() context: ResolverContext
   ): Promise<BasicUserDetails[] | null> {
     const scientists = context.queries.instrument.dataSource.getInstrumentScientists(
-      instrument.instrumentId
+      instrument.id
     );
 
     return isRejection(scientists) ? [] : scientists;

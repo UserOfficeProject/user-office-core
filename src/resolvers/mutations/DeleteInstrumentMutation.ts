@@ -8,11 +8,11 @@ import { wrapResponse } from '../wrapResponse';
 export class DeleteInstrumentMutation {
   @Mutation(() => InstrumentResponseWrap)
   async deleteInstrument(
-    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.instrument.delete(context.user, { instrumentId }),
+      context.mutations.instrument.delete(context.user, { id }),
       InstrumentResponseWrap
     );
   }
