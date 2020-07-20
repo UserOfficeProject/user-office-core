@@ -11,7 +11,7 @@ import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
-const InstrumentsTable: React.FC = () => {
+const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
     instrumentsData,
@@ -200,4 +200,4 @@ const InstrumentsTable: React.FC = () => {
   );
 };
 
-export default InstrumentsTable;
+export default InstrumentTable;

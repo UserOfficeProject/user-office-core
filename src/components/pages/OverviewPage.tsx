@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
-import InstrumentsTable from 'components/instrument/InstrumentsTable';
+import InstrumentTable from 'components/instrument/InstrumentTable';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { UserContext } from 'context/UserContextProvider';
@@ -23,7 +23,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
       roleBasedOverView = <ProposalTableUser id={user.id} />;
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
-      roleBasedOverView = <InstrumentsTable />;
+      roleBasedOverView = <InstrumentTable />;
       break;
 
     default:
