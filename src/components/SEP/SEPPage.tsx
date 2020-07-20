@@ -24,7 +24,7 @@ const SEPPagePropTypes = {
 type SEPPageProps = PropTypes.InferProps<typeof SEPPagePropTypes>;
 
 const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
-  const [sep, setSEP] = useState<Sep | null>(null);
+  const [sep, setSEP] = useState<Sep | null | undefined>(null);
   const api = useDataApi();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const loadSEP = useCallback(async () => {

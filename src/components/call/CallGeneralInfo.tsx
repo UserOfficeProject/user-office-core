@@ -41,7 +41,7 @@ const CallGeneralInfo: React.FC = () => {
           data-cy="end-date"
         />
       </MuiPickersUtilsProvider>
-      {templates.length > 0 && (
+      {templates && templates.length > 0 && (
         <FormikDropdown
           name="templateId"
           label="Call template"

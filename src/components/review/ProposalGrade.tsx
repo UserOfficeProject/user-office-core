@@ -33,7 +33,7 @@ export default function ProposalGrade(props: {
   const { reviewData } = useReviewData(props.reviewID);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const [review, setReview] = useState<Review | null>(null);
+  const [review, setReview] = useState<Review | null | undefined>(null);
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
 
   useEffect(() => {

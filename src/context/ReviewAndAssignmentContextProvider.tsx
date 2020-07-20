@@ -6,7 +6,7 @@ import { SepAssignment, Review } from 'generated/sdk';
 interface ReviewAndAssignmentData {
   currentAssignment: SepAssignment | null;
   setCurrentAssignment: React.Dispatch<SepAssignment | null>;
-  setAssignmentReview: React.Dispatch<Review | null>;
+  setAssignmentReview: React.Dispatch<Review | null | undefined>;
 }
 
 const initialState: ReviewAndAssignmentData = {
@@ -22,7 +22,10 @@ enum ActionType {
 
 const reducer = (
   previousState = initialState,
-  action: { type: ActionType; payload: SepAssignment | Review | null }
+  action: {
+    type: ActionType;
+    payload: SepAssignment | Review | null | undefined;
+  }
 ): ReviewAndAssignmentData => {
   switch (action.type) {
     case ActionType.SET_ASSIGNMENT:
@@ -64,7 +67,7 @@ export const ReviewAndAssignmentContextProvider: React.FC = (
             payload,
           });
         },
-        setAssignmentReview: (payload: Review | null) => {
+        setAssignmentReview: (payload: Review | null | undefined) => {
           dispatch({ type: ActionType.SET_REVIEW, payload });
         },
       }}

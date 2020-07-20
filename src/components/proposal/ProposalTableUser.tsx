@@ -44,7 +44,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
 
   const sendUserProposalRequest = useCallback(async () => {
     return api()
-      .getUserProposals({ id })
+      .getUserProposals()
       .then(data => {
         return {
           page: 0,
