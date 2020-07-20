@@ -82,8 +82,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
   );
 
   const columns = [
-    { title: 'ID', field: 'id' },
-    { title: 'Title', field: 'title' },
+    { title: 'Role', field: 'title' },
     {
       title: 'Action',
       render: RoleAction,

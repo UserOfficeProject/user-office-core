@@ -63,18 +63,13 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     Column<InstrumentWithAvailabilityTime>[]
   >([
     {
-      title: 'ID',
-      field: 'instrumentId',
-      editable: 'never',
-    },
-    {
       title: 'Name',
       field: 'name',
       editable: 'never',
     },
     {
       title: 'Short code',
-      field: 'name',
+      field: 'shortCode',
       editable: 'never',
     },
     {

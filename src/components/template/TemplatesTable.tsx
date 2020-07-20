@@ -31,10 +31,12 @@ export function TemplatesTable(props: TemplatesTableProps) {
   const api = useDataApi();
   const history = useHistory();
   const [show, setShow] = useState(false);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   useEffect(() => {
     props.dataProvider().then(data => {
       setTemplates(data);
+      setLoadingTemplates(false);
     });
   }, [props]);
 
@@ -192,6 +194,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
         icons={tableIcons}
         title="Proposal templates"
         columns={props.columns}
+        isLoading={loadingTemplates}
         data={templates}
         actions={[
           {

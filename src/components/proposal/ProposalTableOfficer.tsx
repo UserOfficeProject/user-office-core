@@ -14,7 +14,7 @@ import ScienceIconAdd from 'components/common/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
-import { Instrument } from 'generated/sdk';
+import { Instrument, Sep } from 'generated/sdk';
 import { ProposalsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -316,16 +316,36 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     });
   };
 
-  const assignProposalToSEP = async (sepId: number): Promise<void> => {
+  const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async id => {
-        const result = await api().assignProposal({ proposalId: id, sepId });
+        const result = await api().assignProposal({
+          proposalId: id,
+          sepId: sep.id,
+        });
 
         return result.assignProposal.error;
       })
     );
 
     const isError = !!assignmentsErrors.join('');
+
+    if (!isError) {
+      setProposalsData(
+        proposalsData.map(prop => {
+          if (
+            selectedProposals.find(
+              selectedProposalId => selectedProposalId === prop.id
+            )
+          ) {
+            prop.sep = sep;
+          }
+
+          return prop;
+        })
+      );
+    }
+
     const message = isError
       ? 'Could not assign all selected proposals to SEP'
       : 'Proposal/s assigned to SEP';
@@ -381,10 +401,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       );
     }
   };
-
-  if (loading) {
-    return <p>Loading</p>;
-  }
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
@@ -446,6 +462,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        isLoading={loading}
         components={{
           Toolbar: Toolbar,
         }}
