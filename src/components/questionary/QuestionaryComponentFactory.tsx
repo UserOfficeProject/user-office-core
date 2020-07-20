@@ -1,42 +1,59 @@
-import { JSDict } from '@esss-swap/duo-localisation';
+import { ProposalComponentBoolean } from 'components/proposal/formComponents/ProposalComponentBoolean';
+import { ProposalComponentDatePicker } from 'components/proposal/formComponents/ProposalComponentDatePicker';
+import { ProposalComponentEmbellishment } from 'components/proposal/formComponents/ProposalComponentEmbellishment';
+import { ProposalComponentFileUpload } from 'components/proposal/formComponents/ProposalComponentFileUpload';
+import { ProposalComponentMultipleChoice } from 'components/proposal/formComponents/ProposalComponentMultipleChoice';
+import ProposalComponentSampleDeclaration from 'components/proposal/formComponents/ProposalComponentSampleDeclaration';
+import { ProposalComponentTextInput } from 'components/proposal/formComponents/ProposalComponentTextInput';
+import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import {
+  Answer,
+  DataType,
+  SubtemplateConfig,
+  TemplateCategoryId,
+} from 'generated/sdk';
 import React from 'react';
 
-import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { ProposalComponentBoolean } from 'components/proposal/ProposalComponentBoolean';
-import { ProposalComponentDatePicker } from 'components/proposal/ProposalComponentDatePicker';
-import { ProposalComponentEmbellishment } from 'components/proposal/ProposalComponentEmbellishment';
-import { ProposalComponentFileUpload } from 'components/proposal/ProposalComponentFileUpload';
-import { ProposalComponentMultipleChoice } from 'components/proposal/ProposalComponentMultipleChoice';
-import { ProposalComponentSubtemplate } from 'components/proposal/ProposalComponentSubtemplate';
-import { ProposalComponentTextInput } from 'components/proposal/ProposalComponentTextInput';
-import { DataType, Answer } from 'generated/sdk';
-
 export class QuestionaryComponentFactory {
-  private componentMap = JSDict.Create<string, any>();
-
-  constructor() {
-    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
-    this.componentMap.put(
-      DataType.SELECTION_FROM_OPTIONS,
-      ProposalComponentMultipleChoice
-    );
-    this.componentMap.put(
-      DataType.EMBELLISHMENT,
-      ProposalComponentEmbellishment
-    );
-    this.componentMap.put(DataType.SUBTEMPLATE, ProposalComponentSubtemplate);
+  getComponentElement(answer: Answer) {
+    switch (answer.question.dataType) {
+      case DataType.TEXT_INPUT:
+        return ProposalComponentTextInput;
+      case DataType.BOOLEAN:
+        return ProposalComponentBoolean;
+      case DataType.DATE:
+        return ProposalComponentDatePicker;
+      case DataType.FILE_UPLOAD:
+        return ProposalComponentFileUpload;
+      case DataType.SELECTION_FROM_OPTIONS:
+        return ProposalComponentMultipleChoice;
+      case DataType.EMBELLISHMENT:
+        return ProposalComponentEmbellishment;
+      case DataType.SUBTEMPLATE:
+        const config = answer.config as SubtemplateConfig;
+        switch (config.templateCategory) {
+          case TemplateCategoryId.SAMPLE_DECLARATION:
+            return ProposalComponentSampleDeclaration;
+          default:
+            throw new Error(
+              `Unkown datatype for factory subcomponent ${config.templateCategory}`
+            );
+        }
+      default:
+        throw new Error(
+          `Unkown datatype for factory ${answer.question.dataType}`
+        );
+    }
   }
+
   createComponent(
     field: Answer,
     props: any
-  ): React.ComponentElement<BasicComponentProps, any> {
+  ): React.FunctionComponentElement<BasicComponentProps> {
     props.templateField = field;
     props.key = field.question.proposalQuestionId;
 
-    const component = this.componentMap.get(field.question.dataType);
+    const component = this.getComponentElement(field);
 
     if (!component) {
       throw new Error(
@@ -44,6 +61,6 @@ export class QuestionaryComponentFactory {
       );
     }
 
-    return React.createElement(component, props);
+    return React.createElement(this.getComponentElement(field), props);
   }
 }

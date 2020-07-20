@@ -3,7 +3,7 @@ import React, { ChangeEvent, useState, useEffect } from 'react';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import { FileUploadConfig } from '../../../generated/sdk';
 import { FileUploadComponent } from '../../common/FileUploadComponent';
-import { ProposalErrorLabel } from '../ProposalErrorLabel';
+import ProposalErrorLabel from '../ProposalErrorLabel';
 
 export function ProposalComponentFileUpload(
   props: BasicComponentProps & { files?: string[] }

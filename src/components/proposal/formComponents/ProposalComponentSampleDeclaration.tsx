@@ -1,14 +1,14 @@
 import { FormControl, FormLabel } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
-import { Questionary, SubtemplateConfig } from '../../../generated/sdk';
-import { useDataApi } from '../../../hooks/useDataApi';
-import { stringToNumericArray } from '../../../utils/ArrayUtils';
-import ModalWrapper from '../../common/ModalWrapper';
-import { SubquestionarySubmissionContainer } from '../../questionary/SubquestionarySubmissionContainer';
 import { BasicComponentProps } from '../IBasicComponentProps';
-import { ProposalErrorLabel } from '../ProposalErrorLabel';
-import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
+import { SubtemplateConfig, Sample } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { QuestionariesListRow, QuestionariesList } from './QuestionariesList';
+import { stringToNumericArray } from 'utils/ArrayUtils';
+import ProposalErrorLabel from '../ProposalErrorLabel';
+import ModalWrapper from 'components/common/ModalWrapper';
+import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
 
 export default function ProposalComponentSampleDeclaration(
   props: BasicComponentProps
@@ -21,28 +21,26 @@ export default function ProposalComponentSampleDeclaration(
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
-  //const [stateValue, setStateValue] = useState<Array<number>>([]);
+  const [stateValue, setStateValue] = useState<number[]>([]);
   const [samples, setSamples] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
-  const parseFieldValue = (value: number[] | string): number[] => {
-    if (Array.isArray(value)) {
-      return value;
-    } else if (typeof value === 'string') {
-      return stringToNumericArray(value, ',');
-    } else {
-      console.error(
-        'Invalid datatype for ProposalComponentSubtemplate. Expected array or string'
-      );
-      return [];
-    }
+  const getSamples = async (answerId: number): Promise<Sample[]> => {
+    return api()
+      .getSamplesByAnswerId({ answerId: props.templateField.answerId })
+      .then(response => {
+        return response.samplesByAnswerId || [];
+      });
+  };
+
+  const sampleToQuestionaryListRow = (sample: Sample): QuestionariesListRow => {
+    return { id: sample.id, label: sample.title };
   };
 
   useEffect(() => {
-    const newValue = props.templateField.value;
-    const sampleIds = parseFieldValue(newValue);
-    // ...
-    setSamples(fetchedSamples);
+    getSamples(props.templateField.answerId).then(samples =>
+      setSamples(samples.map(sampleToQuestionaryListRow))
+    );
   }, [props]);
 
   return (
@@ -54,35 +52,34 @@ export default function ProposalComponentSampleDeclaration(
         <QuestionariesList
           addButtonLabel={config.addEntryButtonLabel}
           data={samples}
-          onEditClick={item =>
-            api()
-              .getQuestionary({ questionaryId })
-              .then(response => {
-                if (!response.questionary) {
-                  enqueueSnackbar(
-                    'Error occurred while retrieving questionary',
-                    {
-                      variant: 'error',
-                    }
-                  );
+          onEditClick={
+            item => {}
+            // api()
+            //   .getQuestionary({ questionaryId:item.id })
+            //   .then(response => {
+            //     if (!response.questionary) {
+            //       enqueueSnackbar(
+            //         'Error occurred while retrieving questionary',
+            //         {
+            //           variant: 'error',
+            //         }
+            //       );
 
-                  return;
-                }
-                setSelectedSample(response.questionary);
-              })
+            //       return;
+            //     }
+            //     setSelectedSample(response.questionary || null);
+            //   })
           }
-          onDeleteClick={id =>
-            // TODO make an API call deleteQuestionary()
-            {
-              const newValue = stateValue.slice();
-              newValue.splice(
-                newValue.findIndex(item => item === id),
-                1
-              );
-              setStateValue(newValue);
-              onComplete(null as any, newValue.join(',')); // convert [1,2,3,...] to "1,2,3,..." because GraphQL does not support arrays yet
-            }
-          }
+          onDeleteClick={id => {}}
+          // TODO make an API call deleteQuestionary()
+          //   const newValue = stateValue.slice();
+          //   newValue.splice(
+          //     newValue.findIndex(item => item === id),
+          //     1
+          //   );
+          //   setStateValue(newValue);
+          //   onComplete(null as any, newValue.join(',')); // convert [1,2,3,...] to "1,2,3,..." because GraphQL does not support arrays yet
+          // }
           onAddNewClick={() =>
             api()
               .createQuestionary({ templateId: config.templateId })
@@ -115,11 +112,11 @@ export default function ProposalComponentSampleDeclaration(
         close={() => setSelectedSample(null)}
         isOpen={selectedSample !== null}
       >
-        <SubquestionarySubmissionContainer
+        {/* <SubquestionarySubmissionContainer
           questionaryEditDone={() => setSelectedSample(null)}
           questionary={selectedSample!}
           title={templateField.question.question}
-        />
+        /> */}
       </ModalWrapper>
     </>
   );
