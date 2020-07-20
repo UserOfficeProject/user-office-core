@@ -1,18 +1,15 @@
 import { makeStyles } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { Visibility } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import {
-  SepProposal,
-  Proposal,
-  ReviewStatus,
-  InstrumentWithAvailabilityTime,
-} from 'generated/sdk';
+import { SepProposal, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
+import { getGrades, average } from 'utils/mathFunctions';
 
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
@@ -48,30 +45,11 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
-  if (loadingInstrumentProposals) {
-    return <div>Loading...</div>;
-  }
-
-  const getGrades = (proposal: Proposal) =>
-    proposal.reviews
-      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade) ?? [];
-
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / numbers.length;
-
-    return avg.toPrecision(3);
-  };
-
   let allocationTimeSum = 0;
   const proposalsWithAverageScore = instrumentProposalsData
     .map(proposalData => {
-      const proposalAverageScore = +average(
-        getGrades(proposalData.proposal) as number[]
+      const proposalAverageScore = average(
+        getGrades(proposalData.proposal.reviews) as number[]
       );
 
       return {
@@ -150,6 +128,13 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
 
   const ViewIcon = (): JSX.Element => <Visibility />;
 
+  const redBackgroundWhenOutOfAvailabiliyZone = (
+    isInsideAvailabilityZone: boolean
+  ): CSSProperties =>
+    isInsideAvailabilityZone
+      ? {}
+      : { backgroundColor: theme.palette.error.light };
+
   return (
     <div className={classes.root} data-cy="sep-instrument-proposals-table">
       <SEPMeetingProposalViewModal
@@ -162,6 +147,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         columns={assignmentColumns}
         title={'Assigned reviewers'}
         data={proposalsWithAverageScore}
+        isLoading={loadingInstrumentProposals}
         actions={[
           {
             icon: ViewIcon,
@@ -182,9 +168,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
               isInAvailabilityZone: boolean;
             }
           ) =>
-            rowData.isInAvailabilityZone
-              ? {}
-              : { backgroundColor: theme.palette.error.light },
+            redBackgroundWhenOutOfAvailabiliyZone(rowData.isInAvailabilityZone),
         }}
       />
     </div>

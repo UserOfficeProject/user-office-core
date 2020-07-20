@@ -5,6 +5,7 @@ import {
   IconButton,
   Tooltip,
   withStyles,
+  CircularProgress,
 } from '@material-ui/core';
 import { PersonAdd, Person } from '@material-ui/icons';
 import { Formik, Form, Field } from 'formik';
@@ -167,7 +168,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   };
 
   if (loadingMembers) {
-    return <p>Loading...</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
+    );
   }
 
   if (SEPMembersData && SEPMembersData.length > 0) {

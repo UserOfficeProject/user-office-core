@@ -31,8 +31,8 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
 
   const initialData = {
     finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
-    commentForUser: proposalData.commentForUser,
-    commentForManagement: proposalData.commentForManagement,
+    commentForUser: proposalData.commentForUser || '',
+    commentForManagement: proposalData.commentForManagement || '',
     finalRank: '',
   };
 

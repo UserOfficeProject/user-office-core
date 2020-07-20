@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
@@ -39,10 +40,6 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
     loadSEP();
   }, [loadSEP]);
 
-  if (!sep) {
-    return <p>Loading...</p>;
-  }
-
   const tabNames = [
     'General',
     'Members',
@@ -56,18 +53,22 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={tabNames}>
-        <SEPGeneralInfo
-          data={sep}
-          onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
-        />
-        <SEPMembers sepId={sep.id} />
-        <SEPProposalsAndAssignmentsView sepId={sep.id} />
-        <SEPMeetingComponentsView sepId={sep.id} />
-        {hasAccessRights && (
-          <EventLogList changedObjectId={sep.id} eventType="SEP" />
-        )}
-      </SimpleTabs>
+      {sep ? (
+        <SimpleTabs tabNames={tabNames}>
+          <SEPGeneralInfo
+            data={sep}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
+          <SEPMembers sepId={sep.id} />
+          <SEPProposalsAndAssignmentsView sepId={sep.id} />
+          <SEPMeetingComponentsView sepId={sep.id} />
+          {hasAccessRights && (
+            <EventLogList changedObjectId={sep.id} eventType="SEP" />
+          )}
+        </SimpleTabs>
+      ) : (
+        <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+      )}
     </Container>
   );
 };
