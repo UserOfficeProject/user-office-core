@@ -6,14 +6,25 @@ import {
   InputType,
   Query,
   Resolver,
+  Int,
 } from 'type-graphql';
 import { ResolverContext } from '../../context';
 import { Sample } from '../types/Sample';
+import { SampleStatus } from '../../models/Sample';
 
 @InputType()
 class SamplesFilter {
-  @Field({ nullable: true })
-  public questionId?: string;
+  @Field(() => String, { nullable: true })
+  public title?: string;
+
+  @Field(() => Int, { nullable: true })
+  public creatorId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public questionaryId?: number;
+
+  @Field(() => SampleStatus, { nullable: true })
+  public status?: SampleStatus;
 }
 
 @ArgsType()

@@ -12,6 +12,7 @@ import {
   QuestionTemplateRelation,
   TemplateCategory,
   Topic,
+  AnswerBasic,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
@@ -86,6 +87,9 @@ export interface AnswerRecord {
   readonly answer: string;
   readonly created_at: Date;
 }
+
+
+
 
 export interface QuestionTemplateRelRecord {
   readonly id: number;
@@ -469,5 +473,15 @@ export const createSampleObject = (sample: SampleRecord) => {
     sample.questionary_id,
     sample.status,
     sample.created
+  );
+};
+
+export const createAnswerBasic = (answer: AnswerRecord) => {
+  return new AnswerBasic(
+    answer.answer_id,
+    answer.questionary_id,
+    answer.question_id,
+    answer.answer,
+    answer.created_at
   );
 };

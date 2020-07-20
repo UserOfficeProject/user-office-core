@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep } from '../../models/ProposalModel';
+import { Questionary, QuestionaryStep, AnswerBasic } from '../../models/ProposalModel';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { Answer } from './../../models/ProposalModel';
 import database from './database';
@@ -11,20 +11,29 @@ import {
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
+  AnswerRecord,
+  createAnswerBasic,
 } from './records';
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
+    return database("answers").select("*")
+    .where("answer_id", answer_id)
+    .then((record:AnswerRecord) => {
+      return createAnswerBasic(record);
+    })
+  }
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {
-    const subquery = database('answer_has_questionaries')
+    const subQuery = database('answer_has_questionaries')
       .select('answer_id')
       .where({ questionary_id: child_questionary_id });
 
     return database('questionaries')
       .select('*')
-      .whereIn('questionary_id', subquery)
+      .whereIn('questionary_id', subQuery)
       .then((rows: QuestionaryRecord[]) => {
         if (rows.length !== 1) {
           return null;

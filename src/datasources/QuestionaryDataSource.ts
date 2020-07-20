@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep } from '../models/ProposalModel';
+import {
+  Questionary,
+  QuestionaryStep,
+  AnswerBasic,
+} from '../models/ProposalModel';
 
 export interface QuestionaryDataSource {
+  getAnswer(answer_id: number): AnswerBasic;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;

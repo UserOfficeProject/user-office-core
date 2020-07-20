@@ -12,6 +12,7 @@ import {
   QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
+  AnswerBasic,
 } from '../../models/ProposalModel';
 import {
   BooleanConfig,
@@ -129,6 +130,9 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  getAnswer(answer_id: number): AnswerBasic {
+    return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
+  }
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {

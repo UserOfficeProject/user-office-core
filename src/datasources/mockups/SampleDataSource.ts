@@ -12,4 +12,10 @@ export class SampleDataSourceMock implements SampleDataSource {
   async getSamples(args: SamplesArgs): Promise<Sample[]> {
     return this.samples;
   }
+  async getSamplesByAnswerId(answerId: number): Promise<Sample[]> {
+    return this.samples;
+  }
+  async getSamplesByCallId(callId: number): Promise<Sample[]> {
+    return this.samples;
+  }
 }

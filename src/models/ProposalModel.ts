@@ -96,7 +96,7 @@ export class QuestionTemplateRelation {
     );
   }
 }
-export class Answer extends QuestionTemplateRelation {
+export class Answer extends QuestionTemplateRelation  {
   constructor(
     public answerId: number,
     templateField: QuestionTemplateRelation,
@@ -123,6 +123,16 @@ export class Answer extends QuestionTemplateRelation {
         : ''
     );
   }
+}
+
+export class AnswerBasic {
+  constructor(
+  answerId:number,
+  questionaryId: number,
+  questionId: string,
+  answer: any,
+  createdAt: Date,
+  ) {}
 }
 
 export class QuestionaryStep {

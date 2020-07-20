@@ -95,7 +95,12 @@ const questionaryMutations = new QuestionaryMutations(
   logger
 );
 
-const sampleQueries = new SampleQueries(sampleDataSource, userAuthorization);
+const sampleQueries = new SampleQueries(
+  sampleDataSource,
+  questionaryDataSource,
+  userAuthorization,
+  questionaryAuthorization
+);
 
 const context: BasicResolverContext = {
   userAuthorization,

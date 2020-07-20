@@ -8,7 +8,7 @@ import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
 
 export default class QuestionaryQueries {
   constructor(
-    private dataSource: QuestionaryDataSource,
+    public dataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource,
     private authorizer: QuestionaryAuthorization
   ) {}
