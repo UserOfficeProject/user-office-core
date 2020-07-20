@@ -12,8 +12,8 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
+import { Instrument } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles(theme => ({
   submit: {
@@ -62,7 +62,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
         } else {
           await api()
             .updateInstrument({
-              instrumentId: instrument.instrumentId,
+              id: instrument.id,
               ...values,
             })
             .then(data => {
@@ -89,7 +89,9 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
     >
       {() => (
         <Form>
-          <Typography variant="h6">Create new instrument</Typography>
+          <Typography variant="h6">
+            {instrument ? 'Update' : 'Create new'} instrument
+          </Typography>
           <Field
             name="name"
             id="name"

@@ -8,9 +8,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
-import { Instrument } from '../../generated/sdk';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import { Instrument } from 'generated/sdk';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
 const assignProposalToInstrumentValidationSchema = yup.object().shape({
   selectedInstrumentId: yup.string().required('You must select instrument'),
@@ -48,8 +48,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
           actions.setSubmitting(false);
 
           const selectedInstrument = instrumentsData.find(
-            instrument =>
-              instrument.instrumentId === +values.selectedInstrumentId
+            instrument => instrument.id === +values.selectedInstrumentId
           );
 
           assignProposalsToInstrument(selectedInstrument as Instrument);
@@ -69,7 +68,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                   name="selectedInstrumentId"
                   label="Select instrument"
                   items={instrumentsData.map(instrument => ({
-                    value: instrument.instrumentId.toString(),
+                    value: instrument.id.toString(),
                     text: instrument.name,
                   }))}
                   required

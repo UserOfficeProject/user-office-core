@@ -3,9 +3,9 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
-import { GetRolesQuery, Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { GetRolesQuery, Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
 
 type RoleTableProps = {
   add: (values: Role) => void;
@@ -13,10 +13,7 @@ type RoleTableProps = {
 
 const RoleTable: React.FC<RoleTableProps> = ({ add }) => {
   const api = useDataApi();
-  const columns = [
-    { title: 'Title', field: 'title' },
-    { title: 'ID', field: 'id' },
-  ];
+  const columns = [{ title: 'Role', field: 'title' }];
   const [roles, setRoles] = useState<GetRolesQuery['roles']>([]);
 
   useEffect(() => {

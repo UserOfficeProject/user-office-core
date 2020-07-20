@@ -12,8 +12,9 @@ const getSpacing = (
   return getTheme().spacing.apply(getTheme(), userValue || defaultValue);
 };
 
+// TODO: Review this props: any!
 export const StyledPaper = styled(({ ...other }) => <Paper {...other} />)({
-  margin: props => getSpacing(props.margin, [3, 0]),
+  margin: (props: any) => getSpacing(props.margin, [3, 0]),
   padding: props => getSpacing(props.margin, [2]),
   [getTheme().breakpoints.up(600 + getTheme().spacing(3) * 2)]: {
     margin: (props): string => getSpacing(props.margin, [6, 0]),
@@ -22,7 +23,7 @@ export const StyledPaper = styled(({ ...other }) => <Paper {...other} />)({
 });
 
 export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
-  margin: props => getSpacing(props.margin, [8]),
+  margin: (props: any) => getSpacing(props.margin, [8]),
   display: props => props.display || 'flex',
   flexDirection: props => props.flexDirection || 'column',
   alignItems: props => props.alignItems || 'center',
@@ -32,7 +33,7 @@ export const FormWrapper = styled(({ ...other }) => <Box {...other} />)({
 export const ContentContainer = styled(({ ...other }) => (
   <Container maxWidth="lg" {...other} />
 ))({
-  padding: props => getSpacing(props.padding, [4, 0]),
+  padding: (props: any) => getSpacing(props.padding, [4, 0]),
 });
 
 export const ButtonContainer = styled(({ ...other }) => <div {...other} />)({

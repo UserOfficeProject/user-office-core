@@ -9,12 +9,8 @@ import {
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import {
-  Proposal,
-  BasicUserDetails,
-  ReviewStatus,
-} from '../../../../generated/sdk';
-import { StyledPaper } from '../../../../styles/StyledComponents';
+import { Proposal, BasicUserDetails, ReviewStatus } from 'generated/sdk';
+import { StyledPaper } from 'styles/StyledComponents';
 
 type ProposalDetailsProps = {
   proposal: Proposal;

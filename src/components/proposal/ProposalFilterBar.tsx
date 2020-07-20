@@ -5,8 +5,8 @@ import Select from '@material-ui/core/Select';
 import { makeStyles } from '@material-ui/core/styles';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import { ProposalsFilter, Call, Instrument } from '../../generated/sdk';
-import SelectedCallFilter from '../common/SelectedCallFilter';
+import SelectedCallFilter from 'components/common/SelectedCallFilter';
+import { ProposalsFilter, Call, Instrument } from 'generated/sdk';
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -52,10 +52,7 @@ export default function ProposalFilterBar(props: {
         >
           <MenuItem value={0}>All</MenuItem>
           {props.instrumentsData.map(instrument => (
-            <MenuItem
-              key={instrument.instrumentId}
-              value={instrument.instrumentId}
-            >
+            <MenuItem key={instrument.id} value={instrument.id}>
               {instrument.name}
             </MenuItem>
           ))}

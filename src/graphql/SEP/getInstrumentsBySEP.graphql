@@ -1,6 +1,6 @@
 query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
   instrumentsBySep(sepId: $sepId, callId: $callId) {
-    instrumentId
+    id
     name
     shortCode
     description

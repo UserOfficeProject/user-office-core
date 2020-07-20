@@ -5,17 +5,18 @@ import { Formik } from 'formik';
 import React, { SyntheticEvent } from 'react';
 import * as Yup from 'yup';
 
-import { Questionary } from '../../generated/sdk';
-import { usePersistSubquestionaryModel } from '../../hooks/usePersistSubquestionaryModel';
-import { areDependenciesSatisfied } from '../../models/ProposalModelFunctions';
+import { NavigButton } from 'components/common/NavigButton';
+import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
+import { Questionary } from 'generated/sdk';
+import { usePersistSubquestionaryModel } from 'hooks/questionary/usePersistSubquestionaryModel';
+import { areDependenciesSatisfied } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   SubquestionarySubmissionModel,
-} from '../../models/SubquestionarySubmissionModel';
-import submitFormAsync from '../../utils/FormikAsyncFormHandler';
-import { NavigButton } from '../common/NavigButton';
-import { createFormikConfigObjects } from '../proposal/createFormikConfigObjects';
+} from 'models/SubquestionarySubmissionModel';
+import submitFormAsync from 'utils/FormikAsyncFormHandler';
+
 import { QuestionaryComponentFactory } from './QuestionaryComponentFactory';
 
 export function SubquestionarySubmissionContainer(props: {

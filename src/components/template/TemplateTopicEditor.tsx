@@ -17,8 +17,9 @@ import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import React, { useState } from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
-import { QuestionTemplateRelation, TemplateStep } from '../../generated/sdk';
-import { Event, EventType } from '../../models/QuestionaryEditorModel';
+import { QuestionTemplateRelation, TemplateStep } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+
 import TemplateQuestionEditor, {
   TemplateTopicEditorData,
 } from './TemplateQuestionEditor';

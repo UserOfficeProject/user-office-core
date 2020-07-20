@@ -1,5 +1,6 @@
 import { Backdrop, Fade, Grid, makeStyles, Modal } from '@material-ui/core';
 import React from 'react';
+
 export default function ModalWrapper(props: {
   isOpen: boolean;
   close: () => void;

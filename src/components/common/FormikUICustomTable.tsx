@@ -2,7 +2,7 @@ import { FormikActions } from 'formik';
 import MaterialTable from 'material-table';
 import React from 'react';
 
-import { tableIcons } from '../../utils/materialIcons';
+import { tableIcons } from 'utils/materialIcons';
 
 export const FormikUICustomTable = ({
   columns,

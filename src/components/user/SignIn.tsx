@@ -12,10 +12,11 @@ import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { useUnauthorizedApi } from '../../hooks/useDataApi';
-import orcid from '../../images/orcid.png';
-import { FormWrapper } from '../../styles/StyledComponents';
+import { UserContext } from 'context/UserContextProvider';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import orcid from 'images/orcid.png';
+import { FormWrapper } from 'styles/StyledComponents';
+
 import PhotoInSide from './PhotoInSide';
 
 const useStyles = makeStyles(theme => ({

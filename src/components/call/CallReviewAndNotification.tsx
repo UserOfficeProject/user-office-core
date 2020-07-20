@@ -4,7 +4,7 @@ import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React from 'react';
 
-import FormikUICustomDatePicker from '../common/FormikUICustomDatePicker';
+import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 
 const CallReviewAndNotification: React.FC = () => (
   <>

@@ -1,7 +1,11 @@
 import { Container, Typography, makeStyles } from '@material-ui/core';
-import React, { FunctionComponent } from 'react';
+import PropTypes from 'prop-types';
+import React, { PropsWithChildren } from 'react';
 
-const TitledContainer: FunctionComponent<{ label?: string }> = props => {
+const TitledContainer: React.FC<PropsWithChildren<{
+  children: NonNullable<React.ReactNode>;
+  label?: string;
+}>> = ({ children, label }) => {
   const classes = makeStyles(theme => ({
     container: {
       marginTop: '35px',
@@ -29,11 +33,19 @@ const TitledContainer: FunctionComponent<{ label?: string }> = props => {
   return (
     <div className={classes.container}>
       <Typography variant="h6" className={classes.heading}>
-        {props.label}
+        {label}
       </Typography>
-      <Container className={classes.contents}>{props.children}</Container>
+      <Container className={classes.contents}>{children}</Container>
     </div>
   );
+};
+
+TitledContainer.propTypes = {
+  label: PropTypes.string.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
 };
 
 export default TitledContainer;

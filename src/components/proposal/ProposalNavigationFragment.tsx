@@ -1,7 +1,7 @@
 import { CircularProgress, makeStyles } from '@material-ui/core';
 import React, { Fragment } from 'react';
 
-import { NavigButton } from '../common/NavigButton';
+import { NavigButton } from 'components/common/NavigButton';
 
 const ProposalNavigationFragment = (props: {
   back?: ButtonConfig;

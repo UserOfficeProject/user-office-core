@@ -3,9 +3,10 @@ import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { InstrumentWithAvailabilityTime } from '../../../generated/sdk';
-import { useInstrumentsBySEPData } from '../../../hooks/useInstrumentsBySEPData';
-import { tableIcons } from '../../../utils/materialIcons';
+import { InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
+import { tableIcons } from 'utils/materialIcons';
+
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
 type SEPMeetingInstrumentsTableProps = {

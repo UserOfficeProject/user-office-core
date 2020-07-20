@@ -1,17 +1,15 @@
 import { ResourceId, getTranslation } from '@esss-swap/duo-localisation';
-import { Assignment } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
-import {
-  Instrument,
-  InstrumentWithAvailabilityTime,
-} from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { tableIcons } from '../../utils/materialIcons';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { tableIcons } from 'utils/materialIcons';
 
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
@@ -27,11 +25,13 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   assignedInstruments,
 }) => {
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
+  const [selectedInstruments, setSelectedInstruments] = useState<
+    InstrumentWithAvailabilityTime[]
+  >([]);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
   const columns = [
-    { title: 'ID', field: 'instrumentId' },
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
@@ -44,8 +44,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   const instruments = instrumentsData.filter(instrument => {
     if (
       !assignedInstruments?.find(
-        assignedInstrument =>
-          assignedInstrument.instrumentId === instrument.instrumentId
+        assignedInstrument => assignedInstrument.id === instrument.id
       )
     ) {
       return instrument;
@@ -54,13 +53,11 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     return null;
   }) as Instrument[];
 
-  const onAssignButtonClick = async (
-    instrumentsToAssign: InstrumentWithAvailabilityTime[]
-  ) => {
+  const onAssignButtonClick = async () => {
     const assignInstrumentToCallResult = await api().assignInstrumentToCall({
       callId,
-      instrumentIds: instrumentsToAssign.map(
-        instrumentToAssign => instrumentToAssign.instrumentId
+      instrumentIds: selectedInstruments.map(
+        instrumentToAssign => instrumentToAssign.id
       ),
     });
 
@@ -75,34 +72,39 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         }
       );
     } else {
-      assignInstrumentsToCall(instrumentsToAssign);
+      assignInstrumentsToCall(selectedInstruments);
     }
   };
 
-  const AssignIcon = (): JSX.Element => <Assignment />;
-
   return (
-    <MaterialTable
-      icons={tableIcons}
-      title={'Instruments'}
-      columns={columns}
-      data={instruments}
-      actions={[
-        {
-          icon: AssignIcon,
-          tooltip: 'Assign instruments to call',
-          onClick: (event, rowData): void => {
-            onAssignButtonClick(rowData as InstrumentWithAvailabilityTime[]);
-          },
-          position: 'toolbarOnSelect',
-        },
-      ]}
-      options={{
-        search: true,
-        selection: true,
-        debounceInterval: 400,
-      }}
-    />
+    <>
+      <MaterialTable
+        icons={tableIcons}
+        title={'Instruments'}
+        columns={columns}
+        data={instruments}
+        onSelectionChange={data =>
+          setSelectedInstruments(data as InstrumentWithAvailabilityTime[])
+        }
+        options={{
+          search: true,
+          selection: true,
+          debounceInterval: 400,
+        }}
+      />
+      <ActionButtonContainer>
+        <Button
+          type="button"
+          variant="contained"
+          color="primary"
+          onClick={() => onAssignButtonClick()}
+          disabled={selectedInstruments.length === 0}
+          data-cy="assign-instrument-to-call"
+        >
+          Assign instrument{selectedInstruments.length > 1 && 's'}
+        </Button>
+      </ActionButtonContainer>
+    </>
   );
 };
 

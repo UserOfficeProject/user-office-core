@@ -33,7 +33,7 @@ query getProposal($id: Int!) {
       }
     }
     instrument {
-      instrumentId
+      id
       name
       shortCode
     }

@@ -2,11 +2,12 @@ import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Sep, UserRole } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useCheckAccess } from '../common/Can';
-import SimpleTabs from '../common/TabPanel';
-import EventLogList from '../eventLog/EventLogList';
+import { useCheckAccess } from 'components/common/Can';
+import SimpleTabs from 'components/common/TabPanel';
+import EventLogList from 'components/eventLog/EventLogList';
+import { Sep, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+
 import SEPGeneralInfo from './General/SEPGeneralInfo';
 import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsView';
 import SEPMembers from './Members/SEPMembers';

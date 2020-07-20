@@ -1,15 +1,15 @@
 import { JSDict } from '@esss-swap/duo-localisation';
 import React from 'react';
 
-import { DataType, Answer } from '../../generated/sdk';
-import { BasicComponentProps } from '../proposal/IBasicComponentProps';
-import { ProposalComponentBoolean } from '../proposal/ProposalComponentBoolean';
-import { ProposalComponentDatePicker } from '../proposal/ProposalComponentDatePicker';
-import { ProposalComponentEmbellishment } from '../proposal/ProposalComponentEmbellishment';
-import { ProposalComponentFileUpload } from '../proposal/ProposalComponentFileUpload';
-import { ProposalComponentMultipleChoice } from '../proposal/ProposalComponentMultipleChoice';
-import { ProposalComponentSubtemplate } from '../proposal/ProposalComponentSubtemplate';
-import { ProposalComponentTextInput } from '../proposal/ProposalComponentTextInput';
+import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { ProposalComponentBoolean } from 'components/proposal/ProposalComponentBoolean';
+import { ProposalComponentDatePicker } from 'components/proposal/ProposalComponentDatePicker';
+import { ProposalComponentEmbellishment } from 'components/proposal/ProposalComponentEmbellishment';
+import { ProposalComponentFileUpload } from 'components/proposal/ProposalComponentFileUpload';
+import { ProposalComponentMultipleChoice } from 'components/proposal/ProposalComponentMultipleChoice';
+import { ProposalComponentSubtemplate } from 'components/proposal/ProposalComponentSubtemplate';
+import { ProposalComponentTextInput } from 'components/proposal/ProposalComponentTextInput';
+import { DataType, Answer } from 'generated/sdk';
 
 export class QuestionaryComponentFactory {
   private componentMap = JSDict.Create<string, any>();

@@ -3,12 +3,14 @@ import { Edit } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import React, { useState } from 'react';
-import { Call, InstrumentWithAvailabilityTime } from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
-import ScienceIconAdd from '../common/ScienceIconAdd';
+
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import ScienceIconAdd from 'components/common/ScienceIconAdd';
+import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { tableIcons } from 'utils/materialIcons';
+
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
@@ -20,10 +22,6 @@ const CallsTable: React.FC = () => {
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
@@ -181,6 +179,7 @@ const CallsTable: React.FC = () => {
         title="Calls"
         columns={columns}
         data={callsData as Call[]}
+        isLoading={loading}
         detailPanel={[
           {
             tooltip: 'Show Instruments',

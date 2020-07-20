@@ -4,12 +4,13 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { useDataApi } from '../../hooks/useDataApi';
-import { useInstitutionData } from '../../hooks/useInstitutionData';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { tableIcons } from 'utils/materialIcons';
+
 import CreateInstitution from './CreateInstitution';
 
 const InstitutionPage: React.FC = () => {
@@ -17,7 +18,11 @@ const InstitutionPage: React.FC = () => {
   const [show, setShow] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const { institutionData, setInstitutionData } = useInstitutionData();
+  const {
+    loadingInstitutions,
+    institutionData,
+    setInstitutionData,
+  } = useInstitutionData();
 
   const deleteInstitution = (id: number) => {
     api()
@@ -69,10 +74,6 @@ const InstitutionPage: React.FC = () => {
     },
   ];
 
-  if (!institutionData) {
-    return <p>Loading</p>;
-  }
-
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
@@ -94,6 +95,7 @@ const InstitutionPage: React.FC = () => {
                 title={'Institutions'}
                 columns={columns}
                 data={institutionData}
+                isLoading={loadingInstitutions}
                 options={{
                   search: true,
                   debounceInterval: 400,

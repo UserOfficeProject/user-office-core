@@ -2,9 +2,10 @@ import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
-import { Question } from '../../../../generated/sdk';
-import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
-import { ActionButtonContainer } from '../../../common/ActionButtonContainer';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { Question } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
 export const QuestionFormShell = (props: {

@@ -2,8 +2,9 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React from 'react';
 import { useParams } from 'react-router';
 
-import { useProposalData } from '../../hooks/useProposalData';
-import SimpleTabs from '../common/TabPanel';
+import SimpleTabs from 'components/common/TabPanel';
+import { useProposalData } from 'hooks/proposal/useProposalData';
+
 import ProposalContainer from './ProposalContainer';
 
 export default function ProposalEdit() {

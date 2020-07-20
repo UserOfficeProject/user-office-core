@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Question } from '../../../../generated/sdk';
-import TitledContainer from '../../../common/TitledContainer';
+import TitledContainer from 'components/common/TitledContainer';
+import { Question } from 'generated/sdk';
 
 export function QuestionExcerpt({ question }: { question: Question }) {
   return (

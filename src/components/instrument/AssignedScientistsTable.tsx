@@ -5,9 +5,9 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument, BasicUserDetails } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { Instrument, BasicUserDetails } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -56,7 +56,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   const removeAssignedScientist = async (scientistId: number) => {
     const result = await api().removeScientistFromInstrument({
       scientistId,
-      instrumentId: instrument.instrumentId,
+      instrumentId: instrument.id,
     });
 
     if (result.removeScientistFromInstrument.error) {
@@ -69,10 +69,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
         }
       );
     } else {
-      removeAssignedScientistFromInstrument(
-        scientistId,
-        instrument.instrumentId
-      );
+      removeAssignedScientistFromInstrument(scientistId, instrument.id);
     }
   };
 

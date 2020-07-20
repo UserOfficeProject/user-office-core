@@ -6,11 +6,11 @@ import PropTypes from 'prop-types';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { getUniqueArrayBy } from '../../utils/helperFunctions';
-import { tableIcons } from '../../utils/materialIcons';
+import { UserContext } from 'context/UserContextProvider';
+import { Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { getUniqueArrayBy } from 'utils/helperFunctions';
+import { tableIcons } from 'utils/materialIcons';
 
 type RoleSelectionProps = {
   close: () => void;
@@ -82,8 +82,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
   );
 
   const columns = [
-    { title: 'ID', field: 'id' },
-    { title: 'Title', field: 'title' },
+    { title: 'Role', field: 'title' },
     {
       title: 'Action',
       render: RoleAction,

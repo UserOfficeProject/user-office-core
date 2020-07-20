@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import {
   SepProposal,
   SepMember,
@@ -13,12 +14,12 @@ import {
   ReviewStatus,
   Review,
   UserRole,
-} from '../../../generated/sdk';
-import { useDataApi } from '../../../hooks/useDataApi';
-import { useSEPProposalsData } from '../../../hooks/useSEPProposalsData';
-import { BasicUserDetails } from '../../../models/User';
-import { tableIcons } from '../../../utils/materialIcons';
-import { useCheckAccess } from '../../common/Can';
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
+import { BasicUserDetails } from 'models/User';
+import { tableIcons } from 'utils/materialIcons';
+
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
 

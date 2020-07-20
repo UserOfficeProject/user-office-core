@@ -8,20 +8,30 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import XLSX from 'xlsx';
 
-import { Review, ReviewStatus, Instrument } from '../../generated/sdk';
-import { ProposalsFilter } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
-import { tableIcons } from '../../utils/materialIcons';
-import DialogConfirmation from '../common/DialogConfirmation';
-import ScienceIconAdd from '../common/ScienceIconAdd';
-import ScienceIconRemove from '../common/ScienceIconRemove';
-import AssignProposalsToInstrument from '../instrument/AssignProposalsToInstrument';
-import AssignProposalToSEP from '../SEP/Proposals/AssignProposalToSEP';
+import DialogConfirmation from 'components/common/DialogConfirmation';
+import ScienceIconAdd from 'components/common/ScienceIconAdd';
+import ScienceIconRemove from 'components/common/ScienceIconRemove';
+import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
+import { Instrument, Sep } from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import {
+  useProposalsData,
+  ProposalData,
+} from 'hooks/proposal/useProposalsData';
+import { excelDownload } from 'utils/excelDownload';
+import { tableIcons } from 'utils/materialIcons';
+import {
+  average,
+  absoluteDifference,
+  standardDeviation,
+  getGrades,
+} from 'utils/mathFunctions';
+
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
@@ -76,50 +86,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       })
     );
   };
-
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / numbers.length;
-
-    return avg;
-  };
-
-  const absoluteDifference = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
-    }
-    numbers = numbers.sort();
-
-    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
-  };
-
-  const standardDeviation = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
-    }
-    const avg = average(numbers);
-
-    const squareDiffs = numbers?.map(function(value) {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-
-    return stdDev;
-  };
-
-  const getGrades = (reviews: Review[] | null | undefined) =>
-    reviews
-      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade as number) ?? [];
 
   const removeProposalFromInstrument = async () => {
     if (
@@ -189,7 +155,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               onClick={() => {
                 setProposalAndInstrumentId({
                   proposalId: rowData.id,
-                  instrumentId: rowData.instrument?.instrumentId as number,
+                  instrumentId: rowData.instrument?.id as number,
                 });
                 setOpenRemoveInstrument(true);
               }}
@@ -207,6 +173,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
+      removable: false,
       render: RowActionButtons,
     },
     { title: 'Proposal ID', field: 'shortCode' },
@@ -349,16 +316,36 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     });
   };
 
-  const assignProposalToSEP = async (sepId: number): Promise<void> => {
+  const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async id => {
-        const result = await api().assignProposal({ proposalId: id, sepId });
+        const result = await api().assignProposal({
+          proposalId: id,
+          sepId: sep.id,
+        });
 
         return result.assignProposal.error;
       })
     );
 
     const isError = !!assignmentsErrors.join('');
+
+    if (!isError) {
+      setProposalsData(
+        proposalsData.map(prop => {
+          if (
+            selectedProposals.find(
+              selectedProposalId => selectedProposalId === prop.id
+            )
+          ) {
+            prop.sep = sep;
+          }
+
+          return prop;
+        })
+      );
+    }
+
     const message = isError
       ? 'Could not assign all selected proposals to SEP'
       : 'Proposal/s assigned to SEP';
@@ -379,7 +366,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     if (selectedProposalsWithInstrument.length === 0) {
       const result = await api().assignProposalsToInstrument({
         proposalIds: selectedProposals,
-        instrumentId: instrument.instrumentId,
+        instrumentId: instrument.id,
       });
       const isError = !!result.assignProposalsToInstrument.error;
 
@@ -414,10 +401,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       );
     }
   };
-
-  if (loading) {
-    return <p>Loading</p>;
-  }
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
@@ -479,6 +462,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        isLoading={loading}
         components={{
           Toolbar: Toolbar,
         }}
@@ -493,41 +477,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           debounceInterval: 400,
           columnsButton: true,
           exportButton: true,
-          exportCsv: (columns, data: ProposalData[]) => {
-            const dataColumns = [
-              'Proposal ID',
-              'Title',
-              'Principal Investigator',
-              'Technical Status',
-              'Tehnical Comment',
-              'Time(Days)',
-              'Score difference',
-              'Average Score',
-              'Comment Management',
-              'Decision',
-              'Order',
-            ];
-            const dataToExport = data.map(proposalData => [
-              proposalData.shortCode,
-              proposalData.title,
-              `${proposalData.proposer.firstname} ${proposalData.proposer.lastname}`,
-              getTranslation(
-                proposalData.technicalReview?.status as ResourceId
-              ),
-              proposalData.technicalReview?.publicComment,
-              proposalData.technicalReview?.timeAllocation,
-              absoluteDifference(getGrades(proposalData.reviews)) || 'NA',
-              average(getGrades(proposalData.reviews)) || 'NA',
-              proposalData.commentForManagement,
-              proposalData.finalStatus,
-              proposalData.rankOrder,
-            ]);
-
-            const ws = XLSX.utils.aoa_to_sheet([dataColumns, ...dataToExport]);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
-            XLSX.writeFile(wb, 'proposals.xlsx');
-          },
+          exportCsv: excelDownload,
         }}
         actions={[
           {

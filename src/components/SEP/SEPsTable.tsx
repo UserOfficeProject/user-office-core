@@ -4,13 +4,14 @@ import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Sep, UserRole } from '../../generated/sdk';
-import { useSEPsData } from '../../hooks/useSEPsData';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import Can from '../common/Can';
-import InputDialog from '../common/InputDialog';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import Can from 'components/common/Can';
+import InputDialog from 'components/common/InputDialog';
+import { UserContext } from 'context/UserContextProvider';
+import { Sep, UserRole } from 'generated/sdk';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
+import { tableIcons } from 'utils/materialIcons';
+
 import AddSEP from './General/AddSEP';
 
 const SEPsTable: React.FC = () => {
@@ -22,7 +23,6 @@ const SEPsTable: React.FC = () => {
   );
   const [show, setShow] = useState(false);
   const columns = [
-    { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },
     {
@@ -35,10 +35,6 @@ const SEPsTable: React.FC = () => {
 
   if (editSEPID) {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
-  }
-
-  if (loading) {
-    return <p>Loading...</p>;
   }
 
   const onSepAdded = (sepAdded: Sep | null) => {
@@ -64,6 +60,7 @@ const SEPsTable: React.FC = () => {
           title={'Scientific evaluation panels'}
           columns={columns}
           data={SEPsData}
+          isLoading={loading}
           options={{
             search: true,
             debounceInterval: 400,

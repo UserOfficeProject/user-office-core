@@ -4,14 +4,15 @@ import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useInstrumentsData } from '../../hooks/useInstrumentsData';
-import { tableIcons } from '../../utils/materialIcons';
-import { ActionButtonContainer } from '../common/ActionButtonContainer';
-import Can from '../common/Can';
-import InputDialog from '../common/InputDialog';
-import ParticipantModal from '../proposal/ParticipantModal';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import Can from 'components/common/Can';
+import InputDialog from 'components/common/InputDialog';
+import ParticipantModal from 'components/proposal/ParticipantModal';
+import { BasicUserDetails, Instrument, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { tableIcons } from 'utils/materialIcons';
+
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
 
@@ -40,10 +41,6 @@ const InstrumentsTable: React.FC = () => {
     number | null
   >(null);
 
-  if (loadingInstruments) {
-    return <p>Loading...</p>;
-  }
-
   const onInstrumentCreated = (instrumentAdded: Instrument | null) => {
     instrumentAdded &&
       setInstrumentsData([...instrumentsData, instrumentAdded]);
@@ -54,7 +51,7 @@ const InstrumentsTable: React.FC = () => {
   const onInstrumentUpdated = (instrumentUpdated: Instrument | null) => {
     if (instrumentUpdated) {
       const newInstrumentsArray = instrumentsData.map(instrumentItem =>
-        instrumentItem.instrumentId === instrumentUpdated.instrumentId
+        instrumentItem.id === instrumentUpdated.id
           ? instrumentUpdated
           : instrumentItem
       );
@@ -67,7 +64,7 @@ const InstrumentsTable: React.FC = () => {
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     const deleteInstrumentResult = await api().deleteInstrument({
-      instrumentId: instrumentDeletedId,
+      id: instrumentDeletedId,
     });
 
     const isError = !!deleteInstrumentResult.deleteInstrument.error;
@@ -78,7 +75,7 @@ const InstrumentsTable: React.FC = () => {
 
     if (!isError) {
       const newInstrumentsArray = instrumentsData.filter(
-        instrumentItem => instrumentItem.instrumentId !== instrumentDeletedId
+        instrumentItem => instrumentItem.id !== instrumentDeletedId
       );
 
       setInstrumentsData(newInstrumentsArray);
@@ -100,7 +97,7 @@ const InstrumentsTable: React.FC = () => {
 
       if (instrumentsData) {
         const newInstrumentsData = instrumentsData.map(instrumentItem => {
-          if (instrumentItem.instrumentId === assigningInstrumentId) {
+          if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
               scientists: [...instrumentItem.scientists, { ...scientist }],
@@ -135,7 +132,7 @@ const InstrumentsTable: React.FC = () => {
   ) => {
     if (instrumentsData) {
       const newInstrumentsData = instrumentsData.map(instrumentItem => {
-        if (instrumentItem.instrumentId === instrumentToRemoveFromId) {
+        if (instrumentItem.id === instrumentToRemoveFromId) {
           const newScientists = instrumentItem.scientists.filter(
             scientistItem => scientistItem.id !== scientistToRemoveId
           );
@@ -167,7 +164,7 @@ const InstrumentsTable: React.FC = () => {
   );
 
   const instrumentAssignments = instrumentsData?.find(
-    instrumentItem => instrumentItem.instrumentId === assigningInstrumentId
+    instrumentItem => instrumentItem.id === assigningInstrumentId
   );
 
   return (
@@ -206,6 +203,7 @@ const InstrumentsTable: React.FC = () => {
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
+          isLoading={loadingInstruments}
           detailPanel={[
             {
               tooltip: 'Show Instruments',
@@ -218,7 +216,7 @@ const InstrumentsTable: React.FC = () => {
           }}
           editable={{
             onRowDelete: (rowInstrumentData: Instrument): Promise<void> =>
-              onInstrumentDelete(rowInstrumentData.instrumentId),
+              onInstrumentDelete(rowInstrumentData.id),
           }}
           actions={[
             {
@@ -232,7 +230,7 @@ const InstrumentsTable: React.FC = () => {
               icon: AssignmentIndIcon,
               tooltip: 'Assign scientist',
               onClick: (event, rowData): void =>
-                setAssigningInstrumentId((rowData as Instrument).instrumentId),
+                setAssigningInstrumentId((rowData as Instrument).id),
               position: 'row',
             },
           ]}

@@ -1,13 +1,13 @@
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
 
-import { Answer, ProposalStatus, QuestionaryStep } from '../generated/sdk';
-import { ProposalSubsetSumbission } from '../models/ProposalModel';
-import { useReducerWithMiddleWares } from '../utils/useReducerWithMiddleWares';
+import { Answer, ProposalStatus, QuestionaryStep } from 'generated/sdk';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from './ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
+import { useReducerWithMiddleWares } from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   BACK_CLICKED = 'BACK_CLICKED',

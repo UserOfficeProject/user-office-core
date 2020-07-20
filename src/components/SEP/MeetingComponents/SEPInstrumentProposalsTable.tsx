@@ -9,9 +9,10 @@ import {
   Proposal,
   ReviewStatus,
   InstrumentWithAvailabilityTime,
-} from '../../../generated/sdk';
-import { useSEPProposalsByInstrument } from '../../../hooks/useSEPProposalsByInstrument';
-import { tableIcons } from '../../../utils/materialIcons';
+} from 'generated/sdk';
+import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
+import { tableIcons } from 'utils/materialIcons';
+
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
@@ -41,11 +42,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const {
     instrumentProposalsData,
     loadingInstrumentProposals,
-  } = useSEPProposalsByInstrument(
-    sepInstrument.instrumentId,
-    sepId,
-    selectedCallId
-  );
+  } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 

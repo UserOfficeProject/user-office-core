@@ -5,9 +5,9 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState, ChangeEvent } from 'react';
 
-import { Call, InstrumentWithAvailabilityTime } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { tableIcons } from 'utils/materialIcons';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -63,18 +63,13 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     Column<InstrumentWithAvailabilityTime>[]
   >([
     {
-      title: 'ID',
-      field: 'instrumentId',
-      editable: 'never',
-    },
-    {
       title: 'Name',
       field: 'name',
       editable: 'never',
     },
     {
       title: 'Short code',
-      field: 'name',
+      field: 'shortCode',
       editable: 'never',
     },
     {
@@ -109,7 +104,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
       );
     } else {
       const dataUpdate = call.instruments.filter(
-        instrumentItem => instrumentItem.instrumentId !== instrumentId
+        instrumentItem => instrumentItem.id !== instrumentId
       );
       removeAssignedInstrumentFromCall(dataUpdate, call.id);
     }
@@ -121,7 +116,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ) => {
     const result = await api().setInstrumentAvailabilityTime({
       callId: call.id,
-      instrumentId: newData.instrumentId,
+      instrumentId: newData.id,
       availabilityTime: +(newData.availabilityTime as number),
     });
 
@@ -153,8 +148,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
         editable={{
           onRowDelete: (
             rowAssignmentsData: InstrumentWithAvailabilityTime
-          ): Promise<void> =>
-            removeAssignedInstrument(rowAssignmentsData.instrumentId),
+          ): Promise<void> => removeAssignedInstrument(rowAssignmentsData.id),
           onRowUpdate: (newData, oldData) =>
             new Promise(async (resolve, reject) => {
               if (

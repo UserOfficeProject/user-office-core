@@ -9,11 +9,11 @@ import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect, useContext } from 'react';
 
-import { ReviewAndAssignmentContext } from '../../context/ReviewAndAssignmentContextProvider';
-import { ReviewStatus, Review } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useReviewData } from '../../hooks/useReviewData';
-import { ButtonContainer } from '../../styles/StyledComponents';
+import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
+import { ReviewStatus, Review } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useReviewData } from 'hooks/review/useReviewData';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 const useStyles = makeStyles(() => ({
   buttons: {

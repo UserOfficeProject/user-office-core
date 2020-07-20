@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes } from 'react';
 
-import { TechnicalReview } from '../../generated/sdk';
+import { TechnicalReview } from 'generated/sdk';
 
 export default function TechnicalReviewInformation(
   props: HTMLAttributes<any> & {

@@ -13,11 +13,11 @@ import dateformat from 'dateformat';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
-import { useCallsData } from '../../hooks/useCallsData';
-import { ContentContainer, StyledPaper } from '../../styles/StyledComponents';
-import { daysRemaining } from '../../utils/Time';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import { daysRemaining } from 'utils/Time';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   date: {
     display: 'block',
     fontStyle: 'italic',

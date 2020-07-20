@@ -3,11 +3,12 @@ import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
-import { Question, TemplateCategoryId } from '../../../../generated/sdk';
-import { useTemplateCategories } from '../../../../hooks/useTemplateCategories';
-import { useTemplates } from '../../../../hooks/useTemplates';
-import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import TitledContainer from '../../../common/TitledContainer';
+
+import TitledContainer from 'components/common/TitledContainer';
+import { Question, TemplateCategoryId } from 'generated/sdk';
+import { useTemplates } from 'hooks/template/useTemplates';
+import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 

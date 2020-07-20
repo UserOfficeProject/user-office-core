@@ -3,19 +3,20 @@ import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
 
-import { QuestionaryStep } from '../../generated/sdk';
-import { useUpdateProposal } from '../../hooks/useUpdateProposal';
+import { ErrorFocus } from 'components/common/ErrorFocus';
+import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
+import { QuestionaryStep } from 'generated/sdk';
+import { useUpdateProposal } from 'hooks/proposal/useUpdateProposal';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
-} from '../../models/ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
 import {
   EventType,
   ProposalSubmissionModelState,
-} from '../../models/ProposalSubmissionModel';
-import submitFormAsync from '../../utils/FormikAsyncFormHandler';
-import { ErrorFocus } from '../common/ErrorFocus';
-import { QuestionaryComponentFactory } from '../questionary/QuestionaryComponentFactory';
+} from 'models/ProposalSubmissionModel';
+import submitFormAsync from 'utils/FormikAsyncFormHandler';
+
 import { createFormikConfigObjects } from './createFormikConfigObjects';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';

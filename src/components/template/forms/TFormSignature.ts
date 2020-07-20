@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
-import { Template } from '../../../generated/sdk';
-import { Event } from '../../../models/QuestionaryEditorModel';
+import { Template } from 'generated/sdk';
+import { Event } from 'models/QuestionaryEditorModel';
 
 interface FormProps<ValueObjectType> {
   field: ValueObjectType;

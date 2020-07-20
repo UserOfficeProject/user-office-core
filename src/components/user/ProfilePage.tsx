@@ -2,7 +2,8 @@ import { Container } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import SimpleTabs from '../common/TabPanel';
+import SimpleTabs from 'components/common/TabPanel';
+
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';
 

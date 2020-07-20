@@ -23,8 +23,9 @@ import {
   Template,
   TemplateCategoryId,
   Topic,
-} from '../../generated/sdk';
-import { Event, EventType } from '../../models/QuestionaryEditorModel';
+} from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+
 import getTemplateFieldIcon from './getTemplateFieldIcon';
 import TemplateQuestionEditor, {
   TemplateTopicEditorData,
