@@ -41,10 +41,6 @@ const InstrumentsTable: React.FC = () => {
     number | null
   >(null);
 
-  if (loadingInstruments) {
-    return <p>Loading...</p>;
-  }
-
   const onInstrumentCreated = (instrumentAdded: Instrument | null) => {
     instrumentAdded &&
       setInstrumentsData([...instrumentsData, instrumentAdded]);
@@ -207,6 +203,7 @@ const InstrumentsTable: React.FC = () => {
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
+          isLoading={loadingInstruments}
           detailPanel={[
             {
               tooltip: 'Show Instruments',

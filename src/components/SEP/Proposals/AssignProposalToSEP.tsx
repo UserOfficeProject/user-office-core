@@ -10,7 +10,7 @@ import * as yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import { UserContext } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
+import { UserRole, Sep } from 'generated/sdk';
 import { useSEPsData } from 'hooks/SEP/useSEPsData';
 
 const assignProposalToSEPValidationSchema = yup.object().shape({
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 
 type AssignProposalToSEPProps = {
   close: () => void;
-  assignProposalToSEP: (sepId: number) => void;
+  assignProposalToSEP: (sep: Sep) => void;
 };
 
 const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
@@ -48,7 +48,10 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
         }}
         onSubmit={async (values, actions): Promise<void> => {
           actions.setSubmitting(false);
-          assignProposalToSEP(+values.selectedSEPId);
+          const selectedSEP = SEPsData.find(
+            sep => sep.id === +values.selectedSEPId
+          );
+          assignProposalToSEP(selectedSEP as Sep);
           close();
         }}
         validationSchema={assignProposalToSEPValidationSchema}

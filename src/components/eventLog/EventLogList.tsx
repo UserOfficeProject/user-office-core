@@ -27,7 +27,6 @@ const EventLogList: React.FC<EventLogListProps> = ({
     changedObjectId.toString()
   );
   const columns = [
-    { title: 'Event log ID', field: 'id' },
     {
       title: 'Changed by',
       render: (rowData: EventLog): string =>

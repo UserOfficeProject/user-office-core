@@ -446,9 +446,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .check();
 
-    cy.get('[title="Assign instruments to call"]')
-      .first()
-      .click();
+    cy.contains('Assign instrument').click();
 
     cy.wait(500);
 
@@ -481,12 +479,112 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('External reviews');
   });
 
+  it('Officer should be able to see calculated availability time on instrument per SEP inside meeting components', () => {
+    const code = faker.random.words(3);
+    const description = faker.random.words(8);
+
+    const title = faker.random.words(3);
+    const abstract = faker.random.words(8);
+
+    cy.login('user');
+    cy.contains('New Proposal').click();
+    cy.get('#title').type(title);
+    cy.get('#abstract').type(abstract);
+    cy.contains('Save and continue').click();
+    cy.wait(500);
+    cy.contains('Submit').click();
+    cy.contains('OK').click();
+    cy.contains('Logout').click();
+
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.contains('Create SEP').click();
+    cy.get('#code').type(code);
+    cy.get('#description').type(description);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(1000);
+
+    cy.contains('View Proposals').click();
+
+    cy.wait(500);
+
+    cy.get('[type="checkbox"]')
+      .eq(1)
+      .check();
+
+    cy.get("[title='Assign proposals to instrument']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedInstrumentId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedInstrumentId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to Instrument').click();
+
+    cy.wait(500);
+
+    cy.get("[title='Assign proposals to SEP']")
+      .first()
+      .click();
+
+    cy.get("[id='mui-component-select-selectedSEPId']")
+      .first()
+      .click();
+
+    cy.get("[id='menu-selectedSEPId'] li")
+      .first()
+      .click();
+
+    cy.contains('Assign to SEP').click();
+
+    cy.contains('View Calls').click();
+
+    cy.wait(500);
+
+    cy.get("[title='Show Instruments']")
+      .first()
+      .click();
+
+    cy.get("[title='Edit']")
+      .first()
+      .click();
+
+    cy.get("[data-cy='availability-time']").type('50');
+
+    cy.get("[title='Save']")
+      .first()
+      .click();
+
+    cy.wait(500);
+
+    cy.contains('SEPs').click();
+
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.wait(1000);
+
+    cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
+      .eq(5)
+      .should('have.text', '25');
+  });
+
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
-      .first()
+      .eq(1)
       .click();
 
     cy.contains('Proposals and Assignments').click();
@@ -532,7 +630,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('SEPs').click();
     cy.get('button[title="Edit SEP"]')
-      .first()
+      .eq(1)
       .click();
 
     cy.contains('Proposals and Assignments').click();
