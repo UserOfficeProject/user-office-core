@@ -23,7 +23,6 @@ const SEPsTable: React.FC = () => {
   );
   const [show, setShow] = useState(false);
   const columns = [
-    { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },
     {
@@ -36,10 +35,6 @@ const SEPsTable: React.FC = () => {
 
   if (editSEPID) {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
-  }
-
-  if (loading) {
-    return <p>Loading...</p>;
   }
 
   const onSepAdded = (sepAdded: Sep | null | undefined) => {
@@ -67,6 +62,7 @@ const SEPsTable: React.FC = () => {
           title={'Scientific evaluation panels'}
           columns={columns}
           data={SEPsData}
+          isLoading={loading}
           options={{
             search: true,
             debounceInterval: 400,
