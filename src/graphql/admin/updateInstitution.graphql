@@ -3,6 +3,7 @@ mutation updateInstitution($id: Int!, $name: String!, $verified: Boolean!) {
     institution {
       id
       verified
+      name
     }
     error
   }
