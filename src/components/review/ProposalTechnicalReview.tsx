@@ -8,13 +8,16 @@ import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
-import { TechnicalReviewStatus, TechnicalReview } from 'generated/sdk';
+import {
+  TechnicalReviewStatus,
+  CoreTechnicalReviewFragment,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalTechnicalReview(props: {
-  data: TechnicalReview | null | undefined;
-  setReview: (data: TechnicalReview) => void;
+  data: CoreTechnicalReviewFragment | null | undefined;
+  setReview: (data: CoreTechnicalReviewFragment) => void;
   id: number;
 }) {
   const api = useDataApi();
@@ -57,7 +60,7 @@ export default function ProposalTechnicalReview(props: {
             publicComment: values.publicComment,
             status:
               TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-          } as TechnicalReview);
+          } as CoreTechnicalReviewFragment);
           actions.setSubmitting(false);
         }}
       >

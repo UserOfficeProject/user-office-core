@@ -1,0 +1,8 @@
+fragment coreTechnicalReview on TechnicalReview {
+      id
+      comment
+      publicComment
+      timeAllocation
+      status
+      proposalID
+}

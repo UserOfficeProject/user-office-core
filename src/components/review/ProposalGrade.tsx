@@ -10,7 +10,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState, useEffect, useContext } from 'react';
 
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
-import { ReviewStatus, Review } from 'generated/sdk';
+import { ReviewStatus, CoreReviewFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { ButtonContainer } from 'styles/StyledComponents';
@@ -33,7 +33,9 @@ export default function ProposalGrade(props: {
   const { reviewData } = useReviewData(props.reviewID);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const [review, setReview] = useState<Review | null | undefined>(null);
+  const [review, setReview] = useState<CoreReviewFragment | null | undefined>(
+    null
+  );
   const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
 
   useEffect(() => {

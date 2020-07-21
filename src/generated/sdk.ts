@@ -23,8 +23,8 @@ export type AddSepMembersRole = {
 
 export type AddUserRoleResponseWrap = {
   __typename?: 'AddUserRoleResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
+  error: Maybe<Scalars['String']>;
+  success: Maybe<Scalars['Boolean']>;
 };
 
 export type Answer = {
@@ -33,8 +33,8 @@ export type Answer = {
   sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
-  dependency?: Maybe<FieldDependency>;
-  value?: Maybe<Scalars['IntStringDateBool']>;
+  dependency: Maybe<FieldDependency>;
+  value: Maybe<Scalars['IntStringDateBool']>;
 };
 
 export type AnswerInput = {
@@ -44,14 +44,14 @@ export type AnswerInput = {
 
 export type AnswerResponseWrap = {
   __typename?: 'AnswerResponseWrap';
-  error?: Maybe<Scalars['String']>;
+  error: Maybe<Scalars['String']>;
   answer: Answer;
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
   __typename?: 'AssignQuestionsToTopicResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  result?: Maybe<Array<Scalars['String']>>;
+  error: Maybe<Scalars['String']>;
+  result: Maybe<Array<Scalars['String']>>;
 };
 
 export type BasicUserDetails = {
@@ -61,14 +61,14 @@ export type BasicUserDetails = {
   lastname: Scalars['String'];
   organisation: Scalars['String'];
   position: Scalars['String'];
-  placeholder?: Maybe<Scalars['Boolean']>;
-  created?: Maybe<Scalars['DateTime']>;
+  placeholder: Maybe<Scalars['Boolean']>;
+  created: Maybe<Scalars['DateTime']>;
 };
 
 export type BasicUserDetailsResponseWrap = {
   __typename?: 'BasicUserDetailsResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  user?: Maybe<BasicUserDetails>;
+  error: Maybe<Scalars['String']>;
+  user: Maybe<BasicUserDetails>;
 };
 
 export type BooleanConfig = {
@@ -92,14 +92,14 @@ export type Call = {
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
-  templateId?: Maybe<Scalars['Int']>;
+  templateId: Maybe<Scalars['Int']>;
   instruments: Array<InstrumentWithAvailabilityTime>;
 };
 
 export type CallResponseWrap = {
   __typename?: 'CallResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  call?: Maybe<Call>;
+  error: Maybe<Scalars['String']>;
+  call: Maybe<Call>;
 };
 
 export type CallsFilter = {
@@ -116,8 +116,8 @@ export type ConfigBase = {
 
 export type CreateUserByEmailInviteResponseWrap = {
   __typename?: 'CreateUserByEmailInviteResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['Int']>;
+  error: Maybe<Scalars['String']>;
+  id: Maybe<Scalars['Int']>;
 };
 
 export enum DataType {
@@ -140,8 +140,8 @@ export type DateConfig = {
 
 export type EmailVerificationResponseWrap = {
   __typename?: 'EmailVerificationResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
+  error: Maybe<Scalars['String']>;
+  success: Maybe<Scalars['Boolean']>;
 };
 
 export type EmbellishmentConfig = {
@@ -234,8 +234,8 @@ export type Institution = {
 
 export type InstitutionResponseWrap = {
   __typename?: 'InstitutionResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  institution?: Maybe<Institution>;
+  error: Maybe<Scalars['String']>;
+  institution: Maybe<Institution>;
 };
 
 export type Institutions = {
@@ -260,8 +260,8 @@ export type Instrument = {
 
 export type InstrumentResponseWrap = {
   __typename?: 'InstrumentResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  instrument?: Maybe<Instrument>;
+  error: Maybe<Scalars['String']>;
+  instrument: Maybe<Instrument>;
 };
 
 export type InstrumentsQueryResult = {
@@ -277,7 +277,7 @@ export type InstrumentWithAvailabilityTime = {
   shortCode: Scalars['String'];
   description: Scalars['String'];
   scientists: Array<BasicUserDetails>;
-  availabilityTime?: Maybe<Scalars['Int']>;
+  availabilityTime: Maybe<Scalars['Int']>;
 };
 
 
@@ -837,18 +837,18 @@ export type MutationUpdateTopicOrderArgs = {
 
 export type OrcIdInformation = {
   __typename?: 'OrcIDInformation';
-  firstname?: Maybe<Scalars['String']>;
-  lastname?: Maybe<Scalars['String']>;
-  orcid?: Maybe<Scalars['String']>;
-  orcidHash?: Maybe<Scalars['String']>;
-  refreshToken?: Maybe<Scalars['String']>;
-  token?: Maybe<Scalars['String']>;
+  firstname: Maybe<Scalars['String']>;
+  lastname: Maybe<Scalars['String']>;
+  orcid: Maybe<Scalars['String']>;
+  orcidHash: Maybe<Scalars['String']>;
+  refreshToken: Maybe<Scalars['String']>;
+  token: Maybe<Scalars['String']>;
 };
 
 export type Page = {
   __typename?: 'Page';
   id: Scalars['Int'];
-  content?: Maybe<Scalars['String']>;
+  content: Maybe<Scalars['String']>;
 };
 
 export enum PageName {
@@ -861,13 +861,13 @@ export enum PageName {
 
 export type PageResponseWrap = {
   __typename?: 'PageResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  page?: Maybe<Page>;
+  error: Maybe<Scalars['String']>;
+  page: Maybe<Page>;
 };
 
 export type PrepareDbResponseWrap = {
   __typename?: 'PrepareDBResponseWrap';
-  error?: Maybe<Scalars['String']>;
+  error: Maybe<Scalars['String']>;
   log: Scalars['String'];
 };
 
@@ -880,20 +880,20 @@ export type Proposal = {
   created: Scalars['DateTime'];
   updated: Scalars['DateTime'];
   shortCode: Scalars['String'];
-  rankOrder?: Maybe<Scalars['Int']>;
-  finalStatus?: Maybe<ProposalEndStatus>;
+  rankOrder: Maybe<Scalars['Int']>;
+  finalStatus: Maybe<ProposalEndStatus>;
   callId: Scalars['Int'];
   questionaryId: Scalars['Int'];
-  commentForUser?: Maybe<Scalars['String']>;
-  commentForManagement?: Maybe<Scalars['String']>;
+  commentForUser: Maybe<Scalars['String']>;
+  commentForManagement: Maybe<Scalars['String']>;
   notified: Scalars['Boolean'];
   users: Array<BasicUserDetails>;
   proposer: BasicUserDetails;
-  reviews?: Maybe<Array<Review>>;
-  technicalReview?: Maybe<TechnicalReview>;
-  instrument?: Maybe<Instrument>;
-  sep?: Maybe<Sep>;
-  call?: Maybe<Call>;
+  reviews: Maybe<Array<Review>>;
+  technicalReview: Maybe<TechnicalReview>;
+  instrument: Maybe<Instrument>;
+  sep: Maybe<Sep>;
+  call: Maybe<Call>;
   questionary: Questionary;
 };
 
@@ -906,8 +906,8 @@ export enum ProposalEndStatus {
 
 export type ProposalResponseWrap = {
   __typename?: 'ProposalResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  proposal?: Maybe<Proposal>;
+  error: Maybe<Scalars['String']>;
+  proposal: Maybe<Proposal>;
 };
 
 export type ProposalsFilter = {
@@ -935,7 +935,7 @@ export type ProposalTemplate = {
   templateId: Scalars['Int'];
   categoryId: TemplateCategoryId;
   name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
@@ -949,38 +949,38 @@ export type ProposalTemplatesFilter = {
 
 export type Query = {
   __typename?: 'Query';
-  calls?: Maybe<Array<Call>>;
-  proposals?: Maybe<ProposalsQueryResult>;
-  templates?: Maybe<Array<Template>>;
-  basicUserDetails?: Maybe<BasicUserDetails>;
-  blankProposal?: Maybe<Proposal>;
-  call?: Maybe<Call>;
-  checkEmailExist?: Maybe<Scalars['Boolean']>;
-  eventLogs?: Maybe<Array<EventLog>>;
-  fileMetadata?: Maybe<Array<FileMetadata>>;
-  getFields?: Maybe<Fields>;
-  getOrcIDInformation?: Maybe<OrcIdInformation>;
-  getPageContent?: Maybe<Scalars['String']>;
-  institutions?: Maybe<Array<Institution>>;
-  instrument?: Maybe<Instrument>;
-  instruments?: Maybe<InstrumentsQueryResult>;
-  instrumentsBySep?: Maybe<Array<InstrumentWithAvailabilityTime>>;
-  isNaturalKeyPresent?: Maybe<Scalars['Boolean']>;
-  proposal?: Maybe<Proposal>;
-  proposalTemplates?: Maybe<Array<ProposalTemplate>>;
-  questionary?: Maybe<Questionary>;
-  review?: Maybe<Review>;
-  roles?: Maybe<Array<Role>>;
-  sep?: Maybe<Sep>;
-  sepMembers?: Maybe<Array<SepMember>>;
-  sepProposals?: Maybe<Array<SepProposal>>;
-  sepProposalsByInstrument?: Maybe<Array<SepProposal>>;
-  seps?: Maybe<SePsQueryResult>;
-  templateCategories?: Maybe<Array<TemplateCategory>>;
-  template?: Maybe<Template>;
-  user?: Maybe<User>;
-  me?: Maybe<User>;
-  users?: Maybe<UserQueryResult>;
+  calls: Maybe<Array<Call>>;
+  proposals: Maybe<ProposalsQueryResult>;
+  templates: Maybe<Array<Template>>;
+  basicUserDetails: Maybe<BasicUserDetails>;
+  blankProposal: Maybe<Proposal>;
+  call: Maybe<Call>;
+  checkEmailExist: Maybe<Scalars['Boolean']>;
+  eventLogs: Maybe<Array<EventLog>>;
+  fileMetadata: Maybe<Array<FileMetadata>>;
+  getFields: Maybe<Fields>;
+  getOrcIDInformation: Maybe<OrcIdInformation>;
+  getPageContent: Maybe<Scalars['String']>;
+  institutions: Maybe<Array<Institution>>;
+  instrument: Maybe<Instrument>;
+  instruments: Maybe<InstrumentsQueryResult>;
+  instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
+  isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
+  proposal: Maybe<Proposal>;
+  proposalTemplates: Maybe<Array<ProposalTemplate>>;
+  questionary: Maybe<Questionary>;
+  review: Maybe<Review>;
+  roles: Maybe<Array<Role>>;
+  sep: Maybe<Sep>;
+  sepMembers: Maybe<Array<SepMember>>;
+  sepProposals: Maybe<Array<SepProposal>>;
+  sepProposalsByInstrument: Maybe<Array<SepProposal>>;
+  seps: Maybe<SePsQueryResult>;
+  templateCategories: Maybe<Array<TemplateCategory>>;
+  template: Maybe<Template>;
+  user: Maybe<User>;
+  me: Maybe<User>;
+  users: Maybe<UserQueryResult>;
 };
 
 
@@ -1144,7 +1144,7 @@ export type Question = {
 
 export type Questionary = {
   __typename?: 'Questionary';
-  questionaryId?: Maybe<Scalars['Int']>;
+  questionaryId: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
   created: Scalars['DateTime'];
   steps: Array<QuestionaryStep>;
@@ -1152,8 +1152,8 @@ export type Questionary = {
 
 export type QuestionaryResponseWrap = {
   __typename?: 'QuestionaryResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  questionary?: Maybe<Questionary>;
+  error: Maybe<Scalars['String']>;
+  questionary: Maybe<Questionary>;
 };
 
 export type QuestionaryStep = {
@@ -1165,14 +1165,14 @@ export type QuestionaryStep = {
 
 export type QuestionaryStepResponseWrap = {
   __typename?: 'QuestionaryStepResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  questionaryStep?: Maybe<QuestionaryStep>;
+  error: Maybe<Scalars['String']>;
+  questionaryStep: Maybe<QuestionaryStep>;
 };
 
 export type QuestionResponseWrap = {
   __typename?: 'QuestionResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  question?: Maybe<Question>;
+  error: Maybe<Scalars['String']>;
+  question: Maybe<Question>;
 };
 
 export type QuestionTemplateRelation = {
@@ -1181,42 +1181,42 @@ export type QuestionTemplateRelation = {
   sortOrder: Scalars['Int'];
   topicId: Scalars['Int'];
   config: FieldConfig;
-  dependency?: Maybe<FieldDependency>;
+  dependency: Maybe<FieldDependency>;
 };
 
 export type QuestionTemplateRelationResponseWrap = {
   __typename?: 'QuestionTemplateRelationResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  questionTemplateRelation?: Maybe<QuestionTemplateRelation>;
+  error: Maybe<Scalars['String']>;
+  questionTemplateRelation: Maybe<QuestionTemplateRelation>;
 };
 
 export type ResetPasswordEmailResponseWrap = {
   __typename?: 'ResetPasswordEmailResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
+  error: Maybe<Scalars['String']>;
+  success: Maybe<Scalars['Boolean']>;
 };
 
 export type ResponseWrapBase = {
   __typename?: 'ResponseWrapBase';
-  error?: Maybe<Scalars['String']>;
+  error: Maybe<Scalars['String']>;
 };
 
 export type Review = {
   __typename?: 'Review';
   id: Scalars['Int'];
   userID: Scalars['Int'];
-  comment?: Maybe<Scalars['String']>;
-  grade?: Maybe<Scalars['Int']>;
+  comment: Maybe<Scalars['String']>;
+  grade: Maybe<Scalars['Int']>;
   status: ReviewStatus;
   sepID: Scalars['Int'];
-  reviewer?: Maybe<User>;
-  proposal?: Maybe<Proposal>;
+  reviewer: Maybe<User>;
+  proposal: Maybe<Proposal>;
 };
 
 export type ReviewResponseWrap = {
   __typename?: 'ReviewResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  review?: Maybe<Review>;
+  error: Maybe<Scalars['String']>;
+  review: Maybe<Review>;
 };
 
 export enum ReviewStatus {
@@ -1252,15 +1252,15 @@ export type Sep = {
 export type SepAssignment = {
   __typename?: 'SEPAssignment';
   proposalId: Scalars['Int'];
-  sepMemberUserId?: Maybe<Scalars['Int']>;
+  sepMemberUserId: Maybe<Scalars['Int']>;
   sepId: Scalars['Int'];
   dateAssigned: Scalars['DateTime'];
   reassigned: Scalars['Boolean'];
-  dateReassigned?: Maybe<Scalars['DateTime']>;
+  dateReassigned: Maybe<Scalars['DateTime']>;
   emailSent: Scalars['Boolean'];
   proposal: Proposal;
   roles: Array<Role>;
-  user?: Maybe<BasicUserDetails>;
+  user: Maybe<BasicUserDetails>;
   review: Review;
 };
 
@@ -1276,8 +1276,8 @@ export type SepMember = {
 
 export type SepMembersRoleResponseWrap = {
   __typename?: 'SEPMembersRoleResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  success?: Maybe<Scalars['Boolean']>;
+  error: Maybe<Scalars['String']>;
+  success: Maybe<Scalars['Boolean']>;
 };
 
 export type SepProposal = {
@@ -1286,13 +1286,13 @@ export type SepProposal = {
   sepId: Scalars['Int'];
   dateAssigned: Scalars['DateTime'];
   proposal: Proposal;
-  assignments?: Maybe<Array<SepAssignment>>;
+  assignments: Maybe<Array<SepAssignment>>;
 };
 
 export type SepResponseWrap = {
   __typename?: 'SEPResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  sep?: Maybe<Sep>;
+  error: Maybe<Scalars['String']>;
+  sep: Maybe<Sep>;
 };
 
 export type SePsQueryResult = {
@@ -1306,32 +1306,32 @@ export type SubtemplateConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
-  maxEntries?: Maybe<Scalars['Int']>;
+  maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
   addEntryButtonLabel: Scalars['String'];
 };
 
 export type SuccessResponseWrap = {
   __typename?: 'SuccessResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  isSuccess?: Maybe<Scalars['Boolean']>;
+  error: Maybe<Scalars['String']>;
+  isSuccess: Maybe<Scalars['Boolean']>;
 };
 
 export type TechnicalReview = {
   __typename?: 'TechnicalReview';
   id: Scalars['Int'];
   proposalID: Scalars['Int'];
-  comment?: Maybe<Scalars['String']>;
-  publicComment?: Maybe<Scalars['String']>;
-  timeAllocation?: Maybe<Scalars['Int']>;
-  status?: Maybe<TechnicalReviewStatus>;
-  proposal?: Maybe<Proposal>;
+  comment: Maybe<Scalars['String']>;
+  publicComment: Maybe<Scalars['String']>;
+  timeAllocation: Maybe<Scalars['Int']>;
+  status: Maybe<TechnicalReviewStatus>;
+  proposal: Maybe<Proposal>;
 };
 
 export type TechnicalReviewResponseWrap = {
   __typename?: 'TechnicalReviewResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  technicalReview?: Maybe<TechnicalReview>;
+  error: Maybe<Scalars['String']>;
+  technicalReview: Maybe<TechnicalReview>;
 };
 
 export enum TechnicalReviewStatus {
@@ -1345,7 +1345,7 @@ export type Template = {
   templateId: Scalars['Int'];
   categoryId: TemplateCategoryId;
   name: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
   isArchived: Scalars['Boolean'];
   steps: Array<TemplateStep>;
   complementaryQuestions: Array<Question>;
@@ -1364,8 +1364,8 @@ export enum TemplateCategoryId {
 
 export type TemplateResponseWrap = {
   __typename?: 'TemplateResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  template?: Maybe<Template>;
+  error: Maybe<Scalars['String']>;
+  template: Maybe<Template>;
 };
 
 export type TemplatesFilter = {
@@ -1384,18 +1384,18 @@ export type TextInputConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
-  min?: Maybe<Scalars['Int']>;
-  max?: Maybe<Scalars['Int']>;
+  min: Maybe<Scalars['Int']>;
+  max: Maybe<Scalars['Int']>;
   multiline: Scalars['Boolean'];
   placeholder: Scalars['String'];
-  htmlQuestion?: Maybe<Scalars['String']>;
+  htmlQuestion: Maybe<Scalars['String']>;
   isHtmlQuestion: Scalars['Boolean'];
 };
 
 export type TokenResponseWrap = {
   __typename?: 'TokenResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  token?: Maybe<Scalars['String']>;
+  error: Maybe<Scalars['String']>;
+  token: Maybe<Scalars['String']>;
 };
 
 export type Topic = {
@@ -1408,35 +1408,35 @@ export type Topic = {
 
 export type TopicResponseWrap = {
   __typename?: 'TopicResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  topic?: Maybe<Topic>;
+  error: Maybe<Scalars['String']>;
+  topic: Maybe<Topic>;
 };
 
 export type UpdateAnswerResponseWrap = {
   __typename?: 'UpdateAnswerResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  questionId?: Maybe<Scalars['String']>;
+  error: Maybe<Scalars['String']>;
+  questionId: Maybe<Scalars['String']>;
 };
 
 export type UpdateTopicOrderResponseWrap = {
   __typename?: 'UpdateTopicOrderResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  topicOrder?: Maybe<Array<Scalars['Int']>>;
+  error: Maybe<Scalars['String']>;
+  topicOrder: Maybe<Array<Scalars['Int']>>;
 };
 
 export type User = {
   __typename?: 'User';
   id: Scalars['Int'];
-  user_title?: Maybe<Scalars['String']>;
+  user_title: Maybe<Scalars['String']>;
   firstname: Scalars['String'];
-  middlename?: Maybe<Scalars['String']>;
+  middlename: Maybe<Scalars['String']>;
   lastname: Scalars['String'];
   username: Scalars['String'];
-  preferredname?: Maybe<Scalars['String']>;
+  preferredname: Maybe<Scalars['String']>;
   orcid: Scalars['String'];
   refreshToken: Scalars['String'];
   gender: Scalars['String'];
-  nationality?: Maybe<Scalars['Int']>;
+  nationality: Maybe<Scalars['Int']>;
   birthdate: Scalars['String'];
   organisation: Scalars['Int'];
   department: Scalars['String'];
@@ -1444,7 +1444,7 @@ export type User = {
   email: Scalars['String'];
   emailVerified: Scalars['Boolean'];
   telephone: Scalars['String'];
-  telephone_alt?: Maybe<Scalars['String']>;
+  telephone_alt: Maybe<Scalars['String']>;
   placeholder: Scalars['Boolean'];
   created: Scalars['String'];
   updated: Scalars['String'];
@@ -1462,8 +1462,8 @@ export type UserQueryResult = {
 
 export type UserResponseWrap = {
   __typename?: 'UserResponseWrap';
-  error?: Maybe<Scalars['String']>;
-  user?: Maybe<User>;
+  error: Maybe<Scalars['String']>;
+  user: Maybe<User>;
 };
 
 export enum UserRole {
@@ -1487,7 +1487,7 @@ export type AssignProposalMutation = (
   & { assignProposal: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1505,7 +1505,7 @@ export type AssignMemberMutation = (
   & { assignMember: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1522,7 +1522,7 @@ export type AssignChairOrSecretaryMutation = (
   & { assignChairOrSecretary: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1541,7 +1541,7 @@ export type AssignMemberToSepProposalMutation = (
   & { assignMemberToSEPProposal: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1561,7 +1561,7 @@ export type CreateSepMutation = (
   & { createSEP: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
     )> }
@@ -1576,7 +1576,7 @@ export type GetInstrumentsBySepQueryVariables = Exact<{
 
 export type GetInstrumentsBySepQuery = (
   { __typename?: 'Query' }
-  & { instrumentsBySep?: Maybe<Array<(
+  & { instrumentsBySep: Maybe<Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
     & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
     & { scientists: Array<(
@@ -1591,7 +1591,7 @@ export type GetUserSepsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUserSepsQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & { seps: Array<(
       { __typename?: 'SEP' }
@@ -1607,7 +1607,7 @@ export type GetSepQueryVariables = Exact<{
 
 export type GetSepQuery = (
   { __typename?: 'Query' }
-  & { sep?: Maybe<(
+  & { sep: Maybe<(
     { __typename?: 'SEP' }
     & Pick<Sep, 'id' | 'code' | 'description' | 'numberRatingsRequired' | 'active'>
   )> }
@@ -1620,7 +1620,7 @@ export type GetSepMembersQueryVariables = Exact<{
 
 export type GetSepMembersQuery = (
   { __typename?: 'Query' }
-  & { sepMembers?: Maybe<Array<(
+  & { sepMembers: Maybe<Array<(
     { __typename?: 'SEPMember' }
     & Pick<SepMember, 'roleUserId' | 'roleId' | 'userId' | 'sepId'>
     & { roles: Array<(
@@ -1641,16 +1641,16 @@ export type GetSepProposalsQueryVariables = Exact<{
 
 export type GetSepProposalsQuery = (
   { __typename?: 'Query' }
-  & { sepProposals?: Maybe<Array<(
+  & { sepProposals: Maybe<Array<(
     { __typename?: 'SEPProposal' }
     & Pick<SepProposal, 'proposalId' | 'dateAssigned' | 'sepId'>
     & { proposal: (
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'title' | 'id' | 'shortCode' | 'status'>
-    ), assignments?: Maybe<Array<(
+    ), assignments: Maybe<Array<(
       { __typename?: 'SEPAssignment' }
       & Pick<SepAssignment, 'sepMemberUserId' | 'dateAssigned'>
-      & { user?: Maybe<(
+      & { user: Maybe<(
         { __typename?: 'BasicUserDetails' }
         & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
       )>, roles: Array<(
@@ -1673,15 +1673,15 @@ export type SepProposalsByInstrumentQueryVariables = Exact<{
 
 export type SepProposalsByInstrumentQuery = (
   { __typename?: 'Query' }
-  & { sepProposalsByInstrument?: Maybe<Array<(
+  & { sepProposalsByInstrument: Maybe<Array<(
     { __typename?: 'SEPProposal' }
     & { proposal: (
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder' | 'status'>
-      & { reviews?: Maybe<Array<(
+      & { reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'comment' | 'grade' | 'status'>
-      )>>, technicalReview?: Maybe<(
+      )>>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
         & Pick<TechnicalReview, 'publicComment' | 'status' | 'timeAllocation'>
       )> }
@@ -1697,7 +1697,7 @@ export type GetSePsQueryVariables = Exact<{
 
 export type GetSePsQuery = (
   { __typename?: 'Query' }
-  & { seps?: Maybe<(
+  & { seps: Maybe<(
     { __typename?: 'SEPsQueryResult' }
     & Pick<SePsQueryResult, 'totalCount'>
     & { seps: Array<(
@@ -1718,7 +1718,7 @@ export type RemoveProposalAssignmentMutation = (
   & { removeProposalAssignment: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1736,7 +1736,7 @@ export type RemoveMemberMutation = (
   & { removeMember: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1755,7 +1755,7 @@ export type RemoveMemberFromSepProposalMutation = (
   & { removeMemberFromSEPProposal: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1776,7 +1776,7 @@ export type UpdateSepMutation = (
   & { updateSEP: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
-    & { sep?: Maybe<(
+    & { sep: Maybe<(
       { __typename?: 'SEP' }
       & Pick<Sep, 'id'>
     )> }
@@ -1807,7 +1807,7 @@ export type CreateInstitutionMutation = (
   & { createInstitution: (
     { __typename?: 'InstitutionResponseWrap' }
     & Pick<InstitutionResponseWrap, 'error'>
-    & { institution?: Maybe<(
+    & { institution: Maybe<(
       { __typename?: 'Institution' }
       & Pick<Institution, 'id' | 'name' | 'verified'>
     )> }
@@ -1824,7 +1824,7 @@ export type DeleteInstitutionMutation = (
   & { deleteInstitution: (
     { __typename?: 'InstitutionResponseWrap' }
     & Pick<InstitutionResponseWrap, 'error'>
-    & { institution?: Maybe<(
+    & { institution: Maybe<(
       { __typename?: 'Institution' }
       & Pick<Institution, 'id' | 'verified'>
     )> }
@@ -1838,7 +1838,7 @@ export type GetInstitutionsQueryVariables = Exact<{
 
 export type GetInstitutionsQuery = (
   { __typename?: 'Query' }
-  & { institutions?: Maybe<Array<(
+  & { institutions: Maybe<Array<(
     { __typename?: 'Institution' }
     & Pick<Institution, 'id' | 'name' | 'verified'>
   )>> }
@@ -1865,7 +1865,7 @@ export type SetPageContentMutation = (
   & { setPageContent: (
     { __typename?: 'PageResponseWrap' }
     & Pick<PageResponseWrap, 'error'>
-    & { page?: Maybe<(
+    & { page: Maybe<(
       { __typename?: 'Page' }
       & Pick<Page, 'id' | 'content'>
     )> }
@@ -1884,7 +1884,7 @@ export type UpdateInstitutionMutation = (
   & { updateInstitution: (
     { __typename?: 'InstitutionResponseWrap' }
     & Pick<InstitutionResponseWrap, 'error'>
-    & { institution?: Maybe<(
+    & { institution: Maybe<(
       { __typename?: 'Institution' }
       & Pick<Institution, 'id' | 'verified' | 'name'>
     )> }
@@ -1902,7 +1902,7 @@ export type AssignInstrumentToCallMutation = (
   & { assignInstrumentToCall: (
     { __typename?: 'CallResponseWrap' }
     & Pick<CallResponseWrap, 'error'>
-    & { call?: Maybe<(
+    & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id'>
     )> }
@@ -1930,7 +1930,7 @@ export type CreateCallMutation = (
   & { createCall: (
     { __typename?: 'CallResponseWrap' }
     & Pick<CallResponseWrap, 'error'>
-    & { call?: Maybe<(
+    & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
@@ -1948,7 +1948,7 @@ export type GetCallsQueryVariables = Exact<{
 
 export type GetCallsQuery = (
   { __typename?: 'Query' }
-  & { calls?: Maybe<Array<(
+  & { calls: Maybe<Array<(
     { __typename?: 'Call' }
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
     & { instruments: Array<(
@@ -1973,7 +1973,7 @@ export type RemoveAssignedInstrumentFromcallMutation = (
   & { removeAssignedInstrumentFromcall: (
     { __typename?: 'CallResponseWrap' }
     & Pick<CallResponseWrap, 'error'>
-    & { call?: Maybe<(
+    & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id'>
     )> }
@@ -2002,7 +2002,7 @@ export type UpdateCallMutation = (
   & { updateCall: (
     { __typename?: 'CallResponseWrap' }
     & Pick<CallResponseWrap, 'error'>
-    & { call?: Maybe<(
+    & { call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
       & { instruments: Array<(
@@ -2021,7 +2021,7 @@ export type GetEventLogsQueryVariables = Exact<{
 
 export type GetEventLogsQuery = (
   { __typename?: 'Query' }
-  & { eventLogs?: Maybe<Array<(
+  & { eventLogs: Maybe<Array<(
     { __typename?: 'EventLog' }
     & Pick<EventLog, 'id' | 'eventType' | 'eventTStamp' | 'rowData' | 'changedObjectId'>
     & { changedBy: (
@@ -2071,7 +2071,7 @@ export type CreateInstrumentMutation = (
   & { createInstrument: (
     { __typename?: 'InstrumentResponseWrap' }
     & Pick<InstrumentResponseWrap, 'error'>
-    & { instrument?: Maybe<(
+    & { instrument: Maybe<(
       { __typename?: 'Instrument' }
       & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
@@ -2100,7 +2100,7 @@ export type GetInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetInstrumentsQuery = (
   { __typename?: 'Query' }
-  & { instruments?: Maybe<(
+  & { instruments: Maybe<(
     { __typename?: 'InstrumentsQueryResult' }
     & Pick<InstrumentsQueryResult, 'totalCount'>
     & { instruments: Array<(
@@ -2170,7 +2170,7 @@ export type UpdateInstrumentMutation = (
   & { updateInstrument: (
     { __typename?: 'InstrumentResponseWrap' }
     & Pick<InstrumentResponseWrap, 'error'>
-    & { instrument?: Maybe<(
+    & { instrument: Maybe<(
       { __typename?: 'Instrument' }
       & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
       & { scientists: Array<(
@@ -2196,7 +2196,7 @@ export type AdministrationProposalMutation = (
   & { administrationProposal: (
     { __typename?: 'ProposalResponseWrap' }
     & Pick<ProposalResponseWrap, 'error'>
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
@@ -2213,7 +2213,7 @@ export type CreateProposalMutation = (
   & { createProposal: (
     { __typename?: 'ProposalResponseWrap' }
     & Pick<ProposalResponseWrap, 'error'>
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
     )> }
@@ -2229,11 +2229,16 @@ export type DeleteProposalMutation = (
   { __typename?: 'Mutation' }
   & { deleteProposal: (
     { __typename?: 'ProposalResponseWrap' }
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
   ) }
+);
+
+export type CoreTechnicalReviewFragment = (
+  { __typename?: 'TechnicalReview' }
+  & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
 );
 
 export type ProposalFragment = (
@@ -2248,7 +2253,7 @@ export type GetBlankProposalQueryVariables = Exact<{
 
 export type GetBlankProposalQuery = (
   { __typename?: 'Query' }
-  & { blankProposal?: Maybe<(
+  & { blankProposal: Maybe<(
     { __typename?: 'Proposal' }
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
@@ -2259,10 +2264,10 @@ export type GetBlankProposalQuery = (
     ), users: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
-    )>, reviews?: Maybe<Array<(
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-      & { reviewer?: Maybe<(
+      & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
@@ -2278,7 +2283,7 @@ export type GetProposalQueryVariables = Exact<{
 
 export type GetProposalQuery = (
   { __typename?: 'Query' }
-  & { proposal?: Maybe<(
+  & { proposal: Maybe<(
     { __typename?: 'Proposal' }
     & { proposer: (
       { __typename?: 'BasicUserDetails' }
@@ -2289,20 +2294,20 @@ export type GetProposalQuery = (
     )>, questionary: (
       { __typename?: 'Questionary' }
       & QuestionaryFragment
-    ), technicalReview?: Maybe<(
+    ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
-      & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
-    )>, reviews?: Maybe<Array<(
+      & CoreTechnicalReviewFragment
+    )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-      & { reviewer?: Maybe<(
+      & { reviewer: Maybe<(
         { __typename?: 'User' }
         & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
       )> }
-    )>>, instrument?: Maybe<(
+    )>>, instrument: Maybe<(
       { __typename?: 'Instrument' }
       & Pick<Instrument, 'id' | 'name' | 'shortCode'>
-    )>, call?: Maybe<(
+    )>, call: Maybe<(
       { __typename?: 'Call' }
       & Pick<Call, 'id' | 'shortCode'>
     )> }
@@ -2317,7 +2322,7 @@ export type GetProposalsQueryVariables = Exact<{
 
 export type GetProposalsQuery = (
   { __typename?: 'Query' }
-  & { proposals?: Maybe<(
+  & { proposals: Maybe<(
     { __typename?: 'ProposalsQueryResult' }
     & Pick<ProposalsQueryResult, 'totalCount'>
     & { proposals: Array<(
@@ -2325,26 +2330,26 @@ export type GetProposalsQuery = (
       & { proposer: (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      ), reviews?: Maybe<Array<(
+      ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-        & { reviewer?: Maybe<(
+        & { reviewer: Maybe<(
           { __typename?: 'User' }
           & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
         )> }
       )>>, users: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
-      )>, technicalReview?: Maybe<(
+      )>, technicalReview: Maybe<(
         { __typename?: 'TechnicalReview' }
         & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
-      )>, instrument?: Maybe<(
+      )>, instrument: Maybe<(
         { __typename?: 'Instrument' }
         & Pick<Instrument, 'id' | 'name'>
-      )>, call?: Maybe<(
+      )>, call: Maybe<(
         { __typename?: 'Call' }
         & Pick<Call, 'id' | 'shortCode'>
-      )>, sep?: Maybe<(
+      )>, sep: Maybe<(
         { __typename?: 'SEP' }
         & Pick<Sep, 'id' | 'code'>
       )> }
@@ -2363,7 +2368,7 @@ export type NotifyProposalMutation = (
   & { notifyProposal: (
     { __typename?: 'ProposalResponseWrap' }
     & Pick<ProposalResponseWrap, 'error'>
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
@@ -2380,7 +2385,7 @@ export type SubmitProposalMutation = (
   & { submitProposal: (
     { __typename?: 'ProposalResponseWrap' }
     & Pick<ProposalResponseWrap, 'error'>
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
@@ -2401,7 +2406,7 @@ export type UpdateProposalMutation = (
   & { updateProposal: (
     { __typename?: 'ProposalResponseWrap' }
     & Pick<ProposalResponseWrap, 'error'>
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
     )> }
@@ -2421,7 +2426,7 @@ export type AnswerTopicMutation = (
   & { answerTopic: (
     { __typename?: 'QuestionaryStepResponseWrap' }
     & Pick<QuestionaryStepResponseWrap, 'error'>
-    & { questionaryStep?: Maybe<(
+    & { questionaryStep: Maybe<(
       { __typename?: 'QuestionaryStep' }
       & QuestionaryStepFragment
     )> }
@@ -2438,7 +2443,7 @@ export type CreateQuestionaryMutation = (
   & { createQuestionary: (
     { __typename?: 'QuestionaryResponseWrap' }
     & Pick<QuestionaryResponseWrap, 'error'>
-    & { questionary?: Maybe<(
+    & { questionary: Maybe<(
       { __typename?: 'Questionary' }
       & QuestionaryFragment
     )> }
@@ -2472,7 +2477,7 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
-  ), dependency?: Maybe<(
+  ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
     & { condition: (
@@ -2510,7 +2515,7 @@ export type GetFileMetadataQueryVariables = Exact<{
 
 export type GetFileMetadataQuery = (
   { __typename?: 'Query' }
-  & { fileMetadata?: Maybe<Array<(
+  & { fileMetadata: Maybe<Array<(
     { __typename?: 'FileMetadata' }
     & Pick<FileMetadata, 'fileId' | 'originalFileName' | 'mimeType' | 'sizeInBytes' | 'createdDate'>
   )>> }
@@ -2523,7 +2528,7 @@ export type GetQuestionaryQueryVariables = Exact<{
 
 export type GetQuestionaryQuery = (
   { __typename?: 'Query' }
-  & { questionary?: Maybe<(
+  & { questionary: Maybe<(
     { __typename?: 'Questionary' }
     & QuestionaryFragment
   )> }
@@ -2543,7 +2548,7 @@ export type AddTechnicalReviewMutation = (
   & { addTechnicalReview: (
     { __typename?: 'TechnicalReviewResponseWrap' }
     & Pick<TechnicalReviewResponseWrap, 'error'>
-    & { technicalReview?: Maybe<(
+    & { technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
       & Pick<TechnicalReview, 'id'>
     )> }
@@ -2562,7 +2567,7 @@ export type AddUserForReviewMutation = (
   & { addUserForReview: (
     { __typename?: 'ReviewResponseWrap' }
     & Pick<ReviewResponseWrap, 'error'>
-    & { review?: Maybe<(
+    & { review: Maybe<(
       { __typename?: 'Review' }
       & Pick<Review, 'id'>
     )> }
@@ -2581,9 +2586,9 @@ export type GetReviewQueryVariables = Exact<{
 
 export type GetReviewQuery = (
   { __typename?: 'Query' }
-  & { review?: Maybe<(
+  & { review: Maybe<(
     { __typename?: 'Review' }
-    & { proposal?: Maybe<(
+    & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'title' | 'abstract'>
       & { proposer: (
@@ -2622,7 +2627,7 @@ export type UpdateReviewMutation = (
   & { addReview: (
     { __typename?: 'ReviewResponseWrap' }
     & Pick<ReviewResponseWrap, 'error'>
-    & { review?: Maybe<(
+    & { review: Maybe<(
       { __typename?: 'Review' }
       & CoreReviewFragment
     )> }
@@ -2634,13 +2639,13 @@ export type UserWithReviewsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type UserWithReviewsQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'id' | 'firstname' | 'lastname' | 'organisation'>
     & { reviews: Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'sepID'>
-      & { proposal?: Maybe<(
+      & { proposal: Maybe<(
         { __typename?: 'Proposal' }
         & Pick<Proposal, 'id' | 'title' | 'shortCode'>
       )> }
@@ -2673,7 +2678,7 @@ export type CloneTemplateMutation = (
   & { cloneTemplate: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateMetadataFragment
     )> }
@@ -2692,7 +2697,7 @@ export type CreateTemplateMutation = (
   & { createTemplate: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateMetadataFragment
     )> }
@@ -2710,7 +2715,7 @@ export type CreateQuestionMutation = (
   & { createQuestion: (
     { __typename?: 'QuestionResponseWrap' }
     & Pick<QuestionResponseWrap, 'error'>
-    & { question?: Maybe<(
+    & { question: Maybe<(
       { __typename?: 'Question' }
       & QuestionFragment
     )> }
@@ -2730,7 +2735,7 @@ export type CreateQuestionTemplateRelationMutation = (
   & { createQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
@@ -2748,7 +2753,7 @@ export type CreateTopicMutation = (
   & { createTopic: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
@@ -2765,7 +2770,7 @@ export type DeleteQuestionMutation = (
   & { deleteQuestion: (
     { __typename?: 'QuestionResponseWrap' }
     & Pick<QuestionResponseWrap, 'error'>
-    & { question?: Maybe<(
+    & { question: Maybe<(
       { __typename?: 'Question' }
       & QuestionFragment
     )> }
@@ -2783,7 +2788,7 @@ export type DeleteQuestionTemplateRelationMutation = (
   & { deleteQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
@@ -2800,7 +2805,7 @@ export type DeleteTemplateMutation = (
   & { deleteTemplate: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & Pick<Template, 'templateId' | 'name'>
     )> }
@@ -2916,7 +2921,7 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
-  ), dependency?: Maybe<(
+  ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
     & { condition: (
@@ -2982,7 +2987,7 @@ export type GetProposalTemplatesQueryVariables = Exact<{
 
 export type GetProposalTemplatesQuery = (
   { __typename?: 'Query' }
-  & { proposalTemplates?: Maybe<Array<(
+  & { proposalTemplates: Maybe<Array<(
     { __typename?: 'ProposalTemplate' }
     & Pick<ProposalTemplate, 'templateId' | 'name' | 'description' | 'isArchived' | 'proposalCount' | 'callCount'>
   )>> }
@@ -2995,7 +3000,7 @@ export type GetTemplateQueryVariables = Exact<{
 
 export type GetTemplateQuery = (
   { __typename?: 'Query' }
-  & { template?: Maybe<(
+  & { template: Maybe<(
     { __typename?: 'Template' }
     & TemplateFragment
   )> }
@@ -3008,7 +3013,7 @@ export type GetTemplatesQueryVariables = Exact<{
 
 export type GetTemplatesQuery = (
   { __typename?: 'Query' }
-  & { templates?: Maybe<Array<(
+  & { templates: Maybe<Array<(
     { __typename?: 'Template' }
     & Pick<Template, 'templateId' | 'name' | 'description' | 'isArchived'>
   )>> }
@@ -3027,7 +3032,7 @@ export type UpdateQuestionMutation = (
   & { updateQuestion: (
     { __typename?: 'QuestionResponseWrap' }
     & Pick<QuestionResponseWrap, 'error'>
-    & { question?: Maybe<(
+    & { question: Maybe<(
       { __typename?: 'Question' }
       & QuestionFragment
     )> }
@@ -3049,7 +3054,7 @@ export type UpdateQuestionTemplateRelationMutation = (
   & { updateQuestionTemplateRelation: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateFragment
     )> }
@@ -3069,7 +3074,7 @@ export type UpdateTemplateMutation = (
   & { updateTemplate: (
     { __typename?: 'TemplateResponseWrap' }
     & Pick<TemplateResponseWrap, 'error'>
-    & { template?: Maybe<(
+    & { template: Maybe<(
       { __typename?: 'Template' }
       & TemplateMetadataFragment
     )> }
@@ -3088,7 +3093,7 @@ export type UpdateTopicMutation = (
   & { updateTopic: (
     { __typename?: 'TopicResponseWrap' }
     & Pick<TopicResponseWrap, 'error'>
-    & { topic?: Maybe<(
+    & { topic: Maybe<(
       { __typename?: 'Topic' }
       & TopicFragment
     )> }
@@ -3136,7 +3141,7 @@ export type CreateUserMutation = (
   & { createUser: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
-    & { user?: Maybe<(
+    & { user: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id'>
     )> }
@@ -3169,7 +3174,7 @@ export type DeleteUserMutation = (
   & { deleteUser: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
-    & { user?: Maybe<(
+    & { user: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id'>
     )> }
@@ -3178,7 +3183,7 @@ export type DeleteUserMutation = (
 
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'created' | 'placeholder'>
 );
 
 export type GetBasicUserDetailsQueryVariables = Exact<{
@@ -3188,7 +3193,7 @@ export type GetBasicUserDetailsQueryVariables = Exact<{
 
 export type GetBasicUserDetailsQuery = (
   { __typename?: 'Query' }
-  & { basicUserDetails?: Maybe<(
+  & { basicUserDetails: Maybe<(
     { __typename?: 'BasicUserDetails' }
     & BasicUserDetailsFragment
   )> }
@@ -3199,13 +3204,13 @@ export type GetFieldsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetFieldsQuery = (
   { __typename?: 'Query' }
-  & { getFields?: Maybe<(
+  & { getFields: Maybe<(
     { __typename?: 'Fields' }
     & { nationalities: Array<(
       { __typename?: 'Entry' }
       & Pick<Entry, 'id' | 'value'>
     )> }
-  )>, institutions?: Maybe<Array<(
+  )>, institutions: Maybe<Array<(
     { __typename?: 'Institution' }
     & Pick<Institution, 'id' | 'name'>
   )>> }
@@ -3216,7 +3221,7 @@ export type GetMyRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMyRolesQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'firstname' | 'lastname'>
     & { roles: Array<(
@@ -3233,7 +3238,7 @@ export type GetOrcIdInformationQueryVariables = Exact<{
 
 export type GetOrcIdInformationQuery = (
   { __typename?: 'Query' }
-  & { getOrcIDInformation?: Maybe<(
+  & { getOrcIDInformation: Maybe<(
     { __typename?: 'OrcIDInformation' }
     & Pick<OrcIdInformation, 'firstname' | 'lastname' | 'orcid' | 'orcidHash' | 'refreshToken' | 'token'>
   )> }
@@ -3244,7 +3249,7 @@ export type GetRolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetRolesQuery = (
   { __typename?: 'Query' }
-  & { roles?: Maybe<Array<(
+  & { roles: Maybe<Array<(
     { __typename?: 'Role' }
     & Pick<Role, 'id' | 'shortCode' | 'title'>
   )>> }
@@ -3283,7 +3288,7 @@ export type GetUserQueryVariables = Exact<{
 
 export type GetUserQuery = (
   { __typename?: 'Query' }
-  & { user?: Maybe<(
+  & { user: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'user_title' | 'username' | 'firstname' | 'middlename' | 'lastname' | 'preferredname' | 'gender' | 'nationality' | 'birthdate' | 'organisation' | 'department' | 'position' | 'email' | 'telephone' | 'telephone_alt' | 'orcid'>
   )> }
@@ -3294,7 +3299,7 @@ export type GetUserMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUserMeQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'user_title' | 'username' | 'firstname' | 'middlename' | 'lastname' | 'preferredname' | 'gender' | 'nationality' | 'birthdate' | 'organisation' | 'department' | 'position' | 'email' | 'telephone' | 'telephone_alt' | 'orcid'>
   )> }
@@ -3305,7 +3310,7 @@ export type GetUserProposalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUserProposalsQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
+  & { me: Maybe<(
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
@@ -3321,7 +3326,7 @@ export type GetUserWithRolesQueryVariables = Exact<{
 
 export type GetUserWithRolesQuery = (
   { __typename?: 'Query' }
-  & { user?: Maybe<(
+  & { user: Maybe<(
     { __typename?: 'User' }
     & Pick<User, 'firstname' | 'lastname'>
     & { roles: Array<(
@@ -3342,7 +3347,7 @@ export type GetUsersQueryVariables = Exact<{
 
 export type GetUsersQuery = (
   { __typename?: 'Query' }
-  & { users?: Maybe<(
+  & { users: Maybe<(
     { __typename?: 'UserQueryResult' }
     & Pick<UserQueryResult, 'totalCount'>
     & { users: Array<(
@@ -3445,7 +3450,7 @@ export type UpdateUserMutation = (
   & { updateUser: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
-    & { user?: Maybe<(
+    & { user: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id'>
     )> }
@@ -3463,7 +3468,7 @@ export type UpdateUserRolesMutation = (
   & { updateUser: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
-    & { user?: Maybe<(
+    & { user: Maybe<(
       { __typename?: 'User' }
       & Pick<User, 'id'>
     )> }
@@ -3483,6 +3488,16 @@ export type VerifyEmailMutation = (
   ) }
 );
 
+export const CoreTechnicalReviewFragmentDoc = gql`
+    fragment coreTechnicalReview on TechnicalReview {
+  id
+  comment
+  publicComment
+  timeAllocation
+  status
+  proposalID
+}
+    `;
 export const ProposalFragmentDoc = gql`
     fragment proposal on Proposal {
   id
@@ -3710,6 +3725,8 @@ export const BasicUserDetailsFragmentDoc = gql`
   lastname
   organisation
   position
+  created
+  placeholder
 }
     `;
 export const AssignProposalDocument = gql`
@@ -4306,12 +4323,7 @@ export const GetProposalDocument = gql`
       ...questionary
     }
     technicalReview {
-      id
-      comment
-      publicComment
-      timeAllocation
-      status
-      proposalID
+      ...coreTechnicalReview
     }
     reviews {
       id
@@ -4340,7 +4352,8 @@ export const GetProposalDocument = gql`
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
+${QuestionaryFragmentDoc}
+${CoreTechnicalReviewFragmentDoc}`;
 export const GetProposalsDocument = gql`
     query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
