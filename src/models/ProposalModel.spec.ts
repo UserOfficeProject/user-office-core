@@ -55,6 +55,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
         fields: [
           {
             topicId: 0,
+            dependency: null,
             config: {
               html: 'General information',
               plain: 'General information',
@@ -82,6 +83,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
           },
           {
             topicId: 0,
+            dependency: null,
             config: {
               variant: 'radio',
               options: ['yes', 'no'],
@@ -187,7 +189,7 @@ export const createDummyField = (values: {
       max: 0,
     },
   },
-  dependency: values.dependency,
+  dependency: values.dependency ?? null,
 });
 
 test('Can parse object', () => {
