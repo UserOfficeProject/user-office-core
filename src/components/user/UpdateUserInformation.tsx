@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +16,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
 import { UserContext } from 'context/UserContextProvider';
-import { UpdateUserMutationVariables } from 'generated/sdk';
+import { UpdateUserMutationVariables, User } from 'generated/sdk';
 import { useInstitutionData } from 'hooks/admin/useInstitutionData';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
@@ -43,28 +44,52 @@ const useStyles = makeStyles({
 
 export default function UpdateUserInformation(props: { id: number }) {
   const { user } = useContext(UserContext);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<User | null>(null);
   const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
-  const { institutionData } = useInstitutionData();
+  const { institutionData, loadingInstitutions } = useInstitutionData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const { enqueueSnackbar } = useSnackbar();
+  const classes = useStyles();
 
-  if (
-    fieldsContent &&
-    institutionData &&
-    !nationalitiesList.length &&
-    !institutionsList.length
-  ) {
+  useEffect(() => {
+    const getUserInformation = (id: number) => {
+      if (user.id !== props.id) {
+        sendRequest()
+          .getUser({ id })
+          .then(data => {
+            setUserData({ ...(data.user as User) });
+          });
+      } else {
+        sendRequest()
+          .getUserMe()
+          .then(data => {
+            setUserData({ ...(data.me as User) });
+          });
+      }
+    };
+    getUserInformation(props.id);
+  }, [props.id, user.id, sendRequest]);
+
+  if (loadingInstitutions || !fieldsContent || !userData) {
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '50px' }} />
+    );
+  }
+
+  if (!institutionsList.length) {
     setInstitutionsList(
       institutionData.map(institution => {
-        return { text: institution.name, value: institution.id.toString() };
+        return { text: institution.name, value: institution.id };
       })
     );
+  }
+
+  if (!nationalitiesList.length) {
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
-        return { text: nationality.value, value: nationality.id.toString() };
+        return { text: nationality.value, value: nationality.id };
       })
     );
   }
@@ -78,30 +103,6 @@ export default function UpdateUserInformation(props: { id: number }) {
         })
       );
   };
-  useEffect(() => {
-    const getUserInformation = (id: number) => {
-      if (user.id !== props.id) {
-        sendRequest()
-          .getUser({ id })
-          .then(data => {
-            setUserData({ ...data.user });
-          });
-      } else {
-        sendRequest()
-          .getUserMe()
-          .then(data => {
-            setUserData({ ...data.me });
-          });
-      }
-    };
-    getUserInformation(props.id);
-  }, [props.id, user.id, sendRequest]);
-
-  const classes = useStyles();
-
-  if (!userData) {
-    return <p>Loading</p>;
-  }
 
   return (
     <React.Fragment>
@@ -126,7 +127,6 @@ export default function UpdateUserInformation(props: { id: number }) {
           ),
           organisation: userData.organisation,
           department: userData.department,
-          organisation_address: userData.organisation_address,
           position: userData.position,
           oldEmail: userData.email,
           email: userData.email,
@@ -139,14 +139,14 @@ export default function UpdateUserInformation(props: { id: number }) {
           const newValues = {
             id: props.id,
             ...values,
+            nationality: +(values.nationality as number),
+            organisation: +values.organisation,
             gender:
               values.gender === 'other' ? values.othergender : values.gender,
-          };
+          } as UpdateUserMutationVariables;
 
           sendUserUpdate({
             ...newValues,
-            nationality: +newValues.nationality,
-            organisation: +newValues.organisation,
           });
           actions.setFieldValue('oldEmail', values.email);
           actions.setSubmitting(false);
