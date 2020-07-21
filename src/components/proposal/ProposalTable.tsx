@@ -20,12 +20,15 @@ type ProposalTableProps = {
   search: boolean;
   /** Function for getting data. */
   searchQuery: () => Promise<UserProposalDataType>;
+  /** Loading data indicator */
+  isLoading: boolean;
 };
 
 const ProposalTable: React.FC<ProposalTableProps> = ({
   title,
   search,
   searchQuery,
+  isLoading,
 }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const [partialProposalsData, setPartialProposalsDataData] = useState<
@@ -63,6 +66,7 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
       title={title}
       columns={columns}
       data={partialProposalsData as PartialProposalsDataType[]}
+      isLoading={isLoading}
       options={{
         search: search,
         debounceInterval: 400,
@@ -97,6 +101,7 @@ ProposalTable.propTypes = {
   title: PropTypes.string.isRequired,
   search: PropTypes.bool.isRequired,
   searchQuery: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
 };
 
 export default ProposalTable;

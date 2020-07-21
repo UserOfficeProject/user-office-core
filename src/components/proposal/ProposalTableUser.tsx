@@ -1,6 +1,6 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import PropTypes from 'prop-types';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -30,6 +30,7 @@ type ProposalTableUserProps = {
 
 const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
   const api = useDataApi();
+  const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
     status: ProposalStatus;
     finalStatus?: ProposalEndStatus | null | undefined;
@@ -43,9 +44,13 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
   };
 
   const sendUserProposalRequest = useCallback(async () => {
+    setLoading(true);
+
     return api()
       .getUserProposals({ id })
       .then(data => {
+        setLoading(false);
+
         return {
           page: 0,
           totalCount: data?.me?.proposals.length,
@@ -74,6 +79,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
       title="Your proposals"
       search={false}
       searchQuery={sendUserProposalRequest}
+      isLoading={loading}
     />
   );
 };

@@ -46,11 +46,10 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
   let allocationTimeSum = 0;
-  const proposalsWithAverageScore = instrumentProposalsData
+  const sortedProposalsWithAverageScore = instrumentProposalsData
     .map(proposalData => {
-      const proposalAverageScore = average(
-        getGrades(proposalData.proposal.reviews) as number[]
-      );
+      const proposalAverageScore =
+        average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
 
       return {
         ...proposalData,
@@ -58,6 +57,11 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       };
     })
     .sort((a, b) => (a.proposalAverageScore < b.proposalAverageScore ? 1 : -1))
+    .sort((a, b) =>
+      (a.proposal.rankOrder as number) > (b.proposal?.rankOrder as number)
+        ? 1
+        : -1
+    )
     .map(proposalData => {
       const proposalAllocationTime =
         proposalData.proposal.technicalReview?.timeAllocation || 0;
@@ -79,8 +83,6 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         };
       }
     });
-  // TODO: Should add this currentRank on proposal or SepProposal.
-  // .sort((a, b) => (a.currentRank > b.currentRank ? 1 : -1));
 
   const assignmentColumns = [
     {
@@ -102,9 +104,8 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
     {
       title: 'Current rank',
-      // render: (rowData: SepProposal) =>
-      //   rowData.currentRank ? rowData.currentRank : '-',
-      render: () => '-',
+      render: (rowData: SepProposal) =>
+        rowData.proposal.rankOrder ? rowData.proposal.rankOrder : '-',
     },
     {
       title: 'Time allocation',
@@ -146,7 +147,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         icons={tableIcons}
         columns={assignmentColumns}
         title={'Assigned reviewers'}
-        data={proposalsWithAverageScore}
+        data={sortedProposalsWithAverageScore}
         isLoading={loadingInstrumentProposals}
         actions={[
           {

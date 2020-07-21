@@ -37,7 +37,11 @@ export default function OverviewPage(props: { userRole: UserRole }) {
           {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
             <Grid item xs={12}>
               <StyledPaper margin={[0]}>
-                {loadingContent ? null : parse(pageContent as string)}
+                {loadingContent ? (
+                  <div>Loading...</div>
+                ) : (
+                  parse(pageContent as string)
+                )}
               </StyledPaper>
             </Grid>
           )}

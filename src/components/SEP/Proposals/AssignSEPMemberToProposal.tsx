@@ -1,4 +1,3 @@
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import { Add } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -32,13 +31,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     { title: 'Organisation', field: 'user.organisation' },
   ];
 
-  if (loadingMembers || !SEPMembersData) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
-  }
-
-  const members = SEPMembersData.filter(sepMember => {
+  const members = SEPMembersData?.filter(sepMember => {
     if (
       !assignedMembers?.find(
         assignedMember => assignedMember.id === sepMember.userId
@@ -58,6 +51,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
       columns={columns}
       title={'Select reviewers'}
       data={members}
+      isLoading={loadingMembers}
       actions={[
         {
           icon: AddIcon,
