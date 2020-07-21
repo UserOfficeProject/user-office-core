@@ -7,7 +7,7 @@ import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 @ObjectType()
 export class Answer extends QuestionTemplateRelation
   implements Partial<AnswerOrigin> {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public answerId: number;
 
   @Field(() => IntStringDateBool, { nullable: true })

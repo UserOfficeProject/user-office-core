@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep, AnswerBasic } from '../../models/ProposalModel';
+import {
+  Questionary,
+  QuestionaryStep,
+  AnswerBasic,
+} from '../../models/ProposalModel';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { Answer } from './../../models/ProposalModel';
 import database from './database';
@@ -18,11 +22,12 @@ import {
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
-    return database("answers").select("*")
-    .where("answer_id", answer_id)
-    .then((record:AnswerRecord) => {
-      return createAnswerBasic(record);
-    })
+    return database('answers')
+      .select('*')
+      .where('answer_id', answer_id)
+      .then((record: AnswerRecord) => {
+        return createAnswerBasic(record);
+      });
   }
   getParentQuestionary(
     child_questionary_id: number
@@ -222,7 +227,7 @@ export default class PostgresQuestionaryDataSource
       QuestionTemplateRelRecord & { value: any; answer_id: number }> = (
       await database.raw(`
                 SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value, answer.answer_id
+                  templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id
                 FROM 
                   templates_has_questions
                 LEFT JOIN

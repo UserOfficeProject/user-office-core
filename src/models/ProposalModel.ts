@@ -96,7 +96,7 @@ export class QuestionTemplateRelation {
     );
   }
 }
-export class Answer extends QuestionTemplateRelation  {
+export class Answer extends QuestionTemplateRelation {
   constructor(
     public answerId: number,
     templateField: QuestionTemplateRelation,
@@ -127,11 +127,11 @@ export class Answer extends QuestionTemplateRelation  {
 
 export class AnswerBasic {
   constructor(
-  answerId:number,
-  questionaryId: number,
-  questionId: string,
-  answer: any,
-  createdAt: Date,
+    answerId: number,
+    questionaryId: number,
+    questionId: string,
+    answer: any,
+    createdAt: Date
   ) {}
 }
 
@@ -258,7 +258,7 @@ defaultConfigs.put('TextInputConfig', {
 });
 defaultConfigs.put('SubtemplateConfig', {
   templateId: 0,
-  templateCategory: TemplateCategoryId.SAMPLE_DECLARATION,
+  templateCategory: TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION],
   ...baseDefaultConfig,
 });
 

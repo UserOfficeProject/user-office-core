@@ -34,6 +34,10 @@ export default class SampleMutations {
       agent.id,
       args.templateId
     );
-    return await this.dataSource.create(questionary.questionaryId!, args.title);
+    return await this.dataSource.create(
+      questionary.questionaryId!,
+      args.title,
+      agent.id
+    );
   }
 }

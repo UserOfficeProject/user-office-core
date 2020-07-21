@@ -88,9 +88,6 @@ export interface AnswerRecord {
   readonly created_at: Date;
 }
 
-
-
-
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
@@ -275,12 +272,12 @@ export interface TemplateCategoryRecord {
 }
 
 export interface SampleRecord {
-  readonly id: number;
+  readonly sample_id: number;
   readonly title: string;
   readonly creator_id: number;
   readonly questionary_id: number;
   readonly status: number;
-  readonly created: Date;
+  readonly created_at: Date;
 }
 
 export const createPageObject = (record: PagetextRecord) => {
@@ -467,12 +464,12 @@ export const createTemplateCategoryObject = (
 
 export const createSampleObject = (sample: SampleRecord) => {
   return new Sample(
-    sample.id,
+    sample.sample_id,
     sample.title,
     sample.creator_id,
     sample.questionary_id,
     sample.status,
-    sample.created
+    sample.created_at
   );
 };
 

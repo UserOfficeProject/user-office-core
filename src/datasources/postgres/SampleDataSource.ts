@@ -8,9 +8,13 @@ import { CreateSampleArgs } from '../../resolvers/mutations/CreateSampleMutation
 import { image } from 'pdfkit/js/mixins/images';
 
 export default class PostgresSampleDataSource implements SampleDataSource {
-  create(questionaryId: number, title: string): Promise<Sample> {
+  create(
+    questionary_id: number,
+    title: string,
+    creator_id: number
+  ): Promise<Sample> {
     return database('samples')
-      .insert([{ title }, { questionaryId: questionaryId }])
+      .insert({ title, questionary_id, creator_id }, '*')
       .then((records: SampleRecord[]) => {
         if (records.length !== 1) {
           throw new Error('Failed to insert sample');
