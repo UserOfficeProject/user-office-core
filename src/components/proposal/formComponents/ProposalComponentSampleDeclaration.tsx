@@ -26,7 +26,7 @@ export default function ProposalComponentSampleDeclaration(
   useEffect(() => {
     const getSamples = async (answerId: number): Promise<Sample[]> => {
       return api()
-        .getSamplesByAnswerId({ answerId: props.templateField.answerId })
+        .getSamplesByAnswerId({ answerId })
         .then(response => {
           return response.samplesByAnswerId || [];
         });
@@ -38,9 +38,11 @@ export default function ProposalComponentSampleDeclaration(
       return { id: sample.id, label: sample.title };
     };
 
-    getSamples(props.templateField.answerId).then(samples =>
-      setSamples(samples.map(sampleToQuestionaryListRow))
-    );
+    if (props.templateField.answerId) {
+      getSamples(props.templateField.answerId).then(samples =>
+        setSamples(samples.map(sampleToQuestionaryListRow))
+      );
+    }
   }, [props]);
 
   return (
