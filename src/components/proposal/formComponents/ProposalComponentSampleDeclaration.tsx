@@ -84,17 +84,20 @@ export default function ProposalComponentSampleDeclaration(
           // }
           onAddNewClick={() =>
             api()
-              .createQuestionary({ templateId: config.templateId })
+              .createSample({
+                title: 'New sample',
+                templateId: config.templateId,
+              })
               .then(response => {
-                if (response.createQuestionary.error) {
-                  enqueueSnackbar(response.createQuestionary.error, {
+                if (response.createSample.error) {
+                  enqueueSnackbar(response.createSample.error, {
                     variant: 'error',
                   });
 
                   return;
                 }
                 const newQuestionaryId =
-                  response.createQuestionary.questionary?.questionaryId;
+                  response.createSample.sample?.questionaryId;
                 if (newQuestionaryId) {
                   const newValue = stateValue.slice();
                   newValue.push(newQuestionaryId);

@@ -34,7 +34,7 @@ export type Answer = {
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
-  answerId: Scalars['Int'];
+  answerId: Maybe<Scalars['Int']>;
   value: Maybe<Scalars['IntStringDateBool']>;
 };
 
@@ -1363,7 +1363,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
-  templateCategory: TemplateCategoryId;
+  templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
 };
 
@@ -1411,7 +1411,6 @@ export type TemplateCategory = {
   __typename?: 'TemplateCategory';
   categoryId: TemplateCategoryId;
   name: Scalars['String'];
-  categoryIdAsInt: Scalars['Int'];
 };
 
 export enum TemplateCategoryId {
@@ -2705,6 +2704,24 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
+export type CreateSampleMutationVariables = Exact<{
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+}>;
+
+
+export type CreateSampleMutation = (
+  { __typename?: 'Mutation' }
+  & { createSample: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
+);
+
 export type SampleFragment = (
   { __typename?: 'Sample' }
   & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'status' | 'created'>
@@ -3083,7 +3100,7 @@ export type GetTemplateCategoriesQuery = (
   { __typename?: 'Query' }
   & { templateCategories: Maybe<Array<(
     { __typename?: 'TemplateCategory' }
-    & Pick<TemplateCategory, 'categoryId' | 'categoryIdAsInt' | 'name'>
+    & Pick<TemplateCategory, 'categoryId' | 'name'>
   )>> }
 );
 
@@ -4633,6 +4650,16 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CreateSampleDocument = gql`
+    mutation createSample($title: String!, $templateId: Int!) {
+  createSample(title: $title, templateId: $templateId) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
 export const GetSamplesByAnswerIdDocument = gql`
     query getSamplesByAnswerId($answerId: Int!) {
   samplesByAnswerId(answerId: $answerId) {
@@ -4763,7 +4790,6 @@ export const GetTemplateCategoriesDocument = gql`
     query getTemplateCategories {
   templateCategories {
     categoryId
-    categoryIdAsInt
     name
   }
 }
@@ -5249,6 +5275,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    createSample(variables: CreateSampleMutationVariables): Promise<CreateSampleMutation> {
+      return withWrapper(() => client.request<CreateSampleMutation>(print(CreateSampleDocument), variables));
     },
     getSamplesByAnswerId(variables: GetSamplesByAnswerIdQueryVariables): Promise<GetSamplesByAnswerIdQuery> {
       return withWrapper(() => client.request<GetSamplesByAnswerIdQuery>(print(GetSamplesByAnswerIdDocument), variables));
