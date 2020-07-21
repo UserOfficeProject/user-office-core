@@ -11,6 +11,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
+import { useTemplateCategories } from 'hooks/template/useTemplateCategories';
 
 export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
   const field = props.field;
@@ -32,7 +33,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           templateId: Yup.number().required('Template is required'),
-          templateCategory: Yup.number().required('Category is required'),
+          templateCategory: Yup.string().required('Category is required'),
           addEntryButtonLabel: Yup.string(),
           maxEntries: Yup.number().nullable(),
         }),
@@ -72,10 +73,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
                 data-cy="templateCategory"
                 inputProps={{
                   onChange: (e: any) => {
-                    const categoryAsInt = e.target.value;
-                    const categoryId = categories.find(
-                      item => item.categoryIdAsInt === categoryAsInt
-                    )!.categoryId;
+                    const categoryId = e.target.value;
                     setSelectedCategory(categoryId);
                   },
                 }}
@@ -89,8 +87,8 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
                   }
                   return (
                     <MenuItem
-                      value={category.categoryIdAsInt}
-                      key={category.categoryIdAsInt}
+                      value={category.categoryId}
+                      key={category.categoryId}
                     >
                       {category.name}
                     </MenuItem>

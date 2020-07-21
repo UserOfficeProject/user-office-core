@@ -1,9 +1,8 @@
+import { GetTemplateCategoriesQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useEffect, useState } from 'react';
 
-import { GetTemplateCategoriesQuery } from '../generated/sdk';
-import { useDataApi } from './useDataApi';
-
-export function useTemplateCategories() {
+export function useTemplateCategories(isArchived: boolean = false) {
   const api = useDataApi();
   const [categories, setCategories] = useState<
     Exclude<GetTemplateCategoriesQuery['templateCategories'], null>
@@ -16,7 +15,7 @@ export function useTemplateCategories() {
           setCategories(data.templateCategories);
         }
       });
-  }, [api]);
+  }, [api, isArchived]);
 
   return { categories, setCategories };
 }

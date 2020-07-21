@@ -1,14 +1,12 @@
 import { FormControl, FormLabel } from '@material-ui/core';
+import ModalWrapper from 'components/common/ModalWrapper';
+import { Sample, SubtemplateConfig } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { BasicComponentProps } from '../IBasicComponentProps';
-import { SubtemplateConfig, Sample } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
-import { QuestionariesListRow, QuestionariesList } from './QuestionariesList';
-import { stringToNumericArray } from 'utils/ArrayUtils';
 import ProposalErrorLabel from '../ProposalErrorLabel';
-import ModalWrapper from 'components/common/ModalWrapper';
-import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
+import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
 
 export default function ProposalComponentSampleDeclaration(
   props: BasicComponentProps
@@ -25,19 +23,21 @@ export default function ProposalComponentSampleDeclaration(
   const [samples, setSamples] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
-  const getSamples = async (answerId: number): Promise<Sample[]> => {
-    return api()
-      .getSamplesByAnswerId({ answerId: props.templateField.answerId })
-      .then(response => {
-        return response.samplesByAnswerId || [];
-      });
-  };
-
-  const sampleToQuestionaryListRow = (sample: Sample): QuestionariesListRow => {
-    return { id: sample.id, label: sample.title };
-  };
-
   useEffect(() => {
+    const getSamples = async (answerId: number): Promise<Sample[]> => {
+      return api()
+        .getSamplesByAnswerId({ answerId: props.templateField.answerId })
+        .then(response => {
+          return response.samplesByAnswerId || [];
+        });
+    };
+
+    const sampleToQuestionaryListRow = (
+      sample: Sample
+    ): QuestionariesListRow => {
+      return { id: sample.id, label: sample.title };
+    };
+
     getSamples(props.templateField.answerId).then(samples =>
       setSamples(samples.map(sampleToQuestionaryListRow))
     );
