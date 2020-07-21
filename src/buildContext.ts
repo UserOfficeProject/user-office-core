@@ -39,6 +39,7 @@ import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
 import SampleQueries from './queries/SampleQueries';
+import SampleMutations from './mutations/SampleMutations';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource);
@@ -102,6 +103,13 @@ const sampleQueries = new SampleQueries(
   questionaryAuthorization
 );
 
+const sampleMutations = new SampleMutations(
+  sampleDataSource,
+  questionaryDataSource,
+  templateDataSource,
+  logger
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -129,6 +137,7 @@ const context: BasicResolverContext = {
     template: templateMutations,
     instrument: instrumentMutations,
     questionary: questionaryMutations,
+    sample: sampleMutations,
   },
 };
 

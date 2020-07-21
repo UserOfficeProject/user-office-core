@@ -22,6 +22,7 @@ import TemplateQueries from '../queries/TemplateQueries';
 import UserQueries from '../queries/UserQueries';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import SampleQueries from '../queries/SampleQueries';
+import SampleMutations from '../mutations/SampleMutations';
 
 interface ResolverContextQueries {
   proposal: ProposalQueries;
@@ -49,6 +50,7 @@ interface ResolverContextMutations {
   sep: SEPMutations;
   instrument: InstrumentMutations;
   questionary: QuestionaryMutations;
+  sample: SampleMutations;
 }
 
 export interface BasicResolverContext {

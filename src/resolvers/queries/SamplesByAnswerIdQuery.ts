@@ -7,8 +7,8 @@ export class SamplesByAnswerIdQuery {
   @Query(() => [Sample], { nullable: true })
   samplesByAnswerId(
     @Ctx() context: ResolverContext,
-    @Arg('callId', () => Int) callId: number
+    @Arg('answerId', () => Int) answerId: number
   ) {
-    return context.queries.sample.getSamplesByCallId(context.user, callId);
+    return context.queries.sample.getSamplesByAnswerId(context.user, answerId);
   }
 }

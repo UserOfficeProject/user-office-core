@@ -18,6 +18,7 @@ import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
+import { Sample } from './Sample';
 
 @ObjectType()
 export class ResponseWrapBase<T> {
@@ -171,13 +172,20 @@ export class TokenResponseWrap extends ResponseWrapBase<string> {
 @ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public log: string;
 }
 
 @ObjectType()
 export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
   @Response()
-  @Field(() => Answer)
+  @Field(() => Answer, { nullable: true })
   public answer: Answer;
+}
+
+@ObjectType()
+export class SampleResponseWrap extends ResponseWrapBase<Sample> {
+  @Response()
+  @Field(() => Sample, { nullable: true })
+  public sample: Sample;
 }

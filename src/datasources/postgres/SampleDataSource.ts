@@ -4,8 +4,20 @@ import { Sample } from '../../models/Sample';
 import database from './database';
 import { createSampleObject, SampleRecord } from './records';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
+import { CreateSampleArgs } from '../../resolvers/mutations/CreateSampleMutations';
+import { image } from 'pdfkit/js/mixins/images';
 
 export default class PostgresSampleDataSource implements SampleDataSource {
+  create(questionaryId: number, title: string): Promise<Sample> {
+    return database('samples')
+      .insert([{ title }, { questionaryId: questionaryId }])
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          throw new Error('Failed to insert sample');
+        }
+        return createSampleObject(records[0]);
+      });
+  }
   getSamplesByCallId(callId: number): Promise<Sample[]> {
     return database('samples_extended_view')
       .select('*')

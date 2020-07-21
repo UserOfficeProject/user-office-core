@@ -18,4 +18,7 @@ export class SampleDataSourceMock implements SampleDataSource {
   async getSamplesByCallId(callId: number): Promise<Sample[]> {
     return this.samples;
   }
+  async create(): Promise<Sample> {
+    return new Sample(1, '', 1, 1, SampleStatus.NONE, new Date());
+  }
 }
