@@ -3203,10 +3203,7 @@ export type GetFieldsQuery = (
       { __typename?: 'Entry' }
       & Pick<Entry, 'id' | 'value'>
     )> }
-  )>, institutions: Maybe<Array<(
-    { __typename?: 'Institution' }
-    & Pick<Institution, 'id' | 'name'>
-  )>> }
+  )> }
 );
 
 export type GetMyRolesQueryVariables = {};
@@ -4749,10 +4746,6 @@ export const GetFieldsDocument = gql`
       id
       value
     }
-  }
-  institutions {
-    id
-    name
   }
 }
     `;

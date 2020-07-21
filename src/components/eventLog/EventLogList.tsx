@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -41,7 +42,9 @@ const EventLogList: React.FC<EventLogListProps> = ({
   ];
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
+    );
   }
 
   return (
