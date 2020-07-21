@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, CircularProgress } from '@material-ui/core';
 import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
@@ -41,7 +41,9 @@ export default function ProposalQuestionaryStep(props: {
   const { dispatch } = useContext(ProposalSubmissionContext)!;
 
   if (data === null) {
-    return <div>loading...</div>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   const questionary = data.proposal.questionary!;

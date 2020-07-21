@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
@@ -73,7 +74,9 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   };
 
   if (!proposal) {
-    return <p>Loading</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return (

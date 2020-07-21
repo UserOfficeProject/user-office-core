@@ -1,4 +1,5 @@
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
@@ -70,7 +71,9 @@ export default function UpdateUserRoles(props: { id: number }) {
   const columns = [{ title: 'Name', field: 'title' }];
 
   if (!userData) {
-    return <p>Loading</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return (

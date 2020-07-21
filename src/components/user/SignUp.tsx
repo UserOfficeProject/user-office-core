@@ -170,7 +170,7 @@ const SignUp: React.FC<SignUpProps> = props => {
     return <Redirect to="/" />;
   }
 
-  if (loadingInstitutions || !fieldsContent) {
+  if (loadingInstitutions || !fieldsContent || (authCodeOrcID && loading)) {
     return (
       <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
     );
@@ -199,10 +199,6 @@ const SignUp: React.FC<SignUpProps> = props => {
       })
       .then(data => setUserID(data?.createUser?.user?.id as number));
   };
-
-  if (authCodeOrcID && loading) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <Container component="main" maxWidth="xs" className={classes.container}>

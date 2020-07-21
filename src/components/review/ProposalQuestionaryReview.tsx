@@ -5,6 +5,7 @@ import {
   TableCell,
   TableRow,
   Typography,
+  CircularProgress,
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
 
@@ -51,7 +52,9 @@ export default function ProposalQuestionaryReview(
   }, [api, fileIds]);
 
   if (!props.data) {
-    return <div>Loading...</div>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   const downloadLink = (file: FileMetaData | undefined) => (

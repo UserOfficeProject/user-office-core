@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useParams } from 'react-router';
@@ -20,7 +21,9 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
-    return <p>Loading</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return (

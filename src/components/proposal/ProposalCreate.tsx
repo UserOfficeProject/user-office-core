@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import React from 'react';
 import { useParams } from 'react-router';
 
@@ -10,7 +11,9 @@ export default function ProposalCreate() {
   const { proposal } = useBlankProposal(parseInt(callId as string));
 
   if (!proposal) {
-    return <p>Loading </p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return <ProposalContainer data={proposal} />;

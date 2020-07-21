@@ -1,5 +1,4 @@
 import {
-  Divider,
   IconButton,
   List,
   ListItem,
@@ -7,6 +6,7 @@ import {
   ListItemText,
   Typography,
   makeStyles,
+  CircularProgress,
 } from '@material-ui/core';
 import { NavigateNext } from '@material-ui/icons';
 import dateformat from 'dateformat';
@@ -30,7 +30,9 @@ export default function ProposalChooseCall() {
   const classes = useStyles();
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   if (callsData.length === 0) {
@@ -57,8 +59,7 @@ export default function ProposalChooseCall() {
           Select a call
         </Typography>
         <List>
-          {callsData.map((call, idx, arr) => {
-            const divider = idx !== arr.length - 1 ? <Divider /> : null;
+          {callsData.map(call => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText =
               daysRemainingNum > 0 && daysRemainingNum < 30
@@ -66,39 +67,39 @@ export default function ProposalChooseCall() {
                 : '';
 
             return (
-              <>
-                <ListItem
-                  button
-                  key={call.id}
-                  onClick={() => handleSelect(call.id)}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="h6">{call.shortCode}</Typography>
-                    }
-                    secondary={
-                      <Fragment>
-                        <Typography className={classes.date}>
-                          {`Application deadline: ${formatDate(
-                            call.endCall
-                          )} ${daysRemainingText}`}
-                        </Typography>
-                        <Typography>{call.cycleComment}</Typography>
-                      </Fragment>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="comments"
-                      onClick={() => handleSelect(call.id)}
-                    >
-                      <NavigateNext />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                {divider}
-              </>
+              <ListItem
+                button
+                key={call.id}
+                onClick={() => handleSelect(call.id)}
+                divider={true}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="h6">{call.shortCode}</Typography>
+                  }
+                  secondary={
+                    <Fragment>
+                      <Typography component="span" className={classes.date}>
+                        {`Application deadline: ${formatDate(
+                          call.endCall
+                        )} ${daysRemainingText}`}
+                      </Typography>
+                      <Typography component="span">
+                        {call.cycleComment}
+                      </Typography>
+                    </Fragment>
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    aria-label="comments"
+                    onClick={() => handleSelect(call.id)}
+                  >
+                    <NavigateNext />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>

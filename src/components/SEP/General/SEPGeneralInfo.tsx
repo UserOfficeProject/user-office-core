@@ -7,6 +7,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  CircularProgress,
 } from '@material-ui/core';
 import { Formik, Form, Field } from 'formik';
 import { useSnackbar } from 'notistack';
@@ -51,7 +52,9 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   };
 
   if (!sep) {
-    return <p>Loading...</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return (

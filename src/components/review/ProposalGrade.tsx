@@ -1,5 +1,6 @@
 import { proposalGradeValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -41,7 +42,9 @@ export default function ProposalGrade(props: {
   }, [reviewData]);
 
   if (!review) {
-    return <p>Loading</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
 
   return (

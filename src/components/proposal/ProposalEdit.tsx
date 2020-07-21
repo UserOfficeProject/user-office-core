@@ -1,4 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import React from 'react';
 import { useParams } from 'react-router';
 
@@ -10,10 +11,12 @@ import ProposalContainer from './ProposalContainer';
 export default function ProposalEdit() {
   const { proposalID } = useParams();
 
-  const { proposalData } = useProposalData(parseInt(proposalID!));
+  const { proposalData } = useProposalData(+proposalID);
 
   if (!proposalData) {
-    return <p>Loading</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
   }
   if (proposalData.notified) {
     return (
@@ -24,10 +27,10 @@ export default function ProposalEdit() {
           </p>
           <p>Comment: {proposalData.commentForUser}</p>
         </>
-        <ProposalContainer data={proposalData!} />
+        <ProposalContainer data={proposalData} />
       </SimpleTabs>
     );
   }
 
-  return <ProposalContainer data={proposalData!} />;
+  return <ProposalContainer data={proposalData} />;
 }
