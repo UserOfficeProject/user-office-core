@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
-import { Card, CardContent } from '@material-ui/core';
+import { Card, CardContent, CircularProgress } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -139,7 +139,7 @@ const SignUp: React.FC<SignUpProps> = props => {
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
-  const { institutionData } = useInstitutionData();
+  const { institutionData, loadingInstitutions } = useInstitutionData();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
@@ -169,20 +169,24 @@ const SignUp: React.FC<SignUpProps> = props => {
     return <Redirect to="/" />;
   }
 
-  if (
-    institutionData.length &&
-    fieldsContent &&
-    !nationalitiesList.length &&
-    !institutionsList.length
-  ) {
+  if (loadingInstitutions || !fieldsContent) {
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
+  }
+
+  if (!institutionsList.length) {
     setInstitutionsList(
       institutionData.map(institution => {
-        return { text: institution.name, value: institution.id.toString() };
+        return { text: institution.name, value: institution.id };
       })
     );
+  }
+
+  if (!nationalitiesList.length) {
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
-        return { text: nationality.value, value: nationality.id.toString() };
+        return { text: nationality.value, value: nationality.id };
       })
     );
   }

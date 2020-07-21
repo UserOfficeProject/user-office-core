@@ -25,10 +25,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     selectedCallId
   );
 
-  if (loadingInstruments) {
-    return <div>Loading...</div>;
-  }
-
   const columns = [
     { title: 'Name', field: 'name' },
     { title: 'Short code', field: 'shortCode' },
@@ -62,6 +58,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
           Toolbar: Toolbar,
         }}
         data={instrumentsData}
+        isLoading={loadingInstruments}
         actions={[
           {
             icon: DoneAllIcon,

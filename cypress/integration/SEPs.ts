@@ -579,6 +579,38 @@ context('Scientific evaluation panel tests', () => {
       .should('have.text', '25');
   });
 
+  it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
+    cy.login('officer');
+
+    cy.get('[data-cy="view-proposal"]')
+      .first()
+      .click();
+
+    cy.contains('Technical').click();
+    cy.get('[data-cy="timeAllocation"]').type('51');
+
+    cy.contains('Update').click();
+
+    cy.wait(500);
+
+    cy.contains('SEPs').click();
+
+    cy.get('button[title="Edit SEP"]')
+      .first()
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.wait(1000);
+
+    cy.get('[title="Show proposals"]')
+      .first()
+      .click();
+    cy.get(
+      '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
+    ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+  });
+
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
 

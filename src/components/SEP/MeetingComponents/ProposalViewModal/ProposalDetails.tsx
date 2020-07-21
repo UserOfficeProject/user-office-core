@@ -9,8 +9,9 @@ import {
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Proposal, BasicUserDetails, ReviewStatus } from 'generated/sdk';
+import { Proposal, BasicUserDetails } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
+import { average, getGrades } from 'utils/mathFunctions';
 
 type ProposalDetailsProps = {
   proposal: Proposal;
@@ -25,21 +26,6 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
       fontWeight: 'bold',
     },
   }))();
-
-  const getGrades = (proposal: Proposal) =>
-    proposal.reviews
-      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade) ?? [];
-
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / numbers.length;
-
-    return avg.toPrecision(3);
-  };
 
   return (
     <div data-cy="SEP-meeting-components-proposal-details">
@@ -59,7 +45,9 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell className={classes.textBold}>Abstract</TableCell>
               <TableCell>{proposal.abstract}</TableCell>
               <TableCell className={classes.textBold}>Average score</TableCell>
-              <TableCell>{average(getGrades(proposal) as number[])}</TableCell>
+              <TableCell>
+                {average(getGrades(proposal.reviews) as number[])}
+              </TableCell>
             </TableRow>
             <TableRow key="principalinvestigatorAndStatus">
               <TableCell className={classes.textBold}>
