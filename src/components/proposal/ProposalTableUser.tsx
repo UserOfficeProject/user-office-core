@@ -1,5 +1,4 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
 import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
@@ -24,11 +23,7 @@ export type UserProposalDataType = {
   data: PartialProposalsDataType[] | undefined;
 };
 
-type ProposalTableUserProps = {
-  id: number;
-};
-
-const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
+const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const getProposalStatus = (proposal: {
     status: ProposalStatus;
@@ -67,7 +62,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
             }),
         };
       });
-  }, [api, id]);
+  }, [api]);
 
   return (
     <ProposalTable
@@ -76,10 +71,6 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
       searchQuery={sendUserProposalRequest}
     />
   );
-};
-
-ProposalTableUser.propTypes = {
-  id: PropTypes.number.isRequired,
 };
 
 export default ProposalTableUser;

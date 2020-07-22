@@ -1,17 +1,15 @@
 import Grid from '@material-ui/core/Grid';
 import parse from 'html-react-parser';
-import React, { useContext } from 'react';
+import React from 'react';
 
 import InstrumentTable from 'components/instrument/InstrumentTable';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
-import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
 export default function OverviewPage(props: { userRole: UserRole }) {
-  const { user } = useContext(UserContext);
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );
@@ -20,7 +18,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
 
   switch (props.userRole) {
     case UserRole.USER:
-      roleBasedOverView = <ProposalTableUser id={user.id} />;
+      roleBasedOverView = <ProposalTableUser />;
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
       roleBasedOverView = <InstrumentTable />;
