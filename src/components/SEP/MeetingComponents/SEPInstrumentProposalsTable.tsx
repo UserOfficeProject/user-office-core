@@ -11,6 +11,7 @@ import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrume
 import { tableIcons } from 'utils/materialIcons';
 import { getGrades, average } from 'utils/mathFunctions';
 
+import { MeetingFormData } from './ProposalViewModal/FinalRankingForm';
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
@@ -40,49 +41,55 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const {
     instrumentProposalsData,
     loadingInstrumentProposals,
+    setInstrumentProposalsData,
   } = useSEPProposalsByInstrument(sepInstrument.id, sepId, selectedCallId);
   const classes = useStyles();
   const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
-  let allocationTimeSum = 0;
-  const sortedProposalsWithAverageScore = instrumentProposalsData
-    .map(proposalData => {
-      const proposalAverageScore =
-        average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
+  const sortByRankOrAverageScore = (data: SepProposal[]) => {
+    let allocationTimeSum = 0;
 
-      return {
-        ...proposalData,
-        proposalAverageScore,
-      };
-    })
-    .sort((a, b) => (a.proposalAverageScore < b.proposalAverageScore ? 1 : -1))
-    .sort((a, b) =>
-      (a.proposal.rankOrder as number) > (b.proposal?.rankOrder as number)
-        ? 1
-        : -1
-    )
-    .map(proposalData => {
-      const proposalAllocationTime =
-        proposalData.proposal.technicalReview?.timeAllocation || 0;
-
-      if (
-        allocationTimeSum + proposalAllocationTime >
-        (sepInstrument.availabilityTime as number)
-      ) {
-        return {
-          isInAvailabilityZone: false,
-          ...proposalData,
-        };
-      } else {
-        allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+    return data
+      .map(proposalData => {
+        const proposalAverageScore =
+          average(getGrades(proposalData.proposal.reviews) as number[]) || 0;
 
         return {
-          isInAvailabilityZone: true,
           ...proposalData,
+          proposalAverageScore,
         };
-      }
-    });
+      })
+      .sort((a, b) =>
+        a.proposalAverageScore < b.proposalAverageScore ? 1 : -1
+      )
+      .sort((a, b) =>
+        (a.proposal.rankOrder as number) > (b.proposal?.rankOrder as number)
+          ? 1
+          : -1
+      )
+      .map(proposalData => {
+        const proposalAllocationTime =
+          proposalData.proposal.technicalReview?.timeAllocation || 0;
+
+        if (
+          allocationTimeSum + proposalAllocationTime >
+          (sepInstrument.availabilityTime as number)
+        ) {
+          return {
+            isInAvailabilityZone: false,
+            ...proposalData,
+          };
+        } else {
+          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
+          return {
+            isInAvailabilityZone: true,
+            ...proposalData,
+          };
+        }
+      });
+  };
 
   const assignmentColumns = [
     {
@@ -127,6 +134,32 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
   ];
 
+  const onMeetingSubmited = (data: MeetingFormData) => {
+    const newInstrumentProposalsData = instrumentProposalsData.map(
+      proposalData => {
+        if (proposalData.proposal.id === data.id) {
+          return {
+            ...proposalData,
+            proposal: {
+              ...proposalData.proposal,
+              ...data,
+            },
+          };
+        } else {
+          return {
+            ...proposalData,
+          };
+        }
+      }
+    );
+
+    setInstrumentProposalsData(newInstrumentProposalsData as SepProposal[]);
+  };
+
+  const sortedProposalsWithAverageScore = sortByRankOrAverageScore(
+    instrumentProposalsData
+  );
+
   const ViewIcon = (): JSX.Element => <Visibility />;
 
   const redBackgroundWhenOutOfAvailabiliyZone = (
@@ -142,6 +175,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         proposalViewModalOpen={!!openProposalId}
         setProposalViewModalOpen={() => setOpenProposalId(null)}
         proposalId={openProposalId || 0}
+        meetingSubmited={onMeetingSubmited}
       />
       <MaterialTable
         icons={tableIcons}

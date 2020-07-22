@@ -15,14 +15,24 @@ import { Proposal, ProposalEndStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 
+export type MeetingFormData = {
+  id: number;
+  commentForUser: string;
+  commentForManagement: string;
+  finalStatus: string;
+  rankOrder: number | string;
+};
+
 type FinalRankingFormProps = {
   closeModal: () => void;
   proposalData: Proposal;
+  meetingSubmited: (data: MeetingFormData) => void;
 };
 
 const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   closeModal,
   proposalData,
+  meetingSubmited,
 }) => {
   const classes = makeStyles(() => ({
     button: {
@@ -42,27 +52,30 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     rankOrder: proposalData.rankOrder || '',
   };
 
-  const handleSubmit = async (values: {
-    commentForUser: string;
-    commentForManagement: string;
-    finalStatus: string;
-    rankOrder: number | string;
-  }) => {
-    const data = await api().administrationProposal({
-      id: proposalData.id,
+  const handleSubmit = async (values: MeetingFormData) => {
+    const administrationProposalVales = {
+      id: values.id,
       finalStatus: ProposalEndStatus[values.finalStatus as ProposalEndStatus],
       commentForUser: values.commentForUser,
       commentForManagement: values.commentForManagement,
-      rankOrder: +values.rankOrder || null,
-    });
+      rankOrder: +values.rankOrder,
+    };
 
-    enqueueSnackbar('Saved!', {
-      variant: data.administrationProposal.error ? 'error' : 'success',
+    const data = await api().administrationProposal(
+      administrationProposalVales
+    );
+
+    const isError = !!data.administrationProposal.error;
+
+    enqueueSnackbar(isError ? 'Not saved!' : 'Saved!', {
+      variant: isError ? 'error' : 'success',
     });
 
     setSubmitting(false);
 
-    if (shouldClose) {
+    meetingSubmited(administrationProposalVales);
+
+    if (shouldClose && !isError) {
       closeModal();
     }
   };
@@ -76,7 +89,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           initialValues={initialData}
           onSubmit={async (values): Promise<void> => {
             setSubmitting(true);
-            await handleSubmit(values);
+            await handleSubmit({ id: proposalData.id, ...values });
           }}
         >
           {({ values, errors, touched, handleChange }): JSX.Element => (
@@ -218,6 +231,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
 FinalRankingForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   proposalData: PropTypes.any.isRequired,
+  meetingSubmited: PropTypes.func.isRequired,
 };
 
 export default FinalRankingForm;

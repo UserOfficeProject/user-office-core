@@ -22,7 +22,7 @@ import { useProposalData } from 'hooks/proposal/useProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';
-import FinalRankingForm from './FinalRankingForm';
+import FinalRankingForm, { MeetingFormData } from './FinalRankingForm';
 import ProposalDetails from './ProposalDetails';
 import TechnicalReviewInfo from './TechnicalReviewInfo';
 
@@ -48,12 +48,14 @@ type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
   setProposalViewModalOpen: (isOpen: boolean) => void;
   proposalId: number;
+  meetingSubmited: (data: MeetingFormData) => void;
 };
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
   setProposalViewModalOpen,
   proposalViewModalOpen,
   proposalId,
+  meetingSubmited,
 }) => {
   const classes = useStyles();
   const { proposalData, loading } = useProposalData(proposalId);
@@ -99,6 +101,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                       <FinalRankingForm
                         closeModal={handleClose}
                         proposalData={proposalData}
+                        meetingSubmited={meetingSubmited}
                       />
                       <ProposalDetails proposal={proposalData} />
                       <TechnicalReviewInfo
@@ -125,6 +128,7 @@ SEPMeetingProposalViewModal.propTypes = {
   proposalId: PropTypes.number.isRequired,
   proposalViewModalOpen: PropTypes.bool.isRequired,
   setProposalViewModalOpen: PropTypes.func.isRequired,
+  meetingSubmited: PropTypes.func.isRequired,
 };
 
 export default SEPMeetingProposalViewModal;
