@@ -19,7 +19,7 @@ export type MeetingFormData = {
   id: number;
   commentForUser: string;
   commentForManagement: string;
-  finalStatus: string;
+  finalStatus: ProposalEndStatus;
   rankOrder: number | string;
 };
 
