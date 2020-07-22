@@ -1,11 +1,18 @@
-import * as yup from 'yup';
+import {
+  createSEPValidationSchema,
+  updateSEPValidationSchema,
+  updateSEPMemberValidationSchema,
+  assignProposalToSEPValidationSchema,
+  assignSEPChairOrSecretaryValidationSchema,
+  assignSEPMemberToProposalValidationSchema,
+} from '@esss-swap/duo-validation';
 
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { SEP } from '../models/SEP';
-import { User, UserRole } from '../models/User';
+import { UserRole, UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 import {
@@ -18,60 +25,17 @@ import { UpdateSEPArgs } from '../resolvers/mutations/UpdateSEPMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
-const createSEPValidationSchema = yup.object().shape({
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const updateSEPValidationSchema = yup.object().shape({
-  id: yup.number().required(),
-  code: yup.string().required(),
-  description: yup.string().required(),
-  numberRatingsRequired: yup.number().min(2),
-});
-
-const assignSEPChairOrSecretaryValidationSchema = yup.object().shape({
-  addSEPMembersRole: yup
-    .object()
-    .shape({
-      userID: yup.number().required(),
-      roleID: yup
-        .number()
-        .oneOf([UserRole.SEP_CHAIR, UserRole.SEP_SECRETARY])
-        .required(),
-      SEPID: yup.number().required(),
-    })
-    .required(),
-});
-
-const updateSEPMemberValidationSchema = yup.object().shape({
-  memberId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignProposalToSEPValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-});
-
-const assignSEPMemberToProposalValidationSchema = yup.object().shape({
-  proposalId: yup.number().required(),
-  sepId: yup.number().required(),
-  memberId: yup.number().required(),
-});
-
 export default class SEPMutations {
   constructor(
     private dataSource: SEPDataSource,
     private userAuth: UserAuthorization
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(createSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_CREATED)
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -93,11 +57,11 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(updateSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_UPDATED)
   async update(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -120,11 +84,11 @@ export default class SEPMutations {
       });
   }
 
+  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema(UserRole))
   @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(assignSEPChairOrSecretaryValidationSchema)
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignChairOrSecretaryToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -157,16 +121,19 @@ export default class SEPMutations {
     });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(updateSEPMemberValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMemberToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -175,7 +142,7 @@ export default class SEPMutations {
       .addSEPMembersRole({
         userID: args.memberId,
         SEPID: args.sepId,
-        roleID: UserRole.SEP_MEMBER,
+        roleID: UserRole.SEP_REVIEWER,
       })
       .then(result => result)
       .catch(err => {
@@ -189,16 +156,19 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(updateSEPMemberValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED)
   async removeMemberFromSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateMemberSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -217,11 +187,11 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(assignProposalToSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_ASSIGNED)
   async assignProposalToSEP(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -238,11 +208,11 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
   @ValidateArgs(assignProposalToSEPValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.SEP_PROPOSAL_REMOVED)
   async removeProposalAssignment(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignProposalToSEPArgs
   ): Promise<SEP | Rejection> {
     return this.dataSource
@@ -259,16 +229,19 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_ASSIGNED_TO_PROPOSAL)
   async assignMemberToSEPProposal(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignSEPProposalToMemberArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }
@@ -287,16 +260,19 @@ export default class SEPMutations {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @ValidateArgs(assignSEPMemberToProposalValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED_FROM_PROPOSAL)
   async removeMemberFromSepProposal(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: AssignSEPProposalToMemberArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP((agent as User).id, args.sepId))
+      !(await this.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
     ) {
       return rejection('NOT_ALLOWED');
     }

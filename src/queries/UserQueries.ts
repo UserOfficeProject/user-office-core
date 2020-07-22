@@ -8,32 +8,28 @@ import rp from 'request-promise';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { User, BasicUserDetails } from '../models/User';
+import { BasicUserDetails, UserWithRole } from '../models/User';
 import { logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class UserQueries {
-  constructor(
-    public dataSource: UserDataSource,
-    private userAuth: UserAuthorization
-  ) {}
+  constructor(public dataSource: UserDataSource) {}
 
   async getAgent(id: number) {
     return this.dataSource.get(id);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async get(agent: User | null, id: number) {
+  async get(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 
   @Authorized()
-  async me(agent: User | null) {
-    return this.dataSource.me((agent as User).id);
+  async me(agent: UserWithRole | null) {
+    return this.dataSource.me((agent as UserWithRole).id);
   }
 
   @Authorized()
-  async getBasic(agent: User | null, id: number) {
+  async getBasic(agent: UserWithRole | null, id: number) {
     const user = await this.dataSource.getBasicUserInfo(id);
     if (!user) {
       return null;
@@ -50,7 +46,7 @@ export default class UserQueries {
     );
   }
 
-  async checkEmailExist(agent: User | null, email: string) {
+  async checkEmailExist(agent: UserWithRole | null, email: string) {
     return this.dataSource.checkEmailExist(email);
   }
 
@@ -146,7 +142,7 @@ export default class UserQueries {
 
   @Authorized()
   async getAll(
-    agent: User | null,
+    agent: UserWithRole | null,
     filter?: string,
     first?: number,
     offset?: number,
@@ -163,7 +159,7 @@ export default class UserQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getRoles(agent: User | null) {
+  async getRoles(agent: UserWithRole | null) {
     return this.dataSource.getRoles();
   }
 
@@ -171,7 +167,7 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
-  async getProposers(agent: User | null, proposalId: number) {
+  async getProposers(agent: UserWithRole | null, proposalId: number) {
     return this.dataSource.getProposalUsers(proposalId);
   }
 }

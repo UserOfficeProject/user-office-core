@@ -1,12 +1,13 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { QuestionRel as QuestionRelOrign } from '../../models/ProposalModel';
+import { QuestionTemplateRelation as QuestionTemplateRelationOrign } from '../../models/ProposalModel';
 import { FieldConfigType } from './FieldConfig';
 import { FieldDependency } from './FieldDependency';
 import { Question } from './Question';
 
 @ObjectType()
-export class QuestionRel implements Partial<QuestionRelOrign> {
+export class QuestionTemplateRelation
+  implements Partial<QuestionTemplateRelationOrign> {
   @Field()
   public question: Question;
 

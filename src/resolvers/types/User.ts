@@ -13,6 +13,7 @@ import { User as UserOrigin } from '../../models/User';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
+import { SEP } from './SEP';
 
 @ObjectType()
 export class User implements Partial<UserOrigin> {
@@ -98,5 +99,10 @@ export class UserResolver {
   @FieldResolver(() => [Proposal])
   async proposals(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.proposal.dataSource.getUserProposals(user.id);
+  }
+
+  @FieldResolver(() => [SEP])
+  async seps(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.sep.dataSource.getUserSeps(user.id);
   }
 }

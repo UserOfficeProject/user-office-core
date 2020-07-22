@@ -14,8 +14,11 @@ import { ProposalStatus } from '../../models/ProposalModel';
 import { ProposalEndStatus } from '../../models/ProposalModel';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Call } from './Call';
+import { Instrument } from './Instrument';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
+import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 
 @ObjectType()
@@ -48,10 +51,10 @@ export class Proposal implements Partial<ProposalOrigin> {
   public finalStatus?: ProposalEndStatus;
 
   @Field(() => Int)
-  public callId?: number;
+  public callId: number;
 
   @Field(() => Int)
-  public templateId?: number;
+  public questionaryId: number;
 
   @Field(() => String, { nullable: true })
   public commentForUser: string;
@@ -65,7 +68,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public proposerId: number;
 }
 
-@Resolver(of => Proposal)
+@Resolver(() => Proposal)
 export class ProposalResolver {
   @FieldResolver(() => [BasicUserDetails])
   async users(
@@ -113,22 +116,54 @@ export class ProposalResolver {
     );
   }
 
+  @FieldResolver(() => Instrument, { nullable: true })
+  async instrument(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Instrument | null> {
+    return await context.queries.instrument.dataSource.getInstrumentByProposalId(
+      proposal.id
+    );
+  }
+
+  @FieldResolver(() => SEP, { nullable: true })
+  async sep(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<SEP | null> {
+    return await context.queries.sep.dataSource.getSEPByProposalId(proposal.id);
+  }
+
+  @FieldResolver(() => Call, { nullable: true })
+  async call(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Call | null> {
+    return await context.queries.call.dataSource.get(proposal.callId);
+  }
+
   @FieldResolver(() => Questionary)
   async questionary(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
     if (proposal.status === ProposalStatus.BLANK) {
-      const questionary = await context.queries.proposal.getEmptyQuestionary(
+      const call = await context.queries.call.get(
         context.user,
-        proposal.callId!
+        proposal.callId
       );
+      if (!call?.templateId) {
+        return null;
+      }
 
-      return isRejection(questionary) ? null : questionary;
-    } else {
-      const questionary = await context.queries.proposal.getQuestionary(
+      return await context.queries.questionary.getBlankQuestionary(
         context.user,
-        proposal.id
+        call.templateId
+      );
+    } else {
+      const questionary = await context.queries.questionary.getQuestionary(
+        context.user,
+        proposal.questionaryId
       );
 
       return isRejection(questionary) ? null : questionary;

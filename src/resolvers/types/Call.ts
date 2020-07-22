@@ -1,6 +1,16 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import {
+  Field,
+  Int,
+  ObjectType,
+  Resolver,
+  FieldResolver,
+  Root,
+  Ctx,
+} from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { Call as CallOrigin } from '../../models/Call';
+import { InstrumentWithAvailabilityTime } from './Instrument';
 
 @ObjectType()
 export class Call implements Partial<CallOrigin> {
@@ -28,6 +38,12 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Date)
   public endNotify: Date;
 
+  @Field(() => Date)
+  public startCycle: Date;
+
+  @Field(() => Date)
+  public endCycle: Date;
+
   @Field()
   public cycleComment: string;
 
@@ -36,4 +52,14 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Int, { nullable: true })
   public templateId?: number;
+}
+
+@Resolver(() => Call)
+export class CallInstrumentsResolver {
+  @FieldResolver(() => [InstrumentWithAvailabilityTime])
+  async instruments(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.instrument.dataSource.getInstrumentsByCallId(
+      call.id
+    );
+  }
 }

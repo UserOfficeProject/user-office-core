@@ -5,7 +5,7 @@ import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { User } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 
 export class UserAuthorization {
   constructor(
@@ -35,7 +35,7 @@ export class UserAuthorization {
     return true;
   }
 
-  async hasRole(agent: User | null, role: string): Promise<boolean> {
+  async hasRole(agent: UserWithRole | null, role: string): Promise<boolean> {
     if (agent == null) {
       return false;
     }

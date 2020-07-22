@@ -26,8 +26,23 @@ export class SEPQuery {
   @Query(() => [SEPProposal], { nullable: true })
   async sepProposals(
     @Arg('sepId', () => Int) sepId: number,
+    @Arg('callId', () => Int) callId: number,
     @Ctx() context: ResolverContext
   ): Promise<SEPProposal[] | null> {
-    return context.queries.sep.getSEPProposals(context.user, sepId);
+    return context.queries.sep.getSEPProposals(context.user, { sepId, callId });
+  }
+
+  @Query(() => [SEPProposal], { nullable: true })
+  async sepProposalsByInstrument(
+    @Arg('sepId', () => Int) sepId: number,
+    @Arg('instrumentId', () => Int) instrumentId: number,
+    @Arg('callId', () => Int) callId: number,
+    @Ctx() context: ResolverContext
+  ): Promise<SEPProposal[] | null> {
+    return context.queries.sep.getSEPProposalsByInstrument(context.user, {
+      sepId,
+      instrumentId,
+      callId,
+    });
   }
 }

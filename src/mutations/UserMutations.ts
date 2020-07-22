@@ -1,14 +1,25 @@
+import {
+  deleteUserValidationSchema,
+  createUserByEmailInviteValidationSchema,
+  createUserValidationSchema,
+  updateUserValidationSchema,
+  signInValidationSchema,
+  getTokenForUserValidationSchema,
+  resetPasswordByEmailValidationSchema,
+  addUserRoleValidationSchema,
+  updatePasswordValidationSchema,
+  userPasswordFieldBEValidationSchema,
+} from '@esss-swap/duo-validation';
 import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
-import * as yup from 'yup';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
-import { Roles } from '../models/Role';
-import { User, BasicUserDetails } from '../models/User';
+import { Roles, Role } from '../models/Role';
+import { User, BasicUserDetails, UserWithRole } from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -18,18 +29,6 @@ import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
 import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
-
-// TODO: Update the validation schemas later when we know all the validation rules.
-const createUserValidationSchema = yup.object().shape({
-  firstname: yup
-    .string()
-    .required()
-    .min(2),
-  lastname: yup
-    .string()
-    .required()
-    .min(2),
-});
 
 export default class UserMutations {
   constructor(
@@ -50,9 +49,13 @@ export default class UserMutations {
     return hash;
   }
 
+  @ValidateArgs(deleteUserValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.USER_DELETED)
-  async delete(agent: User | null, id: number): Promise<User | Rejection> {
+  async delete(
+    agent: UserWithRole | null,
+    { id }: { id: number }
+  ): Promise<User | Rejection> {
     const user = await this.dataSource.delete(id);
     if (!user) {
       return rejection('INTERNAL_ERROR');
@@ -65,10 +68,11 @@ export default class UserMutations {
     return new EmailInviteResponse(userId, agentId, role);
   }
 
+  @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
   @Authorized()
   @EventBus(Event.EMAIL_INVITE)
   async createUserByEmailInvite(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateUserByEmailInviteArgs
   ): Promise<EmailInviteResponse | Rejection> {
     let userId: number | null = null;
@@ -107,6 +111,12 @@ export default class UserMutations {
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.SEP_SECRETARY;
+    } else if (
+      args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
+      (await this.userAuth.isUserOfficer(agent))
+    ) {
+      userId = await this.dataSource.createInviteUser(args);
+      role = UserRole.INSTRUMENT_SCIENTIST;
     }
 
     if (!userId) {
@@ -119,7 +129,7 @@ export default class UserMutations {
   @ValidateArgs(createUserValidationSchema)
   @EventBus(Event.USER_CREATED)
   async create(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateUserArgs
   ): Promise<UserLinkResponse | Rejection> {
     if (
@@ -142,19 +152,18 @@ export default class UserMutations {
     }
 
     //Check if email exist in database and if user has been invited
-    let user = await this.dataSource.getByEmail(args.email);
+    let user = (await this.dataSource.getByEmail(args.email)) as UserWithRole;
 
     if (user && user.placeholder) {
       const changePassword = await this.updatePassword(user, {
         id: user.id,
         password: args.password,
       });
-      const updatedUser = await this.update(user, {
+      const updatedUser = (await this.update(user, {
         id: user.id,
         placeholder: false,
-        password: hash,
         ...args,
-      });
+      })) as UserWithRole;
 
       if (isRejection(updatedUser) || !changePassword) {
         logger.logError('Could not create user', {
@@ -166,7 +175,7 @@ export default class UserMutations {
       }
       user = updatedUser;
     } else {
-      user = await this.dataSource.create(
+      user = (await this.dataSource.create(
         args.user_title,
         args.firstname,
         args.middlename,
@@ -185,7 +194,7 @@ export default class UserMutations {
         args.email,
         args.telephone,
         args.telephone_alt
-      );
+      )) as UserWithRole;
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
@@ -221,10 +230,11 @@ export default class UserMutations {
   }
 
   // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
+  @ValidateArgs(updateUserValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.USER_UPDATED)
   async update(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
     if (
@@ -266,20 +276,24 @@ export default class UserMutations {
       });
   }
 
-  async login(email: string, password: string): Promise<string | Rejection> {
-    const user = await this.dataSource.getByEmail(email);
+  @ValidateArgs(signInValidationSchema)
+  async login(
+    agent: UserWithRole | null,
+    args: { email: string; password: string }
+  ): Promise<string | Rejection> {
+    const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
     const roles = await this.dataSource.getUserRoles(user.id);
-    const result = await this.dataSource.getPasswordByEmail(email);
+    const result = await this.dataSource.getPasswordByEmail(args.email);
 
     if (!result) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
     }
 
-    const valid = bcrypt.compareSync(password, result);
+    const valid = bcrypt.compareSync(args.password, result);
 
     if (!valid) {
       return rejection('WRONG_EMAIL_OR_PASSWORD');
@@ -288,17 +302,22 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
-      expiresIn: process.env.tokenLife,
-    });
+    const token = jsonwebtoken.sign(
+      { user, roles, currentRole: roles[0] },
+      this.secret,
+      {
+        expiresIn: process.env.tokenLife,
+      }
+    );
 
     return token;
   }
 
+  @ValidateArgs(getTokenForUserValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async getTokenForUser(
-    agent: User | null,
-    userId: number
+    agent: UserWithRole | null,
+    { userId }: { userId: number }
   ): Promise<string | Rejection> {
     const user = await this.dataSource.get(userId);
 
@@ -317,8 +336,13 @@ export default class UserMutations {
   async token(token: string): Promise<string | Rejection> {
     try {
       const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const roles = await this.dataSource.getUserRoles(decoded.user.id);
       const freshToken = jsonwebtoken.sign(
-        { user: decoded.user, roles: decoded.roles },
+        {
+          user: decoded.user,
+          roles,
+          currentRole: decoded.currentRole,
+        },
         this.secret,
         {
           expiresIn: process.env.tokenLife,
@@ -333,15 +357,41 @@ export default class UserMutations {
     }
   }
 
+  async selectRole(
+    token: string,
+    selectedRoleId: number
+  ): Promise<string | Rejection> {
+    try {
+      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const currentRole = decoded.roles.find(
+        (role: Role) => role.id === selectedRoleId
+      );
+      const tokenWithRole = jsonwebtoken.sign(
+        { user: decoded.user, roles: decoded.roles, currentRole },
+        this.secret,
+        {
+          expiresIn: process.env.tokenLife,
+        }
+      );
+
+      return tokenWithRole;
+    } catch (error) {
+      logger.logError('Bad token', { token });
+
+      return rejection('BAD_TOKEN');
+    }
+  }
+
+  @ValidateArgs(resetPasswordByEmailValidationSchema)
   @EventBus(Event.USER_PASSWORD_RESET_EMAIL)
   async resetPasswordEmail(
-    agent: User | null,
-    email: string
+    agent: UserWithRole | null,
+    args: { email: string }
   ): Promise<UserLinkResponse | Rejection> {
-    const user = await this.dataSource.getByEmail(email);
+    const user = await this.dataSource.getByEmail(args.email);
 
     if (!user) {
-      logger.logInfo('Could not find user by email', { email });
+      logger.logInfo('Could not find user by email', { email: args });
 
       return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
     }
@@ -388,8 +438,9 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(addUserRoleValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async addUserRole(agent: User | null, args: AddUserRoleArgs) {
+  async addUserRole(agent: UserWithRole | null, args: AddUserRoleArgs) {
     return this.dataSource
       .addUserRole(args)
       .then(() => true)
@@ -400,9 +451,10 @@ export default class UserMutations {
       });
   }
 
+  @ValidateArgs(updatePasswordValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   async updatePassword(
-    agent: User | null,
+    agent: UserWithRole | null,
     { id, password }: { id: number; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     if (
@@ -432,9 +484,10 @@ export default class UserMutations {
     }
   }
 
+  @ValidateArgs(userPasswordFieldBEValidationSchema)
   async resetPassword(
-    token: string,
-    password: string
+    agent: UserWithRole | null,
+    { token, password }: { token: string; password: string }
   ): Promise<BasicUserDetails | Rejection> {
     // Check that token is valid
     try {

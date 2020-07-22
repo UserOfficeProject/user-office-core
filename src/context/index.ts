@@ -1,8 +1,10 @@
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
 import FileMutations from '../mutations/FileMutations';
+import InstrumentMutations from '../mutations/InstrumentMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
+import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
 import SEPMutations from '../mutations/SEPMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
@@ -11,7 +13,9 @@ import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import FileQueries from '../queries/FileQueries';
+import InstrumentQueries from '../queries/InstrumentQueries';
 import ProposalQueries from '../queries/ProposalQueries';
+import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SEPQueries from '../queries/SEPQueries';
 import TemplateQueries from '../queries/TemplateQueries';
@@ -28,6 +32,8 @@ interface ResolverContextQueries {
   template: TemplateQueries;
   eventLogs: EventLogQueries;
   sep: SEPQueries;
+  instrument: InstrumentQueries;
+  questionary: QuestionaryQueries;
 }
 
 interface ResolverContextMutations {
@@ -39,6 +45,8 @@ interface ResolverContextMutations {
   admin: AdminMutations;
   template: TemplateMutations;
   sep: SEPMutations;
+  instrument: InstrumentMutations;
+  questionary: QuestionaryMutations;
 }
 
 export interface BasicResolverContext {
@@ -48,5 +56,5 @@ export interface BasicResolverContext {
 }
 
 export interface ResolverContext extends BasicResolverContext {
-  user: User | null;
+  user: UserWithRole | null;
 }

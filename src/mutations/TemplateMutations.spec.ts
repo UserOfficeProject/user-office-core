@@ -1,35 +1,25 @@
 import 'reflect-metadata';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
-  dummyUser,
-  dummyUserOfficer,
-  UserDataSourceMock,
+  dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import {
   DataType,
-  ProposalTemplate,
   Question,
+  Template,
+  TemplateCategoryId,
   Topic,
 } from '../models/ProposalModel';
-import TemplateQueries from '../queries/TemplateQueries';
 import { isRejection } from '../rejection';
-import { MutedLogger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
 import TemplateMutations from './TemplateMutations';
 
-const dummyLogger = new MutedLogger();
-const dummyTemplateDataSource = new TemplateDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
+const QUESTION_ID = 'links_to_field';
+const NON_EXISTING_QUESTION_ID = 'non_existing_question_id';
 
-const mutations = new TemplateMutations(
-  dummyTemplateDataSource,
-  userAuthorization,
-  dummyLogger
-);
+const dummyTemplateDataSource = new TemplateDataSourceMock();
+
+const mutations = new TemplateMutations(dummyTemplateDataSource);
 
 beforeEach(() => {
   dummyTemplateDataSource.init();
@@ -38,50 +28,81 @@ beforeEach(() => {
 test('An userofficer can update topic', async () => {
   const newTopicTitle = 'new topic title';
   const topicEnabled = false;
-  const topic = await mutations.updateTopic(dummyUserOfficer, {
+  const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
     id: 1,
     title: newTopicTitle,
     isEnabled: topicEnabled,
   });
+
+  expect(isRejection(result)).toBeFalsy();
+
+  const topic = result as Topic;
   expect(topic instanceof Topic).toBe(true);
-  expect((topic as Topic).title).toEqual(newTopicTitle);
-  expect((topic as Topic).isEnabled).toEqual(topicEnabled);
+  expect(topic.title).toEqual(newTopicTitle);
+  expect(topic.isEnabled).toEqual(topicEnabled);
+});
+
+test('Can not update topic that does not exist', async () => {
+  const result = await mutations.updateTopic(dummyUserOfficerWithRole, {
+    id: 9,
+    title: '',
+    isEnabled: false,
+  });
+
+  expect(isRejection(result)).toBeTruthy();
 });
 
 test('An userofficer can create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const template = await mutations.createTemplate(
-    dummyUserOfficer,
+  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
+  const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
+    categoryId,
     name,
-    description
-  );
-  expect(template instanceof ProposalTemplate).toBe(true);
-  expect((template as ProposalTemplate).name).toEqual(name);
-  expect((template as ProposalTemplate).description).toEqual(description);
+    description,
+  });
+  expect(template instanceof Template).toBe(true);
+  expect((template as Template).name).toEqual(name);
+  expect((template as Template).description).toEqual(description);
 });
 test('An user cannot create template', async () => {
   const name = 'The name';
   const description = 'The description';
-  const template = await mutations.createTemplate(dummyUser, name, description);
-  expect(template instanceof ProposalTemplate).toBe(false);
+  const categoryId = TemplateCategoryId.PROPOSAL_QUESTIONARY;
+  const template = await mutations.createTemplate(dummyUserWithRole, {
+    categoryId,
+    name,
+    description,
+  });
+  expect(template instanceof Template).toBe(false);
 });
 
 test('An userofficer can delete template', async () => {
-  const id = 1;
-  const template = await mutations.deleteTemplate(dummyUserOfficer, id);
-  expect(template instanceof ProposalTemplate).toBe(true);
-  expect((template as ProposalTemplate).templateId).toEqual(id);
+  const templateId = 1;
+  const template = await mutations.deleteTemplate(dummyUserOfficerWithRole, {
+    templateId,
+  });
+  expect(template instanceof Template).toBe(true);
+  expect((template as Template).templateId).toEqual(templateId);
 });
 
 test('An user can not delete template', async () => {
-  const id = 1;
-  const template = await mutations.deleteTemplate(dummyUser, id);
-  expect(template instanceof ProposalTemplate).toBe(false);
+  const templateId = 1;
+  const template = await mutations.deleteTemplate(dummyUserWithRole, {
+    templateId,
+  });
+  expect(template instanceof Template).toBe(false);
+});
+
+test('Can not delete non-existing template', async () => {
+  const result = await mutations.deleteTemplate(dummyUserOfficerWithRole, {
+    templateId: 9,
+  });
+  expect(isRejection(result)).toBeTruthy();
 });
 
 test('A user can not update topic', async () => {
-  const topic = await mutations.updateTopic(dummyUser, {
+  const topic = await mutations.updateTopic(dummyUserWithRole, {
     id: 1,
     title: 'New topic title',
     isEnabled: false,
@@ -91,7 +112,7 @@ test('A user can not update topic', async () => {
 });
 
 test('A user-officer can create topic', async () => {
-  const response = await mutations.createTopic(dummyUserOfficer, {
+  const response = await mutations.createTopic(dummyUserOfficerWithRole, {
     templateId: 1,
     sortOrder: 0,
   });
@@ -99,7 +120,7 @@ test('A user-officer can create topic', async () => {
 });
 
 test('A user can not create topic', async () => {
-  const response = await mutations.createTopic(dummyUserOfficer, {
+  const response = await mutations.createTopic(dummyUserOfficerWithRole, {
     templateId: 1,
     sortOrder: 0,
   });
@@ -107,17 +128,20 @@ test('A user can not create topic', async () => {
 });
 
 test('A user-officer can update question topic rel', async () => {
-  const response = await mutations.updateQuestionsTopicRels(dummyUserOfficer, {
-    templateId: 1,
-    topicId: 1,
-    questionIds: ['has_links_with_industry', 'enable_crystallization'],
-  });
+  const response = await mutations.assignQuestionsToTopic(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+      topicId: 1,
+      questionIds: ['has_links_with_industry', 'enable_crystallization'],
+    }
+  );
   expect(isRejection(response)).toEqual(false);
   expect((response as string[])[0]).toEqual('has_links_with_industry');
 });
 
 test('A user can not update question topic rel', async () => {
-  const response = await mutations.updateQuestionsTopicRels(dummyUser, {
+  const response = await mutations.assignQuestionsToTopic(dummyUserWithRole, {
     templateId: 1,
     topicId: 1,
     questionIds: ['has_links_with_industry', 'enable_crystallization'],
@@ -126,14 +150,16 @@ test('A user can not update question topic rel', async () => {
 });
 
 test('User can not create question', async () => {
-  const response = await mutations.createQuestion(dummyUser, {
+  const response = await mutations.createQuestion(dummyUserWithRole, {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     dataType: DataType.EMBELLISHMENT,
   });
-  expect(response).not.toBeInstanceOf(ProposalTemplate);
+  expect(response).not.toBeInstanceOf(Template);
 });
 
 test('User officer can create question', async () => {
-  const response = await mutations.createQuestion(dummyUserOfficer, {
+  const response = await mutations.createQuestion(dummyUserOfficerWithRole, {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     dataType: DataType.EMBELLISHMENT,
   });
   expect(response).toBeInstanceOf(Question);
@@ -144,75 +170,95 @@ test('User officer can create question', async () => {
 
 test('User can not delete question', async () => {
   await expect(
-    mutations.deleteQuestion(dummyUser, 'field_id')
+    mutations.deleteQuestion(dummyUserWithRole, { questionId: QUESTION_ID })
   ).resolves.not.toBeInstanceOf(Question);
 });
 
 test('User officer can delete question', async () => {
   await expect(
-    mutations.deleteQuestion(dummyUserOfficer, 'field_id')
+    mutations.deleteQuestion(dummyUserOfficerWithRole, {
+      questionId: QUESTION_ID,
+    })
   ).resolves.toBeInstanceOf(Question);
+});
+
+test('Can not delete non-existing question', async () => {
+  const result = await mutations.deleteQuestion(dummyUserOfficerWithRole, {
+    questionId: NON_EXISTING_QUESTION_ID,
+  });
+  await expect(isRejection(result)).toBeTruthy();
 });
 
 test('Officer can update topic order', async () => {
   return expect(
-    mutations.updateTopicOrder(dummyUserOfficer, [1, 3, 2])
+    mutations.updateTopicOrder(dummyUserOfficerWithRole, {
+      topicOrder: [1, 3, 2],
+    })
   ).resolves.toBeTruthy();
 });
 
 test('User can not update topic order', async () => {
-  const result = await mutations.updateTopicOrder(dummyUser, [1, 3, 2]);
+  const result = await mutations.updateTopicOrder(dummyUserWithRole, {
+    topicOrder: [1, 3, 2],
+  });
 
   return expect(isRejection(result)).toBeTruthy();
 });
 
-test('Officer can delete a topic', async () => {
-  const topic = await mutations.deleteTopic(dummyUserOfficer, 1);
-  expect(topic instanceof Topic).toBe(true);
-});
-
-test('Dummy user can not delete a topic', async () => {
-  const topic = await mutations.deleteTopic(dummyUser, 1);
+test('User can not delete a topic', async () => {
+  const topic = await mutations.deleteTopic(dummyUserWithRole, { topicId: 1 });
   expect(topic instanceof Topic).toBe(false);
 });
 
 test('User can not update question rel', async () => {
-  const steps = await mutations.updateQuestionRel(dummyUser, {
-    templateId: 1,
-    questionId: 'links_to_field',
-    sortOrder: 2,
-    topicId: 1,
-  });
+  const steps = await mutations.updateQuestionTemplateRelation(
+    dummyUserWithRole,
+    {
+      templateId: 1,
+      questionId: QUESTION_ID,
+      sortOrder: 2,
+      topicId: 1,
+    }
+  );
   expect(isRejection(steps)).toBe(true);
 });
 
 test('User officer can update question rel', async () => {
-  const response = await mutations.updateQuestionRel(dummyUserOfficer, {
-    templateId: 1,
-    questionId: 'links_to_field',
-    sortOrder: 2,
-  });
+  const response = await mutations.updateQuestionTemplateRelation(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+      questionId: QUESTION_ID,
+      sortOrder: 2,
+    }
+  );
   expect(isRejection(response)).toBe(false);
 });
 
 test('User can not delete question rel', async () => {
-  const response = await mutations.deleteQuestionRel(dummyUser, {
-    templateId: 1,
-    questionId: 'links_to_field',
-  });
+  const response = await mutations.deleteQuestionTemplateRelation(
+    dummyUserWithRole,
+    {
+      templateId: 1,
+      questionId: QUESTION_ID,
+    }
+  );
   expect(isRejection(response)).toBe(true);
 });
 
 test('User officer can delete question rel', async () => {
-  const response = await mutations.deleteQuestionRel(dummyUserOfficer, {
-    templateId: 1,
-    questionId: 'links_to_field',
-  });
+  const response = await mutations.deleteQuestionTemplateRelation(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+      questionId: QUESTION_ID,
+    }
+  );
   expect(isRejection(response)).toBe(false);
 });
 
 test('User can not update proposal template', async () => {
-  const steps = await mutations.updateProposalTemplate(dummyUser, {
+  const steps = await mutations.updateTemplate(dummyUserWithRole, {
     templateId: 1,
     description: 'New descsription',
     isArchived: false,
@@ -225,23 +271,80 @@ test('User officer can update proposal template', async () => {
   const newDescription = 'new description';
   const newName = 'new name';
   const newIsArchived = true;
-  let template = await mutations.updateProposalTemplate(dummyUserOfficer, {
+  let template = await mutations.updateTemplate(dummyUserOfficerWithRole, {
     templateId: 1,
     description: newDescription,
     isArchived: newIsArchived,
     name: newName,
   });
   expect(isRejection(template)).toBe(false);
-  template = template as ProposalTemplate;
+  template = template as Template;
   expect(template.description).toEqual(newDescription);
   expect(template.isArchived).toEqual(newIsArchived);
   expect(template.name).toEqual(newName);
 });
 
 test('User can not update question template', async () => {
-  const steps = await mutations.updateQuestion(dummyUser, {
-    id: 'links_to_field',
+  const steps = await mutations.updateQuestion(dummyUserWithRole, {
+    id: QUESTION_ID,
     question: 'new text',
   });
   expect(isRejection(steps)).toBe(true);
+});
+
+test('User officer can clone template', async () => {
+  const clonedTemplate = await mutations.cloneTemplate(
+    dummyUserOfficerWithRole,
+    {
+      templateId: 1,
+    }
+  );
+  expect(clonedTemplate.templateId).toBeGreaterThan(0);
+});
+
+test('User officer can add question to template', async () => {
+  const questionId = 'questionId';
+  const sortOrder = 0;
+  const templateId = 1;
+  const topicId = 1;
+
+  const result = await mutations.createQuestionTemplateRelation(
+    dummyUserOfficerWithRole,
+    {
+      questionId,
+      sortOrder,
+      templateId,
+      topicId,
+    }
+  );
+
+  expect(isRejection(result)).toBeFalsy();
+  expect(result).toBeInstanceOf(Template);
+});
+
+test('User officer can update question', async () => {
+  const NEW_QUESTION_TEXT = 'new question';
+  const result = await mutations.updateQuestion(dummyUserOfficerWithRole, {
+    id: QUESTION_ID,
+    question: NEW_QUESTION_TEXT,
+  });
+  expect(isRejection(result)).toBeFalsy();
+  const updatedQuestion = result as Question;
+  expect(updatedQuestion.question).toBe(NEW_QUESTION_TEXT);
+});
+
+test('User can not update question', async () => {
+  const result = await mutations.updateQuestion(dummyUserWithRole, {
+    id: QUESTION_ID,
+    question: '',
+  });
+  expect(isRejection(result)).toBeTruthy();
+});
+
+test('Updating non existing question should result error', async () => {
+  const result = await mutations.updateQuestion(dummyUserOfficerWithRole, {
+    id: NON_EXISTING_QUESTION_ID,
+    question: '',
+  });
+  expect(isRejection(result)).toBeTruthy();
 });

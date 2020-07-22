@@ -5,9 +5,9 @@ import {
 } from '../datasources/mockups/ReviewDataSource';
 import {
   UserDataSourceMock,
-  dummyUser,
-  dummyUserNotOnProposal,
-  dummyUserOfficer,
+  dummyUserWithRole,
+  dummyUserNotOnProposalWithRole,
+  dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Review, ReviewStatus } from '../models/Review';
 import { UserAuthorization } from '../utils/UserAuthorization';
@@ -26,49 +26,58 @@ const reviewMutations = new ReviewMutations(
 
 test('A reviewer can submit a review on a proposal he is on', () => {
   return expect(
-    reviewMutations.updateReview(dummyUser, {
+    reviewMutations.updateReview(dummyUserWithRole, {
       reviewID: 10,
       comment: 'Good proposal',
       grade: 9,
       status: ReviewStatus.DRAFT,
+      sepID: 1,
     })
   ).resolves.toBe(dummyReview);
 });
 
 test('A user can not submit a review on a proposal', () => {
   return expect(
-    reviewMutations.updateReview(dummyUserNotOnProposal, {
+    reviewMutations.updateReview(dummyUserNotOnProposalWithRole, {
       reviewID: 1,
       comment: 'Good proposal',
       grade: 9,
       status: ReviewStatus.DRAFT,
+      sepID: 1,
     })
   ).resolves.toHaveProperty('reason', 'NOT_REVIEWER_OF_PROPOSAL');
 });
 
 test('A userofficer can add a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.addUserForReview(dummyUserOfficer, {
+    reviewMutations.addUserForReview(dummyUserOfficerWithRole, {
       userID: 1,
       proposalID: 1,
+      sepID: 1,
     })
   ).resolves.toBeInstanceOf(Review);
 });
 
 test('A user can not add a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.addUserForReview(dummyUser, { userID: 1, proposalID: 1 })
+    reviewMutations.addUserForReview(dummyUserWithRole, {
+      userID: 1,
+      proposalID: 1,
+      sepID: 1,
+    })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
 test('A userofficer can remove a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.removeUserForReview(dummyUserOfficer, 1)
+    reviewMutations.removeUserForReview(dummyUserOfficerWithRole, {
+      reviewID: 1,
+    })
   ).resolves.toBeInstanceOf(Review);
 });
 
 test('A user can not remove a reviewer for a proposal', () => {
   return expect(
-    reviewMutations.removeUserForReview(dummyUser, 1)
+    reviewMutations.removeUserForReview(dummyUserWithRole, { reviewID: 1 })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });

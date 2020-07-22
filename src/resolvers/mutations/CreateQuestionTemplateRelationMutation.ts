@@ -9,12 +9,11 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-import { FieldDependencyInput } from './UpdateQuestionRelMutation';
 
 @ArgsType()
-export class CreateQuestionRelArgs {
+export class CreateQuestionTemplateRelationArgs {
   @Field(() => Int)
   templateId: number;
 
@@ -29,15 +28,18 @@ export class CreateQuestionRelArgs {
 }
 
 @Resolver()
-export class CreateQuestionRelMutation {
-  @Mutation(() => ProposalTemplateResponseWrap)
-  createQuestionRel(
-    @Args() args: CreateQuestionRelArgs,
+export class CreateQuestionTopicRelationMutation {
+  @Mutation(() => TemplateResponseWrap)
+  createQuestionTemplateRelation(
+    @Args() args: CreateQuestionTemplateRelationArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.createQuestionRel(context.user, args),
-      ProposalTemplateResponseWrap
+      context.mutations.template.createQuestionTemplateRelation(
+        context.user,
+        args
+      ),
+      TemplateResponseWrap
     );
   }
 }

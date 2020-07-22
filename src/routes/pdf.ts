@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import fs, { existsSync, unlink } from 'fs';
 
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
@@ -6,54 +7,171 @@ import jsonwebtoken from 'jsonwebtoken';
 import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
-import { Answer, DataType, Questionary } from '../models/ProposalModel';
+import { questionaryDataSource } from '../datasources';
+import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
 import { logger } from '../utils/Logger';
 import { createToC } from './pdfTableofContents/index';
 
+type PDFDocument = PDFKit.PDFDocument;
+
+const NOT_ANSWERED = 'Left blank';
+const SEE_APPENDIX = 'See appendix';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const hummus = require('hummus');
 
 const router = express.Router();
+const attachmentQueue = Array<string>();
 
 //Helper functions
-const write = (text: string, doc: PDFKit.PDFDocument) => {
+const write = (text: string, doc: PDFDocument) => {
   return doc
     .font('fonts/Calibri_Regular.ttf')
     .fontSize(11)
     .text(text);
 };
 
-const writeBold = (text: string, doc: PDFKit.PDFDocument) => {
+const writeBold = (text: string, doc: PDFDocument) => {
   return doc
     .font('fonts/Calibri_Bold.ttf')
     .fontSize(11)
     .text(text);
 };
 
-const writeHeading = (text: string, doc: PDFKit.PDFDocument) => {
+const writeItalic = (text: string, doc: PDFDocument) => {
+  return doc
+    .font('fonts/Calibri_Italic.ttf')
+    .fontSize(11)
+    .text(text);
+};
+
+const writeHeading = (text: string, doc: PDFDocument) => {
   return doc
     .font('fonts/Calibri_Bold.ttf')
     .fontSize(14)
     .text(text);
 };
 
-const getAttachments = async (attachmentId: string) => {
+const getFileAttachmentIds = (answer: Answer) => {
+  if (answer.question.dataType === DataType.FILE_UPLOAD && answer.value) {
+    return (answer.value as string).split(',');
+  }
+
+  return [];
+};
+
+const getAttachment = async (attachmentId: string) => {
   await baseContext.mutations.file.prepare(attachmentId);
 
   return baseContext.queries.file.getFileMetadata([attachmentId]);
 };
 
+const getTopicActiveAnswers = (
+  questionarySteps: QuestionaryStep[],
+  topicId: number
+) => {
+  const step = getQuestionaryStepByTopicId(questionarySteps, topicId);
+
+  return step
+    ? (step.fields.filter(field => {
+        return areDependenciesSatisfied(
+          questionarySteps,
+          field.question.proposalQuestionId
+        );
+      }) as Answer[])
+    : [];
+};
+
+const writeEmbellishment = (answer: Answer, doc: PDFDocument) => {
+  const config = answer.question.config as EmbellishmentConfig;
+  if (!config.omitFromPdf) {
+    writeBold(config.plain!, doc);
+  }
+};
+
+const writeFileUpload = (answer: Answer, doc: PDFDocument) => {
+  writeBold(answer.question.question, doc);
+  if (answer.value) {
+    writeItalic(SEE_APPENDIX, doc);
+  } else {
+    write(NOT_ANSWERED, doc);
+  }
+};
+
+const writeDate = (answer: Answer, doc: PDFDocument) => {
+  writeBold(answer.question.question, doc);
+  write(
+    answer.value
+      ? new Date(answer.value).toISOString().split('T')[0]
+      : NOT_ANSWERED,
+    doc
+  );
+};
+
+const writeBoolean = (answer: Answer, doc: PDFDocument) => {
+  writeBold(answer.question.question, doc);
+  if (answer.value) {
+    write('Yes', doc);
+  } else {
+    write('No', doc);
+  }
+};
+
+const writeAnswer = async (answer: Answer, doc: PDFDocument) => {
+  if (answer.question.dataType === DataType.EMBELLISHMENT) {
+    writeEmbellishment(answer, doc);
+  } else if (answer.question.dataType === DataType.FILE_UPLOAD) {
+    writeFileUpload(answer, doc);
+  } else if (answer.question.dataType === DataType.DATE) {
+    writeDate(answer, doc);
+  } else if (answer.question.dataType === DataType.BOOLEAN) {
+    writeBoolean(answer, doc);
+  } else if (answer.question.dataType === DataType.SUBTEMPLATE) {
+    await writeSubtemplate(answer, doc);
+  } else {
+    writeBold(answer.question.question, doc);
+    write(answer.value ? answer.value : NOT_ANSWERED, doc);
+  }
+  doc.moveDown(0.5);
+};
+
+const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
+  writeBold(answer.question.question, doc);
+  doc.moveDown();
+  const subQuestionaryIds = answer.value.split(',');
+  for (const subQuestionaryId of subQuestionaryIds) {
+    writeBold(
+      `Entry ${subQuestionaryIds.indexOf(subQuestionaryId) + 1} of ${
+        subQuestionaryIds.length
+      }`,
+      doc
+    );
+    const subquestionarySteps = await questionaryDataSource.getQuestionarySteps(
+      subQuestionaryId
+    );
+    const firstStepTopicId = subquestionarySteps![0].topic.id; // NOTE: for now only the first topic
+    const answers = getTopicActiveAnswers(
+      subquestionarySteps!,
+      firstStepTopicId
+    );
+    for (const answer of answers) {
+      attachmentQueue.push(...getFileAttachmentIds(answer));
+      await writeAnswer(answer, doc);
+    }
+  }
+  doc.moveDown();
+};
 const createProposalPDF = async (
   proposalId: number,
-  user: User,
+  user: UserWithRole,
   pageNumber: number
 ): Promise<{
   toc: any;
@@ -61,7 +179,6 @@ const createProposalPDF = async (
   metaData: { year: number; path: string; pi: string; shortCode: string };
 }> => {
   try {
-    const notAnswered = 'Left blank';
     const UserAuthorization = baseContext.userAuthorization;
     const proposal = await baseContext.queries.proposal.get(user, proposalId);
     const toc: any = [];
@@ -70,16 +187,17 @@ const createProposalPDF = async (
       throw new Error('User was not allowed to download PDF');
     }
 
-    const questionaryObj = await baseContext.queries.proposal.getQuestionary(
+    const queries = baseContext.queries.questionary;
+
+    const questionarySteps = await queries.getQuestionarySteps(
       user,
-      proposalId
+      proposal.questionaryId
     );
 
-    if (isRejection(questionaryObj) || questionaryObj == null) {
+    if (isRejection(questionarySteps) || questionarySteps == null) {
       throw new Error('Could not fetch questionary');
     }
 
-    const questionary = Questionary.fromObject(questionaryObj);
     const principalInvestigator = await baseContext.queries.user.getBasic(
       user,
       proposal.proposerId
@@ -117,7 +235,6 @@ const createProposalPDF = async (
     doc.pipe(writeStream);
 
     // General information
-    let attachmentIds: string[] = []; // Save attachments for appendix
     doc.image('./images/ESS.png', 15, 15, { width: 100 });
 
     writeHeading(`Proposal: ${proposal.title}`, doc);
@@ -155,75 +272,38 @@ const createProposalPDF = async (
     });
 
     // Information from each topic in proposal
-    questionary.steps.forEach(x => {
+    for (const step of questionarySteps) {
       doc.addPage();
       doc.image('./images/ESS.png', 15, 15, { width: 100 });
-      const step = getQuestionaryStepByTopicId(questionary.steps, x.topic.id);
-      const activeFields = step
-        ? (step.fields.filter(field => {
-            return areDependenciesSatisfied(
-              questionary.steps,
-              field.question.proposalQuestionId
-            );
-          }) as Answer[])
-        : [];
+
       if (!step) {
         throw 'Could not download generated PDF';
       }
-      writeBold(step.topic.title, doc);
+
+      writeHeading(step.topic.title, doc);
       toc.push({
         title: step.topic.title,
         page: pageNumber,
         children: [],
       });
-      doc.moveDown();
-      activeFields.forEach(field => {
-        if (field.question.dataType === DataType.EMBELLISHMENT) {
-          const conf = field.question.config as EmbellishmentConfig;
-          if (!conf.omitFromPdf) {
-            writeBold(conf.plain!, doc);
-          }
-        } else if (field.question.dataType === DataType.FILE_UPLOAD) {
-          writeBold(field.question.question, doc);
-          if (field.value) {
-            const fieldAttachmentArray: string[] = field.value.split(',');
-            attachmentIds = attachmentIds.concat(fieldAttachmentArray);
-            write('This document has been appended to the proposal', doc);
-          } else {
-            write(notAnswered, doc);
-          }
-          // Default case, a ordinary question type
-        } else if (field.question.dataType === DataType.DATE) {
-          writeBold(field.question.question, doc);
-          write(
-            field.value
-              ? new Date(field.value).toISOString().split('T')[0]
-              : notAnswered,
-            doc
-          );
-        } else if (field.question.dataType === DataType.BOOLEAN) {
-          writeBold(field.question.question, doc);
-          if (field.value) {
-            write('Yes', doc);
-          } else {
-            write('No', doc);
-          }
-        } else {
-          writeBold(field.question.question, doc);
-          write(field.value ? field.value : notAnswered, doc);
-        }
-        doc.moveDown(0.5);
-      });
-    });
 
-    doc.end();
+      doc.moveDown();
+      const topic = step.topic;
+      const answers = getTopicActiveAnswers(questionarySteps, topic.id);
+      for (const answer of answers) {
+        attachmentQueue.push(...getFileAttachmentIds(answer));
+        await writeAnswer(answer, doc);
+      }
+    }
+
     pageNumber++;
+    doc.end();
 
     // Stitch together PDF proposal with attachments
     return new Promise(resolve => {
       writeStream.on('finish', async function() {
         const attachmentsMetadata = await Promise.all(
-          attachmentIds.map(getAttachments)
+          attachmentQueue.map(getAttachment)
         ).catch(e => {
           logger.logException('Could not download generated PDF', e);
           throw e;
@@ -349,7 +429,7 @@ router.get('/proposal/download/:proposal_ids', async (req: any, res) => {
     for (const propId of proposalIds) {
       const result = await createProposalPDF(
         parseInt(propId),
-        user as User,
+        user as UserWithRole,
         pageNumber
       ).then(result => {
         pdfWriter.appendPDFPagesFromPDF(`downloads/${result.metaData.path}`);

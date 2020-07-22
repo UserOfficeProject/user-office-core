@@ -2,15 +2,20 @@ import { Field, ObjectType } from 'type-graphql';
 
 import { Response } from '../Decorators';
 import { Page } from './Admin';
+import { Answer } from './Answer';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Institution } from './Institution';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
-import { ProposalTemplate } from './ProposalTemplate';
 import { Question } from './Question';
-import { QuestionRel } from './QuestionRel';
+import { Questionary } from './Questionary';
+import { QuestionaryStep } from './QuestionaryStep';
+import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
+import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
 
@@ -51,6 +56,13 @@ export class SEPResponseWrap extends ResponseWrapBase<SEP> {
 }
 
 @ObjectType()
+export class InstrumentResponseWrap extends ResponseWrapBase<Instrument> {
+  @Response()
+  @Field(() => Instrument, { nullable: true })
+  public instrument: Instrument;
+}
+
+@ObjectType()
 export class SEPMembersRoleResponseWrap extends ResponseWrapBase<boolean> {
   @Response()
   @Field(() => Boolean, { nullable: true })
@@ -67,12 +79,26 @@ export class TechnicalReviewResponseWrap extends ResponseWrapBase<
 }
 
 @ObjectType()
-export class ProposalTemplateResponseWrap extends ResponseWrapBase<
-  ProposalTemplate
+export class TemplateResponseWrap extends ResponseWrapBase<Template> {
+  @Response()
+  @Field(() => Template, { nullable: true })
+  public template: Template;
+}
+
+@ObjectType()
+export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
+  @Response()
+  @Field(() => Questionary, { nullable: true })
+  public questionary: Questionary;
+}
+
+@ObjectType()
+export class QuestionaryStepResponseWrap extends ResponseWrapBase<
+  QuestionaryStep
 > {
   @Response()
-  @Field(() => ProposalTemplate, { nullable: true })
-  public template: ProposalTemplate;
+  @Field(() => QuestionaryStep, { nullable: true })
+  public questionaryStep: QuestionaryStep;
 }
 
 @ObjectType()
@@ -90,14 +116,18 @@ export class ProposalResponseWrap extends ResponseWrapBase<Proposal> {
 }
 
 @ObjectType()
-export class QuestionRelResponseWrap extends ResponseWrapBase<QuestionRel> {
+export class QuestionTemplateRelationResponseWrap extends ResponseWrapBase<
+  QuestionTemplateRelation
+> {
   @Response()
-  @Field(() => QuestionRel, { nullable: true })
-  public questionRel: QuestionRel;
+  @Field(() => QuestionTemplateRelation, { nullable: true })
+  public questionTemplateRelation: QuestionTemplateRelation;
 }
 
 @ObjectType()
-export class QuestionResponseWrap extends ResponseWrapBase<QuestionRel> {
+export class QuestionResponseWrap extends ResponseWrapBase<
+  QuestionTemplateRelation
+> {
   @Response()
   @Field(() => Question, { nullable: true })
   public question: Question;
@@ -115,6 +145,13 @@ export class TopicResponseWrap extends ResponseWrapBase<Topic> {
   @Response()
   @Field(() => Topic, { nullable: true })
   public topic: Topic;
+}
+
+@ObjectType()
+export class InstitutionResponseWrap extends ResponseWrapBase<Topic> {
+  @Response()
+  @Field(() => Institution, { nullable: true })
+  public institution: Institution;
 }
 
 @ObjectType()
@@ -136,4 +173,11 @@ export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
   @Field(() => String)
   public log: string;
+}
+
+@ObjectType()
+export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
+  @Response()
+  @Field(() => Answer)
+  public answer: Answer;
 }

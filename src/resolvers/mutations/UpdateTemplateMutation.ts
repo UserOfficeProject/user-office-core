@@ -9,11 +9,11 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalTemplateResponseWrap } from '../types/CommonWrappers';
+import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
-export class UpdateProposalTemplateArgs {
+export class UpdateTemplateArgs {
   @Field(() => Int)
   public templateId: number;
 
@@ -28,15 +28,15 @@ export class UpdateProposalTemplateArgs {
 }
 
 @Resolver()
-export class UpdateProposalTemplateMutation {
-  @Mutation(() => ProposalTemplateResponseWrap)
-  updateProposalTemplate(
-    @Args() args: UpdateProposalTemplateArgs,
+export class UpdateTemplateMutation {
+  @Mutation(() => TemplateResponseWrap)
+  updateTemplate(
+    @Args() args: UpdateTemplateArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.template.updateProposalTemplate(context.user, args),
-      ProposalTemplateResponseWrap
+      context.mutations.template.updateTemplate(context.user, args),
+      TemplateResponseWrap
     );
   }
 }

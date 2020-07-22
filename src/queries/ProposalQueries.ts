@@ -3,7 +3,7 @@ import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -17,7 +17,7 @@ export default class ProposalQueries {
   ) {}
 
   @Authorized()
-  async get(agent: User | null, id: number) {
+  async get(agent: UserWithRole | null, id: number) {
     const proposal = await this.dataSource.get(id);
 
     if (!proposal) {
@@ -43,23 +43,8 @@ export default class ProposalQueries {
     }
   }
 
-  async getQuestionary(agent: User | null, proposalId: number) {
-    const proposal = await this.dataSource.get(proposalId);
-
-    if ((await this.hasAccessRights(agent, proposal)) === false) {
-      return null;
-    }
-
-    return await this.dataSource.getQuestionary(proposalId);
-  }
-
-  async getEmptyQuestionary(user: User | null, callId: number) {
-    return await this.dataSource.getEmptyQuestionary(callId);
-  }
-
-  // NOTE: Duplicate function! We have this same function under userAuth.
   private async hasAccessRights(
-    agent: User | null,
+    agent: UserWithRole | null,
     proposal: Proposal | null
   ): Promise<boolean> {
     if (proposal == null) {
@@ -75,7 +60,7 @@ export default class ProposalQueries {
 
   @Authorized([Roles.USER_OFFICER])
   async getAll(
-    agent: User | null,
+    agent: UserWithRole | null,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number
@@ -84,7 +69,7 @@ export default class ProposalQueries {
   }
 
   @Authorized()
-  async getBlank(agent: User | null, callId: number) {
+  async getBlank(agent: UserWithRole | null, callId: number) {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.dataSource.checkActiveCall(callId))
@@ -114,7 +99,7 @@ export default class ProposalQueries {
       0,
       '',
       '',
-      (agent as User).id,
+      (agent as UserWithRole).id,
       ProposalStatus.BLANK,
       new Date(),
       new Date(),
@@ -122,7 +107,7 @@ export default class ProposalQueries {
       0,
       ProposalEndStatus.UNSET,
       call?.id,
-      call?.templateId,
+      -1,
       '',
       '',
       false

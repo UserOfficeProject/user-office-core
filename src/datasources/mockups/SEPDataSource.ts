@@ -104,6 +104,10 @@ export class SEPDataSourceMock implements SEPDataSource {
     return null;
   }
 
+  async getUserSeps(id: number): Promise<SEP[]> {
+    return [dummySEP];
+  }
+
   async getAll(
     active: boolean,
     filter?: string,
@@ -133,8 +137,20 @@ export class SEPDataSourceMock implements SEPDataSource {
     return { totalCount: dummySEPsCopy.length, seps: dummySEPsCopy };
   }
 
-  async getSEPProposals(sepId: number) {
+  async getSEPProposals(sepId: number, callId: number) {
     return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
+  }
+
+  async getSEPProposalsByInstrument(
+    sepId: number,
+    instrumentId: number,
+    callId: number
+  ) {
+    return dummySEPProposals.filter(proposal => proposal.sepId === sepId);
+  }
+
+  async getSEPByProposalId(proposalId: number) {
+    return dummySEP;
   }
 
   async getSEPProposalAssignments(sepId: number, proposalId: number) {

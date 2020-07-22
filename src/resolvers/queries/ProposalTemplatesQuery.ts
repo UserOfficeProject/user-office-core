@@ -1,18 +1,19 @@
 import {
   Args,
-  ArgsType,
   Ctx,
-  Field,
   Query,
   Resolver,
   InputType,
+  Field,
+  ArgsType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { TemplateCategoryId } from '../../models/ProposalModel';
 import { ProposalTemplate } from '../types/ProposalTemplate';
 @InputType()
 class ProposalTemplatesFilter {
-  @Field()
+  @Field({ nullable: true })
   public isArchived?: boolean;
 }
 
@@ -21,13 +22,19 @@ export class ProposalTemplatesArgs {
   @Field(() => ProposalTemplatesFilter, { nullable: true })
   public filter?: ProposalTemplatesFilter;
 }
+
 @Resolver()
 export class ProposalTemplatesQuery {
-  @Query(() => [ProposalTemplate])
+  @Query(() => [ProposalTemplate], { nullable: true })
   proposalTemplates(
     @Ctx() context: ResolverContext,
     @Args() args: ProposalTemplatesArgs
   ) {
-    return context.queries.template.getProposalTemplates(context.user, args);
+    return context.queries.template.getTemplates(context.user, {
+      filter: {
+        ...args.filter,
+        category: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      },
+    });
   }
 }

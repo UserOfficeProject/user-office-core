@@ -8,11 +8,13 @@ import {
   FieldCondition,
   FieldDependency,
   Question,
-  QuestionRel,
+  Questionary,
+  QuestionTemplateRelation,
+  TemplateCategory,
   Topic,
 } from '../../models/ProposalModel';
 import { BasicUserDetails, User } from '../../models/User';
-import { ProposalTemplate } from './../../models/ProposalModel';
+import { Template } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -21,8 +23,14 @@ export interface ProposalUserRecord {
   readonly user_id: number;
 }
 
+export interface QuestionaryRecord {
+  readonly questionary_id: number;
+  readonly template_id: number;
+  readonly creator_id: number;
+  readonly created_at: Date;
+}
+
 export interface ProposalRecord {
-  [x: string]: any;
   readonly proposal_id: number;
   readonly title: string;
   readonly abstract: string;
@@ -32,10 +40,13 @@ export interface ProposalRecord {
   readonly updated_at: Date;
   readonly full_count: number;
   readonly short_code: string;
+  readonly rank_order: number;
+  readonly final_status: number;
   readonly excellence_score: number;
   readonly safety_score: number;
   readonly technical_score: number;
   readonly call_id: number;
+  readonly questionary_id: number;
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
@@ -50,13 +61,14 @@ export interface TopicRecord {
 }
 
 export interface FieldDependencyRecord {
-  readonly proposal_question_id: string;
+  readonly question_id: string;
   readonly proposal_question_dependency: string;
   readonly condition: string;
 }
 
-export interface ProposalQuestionRecord {
-  readonly proposal_question_id: string;
+export interface QuestionRecord {
+  readonly category_id: number;
+  readonly question_id: string;
   readonly data_type: string;
   readonly question: string;
   readonly default_config: string;
@@ -66,19 +78,20 @@ export interface ProposalQuestionRecord {
   readonly natural_key: string;
 }
 
-export interface ProposalQuestionProposalTemplateRelRecord {
+export interface QuestionTemplateRelRecord {
   readonly id: number;
-  readonly proposal_question_id: string;
+  readonly question_id: string;
   readonly template_id: string;
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_proposal_question_id: string;
+  readonly dependency_question_id: string;
   readonly dependency_condition: string;
 }
 
-export interface ProposalTemplateRecord {
+export interface TemplateRecord {
   readonly template_id: number;
+  readonly category_id: number;
   readonly name: string;
   readonly description: string;
   readonly is_archived: boolean;
@@ -126,6 +139,7 @@ export interface ReviewRecord {
   readonly comment: string;
   readonly grade: number;
   readonly status: number;
+  readonly sep_id: number;
 }
 
 export interface TechnicalReviewRecord {
@@ -146,6 +160,8 @@ export interface CallRecord {
   readonly end_review: Date;
   readonly start_notify: Date;
   readonly end_notify: Date;
+  readonly start_cycle: Date;
+  readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
   readonly template_id: number;
@@ -222,6 +238,29 @@ export interface SEPMemberRecord {
   readonly sep_id: number;
 }
 
+export interface InstrumentRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
+export interface InstrumentWithAvailabilityTimeRecord {
+  readonly instrument_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly availability_time: number;
+  readonly proposal_count: number;
+  readonly full_count: number;
+}
+
+export interface TemplateCategoryRecord {
+  readonly template_category_id: number;
+  readonly name: string;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -235,9 +274,10 @@ export const createTopicObject = (proposal: TopicRecord) => {
   );
 };
 
-export const createQuestionObject = (question: ProposalQuestionRecord) => {
+export const createQuestionObject = (question: QuestionRecord) => {
   return new Question(
-    question.proposal_question_id,
+    question.category_id,
+    question.question_id,
     question.natural_key,
     question.data_type as DataType,
     question.question,
@@ -245,11 +285,10 @@ export const createQuestionObject = (question: ProposalQuestionRecord) => {
   );
 };
 
-export const createProposalTemplateObject = (
-  template: ProposalTemplateRecord
-) => {
-  return new ProposalTemplate(
+export const createProposalTemplateObject = (template: TemplateRecord) => {
+  return new Template(
     template.template_id,
+    template.category_id,
     template.name,
     template.description,
     template.is_archived
@@ -269,7 +308,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.rank_order,
     proposal.final_status,
     proposal.call_id,
-    proposal.template_id,
+    proposal.questionary_id,
     proposal.comment_for_user,
     proposal.comment_for_management,
     proposal.notified
@@ -282,7 +321,7 @@ export const createFieldDependencyObject = (
   const conditionJson = JSON.parse(fieldDependency.condition);
 
   return new FieldDependency(
-    fieldDependency.proposal_question_id,
+    fieldDependency.question_id,
     fieldDependency.proposal_question_dependency,
     fieldDependency.natural_key,
     new FieldCondition(
@@ -303,12 +342,13 @@ export const createFileMetadata = (record: FileRecord) => {
   );
 };
 
-export const createQuestionRelObject = (
-  record: ProposalQuestionRecord & ProposalQuestionProposalTemplateRelRecord
+export const createQuestionTemplateRelationObject = (
+  record: QuestionRecord & QuestionTemplateRelRecord
 ) => {
-  return new QuestionRel(
+  return new QuestionTemplateRelation(
     new Question(
-      record.proposal_question_id,
+      record.category_id,
+      record.question_id,
       record.natural_key,
       record.data_type as DataType,
       record.question,
@@ -317,10 +357,10 @@ export const createQuestionRelObject = (
     record.topic_id,
     record.sort_order,
     createConfigByType(record.data_type as DataType, record.config),
-    record.dependency_proposal_question_id
+    record.dependency_question_id
       ? new FieldDependency(
-          record.proposal_question_id,
-          record.dependency_proposal_question_id,
+          record.question_id,
+          record.dependency_question_id,
           record.natural_key,
           FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
         )
@@ -377,8 +417,28 @@ export const createCallObject = (call: CallRecord) => {
     call.end_review,
     call.start_notify,
     call.end_notify,
+    call.start_cycle,
+    call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
     call.template_id
+  );
+};
+
+export const createQuestionaryObject = (questionary: QuestionaryRecord) => {
+  return new Questionary(
+    questionary.questionary_id,
+    questionary.template_id,
+    questionary.creator_id,
+    questionary.created_at
+  );
+};
+
+export const createTemplateCategoryObject = (
+  templateCategory: TemplateCategoryRecord
+) => {
+  return new TemplateCategory(
+    templateCategory.template_category_id,
+    templateCategory.name
   );
 };

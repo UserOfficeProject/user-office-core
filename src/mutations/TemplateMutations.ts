@@ -1,22 +1,41 @@
+import {
+  cloneTemplateValidationSchema,
+  createQuestionTemplateRelationValidationSchema,
+  createQuestionValidationSchema,
+  createTemplateValidationSchema,
+  createTopicValidationSchema,
+  deleteQuestionTemplateRelationValidationSchema,
+  deleteQuestionValidationSchema,
+  deleteTemplateValidationSchema,
+  deleteTopicValidationSchema,
+  updateQuestionsTopicRelsValidationSchema,
+  updateQuestionTemplateRelationValidationSchema,
+  updateQuestionValidationSchema,
+  updateTemplateValidationSchema,
+  updateTopicOrderValidationSchema,
+  updateTopicValidationSchema,
+} from '@esss-swap/duo-validation';
+
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import {
   createConfig,
   DataType,
-  ProposalTemplate,
   Question,
+  Template,
   Topic,
 } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
-import { User } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';
-import { CreateQuestionRelArgs } from '../resolvers/mutations/CreateQuestionRelMutation';
+import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
+import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';
-import { DeleteQuestionRelArgs } from '../resolvers/mutations/DeleteQuestionRelMutation';
-import { UpdateProposalTemplateArgs } from '../resolvers/mutations/UpdateProposalTemplateMutation';
+import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/DeleteQuestionTemplateRelationMutation';
 import { UpdateQuestionArgs } from '../resolvers/mutations/UpdateQuestionMutation';
-import { UpdateQuestionRelArgs } from '../resolvers/mutations/UpdateQuestionRelMutation';
+import { UpdateQuestionTemplateRelationArgs } from '../resolvers/mutations/UpdateQuestionTemplateRelationMutation';
+import { UpdateTemplateArgs } from '../resolvers/mutations/UpdateTemplateMutation';
 import { UpdateTopicArgs } from '../resolvers/mutations/UpdateTopicMutation';
 import {
   ConfigBase,
@@ -24,35 +43,36 @@ import {
   FieldConfigType,
   FileUploadConfig,
   SelectionFromOptionsConfig,
+  SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
-import { Logger, logger } from '../utils/Logger';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { logger } from '../utils/Logger';
 
 export default class TemplateMutations {
-  constructor(
-    private dataSource: TemplateDataSource,
-    private userAuth: UserAuthorization,
-    private logger: Logger
-  ) {}
+  constructor(private dataSource: TemplateDataSource) {}
 
+  @ValidateArgs(createTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createTemplate(
-    agent: User | null,
-    name: string,
-    description?: string
-  ): Promise<ProposalTemplate | Rejection> {
+    agent: UserWithRole | null,
+    args: CreateTemplateArgs
+  ): Promise<Template | Rejection> {
     const result = await this.dataSource
-      .createTemplate(name, description)
+      .createTemplate(args)
       .then(result => result);
 
     return result;
   }
 
+  @ValidateArgs(cloneTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async cloneTemplate(
-    agent: User | null,
-    templateId: number
-  ): Promise<unknown> {
+    agent: UserWithRole | null,
+    {
+      templateId,
+    }: {
+      templateId: number;
+    }
+  ) {
     const result = await this.dataSource
       .cloneTemplate(templateId)
       .then(result => result);
@@ -60,26 +80,31 @@ export default class TemplateMutations {
     return result;
   }
 
+  @ValidateArgs(deleteTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteTemplate(
-    user: User | null,
-    id: number
-  ): Promise<ProposalTemplate | Rejection> {
+    user: UserWithRole | null,
+    { templateId }: { templateId: number }
+  ): Promise<Template | Rejection> {
     return this.dataSource
-      .deleteTemplate(id)
+      .deleteTemplate(templateId)
       .then(template => template)
       .catch(err => {
-        logger.logException('Could not delete proposal', err, { id, user });
+        logger.logException('Could not delete proposal', err, {
+          templateId,
+          user,
+        });
 
         return rejection('INTERNAL_ERROR');
       });
   }
 
+  @ValidateArgs(createTopicValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createTopic(
-    user: User | null,
+    user: UserWithRole | null,
     args: CreateTopicArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  ): Promise<Template | Rejection> {
     return this.dataSource
       .createTopic(args)
       .then(response => response)
@@ -92,9 +117,11 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(updateTopicValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateTopic(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateTopicArgs
   ): Promise<Topic | Rejection> {
     return this.dataSource
@@ -109,10 +136,12 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(deleteTopicValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteTopic(
-    agent: User | null,
-    topicId: number
+    agent: UserWithRole | null,
+    { topicId }: { topicId: number }
   ): Promise<Topic | Rejection> {
     return this.dataSource
       .deleteTopic(topicId)
@@ -123,16 +152,19 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(createQuestionValidationSchema(DataType))
   @Authorized([Roles.USER_OFFICER])
   async createQuestion(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: CreateQuestionArgs
   ): Promise<Question | Rejection> {
-    const { dataType } = args;
+    const { dataType, categoryId } = args;
     const newFieldId = `${dataType.toLowerCase()}_${new Date().getTime()}`;
 
     return this.dataSource
       .createQuestion(
+        categoryId,
         newFieldId,
         newFieldId, // natural key defaults to id
         dataType,
@@ -149,9 +181,11 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(updateQuestionValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateQuestion(
-    agent: User | null,
+    agent: UserWithRole | null,
     args: UpdateQuestionArgs
   ): Promise<Question | Rejection> {
     return this.dataSource
@@ -167,10 +201,11 @@ export default class TemplateMutations {
       });
   }
 
+  @ValidateArgs(deleteQuestionValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteQuestion(
-    agent: User | null,
-    questionId: string
+    agent: UserWithRole | null,
+    { questionId }: { questionId: string }
   ): Promise<Question | Rejection> {
     return this.dataSource
       .deleteQuestion(questionId)
@@ -185,13 +220,14 @@ export default class TemplateMutations {
       });
   }
 
+  @ValidateArgs(updateQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionRel(
-    agent: User | null,
-    args: UpdateQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  async updateQuestionTemplateRelation(
+    agent: UserWithRole | null,
+    args: UpdateQuestionTemplateRelationArgs
+  ): Promise<Template | Rejection> {
     return this.dataSource
-      .updateQuestionRel(args)
+      .updateQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not update question rel', err, {
@@ -203,13 +239,14 @@ export default class TemplateMutations {
       });
   }
 
+  @ValidateArgs(deleteQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async deleteQuestionRel(
-    agent: User | null,
-    args: DeleteQuestionRelArgs
-  ): Promise<ProposalTemplate | Rejection> {
+  async deleteQuestionTemplateRelation(
+    agent: UserWithRole | null,
+    args: DeleteQuestionTemplateRelationArgs
+  ): Promise<Template | Rejection> {
     return this.dataSource
-      .deleteQuestionRel(args)
+      .deleteQuestionTemplateRelation(args)
       .then(steps => steps)
       .catch(err => {
         logger.logException('Could not delete question rel', err, {
@@ -220,10 +257,12 @@ export default class TemplateMutations {
         return rejection('INTERNAL_ERROR');
       });
   }
+
+  @ValidateArgs(updateTopicOrderValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateTopicOrder(
-    agent: User | null,
-    topicOrder: number[]
+    agent: UserWithRole | null,
+    { topicOrder }: { topicOrder: number[] }
   ): Promise<number[] | Rejection> {
     return this.dataSource
       .updateTopicOrder(topicOrder)
@@ -238,10 +277,11 @@ export default class TemplateMutations {
       });
   }
 
+  @ValidateArgs(updateQuestionsTopicRelsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async updateQuestionsTopicRels(
-    agent: User | null,
-    values: {
+  async assignQuestionsToTopic(
+    agent: UserWithRole | null,
+    args: {
       templateId: number;
       topicId: number;
       questionIds: string[];
@@ -249,13 +289,15 @@ export default class TemplateMutations {
   ): Promise<string[] | Rejection> {
     let isSuccess = true;
     let index = 1;
-    for (const questionId of values.questionIds) {
-      const updatedField = await this.dataSource.updateQuestionRel({
-        questionId,
-        topicId: values.topicId,
-        templateId: values.templateId,
-        sortOrder: index,
-      });
+    for (const questionId of args.questionIds) {
+      const updatedField = await this.dataSource.updateQuestionTemplateRelation(
+        {
+          questionId,
+          topicId: args.topicId,
+          templateId: args.templateId,
+          sortOrder: index,
+        }
+      );
       isSuccess = isSuccess && updatedField != null;
       index++;
     }
@@ -263,11 +305,12 @@ export default class TemplateMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    return values.questionIds;
+    return args.questionIds;
   }
 
+  @ValidateArgs(updateTemplateValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  updateProposalTemplate(user: User | null, args: UpdateProposalTemplateArgs) {
+  updateTemplate(user: UserWithRole | null, args: UpdateTemplateArgs) {
     return this.dataSource
       .updateTemplate(args)
       .then(data => data)
@@ -280,10 +323,14 @@ export default class TemplateMutations {
       });
   }
 
+  @ValidateArgs(createQuestionTemplateRelationValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  createQuestionRel(user: User | null, args: CreateQuestionRelArgs) {
+  async createQuestionTemplateRelation(
+    user: UserWithRole | null,
+    args: CreateQuestionTemplateRelationArgs
+  ) {
     return this.dataSource
-      .createQuestionRel(args)
+      .createQuestionTemplateRelation(args)
       .then(data => data)
       .catch(err => {
         logger.logException('Could not create Question Relation', err, {
@@ -307,6 +354,10 @@ export default class TemplateMutations {
         return createConfig<SelectionFromOptionsConfig>(
           new SelectionFromOptionsConfig()
         );
+      case DataType.SUBTEMPLATE:
+        return createConfig<SubtemplateConfig>(new SubtemplateConfig(), {
+          addEntryButtonLabel: 'Add',
+        });
       default:
         return new ConfigBase();
     }
