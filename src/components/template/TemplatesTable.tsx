@@ -35,7 +35,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
 
   useEffect(() => {
     props.dataProvider().then(data => {
-      setTemplates(data);
+      data && setTemplates(data);
       setLoadingTemplates(false);
     });
   }, [props]);

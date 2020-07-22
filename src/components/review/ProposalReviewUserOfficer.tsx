@@ -10,7 +10,7 @@ import ParticipantModal from 'components/proposal/ParticipantModal';
 import ProposalAdmin from 'components/proposal/ProposalAdmin';
 import {
   Proposal,
-  TechnicalReview,
+  CoreTechnicalReviewFragment,
   UserRole,
   Review,
   BasicUserDetails,
@@ -33,7 +33,7 @@ type ProposalReviewProps = PropTypes.InferProps<typeof ProposalReviewPropTypes>;
 const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   const [modalOpen, setOpen] = useState(false);
   const [techReview, setTechReview] = useState<
-    TechnicalReview | null | undefined
+    CoreTechnicalReviewFragment | null | undefined
   >(null);
 
   const [reviews, setReviews] = useState<Review[]>([]);

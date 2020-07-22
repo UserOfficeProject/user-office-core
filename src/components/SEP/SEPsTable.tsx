@@ -37,7 +37,7 @@ const SEPsTable: React.FC = () => {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
   }
 
-  const onSepAdded = (sepAdded: Sep | null) => {
+  const onSepAdded = (sepAdded: Sep | null | undefined) => {
     sepAdded && setSEPsData([...SEPsData, sepAdded]);
     setShow(false);
   };
@@ -52,7 +52,9 @@ const SEPsTable: React.FC = () => {
         open={show}
         onClose={(): void => setShow(false)}
       >
-        <AddSEP close={(sepAdded: Sep | null) => onSepAdded(sepAdded)} />
+        <AddSEP
+          close={(sepAdded: Sep | null | undefined) => onSepAdded(sepAdded)}
+        />
       </InputDialog>
       <div data-cy="SEPs-table">
         <MaterialTable

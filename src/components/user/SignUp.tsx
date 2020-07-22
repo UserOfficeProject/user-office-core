@@ -145,7 +145,6 @@ const SignUp: React.FC<SignUpProps> = props => {
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
-
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
   }

@@ -1,5 +1,4 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import PropTypes from 'prop-types';
 import React, { useCallback, useState } from 'react';
 
 import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
@@ -24,11 +23,7 @@ export type UserProposalDataType = {
   data: PartialProposalsDataType[] | undefined;
 };
 
-type ProposalTableUserProps = {
-  id: number;
-};
-
-const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
+const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
@@ -47,7 +42,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
     setLoading(true);
 
     return api()
-      .getUserProposals({ id })
+      .getUserProposals()
       .then(data => {
         setLoading(false);
 
@@ -72,7 +67,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
             }),
         };
       });
-  }, [api, id]);
+  }, [api]);
 
   return (
     <ProposalTable
@@ -82,10 +77,6 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
       isLoading={loading}
     />
   );
-};
-
-ProposalTableUser.propTypes = {
-  id: PropTypes.number.isRequired,
 };
 
 export default ProposalTableUser;

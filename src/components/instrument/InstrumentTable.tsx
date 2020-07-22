@@ -1,23 +1,17 @@
-import { Button } from '@material-ui/core';
-import { AssignmentInd, Edit } from '@material-ui/icons';
-import MaterialTable from 'material-table';
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import { AssignmentInd } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import Can from 'components/common/Can';
-import InputDialog from 'components/common/InputDialog';
-import ParticipantModal from 'components/proposal/ParticipantModal';
-import { BasicUserDetails, Instrument, UserRole } from 'generated/sdk';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
-import { tableIcons } from 'utils/materialIcons';
 
+import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
+import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
-
-const InstrumentsTable: React.FC = () => {
-  const [show, setShow] = useState(false);
+const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
     instrumentsData,
@@ -34,52 +28,31 @@ const InstrumentsTable: React.FC = () => {
         rowData.scientists.length > 0 ? rowData.scientists.length : '-',
     },
   ];
-  const [editInstrument, setEditInstrument] = useState<Instrument | null>(null);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
 
-  const onInstrumentCreated = (instrumentAdded: Instrument | null) => {
-    instrumentAdded &&
-      setInstrumentsData([...instrumentsData, instrumentAdded]);
-
-    setShow(false);
-  };
-
-  const onInstrumentUpdated = (instrumentUpdated: Instrument | null) => {
-    if (instrumentUpdated) {
-      const newInstrumentsArray = instrumentsData.map(instrumentItem =>
-        instrumentItem.id === instrumentUpdated.id
-          ? instrumentUpdated
-          : instrumentItem
-      );
-
-      setInstrumentsData(newInstrumentsArray);
-    }
-
-    setEditInstrument(null);
-  };
-
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
-    const deleteInstrumentResult = await api().deleteInstrument({
-      id: instrumentDeletedId,
-    });
+    return await api()
+      .deleteInstrument({
+        id: instrumentDeletedId,
+      })
+      .then(data => {
+        if (data.deleteInstrument.error) {
+          enqueueSnackbar(
+            getTranslation(data.deleteInstrument.error as ResourceId),
+            {
+              variant: 'error',
+            }
+          );
 
-    const isError = !!deleteInstrumentResult.deleteInstrument.error;
-
-    enqueueSnackbar('Instrument deleted', {
-      variant: isError ? 'error' : 'success',
-    });
-
-    if (!isError) {
-      const newInstrumentsArray = instrumentsData.filter(
-        instrumentItem => instrumentItem.id !== instrumentDeletedId
-      );
-
-      setInstrumentsData(newInstrumentsArray);
-    }
+          return true;
+        } else {
+          return false;
+        }
+      });
   };
 
   const assignScientistsToInstrument = async (scientist: BasicUserDetails) => {
@@ -151,7 +124,6 @@ const InstrumentsTable: React.FC = () => {
     }
   };
 
-  const EditIcon = (): JSX.Element => <Edit />;
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   const AssignedScientists = (rowData: Instrument) => (
@@ -163,29 +135,24 @@ const InstrumentsTable: React.FC = () => {
     />
   );
 
+  const createModal = (
+    onUpdate: Function,
+    onCreate: Function,
+    editInstrument: Instrument | null
+  ) => (
+    <CreateUpdateInstrument
+      instrument={editInstrument}
+      close={(instrument: Instrument | null) =>
+        !!editInstrument ? onUpdate(instrument) : onCreate(instrument)
+      }
+    />
+  );
   const instrumentAssignments = instrumentsData?.find(
     instrumentItem => instrumentItem.id === assigningInstrumentId
   );
 
   return (
     <>
-      <InputDialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={!!editInstrument || show}
-        onClose={(): void =>
-          !!editInstrument ? setEditInstrument(null) : setShow(false)
-        }
-      >
-        <CreateUpdateInstrument
-          instrument={editInstrument as Instrument}
-          close={(instrument: Instrument | null) =>
-            !!editInstrument
-              ? onInstrumentUpdated(instrument)
-              : onInstrumentCreated(instrument)
-          }
-        />
-      </InputDialog>
       <ParticipantModal
         show={!!assigningInstrumentId}
         close={(): void => setAssigningInstrumentId(null)}
@@ -198,12 +165,14 @@ const InstrumentsTable: React.FC = () => {
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
       />
       <div data-cy="instruments-table">
-        <MaterialTable
-          icons={tableIcons}
+        <SuperMaterialTable
+          delete={onInstrumentDelete}
+          setData={setInstrumentsData}
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
           isLoading={loadingInstruments}
+          createModal={createModal}
           detailPanel={[
             {
               tooltip: 'Show Instruments',
@@ -214,46 +183,18 @@ const InstrumentsTable: React.FC = () => {
             search: true,
             debounceInterval: 400,
           }}
-          editable={{
-            onRowDelete: (rowInstrumentData: Instrument): Promise<void> =>
-              onInstrumentDelete(rowInstrumentData.id),
-          }}
           actions={[
-            {
-              icon: EditIcon,
-              tooltip: 'Edit Instrument',
-              onClick: (event, rowData) =>
-                setEditInstrument(rowData as Instrument),
-              position: 'row',
-            },
             {
               icon: AssignmentIndIcon,
               tooltip: 'Assign scientist',
-              onClick: (event, rowData): void =>
+              onClick: (_event: unknown, rowData: unknown): void =>
                 setAssigningInstrumentId((rowData as Instrument).id),
-              position: 'row',
             },
           ]}
         />
-        <Can
-          allowedRoles={[UserRole.USER_OFFICER]}
-          yes={() => (
-            <ActionButtonContainer>
-              <Button
-                type="button"
-                variant="contained"
-                color="primary"
-                onClick={() => setShow(true)}
-              >
-                Create instrument
-              </Button>
-            </ActionButtonContainer>
-          )}
-          no={() => null}
-        ></Can>
       </div>
     </>
   );
 };
 
-export default InstrumentsTable;
+export default InstrumentTable;

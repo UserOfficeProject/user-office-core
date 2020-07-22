@@ -3,7 +3,7 @@ import React from 'react';
 
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
-import InstrumentTable from './InstrumentTable';
+import InstitutionTable from './InstitutionTable';
 
 const InstrumentsPage: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const InstrumentsPage: React.FC = () => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <StyledPaper>
-            <InstrumentTable />
+            <InstitutionTable />
           </StyledPaper>
         </Grid>
       </Grid>
