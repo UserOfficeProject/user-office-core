@@ -1,20 +1,7 @@
 query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
     proposals {
-      id
-      title
-      abstract
-      status
-      shortCode
-      rankOrder
-      finalStatus
-      commentForUser
-      commentForManagement
-      created
-      updated
-      callId
-      templateId
-      notified
+      ...proposal
       proposer {
         ...basicUserDetails
       }
@@ -42,6 +29,18 @@ query getProposals($filter: ProposalsFilter) {
         timeAllocation
         status
         proposalID
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
       }
     }
     totalCount

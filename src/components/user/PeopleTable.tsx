@@ -5,10 +5,11 @@ import MaterialTable, { MTableToolbar, Query } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { UserRole, GetUsersQuery } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { BasicUserDetails } from '../../models/User';
-import { tableIcons } from '../../utils/materialIcons';
+import { UserRole, GetUsersQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { BasicUserDetails } from 'models/User';
+import { tableIcons } from 'utils/materialIcons';
+
 import { InviteUserForm } from './InviteUserForm';
 
 function sendUserRequest(
@@ -85,12 +86,14 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
 
   const getTitle = (): string => {
     switch (props.invitationUserRole) {
-      case UserRole.USEROFFICER:
+      case UserRole.USER_OFFICER:
         return 'Invite User';
       case UserRole.SEP_CHAIR:
         return 'Invite SEP Chair';
       case UserRole.SEP_SECRETARY:
         return 'Invite SEP Secretary';
+      case UserRole.INSTRUMENT_SCIENTIST:
+        return 'Invite Instrument Scientist';
       default:
         return 'Invite User';
     }

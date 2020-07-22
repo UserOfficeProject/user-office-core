@@ -14,14 +14,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   DataType,
   EvaluatorOperator,
-  ProposalTemplate,
-  QuestionRel,
+  Template,
+  QuestionTemplateRelation,
   SelectionFromOptionsConfig,
-} from '../../generated/sdk';
-import {
-  getAllFields,
-  getFieldById,
-} from '../../models/ProposalModelFunctions';
+} from 'generated/sdk';
+import { getAllFields, getFieldById } from 'models/ProposalModelFunctions';
 
 const FormikUICustomDependencySelector = ({
   field,
@@ -31,8 +28,8 @@ const FormikUICustomDependencySelector = ({
 }: {
   field: { name: string; onBlur: Function; onChange: Function; value: string };
   form: FormikActions<any>;
-  template: ProposalTemplate;
-  templateField: QuestionRel;
+  template: Template;
+  templateField: QuestionTemplateRelation;
 }) => {
   const [dependencyId, setDependencyId] = useState<string>('');
   const [operator, setOperator] = useState<EvaluatorOperator>(

@@ -6,10 +6,11 @@ import PropTypes from 'prop-types';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Role } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
+import { UserContext } from 'context/UserContextProvider';
+import { Role } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { getUniqueArrayBy } from 'utils/helperFunctions';
+import { tableIcons } from 'utils/materialIcons';
 
 type RoleSelectionProps = {
   close: () => void;
@@ -30,7 +31,10 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
       const data = await api().getMyRoles();
 
       if (data?.me) {
-        setRoles(data.me?.roles as Role[]);
+        /** NOTE: We have roles that are duplicated in role_id and user_id but different only in sep_id
+         *  which is used to determine if the user with that role is member of a SEP.
+         */
+        setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
       }
     };
     getUserInformation();
@@ -67,7 +71,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
 
   const RoleAction = (rowData: Role) => (
     <>
-      {rowData.shortCode === currentRole ? (
+      {rowData.shortCode.toUpperCase() === currentRole?.valueOf() ? (
         <Button disabled>In Use</Button>
       ) : (
         <Button disabled={loading} onClick={() => selectUserRole(rowData)}>
@@ -78,8 +82,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
   );
 
   const columns = [
-    { title: 'ID', field: 'id' },
-    { title: 'Title', field: 'title' },
+    { title: 'Role', field: 'title' },
     {
       title: 'Action',
       render: RoleAction,

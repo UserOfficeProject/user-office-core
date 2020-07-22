@@ -1,27 +1,27 @@
 import {
-  ProposalTemplate,
+  Template,
   Questionary,
   DataType,
   EvaluatorOperator,
   Question,
   FieldConfig,
   FieldDependency,
-  QuestionRel,
-} from '../generated/sdk';
+  QuestionTemplateRelation,
+  TemplateCategoryId,
+} from 'generated/sdk';
 import {
   getAllFields,
   getFieldById,
   getTopicById,
   getQuestionaryStepByTopicId,
-} from './ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
 
-export const create1TopicFieldlessTemplate = (): ProposalTemplate => {
+export const create1TopicFieldlessTemplate = (): Template => {
   return {
     templateId: 1,
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     name: 'test',
-    callCount: 0,
     isArchived: false,
-    proposalCount: 0,
     description: 'desription',
     steps: [
       {
@@ -40,6 +40,9 @@ export const create1TopicFieldlessTemplate = (): ProposalTemplate => {
 
 export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => {
   return {
+    questionaryId: 1,
+    templateId: 1,
+    created: new Date(),
     steps: [
       {
         topic: {
@@ -52,6 +55,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
         fields: [
           {
             topicId: 0,
+            dependency: null,
             config: {
               html: 'General information',
               plain: 'General information',
@@ -60,6 +64,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: '',
               proposalQuestionId: 'ttl_general',
               naturalKey: 'ttl_general',
@@ -78,6 +83,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
           },
           {
             topicId: 0,
+            dependency: null,
             config: {
               variant: 'radio',
               options: ['yes', 'no'],
@@ -86,6 +92,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: 'Has links with industry',
               proposalQuestionId: 'has_links_with_industry',
               naturalKey: 'has_links_with_industry',
@@ -114,6 +121,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
               tooltip: '',
             },
             question: {
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
               question: 'If yes, please describe:',
               proposalQuestionId: 'links_with_industry',
               naturalKey: 'links_with_industry',
@@ -156,7 +164,7 @@ export const createDummyField = (values: {
   question?: Question;
   config?: FieldConfig;
   dependency?: FieldDependency;
-}): QuestionRel => ({
+}): QuestionTemplateRelation => ({
   topicId: values.id || 1,
   config: values.config || {
     required: false,
@@ -167,6 +175,7 @@ export const createDummyField = (values: {
   },
   sortOrder: values.sortOrder || Math.round(Math.random() * 100),
   question: values.question || {
+    categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     question: 'Some random question',
     proposalQuestionId:
       values.proposalQuestionId || 'random_field_name_' + Math.random(),
@@ -180,7 +189,7 @@ export const createDummyField = (values: {
       max: 0,
     },
   },
-  dependency: values.dependency,
+  dependency: values.dependency ?? null,
 });
 
 test('Can parse object', () => {

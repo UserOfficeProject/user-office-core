@@ -5,8 +5,9 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router';
 
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { tableIcons } from '../../utils/materialIcons';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import { tableIcons } from 'utils/materialIcons';
+
 import {
   UserProposalDataType,
   PartialProposalsDataType,
@@ -70,11 +71,11 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
         rowData => {
           return {
             icon:
-              rowData.status === 'Submitted'
+              rowData.status === 'Submitted' || rowData.status === 'Accepted'
                 ? () => <Visibility />
                 : () => <Edit />,
             tooltip:
-              rowData.status === 'Submitted'
+              rowData.status === 'Submitted' || rowData.status === 'Accepted'
                 ? 'View proposal'
                 : 'Edit proposal',
             onClick: (event, rowData) =>

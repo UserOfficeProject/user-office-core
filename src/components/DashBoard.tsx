@@ -1,4 +1,9 @@
-import { BottomNavigation } from '@material-ui/core';
+import {
+  BottomNavigation,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -6,16 +11,22 @@ import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-import { UserContext } from '../context/UserContextProvider';
-import { PageName, UserRole } from '../generated/sdk';
-import { useGetPageContent } from '../hooks/useGetPageContent';
+import { UserContext } from 'context/UserContextProvider';
+import { PageName, UserRole } from 'generated/sdk';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
+import Can, { useCheckAccess } from './common/Can';
+import InstitutionPage from './institution/InstitutionPage';
+import InstrumentsPage from './instrument/InstrumentsPage';
 import MenuItems from './MenuItems';
 import HelpPage from './pages/HelpPage';
 import InformationModal from './pages/InformationModal';
@@ -31,7 +42,8 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
-import QuestionaryEditor from './template/QuestionaryEditor';
+import SampleTemplates from './template/SampleTemplates';
+import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
@@ -147,6 +159,7 @@ const useStyles = makeStyles(theme => ({
 const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { currentRole } = useContext(UserContext);
 
   const handleDrawerOpen = () => {
@@ -158,6 +171,16 @@ const Dashboard: React.FC = () => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
+  const logoutMenuListItem = (
+    <ListItem component={Link} to="/LogOut" button data-cy="logout">
+      <ListItemIcon>
+        <ExitToApp />
+      </ListItemIcon>
+      <ListItemText primary="Logout" />
+    </ListItem>
+  );
+
+  // TODO: Check who can see what and modify the access controll here.
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -176,7 +199,8 @@ const Dashboard: React.FC = () => {
         </div>
         <Divider />
         <List>
-          <MenuItems role={currentRole} />
+          <MenuItems />
+          {logoutMenuListItem}
         </List>
         <Divider />
       </Drawer>
@@ -186,20 +210,28 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalSelectType" component={ProposalChooseCall} />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
-          <Route path="/PeoplePage/:id" component={UserPage} />
-          <Route path="/PeoplePage" component={PeoplePage} />
+          {isUserOfficer && (
+            <Route path="/PeoplePage/:id" component={UserPage} />
+          )}
+          {isUserOfficer && <Route path="/PeoplePage" component={PeoplePage} />}
           <Route path="/ProposalPage" component={ProposalPage} />
           <Route path="/PageEditor" component={PageEditor} />
-          <Route path="/CallPage" component={CallPage} />
+          {isUserOfficer && <Route path="/CallPage" component={CallPage} />}
           <Route path="/HelpPage" component={HelpPage} />
           <Route path="/SEPPage/:id" component={SEPPage} />
           <Route path="/SEPPage" component={SEPsPage} />
+          <Route path="/InstrumentPage" component={InstrumentsPage} />
+          <Route path="/InstitutionPage" component={InstitutionPage} />
           <Route
             path="/QuestionaryEditor/:templateId"
-            component={QuestionaryEditor}
+            component={TemplateEditor}
           />
           <Route path="/ProposalGrade/:id" component={ProposalReviewReviewer} />
-          <Route path="/Questionaries" component={ProposalTemplates} />
+          <Route path="/ProposalTemplates" component={ProposalTemplates} />
+          <Route
+            path="/SampleDeclarationTemplates"
+            component={SampleTemplates}
+          />
           <Route
             path="/ProposalTableReviewer"
             component={ProposalTableReviewer}
@@ -208,23 +240,44 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
-          {currentRole === 'user_officer' && <Route component={ProposalPage} />}
-          {currentRole === 'user' && (
-            <Route
-              render={props => (
-                <OverviewPage {...props} userRole={UserRole.USER} />
-              )}
-            />
-          )}
-          {['reviewer', 'SEP_Reviewer', 'SEP_Chair', 'SEP_Secretary'].includes(
-            currentRole
-          ) && (
-            <Route
-              render={props => (
-                <OverviewPage {...props} userRole={UserRole.REVIEWER} />
-              )}
-            />
-          )}
+          <Can
+            allowedRoles={[UserRole.USER_OFFICER]}
+            yes={() => <Route component={ProposalPage} />}
+            no={() => (
+              <Can
+                allowedRoles={[UserRole.USER]}
+                yes={() => (
+                  <Route
+                    render={props => (
+                      <OverviewPage {...props} userRole={UserRole.USER} />
+                    )}
+                  />
+                )}
+                no={() => (
+                  <Can
+                    allowedRoles={[
+                      UserRole.REVIEWER,
+                      UserRole.SEP_REVIEWER,
+                      UserRole.SEP_CHAIR,
+                      UserRole.SEP_SECRETARY,
+                      UserRole.INSTRUMENT_SCIENTIST,
+                    ]}
+                    yes={() => (
+                      <Route
+                        render={props => (
+                          <OverviewPage
+                            {...props}
+                            userRole={currentRole as UserRole}
+                          />
+                        )}
+                      />
+                    )}
+                    no={() => null}
+                  />
+                )}
+              />
+            )}
+          />
         </Switch>
         <BottomNavigation className={classes.bottomNavigation}>
           <BottomNavItem

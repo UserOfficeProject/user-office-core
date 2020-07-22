@@ -2,8 +2,10 @@ import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 
-import { Question } from '../../../../generated/sdk';
-import { Event, EventType } from '../../../../models/QuestionaryEditorModel';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { Question } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+
 import getTemplateFieldIcon from '../../getTemplateFieldIcon';
 
 export const QuestionFormShell = (props: {
@@ -58,10 +60,10 @@ export const QuestionFormShell = (props: {
           <Form style={{ flexGrow: 1 }}>
             {props.children(formikProps)}
 
-            <div className={classes.actions}>
+            <ActionButtonContainer>
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 data-cy="delete"
                 onClick={() => {
@@ -82,7 +84,7 @@ export const QuestionFormShell = (props: {
               >
                 Save
               </Button>
-            </div>
+            </ActionButtonContainer>
           </Form>
         )}
       </Formik>

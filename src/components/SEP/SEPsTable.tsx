@@ -1,30 +1,28 @@
-import { Dialog, DialogContent, makeStyles, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Redirect } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Sep } from '../../generated/sdk';
-import { useSEPsData } from '../../hooks/useSEPsData';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import { tableIcons } from '../../utils/materialIcons';
-import AddSEP from './AddSEP';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import Can from 'components/common/Can';
+import InputDialog from 'components/common/InputDialog';
+import { UserContext } from 'context/UserContextProvider';
+import { Sep, UserRole } from 'generated/sdk';
+import { useSEPsData } from 'hooks/SEP/useSEPsData';
+import { tableIcons } from 'utils/materialIcons';
 
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
+import AddSEP from './General/AddSEP';
 
 const SEPsTable: React.FC = () => {
-  const [show, setShow] = useState(false);
   const { currentRole } = useContext(UserContext);
-  const { loading, SEPsData } = useSEPsData(show, '', false, currentRole);
-  const classes = useStyles();
+  const { loading, SEPsData, setSEPsData } = useSEPsData(
+    '',
+    false,
+    currentRole as UserRole
+  );
+  const [show, setShow] = useState(false);
   const columns = [
-    { title: 'SEP ID', field: 'id' },
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },
     {
@@ -39,30 +37,32 @@ const SEPsTable: React.FC = () => {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
   }
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  const onSepAdded = (sepAdded: Sep | null | undefined) => {
+    sepAdded && setSEPsData([...SEPsData, sepAdded]);
+    setShow(false);
+  };
 
   const EditIcon = (): JSX.Element => <Edit />;
 
   return (
     <>
-      <Dialog
+      <InputDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
         onClose={(): void => setShow(false)}
       >
-        <DialogContent>
-          <AddSEP close={(): void => setShow(false)} />
-        </DialogContent>
-      </Dialog>
+        <AddSEP
+          close={(sepAdded: Sep | null | undefined) => onSepAdded(sepAdded)}
+        />
+      </InputDialog>
       <div data-cy="SEPs-table">
         <MaterialTable
           icons={tableIcons}
           title={'Scientific evaluation panels'}
           columns={columns}
           data={SEPsData}
+          isLoading={loading}
           options={{
             search: true,
             debounceInterval: 400,
@@ -77,19 +77,22 @@ const SEPsTable: React.FC = () => {
             },
           ]}
         />
-        {currentRole === 'user_officer' && (
-          <ButtonContainer>
-            <Button
-              type="button"
-              variant="contained"
-              color="primary"
-              className={classes.button}
-              onClick={(): void => setShow(true)}
-            >
-              Create SEP
-            </Button>
-          </ButtonContainer>
-        )}
+        <Can
+          allowedRoles={[UserRole.USER_OFFICER]}
+          yes={() => (
+            <ActionButtonContainer>
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                onClick={() => setShow(true)}
+              >
+                Create SEP
+              </Button>
+            </ActionButtonContainer>
+          )}
+          no={() => null}
+        />
       </div>
     </>
   );

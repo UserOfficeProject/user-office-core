@@ -2,9 +2,10 @@ import { Container, Divider, makeStyles } from '@material-ui/core';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
+import SimpleTabs from 'components/common/TabPanel';
+import EventLogList from 'components/eventLog/EventLogList';
+
 import { getTheme } from '../../theme';
-import SimpleTabs from '../common/TabPanel';
-import EventLogList from '../eventLog/EventLogList';
 import { Impersonate } from './Impersonate';
 import UpdatePassword from './UpdatePassword';
 import UpdateUserInformation from './UpdateUserInformation';

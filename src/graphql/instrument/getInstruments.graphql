@@ -1,0 +1,14 @@
+query getInstruments {
+  instruments {
+    instruments {
+      id
+      name
+      shortCode
+      description
+      scientists {
+        ...basicUserDetails
+      }
+    }
+    totalCount
+  }
+}

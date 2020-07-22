@@ -1,0 +1,18 @@
+fragment template on Template {
+  steps {
+    topic {
+      title
+      id
+    }
+    fields {
+      ...questionTemplateRelation
+    }
+  }
+  templateId
+  categoryId
+  name
+  description
+  complementaryQuestions {
+    ...question
+  }
+}

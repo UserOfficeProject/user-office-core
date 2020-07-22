@@ -1,15 +1,18 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Sep } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import SimpleTabs from '../common/TabPanel';
-import EventLogList from '../eventLog/EventLogList';
-import SEPGeneralInfo from './SEPGeneralInfo';
-import SEPMembers from './SEPMembers';
-import SEPProposalsAndAssignments from './SEPProposalsAndAssignments';
+import { useCheckAccess } from 'components/common/Can';
+import SimpleTabs from 'components/common/TabPanel';
+import EventLogList from 'components/eventLog/EventLogList';
+import { Sep, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+
+import SEPGeneralInfo from './General/SEPGeneralInfo';
+import SEPMeetingComponentsView from './MeetingComponents/SEPMeetingComponentsView';
+import SEPMembers from './Members/SEPMembers';
+import SEPProposalsAndAssignmentsView from './Proposals/SEPProposalsAndAssignmentsView';
 
 const SEPPagePropTypes = {
   match: PropTypes.shape({
@@ -22,9 +25,9 @@ const SEPPagePropTypes = {
 type SEPPageProps = PropTypes.InferProps<typeof SEPPagePropTypes>;
 
 const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
-  const [sep, setSEP] = useState<Sep | null>(null);
+  const [sep, setSEP] = useState<Sep | null | undefined>(null);
   const api = useDataApi();
-  const { currentRole } = useContext(UserContext);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const loadSEP = useCallback(async () => {
     return api()
       .getSEP({ id: parseInt(match.params.id) })
@@ -37,29 +40,35 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
     loadSEP();
   }, [loadSEP]);
 
-  if (!sep) {
-    return <p>Loading...</p>;
-  }
+  const tabNames = [
+    'General',
+    'Members',
+    'Proposals and Assignments',
+    'Meeting Components',
+  ];
 
-  const tabNames = ['General', 'Members', 'Proposals and Assignments'];
-
-  if (currentRole === 'user_officer') {
+  if (hasAccessRights) {
     tabNames.push('Logs');
   }
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs tabNames={tabNames}>
-        <SEPGeneralInfo
-          data={sep}
-          onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
-        />
-        <SEPMembers sepId={sep.id} />
-        <SEPProposalsAndAssignments sepId={sep.id} />
-        {currentRole === 'user_officer' && (
-          <EventLogList changedObjectId={sep.id} eventType="SEP" />
-        )}
-      </SimpleTabs>
+      {sep ? (
+        <SimpleTabs tabNames={tabNames}>
+          <SEPGeneralInfo
+            data={sep}
+            onSEPUpdate={(newSEP: Sep): void => setSEP(newSEP)}
+          />
+          <SEPMembers sepId={sep.id} />
+          <SEPProposalsAndAssignmentsView sepId={sep.id} />
+          <SEPMeetingComponentsView sepId={sep.id} />
+          {hasAccessRights && (
+            <EventLogList changedObjectId={sep.id} eventType="SEP" />
+          )}
+        </SimpleTabs>
+      ) : (
+        <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+      )}
     </Container>
   );
 };

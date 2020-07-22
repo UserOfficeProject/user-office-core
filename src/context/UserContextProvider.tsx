@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useCallback } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Role } from '../generated/sdk';
-import { User, dummyUser } from '../models/User';
+import { Role, UserRole } from 'generated/sdk';
+import { User, dummyUser } from 'models/User';
 
 interface UserContextData {
   user: User;
   token: string;
   roles: Role[];
-  currentRole: string;
+  currentRole: UserRole | null;
   handleLogin: React.Dispatch<string | null | undefined>;
   handleNewToken: React.Dispatch<string | null | undefined>;
   handleLogout: () => void;
@@ -33,7 +33,7 @@ const initUserData: UserContextData = {
   user: dummyUser,
   token: '',
   roles: [],
-  currentRole: '',
+  currentRole: null,
   handleLogin: value => value,
   handleNewToken: value => value,
   handleLogout: () => null,
@@ -89,7 +89,7 @@ const reducer = (
       localStorage.expToken = decoded.exp;
 
       if (decoded.roles.length === 1) {
-        localStorage.currentRole = decoded.roles[0].shortCode;
+        localStorage.currentRole = decoded.roles[0].shortCode.toUpperCase();
       }
 
       return {
@@ -98,7 +98,9 @@ const reducer = (
         expToken: decoded.exp,
         roles: decoded.roles,
         currentRole:
-          decoded.roles.length === 1 ? decoded.roles[0].shortCode : '',
+          decoded.roles.length === 1
+            ? decoded.roles[0].shortCode.toUpperCase()
+            : null,
       };
     case ActionType.SETTOKEN:
       const newToken = decode(action.payload) as DecodedTokenData;
@@ -107,15 +109,16 @@ const reducer = (
 
       return {
         ...state,
+        roles: newToken.roles,
         token: action.payload,
         expToken: newToken.exp,
       };
     case ActionType.SELECTROLE:
-      localStorage.currentRole = action.payload;
+      localStorage.currentRole = action.payload.toUpperCase();
 
       return {
         ...state,
-        currentRole: action.payload,
+        currentRole: action.payload.toUpperCase(),
       };
     case ActionType.LOGOFFUSER:
       localStorage.removeItem('token');

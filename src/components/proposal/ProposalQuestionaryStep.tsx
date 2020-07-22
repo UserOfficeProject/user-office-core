@@ -1,68 +1,25 @@
 import { makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
-import React, { useContext, SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
 
-import { DataType, Answer, QuestionaryStep } from '../../generated/sdk';
-import { useUpdateProposal } from '../../hooks/useUpdateProposal';
-import { ProposalAnswer } from '../../models/ProposalModel';
+import { ErrorFocus } from 'components/common/ErrorFocus';
+import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
+import { QuestionaryStep } from 'generated/sdk';
+import { useUpdateProposal } from 'hooks/proposal/useUpdateProposal';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
-} from '../../models/ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
 import {
   EventType,
   ProposalSubmissionModelState,
-} from '../../models/ProposalSubmissionModel';
-import JSDict from '../../utils/Dictionary';
-import submitFormAsync from '../../utils/FormikAsyncFormHandler';
-import { ErrorFocus } from '../common/ErrorFocus';
+} from 'models/ProposalSubmissionModel';
+import submitFormAsync from 'utils/FormikAsyncFormHandler';
+
 import { createFormikConfigObjects } from './createFormikConfigObjects';
-import { BasicComponentProps } from './IBasicComponentProps';
-import { ProposalComponentBoolean } from './ProposalComponentBoolean';
-import { ProposalComponentDatePicker } from './ProposalComponentDatePicker';
-import { ProposalComponentEmbellishment } from './ProposalComponentEmbellishment';
-import { ProposalComponentFileUpload } from './ProposalComponentFileUpload';
-import { ProposalComponentMultipleChoice } from './ProposalComponentMultipleChoice';
-import { ProposalComponentTextInput } from './ProposalComponentTextInput';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
-
-class ComponentFactory {
-  private componentMap = JSDict.Create<string, any>();
-
-  constructor() {
-    this.componentMap.put(DataType.TEXT_INPUT, ProposalComponentTextInput);
-    this.componentMap.put(DataType.BOOLEAN, ProposalComponentBoolean);
-    this.componentMap.put(DataType.DATE, ProposalComponentDatePicker);
-    this.componentMap.put(DataType.FILE_UPLOAD, ProposalComponentFileUpload);
-    this.componentMap.put(
-      DataType.SELECTION_FROM_OPTIONS,
-      ProposalComponentMultipleChoice
-    );
-    this.componentMap.put(
-      DataType.EMBELLISHMENT,
-      ProposalComponentEmbellishment
-    );
-  }
-  createComponent(
-    field: Answer,
-    props: any
-  ): React.ComponentElement<BasicComponentProps, any> {
-    props.templateField = field;
-    props.key = field.question.proposalQuestionId;
-
-    const component = this.componentMap.get(field.question.dataType);
-
-    if (!component) {
-      throw new Error(
-        `Could not create component for type ${field.question.dataType}`
-      );
-    }
-
-    return React.createElement(component, props);
-  }
-}
 
 export default function ProposalQuestionaryStep(props: {
   data: ProposalSubmissionModelState;
@@ -70,7 +27,7 @@ export default function ProposalQuestionaryStep(props: {
   readonly: boolean;
 }) {
   const { data, topicId } = props;
-  const componentFactory = new ComponentFactory();
+  const componentFactory = new QuestionaryComponentFactory();
   const { loading: formSaving } = useUpdateProposal();
   const classes = makeStyles({
     componentWrapper: {
@@ -83,7 +40,7 @@ export default function ProposalQuestionaryStep(props: {
   })();
   const { dispatch } = useContext(ProposalSubmissionContext)!;
 
-  if (data == null) {
+  if (data === null) {
     return <div>loading...</div>;
   }
 
@@ -109,20 +66,12 @@ export default function ProposalQuestionaryStep(props: {
   );
 
   const saveStepData = async (markAsComplete: boolean) => {
-    const answers: ProposalAnswer[] = activeFields.map(field => {
-      return (({ question, value }) => ({
-        proposalQuestionId: question.proposalQuestionId,
-        dataType: question.dataType,
-        value,
-      }))(field); // convert field to answer object
-    });
-
     dispatch({
       type: markAsComplete
         ? EventType.FINISH_STEP_CLICKED
         : EventType.SAVE_STEP_CLICKED,
       payload: {
-        answers: answers,
+        answers: activeFields,
         topicId: props.topicId,
       },
     });

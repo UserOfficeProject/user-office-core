@@ -1,0 +1,18 @@
+fragment questionTemplateRelation on QuestionTemplateRelation {
+  question {
+    ...question
+  }
+  sortOrder
+  topicId
+  config {
+    ...fieldConfig
+  }
+  dependency {
+    questionId
+    dependencyId
+    dependencyNaturalKey
+    condition {
+      ...fieldCondition
+    }
+  }
+}

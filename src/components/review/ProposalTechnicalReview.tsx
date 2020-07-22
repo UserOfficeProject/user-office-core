@@ -7,14 +7,17 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
-import { TechnicalReviewStatus, TechnicalReview } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import FormikDropdown from '../common/FormikDropdown';
+import FormikDropdown from 'components/common/FormikDropdown';
+import {
+  TechnicalReviewStatus,
+  CoreTechnicalReviewFragment,
+} from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 export default function ProposalTechnicalReview(props: {
-  data: TechnicalReview | null | undefined;
-  setReview: any;
+  data: CoreTechnicalReviewFragment | null | undefined;
+  setReview: (data: CoreTechnicalReviewFragment) => void;
   id: number;
 }) {
   const api = useDataApi();
@@ -39,8 +42,8 @@ export default function ProposalTechnicalReview(props: {
           await api()
             .addTechnicalReview({
               proposalID: props.id,
-              timeAllocation: +values.timeAllocation!,
-              comment: values.comment!,
+              timeAllocation: +values.timeAllocation,
+              comment: values.comment,
               publicComment: values.publicComment,
               status:
                 TechnicalReviewStatus[values.status as TechnicalReviewStatus],
@@ -51,12 +54,13 @@ export default function ProposalTechnicalReview(props: {
               })
             );
           props.setReview({
-            proposalID: props?.data?.proposalID!,
-            timeAllocation: +values.timeAllocation!,
-            comment: values.comment!,
+            proposalID: props?.data?.proposalID,
+            timeAllocation: +values.timeAllocation,
+            comment: values.comment,
+            publicComment: values.publicComment,
             status:
               TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-          });
+          } as CoreTechnicalReviewFragment);
           actions.setSubmitting(false);
         }}
       >

@@ -1,0 +1,18 @@
+mutation createQuestionTemplateRelation(
+  $templateId: Int!
+  $questionId: String!
+  $topicId: Int!
+  $sortOrder: Int!
+) {
+  createQuestionTemplateRelation(
+    templateId: $templateId
+    questionId: $questionId
+    topicId: $topicId
+    sortOrder: $sortOrder
+  ) {
+    template {
+      ...template
+    }
+    error
+  }
+}

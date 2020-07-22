@@ -57,6 +57,8 @@ context('Personal information tests', () => {
 
     cy.contains('Update Profile').click();
 
+    cy.wait(1000);
+
     cy.reload();
 
     cy.get("[name='firstname']")
@@ -88,46 +90,6 @@ context('Personal information tests', () => {
       .should('eq', newTelephone);
   });
 
-  it('Should be able to see user officer role in use', () => {
-    cy.login('officer');
-
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Roles').click();
-
-    cy.wait(1000);
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .first()
-      .should(element => {
-        expect(element.text()).to.contain('User Officer');
-
-        expect(element.text()).to.contain('In Use');
-      });
-  });
-
-  it('Should be able to see user role in use', () => {
-    cy.login('user');
-
-    cy.get("[data-cy='profile-page-btn']").click();
-
-    cy.contains('Roles').click();
-
-    cy.wait(1000);
-
-    cy.contains('User roles');
-
-    cy.get("[data-cy='role-selection-table'] table tbody tr")
-      .first()
-      .should(element => {
-        expect(element.text()).to.contain('User');
-
-        expect(element.text()).to.contain('In Use');
-      });
-  });
-
   it('User Officer should be able to see all and change roles if we have multiple', () => {
     cy.login('officer');
 
@@ -144,18 +106,13 @@ context('Personal information tests', () => {
 
     cy.wait(1000);
 
-    cy.get('[title="Add Role"]').click();
+    cy.get('[data-cy="add-role-button"]').click();
 
-    cy.wait(1000);
-
-    cy.contains('Add Role');
-
-    cy.get('.MuiDialog-root table tbody tr')
-      .eq(3)
+    cy.get('[data-cy="role-modal"]')
+      .contains('SEP Chair')
+      .parent()
       .find('[title="Select role"]')
       .click();
-
-    cy.contains('Update Roles').click();
 
     cy.wait(1000);
 
@@ -187,6 +144,26 @@ context('Personal information tests', () => {
 
     cy.get('[data-cy="SEPRoles-menu-items"]')
       .find('.MuiListItem-root')
-      .should('have.length', 3);
+      .should('have.length', 2);
+  });
+
+  it('Should be able to see user officer role in use', () => {
+    cy.login('officer');
+
+    cy.get("[data-cy='profile-page-btn']").click();
+
+    cy.contains('Roles').click();
+
+    cy.wait(1000);
+
+    cy.contains('User roles');
+
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .first()
+      .should(element => {
+        expect(element.text()).to.contain('User Officer');
+
+        expect(element.text()).to.contain('In Use');
+      });
   });
 });

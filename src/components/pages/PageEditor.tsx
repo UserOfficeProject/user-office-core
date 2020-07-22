@@ -1,8 +1,9 @@
 import Container from '@material-ui/core/Container';
 import React from 'react';
 
-import { PageName } from '../../generated/sdk';
-import SimpleTabs from '../common/TabPanel';
+import SimpleTabs from 'components/common/TabPanel';
+import { PageName } from 'generated/sdk';
+
 import PageInputBox from './PageInputBox';
 
 export default function PageEditor() {

@@ -3,9 +3,10 @@ import { People } from '@material-ui/icons';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { UserRole } from '../../generated/sdk';
-import { BasicUserDetails } from '../../models/User';
-import PeopleTable from '../user/PeopleTable';
+import PeopleTable from 'components/user/PeopleTable';
+import { UserRole } from 'generated/sdk';
+import { BasicUserDetails } from 'models/User';
+
 import ParticipantModal from './ParticipantModal';
 
 const useStyles = makeStyles(theme => ({

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
-import { Card, CardContent } from '@material-ui/core';
+import { Card, CardContent, CircularProgress } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -17,18 +17,20 @@ import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
+import { ObjectSchema } from 'yup';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { PageName, CreateUserMutationVariables } from '../../generated/sdk';
-import { useUnauthorizedApi } from '../../hooks/useDataApi';
-import { useGetFields } from '../../hooks/useGetFields';
-import { useGetPageContent } from '../../hooks/useGetPageContent';
-import { useOrcIDInformation } from '../../hooks/useOrcIDInformation';
-import orcid from '../../images/orcid.png';
-import { userFieldSchema } from '../../utils/userFieldValidationSchema';
-import { ErrorFocus } from '../common/ErrorFocus';
-import FormikDropdown, { Option } from '../common/FormikDropdown';
-import InformationModal from '../pages/InformationModal';
+import { ErrorFocus } from 'components/common/ErrorFocus';
+import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import InformationModal from 'components/pages/InformationModal';
+import { UserContext } from 'context/UserContextProvider';
+import { PageName, CreateUserMutationVariables } from 'generated/sdk';
+import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { useGetFields } from 'hooks/user/useGetFields';
+import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
+import orcid from 'images/orcid.png';
+import { userFieldSchema } from 'utils/userFieldValidationSchema';
 
 const useStyles = makeStyles(theme => ({
   '@global': {
@@ -137,11 +139,11 @@ const SignUp: React.FC<SignUpProps> = props => {
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
+  const { institutionData, loadingInstitutions } = useInstitutionData();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
-
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
   }
@@ -167,15 +169,24 @@ const SignUp: React.FC<SignUpProps> = props => {
     return <Redirect to="/" />;
   }
 
-  if (fieldsContent && !nationalitiesList.length && !institutionsList.length) {
+  if (loadingInstitutions || !fieldsContent) {
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+    );
+  }
+
+  if (!institutionsList.length) {
     setInstitutionsList(
-      fieldsContent.institutions.map(institution => {
-        return { text: institution.value, value: institution.id.toString() };
+      institutionData.map(institution => {
+        return { text: institution.name, value: institution.id };
       })
     );
+  }
+
+  if (!nationalitiesList.length) {
     setNationalitiesList(
       fieldsContent.nationalities.map(nationality => {
-        return { text: nationality.value, value: nationality.id.toString() };
+        return { text: nationality.value, value: nationality.id };
       })
     );
   }
@@ -242,7 +253,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           actions.setSubmitting(false);
         }}
         validationSchema={userFieldSchema.concat(
-          userPasswordFieldValidationSchema
+          userPasswordFieldValidationSchema as ObjectSchema<object>
         )}
       >
         {({ values }) => (

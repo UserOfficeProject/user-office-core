@@ -1,0 +1,11 @@
+mutation removeAssignedInstrumentFromcall($instrumentId: Int!, $callId: Int!) {
+  removeAssignedInstrumentFromcall(
+    instrumentId: $instrumentId
+    callId: $callId
+  ) {
+    error
+    call {
+      id
+    }
+  }
+}

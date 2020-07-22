@@ -1,10 +1,10 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
-import { ProposalStatus, ProposalEndStatus } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { timeAgo } from '../../utils/Time';
+import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { timeAgo } from 'utils/Time';
+
 import ProposalTable from './ProposalTable';
 
 export type PartialProposalsDataType = {
@@ -23,11 +23,7 @@ export type UserProposalDataType = {
   data: PartialProposalsDataType[] | undefined;
 };
 
-type ProposalTableUserProps = {
-  id: number;
-};
-
-const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
+const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const getProposalStatus = (proposal: {
     status: ProposalStatus;
@@ -43,7 +39,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
 
   const sendUserProposalRequest = useCallback(async () => {
     return api()
-      .getUserProposals({ id })
+      .getUserProposals()
       .then(data => {
         return {
           page: 0,
@@ -66,7 +62,7 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
             }),
         };
       });
-  }, [api, id]);
+  }, [api]);
 
   return (
     <ProposalTable
@@ -75,10 +71,6 @@ const ProposalTableUser: React.FC<ProposalTableUserProps> = ({ id }) => {
       searchQuery={sendUserProposalRequest}
     />
   );
-};
-
-ProposalTableUser.propTypes = {
-  id: PropTypes.number.isRequired,
 };
 
 export default ProposalTableUser;

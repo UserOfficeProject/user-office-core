@@ -1,17 +1,13 @@
 import produce from 'immer';
-import { Reducer, Dispatch } from 'react';
+import { Dispatch, Reducer } from 'react';
 
-import {
-  Proposal,
-  ProposalStatus,
-  Answer,
-  QuestionaryStep,
-} from '../generated/sdk';
-import useReducerWithMiddleWares from '../utils/useReducerWithMiddleWares';
+import { Answer, ProposalStatus, QuestionaryStep } from 'generated/sdk';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from './ProposalModelFunctions';
+} from 'models/ProposalModelFunctions';
+import { useReducerWithMiddleWares } from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   BACK_CLICKED = 'BACK_CLICKED',
@@ -35,12 +31,12 @@ export interface Event {
 
 export interface ProposalSubmissionModelState {
   isDirty: boolean;
-  proposal: Proposal;
+  proposal: ProposalSubsetSumbission;
 }
 
 // rename this function
 export function ProposalSubmissionModel(
-  initialProposal: Proposal,
+  initialProposal: ProposalSubsetSumbission,
   middlewares?: Array<Function>
 ): {
   state: ProposalSubmissionModelState;

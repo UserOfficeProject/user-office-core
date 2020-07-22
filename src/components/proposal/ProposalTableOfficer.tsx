@@ -1,26 +1,65 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { IconButton } from '@material-ui/core';
+import { IconButton, Tooltip } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
-import { Visibility, Delete, Assignment, Email } from '@material-ui/icons';
+import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import MaterialTable from 'material-table';
+import MaterialTable, { Column, Options } from 'material-table';
 import { useSnackbar } from 'notistack';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import XLSX from 'xlsx';
 
-import { Review, ReviewStatus } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useDownloadPDFProposal } from '../../hooks/useDownloadPDFProposal';
-import { useProposalsData, ProposalData } from '../../hooks/useProposalsData';
-import { tableIcons } from '../../utils/materialIcons';
-import DialogConfirmation from '../common/DialogConfirmation';
-import AssignProposalToSEP from '../SEP/AssignProposalToSEP';
+import DialogConfirmation from 'components/common/DialogConfirmation';
+import ScienceIconAdd from 'components/common/ScienceIconAdd';
+import ScienceIconRemove from 'components/common/ScienceIconRemove';
+import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
+import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
+import { Instrument, Sep } from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
+import {
+  useProposalsData,
+  ProposalData,
+} from 'hooks/proposal/useProposalsData';
+import { excelDownload } from 'utils/excelDownload';
+import { tableIcons } from 'utils/materialIcons';
+import {
+  average,
+  absoluteDifference,
+  standardDeviation,
+  getGrades,
+} from 'utils/mathFunctions';
+
 import RankInput from './RankInput';
-const ProposalTableOfficer: React.FC = () => {
-  const { loading, proposalsData, setProposalsData } = useProposalsData('');
+
+type ProposalTableOfficerProps = {
+  proposalFilter: ProposalsFilter;
+  Toolbar: (data: Options) => JSX.Element;
+};
+
+const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
+  proposalFilter,
+  Toolbar,
+}) => {
+  const { loading, proposalsData, setProposalsData } = useProposalsData(
+    proposalFilter
+  );
   const [open, setOpen] = React.useState(false);
+  const [openRemoveInstrument, setOpenRemoveInstrument] = React.useState(false);
   const [openAssignment, setOpenAssignment] = React.useState(false);
+  const [proposalAndInstrumentId, setProposalAndInstrumentId] = React.useState<{
+    proposalId: number | null;
+    instrumentId: number | null;
+  }>({
+    proposalId: null,
+    instrumentId: null,
+  });
+  const [
+    openInstrumentAssignment,
+    setOpenInstrumentAssignment,
+  ] = React.useState(false);
   const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
 
   const initalSelectedProposals: number[] = [];
@@ -30,6 +69,9 @@ const ProposalTableOfficer: React.FC = () => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [localStorageValue, setLocalStorageValue] = useLocalStorage<
+    Column<ProposalData>[] | null
+  >('proposalColumnsOfficer', null);
 
   const setNewRanking = (proposalID: number, ranking: number) => {
     api().administrationProposal({
@@ -45,82 +87,100 @@ const ProposalTableOfficer: React.FC = () => {
     );
   };
 
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
+  const removeProposalFromInstrument = async () => {
+    if (
+      proposalAndInstrumentId.instrumentId &&
+      proposalAndInstrumentId.proposalId
+    ) {
+      const result = await api().removeProposalFromInstrument({
+        proposalId: proposalAndInstrumentId.proposalId,
+        instrumentId: proposalAndInstrumentId.instrumentId,
+      });
 
-    const avg = sum / numbers.length;
+      const isError = !!result.removeProposalFromInstrument.error;
 
-    return avg;
-  };
+      if (!isError) {
+        setProposalsData(
+          proposalsData.map(prop => {
+            if (prop.id === proposalAndInstrumentId.proposalId) {
+              prop.instrument = null;
+            }
 
-  const absoluteDifference = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
+            return prop;
+          })
+        );
+      }
+
+      const message = isError
+        ? 'Could not remove proposal from the instrument'
+        : 'Proposal removed from the instrument';
+      enqueueSnackbar(message, {
+        variant: isError ? 'error' : 'success',
+      });
+
+      setProposalAndInstrumentId({ proposalId: null, instrumentId: null });
     }
-    numbers = numbers.sort();
-
-    return Math.abs(numbers[numbers.length - 1] - numbers[0]);
   };
 
-  const standardDeviation = (numbers: number[]) => {
-    if (numbers.length < 2) {
-      return NaN;
-    }
-    const avg = average(numbers);
-
-    const squareDiffs = numbers?.map(function(value) {
-      const diff = value - avg;
-      const sqrDiff = diff * diff;
-
-      return sqrDiff;
-    });
-
-    const avgSquareDiff = average(squareDiffs);
-
-    const stdDev = Math.sqrt(avgSquareDiff);
-
-    return stdDev;
-  };
-
-  const getGrades = (reviews: Review[] | null | undefined) =>
-    reviews
-      ?.filter(review => review.status === ReviewStatus.SUBMITTED)
-      .map(review => review.grade!) ?? [];
+  const RemoveScienceIcon = (): JSX.Element => <ScienceIconRemove />;
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalData) => (
-    <>
-      <IconButton data-cy="view-proposal">
-        <Link
-          to={`/ProposalReviewUserOfficer/${rowData.id}`}
-          style={{ color: 'inherit', textDecoration: 'inherit' }}
-        >
-          <Visibility />
-        </Link>
-      </IconButton>
-      <IconButton onClick={() => downloadPDFProposal(rowData.id)}>
-        <GetAppIcon />
-      </IconButton>
-    </>
-  );
+  const RowActionButtons = (rowData: ProposalData) => {
+    const iconButtonStyle = { padding: '7px' };
 
-  const columns = [
+    return (
+      <>
+        <IconButton data-cy="view-proposal" style={iconButtonStyle}>
+          <Link
+            to={`/ProposalReviewUserOfficer/${rowData.id}`}
+            style={{ color: 'inherit', textDecoration: 'inherit' }}
+          >
+            <Visibility />
+          </Link>
+        </IconButton>
+        <IconButton
+          onClick={() => downloadPDFProposal(rowData.id)}
+          style={iconButtonStyle}
+        >
+          <GetAppIcon />
+        </IconButton>
+
+        {rowData.instrument && (
+          <Tooltip title="Remove assigned instrument">
+            <IconButton
+              style={iconButtonStyle}
+              onClick={() => {
+                setProposalAndInstrumentId({
+                  proposalId: rowData.id,
+                  instrumentId: rowData.instrument?.id as number,
+                });
+                setOpenRemoveInstrument(true);
+              }}
+            >
+              <RemoveScienceIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </>
+    );
+  };
+
+  let columns: Column<ProposalData>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
       sorting: false,
+      removable: false,
       render: RowActionButtons,
     },
     { title: 'Proposal ID', field: 'shortCode' },
     {
       title: 'Title',
       field: 'title',
-      width: 'auto',
+      ...{ width: 'auto' },
     },
     {
       title: 'Time(Days)',
@@ -187,7 +247,34 @@ const ProposalTableOfficer: React.FC = () => {
       ),
     },
     { title: 'Notified', field: 'notified' },
+    {
+      title: 'Instrument',
+      render: (rowData: ProposalData): string =>
+        rowData.instrument ? rowData.instrument.name : '-',
+    },
+    {
+      title: 'Call',
+      render: (rowData: ProposalData): string =>
+        rowData.call ? rowData.call.shortCode : '-',
+      hidden: true,
+    },
+    {
+      title: 'SEP',
+      render: (rowData: ProposalData): string =>
+        rowData.sep ? rowData.sep.code : '-',
+      hidden: true,
+    },
   ];
+
+  // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
+  if (localStorageValue) {
+    columns = columns.map(column => ({
+      ...column,
+      hidden: localStorageValue?.find(
+        localStorageValueItem => localStorageValueItem.title === column.title
+      )?.hidden,
+    }));
+  }
 
   const emailProposals = (): void => {
     selectedProposals.forEach(id => {
@@ -229,16 +316,36 @@ const ProposalTableOfficer: React.FC = () => {
     });
   };
 
-  const assignProposalToSEP = async (sepId: number): Promise<void> => {
+  const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async id => {
-        const result = await api().assignProposal({ proposalId: id, sepId });
+        const result = await api().assignProposal({
+          proposalId: id,
+          sepId: sep.id,
+        });
 
         return result.assignProposal.error;
       })
     );
 
     const isError = !!assignmentsErrors.join('');
+
+    if (!isError) {
+      setProposalsData(
+        proposalsData.map(prop => {
+          if (
+            selectedProposals.find(
+              selectedProposalId => selectedProposalId === prop.id
+            )
+          ) {
+            prop.sep = sep;
+          }
+
+          return prop;
+        })
+      );
+    }
+
     const message = isError
       ? 'Could not assign all selected proposals to SEP'
       : 'Proposal/s assigned to SEP';
@@ -247,14 +354,59 @@ const ProposalTableOfficer: React.FC = () => {
     });
   };
 
-  if (loading) {
-    return <p>Loading</p>;
-  }
+  const assignProposalsToInstrument = async (
+    instrument: Instrument
+  ): Promise<void> => {
+    const selectedProposalsWithInstrument = proposalsData.filter(
+      proposalDataItem =>
+        selectedProposals.includes(proposalDataItem.id) &&
+        proposalDataItem.instrument
+    );
+
+    if (selectedProposalsWithInstrument.length === 0) {
+      const result = await api().assignProposalsToInstrument({
+        proposalIds: selectedProposals,
+        instrumentId: instrument.id,
+      });
+      const isError = !!result.assignProposalsToInstrument.error;
+
+      if (!isError) {
+        setProposalsData(
+          proposalsData.map(prop => {
+            if (
+              selectedProposals.find(
+                selectedProposalId => selectedProposalId === prop.id
+              )
+            ) {
+              prop.instrument = instrument;
+            }
+
+            return prop;
+          })
+        );
+      }
+
+      const message = isError
+        ? 'Could not assign all selected proposals to the instrument'
+        : 'Proposal/s assigned to the selected instrument';
+      enqueueSnackbar(message, {
+        variant: isError ? 'error' : 'success',
+      });
+    } else {
+      enqueueSnackbar(
+        'One or more of your selected proposals already have instrument assigned',
+        {
+          variant: 'error',
+        }
+      );
+    }
+  };
 
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DeleteIcon = (): JSX.Element => <Delete />;
-  const AssignIcon = (): JSX.Element => <Assignment />;
+  const GroupWorkIcon = (): JSX.Element => <GroupWork />;
   const EmailIcon = (): JSX.Element => <Email />;
+  const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
 
   return (
     <>
@@ -264,6 +416,13 @@ const ProposalTableOfficer: React.FC = () => {
         open={open}
         action={deleteProposals}
         handleOpen={setOpen}
+      />
+      <DialogConfirmation
+        title="Remove assigned instrument"
+        text="This action will remove assigned instrument from proposal"
+        open={openRemoveInstrument}
+        action={removeProposalFromInstrument}
+        handleOpen={setOpenRemoveInstrument}
       />
       <DialogConfirmation
         title="Notify results"
@@ -280,8 +439,21 @@ const ProposalTableOfficer: React.FC = () => {
       >
         <DialogContent>
           <AssignProposalToSEP
-            assignProposalToSEP={(sepId: number) => assignProposalToSEP(sepId)}
+            assignProposalToSEP={assignProposalToSEP}
             close={(): void => setOpenAssignment(false)}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openInstrumentAssignment}
+        onClose={(): void => setOpenInstrumentAssignment(false)}
+      >
+        <DialogContent>
+          <AssignProposalsToInstrument
+            assignProposalsToInstrument={assignProposalsToInstrument}
+            close={(): void => setOpenInstrumentAssignment(false)}
           />
         </DialogContent>
       </Dialog>
@@ -290,6 +462,10 @@ const ProposalTableOfficer: React.FC = () => {
         title={'Proposals'}
         columns={columns}
         data={proposalsData}
+        isLoading={loading}
+        components={{
+          Toolbar: Toolbar,
+        }}
         localization={{
           toolbar: {
             exportName: 'Export as Excel',
@@ -301,41 +477,7 @@ const ProposalTableOfficer: React.FC = () => {
           debounceInterval: 400,
           columnsButton: true,
           exportButton: true,
-          exportCsv: (columns, data: ProposalData[]) => {
-            const dataColumns = [
-              'Proposal ID',
-              'Title',
-              'Principal Investigator',
-              'Technical Status',
-              'Tehnical Comment',
-              'Time(Days)',
-              'Score difference',
-              'Average Score',
-              'Comment Management',
-              'Decision',
-              'Order',
-            ];
-            const dataToExport = data.map(proposalData => [
-              proposalData.shortCode,
-              proposalData.title,
-              `${proposalData.proposer.firstname} ${proposalData.proposer.lastname}`,
-              getTranslation(
-                proposalData.technicalReview?.status as ResourceId
-              ),
-              proposalData.technicalReview?.publicComment,
-              proposalData.technicalReview?.timeAllocation,
-              absoluteDifference(getGrades(proposalData.reviews)) || 'NA',
-              average(getGrades(proposalData.reviews)) || 'NA',
-              proposalData.commentForManagement,
-              proposalData.finalStatus,
-              proposalData.rankOrder,
-            ]);
-
-            const ws = XLSX.utils.aoa_to_sheet([dataColumns, ...dataToExport]);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
-            XLSX.writeFile(wb, 'proposals.xlsx');
-          },
+          exportCsv: excelDownload,
         }}
         actions={[
           {
@@ -360,10 +502,21 @@ const ProposalTableOfficer: React.FC = () => {
             position: 'toolbarOnSelect',
           },
           {
-            icon: AssignIcon,
+            icon: GroupWorkIcon,
             tooltip: 'Assign proposals to SEP',
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
+              setSelectedProposals(
+                (rowData as ProposalData[]).map((row: ProposalData) => row.id)
+              );
+            },
+            position: 'toolbarOnSelect',
+          },
+          {
+            icon: AddScienceIcon,
+            tooltip: 'Assign proposals to instrument',
+            onClick: (event, rowData): void => {
+              setOpenInstrumentAssignment(true);
               setSelectedProposals(
                 (rowData as ProposalData[]).map((row: ProposalData) => row.id)
               );
@@ -382,9 +535,27 @@ const ProposalTableOfficer: React.FC = () => {
             position: 'toolbarOnSelect',
           },
         ]}
+        onChangeColumnHidden={collumnChange => {
+          const proposalColumns = columns.map(
+            (proposalColumn: Column<ProposalData>) => ({
+              hidden:
+                proposalColumn.title === collumnChange.title
+                  ? collumnChange.hidden
+                  : proposalColumn.hidden,
+              title: proposalColumn.title,
+            })
+          );
+
+          setLocalStorageValue(proposalColumns);
+        }}
       />
     </>
   );
+};
+
+ProposalTableOfficer.propTypes = {
+  Toolbar: PropTypes.func.isRequired,
+  proposalFilter: PropTypes.any,
 };
 
 export default ProposalTableOfficer;

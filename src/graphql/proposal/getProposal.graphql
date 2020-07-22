@@ -1,19 +1,6 @@
 query getProposal($id: Int!) {
   proposal(id: $id) {
-    id
-    title
-    abstract
-    status
-    shortCode
-    rankOrder
-    finalStatus
-    commentForUser
-    commentForManagement
-    created
-    updated
-    callId
-    templateId
-    notified
+    ...proposal
     proposer {
       ...basicUserDetails
     }
@@ -21,17 +8,10 @@ query getProposal($id: Int!) {
       ...basicUserDetails
     }
     questionary {
-      steps {
-        ...questionaryStep
-      }
+      ...questionary
     }
     technicalReview {
-      id
-      comment
-      publicComment
-      timeAllocation
-      status
-      proposalID
+      ...coreTechnicalReview
     }
     reviews {
       id
@@ -46,6 +26,15 @@ query getProposal($id: Int!) {
         username
         id
       }
+    }
+    instrument {
+      id
+      name
+      shortCode
+    }
+    call {
+      id
+      shortCode
     }
   }
 }

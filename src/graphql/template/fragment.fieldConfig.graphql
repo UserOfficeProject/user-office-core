@@ -1,0 +1,59 @@
+fragment fieldConfig on FieldConfig {
+  ... on BooleanConfig {
+    small_label
+    required
+    tooltip
+  }
+  ... on DateConfig {
+    small_label
+    required
+    tooltip
+  }
+  ... on EmbellishmentConfig {
+    html
+    plain
+
+    small_label
+    required
+    tooltip
+    omitFromPdf
+  }
+  ... on FileUploadConfig {
+    file_type
+    max_files
+
+    small_label
+    required
+    tooltip
+  }
+  ... on SelectionFromOptionsConfig {
+    variant
+    options
+
+    small_label
+    required
+    tooltip
+  }
+  ... on TextInputConfig {
+    min
+    max
+    multiline
+    placeholder
+
+    small_label
+    required
+    tooltip
+    htmlQuestion
+    isHtmlQuestion
+  }
+
+  ... on SubtemplateConfig {
+    addEntryButtonLabel
+    maxEntries
+    templateId
+
+    small_label
+    required
+    tooltip
+  }
+}

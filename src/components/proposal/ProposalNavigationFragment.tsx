@@ -1,19 +1,14 @@
-import {
-  makeStyles,
-  Button,
-  CircularProgress,
-  StandardProps,
-} from '@material-ui/core';
-import { ButtonProps, ButtonClassKey } from '@material-ui/core/Button';
-import { Fragment, Component } from 'react';
-import React from 'react';
+import { CircularProgress, makeStyles } from '@material-ui/core';
+import React, { Fragment } from 'react';
+
+import { NavigButton } from 'components/common/NavigButton';
 
 const ProposalNavigationFragment = (props: {
   back?: ButtonConfig;
   reset?: ButtonConfig;
   save?: ButtonConfig;
   saveAndNext?: ButtonConfig;
-  isLoading: boolean;
+  isLoading?: boolean;
   disabled?: boolean;
 }): JSX.Element => {
   if (props.disabled === true) {
@@ -108,30 +103,4 @@ interface ButtonConfig {
   label?: string;
   disabled?: boolean;
   isBusy?: boolean;
-}
-
-class NavigButton extends Component<
-  StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>
-> {
-  render() {
-    const { className, isbusy, ...other } = this.props;
-
-    return (
-      <div className={className} style={{ position: 'relative' }}>
-        <Button {...other} />
-        {isbusy && (
-          <CircularProgress
-            size={24}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: -12,
-              marginLeft: -12,
-            }}
-          />
-        )}
-      </div>
-    );
-  }
 }

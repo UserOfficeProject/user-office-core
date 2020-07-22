@@ -1,11 +1,12 @@
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { EventLog } from '../../generated/sdk';
-import { useEventLogsData } from '../../hooks/useEventLogsData';
-import { tableIcons } from '../../utils/materialIcons';
+import { EventLog } from 'generated/sdk';
+import { useEventLogsData } from 'hooks/eventLog/useEventLogsData';
+import { tableIcons } from 'utils/materialIcons';
 
 type EventLogListProps = {
   /** Id of the changed object that we want to list event logs for. */
@@ -27,7 +28,6 @@ const EventLogList: React.FC<EventLogListProps> = ({
     changedObjectId.toString()
   );
   const columns = [
-    { title: 'Event log ID', field: 'id' },
     {
       title: 'Changed by',
       render: (rowData: EventLog): string =>
@@ -42,7 +42,9 @@ const EventLogList: React.FC<EventLogListProps> = ({
   ];
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
+    );
   }
 
   return (

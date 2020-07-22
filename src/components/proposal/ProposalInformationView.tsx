@@ -5,26 +5,27 @@ import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Proposal } from '../../generated/sdk';
-import { EventType } from '../../models/ProposalSubmissionModel';
-import { BasicUserDetails, User } from '../../models/User';
-import TextFieldWithCounter from '../common/TextFieldWithCounter';
+import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
+import { UserContext } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { EventType } from 'models/ProposalSubmissionModel';
+import { BasicUserDetails, User } from 'models/User';
+
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 import ProposalParticipant from './ProposalParticipant';
 import ProposalParticipants from './ProposalParticipants';
 
 export default function ProposalInformationView(props: {
-  data: Proposal;
+  data: ProposalSubsetSumbission;
   readonly?: boolean;
   disabled?: boolean;
 }) {
   const [userError, setUserError] = useState(false);
-  const { user: currentUser } = useContext(UserContext);
+  const { user: currentUser, currentRole } = useContext(UserContext);
   const { dispatch } = useContext(ProposalSubmissionContext)!;
   const [users, setUsers] = useState<BasicUserDetails[]>(props.data.users);
-  const { currentRole } = useContext(UserContext);
 
   const MAX_TITLE_LEN = 175;
   const MAX_ABSTRACT_LEN = 1500;
@@ -52,7 +53,7 @@ export default function ProposalInformationView(props: {
         if (
           values.proposer.id !== currentUser.id &&
           !users.some((user: BasicUserDetails) => user.id === currentUser.id) &&
-          currentRole !== 'user_officer'
+          currentRole !== UserRole.USER_OFFICER
         ) {
           setUserError(true);
         } else {

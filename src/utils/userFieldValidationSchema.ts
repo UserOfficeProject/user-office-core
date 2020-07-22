@@ -1,7 +1,7 @@
 import { request } from 'graphql-request';
 import * as Yup from 'yup';
 
-import { useDataApi } from '../hooks/useDataApi';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 export const userFieldSchema = Yup.object().shape({
   firstname: Yup.string()
@@ -51,7 +51,9 @@ export const userFieldSchema = Yup.object().shape({
         request('/graphql', query, {
           email: value,
         })
-          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
+          .then((data: any) =>
+            data.checkEmailExist ? resolve(false) : resolve(true)
+          )
           .catch(() => resolve(false));
       });
     }),
@@ -82,7 +84,9 @@ export const emailFieldSchema = Yup.object().shape({
         request('/graphql', query, {
           email: value,
         })
-          .then(data => (data.checkEmailExist ? resolve(false) : resolve(true)))
+          .then((data: any) =>
+            data.checkEmailExist ? resolve(false) : resolve(true)
+          )
           .catch(() => resolve(false));
       });
     }),

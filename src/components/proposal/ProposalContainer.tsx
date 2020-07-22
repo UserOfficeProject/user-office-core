@@ -1,39 +1,33 @@
-// FIXME: This file should be reviewed once more. It is too messy and lot of things are used before they are defined.
-// Maybe it should be split into multiple files or organized better.
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { StepButton, LinearProgress } from '@material-ui/core';
+import { LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { useSnackbar } from 'notistack';
-import React, {
-  createContext,
-  PropsWithChildren,
-  useEffect,
-  useState,
-  useContext,
-} from 'react';
+import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { Proposal, ProposalStatus, Questionary } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { ProposalAnswer } from '../../models/ProposalModel';
-import { getDataTypeSpec } from '../../models/ProposalModelFunctions';
+import { useCheckAccess } from 'components/common/Can';
+import { Proposal, ProposalStatus, Questionary, UserRole } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
-  ProposalSubmissionModel,
   Event,
   EventType,
+  ProposalSubmissionModel,
   ProposalSubmissionModelState,
-} from '../../models/ProposalSubmissionModel';
-import { StyledPaper } from '../../styles/StyledComponents';
-import { clamp } from '../../utils/Math';
+} from 'models/ProposalSubmissionModel';
+import { StyledPaper } from 'styles/StyledComponents';
+import { clamp } from 'utils/Math';
+
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
+import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 export interface Notification {
   variant: 'error' | 'success';
@@ -45,21 +39,6 @@ enum StepType {
   QUESTIONARY,
   REVIEW,
 }
-
-const prepareAnswers = (answers?: ProposalAnswer[]): ProposalAnswer[] => {
-  if (answers) {
-    answers = answers.filter(
-      answer => getDataTypeSpec(answer.dataType).readonly === false // filter out read only fields
-    );
-    answers = answers.map(answer => {
-      return { ...answer, value: JSON.stringify({ value: answer.value }) }; // store value in JSON to preserve datatype e.g. { "value":74 } or { "value":"yes" } . Because of GraphQL limitations
-    });
-
-    return answers;
-  } else {
-    return [];
-  }
-};
 
 class QuestionaryUIStep {
   constructor(
@@ -74,12 +53,13 @@ export const ProposalSubmissionContext = createContext<{
   dispatch: React.Dispatch<Event>;
 } | null>(null);
 
-export default function ProposalContainer(props: { data: Proposal }) {
+export default function ProposalContainer(props: {
+  data: ProposalSubsetSumbission;
+}) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentRole } = useContext(UserContext);
-  const isNonOfficer = currentRole !== 'user_officer';
+  const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
@@ -126,7 +106,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
       }
       setIsLoading(false);
 
-      return result!;
+      return result;
     });
   };
 
@@ -140,7 +120,7 @@ export default function ProposalContainer(props: { data: Proposal }) {
         const proposal = await executeAndMonitorCall(() =>
           api()
             .getProposal({ id: state.proposal.id })
-            .then(data => data.proposal!)
+            .then(data => data.proposal as Proposal)
         );
         dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
 
@@ -194,21 +174,20 @@ export default function ProposalContainer(props: { data: Proposal }) {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          let { id, status, shortCode } = state.proposal;
+          let { id, status, shortCode, questionaryId } = state.proposal;
           const { callId } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
               () =>
                 api()
                   .createProposal({ callId })
-                  // NOTE:  Using a non-null assertion (the !. operator) will lead to a runtime error if the optional does contain null or undefined.
                   .then(data => data.createProposal.proposal!),
               'Saved'
             );
-            ({ id, status, shortCode } = result);
+            ({ id, status, shortCode, questionaryId } = result);
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode },
+              payload: { id, status, shortCode, questionaryId },
             });
           }
           await executeAndMonitorCall(
@@ -229,13 +208,13 @@ export default function ProposalContainer(props: { data: Proposal }) {
           await executeAndMonitorCall(
             () =>
               api()
-                .updateProposal({
-                  id: state.proposal.id,
+                .answerTopic({
+                  questionaryId: state.proposal.questionaryId,
                   answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [],
-                  partialSave: true,
+                  topicId: action.payload.topicId,
+                  isPartialSave: true,
                 })
-                .then(data => data.updateProposal),
+                .then(data => data.answerTopic),
             'Saved'
           );
           break;
@@ -244,13 +223,12 @@ export default function ProposalContainer(props: { data: Proposal }) {
           await executeAndMonitorCall(
             () =>
               api()
-                .updateProposal({
-                  id: state.proposal.id,
+                .answerTopic({
+                  questionaryId: state.proposal.id,
                   answers: prepareAnswers(action.payload.answers),
-                  topicsCompleted: [action.payload.topicId],
-                  partialSave: false,
+                  topicId: action.payload.topicId,
                 })
-                .then(data => data.updateProposal),
+                .then(data => data.answerTopic),
             'Saved'
           ).then(() => setStepIndex(clampStep(stepIndex + 1)));
           break;
@@ -342,8 +320,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
     setProposalSteps(proposalSteps);
   }, [state, isSubmitted, isNonOfficer]);
 
-  // TODO
-  // this effect should be cleaned up as it is hard to read
   // The purpose of this effect is to navigate user to the
   // right step once proposal loads
   useEffect(() => {
@@ -433,46 +409,6 @@ export default function ProposalContainer(props: { data: Proposal }) {
         </StyledPaper>
       </ProposalSubmissionContext.Provider>
     </Container>
-  );
-}
-
-function QuestionaryStepButton(
-  props: PropsWithChildren<{
-    onClick: () => Promise<void>;
-    active?: boolean;
-    completed?: boolean;
-    clickable?: boolean;
-    editable: boolean;
-  }>
-) {
-  const classes = makeStyles(theme => ({
-    active: {
-      '& SVG': {
-        color: theme.palette.secondary.main + '!important',
-      },
-    },
-    editable: {
-      '& SVG': {
-        color: theme.palette.primary.main + '!important',
-      },
-    },
-  }))();
-
-  // NOTE: Without editable because it fires console warning when passed to StepButton component.
-  const { editable, ...propsWithoutEditable } = props;
-
-  const buttonClasses = [];
-
-  if (propsWithoutEditable.active) {
-    buttonClasses.push(classes.active);
-  } else if (editable) {
-    buttonClasses.push(classes.editable);
-  }
-
-  return (
-    <StepButton {...propsWithoutEditable} className={buttonClasses.join(' ')}>
-      {props.children}
-    </StepButton>
   );
 }
 

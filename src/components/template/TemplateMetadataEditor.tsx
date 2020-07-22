@@ -4,12 +4,13 @@ import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
-import { ProposalTemplate } from '../../generated/sdk';
-import { Event, EventType } from '../../models/QuestionaryEditorModel';
-import { ButtonContainer } from '../../styles/StyledComponents';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { Template } from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 export function TemplateMetadataEditor(props: {
-  template: ProposalTemplate;
+  template: Template;
   dispatch: React.Dispatch<Event>;
 }) {
   const { template, dispatch } = props;
@@ -99,10 +100,10 @@ export function TemplateMetadataEditor(props: {
             fullWidth
             data-cy="description"
           />
-          <ButtonContainer>
+          <ActionButtonContainer>
             <Button
               disabled={isSubmitting}
-              variant="contained"
+              variant="text"
               color="secondary"
               onClick={() => setIsEditMode(false)}
               className={classes.button}
@@ -118,7 +119,7 @@ export function TemplateMetadataEditor(props: {
             >
               Update
             </Button>
-          </ButtonContainer>
+          </ActionButtonContainer>
         </Form>
       )}
     </Formik>

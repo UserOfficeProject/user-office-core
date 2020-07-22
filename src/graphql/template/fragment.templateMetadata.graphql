@@ -1,0 +1,6 @@
+fragment templateMetadata on Template {
+  templateId
+  name
+  description
+  isArchived
+}

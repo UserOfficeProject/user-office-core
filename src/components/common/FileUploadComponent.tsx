@@ -18,10 +18,10 @@ import ErrorIcon from '@material-ui/icons/Error';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { useDataApi } from '../../hooks/useDataApi';
-import { UPLOAD_STATE, useFileUpload } from '../../hooks/useFileUpload';
-import { usePrevious } from '../../hooks/usePrevious';
-import { FileMetaData } from '../../models/FileUpload';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
+import { usePrevious } from 'hooks/common/usePrevious';
+import { FileMetaData } from 'models/FileUpload';
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -37,7 +37,7 @@ export function FileUploadComponent(props: {
   const api = useDataApi();
 
   const classes = makeStyles(() => ({
-    list: {
+    questionariesList: {
       listStyle: 'none',
       padding: 0,
       marginBottom: 0,
@@ -66,11 +66,6 @@ export function FileUploadComponent(props: {
         });
     }
   }, [api, props.value]);
-
-  /*useEffect(() => {
-    setFiles(filesMetadata);
-  }, [filesMetadata]);
-  */
 
   const dispatchChange = (): void => {
     const inputElement: HTMLInputElement = inputRef.current!;
@@ -113,7 +108,7 @@ export function FileUploadComponent(props: {
         ref={inputRef}
       />
       {amountFilesInfo}
-      <List component="ul" className={classes.list}>
+      <List component="ul" className={classes.questionariesList}>
         {files.map &&
           files.map((metaData: FileMetaData) => {
             return (
@@ -225,20 +220,18 @@ export function NewFileEntry(props: {
   switch (state) {
     case UPLOAD_STATE.PRISTINE:
       return (
-        <>
-          <label>
-            <input
-              accept={props.filetype}
-              style={{ display: 'none' }}
-              type="file"
-              multiple={false}
-              onChange={onFileSelected}
-            />
-            <Button variant="outlined" component="span">
-              <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
-            </Button>
-          </label>
-        </>
+        <label>
+          <input
+            accept={props.filetype}
+            style={{ display: 'none' }}
+            type="file"
+            multiple={false}
+            onChange={onFileSelected}
+          />
+          <Button variant="outlined" component="span">
+            <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+          </Button>
+        </label>
       );
     case UPLOAD_STATE.ERROR:
       return (

@@ -7,13 +7,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
-import { ReviewStatus, Review } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { useReviewData } from '../../hooks/useReviewData';
-import { ButtonContainer } from '../../styles/StyledComponents';
-import AssignmentProvider from '../SEP/SEPCurrentAssignmentProvider';
+import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
+import { ReviewStatus, CoreReviewFragment } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { useReviewData } from 'hooks/review/useReviewData';
+import { ButtonContainer } from 'styles/StyledComponents';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -27,13 +27,16 @@ const useStyles = makeStyles(() => ({
 
 export default function ProposalGrade(props: {
   reviewID: number;
-  onChange: any;
+  onChange: Function;
 }) {
   const classes = useStyles();
   const { reviewData } = useReviewData(props.reviewID);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-  const [review, setReview] = useState<Review | null>(null);
+  const [review, setReview] = useState<CoreReviewFragment | null | undefined>(
+    null
+  );
+  const { setAssignmentReview } = useContext(ReviewAndAssignmentContext);
 
   useEffect(() => {
     setReview(reviewData);
@@ -68,7 +71,7 @@ export default function ProposalGrade(props: {
             } else {
               enqueueSnackbar('Updated', { variant: 'success' });
               setReview(data.addReview.review);
-              AssignmentProvider.setReview(data.addReview.review);
+              setAssignmentReview(data.addReview.review);
             }
             props.onChange();
             actions.setSubmitting(false);
@@ -124,8 +127,13 @@ export default function ProposalGrade(props: {
               variant="contained"
               color="secondary"
               onClick={() => {
-                setFieldValue('saveOnly', false, false);
-                handleSubmit();
+                const confirmed = window.confirm(
+                  'I am aware that no futhure changes to the grade is possible after submission.'
+                );
+                if (confirmed) {
+                  setFieldValue('saveOnly', false, false);
+                  handleSubmit();
+                }
               }}
             >
               Submit

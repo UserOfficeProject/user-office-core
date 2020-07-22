@@ -14,7 +14,7 @@ context('Page tests', () => {
   });
 
   afterEach(() => {
-    cy.wait(2000);
+    cy.wait(500);
   });
 
   const faqContents = faker.random.words(2);

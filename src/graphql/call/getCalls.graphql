@@ -4,6 +4,24 @@ query getCalls($filter: CallsFilter) {
     shortCode
     startCall
     endCall
+    startReview
+    endReview
+    startNotify
+    endNotify
+    startCycle
+    endCycle
+    cycleComment
+    surveyComment
     templateId
+    instruments {
+      id
+      name
+      shortCode
+      description
+      availabilityTime
+      scientists {
+        ...basicUserDetails
+      }
+    }
   }
 }

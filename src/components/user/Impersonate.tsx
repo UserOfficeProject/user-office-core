@@ -3,8 +3,8 @@ import { useSnackbar } from 'notistack';
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router';
 
-import { UserContext } from '../../context/UserContextProvider';
-import { useDataApi } from '../../hooks/useDataApi';
+import { UserContext } from 'context/UserContextProvider';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 const useStyles = makeStyles({
   buttons: {

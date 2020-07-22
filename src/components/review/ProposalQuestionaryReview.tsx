@@ -1,22 +1,22 @@
 import {
-  Table,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
   makeStyles,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
 
-import { Proposal, Answer } from '../../generated/sdk';
-import { DataType } from '../../generated/sdk';
-import { useDataApi } from '../../hooks/useDataApi';
-import { FileMetaData } from '../../models/FileUpload';
-import { getAllFields } from '../../models/ProposalModelFunctions';
+import { Answer, DataType } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { FileMetaData } from 'models/FileUpload';
+import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { getAllFields } from 'models/ProposalModelFunctions';
 
 export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {
-    data: Proposal;
+    data: ProposalSubsetSumbission;
   }
 ) {
   const questionary = props.data.questionary!;

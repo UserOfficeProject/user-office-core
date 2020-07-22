@@ -3,10 +3,11 @@ import { TextField } from 'formik-material-ui';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { Question } from '../../../../generated/sdk';
-import { useNaturalKeySchema } from '../../../../utils/userFieldValidationSchema';
-import FormikUICustomSelect from '../../../common/FormikUICustomSelect';
-import TitledContainer from '../../../common/TitledContainer';
+import FormikUICustomMultipleSelect from 'components/common/FormikUICustomMultipleSelect';
+import TitledContainer from 'components/common/TitledContainer';
+import { Question } from 'generated/sdk';
+import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
+
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
 
@@ -69,7 +70,7 @@ export const QuestionFileUploadForm: TFormSignature<Question> = props => {
               name="config.file_type"
               label="Accepted file types (leave empty for any)"
               id="fileType"
-              component={FormikUICustomSelect}
+              component={FormikUICustomMultipleSelect}
               availableOptions={[
                 '.pdf',
                 '.doc',

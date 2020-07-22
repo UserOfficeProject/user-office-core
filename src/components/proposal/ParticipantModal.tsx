@@ -3,8 +3,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import { AddBox } from '@material-ui/icons';
 import React from 'react';
 
-import { UserRole } from '../../generated/sdk';
-import PeopleTable from '../user/PeopleTable';
+import PeopleTable from 'components/user/PeopleTable';
+import { UserRole } from 'generated/sdk';
 
 function ParticipantModal(props: {
   title: string;

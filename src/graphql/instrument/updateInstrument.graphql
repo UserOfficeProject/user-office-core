@@ -1,0 +1,24 @@
+mutation updateInstrument(
+  $id: Int!
+  $name: String!
+  $shortCode: String!
+  $description: String!
+) {
+  updateInstrument(
+    id: $id
+    name: $name
+    shortCode: $shortCode
+    description: $description
+  ) {
+    instrument {
+      id
+      name
+      shortCode
+      description
+      scientists {
+        ...basicUserDetails
+      }
+    }
+    error
+  }
+}

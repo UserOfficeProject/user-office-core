@@ -1,8 +1,0 @@
-fragment proposalTemplateMetadata on ProposalTemplate {
-  templateId
-  name
-  description
-  isArchived
-  proposalCount
-  callCount
-}

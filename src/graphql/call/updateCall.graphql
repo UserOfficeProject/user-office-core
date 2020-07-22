@@ -1,0 +1,55 @@
+mutation updateCall(
+  $id: Int!
+  $shortCode: String!
+  $startCall: DateTime!
+  $endCall: DateTime!
+  $startReview: DateTime!
+  $endReview: DateTime!
+  $startNotify: DateTime!
+  $endNotify: DateTime!
+  $startCycle: DateTime!
+  $endCycle: DateTime!
+  $cycleComment: String!
+  $surveyComment: String!
+  $templateId: Int
+) {
+  updateCall(
+    id: $id
+    shortCode: $shortCode
+    startCall: $startCall
+    endCall: $endCall
+    startReview: $startReview
+    endReview: $endReview
+    startNotify: $startNotify
+    endNotify: $endNotify
+    startCycle: $startCycle
+    endCycle: $endCycle
+    cycleComment: $cycleComment
+    surveyComment: $surveyComment
+    templateId: $templateId
+  ) {
+    error
+    call {
+      id
+      shortCode
+      startCall
+      endCall
+      startReview
+      endReview
+      startNotify
+      endNotify
+      startCycle
+      endCycle
+      cycleComment
+      surveyComment
+      templateId
+      instruments {
+        id
+        name
+        shortCode
+        description
+        availabilityTime
+      }
+    }
+  }
+}

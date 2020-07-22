@@ -15,7 +15,7 @@ context('Event log tests', () => {
   });
 
   afterEach(() => {
-    cy.wait(2000);
+    cy.wait(500);
   });
 
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {

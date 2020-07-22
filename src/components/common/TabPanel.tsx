@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
-import { StyledPaper } from '../../styles/StyledComponents';
+import { StyledPaper } from 'styles/StyledComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;

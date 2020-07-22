@@ -1,68 +1,73 @@
-import { Dialog, DialogContent, Link } from '@material-ui/core';
-import { Archive, Delete, Edit, Email, FileCopy } from '@material-ui/icons';
-import UnarchiveIcon from '@material-ui/icons/Unarchive';
+import { Button, Link } from '@material-ui/core';
+import dateformat from 'dateformat';
 import MaterialTable, { Column } from 'material-table';
-import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import React, { useState } from 'react';
 
-import {
-  GetProposalTemplatesQuery,
-  ProposalTemplate,
-} from '../../generated/sdk';
-import { useCallsData } from '../../hooks/useCallsData';
-import { useDataApi } from '../../hooks/useDataApi';
-import { tableIcons } from '../../utils/materialIcons';
-import withConfirm, { WithConfirmType } from '../../utils/withConfirm';
-import { CallsTable } from '../call/CallsTable';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import { Call, ProposalTemplate, TemplateCategoryId } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { tableIcons } from 'utils/materialIcons';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-type RowDataType = Pick<
-  ProposalTemplate,
-  | 'templateId'
-  | 'name'
-  | 'description'
-  | 'isArchived'
-  | 'proposalCount'
-  | 'callCount'
->;
+import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
-function CallsModal(props: { templateId?: number; onClose: () => void }) {
-  const { loading, callsData } = useCallsData(undefined, props.templateId);
-
-  if (loading) {
-    return <div>loading...</div>;
-  }
+function CallsList(props: { filterTemplateId: number }) {
+  const { callsData } = useCallsData(undefined, props.filterTemplateId);
+  const columns = [
+    { title: 'Short Code', field: 'shortCode' },
+    {
+      title: 'Start Date',
+      field: 'startCall',
+      render: (rowData: Call) =>
+        dateformat(new Date(rowData.startCall), 'dd-mmm-yyyy'),
+    },
+    {
+      title: 'End Date',
+      field: 'endCall',
+      render: (rowData: Call) =>
+        dateformat(new Date(rowData.endCall), 'dd-mmm-yyyy'),
+    },
+  ];
 
   return (
-    <Dialog
-      open={props.templateId !== undefined}
-      fullWidth={true}
-      onClose={props.onClose}
-    >
-      <DialogContent>
-        <CallsTable data={callsData || undefined} />
-      </DialogContent>
-    </Dialog>
+    <MaterialTable
+      icons={tableIcons}
+      title="Calls"
+      columns={columns}
+      data={callsData}
+    />
   );
 }
 
-function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
-  const [templates, setTemplates] = useState<RowDataType[]>([]);
-  const history = useHistory();
+function CallsModal(props: { templateId?: number; onClose: () => void }) {
+  return (
+    <InputDialog
+      open={props.templateId !== undefined}
+      onClose={props.onClose}
+      fullWidth={true}
+    >
+      <CallsList filterTemplateId={props.templateId!} />
+      <ActionButtonContainer>
+        <Button variant="text" onClick={() => props.onClose()}>
+          Close
+        </Button>
+      </ActionButtonContainer>
+    </InputDialog>
+  );
+}
+type ProposalTemplateRowDataType = TemplateRowDataType & {
+  callCount: number;
+  proposalCount: number;
+};
 
-  useEffect(() => {
-    props.dataProvider().then(data => {
-      setTemplates(data.proposalTemplates);
-    });
-  }, [props]);
-  const columns: Column<RowDataType>[] = [
-    { title: 'Template ID', field: 'templateId', editable: 'never' },
-    { title: 'Name', field: 'name', editable: 'always' },
-    { title: 'Description', field: 'description', editable: 'always' },
-    { title: '# proposals', field: 'proposalCount', editable: 'never' },
+function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
+
+  const columns: Column<ProposalTemplateRowDataType>[] = [
+    { title: 'Name', field: 'name' },
+    { title: 'Description', field: 'description' },
+    { title: '# proposals', field: 'proposalCount' },
     {
       title: '# calls',
       field: 'callCount',
@@ -80,220 +85,21 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
     },
   ];
 
-  const actionArray = [];
-  actionArray.push({
-    icon: () => <Email />,
-    isFreeAction: true,
-    tooltip: 'Edit template',
-    onClick: (event: any, rowData: RowDataType) => {
-      history.push(`/QuestionaryEditor/${rowData.templateId}`);
-    },
-  });
-
-  const getUnarchiveButton = () => {
-    return {
-      icon: () => <UnarchiveIcon />,
-      tooltip: 'Unarchive',
-      onClick: (event: any, data: RowDataType | RowDataType[]) => {
-        props.confirm(
-          () => {
-            api()
-              .updateProposalTemplate({
-                templateId: (data as RowDataType).templateId,
-                isArchived: false,
-              })
-              .then(response => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    elem =>
-                      elem.templateId ===
-                      response.updateProposalTemplate.template?.templateId
-                  ),
-                  1,
-                  response.updateProposalTemplate.template!
-                );
-                setTemplates(data);
-              });
-          },
-          {
-            title: 'Are you sure?',
-            description: `Are you sure you want to unarchive ${
-              (data as RowDataType).name
-            }`,
-            confirmationText: 'Yes',
-            cancellationText: 'Cancel',
-          }
-        )();
-      },
-    };
-  };
-
-  const getArchiveButton = () => {
-    return {
-      icon: () => <Archive />,
-      tooltip: 'Archive',
-      onClick: (event: any, data: RowDataType | RowDataType[]) => {
-        props.confirm(
-          () => {
-            api()
-              .updateProposalTemplate({
-                templateId: (data as RowDataType).templateId,
-                isArchived: true,
-              })
-              .then(response => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    elem =>
-                      elem.templateId ===
-                      response.updateProposalTemplate.template?.templateId
-                  ),
-                  1,
-                  response.updateProposalTemplate.template!
-                );
-                setTemplates(data);
-              });
-          },
-          {
-            title: 'Are you sure?',
-            description: `Are you sure you want to archive ${
-              (data as RowDataType).name
-            }`,
-            confirmationText: 'Yes',
-            cancellationText: 'Cancel',
-          }
-        )();
-      },
-    };
-  };
-
-  const getDeleteButton = () => {
-    return {
-      icon: () => <Delete />,
-      tooltip: 'Delete',
-      onClick: (event: any, data: RowDataType | RowDataType[]) => {
-        props.confirm(
-          () => {
-            api()
-              .deleteProposalTemplate({
-                id: (data as RowDataType).templateId,
-              })
-              .then(response => {
-                const data = [...templates];
-                data.splice(
-                  templates.findIndex(
-                    elem =>
-                      elem.templateId ===
-                      response.deleteProposalTemplate.template?.templateId
-                  ),
-                  1
-                );
-                setTemplates(data);
-              });
-          },
-          {
-            title: 'Are you sure?',
-            description: `Are you sure you want to delete ${
-              (data as RowDataType).name
-            }`,
-            confirmationText: 'Yes',
-            cancellationText: 'Cancel',
-          }
-        )();
-      },
-    };
-  };
-
-  const getMaintenanceButton = (rowData: RowDataType) => {
-    if (rowData.isArchived) {
-      return getUnarchiveButton();
-    } else {
-      const isDeleteable =
-        rowData.callCount === 0 && rowData.proposalCount === 0;
-      if (isDeleteable) {
-        return getDeleteButton();
-      } else {
-        return getArchiveButton();
-      }
-    }
-  };
-
   return (
     <>
-      <MaterialTable
-        icons={tableIcons}
-        title="Proposal templates"
+      <TemplatesTable
         columns={columns}
-        data={templates}
-        editable={{
-          onRowAdd: data =>
-            new Promise(resolve => {
-              api()
-                .createProposalTemplate({
-                  name: data.name,
-                  description: data.description,
-                })
-                .then(result => {
-                  const { template, error } = result.createProposalTemplate;
+        templateCategory={TemplateCategoryId.PROPOSAL_QUESTIONARY}
+        isRowRemovable={rowData => {
+          const proposalTemplateRowData = rowData as ProposalTemplateRowDataType;
 
-                  if (!template) {
-                    enqueueSnackbar(error || 'Error ocurred', {
-                      variant: 'error',
-                    });
-                  } else {
-                    const newTemplates = [...templates];
-                    newTemplates.push(template!);
-                    setTemplates(newTemplates);
-                  }
-                  resolve();
-                });
-            }),
+          return (
+            proposalTemplateRowData.callCount === 0 &&
+            proposalTemplateRowData.proposalCount === 0
+          );
         }}
-        actions={[
-          {
-            icon: () => <Edit />,
-            tooltip: 'Edit',
-            onClick: (event: any, data: RowDataType | RowDataType[]) => {
-              history.push(
-                `/QuestionaryEditor/${(data as RowDataType).templateId}`
-              );
-            },
-          },
-          {
-            icon: () => <FileCopy />,
-            hidden: false,
-            tooltip: 'Clone',
-            onClick: (event: any, data: RowDataType | RowDataType[]) => {
-              props.confirm(
-                () => {
-                  api()
-                    .cloneProposalTemplate({
-                      templateId: (data as RowDataType).templateId,
-                    })
-                    .then(result => {
-                      const clonedTemplate =
-                        result.cloneProposalTemplate.template;
-                      if (clonedTemplate) {
-                        const newTemplates = [...templates];
-                        newTemplates.push(clonedTemplate);
-                        setTemplates(newTemplates);
-                      }
-                    });
-                },
-                {
-                  title: 'Are you sure?',
-                  description: `Are you sure you want to clone ${
-                    (data as RowDataType).name
-                  }`,
-                  confirmationText: 'Yes',
-                  cancellationText: 'Cancel',
-                }
-              )();
-            },
-          },
-          rowData => getMaintenanceButton(rowData),
-        ]}
+        dataProvider={props.dataProvider}
+        confirm={props.confirm}
       />
       <CallsModal
         templateId={selectedTemplateId}
@@ -304,7 +110,17 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
 }
 
 interface IProposalTemplatesTableProps {
-  dataProvider: () => Promise<GetProposalTemplatesQuery>;
+  dataProvider: () => Promise<
+    Pick<
+      ProposalTemplate,
+      | 'templateId'
+      | 'name'
+      | 'description'
+      | 'isArchived'
+      | 'callCount'
+      | 'proposalCount'
+    >[]
+  >;
   confirm: WithConfirmType;
 }
 

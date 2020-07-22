@@ -1,12 +1,13 @@
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import TextFieldsIcon from '@material-ui/icons/TextFields';
 import React from 'react';
 
-import { DataType } from '../../generated/sdk';
+import { DataType } from 'generated/sdk';
 
 const getTemplateFieldIcon = (dataType: DataType) => {
   switch (dataType) {
@@ -22,6 +23,8 @@ const getTemplateFieldIcon = (dataType: DataType) => {
       return <AttachFileIcon />;
     case DataType.EMBELLISHMENT:
       return <TextFieldsIcon />;
+    case DataType.SUBTEMPLATE:
+      return <QuestionAnswerIcon />;
 
     default:
       return null;

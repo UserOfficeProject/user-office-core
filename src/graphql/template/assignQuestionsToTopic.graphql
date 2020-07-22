@@ -1,0 +1,13 @@
+mutation assignQuestionsToTopic(
+  $templateId: Int!
+  $topicId: Int!
+  $questionIds: [String!]
+) {
+  assignQuestionsToTopic(
+    templateId: $templateId
+    topicId: $topicId
+    questionIds: $questionIds
+  ) {
+    error
+  }
+}

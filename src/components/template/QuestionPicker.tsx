@@ -1,32 +1,37 @@
 import {
+  AppBar,
+  Divider,
   Fade,
   Grid,
   ListItemIcon,
   makeStyles,
   Menu,
   MenuItem,
+  Toolbar,
   Typography,
   useTheme,
-  Divider,
 } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
 import {
   DataType,
-  ProposalTemplate,
   Question,
+  Template,
+  TemplateCategoryId,
   Topic,
-} from '../../generated/sdk';
-import { Event, EventType } from '../../models/QuestionaryEditorModel';
-import getTemplateFieldIcon from './getTemplateFieldIcon';
-import QuestionaryEditorTopicItem, {
-  IQuestionaryEditorTopicData,
-} from './QuestionaryEditorTopicItem';
+} from 'generated/sdk';
+import { Event, EventType } from 'models/QuestionaryEditorModel';
 
-class QuestionItemAdapter implements IQuestionaryEditorTopicData {
+import getTemplateFieldIcon from './getTemplateFieldIcon';
+import TemplateQuestionEditor, {
+  TemplateTopicEditorData,
+} from './TemplateQuestionEditor';
+
+class QuestionItemAdapter implements TemplateTopicEditorData {
   constructor(public source: Question) {}
 
   get proposalQuestionId() {
@@ -61,7 +66,22 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
       alignContent: 'flex-start',
       flexBasis: '100%',
       marginRight: '10px',
+      backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+    },
+    appbar: {
+      background: 'transparent',
+      boxShadow: 'none',
+      paddingRight: 0,
+    },
+    toolbar: {
+      minHeight: '36px',
+      padding: '0 6px',
+    },
+    title: {
+      flexGrow: 1,
+      color: theme.palette.grey[600],
+      fontWeight: 'bold',
     },
     itemContainer: {
       minHeight: '180px',
@@ -69,25 +89,20 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
     addQuestionMenuItem: {
       minHeight: 0,
     },
-    showMoreButton: {
+    toolbarButton: {
       cursor: 'pointer',
-    },
-    addIcon: {
-      textAlign: 'right',
-      paddingRight: '8px',
+      color: theme.palette.grey[600],
     },
   }))();
 
   const getListStyle = (isDraggingOver: any) => ({
-    background: isDraggingOver
-      ? theme.palette.primary.light
-      : theme.palette.grey[100],
+    background: isDraggingOver ? theme.palette.primary.light : 'transparent',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
   });
 
   const getItems = () => {
     return template.complementaryQuestions.map((question, index) => (
-      <QuestionaryEditorTopicItem
+      <TemplateQuestionEditor
         index={index}
         data={new QuestionItemAdapter(question)}
         onClick={item => {
@@ -130,94 +145,114 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
       id={props.id}
       data-cy="questionPicker"
     >
-      <Grid item xs={10}>
-        Question drawer
-      </Grid>
-      <Grid item xs={2} className={classes.addIcon}>
-        <MoreHorizIcon
-          onClick={(event: React.MouseEvent<SVGSVGElement>) =>
-            setAnchorEl(event.currentTarget)
-          }
-          className={classes.showMoreButton}
-          data-cy="show-more-button"
-        />
-        <Menu
-          anchorEl={anchorEl}
-          keepMounted
-          open={open}
-          onClose={() => setAnchorEl(null)}
-          TransitionComponent={Fade}
-        >
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() => onCreateNewQuestionClicked(DataType.TEXT_INPUT)}
-          >
-            <ListItemIcon>
-              {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
-            </ListItemIcon>
-            <Typography variant="inherit">Add Text input</Typography>
-          </MenuItem>
-
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() => onCreateNewQuestionClicked(DataType.EMBELLISHMENT)}
-          >
-            <ListItemIcon>
-              {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
-            </ListItemIcon>
-            <Typography variant="inherit">Add Embellishment</Typography>
-          </MenuItem>
-
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() => onCreateNewQuestionClicked(DataType.DATE)}
-          >
-            <ListItemIcon>{getTemplateFieldIcon(DataType.DATE)!}</ListItemIcon>
-            <Typography variant="inherit">Add Date</Typography>
-          </MenuItem>
-
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() => onCreateNewQuestionClicked(DataType.FILE_UPLOAD)}
-          >
-            <ListItemIcon>
-              {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
-            </ListItemIcon>
-            <Typography variant="inherit">Add File upload</Typography>
-          </MenuItem>
-
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() =>
-              onCreateNewQuestionClicked(DataType.SELECTION_FROM_OPTIONS)
+      <AppBar position="static" className={classes.appbar}>
+        <Toolbar className={classes.toolbar}>
+          <span className={classes.title}>Question drawer</span>
+          <MoreVertIcon
+            onClick={(event: React.MouseEvent<SVGSVGElement>) =>
+              setAnchorEl(event.currentTarget)
             }
+            className={classes.toolbarButton}
+            data-cy="show-more-button"
+          />
+          <CloseIcon
+            onClick={closeMe}
+            className={classes.toolbarButton}
+            data-cy="close-button"
+          />
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            TransitionComponent={Fade}
           >
-            <ListItemIcon>
-              {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
-            </ListItemIcon>
-            <Typography variant="inherit">Add Multiple choice</Typography>
-          </MenuItem>
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.TEXT_INPUT)}
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.TEXT_INPUT)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Text input</Typography>
+            </MenuItem>
 
-          <MenuItem
-            className={classes.addQuestionMenuItem}
-            onClick={() => onCreateNewQuestionClicked(DataType.BOOLEAN)}
-          >
-            <ListItemIcon>
-              {getTemplateFieldIcon(DataType.BOOLEAN)!}
-            </ListItemIcon>
-            <Typography variant="inherit">Add Boolean</Typography>
-          </MenuItem>
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.EMBELLISHMENT)}
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.EMBELLISHMENT)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Embellishment</Typography>
+            </MenuItem>
 
-          <Divider />
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.DATE)}
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.DATE)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Date</Typography>
+            </MenuItem>
 
-          <MenuItem className={classes.addQuestionMenuItem} onClick={closeMe}>
-            <ListItemIcon>
-              <HighlightOffIcon />
-            </ListItemIcon>
-            <Typography variant="inherit">Close</Typography>
-          </MenuItem>
-        </Menu>
-      </Grid>
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.FILE_UPLOAD)}
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.FILE_UPLOAD)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add File upload</Typography>
+            </MenuItem>
+
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() =>
+                onCreateNewQuestionClicked(DataType.SELECTION_FROM_OPTIONS)
+              }
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.SELECTION_FROM_OPTIONS)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Multiple choice</Typography>
+            </MenuItem>
+
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.BOOLEAN)}
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.BOOLEAN)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Boolean</Typography>
+            </MenuItem>
+
+            <MenuItem
+              className={classes.addQuestionMenuItem}
+              onClick={() => onCreateNewQuestionClicked(DataType.SUBTEMPLATE)}
+              disabled={
+                template.categoryId !== TemplateCategoryId.PROPOSAL_QUESTIONARY
+              }
+            >
+              <ListItemIcon>
+                {getTemplateFieldIcon(DataType.SUBTEMPLATE)!}
+              </ListItemIcon>
+              <Typography variant="inherit">Add Subtemplate</Typography>
+            </MenuItem>
+
+            <Divider />
+
+            <MenuItem className={classes.addQuestionMenuItem} onClick={closeMe}>
+              <ListItemIcon>
+                <HighlightOffIcon />
+              </ListItemIcon>
+              <Typography variant="inherit">Close</Typography>
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
       <Droppable droppableId="questionPicker" type="field">
         {(provided, snapshot) => (
           <Grid
@@ -238,7 +273,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
 
 interface IQuestionPickerProps {
   topic: Topic;
-  template: ProposalTemplate;
+  template: Template;
   dispatch: React.Dispatch<Event>;
   closeMe: () => void;
   id?: string;

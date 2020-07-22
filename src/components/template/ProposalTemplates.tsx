@@ -1,8 +1,9 @@
 import { Container } from '@material-ui/core';
 import React from 'react';
 
-import { useDataApi } from '../../hooks/useDataApi';
-import SimpleTabs from '../common/TabPanel';
+import SimpleTabs from 'components/common/TabPanel';
+import { useDataApi } from 'hooks/common/useDataApi';
+
 import ProposalTemplatesTable from './ProposalTemplatesTable';
 
 export default function ProposalTemplates() {
@@ -15,14 +16,14 @@ export default function ProposalTemplates() {
           dataProvider={() =>
             api()
               .getProposalTemplates({ filter: { isArchived: false } })
-              .then(data => data)
+              .then(data => data.proposalTemplates || [])
           }
         />
         <ProposalTemplatesTable
           dataProvider={() =>
             api()
               .getProposalTemplates({ filter: { isArchived: true } })
-              .then(data => data)
+              .then(data => data.proposalTemplates || [])
           }
         />
       </SimpleTabs>

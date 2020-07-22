@@ -1,5 +1,5 @@
-import { EvaluatorOperator, Answer } from '../generated/sdk';
-import JSDict from '../utils/Dictionary';
+import { EvaluatorOperator, Answer } from 'generated/sdk';
+import JSDict from 'utils/Dictionary';
 
 export class EqualityValidator implements FieldConditionEvaluator {
   isSatisfied(field: Answer, params: string): boolean {
