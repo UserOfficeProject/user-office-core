@@ -10,7 +10,7 @@ import { TemplateCategoryId, TemplateMetadataFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 const CreateTemplate = (props: {
-  onComplete: (template: TemplateMetadataFragment | null) => void;
+  onComplete: (template: TemplateMetadataFragment | null | undefined) => void;
   categoryId: TemplateCategoryId;
 }) => {
   const { onComplete, categoryId } = props;

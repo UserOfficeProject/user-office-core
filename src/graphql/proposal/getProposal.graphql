@@ -11,12 +11,7 @@ query getProposal($id: Int!) {
       ...questionary
     }
     technicalReview {
-      id
-      comment
-      publicComment
-      timeAllocation
-      status
-      proposalID
+      ...coreTechnicalReview
     }
     reviews {
       id

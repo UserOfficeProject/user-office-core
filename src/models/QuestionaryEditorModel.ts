@@ -64,6 +64,7 @@ export default function QuestionaryEditorModel(
     isArchived: false,
     name: 'blank',
     complementaryQuestions: [],
+    description: '',
   };
 
   function reducer(state: Template, action: Event): Template {

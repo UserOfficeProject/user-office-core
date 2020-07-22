@@ -47,7 +47,9 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
           await api()
             .createInstrument(values)
             .then(data => {
-              if (data.createInstrument.error) {
+              const { error, instrument } = data.createInstrument;
+
+              if (error) {
                 enqueueSnackbar(
                   getTranslation(data.createInstrument.error as ResourceId),
                   {
@@ -55,8 +57,8 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
                   }
                 );
                 close(null);
-              } else {
-                close(data.createInstrument.instrument);
+              } else if (instrument) {
+                close(instrument);
               }
             });
         } else {
@@ -66,7 +68,8 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
               ...values,
             })
             .then(data => {
-              if (data.updateInstrument.error) {
+              const { error, instrument } = data.updateInstrument;
+              if (error) {
                 enqueueSnackbar(
                   getTranslation(data.updateInstrument.error as ResourceId),
                   {
@@ -74,8 +77,8 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
                   }
                 );
                 close(null);
-              } else {
-                close(data.updateInstrument.instrument);
+              } else if (instrument) {
+                close(instrument);
               }
             });
         }

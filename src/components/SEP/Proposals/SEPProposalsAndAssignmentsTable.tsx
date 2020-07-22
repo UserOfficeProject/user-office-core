@@ -232,8 +232,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
           return {
             ...editingProposalData,
-            assignments: editingProposalData.assignments?.map(
-              proposalAssignment => {
+            assignments:
+              editingProposalData.assignments?.map(proposalAssignment => {
                 if (
                   proposalAssignment.review.id === currentAssignment?.review.id
                 ) {
@@ -241,8 +241,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                 } else {
                   return proposalAssignment;
                 }
-              }
-            ),
+              }) ?? [],
           };
         } else {
           return sepProposalsData;

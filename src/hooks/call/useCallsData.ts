@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { GetCallsQuery } from 'generated/sdk';
+import { Call } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useCallsData(isActive?: boolean, templateId?: number) {
-  const [callsData, setCallsData] = useState<
-    Exclude<GetCallsQuery['calls'], null>
-  >([]);
+  const [callsData, setCallsData] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();

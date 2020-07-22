@@ -34,7 +34,7 @@ context('Instrument tests', () => {
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.contains('Create instrument').click();
+    cy.contains('Create').click();
     cy.get('#name').type(name);
     cy.get('#shortCode').type(shortCode);
     cy.get('#description').type(description);
@@ -57,7 +57,7 @@ context('Instrument tests', () => {
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.get('[title="Edit Instrument"]').click();
+    cy.get('[title="Edit"]').click();
     cy.get('#name').clear();
     cy.get('#name').type(name);
     cy.get('#shortCode').clear();
