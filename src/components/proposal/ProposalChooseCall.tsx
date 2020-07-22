@@ -6,13 +6,13 @@ import {
   ListItemText,
   Typography,
   makeStyles,
-  CircularProgress,
 } from '@material-ui/core';
 import { NavigateNext } from '@material-ui/icons';
 import dateformat from 'dateformat';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
+import UOLoader from 'components/common/UOLoader';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { daysRemaining } from 'utils/Time';
@@ -30,9 +30,7 @@ export default function ProposalChooseCall() {
   const classes = useStyles();
 
   if (loading) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   if (callsData.length === 0) {

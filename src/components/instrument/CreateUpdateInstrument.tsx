@@ -10,8 +10,9 @@ import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Instrument } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -30,6 +31,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const initialValues = instrument
     ? instrument
@@ -42,7 +44,8 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
+        setSubmitting(true);
         if (!instrument) {
           await api()
             .createInstrument(values)
@@ -79,7 +82,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
               }
             });
         }
-        actions.setSubmitting(false);
+        setSubmitting(false);
       }}
       validationSchema={
         instrument
@@ -101,6 +104,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             margin="normal"
             fullWidth
             data-cy="name"
+            disabled={submitting}
           />
           <Field
             name="shortCode"
@@ -111,6 +115,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             margin="normal"
             fullWidth
             data-cy="shortCode"
+            disabled={submitting}
           />
           <Field
             id="description"
@@ -124,6 +129,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             rowsMax="16"
             rows="3"
             data-cy="description"
+            disabled={submitting}
           />
 
           <Button
@@ -133,7 +139,9 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             color="primary"
             className={classes.submit}
             data-cy="submit"
+            disabled={submitting}
           >
+            {submitting && <UOLoader size={14} />}
             {instrument ? 'Update' : 'Create'}
           </Button>
         </Form>

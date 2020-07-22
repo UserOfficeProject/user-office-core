@@ -1,9 +1,10 @@
-import { makeStyles, CircularProgress } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
+import UOLoader from 'components/common/UOLoader';
 import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
 import { useUpdateProposal } from 'hooks/proposal/useUpdateProposal';
@@ -41,9 +42,7 @@ export default function ProposalQuestionaryStep(props: {
   const { dispatch } = useContext(ProposalSubmissionContext)!;
 
   if (data === null) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   const questionary = data.proposal.questionary!;

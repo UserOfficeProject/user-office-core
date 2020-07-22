@@ -5,7 +5,6 @@ import {
   IconButton,
   Tooltip,
   withStyles,
-  CircularProgress,
 } from '@material-ui/core';
 import { PersonAdd, Person } from '@material-ui/icons';
 import { Formik, Form, Field } from 'formik';
@@ -15,6 +14,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { SepMember, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -168,9 +168,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   };
 
   if (loadingMembers) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
   }
 
   if (SEPMembersData && SEPMembersData.length > 0) {

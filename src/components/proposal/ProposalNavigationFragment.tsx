@@ -1,7 +1,8 @@
-import { CircularProgress, makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import React, { Fragment } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
+import UOLoader from 'components/common/UOLoader';
 
 const ProposalNavigationFragment = (props: {
   back?: ButtonConfig;
@@ -83,7 +84,7 @@ const ProposalNavigationFragment = (props: {
     </NavigButton>
   ) : null;
   const buttonArea = props.isLoading ? (
-    <CircularProgress />
+    <UOLoader />
   ) : (
     <Fragment>
       {backbutton}

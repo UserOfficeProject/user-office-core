@@ -5,10 +5,10 @@ import {
   TableCell,
   TableRow,
   Typography,
-  CircularProgress,
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Answer, DataType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { FileMetaData } from 'models/FileUpload';
@@ -52,9 +52,7 @@ export default function ProposalQuestionaryReview(
   }, [api, fileIds]);
 
   if (!props.data) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   const downloadLink = (file: FileMetaData | undefined) => (

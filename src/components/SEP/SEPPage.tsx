@@ -1,10 +1,10 @@
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Sep, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -67,7 +67,7 @@ const SEPPage: React.FC<SEPPageProps> = ({ match }) => {
           )}
         </SimpleTabs>
       ) : (
-        <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
+        <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
       )}
     </Container>
   );

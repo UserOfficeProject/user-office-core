@@ -1,6 +1,5 @@
 import { proposalGradeValidationSchema } from '@esss-swap/duo-validation';
 import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -10,6 +9,7 @@ import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect, useContext } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { ReviewStatus, Review } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -42,9 +42,7 @@ export default function ProposalGrade(props: {
   }, [reviewData]);
 
   if (!review) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (

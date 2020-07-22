@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
-import { Card, CardContent, CircularProgress } from '@material-ui/core';
+import { Card, CardContent } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
@@ -21,6 +21,7 @@ import { ObjectSchema } from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
+import UOLoader from 'components/common/UOLoader';
 import InformationModal from 'components/pages/InformationModal';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, CreateUserMutationVariables } from 'generated/sdk';
@@ -171,9 +172,7 @@ const SignUp: React.FC<SignUpProps> = props => {
   }
 
   if (loadingInstitutions || !fieldsContent || (authCodeOrcID && loading)) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   if (!institutionsList.length) {

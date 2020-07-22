@@ -8,8 +8,9 @@ import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { Sep } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -27,6 +28,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   return (
     <Formik
@@ -36,7 +38,8 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         numberRatingsRequired: 2,
         active: true,
       }}
-      onSubmit={async (values, actions): Promise<void> => {
+      onSubmit={async (values): Promise<void> => {
+        setSubmitting(true);
         await api()
           .createSEP(values)
           .then(data => {
@@ -53,7 +56,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
               close(data.createSEP.sep);
             }
           });
-        actions.setSubmitting(false);
+        setSubmitting(false);
       }}
       validationSchema={createSEPValidationSchema}
     >
@@ -80,6 +83,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             data-cy="code"
             error={touched.code && errors.code !== undefined}
             helperText={touched.code && errors.code && errors.code}
+            disabled={submitting}
           />
           <Field
             id="description"
@@ -99,6 +103,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             helperText={
               touched.description && errors.description && errors.description
             }
+            disabled={submitting}
           />
 
           <Field
@@ -121,6 +126,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
               errors.numberRatingsRequired &&
               errors.numberRatingsRequired
             }
+            disabled={submitting}
           />
           <FormControlLabel
             control={
@@ -144,7 +150,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             color="primary"
             className={classes.submit}
             data-cy="submit"
+            disabled={submitting}
           >
+            {submitting && <UOLoader size={14} />}
             Create
           </Button>
         </Form>

@@ -12,7 +12,7 @@ import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
-import { NavigButton } from 'components/common/NavigButton';
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import orcid from 'images/orcid.png';
@@ -147,17 +147,18 @@ export default function SignInSide() {
             {failedLogin && (
               <p className={classes.errorMessage}>{errorMessage}</p>
             )}
-            <NavigButton
+            <Button
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
               className={classes.submit}
               data-cy="submit"
-              isbusy={submitting}
+              disabled={submitting}
             >
+              {submitting && <UOLoader size={14} />}
               Sign In
-            </NavigButton>
+            </Button>
             <Grid container>
               <Grid item xs>
                 <Link to="/ResetPasswordEmail/">Forgot password?</Link>

@@ -1,9 +1,9 @@
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ParticipantModal from 'components/proposal/ParticipantModal';
@@ -74,9 +74,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   };
 
   if (!proposal) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (

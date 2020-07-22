@@ -1,9 +1,9 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import React from 'react';
 import { useParams } from 'react-router';
 
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 
 import ProposalContainer from './ProposalContainer';
@@ -14,9 +14,7 @@ export default function ProposalEdit() {
   const { proposalData } = useProposalData(+proposalID);
 
   if (!proposalData) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '100px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
   if (proposalData.notified) {
     return (
