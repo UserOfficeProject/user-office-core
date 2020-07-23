@@ -7,7 +7,9 @@ import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ParticipantModal from 'components/proposal/ParticipantModal';
-import ProposalAdmin from 'components/proposal/ProposalAdmin';
+import ProposalAdmin, {
+  AdministrationFormData,
+} from 'components/proposal/ProposalAdmin';
 import {
   Proposal,
   CoreTechnicalReviewFragment,
@@ -107,7 +109,12 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           data={techReview}
           setReview={setTechReview}
         />
-        <ProposalAdmin data={proposal} />
+        <ProposalAdmin
+          data={proposal}
+          setAdministration={(data: AdministrationFormData) =>
+            setProposal({ ...proposal, ...data })
+          }
+        />
         <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
       </SimpleTabs>
     </Container>

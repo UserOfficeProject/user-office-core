@@ -6,12 +6,12 @@ import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { SepProposal, InstrumentWithAvailabilityTime } from 'generated/sdk';
 import { useSEPProposalsByInstrument } from 'hooks/SEP/useSEPProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import { getGrades, average } from 'utils/mathFunctions';
 
-import { MeetingFormData } from './ProposalViewModal/FinalRankingForm';
 import SEPMeetingProposalViewModal from './ProposalViewModal/SEPMeetingProposalViewModal';
 
 // NOTE: Some custom styles for row expand table.
@@ -134,7 +134,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
   ];
 
-  const onMeetingSubmited = (data: MeetingFormData) => {
+  const onMeetingSubmited = (data: AdministrationFormData) => {
     const newInstrumentProposalsData = instrumentProposalsData.map(
       proposalData => {
         if (proposalData.proposal.id === data.id) {

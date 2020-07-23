@@ -11,22 +11,15 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
+import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { Proposal, ProposalEndStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 
-export type MeetingFormData = {
-  id: number;
-  commentForUser: string;
-  commentForManagement: string;
-  finalStatus: ProposalEndStatus;
-  rankOrder: number | string;
-};
-
 type FinalRankingFormProps = {
   closeModal: () => void;
   proposalData: Proposal;
-  meetingSubmited: (data: MeetingFormData) => void;
+  meetingSubmited: (data: AdministrationFormData) => void;
 };
 
 const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
@@ -52,13 +45,13 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     rankOrder: proposalData.rankOrder || '',
   };
 
-  const handleSubmit = async (values: MeetingFormData) => {
+  const handleSubmit = async (values: AdministrationFormData) => {
     const administrationProposalVales = {
       id: values.id,
       finalStatus: ProposalEndStatus[values.finalStatus as ProposalEndStatus],
       commentForUser: values.commentForUser,
       commentForManagement: values.commentForManagement,
-      rankOrder: +values.rankOrder,
+      rankOrder: values.rankOrder,
     };
 
     const data = await api().administrationProposal(
@@ -89,7 +82,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           initialValues={initialData}
           onSubmit={async (values): Promise<void> => {
             setSubmitting(true);
-            await handleSubmit({ id: proposalData.id, ...values });
+            await handleSubmit({
+              id: proposalData.id,
+              ...values,
+              rankOrder: +values.rankOrder,
+            });
           }}
         >
           {({ values, errors, touched, handleChange }): JSX.Element => (
