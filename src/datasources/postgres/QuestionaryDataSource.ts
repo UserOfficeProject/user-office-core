@@ -21,6 +21,23 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async insertAnswerHasQuestionaries(
+    answerId: number,
+    questionaryId: number
+  ): Promise<Questionary> {
+    return database('answer_has_questionaries')
+      .insert({
+        answer_id: answerId,
+        questionary_id: questionaryId,
+      })
+      .then(async () => {
+        const questionary = await this.getQuestionary(questionaryId);
+        if (!questionary) {
+          throw new Error('Failed to update sample');
+        }
+        return questionary;
+      });
+  }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return database('answers')
       .select('*')

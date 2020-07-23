@@ -5,8 +5,9 @@ import { Authorized } from '../decorators';
 import { TemplateCategoryId } from '../models/ProposalModel';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
-import { Logger, logger } from '../utils/Logger';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
+import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
+import { Logger, logger } from '../utils/Logger';
 
 export default class SampleMutations {
   constructor(
@@ -39,5 +40,11 @@ export default class SampleMutations {
       args.title,
       agent.id
     );
+  }
+
+  @Authorized()
+  updateSampleTitle(agent: User | null, args: UpdateSampleTitleArgs) {
+    // TODO perform authorization
+    return this.dataSource.updateSampleTitle(args);
   }
 }

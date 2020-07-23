@@ -130,6 +130,12 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  insertAnswerHasQuestionaries(
+    answerId: number,
+    questionaryId: number
+  ): Promise<Questionary> {
+    throw new Error('Method not implemented.');
+  }
   getAnswer(answer_id: number): AnswerBasic {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
   }

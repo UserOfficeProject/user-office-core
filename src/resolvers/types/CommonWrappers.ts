@@ -94,6 +94,13 @@ export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
 }
 
 @ObjectType()
+export class QuestionariesResponseWrap extends ResponseWrapBase<Questionary[]> {
+  @Response()
+  @Field(() => [Questionary])
+  public questionaries: Questionary[];
+}
+
+@ObjectType()
 export class QuestionaryStepResponseWrap extends ResponseWrapBase<
   QuestionaryStep
 > {

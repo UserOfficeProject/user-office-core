@@ -2,7 +2,6 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { Sample } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
@@ -15,18 +14,23 @@ export default class SampleQueries {
     private userAuth: UserAuthorization,
     private questionaryAuth: QuestionaryAuthorization
   ) {}
+
+  async getSample(agent: UserWithRole | null, sampleId: number) {
+    const sample = await this.dataSource.getSample(sampleId);
+    if (this.userAuth.isUserOfficer(agent) || agent?.id === sample.creatorId) {
+      return sample;
+    }
+
+    // TODO peform authorization for co-proposers
+    return null;
+  }
+
   @Authorized([Roles.USER_OFFICER])
-  async getSamples(
-    agent: UserWithRole | null,
-    args: SamplesArgs
-  ): Promise<Sample[]> {
+  async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
     return await this.dataSource.getSamples(args);
   }
 
-  async getSamplesByAnswerId(
-    agent: UserWithRole | null,
-    answerId: number
-  ): Promise<Sample[]> {
+  async getSamplesByAnswerId(agent: UserWithRole | null, answerId: number) {
     // TODO add authorization
     return await this.dataSource.getSamplesByAnswerId(answerId);
   }
