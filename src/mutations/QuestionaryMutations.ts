@@ -1,11 +1,9 @@
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { Questionary } from '../models/ProposalModel';
 import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
-import { AddQuestionariesToAnswerArgs } from '../resolvers/mutations/AddQuestionaryToAnswer';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
@@ -116,23 +114,5 @@ export default class QuestionaryMutations {
   @Authorized()
   async create(agent: User | null, args: CreateQuestionaryArgs) {
     return this.dataSource.create(agent!.id, args.templateId);
-  }
-
-  @Authorized()
-  async addQuestionariesToAnswer(
-    agent: User | null,
-    args: AddQuestionariesToAnswerArgs
-  ) {
-    // TODO perform authorization
-    const response: Questionary[] = [];
-    for (const questionaryId of args.questionaryIds) {
-      response.push(
-        await this.dataSource.insertAnswerHasQuestionaries(
-          args.answerId,
-          questionaryId
-        )
-      );
-    }
-    return response;
   }
 }

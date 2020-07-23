@@ -94,10 +94,10 @@ export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
 }
 
 @ObjectType()
-export class QuestionariesResponseWrap extends ResponseWrapBase<Questionary[]> {
+export class SamplesResponseWrap extends ResponseWrapBase<Questionary[]> {
   @Response()
-  @Field(() => [Questionary])
-  public questionaries: Questionary[];
+  @Field(() => [Sample])
+  public samples: Sample[];
 }
 
 @ObjectType()
