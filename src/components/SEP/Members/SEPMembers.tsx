@@ -11,11 +11,12 @@ import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
+import { UserContext } from 'context/UserContextProvider';
 import { SepMember, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
@@ -46,6 +47,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
+  const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const {
     loadingMembers,
@@ -118,7 +120,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
     showNotification(!!assignChairResult.assignChairOrSecretary.error);
     setSepChairModalOpen(false);
-    setRenewTokenValue();
+
+    if (value.id === user.id || initialValues.SEPChair?.id === user.id) {
+      setRenewTokenValue();
+    }
   };
 
   const sendSEPSecretaryUpdate = async (
@@ -138,7 +143,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       setSepSecretaryModalOpen(false);
     }
 
-    setRenewTokenValue();
+    if (value.id === user.id || initialValues.SEPSecretary?.id === user.id) {
+      setRenewTokenValue();
+    }
   };
 
   const addMember = async (user: BasicUserDetails): Promise<void> => {
@@ -160,7 +167,18 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
     if (SEPMembersData) {
       setSEPMembersData(
-        SEPMembersData.filter(member => member.userId !== user.id)
+        SEPMembersData.map(member => {
+          if (member.userId === user.id) {
+            return {
+              ...member,
+              roles: member.roles.filter(
+                role => role.shortCode.toUpperCase() !== UserRole.SEP_REVIEWER
+              ),
+            };
+          }
+
+          return member;
+        })
       );
     }
 

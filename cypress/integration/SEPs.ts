@@ -40,10 +40,10 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    let SEPsTable = cy.get('[data-cy="SEPs-table"]');
+    cy.get('#code').should('contain.value', code);
+    cy.get('#description').should('contain.value', description);
 
-    SEPsTable.should('contain', code);
-    SEPsTable.should('contain', description);
+    cy.url().should('contain', 'SEPPage/2');
   });
 
   it('Officer should be able to edit existing SEP', () => {
