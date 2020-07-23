@@ -1,0 +1,11 @@
+mutation addQuestionariesToAnswer($answerId: Int!, $questionaryIds: [Int!]!) {
+  addQuestionariesToAnswer(
+    answerId: $answerId
+    questionaryIds: $questionaryIds
+  ) {
+    questionaries {
+      questionaryId
+    }
+    error
+  }
+}

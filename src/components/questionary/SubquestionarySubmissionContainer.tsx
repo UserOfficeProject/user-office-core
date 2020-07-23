@@ -1,12 +1,9 @@
-import { makeStyles, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import { Formik } from 'formik';
-import React, { SyntheticEvent } from 'react';
-import * as Yup from 'yup';
-
 import { NavigButton } from 'components/common/NavigButton';
 import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
+import { Formik } from 'formik';
 import { Questionary } from 'generated/sdk';
 import { usePersistSubquestionaryModel } from 'hooks/questionary/usePersistSubquestionaryModel';
 import { areDependenciesSatisfied } from 'models/ProposalModelFunctions';
@@ -15,14 +12,14 @@ import {
   EventType,
   SubquestionarySubmissionModel,
 } from 'models/SubquestionarySubmissionModel';
+import React, { SyntheticEvent } from 'react';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
-
+import * as Yup from 'yup';
 import { QuestionaryComponentFactory } from './QuestionaryComponentFactory';
 
 export function SubquestionarySubmissionContainer(props: {
   questionary: Questionary;
   questionaryEditDone?: () => void;
-  title: string;
 }) {
   function handleEvents() {
     return (next: Function) => async (action: Event) => {
@@ -80,75 +77,72 @@ export function SubquestionarySubmissionContainer(props: {
   );
 
   return (
-    <>
-      <Typography variant="h5">{props.title}</Typography>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={Yup.object().shape(validationSchema)}
-        onSubmit={() => {}}
-        enableReinitialize={true}
-      >
-        {({ errors, touched, handleChange, submitForm, validateForm }) => (
-          <form style={{ width: '100%' }}>
-            {activeFields.map(field => {
-              return (
-                <div
-                  className={classes.componentWrapper}
-                  key={field.question.proposalQuestionId}
-                >
-                  {componentFactory.createComponent(field, {
-                    touched: touched, // for formik
-                    errors: errors, // for formik
-                    onComplete: (evt: SyntheticEvent, newValue: any) => {
-                      if (field.value !== newValue) {
-                        dispatch({
-                          type: EventType.FIELD_CHANGED,
-                          payload: {
-                            id: field.question.proposalQuestionId,
-                            newValue: newValue,
-                          },
-                        });
-                        handleChange(evt);
-                      }
-                    },
-                  })}
-                </div>
-              );
-            })}
-
-            <div className={classes.buttonContainer}>
-              <NavigButton
-                onClick={() => dispatch({ type: EventType.CANCEL_CLICKED })}
-                type="button"
-                color="primary"
-                startIcon={<CloseIcon />}
-                className={classes.button}
+    <Formik
+      initialValues={initialValues}
+      validationSchema={Yup.object().shape(validationSchema)}
+      onSubmit={() => {}}
+      enableReinitialize={true}
+    >
+      {({ errors, touched, handleChange, submitForm, validateForm }) => (
+        <form style={{ width: '100%' }}>
+          {activeFields.map(field => {
+            return (
+              <div
+                className={classes.componentWrapper}
+                key={field.question.proposalQuestionId}
               >
-                Cancel
-              </NavigButton>
-              <NavigButton
-                onClick={() =>
-                  submitFormAsync(submitForm, validateForm).then(
-                    (isValid: boolean) => {
-                      if (isValid) {
-                        dispatch({ type: EventType.SAVE_CLICKED });
-                      }
+                {componentFactory.createComponent(field, {
+                  touched: touched, // for formik
+                  errors: errors, // for formik
+                  onComplete: (evt: SyntheticEvent, newValue: any) => {
+                    if (field.value !== newValue) {
+                      dispatch({
+                        type: EventType.FIELD_CHANGED,
+                        payload: {
+                          id: field.question.proposalQuestionId,
+                          newValue: newValue,
+                        },
+                      });
+                      handleChange(evt);
                     }
-                  )
-                }
-                type="button"
-                variant="contained"
-                color="primary"
-                startIcon={<CheckIcon />}
-                className={classes.button}
-                isbusy={isSavingModel}
-              >
-                Save
-              </NavigButton>
-            </div>
-          </form>
-        )}
-      </Formik>
-    </>
+                  },
+                })}
+              </div>
+            );
+          })}
+
+          <div className={classes.buttonContainer}>
+            <NavigButton
+              onClick={() => dispatch({ type: EventType.CANCEL_CLICKED })}
+              type="button"
+              color="primary"
+              startIcon={<CloseIcon />}
+              className={classes.button}
+            >
+              Cancel
+            </NavigButton>
+            <NavigButton
+              onClick={() =>
+                submitFormAsync(submitForm, validateForm).then(
+                  (isValid: boolean) => {
+                    if (isValid) {
+                      dispatch({ type: EventType.SAVE_CLICKED });
+                    }
+                  }
+                )
+              }
+              type="button"
+              variant="contained"
+              color="primary"
+              startIcon={<CheckIcon />}
+              className={classes.button}
+              isbusy={isSavingModel}
+            >
+              Save
+            </NavigButton>
+          </div>
+        </form>
+      )}
+    </Formik>
   );
 }

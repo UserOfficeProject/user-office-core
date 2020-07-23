@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetProposalTemplatesQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useProposalsTemplates(isArchived?: boolean) {
+export function useProposalsTemplates(isArchived: boolean = false) {
   const api = useDataApi();
   const [templates, setTemplates] = useState<
     Exclude<GetProposalTemplatesQuery['proposalTemplates'], null>

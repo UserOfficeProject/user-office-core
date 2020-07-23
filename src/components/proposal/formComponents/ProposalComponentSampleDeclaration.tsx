@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
+import SampleDeclarationEditor from '../SampleDeclarationEditor';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
 
 export default function ProposalComponentSampleDeclaration(
@@ -20,8 +21,12 @@ export default function ProposalComponentSampleDeclaration(
   const { enqueueSnackbar } = useSnackbar();
 
   const [stateValue, setStateValue] = useState<number[]>([]);
-  const [samples, setSamples] = useState<QuestionariesListRow[]>([]);
+  const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
+
+  const sampleToQuestionaryListRow = (sample: Sample): QuestionariesListRow => {
+    return { id: sample.id, label: sample.title };
+  };
 
   useEffect(() => {
     const getSamples = async (answerId: number): Promise<Sample[]> => {
@@ -32,18 +37,12 @@ export default function ProposalComponentSampleDeclaration(
         });
     };
 
-    const sampleToQuestionaryListRow = (
-      sample: Sample
-    ): QuestionariesListRow => {
-      return { id: sample.id, label: sample.title };
-    };
-
-    if (props.templateField.answerId) {
-      getSamples(props.templateField.answerId).then(samples =>
-        setSamples(samples.map(sampleToQuestionaryListRow))
+    if (templateField.answerId) {
+      getSamples(templateField.answerId).then(samples =>
+        setRows(samples.map(sampleToQuestionaryListRow))
       );
     }
-  }, [props]);
+  }, [templateField.answerId, api]);
 
   return (
     <>
@@ -53,24 +52,15 @@ export default function ProposalComponentSampleDeclaration(
 
         <QuestionariesList
           addButtonLabel={config.addEntryButtonLabel}
-          data={samples}
-          onEditClick={
-            item => {}
-            // api()
-            //   .getQuestionary({ questionaryId:item.id })
-            //   .then(response => {
-            //     if (!response.questionary) {
-            //       enqueueSnackbar(
-            //         'Error occurred while retrieving questionary',
-            //         {
-            //           variant: 'error',
-            //         }
-            //       );
-
-            //       return;
-            //     }
-            //     setSelectedSample(response.questionary || null);
-            //   })
+          data={rows}
+          onEditClick={item =>
+            api()
+              .getSample({ sampleId: item.id })
+              .then(response => {
+                if (response.sample) {
+                  setSelectedSample(response.sample);
+                }
+              })
           }
           onDeleteClick={id => {}}
           // TODO make an API call deleteQuestionary()
@@ -85,25 +75,28 @@ export default function ProposalComponentSampleDeclaration(
           onAddNewClick={() =>
             api()
               .createSample({
-                title: 'New sample',
+                title: 'Untitled',
                 templateId: config.templateId,
               })
               .then(response => {
-                if (response.createSample.error) {
-                  enqueueSnackbar(response.createSample.error, {
-                    variant: 'error',
-                  });
-
+                const { sample: newSample, error } = response.createSample;
+                if (error) {
+                  enqueueSnackbar(error, { variant: 'error' });
                   return;
                 }
-                const newQuestionaryId =
-                  response.createSample.sample?.questionaryId;
-                if (newQuestionaryId) {
-                  const newValue = stateValue.slice();
-                  newValue.push(newQuestionaryId);
-                  setStateValue(newValue);
 
-                  onComplete(null as any, newValue.join(','));
+                if (newSample) {
+                  const newStateValue = stateValue.slice();
+                  newStateValue.push(newSample.questionaryId);
+                  setStateValue(newStateValue);
+
+                  const newSamples = rows.slice();
+                  newSamples.push(sampleToQuestionaryListRow(newSample));
+                  setRows(newSamples);
+
+                  setSelectedSample(newSample);
+
+                  onComplete(null as any, newStateValue.join(','));
                 }
               })
           }
@@ -117,11 +110,23 @@ export default function ProposalComponentSampleDeclaration(
         close={() => setSelectedSample(null)}
         isOpen={selectedSample !== null}
       >
-        {/* <SubquestionarySubmissionContainer
-          questionaryEditDone={() => setSelectedSample(null)}
-          questionary={selectedSample!}
-          title={templateField.question.question}
-        /> */}
+        {selectedSample ? (
+          <SampleDeclarationEditor
+            sample={selectedSample!}
+            sampleEditDone={updatedSample => {
+              const index = rows.findIndex(
+                sample => sample.id === updatedSample.id
+              );
+              const newRows = [...rows];
+              newRows.splice(index, 1, {
+                ...rows[index],
+                ...sampleToQuestionaryListRow(updatedSample),
+              });
+              setRows(newRows);
+              setSelectedSample(null);
+            }}
+          ></SampleDeclarationEditor>
+        ) : null}
       </ModalWrapper>
     </>
   );

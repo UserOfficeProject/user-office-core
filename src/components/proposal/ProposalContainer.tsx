@@ -6,12 +6,18 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { useSnackbar } from 'notistack';
-import { createContext, default as React, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
-
 import { useCheckAccess } from 'components/common/Can';
-import { Proposal, ProposalStatus, Questionary, UserRole } from 'generated/sdk';
+import {
+  Answer,
+  DataType,
+  Proposal,
+  ProposalStatus,
+  Questionary,
+  QuestionaryStep,
+  SubtemplateConfig,
+  TemplateCategoryId,
+  UserRole,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { prepareAnswers } from 'models/ProposalModelFunctions';
@@ -21,9 +27,12 @@ import {
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
+import { useSnackbar } from 'notistack';
+import { createContext, default as React, useEffect, useState } from 'react';
+import { Prompt } from 'react-router';
 import { StyledPaper } from 'styles/StyledComponents';
+import { stringToNumericArray } from 'utils/ArrayUtils';
 import { clamp } from 'utils/Math';
-
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -70,6 +79,28 @@ export default function ProposalContainer(props: {
 
   const getConfirmNavigMsg = (): string => {
     return 'Changes you recently made in this step will not be saved! Are you sure?';
+  };
+
+  const isSample = (answer: Answer) => {
+    const { dataType, config } = answer.question;
+    return (
+      dataType === DataType.SUBTEMPLATE &&
+      (config as SubtemplateConfig).templateCategory ===
+        TemplateCategoryId.SAMPLE_DECLARATION
+    );
+  };
+
+  const processSamples = async (answers?: Answer[]) => {
+    if (!answers) {
+      return;
+    }
+    const sampleAnswers = answers.filter(isSample);
+    for (const sampleAnswer of sampleAnswers) {
+      await api().addQuestionariesToAnswer({
+        answerId: sampleAnswer.answerId!,
+        questionaryIds: stringToNumericArray(sampleAnswer.value),
+      });
+    }
   };
 
   /**
@@ -205,32 +236,32 @@ export default function ProposalContainer(props: {
           break;
 
         case EventType.SAVE_STEP_CLICKED:
-          await executeAndMonitorCall(
+        case EventType.FINISH_STEP_CLICKED:
+          const answers: Answer[] = action.payload.answers;
+          const requestResult = await executeAndMonitorCall(
             () =>
               api()
                 .answerTopic({
                   questionaryId: state.proposal.questionaryId,
-                  answers: prepareAnswers(action.payload.answers),
+                  answers: prepareAnswers(answers),
                   topicId: action.payload.topicId,
-                  isPartialSave: true,
+                  isPartialSave: action.type !== EventType.FINISH_STEP_CLICKED,
                 })
-                .then(data => data.answerTopic),
+                .then(async data => data.answerTopic),
             'Saved'
           );
+          if (!requestResult.error) {
+            dispatch({
+              type: EventType.STEP_ANSWERED,
+              payload: { step: requestResult.questionaryStep },
+            });
+          }
           break;
 
-        case EventType.FINISH_STEP_CLICKED:
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .answerTopic({
-                  questionaryId: state.proposal.id,
-                  answers: prepareAnswers(action.payload.answers),
-                  topicId: action.payload.topicId,
-                })
-                .then(data => data.answerTopic),
-            'Saved'
-          ).then(() => setStepIndex(clampStep(stepIndex + 1)));
+        case EventType.STEP_ANSWERED:
+          const step = action.payload.step as QuestionaryStep;
+          await processSamples(step.fields);
+          setStepIndex(clampStep(stepIndex + 1));
           break;
 
         case EventType.RESET_CLICKED:

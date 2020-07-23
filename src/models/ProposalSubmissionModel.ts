@@ -12,8 +12,6 @@ import { useReducerWithMiddleWares } from 'utils/useReducerWithMiddleWares';
 export enum EventType {
   BACK_CLICKED = 'BACK_CLICKED',
   RESET_CLICKED = 'RESET_CLICKED',
-  SAVE_AND_NEXT_CLICKED = 'SAVE_AND_NEXT_CLICKED',
-  SAVE_CLICKED = 'SAVE_CLICKED',
   SAVE_STEP_CLICKED = 'SAVE_STEP_CLICKED',
   FINISH_STEP_CLICKED = 'FINISH_STEP_CLICKED',
   SAVE_GENERAL_INFO_CLICKED = 'SAVE_GENERAL_INFO_CLICKED',
@@ -23,6 +21,7 @@ export enum EventType {
   API_CALL_ERROR = 'API_ERROR_OCCURRED',
   API_CALL_SUCCESS = 'API_SUCCESS_OCCURRED',
   PROPOSAL_METADATA_CHANGED = 'PROPOSAL_INFORMATION_CHANGED',
+  STEP_ANSWERED = 'TOPIC_ANSWERED',
 }
 export interface Event {
   type: EventType;
@@ -68,10 +67,6 @@ export function ProposalSubmissionModel(
           draftState.isDirty = false;
           break;
 
-        case EventType.SAVE_STEP_CLICKED:
-          draftState.isDirty = false;
-          break;
-
         case EventType.FINISH_STEP_CLICKED:
           draftState.proposal = {
             ...draftState.proposal,
@@ -81,7 +76,20 @@ export function ProposalSubmissionModel(
             draftState.proposal.questionary.steps,
             action.payload.topicId
           ) as QuestionaryStep).isCompleted = true;
+          break;
+
+        case EventType.STEP_ANSWERED:
+          const updatedStep = action.payload.step as QuestionaryStep;
+          const stepIndex = draftState.proposal.questionary.steps.findIndex(
+            step => step.topic.id === updatedStep.topic.id
+          );
+          draftState.proposal.questionary.steps.splice(
+            stepIndex,
+            1,
+            updatedStep
+          );
           draftState.isDirty = false;
+
           break;
 
         case EventType.MODEL_LOADED:
