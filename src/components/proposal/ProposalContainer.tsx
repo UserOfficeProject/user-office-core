@@ -96,9 +96,9 @@ export default function ProposalContainer(props: {
     }
     const sampleAnswers = answers.filter(isSample);
     for (const sampleAnswer of sampleAnswers) {
-      await api().addQuestionariesToAnswer({
+      await api().addSamplesToAnswer({
         answerId: sampleAnswer.answerId!,
-        questionaryIds: stringToNumericArray(sampleAnswer.value),
+        sampleIds: stringToNumericArray(sampleAnswer.value),
       });
     }
   };
@@ -235,8 +235,7 @@ export default function ProposalContainer(props: {
           setStepIndex(clampStep(stepIndex + 1));
           break;
 
-        case EventType.SAVE_STEP_CLICKED:
-        case EventType.FINISH_STEP_CLICKED:
+        case EventType.SAVE_STEP_CLICKED: {
           const answers: Answer[] = action.payload.answers;
           const requestResult = await executeAndMonitorCall(
             () =>
@@ -245,24 +244,45 @@ export default function ProposalContainer(props: {
                   questionaryId: state.proposal.questionaryId,
                   answers: prepareAnswers(answers),
                   topicId: action.payload.topicId,
-                  isPartialSave: action.type !== EventType.FINISH_STEP_CLICKED,
+                  isPartialSave: true,
                 })
                 .then(async data => data.answerTopic),
             'Saved'
           );
           if (!requestResult.error) {
+            await processSamples(requestResult.questionaryStep?.fields);
             dispatch({
               type: EventType.STEP_ANSWERED,
               payload: { step: requestResult.questionaryStep },
             });
           }
           break;
+        }
 
-        case EventType.STEP_ANSWERED:
-          const step = action.payload.step as QuestionaryStep;
-          await processSamples(step.fields);
-          setStepIndex(clampStep(stepIndex + 1));
+        case EventType.FINISH_STEP_CLICKED: {
+          const answers: Answer[] = action.payload.answers;
+          const requestResult = await executeAndMonitorCall(
+            () =>
+              api()
+                .answerTopic({
+                  questionaryId: state.proposal.questionaryId,
+                  answers: prepareAnswers(answers),
+                  topicId: action.payload.topicId,
+                  isPartialSave: false,
+                })
+                .then(async data => data.answerTopic),
+            'Saved'
+          );
+          if (!requestResult.error) {
+            await processSamples(requestResult.questionaryStep?.fields);
+            dispatch({
+              type: EventType.STEP_ANSWERED,
+              payload: { step: requestResult.questionaryStep },
+            });
+            setStepIndex(clampStep(stepIndex + 1));
+          }
           break;
+        }
 
         case EventType.RESET_CLICKED:
           const stepBeforeReset = stepIndex;

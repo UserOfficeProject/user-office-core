@@ -8,6 +8,7 @@ import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
+import { stringToNumericArray } from 'utils/ArrayUtils';
 
 export default function ProposalComponentSampleDeclaration(
   props: BasicComponentProps
@@ -20,7 +21,7 @@ export default function ProposalComponentSampleDeclaration(
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [stateValue, setStateValue] = useState<number[]>([]);
+  const [stateValue, setStateValue] = useState<string>(templateField.value);
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
@@ -86,9 +87,9 @@ export default function ProposalComponentSampleDeclaration(
                 }
 
                 if (newSample) {
-                  const newStateValue = stateValue.slice();
-                  newStateValue.push(newSample.questionaryId);
-                  setStateValue(newStateValue);
+                  const newStateValue = stringToNumericArray(stateValue);
+                  newStateValue.push(newSample.id);
+                  setStateValue(newStateValue.join(','));
 
                   const newSamples = rows.slice();
                   newSamples.push(sampleToQuestionaryListRow(newSample));

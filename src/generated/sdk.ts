@@ -302,7 +302,6 @@ export type Mutation = {
   answerTopic: QuestionaryStepResponseWrap;
   createQuestionary: QuestionaryResponseWrap;
   updateAnswer: UpdateAnswerResponseWrap;
-  addQuestionariesToAnswer: QuestionariesResponseWrap;
   addReview: ReviewResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
@@ -330,6 +329,7 @@ export type Mutation = {
   updateUser: UserResponseWrap;
   createSample: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
+  addSamplesToAnswer: SamplesResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -498,12 +498,6 @@ export type MutationCreateQuestionaryArgs = {
 export type MutationUpdateAnswerArgs = {
   questionaryId: Scalars['Int'];
   answer: AnswerInput;
-};
-
-
-export type MutationAddQuestionariesToAnswerArgs = {
-  answerId: Scalars['Int'];
-  questionaryIds: Array<Scalars['Int']>;
 };
 
 
@@ -728,6 +722,12 @@ export type MutationCreateSampleArgs = {
 export type MutationUpdateSampleTitleArgs = {
   sampleId: Scalars['Int'];
   title: Scalars['String'];
+};
+
+
+export type MutationAddSamplesToAnswerArgs = {
+  answerId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
 };
 
 
@@ -1188,12 +1188,6 @@ export type Question = {
   config: FieldConfig;
 };
 
-export type QuestionariesResponseWrap = {
-  __typename?: 'QuestionariesResponseWrap';
-  error: Maybe<Scalars['String']>;
-  questionaries: Array<Questionary>;
-};
-
 export type Questionary = {
   __typename?: 'Questionary';
   questionaryId: Maybe<Scalars['Int']>;
@@ -1304,6 +1298,12 @@ export type SamplesFilter = {
   creatorId?: Maybe<Scalars['Int']>;
   questionaryId?: Maybe<Scalars['Int']>;
   status?: Maybe<SampleStatus>;
+};
+
+export type SamplesResponseWrap = {
+  __typename?: 'SamplesResponseWrap';
+  error: Maybe<Scalars['String']>;
+  samples: Array<Sample>;
 };
 
 export enum SampleStatus {
@@ -2298,10 +2298,6 @@ export type CreateProposalMutation = (
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
-      & { questionary: (
-        { __typename?: 'Questionary' }
-        & QuestionaryFragment
-      ) }
     )> }
   ) }
 );
@@ -2490,24 +2486,6 @@ export type UpdateProposalMutation = (
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id'>
-    )> }
-  ) }
-);
-
-export type AddQuestionariesToAnswerMutationVariables = Exact<{
-  answerId: Scalars['Int'];
-  questionaryIds: Array<Scalars['Int']>;
-}>;
-
-
-export type AddQuestionariesToAnswerMutation = (
-  { __typename?: 'Mutation' }
-  & { addQuestionariesToAnswer: (
-    { __typename?: 'QuestionariesResponseWrap' }
-    & Pick<QuestionariesResponseWrap, 'error'>
-    & { questionaries: Array<(
-      { __typename?: 'Questionary' }
-      & Pick<Questionary, 'questionaryId'>
     )> }
   ) }
 );
@@ -2750,6 +2728,24 @@ export type UserWithReviewsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type AddSamplesToAnswerMutationVariables = Exact<{
+  answerId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
+}>;
+
+
+export type AddSamplesToAnswerMutation = (
+  { __typename?: 'Mutation' }
+  & { addSamplesToAnswer: (
+    { __typename?: 'SamplesResponseWrap' }
+    & Pick<SamplesResponseWrap, 'error'>
+    & { samples: Array<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
 );
 
 export type CreateSampleMutationVariables = Exact<{
@@ -4441,14 +4437,11 @@ export const CreateProposalDocument = gql`
       status
       shortCode
       questionaryId
-      questionary {
-        ...questionary
-      }
     }
     error
   }
 }
-    ${QuestionaryFragmentDoc}`;
+    `;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
@@ -4620,16 +4613,6 @@ export const UpdateProposalDocument = gql`
   }
 }
     `;
-export const AddQuestionariesToAnswerDocument = gql`
-    mutation addQuestionariesToAnswer($answerId: Int!, $questionaryIds: [Int!]!) {
-  addQuestionariesToAnswer(answerId: $answerId, questionaryIds: $questionaryIds) {
-    questionaries {
-      questionaryId
-    }
-    error
-  }
-}
-    `;
 export const AnswerTopicDocument = gql`
     mutation answerTopic($questionaryId: Int!, $topicId: Int!, $answers: [AnswerInput!]!, $isPartialSave: Boolean) {
   answerTopic(questionaryId: $questionaryId, topicId: $topicId, answers: $answers, isPartialSave: $isPartialSave) {
@@ -4742,6 +4725,16 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const AddSamplesToAnswerDocument = gql`
+    mutation addSamplesToAnswer($answerId: Int!, $sampleIds: [Int!]!) {
+  addSamplesToAnswer(answerId: $answerId, sampleIds: $sampleIds) {
+    samples {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
 export const CreateSampleDocument = gql`
     mutation createSample($title: String!, $templateId: Int!) {
   createSample(title: $title, templateId: $templateId) {
@@ -5355,9 +5348,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     updateProposal(variables: UpdateProposalMutationVariables): Promise<UpdateProposalMutation> {
       return withWrapper(() => client.request<UpdateProposalMutation>(print(UpdateProposalDocument), variables));
     },
-    addQuestionariesToAnswer(variables: AddQuestionariesToAnswerMutationVariables): Promise<AddQuestionariesToAnswerMutation> {
-      return withWrapper(() => client.request<AddQuestionariesToAnswerMutation>(print(AddQuestionariesToAnswerDocument), variables));
-    },
     answerTopic(variables: AnswerTopicMutationVariables): Promise<AnswerTopicMutation> {
       return withWrapper(() => client.request<AnswerTopicMutation>(print(AnswerTopicDocument), variables));
     },
@@ -5387,6 +5377,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    addSamplesToAnswer(variables: AddSamplesToAnswerMutationVariables): Promise<AddSamplesToAnswerMutation> {
+      return withWrapper(() => client.request<AddSamplesToAnswerMutation>(print(AddSamplesToAnswerDocument), variables));
     },
     createSample(variables: CreateSampleMutationVariables): Promise<CreateSampleMutation> {
       return withWrapper(() => client.request<CreateSampleMutation>(print(CreateSampleDocument), variables));

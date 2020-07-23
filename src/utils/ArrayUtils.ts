@@ -1,6 +1,9 @@
-export function stringToNumericArray(value: any): Array<number> {
+export function stringToNumericArray(
+  value: string,
+  separator: string = ','
+): Array<number> {
   return value
-    .split(',')
+    .split(separator)
     .map((str: string) => parseInt(str))
     .filter((maybeNumber: any) => Number.isNaN(maybeNumber) === false);
 }

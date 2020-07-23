@@ -1,0 +1,8 @@
+mutation addSamplesToAnswer($answerId: Int!, $sampleIds: [Int!]!) {
+  addSamplesToAnswer(answerId: $answerId, sampleIds: $sampleIds) {
+    samples {
+      ...sample
+    }
+    error
+  }
+}
