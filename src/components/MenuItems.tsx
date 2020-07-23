@@ -1,4 +1,4 @@
-import { Collapse } from '@material-ui/core';
+import { Collapse, Tooltip } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -86,7 +86,9 @@ const MenuItems: React.FC = () => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <ListItemText primary="SEPs" />
+        <Tooltip title="Scientific evaluation panels">
+          <ListItemText primary="SEPs" />
+        </Tooltip>
       </ListItem>
       <ListItem component={Link} to="/PageEditor" button>
         <ListItemIcon>
@@ -127,7 +129,9 @@ const MenuItems: React.FC = () => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <ListItemText primary="SEPs" />
+        <Tooltip title="Scientific evaluation panels">
+          <ListItemText primary="SEPs" />
+        </Tooltip>
       </ListItem>
     </div>
   );
