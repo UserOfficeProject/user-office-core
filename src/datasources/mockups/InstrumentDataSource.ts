@@ -31,7 +31,7 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
 
   async get(instrumentId: number): Promise<Instrument | null> {
     const instrument = dummyInstruments.find(
-      dummyInstrumentItem => dummyInstrumentItem.instrumentId === instrumentId
+      dummyInstrumentItem => dummyInstrumentItem.id === instrumentId
     );
 
     if (instrument) {
@@ -80,6 +80,13 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     proposalId: number
   ): Promise<Instrument | null> {
     return dummyInstrument;
+  }
+
+  async getInstrumentsBySepId(
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
+    return [dummyInstrumentWithAvailabilityTime];
   }
 
   async assignScientistsToInstrument(

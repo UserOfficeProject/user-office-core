@@ -130,10 +130,10 @@ export default class PostgresInstrumentDataSource
         ['*']
       )
       .from('instruments')
-      .where('instrument_id', instrument.instrumentId)
+      .where('instrument_id', instrument.id)
       .then((records: InstrumentRecord[]) => {
         if (records === undefined || !records.length) {
-          throw new Error(`Instrument not found ${instrument.instrumentId}`);
+          throw new Error(`Instrument not found ${instrument.id}`);
         }
 
         return this.createInstrumentObject(records[0]);
@@ -209,6 +209,58 @@ export default class PostgresInstrumentDataSource
         }
 
         const result = this.createInstrumentObject(instrument);
+
+        return result;
+      });
+  }
+
+  async getInstrumentsBySepId(
+    sepId: number,
+    callId: number
+  ): Promise<InstrumentWithAvailabilityTime[]> {
+    return database
+      .select([
+        'i.instrument_id',
+        'name',
+        'i.short_code',
+        'description',
+        'chi.availability_time',
+        database.raw(
+          `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) as proposal_count`
+        ),
+        database.raw(
+          `count(*) filter (where sp.call_id = ${callId}) as full_count`
+        ),
+      ])
+      .from('instruments as i')
+      .join('instrument_has_proposals as ihp', {
+        'i.instrument_id': 'ihp.instrument_id',
+      })
+      .join('SEP_Proposals as sp', {
+        'sp.proposal_id': 'ihp.proposal_id',
+      })
+      .join('call_has_instruments as chi', {
+        'chi.instrument_id': 'i.instrument_id',
+        'chi.call_id': callId,
+      })
+      .groupBy(['i.instrument_id', 'chi.availability_time'])
+      .having(
+        database.raw(
+          `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) > 0`
+        )
+      )
+      .then(async (instruments: InstrumentWithAvailabilityTimeRecord[]) => {
+        const result = instruments.map(instrument => {
+          const calculatedInstrumentAvailabilityTimePerSEP = Math.round(
+            (instrument.proposal_count / instrument.full_count) *
+              instrument.availability_time
+          );
+
+          return this.createInstrumentWithAvailabilityTimeObject({
+            ...instrument,
+            availability_time: calculatedInstrumentAvailabilityTimePerSEP,
+          });
+        });
 
         return result;
       });

@@ -18,7 +18,7 @@ import { wrapResponse } from '../wrapResponse';
 @ArgsType()
 export class UpdateInstrumentArgs {
   @Field(() => Int)
-  public instrumentId: number;
+  public id: number;
 
   @Field(() => String)
   public name: string;

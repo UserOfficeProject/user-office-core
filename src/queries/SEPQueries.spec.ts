@@ -61,7 +61,10 @@ describe('Test SEPQueries', () => {
 
   test('A userofficer can get SEP Proposals by SEP id', () => {
     return expect(
-      SEPQueriesInstance.getSEPProposals(dummyUserOfficerWithRole, 1)
+      SEPQueriesInstance.getSEPProposals(dummyUserOfficerWithRole, {
+        sepId: 1,
+        callId: 1,
+      })
     ).resolves.toStrictEqual([dummySEPProposal]);
   });
 });

@@ -19,4 +19,17 @@ export default class InstrumentQueries {
 
     return instruments;
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getInstrumentsBySepId(
+    agent: UserWithRole | null,
+    { sepId, callId }: { sepId: number; callId: number }
+  ) {
+    const instruments = await this.dataSource.getInstrumentsBySepId(
+      sepId,
+      callId
+    );
+
+    return instruments;
+  }
 }

@@ -174,10 +174,42 @@ export default class PostgresSEPDataSource implements SEPDataSource {
     );
   }
 
-  async getSEPProposals(sepId: number): Promise<SEPProposal[]> {
+  async getSEPProposals(sepId: number, callId: number): Promise<SEPProposal[]> {
     const sepProposals: SEPProposalRecord[] = await database
-      .from('SEP_Proposals')
-      .where('sep_id', sepId);
+      .select(['sp.*'])
+      .from('SEP_Proposals as sp')
+      .modify(query => {
+        if (callId) {
+          query.join('proposals as p', {
+            'p.proposal_id': 'sp.proposal_id',
+            'p.call_id': callId,
+          });
+        }
+      })
+      .where('sp.sep_id', sepId);
+
+    return sepProposals.map(sepProposal =>
+      this.createSEPProposalObject(sepProposal)
+    );
+  }
+
+  async getSEPProposalsByInstrument(
+    sepId: number,
+    instrumentId: number,
+    callId: number
+  ): Promise<SEPProposal[]> {
+    const sepProposals: SEPProposalRecord[] = await database
+      .select(['sp.proposal_id', 'sp.sep_id'])
+      .from('SEP_Proposals as sp')
+      .join('instrument_has_proposals as ihp', {
+        'sp.proposal_id': 'ihp.proposal_id',
+      })
+      .join('proposals as p', {
+        'p.proposal_id': 'sp.proposal_id',
+        'p.call_id': callId,
+      })
+      .where('sp.sep_id', sepId)
+      .andWhere('ihp.instrument_id', instrumentId);
 
     return sepProposals.map(sepProposal =>
       this.createSEPProposalObject(sepProposal)
@@ -262,11 +294,13 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async assignProposal(proposalId: number, sepId: number) {
-    // TODO: Revisit this later! Not sure if this is the correct way to do it but for now it is fine.
     await database.raw(
       `${database('SEP_Proposals').insert({
         proposal_id: proposalId,
         sep_id: sepId,
+        call_id: database('proposals')
+          .select('call_id')
+          .where('proposal_id', proposalId),
       })} ON CONFLICT (sep_id, proposal_id) DO UPDATE SET date_assigned=NOW()`
     );
 
