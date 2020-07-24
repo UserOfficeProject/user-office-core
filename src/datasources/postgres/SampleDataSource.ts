@@ -17,6 +17,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           logger.logError('Could not update sample title', { args });
           throw new Error('Could not update sample title');
         }
+
         return createSampleObject(records[0]);
       });
   }
@@ -36,6 +37,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           });
           throw new Error('Failed to insert sample');
         }
+
         return createSampleObject(records[0]);
       });
   }
@@ -48,6 +50,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         if (records.length !== 1) {
           logger.logError('Sample does not exist', { sampleId });
         }
+
         return createSampleObject(records[0]);
       });
   }
@@ -74,6 +77,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   }
   async getSamples(args: SamplesArgs): Promise<Sample[]> {
     const filter = args.filter;
+
     return database('samples')
       .modify(query => {
         if (filter?.creatorId) {

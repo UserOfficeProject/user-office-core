@@ -1,4 +1,5 @@
 import { registerEnumType } from 'type-graphql';
+
 import { EvaluatorOperator } from '../models/ConditionEvaluator';
 import { PageName } from '../models/Page';
 import {

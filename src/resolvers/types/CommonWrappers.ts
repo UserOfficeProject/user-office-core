@@ -13,12 +13,12 @@ import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
+import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
-import { Sample } from './Sample';
 
 @ObjectType()
 export class ResponseWrapBase<T> {

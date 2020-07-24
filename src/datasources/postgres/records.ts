@@ -14,9 +14,9 @@ import {
   Topic,
   AnswerBasic,
 } from '../../models/ProposalModel';
+import { Sample } from '../../models/Sample';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
-import { Sample } from '../../models/Sample';
 
 // Interfaces corresponding exactly to database tables
 

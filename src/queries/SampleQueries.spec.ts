@@ -1,12 +1,14 @@
 import 'reflect-metadata';
+import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import {
   dummyUserOfficerWithRole,
   UserDataSourceMock,
 } from '../datasources/mockups/UserDataSource';
-import SampleQueries from './SampleQueries';
-import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { UserAuthorization } from '../utils/UserAuthorization';
+import SampleQueries from './SampleQueries';
+import { questionaryDataSource } from '../datasources';
+import { questionaryAuthorization } from '../utils/QuestionaryAuthorization';
 const dummySampleDataSource = new SampleDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
@@ -14,7 +16,9 @@ const userAuthorization = new UserAuthorization(
 );
 const sampleQueries = new SampleQueries(
   dummySampleDataSource,
-  userAuthorization
+  questionaryDataSource,
+  userAuthorization,
+  questionaryAuthorization
 );
 
 beforeEach(() => {

@@ -6,10 +6,10 @@ import PostgresInstrumentDataSource from './postgres/InstrumentDataSource';
 import PostgresProposalDataSource from './postgres/ProposalDataSource';
 import PostgresQuestionaryDataSource from './postgres/QuestionaryDataSource';
 import PostgresReviewDataSource from './postgres/ReviewDataSource';
+import PostgresSampleDataSource from './postgres/SampleDataSource';
 import PostgresSEPDataSource from './postgres/SEPDataSource';
 import PostgresTemplateDataSource from './postgres/TemplateDataSource';
 import PostgresUserDataSource from './postgres/UserDataSource';
-import PostgresSampleDataSource from './postgres/SampleDataSource';
 
 export const userDataSource = new PostgresUserDataSource();
 export const proposalDataSource = new PostgresProposalDataSource();

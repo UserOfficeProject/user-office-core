@@ -1,12 +1,13 @@
 import { Sample, SampleStatus } from '../../models/Sample';
+import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
-import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
 
 export class SampleDataSourceMock implements SampleDataSource {
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     return this.getSample(args.sampleId).then(sample => {
       sample.title = args.title;
+
       return sample;
     });
   }

@@ -26,10 +26,11 @@ export default class SampleMutations {
     }
     const template = await this.templateDataSource.getTemplate(args.templateId);
     if (template?.categoryId !== TemplateCategoryId.SAMPLE_DECLARATION) {
-      logger.logError("Can't create sample with this template", {
+      logger.logError('Cant create sample with this template', {
         args,
         agent,
       });
+
       return rejection('INTERNAL_ERROR');
     }
 
@@ -37,6 +38,7 @@ export default class SampleMutations {
       agent.id,
       args.templateId
     );
+
     return await this.dataSource.create(
       questionary.questionaryId!,
       args.title,
@@ -58,6 +60,7 @@ export default class SampleMutations {
       const sample = await this.dataSource.getSample(sampleId);
       if (!sample) {
         logger.logError('Counld not find sample', { sampleId });
+
         return rejection('INTERNAL_ERROR');
       }
       await this.questionaryDataSource.insertAnswerHasQuestionaries(
@@ -66,6 +69,7 @@ export default class SampleMutations {
       );
       response.push(sample);
     }
+
     return response;
   }
 }

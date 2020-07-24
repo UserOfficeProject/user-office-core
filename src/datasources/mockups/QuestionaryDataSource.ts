@@ -136,7 +136,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<Questionary> {
     throw new Error('Method not implemented.');
   }
-  getAnswer(answer_id: number): AnswerBasic {
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
   }
   getParentQuestionary(

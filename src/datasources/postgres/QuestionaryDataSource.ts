@@ -35,6 +35,7 @@ export default class PostgresQuestionaryDataSource
         if (!questionary) {
           throw new Error('Failed to update sample');
         }
+
         return questionary;
       });
   }

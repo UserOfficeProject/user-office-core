@@ -21,6 +21,7 @@ import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import SampleMutations from './mutations/SampleMutations';
 import SEPMutations from './mutations/SEPMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
@@ -32,14 +33,13 @@ import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
+import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
 import { logger } from './utils/Logger';
 import { questionaryAuthorization } from './utils/QuestionaryAuthorization';
 import { userAuthorization } from './utils/UserAuthorization';
-import SampleQueries from './queries/SampleQueries';
-import SampleMutations from './mutations/SampleMutations';
 
 // From this point nothing is site-specific
 const userQueries = new UserQueries(userDataSource);

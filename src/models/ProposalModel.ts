@@ -127,11 +127,11 @@ export class Answer extends QuestionTemplateRelation {
 
 export class AnswerBasic {
   constructor(
-    answerId: number,
-    questionaryId: number,
-    questionId: string,
-    answer: any,
-    createdAt: Date
+    public answerId: number,
+    public questionaryId: number,
+    public questionId: string,
+    public answer: any,
+    public createdAt: Date
   ) {}
 }
 

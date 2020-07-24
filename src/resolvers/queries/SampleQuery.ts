@@ -1,4 +1,5 @@
 import { Arg, Ctx, Query, Resolver, Int } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { Sample } from '../types/Sample';
 

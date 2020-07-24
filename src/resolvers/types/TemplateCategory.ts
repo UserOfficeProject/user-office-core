@@ -6,6 +6,7 @@ import {
   Resolver,
   Root,
 } from 'type-graphql';
+
 import {
   TemplateCategory as TemplateCategoryOrigin,
   TemplateCategoryId,

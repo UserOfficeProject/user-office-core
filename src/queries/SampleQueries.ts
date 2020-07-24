@@ -28,6 +28,7 @@ export default class SampleQueries {
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
     // TODO add authorization
     const samples = await this.dataSource.getSamples(args);
+
     return samples;
   }
 

@@ -8,9 +8,10 @@ import {
   Resolver,
   Int,
 } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
-import { Sample } from '../types/Sample';
 import { SampleStatus } from '../../models/Sample';
+import { Sample } from '../types/Sample';
 
 @InputType()
 class SamplesFilter {
@@ -43,6 +44,7 @@ export class SamplesQuery {
       context.user,
       args
     );
+
     return response;
   }
 }
