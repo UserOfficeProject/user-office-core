@@ -42,11 +42,12 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
-import SampleTemplates from './template/SampleTemplates';
+import SampleTemplatesPage from './template/SampleTemplates';
 import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
+import SampleSafetyPage from './sample/SampleSafetyPage';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
@@ -160,6 +161,10 @@ const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isSampleSafetyReviewer = useCheckAccess([
+    UserRole.SAMPLE_SAFETY_REVIEWER,
+  ]);
+
   const { currentRole } = useContext(UserContext);
 
   const handleDrawerOpen = () => {
@@ -230,7 +235,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalTemplates" component={ProposalTemplates} />
           <Route
             path="/SampleDeclarationTemplates"
-            component={SampleTemplates}
+            component={SampleTemplatesPage}
           />
           <Route
             path="/ProposalTableReviewer"
@@ -240,6 +245,9 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
+          {isSampleSafetyReviewer && (
+            <Route path="/SampleSafety" component={SampleSafetyPage} />
+          )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}
@@ -272,7 +280,6 @@ const Dashboard: React.FC = () => {
                         )}
                       />
                     )}
-                    no={() => null}
                   />
                 )}
               />
