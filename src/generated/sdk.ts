@@ -327,9 +327,9 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
+  addSamplesToAnswer: SamplesResponseWrap;
   createSample: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
-  addSamplesToAnswer: SamplesResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -713,6 +713,12 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationAddSamplesToAnswerArgs = {
+  answerId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
+};
+
+
 export type MutationCreateSampleArgs = {
   title: Scalars['String'];
   templateId: Scalars['Int'];
@@ -722,12 +728,6 @@ export type MutationCreateSampleArgs = {
 export type MutationUpdateSampleTitleArgs = {
   sampleId: Scalars['Int'];
   title: Scalars['String'];
-};
-
-
-export type MutationAddSamplesToAnswerArgs = {
-  answerId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
 };
 
 
@@ -974,7 +974,6 @@ export type Query = {
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
-  samples: Maybe<Array<Sample>>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankProposal: Maybe<Proposal>;
   call: Maybe<Call>;
@@ -997,6 +996,7 @@ export type Query = {
   sample: Maybe<Sample>;
   samplesByAnswerId: Maybe<Array<Sample>>;
   samplesByCallId: Maybe<Array<Sample>>;
+  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepMember>>;
   sepProposals: Maybe<Array<SepProposal>>;
@@ -1024,11 +1024,6 @@ export type QueryProposalsArgs = {
 
 export type QueryTemplatesArgs = {
   filter?: Maybe<TemplatesFilter>;
-};
-
-
-export type QuerySamplesArgs = {
-  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -1126,6 +1121,11 @@ export type QuerySamplesByAnswerIdArgs = {
 
 export type QuerySamplesByCallIdArgs = {
   callId: Scalars['Int'];
+};
+
+
+export type QuerySamplesArgs = {
+  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -1297,6 +1297,7 @@ export type SamplesFilter = {
   title?: Maybe<Scalars['String']>;
   creatorId?: Maybe<Scalars['Int']>;
   questionaryId?: Maybe<Scalars['Int']>;
+  sampleIds?: Maybe<Array<Scalars['Int']>>;
   status?: Maybe<SampleStatus>;
 };
 
@@ -2782,6 +2783,19 @@ export type GetSampleQuery = (
     { __typename?: 'Sample' }
     & SampleFragment
   )> }
+);
+
+export type GetSamplesQueryVariables = Exact<{
+  filter: SamplesFilter;
+}>;
+
+
+export type GetSamplesQuery = (
+  { __typename?: 'Query' }
+  & { samples: Maybe<Array<(
+    { __typename?: 'Sample' }
+    & SampleFragment
+  )>> }
 );
 
 export type GetSamplesByAnswerIdQueryVariables = Exact<{
@@ -4752,6 +4766,13 @@ export const GetSampleDocument = gql`
   }
 }
     ${SampleFragmentDoc}`;
+export const GetSamplesDocument = gql`
+    query getSamples($filter: SamplesFilter!) {
+  samples(filter: $filter) {
+    ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
 export const GetSamplesByAnswerIdDocument = gql`
     query getSamplesByAnswerId($answerId: Int!) {
   samplesByAnswerId(answerId: $answerId) {
@@ -5386,6 +5407,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSample(variables: GetSampleQueryVariables): Promise<GetSampleQuery> {
       return withWrapper(() => client.request<GetSampleQuery>(print(GetSampleDocument), variables));
+    },
+    getSamples(variables: GetSamplesQueryVariables): Promise<GetSamplesQuery> {
+      return withWrapper(() => client.request<GetSamplesQuery>(print(GetSamplesDocument), variables));
     },
     getSamplesByAnswerId(variables: GetSamplesByAnswerIdQueryVariables): Promise<GetSamplesByAnswerIdQuery> {
       return withWrapper(() => client.request<GetSamplesByAnswerIdQuery>(print(GetSamplesByAnswerIdDocument), variables));

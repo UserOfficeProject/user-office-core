@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { useSample } from 'hooks/sample/useSample';
 import React from 'react';
@@ -15,14 +15,7 @@ function SampleDetails(props: SampleInformationProps) {
 
   return (
     <>
-      <Table>
-        <TableBody>
-          <TableRow key="title">
-            <TableCell>Title</TableCell>
-            <TableCell>{sample.title}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <Typography variant="h6">{sample.title}</Typography>
       <QuestionaryDetails questionaryId={sample.questionaryId} />
     </>
   );

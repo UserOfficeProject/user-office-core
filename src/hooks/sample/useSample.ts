@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-
-import { GetSampleQuery, Sample } from 'generated/sdk';
+import { GetSampleQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { useEffect, useState } from 'react';
 
 export function useSample(sampleId: number) {
   const [sample, setSample] = useState<GetSampleQuery['sample']>(null);

@@ -1,28 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { useQuestionary } from 'hooks/questionary/useQuestionary';
-import { getAllFields } from 'models/ProposalModelFunctions';
+import {
+  Button,
+  Link,
+  makeStyles,
+  Table,
+  TableCell,
+  TableRow,
+} from '@material-ui/core';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import InputDialog from 'components/common/InputDialog';
+import SampleDetails from 'components/sample/SampleDetails';
 import {
   Answer,
   DataType,
+  Sample,
   SubtemplateConfig,
   TemplateCategoryId,
 } from 'generated/sdk';
-import {
-  Table,
-  TableRow,
-  TableCell,
-  makeStyles,
-  Dialog,
-  Link,
-} from '@material-ui/core';
+import { useFileMetadata } from 'hooks/file/useFileMetadata';
+import { useQuestionary } from 'hooks/questionary/useQuestionary';
+import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
-import { useDataApi } from 'hooks/common/useDataApi';
-import SampleDeclarationEditor from 'components/proposal/SampleDeclarationEditor';
-import SampleDetails from 'components/sample/SampleDetails';
+import { getAllFields } from 'models/ProposalModelFunctions';
+import React, { useState } from 'react';
 import { stringToNumericArray } from 'utils/ArrayUtils';
 
 const useStyles = makeStyles(theme => ({
-  fileList: {
+  list: {
     padding: 0,
     margin: 0,
     '& li': {
@@ -35,30 +38,43 @@ const useStyles = makeStyles(theme => ({
 function DownloadableFileList(props: { fileIds: string[] }) {
   const { fileIds } = props;
 
-  const api = useDataApi();
   const classes = useStyles();
-  const [files, setFiles] = useState<FileMetaData[]>([]);
+  const { files } = useFileMetadata(fileIds);
 
-  const downloadLink = (file: FileMetaData | undefined) => (
-    <a href={`/files/download/${file?.fileId}`} download>
-      {file?.originalFileName}
-    </a>
+  const downloadLink = (file: FileMetaData) => (
+    <Link href={`/files/download/${file.fileId}`} download>
+      {file.originalFileName}
+    </Link>
   );
 
-  useEffect(() => {
-    if (fileIds) {
-      api()
-        .getFileMetadata({ fileIds })
-        .then(data => {
-          setFiles(data?.fileMetadata || []);
-        });
-    }
-  }, [api, fileIds]);
-
   return (
-    <ul className={classes.fileList}>
+    <ul className={classes.list}>
       {files.map(file => (
         <li>{downloadLink(file)}</li>
+      ))}
+    </ul>
+  );
+}
+
+function SampleList(props: {
+  sampleIds: number[];
+  onClick?: (sample: Sample) => any;
+}) {
+  const { sampleIds } = props;
+
+  const classes = useStyles();
+  const { samples } = useSamples({ sampleIds });
+
+  const sampleLink = (sample: Sample) => (
+    <Link href="#" onClick={() => props.onClick?.(sample)}>
+      {sample.title}
+    </Link>
+  );
+
+  return (
+    <ul className={classes.list}>
+      {samples.map(sample => (
+        <li>{sampleLink(sample)}</li>
       ))}
     </ul>
   );
@@ -86,11 +102,14 @@ function QuestionaryDetails(props: { questionaryId: number }) {
           (answer.config as SubtemplateConfig).templateCategory ===
           TemplateCategoryId.SAMPLE_DECLARATION
         ) {
-          return stringToNumericArray(answer.value).map(sampleId => (
-            <Link href="#" onClick={preventDefault}>
-              Link
-            </Link>
-          ));
+          return (
+            <SampleList
+              sampleIds={stringToNumericArray(answer.value)}
+              onClick={sample => setSelectedSampleId(sample.id)}
+            />
+          );
+        } else {
+          return <span>unknown template</span>;
         }
 
       default:
@@ -107,13 +126,25 @@ function QuestionaryDetails(props: { questionaryId: number }) {
           </TableRow>
         ))}
       </Table>
-      <Dialog
+      <InputDialog
         maxWidth="sm"
         open={selectedSampleId !== null}
         onClose={() => setSelectedSampleId(null)}
       >
-        <SampleDetails sampleId={selectedSampleId} />
-      </Dialog>
+        {selectedSampleId ? (
+          <SampleDetails sampleId={selectedSampleId} />
+        ) : null}
+        <ActionButtonContainer>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => setSelectedSampleId(null)}
+            data-cy="close-sample-dialog"
+          >
+            Close
+          </Button>
+        </ActionButtonContainer>
+      </InputDialog>
     </>
   );
 }
