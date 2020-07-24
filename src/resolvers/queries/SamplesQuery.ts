@@ -23,6 +23,9 @@ class SamplesFilter {
   @Field(() => Int, { nullable: true })
   public questionaryId?: number;
 
+  @Field(() => [Int], { nullable: true })
+  public sampleIds?: [number];
+
   @Field(() => SampleStatus, { nullable: true })
   public status?: SampleStatus;
 }
@@ -35,7 +38,11 @@ export class SamplesArgs {
 @Resolver()
 export class SamplesQuery {
   @Query(() => [Sample], { nullable: true })
-  samples(@Ctx() context: ResolverContext, @Args() args: SamplesArgs) {
-    return context.queries.sample.getSamples(context.user, args);
+  async samples(@Ctx() context: ResolverContext, @Args() args: SamplesArgs) {
+    const response = await context.queries.sample.getSamples(
+      context.user,
+      args
+    );
+    return response;
   }
 }

@@ -25,9 +25,10 @@ export default class SampleQueries {
     return null;
   }
 
-  @Authorized([Roles.USER_OFFICER])
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
-    return await this.dataSource.getSamples(args);
+    // TODO add authorization
+    const samples = await this.dataSource.getSamples(args);
+    return samples;
   }
 
   async getSamplesByAnswerId(agent: UserWithRole | null, answerId: number) {

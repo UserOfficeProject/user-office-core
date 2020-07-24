@@ -72,24 +72,29 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         return records.map(record => createSampleObject(record)) || [];
       });
   }
-  getSamples(args: SamplesArgs): Promise<Sample[]> {
+  async getSamples(args: SamplesArgs): Promise<Sample[]> {
     const filter = args.filter;
-    return database('samples').modify(query => {
-      if (filter?.creatorId) {
-        query.where('creator_id', filter?.creatorId);
-      }
-      if (filter?.status) {
-        query.where('creator_id', filter?.status);
-      }
-      if (filter?.questionaryId) {
-        query.where('questionary_id', filter?.questionaryId);
-      }
-      if (filter?.title) {
-        query.where('title', 'like', `%${filter.title}%`);
-      }
-      query.select('*').then((records: SampleRecord[]) => {
-        return records.map(record => createSampleObject(record)) || [];
-      });
-    });
+    return database('samples')
+      .modify(query => {
+        if (filter?.creatorId) {
+          query.where('creator_id', filter?.creatorId);
+        }
+        if (filter?.status) {
+          query.where('creator_id', filter?.status);
+        }
+        if (filter?.questionaryId) {
+          query.where('questionary_id', filter?.questionaryId);
+        }
+        if (filter?.title) {
+          query.where('title', 'like', `%${filter.title}%`);
+        }
+        if (filter?.sampleIds) {
+          query.where('sample_id', 'in', filter.sampleIds);
+        }
+      })
+      .select('*')
+      .then((records: SampleRecord[]) =>
+        records.map(record => createSampleObject(record))
+      );
   }
 }
