@@ -181,35 +181,32 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       </Stepper>
       <Formik
         initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
+        onSubmit={async (values, actions): Promise<void> => {
           setSubmitting(true);
           const { templateId } = values;
           if (call) {
-            await api()
-              .updateCall({
-                id: call.id,
-                ...values,
-                templateId: templateId ? +templateId : null,
-              })
-              .then(data => {
-                showNotificationAndClose(
-                  data.updateCall.error,
-                  data.updateCall.call as Call
-                );
-              });
+            const data = await api().updateCall({
+              id: call.id,
+              ...values,
+              templateId: templateId ? +templateId : null,
+            });
+            showNotificationAndClose(
+              data.updateCall.error,
+              data.updateCall.call as Call
+            );
           } else {
-            await api()
-              .createCall({
-                ...values,
-                templateId: templateId ? +templateId : null,
-              })
-              .then(data => {
-                showNotificationAndClose(
-                  data.createCall.error,
-                  data.createCall.call as Call
-                );
-              });
+            const data = await api().createCall({
+              ...values,
+              templateId: templateId ? +templateId : null,
+            });
+
+            showNotificationAndClose(
+              data.createCall.error,
+              data.createCall.call as Call
+            );
           }
+
+          actions.setSubmitting(false);
         }}
         validationSchema={
           call ? updateCallValidationSchema : createCallValidationSchema

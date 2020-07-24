@@ -80,13 +80,14 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           validateOnChange={false}
           validateOnBlur={false}
           initialValues={initialData}
-          onSubmit={async (values): Promise<void> => {
+          onSubmit={async (values, actions): Promise<void> => {
             setSubmitting(true);
             await handleSubmit({
               id: proposalData.id,
               ...values,
               rankOrder: +values.rankOrder,
             });
+            actions.setSubmitting(false);
           }}
         >
           {({ values, errors, touched, handleChange }): JSX.Element => (

@@ -80,11 +80,12 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values): Promise<void> => {
+      onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
         institution
           ? updateInstitution(institution.id, values.verified, values.name)
           : createInstitution(values.verified, values.name);
+        actions.setSubmitting(false);
       }}
       validationSchema={{
         name: Yup.string().required(),
