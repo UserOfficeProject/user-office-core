@@ -1,8 +1,10 @@
 import { Role } from '../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../models/SEP';
+import { User } from '../models/User';
 import { AddSEPMembersRole } from '../resolvers/mutations/AddSEPMembersRoleMutation';
 
 export interface SEPDataSource {
+  isMemberOfSEP(agent: User | null, sepId: number): Promise<boolean>;
   create(
     code: string,
     description: string,
@@ -38,7 +40,11 @@ export interface SEPDataSource {
   getMembers(sepId: number): Promise<SEPMember[]>;
   getSEPUserRoles(id: number, sepId: number): Promise<Role[]>;
   addSEPMembersRole(args: AddSEPMembersRole): Promise<SEP>;
-  removeSEPMemberRole(memberId: number, sepId: number): Promise<SEP>;
+  removeSEPMemberRole(
+    memberId: number,
+    sepId: number,
+    roleId: number
+  ): Promise<SEP>;
   assignProposal(proposalId: number, sepId: number): Promise<SEP>;
   removeMemberFromSepProposal(
     proposalId: number,
