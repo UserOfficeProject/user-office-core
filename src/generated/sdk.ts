@@ -2300,6 +2300,10 @@ export type CreateProposalMutation = (
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
     )> }
   ) }
 );
@@ -4465,11 +4469,14 @@ export const CreateProposalDocument = gql`
       status
       shortCode
       questionaryId
+      questionary {
+        ...questionary
+      }
     }
     error
   }
 }
-    `;
+    ${QuestionaryFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {

@@ -9,6 +9,7 @@ import {
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import React, { Fragment, HTMLAttributes } from 'react';
+import { database } from 'faker';
 
 const useStyles = makeStyles(theme => ({
   heading: {
@@ -23,7 +24,7 @@ export default function ProposalQuestionaryReview(
 ) {
   const classes = useStyles();
 
-  if (!props.data) {
+  if (!props.data.questionaryId) {
     return <div>Loading...</div>;
   }
   const questionary = props.data.questionary;

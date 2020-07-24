@@ -204,7 +204,8 @@ export default function ProposalContainer(props: {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          let { id, status, shortCode, questionaryId } = state.proposal;
+          const proposal = state.proposal;
+          let { id, status, shortCode, questionaryId, questionary } = proposal;
           const { callId } = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const result = await executeAndMonitorCall(
@@ -214,10 +215,10 @@ export default function ProposalContainer(props: {
                   .then(data => data.createProposal.proposal!),
               'Saved'
             );
-            ({ id, status, shortCode, questionaryId } = result);
+            ({ id, status, shortCode, questionaryId, questionary } = result);
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode, questionaryId },
+              payload: { id, status, shortCode, questionaryId, questionary },
             });
           }
           await executeAndMonitorCall(
