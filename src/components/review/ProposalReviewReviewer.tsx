@@ -3,6 +3,7 @@ import React from 'react';
 import { useParams } from 'react-router';
 
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
@@ -20,7 +21,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ reviewId }) => {
   const { proposalData } = useProposalData(reviewData?.proposal?.id);
 
   if (!reviewData || !proposalData) {
-    return <p>Loading</p>;
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (

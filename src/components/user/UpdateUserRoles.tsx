@@ -4,6 +4,7 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import UOLoader from 'components/common/UOLoader';
 import { GetUserWithRolesQuery, Role } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
@@ -70,7 +71,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const columns = [{ title: 'Name', field: 'title' }];
 
   if (!userData) {
-    return <p>Loading</p>;
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (

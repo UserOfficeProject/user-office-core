@@ -12,6 +12,7 @@ import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import orcid from 'images/orcid.png';
@@ -30,6 +31,7 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+    width: '100%',
   },
   errorMessage: {
     color: theme.palette.error.main,
@@ -77,20 +79,25 @@ export default function SignInSide() {
   const [errorMessage, setErrorMessage] = useState('');
   const { handleLogin, token } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
+  /**
+   * NOTE: Use this submitting flag to rerender the form when submitting because of this: https://github.com/formium/formik/issues/2097.
+   * It is resolved in version 2.0.7 so we can use just isSubmitting from formik.
+   */
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const requestToken = (values: { email: string; password: string }) => {
+  const requestToken = async (values: { email: string; password: string }) => {
     const { email, password } = values;
 
-    unauthorizedApi.login({ email, password }).then(data => {
-      if (data.login && !data.login.error) {
-        handleLogin(data.login.token);
-      } else {
-        if (data.login) {
-          setErrorMessage(getTranslation(data.login.error as ResourceId));
-          setFailed(true);
-        }
+    const data = await unauthorizedApi.login({ email, password });
+
+    if (data.login && !data.login.error) {
+      handleLogin(data.login.token);
+    } else {
+      if (data.login) {
+        setErrorMessage(getTranslation(data.login.error as ResourceId));
+        setFailed(true);
       }
-    });
+    }
   };
 
   if (token) {
@@ -101,9 +108,10 @@ export default function SignInSide() {
     <PhotoInSide>
       <Formik
         initialValues={{ email: '', password: '' }}
-        onSubmit={async (values, actions) => {
+        onSubmit={async values => {
+          setSubmitting(true);
           await requestToken(values);
-          actions.setSubmitting(false);
+          setSubmitting(false);
         }}
         validationSchema={signInValidationSchema}
       >
@@ -124,6 +132,7 @@ export default function SignInSide() {
               margin="normal"
               fullWidth
               data-cy="input-email"
+              disabled={submitting}
             />
             <Field
               name="password"
@@ -133,6 +142,7 @@ export default function SignInSide() {
               margin="normal"
               fullWidth
               data-cy="input-password"
+              disabled={submitting}
             />
             {failedLogin && (
               <p className={classes.errorMessage}>{errorMessage}</p>
@@ -144,7 +154,9 @@ export default function SignInSide() {
               color="primary"
               className={classes.submit}
               data-cy="submit"
+              disabled={submitting}
             >
+              {submitting && <UOLoader size={14} />}
               Sign In
             </Button>
             <Grid container>

@@ -46,7 +46,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell>{proposal.abstract}</TableCell>
               <TableCell className={classes.textBold}>Average score</TableCell>
               <TableCell>
-                {average(getGrades(proposal.reviews) as number[])}
+                {average(getGrades(proposal.reviews)) || '-'}
               </TableCell>
             </TableRow>
             <TableRow key="principalinvestigatorAndStatus">

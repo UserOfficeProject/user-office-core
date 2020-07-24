@@ -72,6 +72,7 @@ export default function ProposalInformationView(props: {
         handleChange,
         submitForm,
         setFieldValue,
+        isSubmitting,
       }) => (
         <Form className={props.readonly ? classes.disabled : undefined}>
           <Typography variant="h6" gutterBottom>
@@ -155,7 +156,7 @@ export default function ProposalInformationView(props: {
           />
           <ProposalNavigationFragment
             disabled={props.readonly}
-            saveAndNext={{ callback: submitForm }}
+            saveAndNext={{ callback: submitForm, isBusy: isSubmitting }}
             isLoading={false}
           />
         </Form>

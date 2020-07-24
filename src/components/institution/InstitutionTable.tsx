@@ -13,7 +13,11 @@ const InstitutionPage: React.FC = () => {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { institutionData, setInstitutionData } = useInstitutionData();
+  const {
+    loadingInstitutions,
+    institutionData,
+    setInstitutionData,
+  } = useInstitutionData();
 
   const deleteInstitution = async (id: number) => {
     return await api()
@@ -55,10 +59,6 @@ const InstitutionPage: React.FC = () => {
     />
   );
 
-  if (!institutionData) {
-    return <p>Loading</p>;
-  }
-
   return (
     <>
       <SuperMaterialTable
@@ -68,6 +68,7 @@ const InstitutionPage: React.FC = () => {
         icons={tableIcons}
         title={'Institutions'}
         columns={columns}
+        isLoading={loadingInstitutions}
         data={institutionData}
         options={{
           search: true,
