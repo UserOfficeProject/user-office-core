@@ -34,7 +34,6 @@ export type Answer = {
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
-  answerId: Maybe<Scalars['Int']>;
   value: Maybe<Scalars['IntStringDateBool']>;
 };
 
@@ -46,7 +45,7 @@ export type AnswerInput = {
 export type AnswerResponseWrap = {
   __typename?: 'AnswerResponseWrap';
   error: Maybe<Scalars['String']>;
-  answer: Maybe<Answer>;
+  answer: Answer;
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
@@ -327,9 +326,6 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
-  addSamplesToAnswer: SamplesResponseWrap;
-  createSample: SampleResponseWrap;
-  updateSampleTitle: SampleResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -890,7 +886,7 @@ export type PageResponseWrap = {
 export type PrepareDbResponseWrap = {
   __typename?: 'PrepareDBResponseWrap';
   error: Maybe<Scalars['String']>;
-  log: Maybe<Scalars['String']>;
+  log: Scalars['String'];
 };
 
 export type Proposal = {
@@ -993,10 +989,6 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
-  sample: Maybe<Sample>;
-  samplesByAnswerId: Maybe<Array<Sample>>;
-  samplesByCallId: Maybe<Array<Sample>>;
-  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepMember>>;
   sepProposals: Maybe<Array<SepProposal>>;
@@ -1390,7 +1382,6 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
-  templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
 };
 
@@ -1436,7 +1427,7 @@ export type Template = {
 
 export type TemplateCategory = {
   __typename?: 'TemplateCategory';
-  categoryId: TemplateCategoryId;
+  categoryId: Scalars['Int'];
   name: Scalars['String'];
 };
 
@@ -1970,7 +1961,7 @@ export type UpdateInstitutionMutation = (
     & Pick<InstitutionResponseWrap, 'error'>
     & { institution: Maybe<(
       { __typename?: 'Institution' }
-      & Pick<Institution, 'id' | 'verified'>
+      & Pick<Institution, 'id' | 'verified' | 'name'>
     )> }
   ) }
 );
@@ -2320,6 +2311,11 @@ export type DeleteProposalMutation = (
   ) }
 );
 
+export type CoreTechnicalReviewFragment = (
+  { __typename?: 'TechnicalReview' }
+  & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+);
+
 export type ProposalFragment = (
   { __typename?: 'Proposal' }
   & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified'>
@@ -2375,7 +2371,7 @@ export type GetProposalQuery = (
       & QuestionaryFragment
     ), technicalReview: Maybe<(
       { __typename?: 'TechnicalReview' }
-      & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+      & CoreTechnicalReviewFragment
     )>, reviews: Maybe<Array<(
       { __typename?: 'Review' }
       & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
@@ -2732,9 +2728,10 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
-export type AddSamplesToAnswerMutationVariables = Exact<{
-  answerId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
+export type AssignQuestionsToTopicMutationVariables = Exact<{
+  templateId: Scalars['Int'];
+  topicId: Scalars['Int'];
+  questionIds?: Maybe<Array<Scalars['String']>>;
 }>;
 
 
@@ -3183,7 +3180,9 @@ export type GetTemplateQuery = (
   )> }
 );
 
-export type GetTemplateCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetTemplatesQueryVariables = Exact<{
+  filter?: Maybe<TemplatesFilter>;
+}>;
 
 
 export type GetTemplateCategoriesQuery = (
@@ -3371,7 +3370,7 @@ export type DeleteUserMutation = (
 
 export type BasicUserDetailsFragment = (
   { __typename?: 'BasicUserDetails' }
-  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'placeholder' | 'created'>
+  & Pick<BasicUserDetails, 'id' | 'firstname' | 'lastname' | 'organisation' | 'position' | 'created' | 'placeholder'>
 );
 
 export type GetBasicUserDetailsQueryVariables = Exact<{
@@ -3398,10 +3397,7 @@ export type GetFieldsQuery = (
       { __typename?: 'Entry' }
       & Pick<Entry, 'id' | 'value'>
     )> }
-  )>, institutions: Maybe<Array<(
-    { __typename?: 'Institution' }
-    & Pick<Institution, 'id' | 'name'>
-  )>> }
+  )> }
 );
 
 export type GetMyRolesQueryVariables = Exact<{ [key: string]: never; }>;
@@ -3676,6 +3672,16 @@ export type VerifyEmailMutation = (
   ) }
 );
 
+export const CoreTechnicalReviewFragmentDoc = gql`
+    fragment coreTechnicalReview on TechnicalReview {
+  id
+  comment
+  publicComment
+  timeAllocation
+  status
+  proposalID
+}
+    `;
 export const ProposalFragmentDoc = gql`
     fragment proposal on Proposal {
   id
@@ -3915,8 +3921,8 @@ export const BasicUserDetailsFragmentDoc = gql`
   lastname
   organisation
   position
-  placeholder
   created
+  placeholder
 }
     `;
 export const AssignProposalDocument = gql`
@@ -4210,6 +4216,7 @@ export const UpdateInstitutionDocument = gql`
     institution {
       id
       verified
+      name
     }
     error
   }
@@ -4512,12 +4519,7 @@ export const GetProposalDocument = gql`
       ...questionary
     }
     technicalReview {
-      id
-      comment
-      publicComment
-      timeAllocation
-      status
-      proposalID
+      ...coreTechnicalReview
     }
     reviews {
       id
@@ -4546,7 +4548,8 @@ export const GetProposalDocument = gql`
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
+${QuestionaryFragmentDoc}
+${CoreTechnicalReviewFragmentDoc}`;
 export const GetProposalsDocument = gql`
     query getProposals($filter: ProposalsFilter) {
   proposals(filter: $filter) {
@@ -5017,10 +5020,6 @@ export const GetFieldsDocument = gql`
       id
       value
     }
-  }
-  institutions {
-    id
-    name
   }
 }
     `;

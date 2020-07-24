@@ -5,8 +5,4 @@ query getFields {
       value
     }
   }
-  institutions {
-    id
-    name
-  }
 }

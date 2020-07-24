@@ -105,16 +105,17 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
                 component={Select}
                 data-cy="templateId"
               >
-                {templates.map(template => {
-                  return (
-                    <MenuItem
-                      value={template.templateId}
-                      key={template.templateId}
-                    >
-                      {template.name}
-                    </MenuItem>
-                  );
-                })}
+                {templates &&
+                  templates.map(template => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateId}
+                      >
+                        {template.name}
+                      </MenuItem>
+                    );
+                  })}
               </Field>
               <Link href="/SampleDeclarationTemplates/" target="blank">
                 View all templates

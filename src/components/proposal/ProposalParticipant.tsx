@@ -14,7 +14,9 @@ export default function ProposalParticipant(props: {
   title?: string;
   className?: string;
 }) {
-  const [curUser, setCurUser] = useState<BasicUserData | null>(null);
+  const [curUser, setCurUser] = useState<BasicUserData | null | undefined>(
+    null
+  );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const { loadBasicUserData } = useBasicUserData();
 

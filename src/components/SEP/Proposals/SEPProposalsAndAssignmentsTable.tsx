@@ -19,6 +19,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
+import { average } from 'utils/mathFunctions';
 
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
@@ -51,22 +52,12 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     UserRole.SEP_SECRETARY,
   ]);
 
-  const getGrades = (assignments: SepAssignment[]) =>
+  const getGradesFromAssignments = (assignments: SepAssignment[]) =>
     assignments
       ?.filter(
         assignment => assignment.review.status === ReviewStatus.SUBMITTED
       )
       .map(assignment => assignment.review.grade) ?? [];
-
-  const average = (numbers: number[]) => {
-    const sum = numbers.reduce(function(sum, value) {
-      return sum + value;
-    }, 0);
-
-    const avg = sum / numbers.length;
-
-    return avg.toPrecision(3);
-  };
 
   const SEPProposalColumns = [
     { title: 'ID', field: 'proposal.shortCode' },
@@ -92,13 +83,13 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     {
       title: 'Average grade',
       render: (rowData: SepProposal): string =>
-        average(getGrades(rowData.assignments as SepAssignment[]) as number[]),
+        average(
+          getGradesFromAssignments(
+            rowData.assignments as SepAssignment[]
+          ) as number[]
+        ).toString(),
     },
   ];
-
-  if (loadingSEPProposals) {
-    return <p>Loading...</p>;
-  }
 
   const removeProposalFromSEP = async (
     proposalToRemove: SepProposal
@@ -241,8 +232,8 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         if (sepProposalsData.proposalId === editingProposalData.proposalId) {
           return {
             ...editingProposalData,
-            assignments: editingProposalData.assignments?.map(
-              proposalAssignment => {
+            assignments:
+              editingProposalData.assignments?.map(proposalAssignment => {
                 if (
                   proposalAssignment.review.id === currentAssignment?.review.id
                 ) {
@@ -250,8 +241,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
                 } else {
                   return proposalAssignment;
                 }
-              }
-            ),
+              }) ?? [],
           };
         } else {
           return sepProposalsData;
@@ -307,6 +297,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
             }}
             title={'SEP Proposals'}
             data={initialValues}
+            isLoading={loadingSEPProposals}
             detailPanel={[
               {
                 tooltip: 'Show Reviewers',

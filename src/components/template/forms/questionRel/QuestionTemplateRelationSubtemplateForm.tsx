@@ -74,16 +74,17 @@ export const QuestionTemplateRelationSubtemplateForm: TFormSignature<QuestionTem
                 margin="normal"
                 data-cy="templateId"
               >
-                {templates.map(template => {
-                  return (
-                    <MenuItem
-                      value={template.templateId}
-                      key={template.templateId}
-                    >
-                      {template.name}
-                    </MenuItem>
-                  );
-                })}
+                {templates &&
+                  templates.map(template => {
+                    return (
+                      <MenuItem
+                        value={template.templateId}
+                        key={template.templateId}
+                      >
+                        {template.name}
+                      </MenuItem>
+                    );
+                  })}
               </Field>
               <Link href="/SampleDeclarationTemplates/" target="blank">
                 View all templates

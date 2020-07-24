@@ -10,6 +10,7 @@ import {
   Typography,
   DialogContent,
   Grid,
+  CircularProgress,
 } from '@material-ui/core';
 import { TransitionProps } from '@material-ui/core/transitions/transition';
 import CloseIcon from '@material-ui/icons/Close';
@@ -90,7 +91,9 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
               <Grid item xs={12}>
                 <div data-cy="SEP-meeting-components-proposal-view">
                   {loading || !proposalData ? (
-                    <div>Loading...</div>
+                    <CircularProgress
+                      style={{ marginLeft: '50%', marginTop: '20px' }}
+                    />
                   ) : (
                     <>
                       <FinalRankingForm

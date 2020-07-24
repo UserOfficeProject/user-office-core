@@ -29,7 +29,7 @@ export default function ProposalChooseCall() {
   const history = useHistory();
   const classes = useStyles();
 
-  if (loading) {
+  if (loading || !callsData) {
     return <p>Loading...</p>;
   }
 
