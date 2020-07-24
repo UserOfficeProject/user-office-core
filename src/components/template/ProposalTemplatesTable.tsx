@@ -13,7 +13,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { callsData } = useCallsData(undefined, props.filterTemplateId);
+  const { callsData } = useCallsData({ templateIds: [props.filterTemplateId] });
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {

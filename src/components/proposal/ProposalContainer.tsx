@@ -13,7 +13,6 @@ import {
   Proposal,
   ProposalStatus,
   Questionary,
-  QuestionaryStep,
   SubtemplateConfig,
   TemplateCategoryId,
   UserRole,

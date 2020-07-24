@@ -34,6 +34,7 @@ export type Answer = {
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
+  answerId: Maybe<Scalars['Int']>;
   value: Maybe<Scalars['IntStringDateBool']>;
 };
 
@@ -45,7 +46,7 @@ export type AnswerInput = {
 export type AnswerResponseWrap = {
   __typename?: 'AnswerResponseWrap';
   error: Maybe<Scalars['String']>;
-  answer: Answer;
+  answer: Maybe<Answer>;
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
@@ -304,6 +305,9 @@ export type Mutation = {
   addReview: ReviewResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
+  addSamplesToAnswer: SamplesResponseWrap;
+  createSample: SampleResponseWrap;
+  updateSampleTitle: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
   assignMember: SepResponseWrap;
   removeMember: SepResponseWrap;
@@ -522,6 +526,24 @@ export type MutationAddUserForReviewArgs = {
 };
 
 
+export type MutationAddSamplesToAnswerArgs = {
+  answerId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
+};
+
+
+export type MutationCreateSampleArgs = {
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSampleTitleArgs = {
+  sampleId: Scalars['Int'];
+  title: Scalars['String'];
+};
+
+
 export type MutationAssignChairOrSecretaryArgs = {
   addSEPMembersRole?: Maybe<AddSepMembersRole>;
 };
@@ -709,24 +731,6 @@ export type MutationUpdateUserArgs = {
 };
 
 
-export type MutationAddSamplesToAnswerArgs = {
-  answerId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
-};
-
-
-export type MutationCreateSampleArgs = {
-  title: Scalars['String'];
-  templateId: Scalars['Int'];
-};
-
-
-export type MutationUpdateSampleTitleArgs = {
-  sampleId: Scalars['Int'];
-  title: Scalars['String'];
-};
-
-
 export type MutationAddClientLogArgs = {
   error: Scalars['String'];
 };
@@ -886,7 +890,7 @@ export type PageResponseWrap = {
 export type PrepareDbResponseWrap = {
   __typename?: 'PrepareDBResponseWrap';
   error: Maybe<Scalars['String']>;
-  log: Scalars['String'];
+  log: Maybe<Scalars['String']>;
 };
 
 export type Proposal = {
@@ -989,6 +993,10 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
+  sample: Maybe<Sample>;
+  samplesByAnswerId: Maybe<Array<Sample>>;
+  samplesByCallId: Maybe<Array<Sample>>;
+  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepMember>>;
   sepProposals: Maybe<Array<SepProposal>>;
@@ -1382,6 +1390,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
+  templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
 };
 
@@ -1427,7 +1436,7 @@ export type Template = {
 
 export type TemplateCategory = {
   __typename?: 'TemplateCategory';
-  categoryId: Scalars['Int'];
+  categoryId: TemplateCategoryId;
   name: Scalars['String'];
 };
 
@@ -1548,7 +1557,7 @@ export enum UserRole {
   SEP_SECRETARY = 'SEP_SECRETARY',
   SEP_REVIEWER = 'SEP_REVIEWER',
   INSTRUMENT_SCIENTIST = 'INSTRUMENT_SCIENTIST',
-  SAMPLE_SAFETY_REVIEWER = "SAMPLE_SAFETY_REVIEWER"
+  SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
 export type AssignProposalMutationVariables = Exact<{
@@ -2728,10 +2737,9 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
-export type AssignQuestionsToTopicMutationVariables = Exact<{
-  templateId: Scalars['Int'];
-  topicId: Scalars['Int'];
-  questionIds?: Maybe<Array<Scalars['String']>>;
+export type AddSamplesToAnswerMutationVariables = Exact<{
+  answerId: Scalars['Int'];
+  sampleIds: Array<Scalars['Int']>;
 }>;
 
 
@@ -3180,9 +3188,7 @@ export type GetTemplateQuery = (
   )> }
 );
 
-export type GetTemplatesQueryVariables = Exact<{
-  filter?: Maybe<TemplatesFilter>;
-}>;
+export type GetTemplateCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetTemplateCategoriesQuery = (

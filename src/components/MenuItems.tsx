@@ -24,7 +24,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import ScienceIcon from './common/ScienceIcon';
 
 const MenuItems: React.FC = () => {
-  const { callsData } = useCallsData(true);
+  const { callsData } = useCallsData({ isActive: true });
   const { currentRole } = useContext(UserContext);
 
   const proposalDisabled = callsData.length === 0;
