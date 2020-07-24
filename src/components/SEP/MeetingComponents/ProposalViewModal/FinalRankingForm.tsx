@@ -10,9 +10,10 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
-import { Proposal, ProposalEndStatus } from 'generated/sdk';
+import { Proposal, ProposalEndStatus, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
 
@@ -37,6 +38,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   const initialData = {
     finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
@@ -182,32 +188,36 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                 </Grid>
               </Grid>
               <ButtonContainer>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  onClick={() => {
-                    setShouldClose(false);
-                  }}
-                  color="primary"
-                  className={classes.button}
-                  data-cy="save"
-                  disabled={submitting}
-                >
-                  Save
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  onClick={() => {
-                    setShouldClose(true);
-                  }}
-                  color="primary"
-                  className={classes.button}
-                  data-cy="saveAndContinue"
-                  disabled={submitting}
-                >
-                  Save and continue
-                </Button>
+                {hasAccessRights && (
+                  <>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={() => {
+                        setShouldClose(false);
+                      }}
+                      color="primary"
+                      className={classes.button}
+                      data-cy="save"
+                      disabled={submitting}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={() => {
+                        setShouldClose(true);
+                      }}
+                      color="primary"
+                      className={classes.button}
+                      data-cy="saveAndContinue"
+                      disabled={submitting}
+                    >
+                      Save and continue
+                    </Button>
+                  </>
+                )}
                 <Button
                   type="button"
                   onClick={closeModal}
