@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
-import { UserRole } from 'generated/sdk';
-import { BasicUserDetails } from 'models/User';
+import { UserRole, BasicUserDetails } from 'generated/sdk';
 
 import ParticipantModal from './ParticipantModal';
 
@@ -40,8 +39,8 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
   const classes = useStyles();
   const [modalOpen, setOpen] = useState(false);
 
-  const addUser = (user: BasicUserDetails) => {
-    setUsers([...users, user]);
+  const addUsers = (addedUsers: BasicUserDetails[]) => {
+    setUsers([...users, ...addedUsers]);
     setOpen(false);
   };
 
@@ -60,9 +59,10 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
       <ParticipantModal
         show={modalOpen}
         close={() => setOpen(false)}
-        addParticipant={addUser}
+        addParticipants={addUsers}
         selectedUsers={users.map(user => user.id)}
         title={'Add Co-Proposer'}
+        selection={true}
         userRole={UserRole.USER}
       />
       <PeopleTable
@@ -71,6 +71,7 @@ const ProposalParticipants: React.FC<ProposalParticipantsProps> = ({
         actionText={'Add Co-Proposers'}
         action={openModal}
         isFreeAction={true}
+        selection={false}
         data={users}
         search={false}
         userRole={UserRole.USER}

@@ -55,10 +55,10 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
     loadProposal();
   }, [loadProposal]);
 
-  const addUser = async (user: BasicUserDetails): Promise<void> => {
+  const addUser = async (users: BasicUserDetails[]): Promise<void> => {
     // TODO: This should be reviewed here because we wont have adding user for review outside SEPs.
     await api().addUserForReview({
-      userID: user.id,
+      userID: users[0].id,
       proposalID: parseInt(match.params.id),
       sepID: 0,
     });
@@ -90,7 +90,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           <ParticipantModal
             show={modalOpen}
             close={() => setOpen(false)}
-            addParticipant={addUser}
+            addParticipants={addUser}
             selectedUsers={reviews.map(review => review.userID)}
             title={'Reviewer'}
             userRole={UserRole.REVIEWER}
