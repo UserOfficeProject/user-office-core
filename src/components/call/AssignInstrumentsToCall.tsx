@@ -37,10 +37,6 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     { title: 'Description', field: 'description' },
   ];
 
-  if (loadingInstruments || !instrumentsData) {
-    return <div>Loading...</div>;
-  }
-
   const instruments = instrumentsData.filter(instrument => {
     if (
       !assignedInstruments?.find(
@@ -83,6 +79,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         title={'Instruments'}
         columns={columns}
         data={instruments}
+        isLoading={loadingInstruments}
         onSelectionChange={data =>
           setSelectedInstruments(data as InstrumentWithAvailabilityTime[])
         }

@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Redirect, useHistory } from 'react-router';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import Can from 'components/common/Can';
@@ -16,6 +16,7 @@ import AddSEP from './General/AddSEP';
 
 const SEPsTable: React.FC = () => {
   const { currentRole } = useContext(UserContext);
+  const history = useHistory();
   const { loading, SEPsData, setSEPsData } = useSEPsData(
     '',
     false,
@@ -40,6 +41,10 @@ const SEPsTable: React.FC = () => {
   const onSepAdded = (sepAdded: Sep | null | undefined) => {
     sepAdded && setSEPsData([...SEPsData, sepAdded]);
     setShow(false);
+
+    setTimeout(() => {
+      history.push(`/SEPPage/${sepAdded?.id}`);
+    });
   };
 
   const EditIcon = (): JSX.Element => <Edit />;

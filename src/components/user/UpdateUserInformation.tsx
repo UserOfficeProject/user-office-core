@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 import Button from '@material-ui/core/Button';
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
@@ -15,6 +14,7 @@ import React, { useEffect, useState, useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
 import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { UpdateUserMutationVariables, User } from 'generated/sdk';
 import { useInstitutionData } from 'hooks/admin/useInstitutionData';
@@ -73,9 +73,7 @@ export default function UpdateUserInformation(props: { id: number }) {
   }, [props.id, user.id, sendRequest]);
 
   if (loadingInstitutions || !fieldsContent || !userData) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '50px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
   }
 
   if (!institutionsList.length) {

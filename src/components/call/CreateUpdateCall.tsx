@@ -17,9 +17,10 @@ import Typography from '@material-ui/core/Typography';
 import { Form, Formik, FormikErrors } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import UOLoader from 'components/common/UOLoader';
 import { Call } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -62,6 +63,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const api = useDataApi();
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const currentDay = new Date();
   let isLastStep = false;
 
@@ -123,6 +125,8 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     } else {
       close(callToReturn);
     }
+
+    setSubmitting(false);
   };
 
   if (activeStep + 1 === steps.length) {
@@ -178,32 +182,28 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
+          setSubmitting(true);
           const { templateId } = values;
           if (call) {
-            await api()
-              .updateCall({
-                id: call.id,
-                ...values,
-                templateId: templateId ? +templateId : null,
-              })
-              .then(data => {
-                showNotificationAndClose(
-                  data.updateCall.error,
-                  data.updateCall.call as Call
-                );
-              });
+            const data = await api().updateCall({
+              id: call.id,
+              ...values,
+              templateId: templateId ? +templateId : null,
+            });
+            showNotificationAndClose(
+              data.updateCall.error,
+              data.updateCall.call as Call
+            );
           } else {
-            await api()
-              .createCall({
-                ...values,
-                templateId: templateId ? +templateId : null,
-              })
-              .then(data => {
-                showNotificationAndClose(
-                  data.createCall.error,
-                  data.createCall.call as Call
-                );
-              });
+            const data = await api().createCall({
+              ...values,
+              templateId: templateId ? +templateId : null,
+            });
+
+            showNotificationAndClose(
+              data.createCall.error,
+              data.createCall.call as Call
+            );
           }
 
           actions.setSubmitting(false);
@@ -233,7 +233,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
                 fullWidth
                 onClick={isLastStep ? () => null : handleNext}
                 className={classes.button}
+                disabled={submitting}
               >
+                {submitting && <UOLoader size={14} />}
                 {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
               </Button>
             </ActionButtonContainer>

@@ -3,7 +3,8 @@ import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { useCheckAccess } from 'components/common/Can';
+import { InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -24,6 +25,11 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     sepId,
     selectedCallId
   );
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -48,6 +54,21 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
 
   const DoneAllIcon = (): JSX.Element => <DoneAll />;
 
+  const actions = [];
+
+  if (hasAccessRights) {
+    actions.push({
+      icon: DoneAllIcon,
+      onClick: (
+        event: React.MouseEvent<HTMLButtonElement>,
+        data: InstrumentWithAvailabilityTime | InstrumentWithAvailabilityTime[]
+      ) => {
+        console.log('Submit', data);
+      },
+      tooltip: 'Submit instrument',
+    });
+  }
+
   return (
     <div data-cy="SEP-meeting-components-table">
       <MaterialTable
@@ -59,20 +80,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
         }}
         data={instrumentsData}
         isLoading={loadingInstruments}
-        actions={[
-          {
-            icon: DoneAllIcon,
-            onClick: (
-              event,
-              data:
-                | InstrumentWithAvailabilityTime
-                | InstrumentWithAvailabilityTime[]
-            ) => {
-              console.log('Submit', data);
-            },
-            tooltip: 'Submit instrument',
-          },
-        ]}
+        actions={actions}
         detailPanel={[
           {
             tooltip: 'Show proposals',

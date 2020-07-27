@@ -31,11 +31,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
     { title: 'Organisation', field: 'user.organisation' },
   ];
 
-  if (loadingMembers || !SEPMembersData) {
-    return <div>Loading...</div>;
-  }
-
-  const members = SEPMembersData.filter(sepMember => {
+  const members = SEPMembersData?.filter(sepMember => {
     if (
       !assignedMembers?.find(
         assignedMember => assignedMember.id === sepMember.userId
@@ -55,6 +51,7 @@ const AssignSEPMemberToProposal: React.FC<AssignSEPMemberToProposalProps> = ({
       columns={columns}
       title={'Select reviewers'}
       data={members}
+      isLoading={loadingMembers}
       actions={[
         {
           icon: AddIcon,

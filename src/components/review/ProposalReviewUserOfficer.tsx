@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ParticipantModal from 'components/proposal/ParticipantModal';
-import ProposalAdmin from 'components/proposal/ProposalAdmin';
+import ProposalAdmin, {
+  AdministrationFormData,
+} from 'components/proposal/ProposalAdmin';
 import {
   Proposal,
   CoreTechnicalReviewFragment,
@@ -73,7 +76,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   };
 
   if (!proposal) {
-    return <p>Loading</p>;
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (
@@ -106,7 +109,12 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           data={techReview}
           setReview={setTechReview}
         />
-        <ProposalAdmin data={proposal} />
+        <ProposalAdmin
+          data={proposal}
+          setAdministration={(data: AdministrationFormData) =>
+            setProposal({ ...proposal, ...data })
+          }
+        />
         <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
       </SimpleTabs>
     </Container>

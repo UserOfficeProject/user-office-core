@@ -34,10 +34,6 @@ const InstrumentTable: React.FC = () => {
     number | null
   >(null);
 
-  if (loadingInstruments) {
-    return <p>Loading...</p>;
-  }
-
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api()
       .deleteInstrument({
@@ -175,6 +171,7 @@ const InstrumentTable: React.FC = () => {
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
+          isLoading={loadingInstruments}
           createModal={createModal}
           detailPanel={[
             {

@@ -20,5 +20,5 @@ export function useProposalData(id: number | null | undefined) {
     }
   }, [id, api]);
 
-  return { loading, proposalData };
+  return { loading, proposalData, setProposalData };
 }

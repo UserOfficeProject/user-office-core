@@ -1,5 +1,4 @@
 import {
-  Divider,
   IconButton,
   List,
   ListItem,
@@ -10,10 +9,12 @@ import {
 } from '@material-ui/core';
 import { NavigateNext } from '@material-ui/icons';
 import dateformat from 'dateformat';
+import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
-import { useCallsData } from 'hooks/call/useCallsData';
+import UOLoader from 'components/common/UOLoader';
+import { Call } from 'generated/sdk';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { daysRemaining } from 'utils/Time';
 
@@ -24,21 +25,24 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function ProposalChooseCall() {
-  const { loading, callsData } = useCallsData(true);
+type ProposalChooseCallProps = {
+  callsData: Call[];
+  loadingCalls: boolean;
+};
+
+const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
+  callsData,
+  loadingCalls,
+}) => {
   const history = useHistory();
   const classes = useStyles();
 
-  if (loading || !callsData) {
-    return <p>Loading...</p>;
+  if (loadingCalls) {
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   if (callsData.length === 0) {
     return <p>There are no available calls at the moment</p>;
-  }
-
-  if (callsData.length === 1) {
-    history.push(`/ProposalCreate/${callsData[0].templateId}`);
   }
 
   const handleSelect = (callId: number) => {
@@ -57,8 +61,7 @@ export default function ProposalChooseCall() {
           Select a call
         </Typography>
         <List>
-          {callsData.map((call, idx, arr) => {
-            const divider = idx !== arr.length - 1 ? <Divider /> : null;
+          {callsData.map(call => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
             const daysRemainingText =
               daysRemainingNum > 0 && daysRemainingNum < 30
@@ -66,43 +69,50 @@ export default function ProposalChooseCall() {
                 : '';
 
             return (
-              <>
-                <ListItem
-                  button
-                  key={call.id}
-                  onClick={() => handleSelect(call.id)}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="h6">{call.shortCode}</Typography>
-                    }
-                    secondary={
-                      <Fragment>
-                        <Typography className={classes.date}>
-                          {`Application deadline: ${formatDate(
-                            call.endCall
-                          )} ${daysRemainingText}`}
-                        </Typography>
-                        <Typography>{call.cycleComment}</Typography>
-                      </Fragment>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="comments"
-                      onClick={() => handleSelect(call.id)}
-                    >
-                      <NavigateNext />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                {divider}
-              </>
+              <ListItem
+                button
+                key={call.id}
+                onClick={() => handleSelect(call.id)}
+                divider={true}
+              >
+                <ListItemText
+                  primary={
+                    <Typography variant="h6">{call.shortCode}</Typography>
+                  }
+                  secondary={
+                    <Fragment>
+                      <Typography component="span" className={classes.date}>
+                        {`Application deadline: ${formatDate(
+                          call.endCall
+                        )} ${daysRemainingText}`}
+                      </Typography>
+                      <Typography component="span">
+                        {call.cycleComment}
+                      </Typography>
+                    </Fragment>
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    aria-label="comments"
+                    onClick={() => handleSelect(call.id)}
+                  >
+                    <NavigateNext />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>
       </StyledPaper>
     </ContentContainer>
   );
-}
+};
+
+ProposalChooseCall.propTypes = {
+  callsData: PropTypes.array.isRequired,
+  loadingCalls: PropTypes.bool.isRequired,
+};
+
+export default ProposalChooseCall;

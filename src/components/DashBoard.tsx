@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
+import { useCallsData } from 'hooks/call/useCallsData';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
@@ -161,6 +162,7 @@ const Dashboard: React.FC = () => {
   const [open, setOpen] = React.useState(true);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { currentRole } = useContext(UserContext);
+  const { callsData, loading } = useCallsData(true);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -199,7 +201,7 @@ const Dashboard: React.FC = () => {
         </div>
         <Divider />
         <List>
-          <MenuItems />
+          <MenuItems callsData={callsData} currentRole={currentRole} />
           {logoutMenuListItem}
         </List>
         <Divider />
@@ -207,7 +209,15 @@ const Dashboard: React.FC = () => {
       <main className={classes.content}>
         <Switch>
           <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
-          <Route path="/ProposalSelectType" component={ProposalChooseCall} />
+          <Route
+            path="/ProposalSelectType"
+            component={() => (
+              <ProposalChooseCall
+                callsData={callsData}
+                loadingCalls={loading}
+              />
+            )}
+          />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
           {isUserOfficer && (

@@ -10,13 +10,14 @@ import {
   Typography,
   DialogContent,
   Grid,
-  CircularProgress,
 } from '@material-ui/core';
 import { TransitionProps } from '@material-ui/core/transitions/transition';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
+import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { TechnicalReview, Review } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
@@ -48,15 +49,19 @@ type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
   setProposalViewModalOpen: (isOpen: boolean) => void;
   proposalId: number;
+  meetingSubmited: (data: AdministrationFormData) => void;
 };
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
   setProposalViewModalOpen,
   proposalViewModalOpen,
   proposalId,
+  meetingSubmited,
 }) => {
   const classes = useStyles();
-  const { proposalData, loading } = useProposalData(proposalId);
+  const { proposalData, loading, setProposalData } = useProposalData(
+    proposalId
+  );
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
@@ -91,7 +96,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
               <Grid item xs={12}>
                 <div data-cy="SEP-meeting-components-proposal-view">
                   {loading || !proposalData ? (
-                    <CircularProgress
+                    <UOLoader
                       style={{ marginLeft: '50%', marginTop: '20px' }}
                     />
                   ) : (
@@ -99,6 +104,14 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
                       <FinalRankingForm
                         closeModal={handleClose}
                         proposalData={proposalData}
+                        meetingSubmited={data => {
+                          setProposalData({
+                            ...proposalData,
+                            ...data,
+                            rankOrder: data.rankOrder as number,
+                          });
+                          meetingSubmited(data);
+                        }}
                       />
                       <ProposalDetails proposal={proposalData} />
                       <TechnicalReviewInfo
@@ -125,6 +138,7 @@ SEPMeetingProposalViewModal.propTypes = {
   proposalId: PropTypes.number.isRequired,
   proposalViewModalOpen: PropTypes.bool.isRequired,
   setProposalViewModalOpen: PropTypes.func.isRequired,
+  meetingSubmited: PropTypes.func.isRequired,
 };
 
 export default SEPMeetingProposalViewModal;
