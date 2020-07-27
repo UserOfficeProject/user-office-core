@@ -4,6 +4,7 @@ import {
   InstrumentDataSourceMock,
   dummyInstrument,
 } from '../datasources/mockups/InstrumentDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUserWithRole,
   dummyUserOfficerWithRole,
@@ -11,8 +12,10 @@ import {
 import InstrumentQueries from './InstrumentQueries';
 
 const dummyInstrumentDataSource = new InstrumentDataSourceMock();
+const dummySepDataSource = new SEPDataSourceMock();
 const InstrumentQueriesInstance = new InstrumentQueries(
-  dummyInstrumentDataSource
+  dummyInstrumentDataSource,
+  dummySepDataSource
 );
 
 describe('Test Instrument Queries', () => {
