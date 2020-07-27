@@ -9,7 +9,6 @@ import {
   TextInputConfig,
   SubtemplateConfig,
 } from '../resolvers/types/FieldConfig';
-import JSDict from '../utils/Dictionary';
 import { EvaluatorOperator } from './ConditionEvaluator';
 
 export class FieldDependency {
@@ -221,7 +220,7 @@ export interface DataTypeSpec {
 }
 
 const baseDefaultConfig = { required: false, small_label: '', tooltip: '' };
-const defaultConfigs = JSDict.Create<
+const defaultConfigs = new Map<
   string,
   | BooleanConfig
   | DateConfig
@@ -231,45 +230,45 @@ const defaultConfigs = JSDict.Create<
   | TextInputConfig
   | SubtemplateConfig
 >();
-defaultConfigs.put('BooleanConfig', { ...baseDefaultConfig });
-defaultConfigs.put('DateConfig', { ...baseDefaultConfig });
+defaultConfigs.set('BooleanConfig', { ...baseDefaultConfig });
+defaultConfigs.set('DateConfig', { ...baseDefaultConfig });
 
-defaultConfigs.put('EmbellishmentConfig', {
+defaultConfigs.set('EmbellishmentConfig', {
   plain: '',
   html: '',
   omitFromPdf: false,
   ...baseDefaultConfig,
 });
-defaultConfigs.put('FileUploadConfig', {
+defaultConfigs.set('FileUploadConfig', {
   max_files: 1,
   file_type: [],
   ...baseDefaultConfig,
 });
-defaultConfigs.put('SelectionFromOptionsConfig', {
+defaultConfigs.set('SelectionFromOptionsConfig', {
   options: [],
   variant: 'radio',
   ...baseDefaultConfig,
 });
-defaultConfigs.put('TextInputConfig', {
+defaultConfigs.set('TextInputConfig', {
   multiline: false,
   isHtmlQuestion: false,
   placeholder: '',
   ...baseDefaultConfig,
 });
-defaultConfigs.put('SubtemplateConfig', {
+defaultConfigs.set('SubtemplateConfig', {
   templateId: 0,
   templateCategory: TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION],
   ...baseDefaultConfig,
 });
 
-const f = JSDict.Create<string, () => typeof FieldConfigType>();
-f.put(DataType.BOOLEAN, () => new BooleanConfig());
-f.put(DataType.DATE, () => new DateConfig());
-f.put(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
-f.put(DataType.FILE_UPLOAD, () => new FileUploadConfig());
-f.put(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
-f.put(DataType.TEXT_INPUT, () => new TextInputConfig());
-f.put(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
+const f = new Map<string, () => typeof FieldConfigType>();
+f.set(DataType.BOOLEAN, () => new BooleanConfig());
+f.set(DataType.DATE, () => new DateConfig());
+f.set(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
+f.set(DataType.FILE_UPLOAD, () => new FileUploadConfig());
+f.set(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
+f.set(DataType.TEXT_INPUT, () => new TextInputConfig());
+f.set(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,

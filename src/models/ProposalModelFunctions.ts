@@ -2,7 +2,6 @@ import {
   SelectionFromOptionsConfig,
   TextInputConfig,
 } from '../resolvers/types/FieldConfig';
-import JSDict from '../utils/Dictionary';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import {
   Answer,
@@ -149,9 +148,9 @@ class SelectFromOptionsInputValidator extends BaseValidator {
   }
 }
 
-const validatorMap = JSDict.Create<DataType, ConstraintValidator>();
-validatorMap.put(DataType.TEXT_INPUT, new TextInputValidator());
-validatorMap.put(
+const validatorMap = new Map<DataType, ConstraintValidator>();
+validatorMap.set(DataType.TEXT_INPUT, new TextInputValidator());
+validatorMap.set(
   DataType.SELECTION_FROM_OPTIONS,
   new SelectFromOptionsInputValidator()
 );

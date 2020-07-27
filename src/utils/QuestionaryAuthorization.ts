@@ -1,5 +1,3 @@
-import { JSDict } from '@esss-swap/duo-localisation';
-
 import {
   proposalDataSource,
   questionaryDataSource,
@@ -80,18 +78,17 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
 }
 
 export class QuestionaryAuthorization {
-  private authorizers: JSDict<number, QuestionaryAuthorizer> = JSDict.Create();
+  private authorizers = new Map<number, QuestionaryAuthorizer>();
   constructor(
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource
   ) {
-    this.authorizers = JSDict.Create();
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.PROPOSAL_QUESTIONARY,
       new ProposalQuestionaryAuthorizer(this.proposalDataSource)
     );
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.SAMPLE_DECLARATION,
       new SampleDeclarationQuestionaryAuthorizer(
         proposalDataSource,
