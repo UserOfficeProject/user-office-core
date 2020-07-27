@@ -13,7 +13,18 @@ import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
-export default function ProposalAdmin(props: { data: Proposal }) {
+export type AdministrationFormData = {
+  id: number;
+  commentForUser: string;
+  commentForManagement: string;
+  finalStatus: ProposalEndStatus;
+  rankOrder?: number;
+};
+
+export default function ProposalAdmin(props: {
+  data: Proposal;
+  setAdministration: (data: AdministrationFormData) => void;
+}) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -33,22 +44,23 @@ export default function ProposalAdmin(props: { data: Proposal }) {
         initialValues={initialValues}
         validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values, actions) => {
-          await api()
-            .administrationProposal({
-              id: props.data.id,
-              finalStatus:
-                ProposalEndStatus[values.finalStatus as ProposalEndStatus],
-              status: ProposalStatus[values.proposalStatus as ProposalStatus],
-              commentForUser: values.commentForUser,
-              commentForManagement: values.commentForManagement,
-            })
-            .then(data =>
-              enqueueSnackbar('Updated', {
-                variant: data.administrationProposal.error
-                  ? 'error'
-                  : 'success',
-              })
-            );
+          const administrationValues = {
+            id: props.data.id,
+            finalStatus:
+              ProposalEndStatus[values.finalStatus as ProposalEndStatus],
+            status: ProposalStatus[values.proposalStatus as ProposalStatus],
+            commentForUser: values.commentForUser,
+            commentForManagement: values.commentForManagement,
+          };
+          const data = await api().administrationProposal(administrationValues);
+
+          enqueueSnackbar('Updated', {
+            variant: data.administrationProposal.error ? 'error' : 'success',
+          });
+
+          if (!data.administrationProposal.error) {
+            props.setAdministration(administrationValues);
+          }
           actions.setSubmitting(false);
         }}
       >

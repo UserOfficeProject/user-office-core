@@ -97,6 +97,8 @@ export default function SignInSide() {
         setErrorMessage(getTranslation(data.login.error as ResourceId));
         setFailed(true);
       }
+
+      setSubmitting(false);
     }
   };
 
@@ -108,10 +110,10 @@ export default function SignInSide() {
     <PhotoInSide>
       <Formik
         initialValues={{ email: '', password: '' }}
-        onSubmit={async values => {
+        onSubmit={async (values, actions) => {
           setSubmitting(true);
           await requestToken(values);
-          setSubmitting(false);
+          actions.setSubmitting(false);
         }}
         validationSchema={signInValidationSchema}
       >

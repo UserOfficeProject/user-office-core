@@ -38,7 +38,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         numberRatingsRequired: 2,
         active: true,
       }}
-      onSubmit={async (values): Promise<void> => {
+      onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
         await api()
           .createSEP(values)
@@ -57,6 +57,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             }
           });
         setSubmitting(false);
+        actions.setSubmitting(false);
       }}
       validationSchema={createSEPValidationSchema}
     >
