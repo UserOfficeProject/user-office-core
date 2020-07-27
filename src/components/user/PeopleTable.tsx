@@ -129,6 +129,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   );
 
   props.action &&
+    !props.selection &&
     actionArray.push({
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
@@ -149,7 +150,16 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
         icons={tableIcons}
         title={props.title}
         columns={columns}
-        onSelectionChange={data => setSelectedParticipants(data)}
+        onSelectionChange={selectedItems => {
+          const newData = selectedItems.map(selectedItem => ({
+            id: selectedItem.id,
+            firstname: selectedItem.firstname,
+            lastname: selectedItem.lastname,
+            organisation: selectedItem.organisation,
+          }));
+
+          setSelectedParticipants(newData as BasicUserDetails[]);
+        }}
         components={{
           Toolbar: ToolbarElement,
         }}

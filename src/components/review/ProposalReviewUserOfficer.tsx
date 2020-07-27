@@ -56,6 +56,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   }, [loadProposal]);
 
   const addUser = async (users: BasicUserDetails[]): Promise<void> => {
+    // NOTE: This is now working! Do we really need this?
     // TODO: This should be reviewed here because we wont have adding user for review outside SEPs.
     await api().addUserForReview({
       userID: users[0].id,
@@ -93,6 +94,7 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
             addParticipants={addUser}
             selectedUsers={reviews.map(review => review.userID)}
             title={'Reviewer'}
+            selection={true}
             userRole={UserRole.REVIEWER}
           />
           <ReviewTable
