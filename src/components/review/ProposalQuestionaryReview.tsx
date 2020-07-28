@@ -9,7 +9,6 @@ import {
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import React, { Fragment, HTMLAttributes } from 'react';
-import { database } from 'faker';
 
 const useStyles = makeStyles(theme => ({
   heading: {

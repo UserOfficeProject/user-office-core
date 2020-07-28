@@ -107,7 +107,7 @@ export default function ProposalContainer(props: {
    *
    * @template T no need to specify because type is implied from call response
    * @param {TServiceCall<T>} call an API call
-   * @param {string} [successToastMessage] optional message to show in snackvar on success
+   * @param {string} [successToastMessage] optional message to show in snackbar on success
    * @returns result of the call
    */
   const executeAndMonitorCall = <T extends unknown>( // declared as unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics

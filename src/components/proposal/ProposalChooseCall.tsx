@@ -25,11 +25,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function ProposalChooseCall() {
-  const { loading, callsData } = useCallsData({ isActive: true });
+  const { loadingCalls, callsData } = useCallsData({ isActive: true });
   const history = useHistory();
   const classes = useStyles();
 
-  if (loading || !callsData) {
+  if (loadingCalls) {
     return <p>Loading...</p>;
   }
 

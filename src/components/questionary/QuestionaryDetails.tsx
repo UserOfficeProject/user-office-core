@@ -5,6 +5,7 @@ import {
   Table,
   TableCell,
   TableRow,
+  TableBody,
 } from '@material-ui/core';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -22,7 +23,7 @@ import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
 import { getAllFields } from 'models/ProposalModelFunctions';
 import React, { useState } from 'react';
-import { stringToNumericArray } from 'utils/ArrayUtils';
+import { stringToNumericArray, stringToTextArray } from 'utils/ArrayUtils';
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -50,7 +51,7 @@ function DownloadableFileList(props: { fileIds: string[] }) {
   return (
     <ul className={classes.list}>
       {files.map(file => (
-        <li>{downloadLink(file)}</li>
+        <li key={`file-id-${file.fileId}`}>{downloadLink(file)}</li>
       ))}
     </ul>
   );
@@ -96,7 +97,9 @@ function QuestionaryDetails(props: { questionaryId: number }) {
   const formatAnswer = (answer: Answer) => {
     switch (answer.question.dataType) {
       case DataType.FILE_UPLOAD:
-        return <DownloadableFileList fileIds={answer.value.split(',')} />;
+        return (
+          <DownloadableFileList fileIds={stringToTextArray(answer.value)} />
+        );
       case DataType.SUBTEMPLATE:
         if (
           (answer.config as SubtemplateConfig).templateCategory ===
@@ -116,15 +119,18 @@ function QuestionaryDetails(props: { questionaryId: number }) {
         return answer.value.toString();
     }
   };
+
   return (
     <>
       <Table>
-        {completedFields.map(row => (
-          <TableRow key={row.question.proposalQuestionId}>
-            <TableCell>{row.question.question}</TableCell>
-            <TableCell>{formatAnswer(row)}</TableCell>
-          </TableRow>
-        ))}
+        <TableBody>
+          {completedFields.map(row => (
+            <TableRow key={`answer-${row.answerId}`}>
+              <TableCell>{row.question.question}</TableCell>
+              <TableCell>{formatAnswer(row)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
       <InputDialog
         maxWidth="sm"

@@ -1,4 +1,4 @@
-query getSamples($filter: SamplesFilter!) {
+query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
   }

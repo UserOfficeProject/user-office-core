@@ -307,6 +307,7 @@ export type Mutation = {
   addUserForReview: ReviewResponseWrap;
   addSamplesToAnswer: SamplesResponseWrap;
   createSample: SampleResponseWrap;
+  updateSampleStatus: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
   assignMember: SepResponseWrap;
@@ -535,6 +536,12 @@ export type MutationAddSamplesToAnswerArgs = {
 export type MutationCreateSampleArgs = {
   title: Scalars['String'];
   templateId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSampleStatusArgs = {
+  sampleId: Scalars['Int'];
+  status: SampleStatus;
 };
 
 
@@ -2796,7 +2803,7 @@ export type GetSampleQuery = (
 );
 
 export type GetSamplesQueryVariables = Exact<{
-  filter: SamplesFilter;
+  filter?: Maybe<SamplesFilter>;
 }>;
 
 
@@ -2819,6 +2826,37 @@ export type GetSamplesByAnswerIdQuery = (
     { __typename?: 'Sample' }
     & SampleFragment
   )>> }
+);
+
+export type GetSamplesByCallIdQueryVariables = Exact<{
+  callId: Scalars['Int'];
+}>;
+
+
+export type GetSamplesByCallIdQuery = (
+  { __typename?: 'Query' }
+  & { samplesByCallId: Maybe<Array<(
+    { __typename?: 'Sample' }
+    & SampleFragment
+  )>> }
+);
+
+export type UpdateSampleStatusMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+  status: SampleStatus;
+}>;
+
+
+export type UpdateSampleStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSampleStatus: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
 );
 
 export type UpdateSampleTitleMutationVariables = Exact<{
@@ -4784,7 +4822,7 @@ export const GetSampleDocument = gql`
 }
     ${SampleFragmentDoc}`;
 export const GetSamplesDocument = gql`
-    query getSamples($filter: SamplesFilter!) {
+    query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {
     ...sample
   }
@@ -4794,6 +4832,23 @@ export const GetSamplesByAnswerIdDocument = gql`
     query getSamplesByAnswerId($answerId: Int!) {
   samplesByAnswerId(answerId: $answerId) {
     ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
+export const GetSamplesByCallIdDocument = gql`
+    query getSamplesByCallId($callId: Int!) {
+  samplesByCallId(callId: $callId) {
+    ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
+export const UpdateSampleStatusDocument = gql`
+    mutation updateSampleStatus($sampleId: Int!, $status: SampleStatus!) {
+  updateSampleStatus(sampleId: $sampleId, status: $status) {
+    sample {
+      ...sample
+    }
+    error
   }
 }
     ${SampleFragmentDoc}`;
@@ -5421,11 +5476,17 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getSample(variables: GetSampleQueryVariables): Promise<GetSampleQuery> {
       return withWrapper(() => client.request<GetSampleQuery>(print(GetSampleDocument), variables));
     },
-    getSamples(variables: GetSamplesQueryVariables): Promise<GetSamplesQuery> {
+    getSamples(variables?: GetSamplesQueryVariables): Promise<GetSamplesQuery> {
       return withWrapper(() => client.request<GetSamplesQuery>(print(GetSamplesDocument), variables));
     },
     getSamplesByAnswerId(variables: GetSamplesByAnswerIdQueryVariables): Promise<GetSamplesByAnswerIdQuery> {
       return withWrapper(() => client.request<GetSamplesByAnswerIdQuery>(print(GetSamplesByAnswerIdDocument), variables));
+    },
+    getSamplesByCallId(variables: GetSamplesByCallIdQueryVariables): Promise<GetSamplesByCallIdQuery> {
+      return withWrapper(() => client.request<GetSamplesByCallIdQuery>(print(GetSamplesByCallIdDocument), variables));
+    },
+    updateSampleStatus(variables: UpdateSampleStatusMutationVariables): Promise<UpdateSampleStatusMutation> {
+      return withWrapper(() => client.request<UpdateSampleStatusMutation>(print(UpdateSampleStatusDocument), variables));
     },
     updateSampleTitle(variables: UpdateSampleTitleMutationVariables): Promise<UpdateSampleTitleMutation> {
       return withWrapper(() => client.request<UpdateSampleTitleMutation>(print(UpdateSampleTitleDocument), variables));
