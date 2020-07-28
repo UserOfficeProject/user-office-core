@@ -176,7 +176,7 @@ export default class SEPMutations {
     }
 
     return this.dataSource
-      .removeSEPMemberRole(args.memberId, args.sepId)
+      .removeSEPMemberRole(args.memberId, args.sepId, UserRole.SEP_REVIEWER)
       .then(result => result)
       .catch(err => {
         logger.logException(
