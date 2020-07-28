@@ -2,8 +2,12 @@ import { Sample, SampleStatus } from '../../models/Sample';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
+import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatus';
 
 export class SampleDataSourceMock implements SampleDataSource {
+  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
+    throw new Error('Method not implemented.');
+  }
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     return this.getSample(args.sampleId).then(sample => {
       sample.title = args.title;

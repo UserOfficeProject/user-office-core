@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Sample } from '../../models/Sample';
+import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatus';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { logger } from '../../utils/Logger';
@@ -8,6 +9,19 @@ import database from './database';
 import { createSampleObject, SampleRecord } from './records';
 
 export default class PostgresSampleDataSource implements SampleDataSource {
+  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
+    return database('samples')
+      .update({ status: args.status }, '*')
+      .where({ sample_id: args.sampleId })
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not update sample status', { args });
+          throw new Error('Could not update sample status');
+        }
+
+        return createSampleObject(records[0]);
+      });
+  }
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     return database('samples')
       .update({ title: args.title }, '*')
@@ -56,9 +70,24 @@ export default class PostgresSampleDataSource implements SampleDataSource {
   }
 
   getSamplesByCallId(callId: number): Promise<Sample[]> {
-    return database('samples_extended_view')
-      .select('*')
-      .where('call_id', callId)
+    return database('answer_has_questionaries')
+      .leftJoin(
+        'answers',
+        'answer_has_questionaries.answer_id',
+        'answers.answer_id'
+      )
+      .leftJoin(
+        'proposals',
+        'answers.questionary_id',
+        'proposals.questionary_id'
+      )
+      .leftJoin(
+        'samples',
+        'samples.questionary_id',
+        'answer_has_questionaries.questionary_id'
+      )
+      .select('samples.*')
+      .where(' proposals.call_id', callId)
       .then((records: SampleRecord[]) => {
         return records.map(record => createSampleObject(record)) || [];
       });

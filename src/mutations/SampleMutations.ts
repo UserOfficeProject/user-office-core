@@ -3,13 +3,15 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { TemplateCategoryId } from '../models/ProposalModel';
+import { Roles } from '../models/Role';
 import { Sample } from '../models/Sample';
-import { User } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { AddSamplesToAnswerArgs } from '../resolvers/mutations/AddSamplesToAnswer';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
-import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
+import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
 import { Logger, logger } from '../utils/Logger';
+import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
 
 export default class SampleMutations {
   constructor(
@@ -18,6 +20,14 @@ export default class SampleMutations {
     private templateDataSource: TemplateDataSource,
     private logger: Logger
   ) {}
+
+  @Authorized([Roles.SAMPLE_SAFETY_REVIEWER])
+  updateSampleStatus(
+    user: UserWithRole | null,
+    args: UpdateSampleStatusArgs
+  ): Promise<Sample> {
+    return this.dataSource.updateSampleStatus(args);
+  }
 
   @Authorized()
   async createSample(agent: User | null, args: CreateSampleArgs) {

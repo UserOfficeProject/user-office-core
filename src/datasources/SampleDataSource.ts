@@ -1,8 +1,10 @@
 import { Sample } from '../models/Sample';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
+import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
 
 export interface SampleDataSource {
+  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample>;
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample>;
   create(
     questionaryId: number,
