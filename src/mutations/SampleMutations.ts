@@ -10,8 +10,8 @@ import { rejection } from '../rejection';
 import { AddSamplesToAnswerArgs } from '../resolvers/mutations/AddSamplesToAnswer';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
-import { Logger, logger } from '../utils/Logger';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
+import { Logger, logger } from '../utils/Logger';
 
 export default class SampleMutations {
   constructor(

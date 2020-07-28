@@ -9,9 +9,9 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { SampleStatus } from '../../models/Sample';
 import { SampleResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
-import { SampleStatus } from '../../models/Sample';
 
 @ArgsType()
 export class UpdateSampleStatusArgs {

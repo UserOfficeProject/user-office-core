@@ -1,8 +1,8 @@
 import { Sample, SampleStatus } from '../../models/Sample';
+import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatus';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
-import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatus';
 
 export class SampleDataSourceMock implements SampleDataSource {
   updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
