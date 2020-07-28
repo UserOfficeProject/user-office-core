@@ -119,6 +119,23 @@ export default class PostgresInstrumentDataSource
       });
   }
 
+  async getUserInstruments(userId: number): Promise<Instrument[]> {
+    return database
+      .select(['i.instrument_id', 'name', 'short_code', 'description'])
+      .from('instruments as i')
+      .join('instrument_has_scientists as ihs', {
+        'i.instrument_id': 'ihs.instrument_id',
+      })
+      .where('ihs.user_id', userId)
+      .then((instruments: InstrumentRecord[]) => {
+        const result = instruments.map(instrument =>
+          this.createInstrumentObject(instrument)
+        );
+
+        return result;
+      });
+  }
+
   async update(instrument: Instrument): Promise<Instrument> {
     return database
       .update(
