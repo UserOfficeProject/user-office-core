@@ -41,16 +41,13 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const sendSEPUpdate = (values: Sep): void => {
-    api()
-      .updateSEP(values)
-      .then(result => {
-        onSEPUpdate(values);
-        enqueueSnackbar('Updated Information', {
-          variant: result.updateSEP.error ? 'error' : 'success',
-        });
-        setSubmitting(false);
-      });
+  const sendSEPUpdate = async (values: Sep): Promise<void> => {
+    const result = await api().updateSEP(values);
+    onSEPUpdate(values);
+    enqueueSnackbar('Updated Information', {
+      variant: result.updateSEP.error ? 'error' : 'success',
+    });
+    setSubmitting(false);
   };
 
   if (!sep) {
@@ -62,9 +59,10 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
       validateOnChange={false}
       validateOnBlur={false}
       initialValues={sep}
-      onSubmit={(values): void => {
+      onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
-        sendSEPUpdate(values);
+        await sendSEPUpdate(values);
+        actions.setSubmitting(false);
       }}
       validationSchema={updateSEPValidationSchema}
     >

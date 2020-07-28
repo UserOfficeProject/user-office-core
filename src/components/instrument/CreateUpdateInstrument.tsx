@@ -44,48 +44,40 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values): Promise<void> => {
+      onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
-        if (!instrument) {
-          await api()
-            .createInstrument(values)
-            .then(data => {
-              const { error, instrument } = data.createInstrument;
-
-              if (error) {
-                enqueueSnackbar(
-                  getTranslation(data.createInstrument.error as ResourceId),
-                  {
-                    variant: 'error',
-                  }
-                );
-                close(null);
-              } else if (instrument) {
-                close(instrument);
+        if (instrument) {
+          const data = await api().updateInstrument({
+            id: instrument.id,
+            ...values,
+          });
+          if (data.updateInstrument.error) {
+            enqueueSnackbar(
+              getTranslation(data.updateInstrument.error as ResourceId),
+              {
+                variant: 'error',
               }
-            });
+            );
+            close(null);
+          } else if (data.updateInstrument.instrument) {
+            close(data.updateInstrument.instrument);
+          }
         } else {
-          await api()
-            .updateInstrument({
-              id: instrument.id,
-              ...values,
-            })
-            .then(data => {
-              const { error, instrument } = data.updateInstrument;
-              if (error) {
-                enqueueSnackbar(
-                  getTranslation(data.updateInstrument.error as ResourceId),
-                  {
-                    variant: 'error',
-                  }
-                );
-                close(null);
-              } else if (instrument) {
-                close(instrument);
+          const data = await api().createInstrument(values);
+          if (data.createInstrument.error) {
+            enqueueSnackbar(
+              getTranslation(data.createInstrument.error as ResourceId),
+              {
+                variant: 'error',
               }
-            });
+            );
+            close(null);
+          } else if (data.createInstrument.instrument) {
+            close(data.createInstrument.instrument);
+          }
         }
         setSubmitting(false);
+        actions.setSubmitting(false);
       }}
       validationSchema={
         instrument

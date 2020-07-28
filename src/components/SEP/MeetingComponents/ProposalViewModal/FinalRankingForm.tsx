@@ -10,23 +10,17 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
-import { Proposal, ProposalEndStatus } from 'generated/sdk';
+import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
+import { Proposal, ProposalEndStatus, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
-
-export type MeetingFormData = {
-  id: number;
-  commentForUser: string;
-  commentForManagement: string;
-  finalStatus: ProposalEndStatus;
-  rankOrder: number | string;
-};
 
 type FinalRankingFormProps = {
   closeModal: () => void;
   proposalData: Proposal;
-  meetingSubmited: (data: MeetingFormData) => void;
+  meetingSubmited: (data: AdministrationFormData) => void;
 };
 
 const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
@@ -44,6 +38,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const hasAccessRights = useCheckAccess([
+    UserRole.USER_OFFICER,
+    UserRole.SEP_CHAIR,
+    UserRole.SEP_SECRETARY,
+  ]);
 
   const initialData = {
     finalStatus: proposalData.finalStatus || ProposalEndStatus.UNSET,
@@ -52,13 +51,13 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
     rankOrder: proposalData.rankOrder || '',
   };
 
-  const handleSubmit = async (values: MeetingFormData) => {
+  const handleSubmit = async (values: AdministrationFormData) => {
     const administrationProposalVales = {
       id: values.id,
       finalStatus: ProposalEndStatus[values.finalStatus as ProposalEndStatus],
       commentForUser: values.commentForUser,
       commentForManagement: values.commentForManagement,
-      rankOrder: +values.rankOrder,
+      rankOrder: values.rankOrder,
     };
 
     const data = await api().administrationProposal(
@@ -87,9 +86,14 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
           validateOnChange={false}
           validateOnBlur={false}
           initialValues={initialData}
-          onSubmit={async (values): Promise<void> => {
+          onSubmit={async (values, actions): Promise<void> => {
             setSubmitting(true);
-            await handleSubmit({ id: proposalData.id, ...values });
+            await handleSubmit({
+              id: proposalData.id,
+              ...values,
+              rankOrder: +values.rankOrder,
+            });
+            actions.setSubmitting(false);
           }}
         >
           {({ values, errors, touched, handleChange }): JSX.Element => (
@@ -184,32 +188,36 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
                 </Grid>
               </Grid>
               <ButtonContainer>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  onClick={() => {
-                    setShouldClose(false);
-                  }}
-                  color="primary"
-                  className={classes.button}
-                  data-cy="save"
-                  disabled={submitting}
-                >
-                  Save
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  onClick={() => {
-                    setShouldClose(true);
-                  }}
-                  color="primary"
-                  className={classes.button}
-                  data-cy="saveAndContinue"
-                  disabled={submitting}
-                >
-                  Save and continue
-                </Button>
+                {hasAccessRights && (
+                  <>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={() => {
+                        setShouldClose(false);
+                      }}
+                      color="primary"
+                      className={classes.button}
+                      data-cy="save"
+                      disabled={submitting}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      onClick={() => {
+                        setShouldClose(true);
+                      }}
+                      color="primary"
+                      className={classes.button}
+                      data-cy="saveAndContinue"
+                      disabled={submitting}
+                    >
+                      Save and continue
+                    </Button>
+                  </>
+                )}
                 <Button
                   type="button"
                   onClick={closeModal}

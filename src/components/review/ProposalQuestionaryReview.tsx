@@ -77,6 +77,10 @@ export default function ProposalQuestionaryReview(
             <TableCell>Title</TableCell>
             <TableCell>{props.data.title}</TableCell>
           </TableRow>
+          <TableRow key="shortCode">
+            <TableCell>Proposal ID</TableCell>
+            <TableCell>{props.data.shortCode}</TableCell>
+          </TableRow>
           <TableRow key="abstract">
             <TableCell>Abstract</TableCell>
             <TableCell>{props.data.abstract}</TableCell>

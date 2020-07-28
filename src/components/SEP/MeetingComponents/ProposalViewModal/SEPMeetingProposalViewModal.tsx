@@ -17,12 +17,13 @@ import PropTypes from 'prop-types';
 import React, { Ref } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
+import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { TechnicalReview, Review } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { ContentContainer } from 'styles/StyledComponents';
 
 import ExternalReviews from './ExternalReviews';
-import FinalRankingForm, { MeetingFormData } from './FinalRankingForm';
+import FinalRankingForm from './FinalRankingForm';
 import ProposalDetails from './ProposalDetails';
 import TechnicalReviewInfo from './TechnicalReviewInfo';
 
@@ -48,7 +49,7 @@ type SEPMeetingProposalViewModalProps = {
   proposalViewModalOpen: boolean;
   setProposalViewModalOpen: (isOpen: boolean) => void;
   proposalId: number;
-  meetingSubmited: (data: MeetingFormData) => void;
+  meetingSubmited: (data: AdministrationFormData) => void;
 };
 
 const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = ({
