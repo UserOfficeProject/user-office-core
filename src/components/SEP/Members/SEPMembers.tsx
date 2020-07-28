@@ -125,7 +125,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     showNotification(!!assignChairResult.assignChairOrSecretary.error);
     setSepChairModalOpen(false);
 
-    if (value.id === user.id || initialValues.SEPChair?.id === user.id) {
+    if (sepChair.id === user.id || initialValues.SEPChair?.id === user.id) {
       setRenewTokenValue();
     }
   };
@@ -149,7 +149,10 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       setSepSecretaryModalOpen(false);
     }
 
-    if (value.id === user.id || initialValues.SEPSecretary?.id === user.id) {
+    if (
+      sepSecretary.id === user.id ||
+      initialValues.SEPSecretary?.id === user.id
+    ) {
       setRenewTokenValue();
     }
   };
