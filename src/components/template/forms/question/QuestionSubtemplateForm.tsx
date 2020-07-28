@@ -6,12 +6,12 @@ import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { Question, TemplateCategoryId } from 'generated/sdk';
+import { useTemplateCategories } from 'hooks/template/useTemplateCategories';
 import { useTemplates } from 'hooks/template/useTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { TFormSignature } from '../TFormSignature';
 import { QuestionFormShell } from './QuestionFormShell';
-import { useTemplateCategories } from 'hooks/template/useTemplateCategories';
 
 export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
   const field = props.field;
@@ -85,6 +85,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
                   ) {
                     return null;
                   }
+
                   return (
                     <MenuItem
                       value={category.categoryId}

@@ -6,6 +6,10 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { useSnackbar } from 'notistack';
+import { createContext, default as React, useEffect, useState } from 'react';
+import { Prompt } from 'react-router';
+
 import { useCheckAccess } from 'components/common/Can';
 import {
   Answer,
@@ -26,12 +30,10 @@ import {
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
-import { useSnackbar } from 'notistack';
-import { createContext, default as React, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
 import { StyledPaper } from 'styles/StyledComponents';
 import { stringToNumericArray } from 'utils/ArrayUtils';
 import { clamp } from 'utils/Math';
+
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -82,6 +84,7 @@ export default function ProposalContainer(props: {
 
   const isSample = (answer: Answer) => {
     const { dataType, config } = answer.question;
+
     return (
       dataType === DataType.SUBTEMPLATE &&
       (config as SubtemplateConfig).templateCategory ===

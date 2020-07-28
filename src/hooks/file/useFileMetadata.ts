@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { GetFileMetadataQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { useEffect, useState } from 'react';
 
 export function useFileMetadata(fileIds: string[]) {
   const [files, setFiles] = useState<

@@ -39,6 +39,7 @@ import ProposalPage from './proposal/ProposalPage';
 import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
+import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
@@ -47,7 +48,6 @@ import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
 import UserPage from './user/UserPage';
-import SampleSafetyPage from './sample/SampleSafetyPage';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */

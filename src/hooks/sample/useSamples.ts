@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { GetSamplesQuery, SamplesFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { useEffect, useState } from 'react';
 
 export function useSamples(filter?: SamplesFilter) {
   const [samples, setSamples] = useState<

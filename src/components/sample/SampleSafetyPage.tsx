@@ -1,14 +1,16 @@
 import { Button, Container, LinearProgress } from '@material-ui/core';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import { MTableToolbar, Options } from 'material-table';
+import React, { useEffect, useState } from 'react';
+
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { MTableToolbar, Options } from 'material-table';
-import React, { useEffect, useState } from 'react';
 import useCallWithFeedback from 'utils/useCallWithFeedback';
+
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 

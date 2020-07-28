@@ -1,7 +1,8 @@
 import { Typography } from '@material-ui/core';
+import React from 'react';
+
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { useSample } from 'hooks/sample/useSample';
-import React from 'react';
 
 interface SampleInformationProps {
   sampleId: number;

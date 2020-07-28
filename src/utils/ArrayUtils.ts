@@ -1,6 +1,6 @@
 export function stringToNumericArray(
   value: string,
-  separator: string = ','
+  separator = ','
 ): Array<number> {
   return value
     .split(separator)
@@ -10,7 +10,7 @@ export function stringToNumericArray(
 
 export function stringToTextArray(
   value: string,
-  separator: string = ','
+  separator = ','
 ): Array<string> {
   return value
     .split(separator)

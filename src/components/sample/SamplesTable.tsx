@@ -1,6 +1,7 @@
-import React from 'react';
-import { Sample } from 'generated/sdk';
 import MaterialTable, { MaterialTableProps } from 'material-table';
+import React from 'react';
+
+import { Sample } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 
 const columns = [

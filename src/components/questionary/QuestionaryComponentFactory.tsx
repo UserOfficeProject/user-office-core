@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { ProposalComponentBoolean } from 'components/proposal/formComponents/ProposalComponentBoolean';
 import { ProposalComponentDatePicker } from 'components/proposal/formComponents/ProposalComponentDatePicker';
 import { ProposalComponentEmbellishment } from 'components/proposal/formComponents/ProposalComponentEmbellishment';
@@ -12,7 +14,6 @@ import {
   SubtemplateConfig,
   TemplateCategoryId,
 } from 'generated/sdk';
-import React from 'react';
 
 export class QuestionaryComponentFactory {
   getComponentElement(answer: Answer) {

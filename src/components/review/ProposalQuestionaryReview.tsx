@@ -6,9 +6,10 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
+import React, { Fragment, HTMLAttributes } from 'react';
+
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
-import React, { Fragment, HTMLAttributes } from 'react';
 
 const useStyles = makeStyles(theme => ({
   heading: {

@@ -11,6 +11,7 @@ function useCallWithFeedback() {
     successToastMessage?: string
   ) => {
     setIsExecutingCall(true);
+
     return call.then(result => {
       if (result.error) {
         enqueueSnackbar(result.error, { variant: 'error' });
@@ -19,9 +20,11 @@ function useCallWithFeedback() {
           enqueueSnackbar(successToastMessage, { variant: 'success' });
       }
       setIsExecutingCall(false);
+
       return result;
     });
   };
+
   return { callWithFeedback, isExecutingCall };
 }
 

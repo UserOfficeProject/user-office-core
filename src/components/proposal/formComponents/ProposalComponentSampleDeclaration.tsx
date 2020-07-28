@@ -1,14 +1,16 @@
 import { FormControl, FormLabel } from '@material-ui/core';
+import { useSnackbar } from 'notistack';
+import React, { useEffect, useState } from 'react';
+
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import { stringToNumericArray } from 'utils/ArrayUtils';
+
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
-import { stringToNumericArray } from 'utils/ArrayUtils';
 
 export default function ProposalComponentSampleDeclaration(
   props: BasicComponentProps
@@ -83,6 +85,7 @@ export default function ProposalComponentSampleDeclaration(
                 const { sample: newSample, error } = response.createSample;
                 if (error) {
                   enqueueSnackbar(error, { variant: 'error' });
+
                   return;
                 }
 

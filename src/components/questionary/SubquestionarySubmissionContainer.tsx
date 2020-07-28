@@ -1,9 +1,12 @@
 import { makeStyles } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
+import { Formik } from 'formik';
+import React, { SyntheticEvent } from 'react';
+import * as Yup from 'yup';
+
 import { NavigButton } from 'components/common/NavigButton';
 import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
-import { Formik } from 'formik';
 import { Questionary } from 'generated/sdk';
 import { usePersistSubquestionaryModel } from 'hooks/questionary/usePersistSubquestionaryModel';
 import { areDependenciesSatisfied } from 'models/ProposalModelFunctions';
@@ -12,9 +15,8 @@ import {
   EventType,
   SubquestionarySubmissionModel,
 } from 'models/SubquestionarySubmissionModel';
-import React, { SyntheticEvent } from 'react';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
-import * as Yup from 'yup';
+
 import { QuestionaryComponentFactory } from './QuestionaryComponentFactory';
 
 export function SubquestionarySubmissionContainer(props: {

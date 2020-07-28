@@ -7,6 +7,7 @@ const getSpacing = (
   userValue: [number, number, number, number],
   defaultValue: [number, number?, number?, number?]
 ): string => {
+  // eslint-disable-next-line prefer-spread
   return getTheme().spacing.apply(getTheme(), userValue || defaultValue);
 };
 

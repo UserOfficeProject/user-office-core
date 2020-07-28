@@ -1,8 +1,9 @@
 import { FormControl, FormLabel } from '@material-ui/core';
 import React, { ChangeEvent, useState, useEffect } from 'react';
-import { BasicComponentProps } from '../IBasicComponentProps';
+
 import { FileUploadConfig } from '../../../generated/sdk';
 import { FileUploadComponent } from '../../common/FileUploadComponent';
+import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 
 export function ProposalComponentFileUpload(

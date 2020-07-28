@@ -1,12 +1,13 @@
 import { Typography, Grid } from '@material-ui/core';
-import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
 import { Field, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { Questionary, Sample } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
-import { useSnackbar } from 'notistack';
+
+import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
+import { Questionary, Sample } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
 
 interface SampleDeclarationEditorProps {
   sample: Sample;

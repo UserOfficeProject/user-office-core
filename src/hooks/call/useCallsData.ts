@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { Call, CallsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { useEffect, useState } from 'react';
 
 export function useCallsData(filter?: CallsFilter) {
   const [callsFilter, setCallsFilter] = useState(filter);

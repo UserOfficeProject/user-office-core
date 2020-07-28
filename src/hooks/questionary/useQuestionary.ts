@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
+
 import { GetQuestionaryQuery } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { useEffect, useState } from 'react';
 
 export function useQuestionary(questionaryId: number) {
   const [questionary, setQuestionary] = useState<
