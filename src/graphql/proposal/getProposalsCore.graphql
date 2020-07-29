@@ -14,5 +14,7 @@ query getProposalsCore($filter: ProposalsFilter) {
     sepShortCode
     reviewAverage
     reviewDeviation
+    instrumentId
+    callId
   }
 }

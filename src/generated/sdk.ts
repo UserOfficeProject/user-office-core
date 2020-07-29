@@ -963,6 +963,8 @@ export type ProposalView = {
   sepShortCode: Maybe<Scalars['String']>;
   reviewAverage: Maybe<Scalars['Int']>;
   reviewDeviation: Maybe<Scalars['Int']>;
+  instrumentId: Maybe<Scalars['Int']>;
+  callId: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -2391,7 +2393,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'id' | 'title' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation'>
+    & Pick<ProposalView, 'id' | 'title' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId'>
   )>> }
 );
 
@@ -4456,6 +4458,8 @@ export const GetProposalsCoreDocument = gql`
     sepShortCode
     reviewAverage
     reviewDeviation
+    instrumentId
+    callId
   }
 }
     `;

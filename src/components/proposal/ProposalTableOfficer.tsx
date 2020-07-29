@@ -150,8 +150,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               onClick={() => {
                 setProposalAndInstrumentId({
                   proposalId: rowData.id,
-                  //instrumentId: rowData.instrument?.id as number,
-                  instrumentId: null,
+                  instrumentId: rowData.instrumentId,
                 });
                 setOpenRemoveInstrument(true);
               }}
