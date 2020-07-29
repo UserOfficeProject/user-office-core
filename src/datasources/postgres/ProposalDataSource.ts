@@ -4,10 +4,17 @@ import { Transaction } from 'knex';
 
 import { Proposal } from '../../models/Proposal';
 import { ProposalStatus } from '../../models/ProposalModel';
+import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
-import { CallRecord, createProposalObject, ProposalRecord } from './records';
+import {
+  CallRecord,
+  createProposalObject,
+  createProposalViewObject,
+  ProposalRecord,
+  ProposalViewRecord,
+} from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
   // TODO move this function to callDataSource
@@ -137,6 +144,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
+      });
+  }
+
+  async getProposalsFromView(
+    filter?: ProposalsFilter
+  ): Promise<ProposalView[]> {
+    return database
+      .select()
+      .from('proposal_table_view')
+      .modify(query => {
+        if (filter?.callId) {
+          query.where('proposal_table_view.call_id', filter?.callId);
+        }
+        if (filter?.instrumentId) {
+          query.where(
+            'proposal_table_view.instrument_id',
+            filter?.instrumentId
+          );
+        }
+      })
+      .then((proposals: ProposalViewRecord[]) => {
+        return proposals.map(proposal => createProposalViewObject(proposal));
       });
   }
 

@@ -13,5 +13,6 @@ export async function execute<T>(f: () => Promise<T>, count: number) {
   process.stdout.clearLine(0);
   process.stdout.cursorTo(0);
   console.log('100%');
+
   return results;
 }

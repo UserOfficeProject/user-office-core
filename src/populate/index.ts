@@ -1,4 +1,5 @@
 import faker from 'faker';
+
 import 'reflect-metadata';
 import {
   adminDataSource,
@@ -34,18 +35,19 @@ const createUniqueIntArray = (size: number, max: number) => {
   if (size > max) {
     throw Error('size must be smaller than max');
   }
-  var array = Array.from(Array(max).keys());
+  const shuffle = (array: number[]) => {
+    array.sort(() => Math.random() - 0.5);
+  };
+
+  const array = Array.from(Array(max).keys());
   array.shift(); //excluding 0
   shuffle(array);
+
   return array.slice(0, size);
 };
 
 const createIntArray = (size: number, max: number) => {
   return new Array(size).fill(0).map(el => dummy.positiveNumber(max));
-};
-
-const shuffle = (array: number[]) => {
-  array.sort(() => Math.random() - 0.5);
 };
 
 const createUsers = async () => {
@@ -107,6 +109,7 @@ const createUsers = async () => {
         roleID: UserRole.USER_OFFICER,
       });
     }
+
     return user;
   }, MAX_USERS);
 };
@@ -154,6 +157,7 @@ const createTemplates = async () => {
     for (const step of steps) {
       const questions = await execute(() => {
         const questionId = `text_input_${new Date().getTime()}`;
+
         return templateDataSource.createQuestion(
           TemplateCategoryId.PROPOSAL_QUESTIONARY,
           questionId,
@@ -188,11 +192,11 @@ const createInstruments = async () => {
   for (const instrument of instruments) {
     await instrumentDatasource.assignScientistsToInstrument(
       createUniqueIntArray(3, MAX_USERS),
-      instrument.instrumentId
+      instrument.id
     );
     await instrumentDatasource.setAvailabilityTimeOnInstrument(
       dummy.positiveNumber(MAX_CALLS),
-      instrument.instrumentId,
+      instrument.id,
       dummy.positiveNumber(100)
     );
   }
@@ -247,6 +251,7 @@ const createReviews = async () => {
   const proposalIds = createIntArray(MAX_REVIEWS, MAX_PROPOSALS);
   await execute(() => {
     const proposalID = proposalIds.pop()!;
+
     return reviewDataSource.addUserForReview({
       proposalID,
       sepID: dummy.positiveNumber(MAX_SEPS),
