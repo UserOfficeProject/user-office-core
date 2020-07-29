@@ -36,8 +36,13 @@ export const dummyConfigFactory = (values?: any): typeof FieldConfigType => {
   };
 };
 
-const createDummyQuestionary = () => {
-  return new Questionary(1, 1, 1, new Date());
+const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
+  return new Questionary(
+    values?.questionaryId || 1,
+    values?.templateId || 1,
+    values?.creator_id || 1,
+    new Date()
+  );
 };
 export const dummyQuestionFactory = (
   values?: DeepPartial<Question>
@@ -130,33 +135,38 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
-  insertAnswerHasQuestionaries(
+  public init() {
+    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
+    dummyQuestionary = createDummyQuestionary();
+  }
+
+  async deleteAnswerQuestionaryRelations(
+    answerId: number
+  ): Promise<AnswerBasic> {
+    const answers = dummyQuestionarySteps.reduce(
+      (acc, val) => acc.concat(val.fields),
+      new Array<Answer>()
+    );
+    const answer = answers.find(answer => answer.answerId === answerId)!;
+    answer.value = '';
+    return new AnswerBasic(answerId, 1, '', '', new Date());
+  }
+  async createAnswerQuestionaryRelations(
     answerId: number,
-    questionaryId: number
-  ): Promise<Questionary> {
-    throw new Error('Method not implemented.');
+    questionaryIds: number[]
+  ): Promise<AnswerBasic> {
+    return new AnswerBasic(answerId, 1, '', '', new Date());
   }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {
     return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
   }
-  getParentQuestionary(
+  async getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {
-    throw new Error('Method not implemented.');
+    return createDummyQuestionary();
   }
-  async delete(questionary_id: number): Promise<Questionary> {
-    if (dummyQuestionary.questionaryId !== questionary_id) {
-      throw new Error('Proposal does not exist');
-    }
-
-    const copy = { ...dummyQuestionary };
-    dummyQuestionary.questionaryId = -1;
-
-    return copy;
-  }
-  public init() {
-    dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
-    dummyQuestionary = createDummyQuestionary();
+  async delete(questionaryId: number): Promise<Questionary> {
+    return createDummyQuestionary({ questionaryId });
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
@@ -201,12 +211,10 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;
   }
-  async getQuestionary(questionary_id: number): Promise<Questionary> {
-    if (questionary_id === dummyQuestionary.questionaryId) {
-      return dummyQuestionary;
-    } else {
-      throw Error('Questionary not found');
-    }
+  async getQuestionary(questionary_id: number): Promise<Questionary | null> {
+    return questionary_id === dummyQuestionary.questionaryId
+      ? dummyQuestionary
+      : null;
   }
 
   async getQuestionarySteps(

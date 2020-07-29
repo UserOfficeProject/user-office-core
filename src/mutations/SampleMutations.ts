@@ -7,7 +7,6 @@ import { Roles } from '../models/Role';
 import { Sample } from '../models/Sample';
 import { User, UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
-import { SetAnswerSamplesArgs } from '../resolvers/mutations/SetAnswerSamples';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
@@ -60,25 +59,6 @@ export default class SampleMutations {
   updateSampleTitle(agent: User | null, args: UpdateSampleTitleArgs) {
     // TODO perform authorization
     return this.dataSource.updateSampleTitle(args);
-  }
-
-  @Authorized()
-  async setAnswerSamples(agent: User | null, args: SetAnswerSamplesArgs) {
-    // TODO perform authorization
-    const response: Sample[] = [];
-    await this.questionaryDataSource.removeQuestionariesFromAnswer(
-      args.answerId
-    );
-    const samples = await this.dataSource.getSamples({
-      filter: { sampleIds: args.sampleIds },
-    });
-    const questionaryIds = samples.map(sample => sample.questionaryId);
-    await this.questionaryDataSource.assignQuestionariesToAnswer(
-      args.answerId,
-      questionaryIds
-    );
-
-    return response;
   }
 
   @Authorized()

@@ -19,6 +19,7 @@ import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
+import { AnswerBasic } from './AnswerBasic';
 
 @ObjectType()
 export class ResponseWrapBase<T> {
@@ -188,6 +189,13 @@ export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
   @Response()
   @Field(() => Answer, { nullable: true })
   public answer: Answer;
+}
+
+@ObjectType()
+export class AnswerBasicResponseWrap extends ResponseWrapBase<AnswerBasic> {
+  @Response()
+  @Field(() => AnswerBasic, { nullable: true })
+  public answer: AnswerBasic;
 }
 
 @ObjectType()

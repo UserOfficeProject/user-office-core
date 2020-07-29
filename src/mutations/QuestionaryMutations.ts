@@ -9,6 +9,7 @@ import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryM
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import { CreateAnswerQuestionaryRelationsArgs } from '../resolvers/mutations/CreateAnswerQuestionaryRelationsMutation';
 
 export default class QuestionaryMutations {
   constructor(
@@ -114,5 +115,17 @@ export default class QuestionaryMutations {
   @Authorized()
   async create(agent: User | null, args: CreateQuestionaryArgs) {
     return this.dataSource.create(agent!.id, args.templateId);
+  }
+
+  async createAnswerQuestionaryRelation(
+    agent: User | null,
+    args: CreateAnswerQuestionaryRelationsArgs
+  ) {
+    // TODO perform authorization
+    await this.dataSource.deleteAnswerQuestionaryRelations(args.answerId);
+    return this.dataSource.createAnswerQuestionaryRelations(
+      args.answerId,
+      args.questionaryIds
+    );
   }
 }

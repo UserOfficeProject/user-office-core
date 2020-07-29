@@ -22,34 +22,27 @@ import { logger } from '../../utils/Logger';
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  async removeQuestionariesFromAnswer(
+  async deleteAnswerQuestionaryRelations(
     answerId: number
-  ): Promise<Questionary[]> {
+  ): Promise<AnswerBasic> {
     return database('answer_has_questionaries')
       .delete('*')
       .where({ answer_id: answerId })
       .then((records: QuestionaryRecord[]) => {
-        return records.map(record => createQuestionaryObject(record));
+        return this.getAnswer(answerId);
       });
   }
-  async assignQuestionariesToAnswer(
+  async createAnswerQuestionaryRelations(
     answerId: number,
     questionaryIds: number[]
-  ): Promise<Questionary[]> {
+  ): Promise<AnswerBasic> {
     const rows = questionaryIds.map(questionaryId => {
       return { answer_id: answerId, questionary_id: questionaryId };
     });
     return database('answer_has_questionaries')
       .insert(rows)
       .then(async () => {
-        return database('questionaries')
-          .select('*')
-          .where('questionary_id', 'in', questionaryIds)
-          .then(questionaryRecords => {
-            return questionaryRecords.map((record: QuestionaryRecord) =>
-              createQuestionaryObject(record)
-            );
-          });
+        return this.getAnswer(answerId);
       });
   }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {

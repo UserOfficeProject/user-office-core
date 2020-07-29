@@ -6,11 +6,11 @@ import {
 } from '../models/ProposalModel';
 
 export interface QuestionaryDataSource {
-  removeQuestionariesFromAnswer(answerId: number): Promise<Questionary[]>;
-  assignQuestionariesToAnswer(
+  deleteAnswerQuestionaryRelations(answerId: number): Promise<AnswerBasic>;
+  createAnswerQuestionaryRelations(
     answerId: number,
     questionaryIds: number[]
-  ): Promise<Questionary[]>;
+  ): Promise<AnswerBasic>;
   getAnswer(answer_id: number): Promise<AnswerBasic>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;

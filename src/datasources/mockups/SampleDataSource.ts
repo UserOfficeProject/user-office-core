@@ -5,16 +5,6 @@ import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
 
 export class SampleDataSourceMock implements SampleDataSource {
-  updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
-    throw new Error('Method not implemented.');
-  }
-  updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
-    return this.getSample(args.sampleId).then(sample => {
-      sample.title = args.title;
-
-      return sample;
-    });
-  }
   samples: Sample[];
   public init() {
     this.samples = [
@@ -47,5 +37,22 @@ export class SampleDataSourceMock implements SampleDataSource {
       SampleStatus.NONE,
       new Date()
     );
+  }
+
+  async delete(sampleId: number): Promise<Sample> {
+    return this.samples.splice(
+      this.samples.findIndex(sample => sample.id == sampleId),
+      1
+    )[0];
+  }
+  async updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
+    const sample = await this.getSample(args.sampleId);
+    sample.status = args.status;
+    return sample;
+  }
+  async updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
+    const sample = await this.getSample(args.sampleId);
+    sample.title = args.title;
+    return sample;
   }
 }
