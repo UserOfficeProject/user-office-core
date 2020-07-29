@@ -256,6 +256,13 @@ export class UserDataSourceMock implements UserDataSource {
     return [basicDummyUser];
   }
 
+  async checkScientistToProposal(
+    scientsitId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
   async create(firstname: string, lastname: string) {
     return dummyUser;
   }

@@ -68,6 +68,18 @@ export class UserAuthorization {
     });
   }
 
+  async isScientistToProposal(agent: User | null, proposalID: number) {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.userDataSource
+      .checkScientistToProposal(agent.id, proposalID)
+      .then(result => {
+        return result;
+      });
+  }
+
   async hasAccessRights(
     agent: User | null,
     proposal: Proposal
@@ -75,7 +87,8 @@ export class UserAuthorization {
     return (
       (await this.isUserOfficer(agent)) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.id))
+      (await this.isReviewerOfProposal(agent, proposal.id)) ||
+      (await this.isScientistToProposal(agent, proposal.id))
     );
   }
 }
