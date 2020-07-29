@@ -4,24 +4,27 @@ import { AddBox } from '@material-ui/icons';
 import React from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
-import { UserRole } from 'generated/sdk';
+import { UserRole, BasicUserDetails } from 'generated/sdk';
 
 function ParticipantModal(props: {
   title: string;
-  addParticipant: any;
+  addParticipants: (data: BasicUserDetails[]) => void;
   show: boolean;
-  close: any;
+  close: () => void;
+  selection?: boolean;
   selectedUsers?: number[];
   userRole?: UserRole;
   invitationUserRole?: UserRole;
 }) {
-  const addUser = (rowData: any) => {
-    props.addParticipant({
-      firstname: rowData.firstname,
-      lastname: rowData.lastname,
-      organisation: rowData.organisation,
-      id: rowData.id,
-    });
+  const addUser = (rowData: BasicUserDetails) => {
+    props.addParticipants([
+      {
+        firstname: rowData.firstname,
+        lastname: rowData.lastname,
+        organisation: rowData.organisation,
+        id: rowData.id,
+      } as BasicUserDetails,
+    ]);
   };
 
   return (
@@ -40,6 +43,8 @@ function ParticipantModal(props: {
           selectedUsers={props.selectedUsers}
           userRole={props.userRole || ('' as UserRole)}
           emailInvite={true}
+          selection={!!props.selection}
+          onUpdate={data => props.addParticipants(data as BasicUserDetails[])}
           invitationUserRole={props.invitationUserRole || props.userRole}
         />
       </DialogContent>

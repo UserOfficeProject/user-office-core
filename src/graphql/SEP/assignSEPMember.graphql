@@ -1,5 +1,5 @@
-mutation assignMember($memberId: Int!, $sepId: Int!) {
-  assignMember(memberId: $memberId, sepId: $sepId) {
+mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
+  assignMembers(memberIds: $memberIds, sepId: $sepId) {
     error
     sep {
       id

@@ -202,7 +202,11 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.get('[title="Select user"]').click();
+    cy.get('input[type="checkbox"')
+      .eq(1)
+      .click();
+
+    cy.contains('Update').click();
 
     cy.wait(1000);
 
@@ -508,7 +512,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('View Proposals').click();
 
-    cy.wait(500);
+    cy.wait(1000);
 
     cy.get('[type="checkbox"]')
       .eq(1)
