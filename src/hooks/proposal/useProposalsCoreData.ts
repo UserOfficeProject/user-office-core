@@ -1,11 +1,12 @@
+import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { useEffect, useState } from 'react';
 
-import { ProposalsFilter, ProposalView } from 'generated/sdk';
+import { ProposalsFilter, ProposalView, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalsCoreData(filter: ProposalsFilter) {
   const api = useDataApi();
-  const [proposalsData, setProposalsData] = useState<ProposalView[]>([]);
+  const [proposalsData, setProposalsData] = useState<ProposalViewData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { callId, instrumentId, questionaryIds, templateIds, text } = filter;
@@ -17,11 +18,31 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
       })
       .then(data => {
         if (data.proposalsView) {
-          setProposalsData(data.proposalsView);
+          setProposalsData(
+            data.proposalsView.map(proposal => {
+              return {
+                ...proposal,
+                status:
+                  proposal.status === ProposalStatus.DRAFT
+                    ? 'Open'
+                    : 'Submitted',
+                technicalStatus: getTranslation(
+                  proposal.technicalStatus as ResourceId
+                ),
+                finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+              } as ProposalViewData;
+            })
+          );
         }
         setLoading(false);
       });
   }, [callId, instrumentId, questionaryIds, templateIds, text, api]);
 
   return { loading, proposalsData, setProposalsData };
+}
+
+export interface ProposalViewData
+  extends Omit<ProposalView, 'status' | 'technicalStatus'> {
+  status: string;
+  technicalStatus: string;
 }

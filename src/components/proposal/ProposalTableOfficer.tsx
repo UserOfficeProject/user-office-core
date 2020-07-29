@@ -13,17 +13,14 @@ import ScienceIconAdd from 'components/common/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
-import {
-  Instrument,
-  Sep,
-  ProposalStatus,
-  ProposalsFilter,
-  ProposalView,
-} from 'generated/sdk';
+import { Instrument, Sep, ProposalsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { useProposalsCoreData } from 'hooks/proposal/useProposalsCoreData';
+import {
+  useProposalsCoreData,
+  ProposalViewData,
+} from 'hooks/proposal/useProposalsCoreData';
 import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -62,7 +59,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
-    Column<ProposalView>[] | null
+    Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
   const { loading, setProposalsData, proposalsData } = useProposalsCoreData(
     proposalFilter
@@ -123,7 +120,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalView) => {
+  const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
 
     return (
@@ -163,7 +160,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
   };
 
-  let columns: Column<ProposalView>[] = [
+  let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -184,17 +181,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Technical status',
-      sorting: false,
-      render: (rowData: ProposalView): string =>
-        rowData.technicalStatus
-          ? getTranslation(rowData.technicalStatus as ResourceId)
-          : '',
+      field: 'technicalStatus',
     },
     {
       title: 'Status',
-      sorting: false,
-      render: (rowData: ProposalView): string =>
-        rowData.status === ProposalStatus.DRAFT ? 'Open' : 'Submitted',
+      field: 'status',
     },
     {
       title: 'Deviation',
@@ -206,18 +197,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Final Status',
-      sorting: false,
-      render: (rowData: ProposalView): string =>
-        rowData.finalStatus
-          ? getTranslation(rowData.finalStatus as ResourceId)
-          : '',
+      field: 'finalStatus',
     },
     {
       title: 'Ranking',
       field: 'rankOrder',
       // To be refactored
       // eslint-disable-next-line react/display-name
-      render: (rowData: ProposalView) => (
+      render: (rowData: ProposalViewData) => (
         <RankInput
           proposalID={rowData.id}
           defaultvalue={rowData.rankOrder}
@@ -459,7 +446,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Download proposals',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalView[]).map(row => row.id).join(',')
+                (rowData as ProposalViewData[]).map(row => row.id).join(',')
               );
             },
             position: 'toolbarOnSelect',
@@ -470,7 +457,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpen(true);
               setSelectedProposals(
-                (rowData as ProposalView[]).map((row: ProposalView) => row.id)
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => row.id
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -481,7 +470,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
               setSelectedProposals(
-                (rowData as ProposalView[]).map((row: ProposalView) => row.id)
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => row.id
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -492,7 +483,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenInstrumentAssignment(true);
               setSelectedProposals(
-                (rowData as ProposalView[]).map((row: ProposalView) => row.id)
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => row.id
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -503,7 +496,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenEmailProposals(true);
               setSelectedProposals(
-                (rowData as ProposalView[]).map((row: ProposalView) => row.id)
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => row.id
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -511,7 +506,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         ]}
         onChangeColumnHidden={collumnChange => {
           const proposalColumns = columns.map(
-            (proposalColumn: Column<ProposalView>) => ({
+            (proposalColumn: Column<ProposalViewData>) => ({
               hidden:
                 proposalColumn.title === collumnChange.title
                   ? collumnChange.hidden
