@@ -7,7 +7,7 @@ import { Roles } from '../models/Role';
 import { Sample } from '../models/Sample';
 import { User, UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
-import { AddSamplesToAnswerArgs } from '../resolvers/mutations/AddSamplesToAnswer';
+import { SetAnswerSamplesArgs } from '../resolvers/mutations/SetAnswerSamples';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
@@ -63,23 +63,26 @@ export default class SampleMutations {
   }
 
   @Authorized()
-  async addSamplesToAnswer(agent: User | null, args: AddSamplesToAnswerArgs) {
+  async setAnswerSamples(agent: User | null, args: SetAnswerSamplesArgs) {
     // TODO perform authorization
     const response: Sample[] = [];
-    for (const sampleId of args.sampleIds) {
-      const sample = await this.dataSource.getSample(sampleId);
-      if (!sample) {
-        logger.logError('Counld not find sample', { sampleId });
-
-        return rejection('INTERNAL_ERROR');
-      }
-      await this.questionaryDataSource.insertAnswerHasQuestionaries(
-        args.answerId,
-        sample.questionaryId
-      );
-      response.push(sample);
-    }
+    await this.questionaryDataSource.removeQuestionariesFromAnswer(
+      args.answerId
+    );
+    const samples = await this.dataSource.getSamples({
+      filter: { sampleIds: args.sampleIds },
+    });
+    const questionaryIds = samples.map(sample => sample.questionaryId);
+    await this.questionaryDataSource.assignQuestionariesToAnswer(
+      args.answerId,
+      questionaryIds
+    );
 
     return response;
+  }
+
+  @Authorized()
+  async deleteSample(agent: User | null, sampleId: number): Promise<Sample> {
+    return this.dataSource.delete(sampleId);
   }
 }

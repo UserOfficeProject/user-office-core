@@ -4,6 +4,7 @@ import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle'
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 
 export interface SampleDataSource {
+  delete(sampleId: number): Promise<Sample>;
   updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample>;
   updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample>;
   create(

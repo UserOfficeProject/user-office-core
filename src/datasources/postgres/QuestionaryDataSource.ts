@@ -18,25 +18,38 @@ import {
   AnswerRecord,
   createAnswerBasic,
 } from './records';
+import { logger } from '../../utils/Logger';
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
-  async insertAnswerHasQuestionaries(
-    answerId: number,
-    questionaryId: number
-  ): Promise<Questionary> {
+  async removeQuestionariesFromAnswer(
+    answerId: number
+  ): Promise<Questionary[]> {
     return database('answer_has_questionaries')
-      .insert({
-        answer_id: answerId,
-        questionary_id: questionaryId,
-      })
+      .delete('*')
+      .where({ answer_id: answerId })
+      .then((records: QuestionaryRecord[]) => {
+        return records.map(record => createQuestionaryObject(record));
+      });
+  }
+  async assignQuestionariesToAnswer(
+    answerId: number,
+    questionaryIds: number[]
+  ): Promise<Questionary[]> {
+    const rows = questionaryIds.map(questionaryId => {
+      return { answer_id: answerId, questionary_id: questionaryId };
+    });
+    return database('answer_has_questionaries')
+      .insert(rows)
       .then(async () => {
-        const questionary = await this.getQuestionary(questionaryId);
-        if (!questionary) {
-          throw new Error('Failed to update sample');
-        }
-
-        return questionary;
+        return database('questionaries')
+          .select('*')
+          .where('questionary_id', 'in', questionaryIds)
+          .then(questionaryRecords => {
+            return questionaryRecords.map((record: QuestionaryRecord) =>
+              createQuestionaryObject(record)
+            );
+          });
       });
   }
   async getAnswer(answer_id: number): Promise<AnswerBasic> {

@@ -25,7 +25,7 @@ class SamplesFilter {
   public questionaryId?: number;
 
   @Field(() => [Int], { nullable: true })
-  public sampleIds?: [number];
+  public sampleIds?: number[];
 
   @Field(() => SampleStatus, { nullable: true })
   public status?: SampleStatus;

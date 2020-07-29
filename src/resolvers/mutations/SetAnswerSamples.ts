@@ -1,19 +1,19 @@
 import {
   Args,
-  ArgsType,
   Ctx,
-  Field,
-  Int,
   Mutation,
   Resolver,
+  ArgsType,
+  Field,
+  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SamplesResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
+import { SamplesResponseWrap } from '../types/CommonWrappers';
 
 @ArgsType()
-export class AddSamplesToAnswerArgs {
+export class SetAnswerSamplesArgs {
   @Field(() => Int!)
   answerId: number;
 
@@ -22,14 +22,14 @@ export class AddSamplesToAnswerArgs {
 }
 
 @Resolver()
-export class AddSamplesToAnswer {
+export class SetAnswerSamples {
   @Mutation(() => SamplesResponseWrap)
-  addSamplesToAnswer(
-    @Args() args: AddSamplesToAnswerArgs,
+  setAnswerSamples(
+    @Args() args: SetAnswerSamplesArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.sample.addSamplesToAnswer(context.user, args),
+      context.mutations.sample.setAnswerSamples(context.user, args),
       SamplesResponseWrap
     );
   }

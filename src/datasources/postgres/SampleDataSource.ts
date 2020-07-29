@@ -9,6 +9,18 @@ import database from './database';
 import { createSampleObject, SampleRecord } from './records';
 
 export default class PostgresSampleDataSource implements SampleDataSource {
+  delete(sampleId: number): Promise<Sample> {
+    return database('samples')
+      .where({ sample_id: sampleId })
+      .delete('*')
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not delete sample', { sampleId });
+          throw new Error('Could not delete sample');
+        }
+        return createSampleObject(records[0]);
+      });
+  }
   updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
     return database('samples')
       .update({ status: args.status }, '*')
