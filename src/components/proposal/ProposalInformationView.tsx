@@ -10,7 +10,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { UserRole } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { EventType } from 'models/ProposalSubmissionModel';
-import { BasicUserDetails, User } from 'models/User';
+import { BasicUserDetails } from 'models/User';
 
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
@@ -130,7 +130,7 @@ export default function ProposalInformationView(props: {
             </Grid>
           </Grid>
           <ProposalParticipant
-            userChanged={(user: User) => {
+            userChanged={(user: BasicUserDetails) => {
               setFieldValue('proposer', user);
               dispatch({
                 type: EventType.PROPOSAL_METADATA_CHANGED,

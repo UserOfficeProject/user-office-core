@@ -5,9 +5,9 @@ import MaterialTable, { MTableToolbar, Query } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import { UserRole, GetUsersQuery } from 'generated/sdk';
+import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { UserRole, GetUsersQuery, BasicUserDetails } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 
 import { InviteUserForm } from './InviteUserForm';
@@ -56,10 +56,12 @@ type PeopleTableProps = {
   actionIcon: JSX.Element;
   actionText: string;
   action: (data: any) => void;
+  selection: boolean;
   isFreeAction?: boolean;
   data?: BasicUserDetails[];
   search?: boolean;
   onRemove?: (user: BasicUserDetails) => void;
+  onUpdate?: (user: BasicUserDetails[]) => void;
   emailInvite?: boolean;
   selectedUsers?: number[];
   menuItems?: any[];
@@ -70,6 +72,9 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   const [loading, setLoading] = useState(false);
   const [pageSize, setPageSize] = useState(5);
   const [sendUserEmail, setSendUserEmail] = useState(false);
+  const [selectedParticipants, setSelectedParticipants] = useState<
+    BasicUserDetails[]
+  >([]);
   const columns = [
     { title: 'Name', field: 'firstname' },
     { title: 'Surname', field: 'lastname' },
@@ -124,6 +129,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
   );
 
   props.action &&
+    !props.selection &&
     actionArray.push({
       icon: () => props.actionIcon,
       isFreeAction: props.isFreeAction,
@@ -144,6 +150,16 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
         icons={tableIcons}
         title={props.title}
         columns={columns}
+        onSelectionChange={selectedItems => {
+          const newData = selectedItems.map(selectedItem => ({
+            id: selectedItem.id,
+            firstname: selectedItem.firstname,
+            lastname: selectedItem.lastname,
+            organisation: selectedItem.organisation,
+          }));
+
+          setSelectedParticipants(newData as BasicUserDetails[]);
+        }}
         components={{
           Toolbar: ToolbarElement,
         }}
@@ -167,6 +183,7 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           search: props.search,
           debounceInterval: 400,
           pageSize,
+          selection: props.selection,
         }}
         actions={actionArray}
         editable={
@@ -181,6 +198,25 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
             : {}
         }
       />
+      {props.selection && (
+        <ActionButtonContainer>
+          <Button
+            type="button"
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              if (props.onUpdate) {
+                props.onUpdate(selectedParticipants);
+                setSelectedParticipants([]);
+              }
+            }}
+            disabled={selectedParticipants.length === 0}
+            data-cy="assign-instrument-to-call"
+          >
+            Update
+          </Button>
+        </ActionButtonContainer>
+      )}
     </div>
   );
 };
@@ -190,12 +226,14 @@ PeopleTable.propTypes = {
   actionIcon: PropTypes.element.isRequired,
   actionText: PropTypes.string.isRequired,
   action: PropTypes.func.isRequired,
+  selection: PropTypes.bool.isRequired,
   isFreeAction: PropTypes.bool,
   userRole: PropTypes.any,
   invitationUserRole: PropTypes.any,
   data: PropTypes.array,
   search: PropTypes.bool,
   onRemove: PropTypes.func,
+  onUpdate: PropTypes.func,
   emailInvite: PropTypes.bool,
   selectedUsers: PropTypes.array,
   menuItems: PropTypes.array,

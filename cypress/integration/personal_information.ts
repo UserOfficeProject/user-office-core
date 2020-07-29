@@ -111,8 +111,10 @@ context('Personal information tests', () => {
     cy.get('[data-cy="role-modal"]')
       .contains('SEP Chair')
       .parent()
-      .find('[title="Select role"]')
+      .find('input[type="checkbox"]')
       .click();
+
+    cy.contains('Update').click();
 
     cy.wait(1000);
 
