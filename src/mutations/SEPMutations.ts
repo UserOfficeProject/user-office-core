@@ -1,7 +1,8 @@
 import {
   createSEPValidationSchema,
   updateSEPValidationSchema,
-  updateSEPMemberValidationSchema,
+  assignSEPMembersValidationSchema,
+  removeSEPMemberValidationSchema,
   assignProposalToSEPValidationSchema,
   assignSEPChairOrSecretaryValidationSchema,
   assignSEPMemberToProposalValidationSchema,
@@ -18,6 +19,7 @@ import { AddSEPMembersRoleArgs } from '../resolvers/mutations/AddSEPMembersRoleM
 import {
   UpdateMemberSEPArgs,
   AssignSEPProposalToMemberArgs,
+  AssignMembersSEPArgs,
 } from '../resolvers/mutations/AssignMembersToSEP';
 import { AssignProposalToSEPArgs } from '../resolvers/mutations/AssignProposalToSEP';
 import { CreateSEPArgs } from '../resolvers/mutations/CreateSEPMutation';
@@ -121,12 +123,12 @@ export default class SEPMutations {
     });
   }
 
-  @ValidateArgs(updateSEPMemberValidationSchema)
+  @ValidateArgs(assignSEPMembersValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
   async assignMemberToSEP(
     agent: UserWithRole | null,
-    args: UpdateMemberSEPArgs
+    args: AssignMembersSEPArgs
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
@@ -140,7 +142,7 @@ export default class SEPMutations {
 
     return this.dataSource
       .addSEPMembersRole({
-        userID: args.memberId,
+        userIDs: args.memberIds,
         SEPID: args.sepId,
         roleID: UserRole.SEP_REVIEWER,
       })
@@ -156,7 +158,7 @@ export default class SEPMutations {
       });
   }
 
-  @ValidateArgs(updateSEPMemberValidationSchema)
+  @ValidateArgs(removeSEPMemberValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBER_REMOVED)
   async removeMemberFromSEP(

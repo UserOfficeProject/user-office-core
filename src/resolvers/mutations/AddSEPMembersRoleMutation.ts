@@ -4,8 +4,8 @@ import { UserRole } from '../../models/User';
 
 @InputType()
 export class AddSEPMembersRole {
-  @Field(() => Int)
-  userID: number;
+  @Field(() => [Int])
+  userIDs: number[];
 
   @Field(() => UserRole)
   roleID: UserRole;

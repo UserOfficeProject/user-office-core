@@ -70,7 +70,7 @@ describe('Test SEPMutations', () => {
         addSEPMembersRole: {
           SEPID: 1,
           roleID: UserRole.SEP_CHAIR,
-          userID: 1,
+          userIDs: [1],
         },
       }
     )) as Rejection;
@@ -85,7 +85,7 @@ describe('Test SEPMutations', () => {
         addSEPMembersRole: {
           SEPID: 1,
           roleID: UserRole.SEP_CHAIR,
-          userID: 1,
+          userIDs: [1],
         },
       }
     )) as Rejection;
@@ -100,7 +100,7 @@ describe('Test SEPMutations', () => {
         addSEPMembersRole: {
           SEPID: 1,
           roleID: UserRole.SEP_SECRETARY,
-          userID: 2,
+          userIDs: [2],
         },
       }
     )) as Rejection;
@@ -115,7 +115,7 @@ describe('Test SEPMutations', () => {
         addSEPMembersRole: {
           SEPID: 1,
           roleID: UserRole.USER_OFFICER,
-          userID: 2,
+          userIDs: [2],
         },
       }
     )) as Rejection;
@@ -127,7 +127,7 @@ describe('Test SEPMutations', () => {
     const result = (await SEPMutationsInstance.assignMemberToSEP(
       dummyUserWithRole,
       {
-        memberId: 1,
+        memberIds: [1],
         sepId: 1,
       }
     )) as Rejection;
@@ -138,7 +138,7 @@ describe('Test SEPMutations', () => {
   test('A userofficer can assign members to SEP', () => {
     return expect(
       SEPMutationsInstance.assignMemberToSEP(dummyUserOfficerWithRole, {
-        memberId: 1,
+        memberIds: [1],
         sepId: 1,
       })
     ).resolves.toStrictEqual(dummySEP);

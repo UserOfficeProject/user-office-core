@@ -23,6 +23,15 @@ export class UpdateMemberSEPArgs {
 }
 
 @ArgsType()
+export class AssignMembersSEPArgs {
+  @Field(() => Int)
+  public memberIds: number[];
+
+  @Field(() => Int)
+  public sepId: number;
+}
+
+@ArgsType()
 export class AssignSEPProposalToMemberArgs {
   @Field(() => Int)
   public memberId: number;
@@ -57,8 +66,8 @@ export class AssignMembersToSEPMutation {
   }
 
   @Mutation(() => SEPResponseWrap)
-  async assignMember(
-    @Args() args: UpdateMemberSEPArgs,
+  async assignMembers(
+    @Args() args: AssignMembersSEPArgs,
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
