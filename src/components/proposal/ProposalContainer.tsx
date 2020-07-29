@@ -98,10 +98,15 @@ export default function ProposalContainer(props: {
     }
     const sampleAnswers = answers.filter(isSample);
     for (const sampleAnswer of sampleAnswers) {
-      await api().addSamplesToAnswer({
-        answerId: sampleAnswer.answerId!,
-        sampleIds: stringToNumericArray(sampleAnswer.value),
+      const { samples } = await api().getSamples({
+        filter: { sampleIds: stringToNumericArray(sampleAnswer.value) },
       });
+      if (samples) {
+        await api().createAnswerQuestionaryRelations({
+          answerId: sampleAnswer.answerId!,
+          questionaryIds: samples.map(sample => sample.questionaryId),
+        });
+      }
     }
   };
 

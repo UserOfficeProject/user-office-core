@@ -38,6 +38,21 @@ export type Answer = {
   value: Maybe<Scalars['IntStringDateBool']>;
 };
 
+export type AnswerBasic = {
+  __typename?: 'AnswerBasic';
+  answerId: Maybe<Scalars['Int']>;
+  answer: Scalars['IntStringDateBool'];
+  questionaryId: Scalars['Int'];
+  questionId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+};
+
+export type AnswerBasicResponseWrap = {
+  __typename?: 'AnswerBasicResponseWrap';
+  error: Maybe<Scalars['String']>;
+  answer: Maybe<AnswerBasic>;
+};
+
 export type AnswerInput = {
   questionId: Scalars['String'];
   value?: Maybe<Scalars['String']>;
@@ -305,7 +320,6 @@ export type Mutation = {
   addReview: ReviewResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
-  addSamplesToAnswer: SamplesResponseWrap;
   createSample: SampleResponseWrap;
   updateSampleStatus: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
@@ -335,11 +349,13 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
   cloneTemplate: TemplateResponseWrap;
+  createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
   createProposal: ProposalResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
+  deleteSample: SampleResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
   deleteUser: UserResponseWrap;
@@ -524,12 +540,6 @@ export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'];
   proposalID: Scalars['Int'];
   sepID: Scalars['Int'];
-};
-
-
-export type MutationAddSamplesToAnswerArgs = {
-  answerId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
 };
 
 
@@ -755,6 +765,12 @@ export type MutationCloneTemplateArgs = {
 };
 
 
+export type MutationCreateAnswerQuestionaryRelationsArgs = {
+  answerId: Scalars['Int'];
+  questionaryIds: Array<Scalars['Int']>;
+};
+
+
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int'];
 };
@@ -777,6 +793,11 @@ export type MutationDeleteProposalArgs = {
 
 export type MutationDeleteQuestionArgs = {
   questionId: Scalars['String'];
+};
+
+
+export type MutationDeleteSampleArgs = {
+  sampleId: Scalars['Int'];
 };
 
 
@@ -2528,6 +2549,24 @@ export type AnswerTopicMutation = (
   ) }
 );
 
+export type CreateAnswerQuestionaryRelationsMutationVariables = Exact<{
+  answerId: Scalars['Int'];
+  questionaryIds: Array<Scalars['Int']>;
+}>;
+
+
+export type CreateAnswerQuestionaryRelationsMutation = (
+  { __typename?: 'Mutation' }
+  & { createAnswerQuestionaryRelations: (
+    { __typename?: 'AnswerBasicResponseWrap' }
+    & Pick<AnswerBasicResponseWrap, 'error'>
+    & { answer: Maybe<(
+      { __typename?: 'AnswerBasic' }
+      & Pick<AnswerBasic, 'answerId'>
+    )> }
+  ) }
+);
+
 export type CreateQuestionaryMutationVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -2748,24 +2787,6 @@ export type UserWithReviewsQuery = (
   )> }
 );
 
-export type AddSamplesToAnswerMutationVariables = Exact<{
-  answerId: Scalars['Int'];
-  sampleIds: Array<Scalars['Int']>;
-}>;
-
-
-export type AddSamplesToAnswerMutation = (
-  { __typename?: 'Mutation' }
-  & { addSamplesToAnswer: (
-    { __typename?: 'SamplesResponseWrap' }
-    & Pick<SamplesResponseWrap, 'error'>
-    & { samples: Array<(
-      { __typename?: 'Sample' }
-      & SampleFragment
-    )> }
-  ) }
-);
-
 export type CreateSampleMutationVariables = Exact<{
   title: Scalars['String'];
   templateId: Scalars['Int'];
@@ -2775,6 +2796,23 @@ export type CreateSampleMutationVariables = Exact<{
 export type CreateSampleMutation = (
   { __typename?: 'Mutation' }
   & { createSample: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
+);
+
+export type DeleteSampleMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+}>;
+
+
+export type DeleteSampleMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteSample: (
     { __typename?: 'SampleResponseWrap' }
     & Pick<SampleResponseWrap, 'error'>
     & { sample: Maybe<(
@@ -4692,6 +4730,16 @@ export const AnswerTopicDocument = gql`
   }
 }
     ${QuestionaryStepFragmentDoc}`;
+export const CreateAnswerQuestionaryRelationsDocument = gql`
+    mutation createAnswerQuestionaryRelations($answerId: Int!, $questionaryIds: [Int!]!) {
+  createAnswerQuestionaryRelations(answerId: $answerId, questionaryIds: $questionaryIds) {
+    answer {
+      answerId
+    }
+    error
+  }
+}
+    `;
 export const CreateQuestionaryDocument = gql`
     mutation createQuestionary($templateId: Int!) {
   createQuestionary(templateId: $templateId) {
@@ -4794,19 +4842,19 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
-export const AddSamplesToAnswerDocument = gql`
-    mutation addSamplesToAnswer($answerId: Int!, $sampleIds: [Int!]!) {
-  addSamplesToAnswer(answerId: $answerId, sampleIds: $sampleIds) {
-    samples {
+export const CreateSampleDocument = gql`
+    mutation createSample($title: String!, $templateId: Int!) {
+  createSample(title: $title, templateId: $templateId) {
+    sample {
       ...sample
     }
     error
   }
 }
     ${SampleFragmentDoc}`;
-export const CreateSampleDocument = gql`
-    mutation createSample($title: String!, $templateId: Int!) {
-  createSample(title: $title, templateId: $templateId) {
+export const DeleteSampleDocument = gql`
+    mutation deleteSample($sampleId: Int!) {
+  deleteSample(sampleId: $sampleId) {
     sample {
       ...sample
     }
@@ -5440,6 +5488,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     answerTopic(variables: AnswerTopicMutationVariables): Promise<AnswerTopicMutation> {
       return withWrapper(() => client.request<AnswerTopicMutation>(print(AnswerTopicDocument), variables));
     },
+    createAnswerQuestionaryRelations(variables: CreateAnswerQuestionaryRelationsMutationVariables): Promise<CreateAnswerQuestionaryRelationsMutation> {
+      return withWrapper(() => client.request<CreateAnswerQuestionaryRelationsMutation>(print(CreateAnswerQuestionaryRelationsDocument), variables));
+    },
     createQuestionary(variables: CreateQuestionaryMutationVariables): Promise<CreateQuestionaryMutation> {
       return withWrapper(() => client.request<CreateQuestionaryMutation>(print(CreateQuestionaryDocument), variables));
     },
@@ -5467,11 +5518,11 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
     },
-    addSamplesToAnswer(variables: AddSamplesToAnswerMutationVariables): Promise<AddSamplesToAnswerMutation> {
-      return withWrapper(() => client.request<AddSamplesToAnswerMutation>(print(AddSamplesToAnswerDocument), variables));
-    },
     createSample(variables: CreateSampleMutationVariables): Promise<CreateSampleMutation> {
       return withWrapper(() => client.request<CreateSampleMutation>(print(CreateSampleDocument), variables));
+    },
+    deleteSample(variables: DeleteSampleMutationVariables): Promise<DeleteSampleMutation> {
+      return withWrapper(() => client.request<DeleteSampleMutation>(print(DeleteSampleDocument), variables));
     },
     getSample(variables: GetSampleQueryVariables): Promise<GetSampleQuery> {
       return withWrapper(() => client.request<GetSampleQuery>(print(GetSampleDocument), variables));

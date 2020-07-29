@@ -1,12 +1,10 @@
 import { FormControl, FormLabel } from '@material-ui/core';
-import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
-
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import React, { useEffect, useState } from 'react';
 import { stringToNumericArray } from 'utils/ArrayUtils';
-
+import useCallWithFeedback from 'utils/useCallWithFeedback';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
@@ -20,8 +18,8 @@ export default function ProposalComponentSampleDeclaration(
   const config = templateField.config as SubtemplateConfig;
   const isError = errors[proposalQuestionId] ? true : false;
 
+  const { callWithFeedback } = useCallWithFeedback();
   const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
 
   const [stateValue, setStateValue] = useState<string>(templateField.value);
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
@@ -65,44 +63,41 @@ export default function ProposalComponentSampleDeclaration(
                 }
               })
           }
-          onDeleteClick={id => {}}
-          // TODO make an API call deleteQuestionary()
-          //   const newValue = stateValue.slice();
-          //   newValue.splice(
-          //     newValue.findIndex(item => item === id),
-          //     1
-          //   );
-          //   setStateValue(newValue);
-          //   onComplete(null as any, newValue.join(',')); // convert [1,2,3,...] to "1,2,3,..." because GraphQL does not support arrays yet
-          // }
+          onDeleteClick={item => {
+            let newStateValue = stringToNumericArray(stateValue);
+            newStateValue = newStateValue.filter(sample => sample !== item.id);
+            setStateValue(newStateValue.join(','));
+
+            let newSamples = rows.slice();
+            newSamples = newSamples.filter(row => row.id !== item.id);
+            setRows(newSamples);
+
+            onComplete(null as any, newStateValue.join(','));
+          }}
           onAddNewClick={() =>
-            api()
-              .createSample({
-                title: 'Untitled',
-                templateId: config.templateId,
-              })
-              .then(response => {
-                const { sample: newSample, error } = response.createSample;
-                if (error) {
-                  enqueueSnackbar(error, { variant: 'error' });
+            callWithFeedback(
+              api()
+                .createSample({
+                  title: 'Untitled',
+                  templateId: config.templateId,
+                })
+                .then(response => response.createSample)
+            ).then(response => {
+              const { sample: newSample } = response;
+              if (newSample) {
+                const newStateValue = stringToNumericArray(stateValue);
+                newStateValue.push(newSample.id);
+                setStateValue(newStateValue.join(','));
 
-                  return;
-                }
+                const newSamples = rows.slice();
+                newSamples.push(sampleToQuestionaryListRow(newSample));
+                setRows(newSamples);
 
-                if (newSample) {
-                  const newStateValue = stringToNumericArray(stateValue);
-                  newStateValue.push(newSample.id);
-                  setStateValue(newStateValue.join(','));
+                setSelectedSample(newSample);
 
-                  const newSamples = rows.slice();
-                  newSamples.push(sampleToQuestionaryListRow(newSample));
-                  setRows(newSamples);
-
-                  setSelectedSample(newSample);
-
-                  onComplete(null as any, newStateValue.join(','));
-                }
-              })
+                onComplete(null as any, newStateValue.join(','));
+              }
+            })
           }
           {...props}
         />
