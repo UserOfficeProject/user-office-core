@@ -16,7 +16,7 @@ export type Scalars = {
 };
 
 export type AddSepMembersRole = {
-  userID: Scalars['Int'];
+  userIDs: Array<Scalars['Int']>;
   roleID: UserRole;
   SEPID: Scalars['Int'];
 };
@@ -305,7 +305,7 @@ export type Mutation = {
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
-  assignMember: SepResponseWrap;
+  assignMembers: SepResponseWrap;
   removeMember: SepResponseWrap;
   assignMemberToSEPProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
@@ -527,8 +527,8 @@ export type MutationAssignChairOrSecretaryArgs = {
 };
 
 
-export type MutationAssignMemberArgs = {
-  memberId: Scalars['Int'];
+export type MutationAssignMembersArgs = {
+  memberIds: Array<Scalars['Int']>;
   sepId: Scalars['Int'];
 };
 
@@ -1495,15 +1495,15 @@ export type AssignProposalMutation = (
   ) }
 );
 
-export type AssignMemberMutationVariables = Exact<{
-  memberId: Scalars['Int'];
+export type AssignMembersMutationVariables = Exact<{
+  memberIds: Array<Scalars['Int']>;
   sepId: Scalars['Int'];
 }>;
 
 
-export type AssignMemberMutation = (
+export type AssignMembersMutation = (
   { __typename?: 'Mutation' }
-  & { assignMember: (
+  & { assignMembers: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
@@ -3755,9 +3755,9 @@ export const AssignProposalDocument = gql`
   }
 }
     `;
-export const AssignMemberDocument = gql`
-    mutation assignMember($memberId: Int!, $sepId: Int!) {
-  assignMember(memberId: $memberId, sepId: $sepId) {
+export const AssignMembersDocument = gql`
+    mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
+  assignMembers(memberIds: $memberIds, sepId: $sepId) {
     error
     sep {
       id
@@ -5007,8 +5007,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     assignProposal(variables: AssignProposalMutationVariables): Promise<AssignProposalMutation> {
       return withWrapper(() => client.request<AssignProposalMutation>(print(AssignProposalDocument), variables));
     },
-    assignMember(variables: AssignMemberMutationVariables): Promise<AssignMemberMutation> {
-      return withWrapper(() => client.request<AssignMemberMutation>(print(AssignMemberDocument), variables));
+    assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
+      return withWrapper(() => client.request<AssignMembersMutation>(print(AssignMembersDocument), variables));
     },
     assignChairOrSecretary(variables: AssignChairOrSecretaryMutationVariables): Promise<AssignChairOrSecretaryMutation> {
       return withWrapper(() => client.request<AssignChairOrSecretaryMutation>(print(AssignChairOrSecretaryDocument), variables));
