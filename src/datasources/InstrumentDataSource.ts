@@ -13,6 +13,7 @@ export interface InstrumentDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; instruments: Instrument[] }>;
+  getUserInstruments(userId: number): Promise<Instrument[]>;
   getInstrumentsByCallId(
     callId: number
   ): Promise<InstrumentWithAvailabilityTime[]>;
