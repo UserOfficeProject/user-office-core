@@ -947,6 +947,24 @@ export type ProposalTemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
 };
 
+export type ProposalView = {
+  __typename?: 'ProposalView';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  status: ProposalStatus;
+  shortCode: Scalars['String'];
+  rankOrder: Maybe<Scalars['Int']>;
+  finalStatus: Maybe<ProposalEndStatus>;
+  notified: Scalars['Boolean'];
+  timeAllocation: Maybe<Scalars['Int']>;
+  technicalStatus: Maybe<TechnicalReviewStatus>;
+  instrumentName: Maybe<Scalars['String']>;
+  callShortCode: Maybe<Scalars['String']>;
+  sepShortCode: Maybe<Scalars['String']>;
+  reviewAverage: Maybe<Scalars['Int']>;
+  reviewDeviation: Maybe<Scalars['Int']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
@@ -967,6 +985,7 @@ export type Query = {
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
+  proposalsView: Maybe<Array<ProposalView>>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
@@ -1065,6 +1084,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryProposalsViewArgs = {
+  filter?: Maybe<ProposalsFilter>;
 };
 
 
@@ -2356,6 +2380,19 @@ export type GetProposalsQuery = (
       & ProposalFragment
     )> }
   )> }
+);
+
+export type GetProposalsCoreQueryVariables = Exact<{
+  filter?: Maybe<ProposalsFilter>;
+}>;
+
+
+export type GetProposalsCoreQuery = (
+  { __typename?: 'Query' }
+  & { proposalsView: Maybe<Array<(
+    { __typename?: 'ProposalView' }
+    & Pick<ProposalView, 'id' | 'title' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation'>
+  )>> }
 );
 
 export type NotifyProposalMutationVariables = Exact<{
@@ -4402,6 +4439,26 @@ export const GetProposalsDocument = gql`
 }
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}`;
+export const GetProposalsCoreDocument = gql`
+    query getProposalsCore($filter: ProposalsFilter) {
+  proposalsView(filter: $filter) {
+    id
+    title
+    status
+    shortCode
+    rankOrder
+    finalStatus
+    notified
+    timeAllocation
+    technicalStatus
+    instrumentName
+    callShortCode
+    sepShortCode
+    reviewAverage
+    reviewDeviation
+  }
+}
+    `;
 export const NotifyProposalDocument = gql`
     mutation notifyProposal($id: Int!) {
   notifyProposal(id: $id) {
@@ -5101,6 +5158,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProposals(variables?: GetProposalsQueryVariables): Promise<GetProposalsQuery> {
       return withWrapper(() => client.request<GetProposalsQuery>(print(GetProposalsDocument), variables));
+    },
+    getProposalsCore(variables?: GetProposalsCoreQueryVariables): Promise<GetProposalsCoreQuery> {
+      return withWrapper(() => client.request<GetProposalsCoreQuery>(print(GetProposalsCoreDocument), variables));
     },
     notifyProposal(variables: NotifyProposalMutationVariables): Promise<NotifyProposalMutation> {
       return withWrapper(() => client.request<NotifyProposalMutation>(print(NotifyProposalDocument), variables));
