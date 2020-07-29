@@ -189,11 +189,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Deviation',
-      field: 'deviation',
+      field: 'reviewDeviation',
     },
     {
       title: 'Average Score',
-      field: 'average',
+      field: 'reviewAverage',
     },
     {
       title: 'Final Status',

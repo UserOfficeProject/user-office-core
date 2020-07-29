@@ -961,8 +961,8 @@ export type ProposalView = {
   instrumentName: Maybe<Scalars['String']>;
   callShortCode: Maybe<Scalars['String']>;
   sepShortCode: Maybe<Scalars['String']>;
-  reviewAverage: Maybe<Scalars['Int']>;
-  reviewDeviation: Maybe<Scalars['Int']>;
+  reviewAverage: Maybe<Scalars['Float']>;
+  reviewDeviation: Maybe<Scalars['Float']>;
   instrumentId: Maybe<Scalars['Int']>;
   callId: Maybe<Scalars['Int']>;
 };
@@ -1478,6 +1478,7 @@ export type User = {
   reviews: Array<Review>;
   proposals: Array<Proposal>;
   seps: Array<Sep>;
+  instruments: Array<Instrument>;
 };
 
 export type UserQueryResult = {
