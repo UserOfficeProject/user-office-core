@@ -248,16 +248,6 @@ const createProposals = async () => {
 };
 
 const createReviews = async () => {
-  const proposalIds = createIntArray(MAX_REVIEWS, MAX_PROPOSALS);
-  await execute(() => {
-    const proposalID = proposalIds.pop()!;
-
-    return reviewDataSource.addUserForReview({
-      proposalID,
-      sepID: dummy.positiveNumber(MAX_SEPS),
-      userID: dummy.positiveNumber(MAX_USERS),
-    });
-  }, MAX_REVIEWS);
   await execute(() => {
     return reviewDataSource.setTechnicalReview({
       proposalID: dummy.positiveNumber(MAX_PROPOSALS),
@@ -300,14 +290,20 @@ const createSeps = async () => {
       roleID: UserRole.USER,
       userID: dummy.positiveNumber(MAX_USERS),
     });
-    const proposalIds = createUniqueIntArray(MAX_PROPOSALS, MAX_PROPOSALS);
+    const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalId of proposalIds) {
+      const tmpUserId = dummy.positiveNumber(MAX_USERS);
       await sepDataSource.assignProposal(proposalId, sep.id);
       await sepDataSource.assignMemberToSEPProposal(
         proposalId,
         sep.id,
-        dummy.positiveNumber(MAX_USERS)
+        tmpUserId
       );
+      await reviewDataSource.addUserForReview({
+        proposalID: proposalId,
+        sepID: sep.id,
+        userID: tmpUserId,
+      });
     }
   }, MAX_SEPS);
 };
