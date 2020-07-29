@@ -70,6 +70,8 @@ export interface ProposalViewRecord {
   readonly code: string;
   readonly average: number;
   readonly deviation: number;
+  readonly instrument_id: number;
+  readonly call_id: number;
 }
 
 export interface TopicRecord {
@@ -349,7 +351,9 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_short_code,
     proposal.code,
     proposal.average,
-    proposal.deviation
+    proposal.deviation,
+    proposal.instrument_id,
+    proposal.call_id
   );
 };
 

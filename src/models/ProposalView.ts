@@ -15,6 +15,8 @@ export class ProposalView {
     public callShortCode: string,
     public sepShortCode: string,
     public reviewAverage: number,
-    public reviewDeviation: number
+    public reviewDeviation: number,
+    public instrumentId: number,
+    public callId: number
   ) {}
 }

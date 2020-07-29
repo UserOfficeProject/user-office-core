@@ -47,4 +47,10 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => Int, { nullable: true })
   public reviewDeviation: number;
+
+  @Field(() => Int, { nullable: true })
+  public instrumentId: number;
+
+  @Field(() => Int, { nullable: true })
+  public callId: number;
 }
