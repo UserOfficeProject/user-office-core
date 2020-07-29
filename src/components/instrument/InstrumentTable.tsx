@@ -55,25 +55,31 @@ const InstrumentTable: React.FC = () => {
       });
   };
 
-  const assignScientistsToInstrument = async (scientist: BasicUserDetails) => {
+  const assignScientistsToInstrument = async (
+    scientists: BasicUserDetails[]
+  ) => {
     const assignScientistToInstrumentResult = await api().assignScientistsToInstrument(
       {
         instrumentId: assigningInstrumentId as number,
-        scientistIds: [scientist.id],
+        scientistIds: scientists.map(scientist => scientist.id),
       }
     );
 
     if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
-      if (!scientist.organisation) {
-        scientist.organisation = 'Other';
-      }
+      scientists = scientists.map(scientist => {
+        if (!scientist.organisation) {
+          scientist.organisation = 'Other';
+        }
+
+        return scientist;
+      });
 
       if (instrumentsData) {
         const newInstrumentsData = instrumentsData.map(instrumentItem => {
           if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
-              scientists: [...instrumentItem.scientists, { ...scientist }],
+              scientists: [...instrumentItem.scientists, ...scientists],
             };
           } else {
             return instrumentItem;
@@ -156,10 +162,11 @@ const InstrumentTable: React.FC = () => {
       <ParticipantModal
         show={!!assigningInstrumentId}
         close={(): void => setAssigningInstrumentId(null)}
-        addParticipant={assignScientistsToInstrument}
+        addParticipants={assignScientistsToInstrument}
         selectedUsers={instrumentAssignments?.scientists.map(
           scientist => scientist.id
         )}
+        selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}
         title={'Instrument scientist'}
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}

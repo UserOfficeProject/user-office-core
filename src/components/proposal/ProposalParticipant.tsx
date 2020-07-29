@@ -2,15 +2,14 @@ import { IconButton, Typography } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useState, useEffect } from 'react';
 
-import { UserRole } from 'generated/sdk';
+import { UserRole, BasicUserDetails } from 'generated/sdk';
 import { useBasicUserData, BasicUserData } from 'hooks/user/useUserData';
-import { User } from 'models/User';
 
 import ParticipantModal from './ParticipantModal';
 
 export default function ProposalParticipant(props: {
   userId?: number;
-  userChanged: (user: User) => void;
+  userChanged: (user: BasicUserDetails) => void;
   title?: string;
   className?: string;
 }) {
@@ -37,9 +36,9 @@ export default function ProposalParticipant(props: {
         close={() => {
           setIsPickerOpen(false);
         }}
-        addParticipant={(user: User) => {
-          setCurUser(user);
-          props.userChanged(user);
+        addParticipants={(users: BasicUserDetails[]) => {
+          setCurUser(users[0]);
+          props.userChanged(users[0]);
           setIsPickerOpen(false);
         }}
       />
