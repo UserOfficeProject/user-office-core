@@ -273,22 +273,22 @@ const createSeps = async () => {
     await sepDataSource.addSEPMembersRole({
       SEPID: sep.id,
       roleID: UserRole.INSTRUMENT_SCIENTIST,
-      userID: dummy.positiveNumber(MAX_USERS),
+      userIDs: [dummy.positiveNumber(MAX_USERS)],
     });
     await sepDataSource.addSEPMembersRole({
       SEPID: sep.id,
       roleID: UserRole.SEP_CHAIR,
-      userID: dummy.positiveNumber(MAX_USERS),
+      userIDs: [dummy.positiveNumber(MAX_USERS)],
     });
     await sepDataSource.addSEPMembersRole({
       SEPID: sep.id,
       roleID: UserRole.SEP_SECRETARY,
-      userID: dummy.positiveNumber(MAX_USERS),
+      userIDs: [dummy.positiveNumber(MAX_USERS)],
     });
     await sepDataSource.addSEPMembersRole({
       SEPID: sep.id,
       roleID: UserRole.USER,
-      userID: dummy.positiveNumber(MAX_USERS),
+      userIDs: [dummy.positiveNumber(MAX_USERS)],
     });
     const proposalIds = createUniqueIntArray(5, MAX_PROPOSALS);
     for (const proposalId of proposalIds) {

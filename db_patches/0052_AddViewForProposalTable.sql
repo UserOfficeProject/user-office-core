@@ -15,8 +15,8 @@ BEGIN
     s.code,
     c.call_id,
     i.instrument_id,
-    (select avg(grade) from "SEP_Reviews") as average,
-    (select stddev_pop(grade) from "SEP_Reviews") as deviation
+    (select round(avg(grade),1) from "SEP_Reviews" where proposal_id=p.proposal_id) as average,
+    (select round(stddev_pop(grade),1) from "SEP_Reviews" where proposal_id=p.proposal_id) as deviation
     from proposals p 
     left join technical_review t on t.proposal_id = p.proposal_id
     left join instrument_has_proposals ihp on ihp.proposal_id = p.proposal_id 

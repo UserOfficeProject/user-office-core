@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType, Float } from 'type-graphql';
 
 import { Proposal as ProposalOrigin } from '../../models/Proposal';
 import { ProposalStatus } from '../../models/ProposalModel';
@@ -42,10 +42,10 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public sepShortCode: string;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Float, { nullable: true })
   public reviewAverage: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Float, { nullable: true })
   public reviewDeviation: number;
 
   @Field(() => Int, { nullable: true })
