@@ -2141,6 +2141,24 @@ export type GetInstrumentsQuery = (
   )> }
 );
 
+export type GetUserInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserInstrumentsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { instruments: Array<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
+      & { scientists: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
+    )> }
+  )> }
+);
+
 export type RemoveProposalFromInstrumentMutationVariables = Exact<{
   proposalId: Scalars['Int'];
   instrumentId: Scalars['Int'];
@@ -4242,6 +4260,21 @@ export const GetInstrumentsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const GetUserInstrumentsDocument = gql`
+    query getUserInstruments {
+  me {
+    instruments {
+      id
+      name
+      shortCode
+      description
+      scientists {
+        ...basicUserDetails
+      }
+    }
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const RemoveProposalFromInstrumentDocument = gql`
     mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
   removeProposalFromInstrument(proposalId: $proposalId, instrumentId: $instrumentId) {
@@ -5133,6 +5166,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getInstruments(variables?: GetInstrumentsQueryVariables): Promise<GetInstrumentsQuery> {
       return withWrapper(() => client.request<GetInstrumentsQuery>(print(GetInstrumentsDocument), variables));
+    },
+    getUserInstruments(variables?: GetUserInstrumentsQueryVariables): Promise<GetUserInstrumentsQuery> {
+      return withWrapper(() => client.request<GetUserInstrumentsQuery>(print(GetUserInstrumentsDocument), variables));
     },
     removeProposalFromInstrument(variables: RemoveProposalFromInstrumentMutationVariables): Promise<RemoveProposalFromInstrumentMutation> {
       return withWrapper(() => client.request<RemoveProposalFromInstrumentMutation>(print(RemoveProposalFromInstrumentDocument), variables));
