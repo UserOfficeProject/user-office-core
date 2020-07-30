@@ -260,6 +260,10 @@ export class UserDataSourceMock implements UserDataSource {
     scientsitId: number,
     proposalId: number
   ): Promise<boolean> {
+    if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
     return true;
   }
 
