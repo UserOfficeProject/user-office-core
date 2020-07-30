@@ -16,6 +16,7 @@ interface SuperProps<RowData extends object> {
   delete: (id: number) => Promise<boolean>;
   setData: Function;
   data: RowData[];
+  hasCreateAccess: boolean;
 }
 
 interface EntryID {
@@ -34,15 +35,17 @@ export default function SuperMaterialTable<Entry extends EntryID>(
   };
 
   const onUpdated = (objectUpdated: Entry) => {
-    const newObjectsArray = props.data.map(objectItem =>
-      objectItem.id === objectUpdated.id ? objectUpdated : objectItem
-    );
-    props.setData(newObjectsArray);
+    if (objectUpdated) {
+      const newObjectsArray = props.data.map(objectItem =>
+        objectItem.id === objectUpdated.id ? objectUpdated : objectItem
+      );
+      props.setData(newObjectsArray);
+    }
     setEditObject(null);
     setShow(false);
   };
 
-  const onDelete = async (deletedId: number) => {
+  const onDeleted = async (deletedId: number) => {
     const deleteResult = await props.delete(deletedId);
 
     if (!deleteResult) {
@@ -79,7 +82,7 @@ export default function SuperMaterialTable<Entry extends EntryID>(
         {...props}
         icons={tableIcons}
         editable={{
-          onRowDelete: (rowData: Entry): Promise<void> => onDelete(rowData.id),
+          onRowDelete: (rowData: Entry): Promise<void> => onDeleted(rowData.id),
         }}
         actions={[
           {
@@ -94,16 +97,18 @@ export default function SuperMaterialTable<Entry extends EntryID>(
           ...actions,
         ]}
       />
-      <ActionButtonContainer>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          onClick={() => setShow(true)}
-        >
-          Create
-        </Button>
-      </ActionButtonContainer>
+      {props.hasCreateAccess && (
+        <ActionButtonContainer>
+          <Button
+            type="button"
+            variant="contained"
+            color="primary"
+            onClick={() => setShow(true)}
+          >
+            Create
+          </Button>
+        </ActionButtonContainer>
+      )}
     </>
   );
 }

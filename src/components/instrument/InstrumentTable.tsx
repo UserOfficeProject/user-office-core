@@ -3,6 +3,7 @@ import { AssignmentInd } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -11,6 +12,7 @@ import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
+
 const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
@@ -33,6 +35,7 @@ const InstrumentTable: React.FC = () => {
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api()
@@ -175,6 +178,7 @@ const InstrumentTable: React.FC = () => {
         <SuperMaterialTable
           delete={onInstrumentDelete}
           setData={setInstrumentsData}
+          hasCreateAccess={isUserOfficer}
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}

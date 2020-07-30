@@ -65,6 +65,7 @@ const InstitutionPage: React.FC = () => {
         delete={deleteInstitution}
         setData={setInstitutionData}
         createModal={createModal}
+        hasCreateAccess={true}
         icons={tableIcons}
         title={'Institutions'}
         columns={columns}
