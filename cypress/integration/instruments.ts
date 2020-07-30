@@ -140,7 +140,11 @@ context('Instrument tests', () => {
     cy.get('[data-cy="role-modal"]')
       .contains('Instrument Scientist')
       .parent()
-      .find('[title="Select role"]')
+      .find('input[type="checkbox"]')
+      .click();
+
+    cy.get('[data-cy="role-modal"]')
+      .contains('Update')
       .click();
     cy.wait(500);
 
@@ -150,8 +154,12 @@ context('Instrument tests', () => {
     cy.get('[title="Assign scientist"]').click();
     cy.wait(500);
 
-    cy.get('[title="Select user"]')
-      .first()
+    cy.get('input[type="checkbox"]')
+      .eq(1)
+      .click();
+
+    cy.get('.MuiDialog-root')
+      .contains('Update')
       .click();
 
     cy.wait(500);
