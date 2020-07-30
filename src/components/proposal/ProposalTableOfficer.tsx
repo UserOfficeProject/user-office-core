@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton, Tooltip } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
 import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
