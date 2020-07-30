@@ -5,7 +5,8 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Instrument, BasicUserDetails } from 'generated/sdk';
+import { useCheckAccess } from 'components/common/Can';
+import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -37,6 +38,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   const classes = useStyles();
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const assignmentColumns = [
     {
@@ -83,10 +85,16 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
         columns={assignmentColumns}
         title={'Assigned instruments'}
         data={instrument.scientists}
-        editable={{
-          onRowDelete: (rowAssignmentsData: BasicUserDetails): Promise<void> =>
-            removeAssignedScientist(rowAssignmentsData.id),
-        }}
+        editable={
+          isUserOfficer
+            ? {
+                onRowDelete: (
+                  rowAssignmentsData: BasicUserDetails
+                ): Promise<void> =>
+                  removeAssignedScientist(rowAssignmentsData.id),
+              }
+            : {}
+        }
         options={{
           search: false,
           paging: false,
