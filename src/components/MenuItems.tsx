@@ -146,9 +146,9 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     <div data-cy="instrument-scientist-menu-items">
       <ListItem component={Link} to="/" button>
         <ListItemIcon>
-          <DashboardIcon />
+          <FolderOpen />
         </ListItemIcon>
-        <ListItemText primary="Dashboard" />
+        <ListItemText primary="View Proposals" />
       </ListItem>
       <ListItem component={Link} to="/InstrumentPage" button>
         <ListItemIcon>
