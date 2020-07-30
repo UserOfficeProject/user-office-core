@@ -124,11 +124,29 @@ context('Instrument tests', () => {
     cy.get('[title="Remove assigned instrument"]').should('not.exist');
   });
 
-  it('User Officer should be able to assign scientist to instrument', () => {
-    const firstName = faker.name.firstName();
-    const lastName = faker.name.lastName();
-    var randomEmail = faker.internet.email();
+  it('User Officer should be able to assign scientist to instrument and instrument scientist should be able to see instruments he is assigned to', () => {
     cy.login('officer');
+
+    cy.contains('View People').click();
+    cy.get('[title="Edit user"]')
+      .last()
+      .click();
+    cy.wait(500);
+    cy.contains('Settings').click();
+    cy.wait(500);
+    cy.contains('Add role').click();
+    cy.get('[data-cy="role-modal"] [title="Last Page"]').click();
+
+    cy.get('[data-cy="role-modal"]')
+      .contains('Instrument Scientist')
+      .parent()
+      .find('input[type="checkbox"]')
+      .click();
+
+    cy.get('[data-cy="role-modal"]')
+      .contains('Update')
+      .click();
+    cy.wait(500);
 
     cy.contains('Instruments').click();
     cy.wait(500);
@@ -136,23 +154,31 @@ context('Instrument tests', () => {
     cy.get('[title="Assign scientist"]').click();
     cy.wait(500);
 
-    cy.get('[title="Add by email"]').click();
+    cy.get('input[type="checkbox"]')
+      .eq(1)
+      .click();
 
-    cy.get('[name="name"]').type(firstName);
-    cy.get('[name="lastname"]').type(lastName);
-    cy.get('[name="email"]').type(randomEmail);
+    cy.get('.MuiDialog-root')
+      .contains('Update')
+      .click();
 
-    cy.contains('Invite User').click();
+    cy.wait(500);
 
+    cy.contains('Logout').click();
+
+    cy.login('user');
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+    cy.contains('Roles').click();
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .contains('Use')
+      .click();
     cy.wait(1000);
 
-    cy.get('[data-cy="instruments-table"] table tbody tr')
-      .first()
-      .find('td')
-      .last()
-      .then(element => {
-        expect(element.text()).to.be.equal('1');
-      });
+    cy.contains('Instruments');
+
+    cy.get('[title="Edit"]').should('exist');
   });
 
   it('User Officer should be able to remove assigned scientist from instrument', () => {

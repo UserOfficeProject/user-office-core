@@ -1,0 +1,13 @@
+query getUserInstruments {
+  me {
+    instruments {
+      id
+      name
+      shortCode
+      description
+      scientists {
+        ...basicUserDetails
+      }
+    }
+  }
+}
