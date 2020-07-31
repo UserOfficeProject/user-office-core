@@ -147,4 +147,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async getUserProposals(id: number) {
     return [dummyProposal];
   }
+
+  async getInstrumentScientistProposals(
+    scientsitId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return { totalCount: 1, proposals: [dummyProposal] };
+  }
 }
