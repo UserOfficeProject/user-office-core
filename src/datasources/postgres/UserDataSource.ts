@@ -431,4 +431,23 @@ export default class PostgresUserDataSource implements UserDataSource {
       .returning('institution_id')
       .then((id: number[]) => id[0]);
   }
+
+  async checkScientistToProposal(
+    scientistId: number,
+    proposalId: number
+  ): Promise<boolean> {
+    const proposal = await database
+      .select('*')
+      .from('proposals as p')
+      .join('instrument_has_scientists as ihs', {
+        'ihs.user_id': scientistId,
+      })
+      .join('instrument_has_proposals as ihp', {
+        'ihp.instrument_id': 'ihs.instrument_id',
+      })
+      .where('ihp.proposal_id', proposalId)
+      .first();
+
+    return !!proposal;
+  }
 }

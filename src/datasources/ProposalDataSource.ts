@@ -11,6 +11,12 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: Proposal[] }>;
+  getInstrumentScientistProposals(
+    scientistId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: Proposal[] }>;
   getUserProposals(id: number): Promise<Proposal[]>;
 
   // Write
