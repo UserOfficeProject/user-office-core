@@ -951,6 +951,7 @@ export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
+  instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankProposal: Maybe<Proposal>;
@@ -990,6 +991,13 @@ export type QueryCallsArgs = {
 
 
 export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -2292,6 +2300,49 @@ export type GetBlankProposalQuery = (
       )> }
     )>> }
     & ProposalFragment
+  )> }
+);
+
+export type GetInstrumentScientistProposalsQueryVariables = Exact<{
+  filter?: Maybe<ProposalsFilter>;
+}>;
+
+
+export type GetInstrumentScientistProposalsQuery = (
+  { __typename?: 'Query' }
+  & { instrumentScientistProposals: Maybe<(
+    { __typename?: 'ProposalsQueryResult' }
+    & Pick<ProposalsQueryResult, 'totalCount'>
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
+      & { proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), reviews: Maybe<Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
+        & { reviewer: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+        )> }
+      )>>, users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+      )>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'id' | 'name'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
+      )>, sep: Maybe<(
+        { __typename?: 'SEP' }
+        & Pick<Sep, 'id' | 'code'>
+      )> }
+      & ProposalFragment
+    )> }
   )> }
 );
 
@@ -4340,6 +4391,57 @@ export const GetBlankProposalDocument = gql`
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}`;
+export const GetInstrumentScientistProposalsDocument = gql`
+    query getInstrumentScientistProposals($filter: ProposalsFilter) {
+  instrumentScientistProposals(filter: $filter) {
+    proposals {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          username
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        id
+        comment
+        publicComment
+        timeAllocation
+        status
+        proposalID
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
+      }
+    }
+    totalCount
+  }
+}
+    ${ProposalFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -5132,6 +5234,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
       return withWrapper(() => client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables));
+    },
+    getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
+      return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return withWrapper(() => client.request<GetProposalQuery>(print(GetProposalDocument), variables));

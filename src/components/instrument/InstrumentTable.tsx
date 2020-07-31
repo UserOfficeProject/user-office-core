@@ -178,7 +178,11 @@ const InstrumentTable: React.FC = () => {
         <SuperMaterialTable
           delete={onInstrumentDelete}
           setData={setInstrumentsData}
-          hasCreateAccess={isUserOfficer}
+          hasAccess={{
+            create: isUserOfficer,
+            update: isUserOfficer,
+            remove: isUserOfficer,
+          }}
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
@@ -194,14 +198,18 @@ const InstrumentTable: React.FC = () => {
             search: true,
             debounceInterval: 400,
           }}
-          actions={[
-            {
-              icon: AssignmentIndIcon,
-              tooltip: 'Assign scientist',
-              onClick: (_event: unknown, rowData: unknown): void =>
-                setAssigningInstrumentId((rowData as Instrument).id),
-            },
-          ]}
+          actions={
+            isUserOfficer
+              ? [
+                  {
+                    icon: AssignmentIndIcon,
+                    tooltip: 'Assign scientist',
+                    onClick: (_event: unknown, rowData: unknown): void =>
+                      setAssigningInstrumentId((rowData as Instrument).id),
+                  },
+                ]
+              : []
+          }
         />
       </div>
     </>
