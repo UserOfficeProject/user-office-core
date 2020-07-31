@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../models/Proposal';
+import { ProposalView } from '../models/ProposalView';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
+  getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
   get(id: number): Promise<Proposal | null>;
   checkActiveCall(callId: number): Promise<boolean>;

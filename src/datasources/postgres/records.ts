@@ -13,6 +13,7 @@ import {
   TemplateCategory,
   Topic,
 } from '../../models/ProposalModel';
+import { ProposalView } from '../../models/ProposalView';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
 
@@ -51,6 +52,26 @@ export interface ProposalRecord {
   readonly comment_for_user: string;
   readonly comment_for_management: string;
   readonly notified: boolean;
+}
+
+export interface ProposalViewRecord {
+  readonly id: number;
+  readonly title: string;
+  readonly proposer_id: number;
+  readonly proposal_status: number;
+  readonly short_code: string;
+  readonly rank_order: number;
+  readonly final_status: number;
+  readonly time_allocation: number;
+  readonly notified: boolean;
+  readonly status: number;
+  readonly instrument_name: string;
+  readonly call_short_code: string;
+  readonly code: string;
+  readonly average: number;
+  readonly deviation: number;
+  readonly instrument_id: number;
+  readonly call_id: number;
 }
 
 export interface TopicRecord {
@@ -312,6 +333,27 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.comment_for_user,
     proposal.comment_for_management,
     proposal.notified
+  );
+};
+
+export const createProposalViewObject = (proposal: ProposalViewRecord) => {
+  return new ProposalView(
+    proposal.id,
+    proposal.title || '',
+    proposal.proposal_status,
+    proposal.short_code,
+    proposal.rank_order,
+    proposal.final_status,
+    proposal.time_allocation,
+    proposal.notified,
+    proposal.status,
+    proposal.instrument_name,
+    proposal.call_short_code,
+    proposal.code,
+    proposal.average,
+    proposal.deviation,
+    proposal.instrument_id,
+    proposal.call_id
   );
 };
 

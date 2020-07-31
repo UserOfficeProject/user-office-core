@@ -69,6 +69,11 @@ export default class ProposalQueries {
     return this.dataSource.getProposals(filter, first, offset);
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async getAllView(agent: UserWithRole | null, filter?: ProposalsFilter) {
+    return this.dataSource.getProposalsFromView(filter);
+  }
+
   @Authorized([Roles.INSTRUMENT_SCIENTIST])
   async getInstrumentScientistProposals(
     agent: UserWithRole | null,
