@@ -12,13 +12,13 @@ export class NavigButton extends Component<
   StandardProps<ButtonProps & { isbusy?: boolean }, ButtonClassKey>
 > {
   render() {
-    const { className, isbusy, ...other } = this.props;
+    const { className, isbusy, disabled, ...other } = this.props;
 
     return (
       <div className={className} style={{ position: 'relative' }}>
         <Button
           {...other}
-          disabled={isbusy}
+          disabled={isbusy || disabled}
           style={{ opacity: isbusy ? 0.8 : 'inherit' }}
         />
         {isbusy && (
