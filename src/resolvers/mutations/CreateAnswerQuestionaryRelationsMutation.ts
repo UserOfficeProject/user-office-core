@@ -9,12 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { wrapResponse } from '../wrapResponse';
 import {
   SamplesResponseWrap,
   AnswerResponseWrap,
   AnswerBasicResponseWrap,
 } from '../types/CommonWrappers';
+import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
 export class CreateAnswerQuestionaryRelationsArgs {

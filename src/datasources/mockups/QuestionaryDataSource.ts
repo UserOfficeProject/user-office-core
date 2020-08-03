@@ -149,6 +149,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     );
     const answer = answers.find(answer => answer.answerId === answerId)!;
     answer.value = '';
+
     return new AnswerBasic(answerId, 1, '', '', new Date());
   }
   async createAnswerQuestionaryRelations(

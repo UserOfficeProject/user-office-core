@@ -3,6 +3,7 @@ import { Field, ObjectType } from 'type-graphql';
 import { Response } from '../Decorators';
 import { Page } from './Admin';
 import { Answer } from './Answer';
+import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
@@ -19,7 +20,6 @@ import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
 import { Topic } from './Topic';
 import { User } from './User';
-import { AnswerBasic } from './AnswerBasic';
 
 @ObjectType()
 export class ResponseWrapBase<T> {

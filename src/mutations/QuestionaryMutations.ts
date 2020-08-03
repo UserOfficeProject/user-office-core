@@ -5,11 +5,11 @@ import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
+import { CreateAnswerQuestionaryRelationsArgs } from '../resolvers/mutations/CreateAnswerQuestionaryRelationsMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
 import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { CreateAnswerQuestionaryRelationsArgs } from '../resolvers/mutations/CreateAnswerQuestionaryRelationsMutation';
 
 export default class QuestionaryMutations {
   constructor(
@@ -123,6 +123,7 @@ export default class QuestionaryMutations {
   ) {
     // TODO perform authorization
     await this.dataSource.deleteAnswerQuestionaryRelations(args.answerId);
+
     return this.dataSource.createAnswerQuestionaryRelations(
       args.answerId,
       args.questionaryIds

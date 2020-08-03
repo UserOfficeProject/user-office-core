@@ -18,6 +18,7 @@ export default class PostgresSampleDataSource implements SampleDataSource {
           logger.logError('Could not delete sample', { sampleId });
           throw new Error('Could not delete sample');
         }
+
         return createSampleObject(records[0]);
       });
   }

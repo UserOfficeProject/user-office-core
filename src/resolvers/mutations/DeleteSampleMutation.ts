@@ -1,4 +1,5 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
+
 import { ResolverContext } from '../../context';
 import { SampleResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';

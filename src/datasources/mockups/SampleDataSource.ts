@@ -48,11 +48,13 @@ export class SampleDataSourceMock implements SampleDataSource {
   async updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
     sample.status = args.status;
+
     return sample;
   }
   async updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
     sample.title = args.title;
+
     return sample;
   }
 }

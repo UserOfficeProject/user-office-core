@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from 'type-graphql';
+
 import { AnswerBasic as AnswerBasicOrig } from '../../models/ProposalModel';
 import { IntStringDateBoolArray, AnswerType } from '../CustomScalars';
 

@@ -4,6 +4,7 @@ import {
   QuestionaryStep,
   AnswerBasic,
 } from '../../models/ProposalModel';
+import { logger } from '../../utils/Logger';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import { Answer } from './../../models/ProposalModel';
 import database from './database';
@@ -18,7 +19,6 @@ import {
   AnswerRecord,
   createAnswerBasic,
 } from './records';
-import { logger } from '../../utils/Logger';
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
@@ -39,6 +39,7 @@ export default class PostgresQuestionaryDataSource
     const rows = questionaryIds.map(questionaryId => {
       return { answer_id: answerId, questionary_id: questionaryId };
     });
+
     return database('answer_has_questionaries')
       .insert(rows)
       .then(async () => {
