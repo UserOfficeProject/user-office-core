@@ -16,7 +16,7 @@ export type Scalars = {
 };
 
 export type AddSepMembersRole = {
-  userID: Scalars['Int'];
+  userIDs: Array<Scalars['Int']>;
   roleID: UserRole;
   SEPID: Scalars['Int'];
 };
@@ -324,7 +324,7 @@ export type Mutation = {
   updateSampleStatus: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
-  assignMember: SepResponseWrap;
+  assignMembers: SepResponseWrap;
   removeMember: SepResponseWrap;
   assignMemberToSEPProposal: SepResponseWrap;
   removeMemberFromSEPProposal: SepResponseWrap;
@@ -566,8 +566,8 @@ export type MutationAssignChairOrSecretaryArgs = {
 };
 
 
-export type MutationAssignMemberArgs = {
-  memberId: Scalars['Int'];
+export type MutationAssignMembersArgs = {
+  memberIds: Array<Scalars['Int']>;
   sepId: Scalars['Int'];
 };
 
@@ -1001,6 +1001,7 @@ export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
+  instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankProposal: Maybe<Proposal>;
@@ -1044,6 +1045,13 @@ export type QueryCallsArgs = {
 
 
 export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -1563,6 +1571,7 @@ export type User = {
   reviews: Array<Review>;
   proposals: Array<Proposal>;
   seps: Array<Sep>;
+  instruments: Array<Instrument>;
 };
 
 export type UserQueryResult = {
@@ -1606,15 +1615,15 @@ export type AssignProposalMutation = (
   ) }
 );
 
-export type AssignMemberMutationVariables = Exact<{
-  memberId: Scalars['Int'];
+export type AssignMembersMutationVariables = Exact<{
+  memberIds: Array<Scalars['Int']>;
   sepId: Scalars['Int'];
 }>;
 
 
-export type AssignMemberMutation = (
+export type AssignMembersMutation = (
   { __typename?: 'Mutation' }
-  & { assignMember: (
+  & { assignMembers: (
     { __typename?: 'SEPResponseWrap' }
     & Pick<SepResponseWrap, 'error'>
     & { sep: Maybe<(
@@ -2226,6 +2235,24 @@ export type GetInstrumentsQuery = (
   )> }
 );
 
+export type GetUserInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserInstrumentsQuery = (
+  { __typename?: 'Query' }
+  & { me: Maybe<(
+    { __typename?: 'User' }
+    & { instruments: Array<(
+      { __typename?: 'Instrument' }
+      & Pick<Instrument, 'id' | 'name' | 'shortCode' | 'description'>
+      & { scientists: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
+    )> }
+  )> }
+);
+
 export type RemoveProposalFromInstrumentMutationVariables = Exact<{
   proposalId: Scalars['Int'];
   instrumentId: Scalars['Int'];
@@ -2389,6 +2416,49 @@ export type GetBlankProposalQuery = (
       )> }
     )>> }
     & ProposalFragment
+  )> }
+);
+
+export type GetInstrumentScientistProposalsQueryVariables = Exact<{
+  filter?: Maybe<ProposalsFilter>;
+}>;
+
+
+export type GetInstrumentScientistProposalsQuery = (
+  { __typename?: 'Query' }
+  & { instrumentScientistProposals: Maybe<(
+    { __typename?: 'ProposalsQueryResult' }
+    & Pick<ProposalsQueryResult, 'totalCount'>
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
+      & { proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), reviews: Maybe<Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
+        & { reviewer: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+        )> }
+      )>>, users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+      )>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'id' | 'name'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
+      )>, sep: Maybe<(
+        { __typename?: 'SEP' }
+        & Pick<Sep, 'id' | 'code'>
+      )> }
+      & ProposalFragment
+    )> }
   )> }
 );
 
@@ -4021,9 +4091,9 @@ export const AssignProposalDocument = gql`
   }
 }
     `;
-export const AssignMemberDocument = gql`
-    mutation assignMember($memberId: Int!, $sepId: Int!) {
-  assignMember(memberId: $memberId, sepId: $sepId) {
+export const AssignMembersDocument = gql`
+    mutation assignMembers($memberIds: [Int!]!, $sepId: Int!) {
+  assignMembers(memberIds: $memberIds, sepId: $sepId) {
     error
     sep {
       id
@@ -4487,6 +4557,21 @@ export const GetInstrumentsDocument = gql`
   }
 }
     ${BasicUserDetailsFragmentDoc}`;
+export const GetUserInstrumentsDocument = gql`
+    query getUserInstruments {
+  me {
+    instruments {
+      id
+      name
+      shortCode
+      description
+      scientists {
+        ...basicUserDetails
+      }
+    }
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const RemoveProposalFromInstrumentDocument = gql`
     mutation removeProposalFromInstrument($proposalId: Int!, $instrumentId: Int!) {
   removeProposalFromInstrument(proposalId: $proposalId, instrumentId: $instrumentId) {
@@ -4594,6 +4679,57 @@ export const GetBlankProposalDocument = gql`
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}`;
+export const GetInstrumentScientistProposalsDocument = gql`
+    query getInstrumentScientistProposals($filter: ProposalsFilter) {
+  instrumentScientistProposals(filter: $filter) {
+    proposals {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          username
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        id
+        comment
+        publicComment
+        timeAllocation
+        status
+        proposalID
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
+      }
+    }
+    totalCount
+  }
+}
+    ${ProposalFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -5347,8 +5483,8 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     assignProposal(variables: AssignProposalMutationVariables): Promise<AssignProposalMutation> {
       return withWrapper(() => client.request<AssignProposalMutation>(print(AssignProposalDocument), variables));
     },
-    assignMember(variables: AssignMemberMutationVariables): Promise<AssignMemberMutation> {
-      return withWrapper(() => client.request<AssignMemberMutation>(print(AssignMemberDocument), variables));
+    assignMembers(variables: AssignMembersMutationVariables): Promise<AssignMembersMutation> {
+      return withWrapper(() => client.request<AssignMembersMutation>(print(AssignMembersDocument), variables));
     },
     assignChairOrSecretary(variables: AssignChairOrSecretaryMutationVariables): Promise<AssignChairOrSecretaryMutation> {
       return withWrapper(() => client.request<AssignChairOrSecretaryMutation>(print(AssignChairOrSecretaryDocument), variables));
@@ -5446,6 +5582,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getInstruments(variables?: GetInstrumentsQueryVariables): Promise<GetInstrumentsQuery> {
       return withWrapper(() => client.request<GetInstrumentsQuery>(print(GetInstrumentsDocument), variables));
     },
+    getUserInstruments(variables?: GetUserInstrumentsQueryVariables): Promise<GetUserInstrumentsQuery> {
+      return withWrapper(() => client.request<GetUserInstrumentsQuery>(print(GetUserInstrumentsDocument), variables));
+    },
     removeProposalFromInstrument(variables: RemoveProposalFromInstrumentMutationVariables): Promise<RemoveProposalFromInstrumentMutation> {
       return withWrapper(() => client.request<RemoveProposalFromInstrumentMutation>(print(RemoveProposalFromInstrumentDocument), variables));
     },
@@ -5469,6 +5608,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
       return withWrapper(() => client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables));
+    },
+    getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
+      return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return withWrapper(() => client.request<GetProposalQuery>(print(GetProposalDocument), variables));

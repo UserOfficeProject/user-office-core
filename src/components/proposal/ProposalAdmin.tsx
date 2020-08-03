@@ -7,15 +7,28 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
-import { Proposal } from 'generated/sdk';
+import { Proposal, UserRole } from 'generated/sdk';
 import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
-export default function ProposalAdmin(props: { data: Proposal }) {
+export type AdministrationFormData = {
+  id: number;
+  commentForUser: string;
+  commentForManagement: string;
+  finalStatus: ProposalEndStatus;
+  rankOrder?: number;
+};
+
+export default function ProposalAdmin(props: {
+  data: Proposal;
+  setAdministration: (data: AdministrationFormData) => void;
+}) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues = {
     finalStatus: props.data.finalStatus || ProposalEndStatus.UNSET,
@@ -33,22 +46,23 @@ export default function ProposalAdmin(props: { data: Proposal }) {
         initialValues={initialValues}
         validationSchema={administrationProposalValidationSchema}
         onSubmit={async (values, actions) => {
-          await api()
-            .administrationProposal({
-              id: props.data.id,
-              finalStatus:
-                ProposalEndStatus[values.finalStatus as ProposalEndStatus],
-              status: ProposalStatus[values.proposalStatus as ProposalStatus],
-              commentForUser: values.commentForUser,
-              commentForManagement: values.commentForManagement,
-            })
-            .then(data =>
-              enqueueSnackbar('Updated', {
-                variant: data.administrationProposal.error
-                  ? 'error'
-                  : 'success',
-              })
-            );
+          const administrationValues = {
+            id: props.data.id,
+            finalStatus:
+              ProposalEndStatus[values.finalStatus as ProposalEndStatus],
+            status: ProposalStatus[values.proposalStatus as ProposalStatus],
+            commentForUser: values.commentForUser,
+            commentForManagement: values.commentForManagement,
+          };
+          const data = await api().administrationProposal(administrationValues);
+
+          enqueueSnackbar('Updated', {
+            variant: data.administrationProposal.error ? 'error' : 'success',
+          });
+
+          if (!data.administrationProposal.error) {
+            props.setAdministration(administrationValues);
+          }
           actions.setSubmitting(false);
         }}
       >
@@ -67,6 +81,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
                   ]}
                   required
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -80,6 +95,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                     { text: 'Submitted', value: ProposalStatus.SUBMITTED },
                   ]}
                   required
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -95,6 +111,7 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                   multiline
                   rowsMax="16"
                   rows="4"
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -110,19 +127,22 @@ export default function ProposalAdmin(props: { data: Proposal }) {
                   multiline
                   rowsMax="16"
                   rows="4"
+                  disabled={!isUserOfficer}
                 />
               </Grid>
             </Grid>
-            <ButtonContainer>
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Update
-              </Button>
-            </ButtonContainer>
+            {isUserOfficer && (
+              <ButtonContainer>
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                >
+                  Update
+                </Button>
+              </ButtonContainer>
+            )}
           </Form>
         )}
       </Formik>

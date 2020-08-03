@@ -8,6 +8,10 @@ import {
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
+import { Answer, DataType } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+import { FileMetaData } from 'models/FileUpload';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 
@@ -24,8 +28,35 @@ export default function ProposalQuestionaryReview(
 ) {
   const classes = useStyles();
 
-  if (!props.data.questionaryId) {
-    return <div>Loading...</div>;
+  const classes = makeStyles(theme => ({
+    heading: {
+      marginTop: theme.spacing(2),
+    },
+  }))();
+
+  const allFields = getAllFields(questionary.steps) as Answer[];
+  const completedFields = allFields.filter(field => {
+    return !!field.value;
+  });
+
+  // Get all questions with a file upload and create a string with fileid comma separated
+  const fileIds = completedFields
+    .filter(field => field.question.dataType === DataType.FILE_UPLOAD)
+    .map(fileId => fileId.value)
+    .join(',');
+
+  useEffect(() => {
+    if (fileIds) {
+      api()
+        .getFileMetadata({ fileIds: fileIds.split(',') })
+        .then(data => {
+          setFiles(data?.fileMetadata || []);
+        });
+    }
+  }, [api, fileIds]);
+
+  if (!props.data) {
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
   const questionary = props.data.questionary;
   const users = props.data.users || [];
@@ -40,6 +71,10 @@ export default function ProposalQuestionaryReview(
           <TableRow key="title">
             <TableCell>Title</TableCell>
             <TableCell>{props.data.title}</TableCell>
+          </TableRow>
+          <TableRow key="shortCode">
+            <TableCell>Proposal ID</TableCell>
+            <TableCell>{props.data.shortCode}</TableCell>
           </TableRow>
           <TableRow key="abstract">
             <TableCell>Abstract</TableCell>

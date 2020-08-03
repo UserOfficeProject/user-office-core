@@ -2,11 +2,15 @@ import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState, useCallback } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/TabPanel';
+import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import GeneralInformation from 'components/proposal/GeneralInformation';
 import ParticipantModal from 'components/proposal/ParticipantModal';
-import ProposalAdmin from 'components/proposal/ProposalAdmin';
+import ProposalAdmin, {
+  AdministrationFormData,
+} from 'components/proposal/ProposalAdmin';
 import {
   Proposal,
   CoreTechnicalReviewFragment,
@@ -38,6 +42,8 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const api = useDataApi();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
   const loadProposal = useCallback(async () => {
     return api()
       .getProposal({ id: parseInt(match.params.id) })
@@ -54,10 +60,11 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
     loadProposal();
   }, [loadProposal]);
 
-  const addUser = async (user: BasicUserDetails): Promise<void> => {
+  const addUser = async (users: BasicUserDetails[]): Promise<void> => {
+    // NOTE: This is now working! Do we really need this?
     // TODO: This should be reviewed here because we wont have adding user for review outside SEPs.
     await api().addUserForReview({
-      userID: user.id,
+      userID: users[0].id,
       proposalID: parseInt(match.params.id),
       sepID: 0,
     });
@@ -73,14 +80,18 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
   };
 
   if (!proposal) {
-    return <p>Loading</p>;
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
+  const tabNames = ['General', 'Excellence', 'Technical', 'Admin'];
+
+  if (isUserOfficer) {
+    tabNames.push('Logs');
   }
 
   return (
     <Container maxWidth="lg">
-      <SimpleTabs
-        tabNames={['General', 'Excellence', 'Technical', 'Admin', 'Logs']}
-      >
+      <SimpleTabs tabNames={tabNames}>
         <GeneralInformation
           data={proposal}
           onProposalChanged={(newProposal): void => setProposal(newProposal)}
@@ -89,9 +100,10 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           <ParticipantModal
             show={modalOpen}
             close={() => setOpen(false)}
-            addParticipant={addUser}
+            addParticipants={addUser}
             selectedUsers={reviews.map(review => review.userID)}
             title={'Reviewer'}
+            selection={true}
             userRole={UserRole.REVIEWER}
           />
           <ReviewTable
@@ -106,8 +118,15 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
           data={techReview}
           setReview={setTechReview}
         />
-        <ProposalAdmin data={proposal} />
-        <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
+        <ProposalAdmin
+          data={proposal}
+          setAdministration={(data: AdministrationFormData) =>
+            setProposal({ ...proposal, ...data })
+          }
+        />
+        {isUserOfficer && (
+          <EventLogList changedObjectId={proposal.id} eventType="PROPOSAL" />
+        )}
       </SimpleTabs>
     </Container>
   );

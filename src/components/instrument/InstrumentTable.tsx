@@ -3,6 +3,7 @@ import { AssignmentInd } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -11,6 +12,7 @@ import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 import AssignedScientistsTable from './AssignedScientistsTable';
 import CreateUpdateInstrument from './CreateUpdateInstrument';
+
 const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
@@ -33,10 +35,7 @@ const InstrumentTable: React.FC = () => {
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
-
-  if (loadingInstruments) {
-    return <p>Loading...</p>;
-  }
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api()
@@ -59,25 +58,31 @@ const InstrumentTable: React.FC = () => {
       });
   };
 
-  const assignScientistsToInstrument = async (scientist: BasicUserDetails) => {
+  const assignScientistsToInstrument = async (
+    scientists: BasicUserDetails[]
+  ) => {
     const assignScientistToInstrumentResult = await api().assignScientistsToInstrument(
       {
         instrumentId: assigningInstrumentId as number,
-        scientistIds: [scientist.id],
+        scientistIds: scientists.map(scientist => scientist.id),
       }
     );
 
     if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
-      if (!scientist.organisation) {
-        scientist.organisation = 'Other';
-      }
+      scientists = scientists.map(scientist => {
+        if (!scientist.organisation) {
+          scientist.organisation = 'Other';
+        }
+
+        return scientist;
+      });
 
       if (instrumentsData) {
         const newInstrumentsData = instrumentsData.map(instrumentItem => {
           if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
-              scientists: [...instrumentItem.scientists, { ...scientist }],
+              scientists: [...instrumentItem.scientists, ...scientists],
             };
           } else {
             return instrumentItem;
@@ -160,10 +165,11 @@ const InstrumentTable: React.FC = () => {
       <ParticipantModal
         show={!!assigningInstrumentId}
         close={(): void => setAssigningInstrumentId(null)}
-        addParticipant={assignScientistsToInstrument}
+        addParticipants={assignScientistsToInstrument}
         selectedUsers={instrumentAssignments?.scientists.map(
           scientist => scientist.id
         )}
+        selection={true}
         userRole={UserRole.INSTRUMENT_SCIENTIST}
         title={'Instrument scientist'}
         invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
@@ -172,9 +178,15 @@ const InstrumentTable: React.FC = () => {
         <SuperMaterialTable
           delete={onInstrumentDelete}
           setData={setInstrumentsData}
+          hasAccess={{
+            create: isUserOfficer,
+            update: isUserOfficer,
+            remove: isUserOfficer,
+          }}
           title={'Instruments'}
           columns={columns}
           data={instrumentsData}
+          isLoading={loadingInstruments}
           createModal={createModal}
           detailPanel={[
             {
@@ -186,14 +198,18 @@ const InstrumentTable: React.FC = () => {
             search: true,
             debounceInterval: 400,
           }}
-          actions={[
-            {
-              icon: AssignmentIndIcon,
-              tooltip: 'Assign scientist',
-              onClick: (_event: unknown, rowData: unknown): void =>
-                setAssigningInstrumentId((rowData as Instrument).id),
-            },
-          ]}
+          actions={
+            isUserOfficer
+              ? [
+                  {
+                    icon: AssignmentIndIcon,
+                    tooltip: 'Assign scientist',
+                    onClick: (_event: unknown, rowData: unknown): void =>
+                      setAssigningInstrumentId((rowData as Instrument).id),
+                  },
+                ]
+              : []
+          }
         />
       </div>
     </>

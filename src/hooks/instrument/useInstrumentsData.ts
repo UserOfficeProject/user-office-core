@@ -1,6 +1,13 @@
-import { useEffect, useState, SetStateAction, Dispatch } from 'react';
+import {
+  useEffect,
+  useState,
+  SetStateAction,
+  Dispatch,
+  useContext,
+} from 'react';
 
-import { Instrument } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { Instrument, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useInstrumentsData(): {
@@ -10,20 +17,32 @@ export function useInstrumentsData(): {
 } {
   const [instrumentsData, setInstrumentsData] = useState<Instrument[]>([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
+  const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
 
   useEffect(() => {
     setLoadingInstruments(true);
-    api()
-      .getInstruments()
-      .then(data => {
-        if (data.instruments) {
-          setInstrumentsData(data.instruments.instruments as Instrument[]);
-        }
-        setLoadingInstruments(false);
-      });
-  }, [api]);
+    if (currentRole === UserRole.USER_OFFICER) {
+      api()
+        .getInstruments()
+        .then(data => {
+          if (data.instruments) {
+            setInstrumentsData(data.instruments.instruments as Instrument[]);
+          }
+          setLoadingInstruments(false);
+        });
+    } else {
+      api()
+        .getUserInstruments()
+        .then(data => {
+          if (data.me?.instruments) {
+            setInstrumentsData(data.me.instruments as Instrument[]);
+          }
+          setLoadingInstruments(false);
+        });
+    }
+  }, [api, currentRole]);
 
   return { loadingInstruments, instrumentsData, setInstrumentsData };
 }

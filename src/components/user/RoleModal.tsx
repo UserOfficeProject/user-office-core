@@ -10,10 +10,16 @@ import RoleTable from './RoleTable';
 type RoleModalProps = {
   show: boolean;
   close: () => void;
-  add: (role: Role) => void;
+  add: (role: Role[]) => void;
+  activeRoles: Role[];
 };
 
-const RoleModal: React.FC<RoleModalProps> = ({ show, close, add }) => {
+const RoleModal: React.FC<RoleModalProps> = ({
+  show,
+  close,
+  add,
+  activeRoles,
+}) => {
   return (
     <Dialog
       aria-labelledby="simple-modal-title"
@@ -24,7 +30,7 @@ const RoleModal: React.FC<RoleModalProps> = ({ show, close, add }) => {
       data-cy="role-modal"
     >
       <DialogContent>
-        <RoleTable add={add} />
+        <RoleTable add={add} activeRoles={activeRoles} />
       </DialogContent>
     </Dialog>
   );
@@ -34,6 +40,7 @@ RoleModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   add: PropTypes.func.isRequired,
+  activeRoles: PropTypes.array.isRequired,
 };
 
 export default RoleModal;

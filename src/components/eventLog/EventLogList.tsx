@@ -1,4 +1,3 @@
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import dateformat from 'dateformat';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
@@ -41,12 +40,6 @@ const EventLogList: React.FC<EventLogListProps> = ({
     { title: 'Event type', field: 'eventType' },
   ];
 
-  if (loading) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
-    );
-  }
-
   return (
     <div data-cy="event-logs-table">
       <MaterialTable
@@ -54,6 +47,7 @@ const EventLogList: React.FC<EventLogListProps> = ({
         title={'Event logs'}
         columns={columns}
         data={eventLogsData}
+        isLoading={loading}
         options={{
           search: true,
           debounceInterval: 400,

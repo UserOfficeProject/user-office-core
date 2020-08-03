@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import parse from 'html-react-parser';
 import React from 'react';
 
-import InstrumentTable from 'components/instrument/InstrumentTable';
+import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import ProposalTableReviewer from 'components/review/ProposalTableReviewer';
 import { PageName, UserRole } from 'generated/sdk';
@@ -21,7 +21,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
       roleBasedOverView = <ProposalTableUser />;
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
-      roleBasedOverView = <InstrumentTable />;
+      roleBasedOverView = <ProposalTableInstrumentScientist />;
       break;
 
     default:
@@ -35,7 +35,11 @@ export default function OverviewPage(props: { userRole: UserRole }) {
           {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
             <Grid item xs={12}>
               <StyledPaper margin={[0]}>
-                {loadingContent ? null : parse(pageContent as string)}
+                {loadingContent ? (
+                  <div>Loading...</div>
+                ) : (
+                  parse(pageContent as string)
+                )}
               </StyledPaper>
             </Grid>
           )}

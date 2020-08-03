@@ -72,6 +72,7 @@ export default function PeoplePage() {
                   actionText="Edit user"
                   actionIcon={<Edit />}
                   action={setUserData}
+                  selection={false}
                   menuItems={menuItems}
                   onRemove={(user: { id: number }) =>
                     api()

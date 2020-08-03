@@ -28,6 +28,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
 
   useEffect(() => {
     const getUserInformation = async () => {
+      setLoading(true);
       const data = await api().getMyRoles();
 
       if (data?.me) {
@@ -35,6 +36,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
          *  which is used to determine if the user with that role is member of a SEP.
          */
         setRoles(getUniqueArrayBy(data.me?.roles, 'id'));
+        setLoading(false);
       }
     };
     getUserInformation();
@@ -96,6 +98,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
         title="User roles"
         columns={columns}
         data={roles}
+        isLoading={loading}
         options={{
           search: false,
           paging: false,

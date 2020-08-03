@@ -1,9 +1,10 @@
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { UserContext } from 'context/UserContextProvider';
 import { GetUserWithRolesQuery, Role } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
@@ -20,6 +21,7 @@ export default function UpdateUserRoles(props: { id: number }) {
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Array<Role>>([]);
   const { setRenewTokenValue } = useRenewToken();
+  const { user } = useContext(UserContext);
 
   const sendUpdateRoles = async (newRoles: Role[]) => {
     const variables = {
@@ -28,15 +30,18 @@ export default function UpdateUserRoles(props: { id: number }) {
     };
 
     const userUpdateResult = await api().updateUserRoles(variables);
-    setRenewTokenValue();
+
+    if (props.id === user.id) {
+      setRenewTokenValue();
+    }
 
     enqueueSnackbar('Updated Roles', {
       variant: userUpdateResult.updateUser.error ? 'error' : 'success',
     });
   };
 
-  const addRole = async (role: Role) => {
-    const newRoles = [...roles, role];
+  const addRole = async (newSelectedRoles: Role[]) => {
+    const newRoles = [...roles, ...newSelectedRoles];
     setRoles(newRoles);
     await sendUpdateRoles(newRoles);
     setOpen(false);
@@ -69,13 +74,14 @@ export default function UpdateUserRoles(props: { id: number }) {
 
   const columns = [{ title: 'Name', field: 'title' }];
 
-  if (!userData) {
-    return <p>Loading</p>;
-  }
-
   return (
     <React.Fragment>
-      <RoleModal show={modalOpen} close={() => setOpen(false)} add={addRole} />
+      <RoleModal
+        show={modalOpen}
+        close={() => setOpen(false)}
+        add={addRole}
+        activeRoles={roles}
+      />
       <MaterialTable
         title="Roles"
         columns={columns}
@@ -83,6 +89,7 @@ export default function UpdateUserRoles(props: { id: number }) {
         data={roles.map((role: Role) => {
           return { title: role.title, id: role.id };
         })}
+        isLoading={!userData}
         options={{
           search: false,
         }}

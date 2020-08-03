@@ -37,6 +37,7 @@ const AccountActionButton: React.FC = () => {
         aria-describedby="simple-modal-description"
         open={show}
         onClose={(): void => setShow(false)}
+        style={{ backdropFilter: 'blur(6px)' }}
       >
         <DialogContent>
           <RoleSelection close={() => setShow(false)} />

@@ -16,15 +16,21 @@ interface SuperProps<RowData extends object> {
   delete: (id: number) => Promise<boolean>;
   setData: Function;
   data: RowData[];
+  hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
 }
 
 interface EntryID {
   id: number;
 }
 
-export default function SuperMaterialTable<Entry extends EntryID>(
-  props: MaterialTableProps<Entry> & SuperProps<Entry>
-) {
+export default function SuperMaterialTable<Entry extends EntryID>({
+  hasAccess = {
+    create: true,
+    remove: true,
+    update: true,
+  },
+  ...props
+}: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
@@ -34,15 +40,17 @@ export default function SuperMaterialTable<Entry extends EntryID>(
   };
 
   const onUpdated = (objectUpdated: Entry) => {
-    const newObjectsArray = props.data.map(objectItem =>
-      objectItem.id === objectUpdated.id ? objectUpdated : objectItem
-    );
-    props.setData(newObjectsArray);
+    if (objectUpdated) {
+      const newObjectsArray = props.data.map(objectItem =>
+        objectItem.id === objectUpdated.id ? objectUpdated : objectItem
+      );
+      props.setData(newObjectsArray);
+    }
     setEditObject(null);
     setShow(false);
   };
 
-  const onDelete = async (deletedId: number) => {
+  const onDeleted = async (deletedId: number) => {
     const deleteResult = await props.delete(deletedId);
 
     if (!deleteResult) {
@@ -78,32 +86,43 @@ export default function SuperMaterialTable<Entry extends EntryID>(
       <MaterialTable
         {...props}
         icons={tableIcons}
-        editable={{
-          onRowDelete: (rowData: Entry): Promise<void> => onDelete(rowData.id),
-        }}
-        actions={[
-          {
-            icon: EditIcon,
-            tooltip: 'Edit',
-            onClick: (_event: unknown, rowData: Entry | Entry[]) => {
-              setShow(true);
-              setEditObject(rowData as Entry);
-            },
-            position: 'row',
-          },
-          ...actions,
-        ]}
+        editable={
+          hasAccess.remove
+            ? {
+                onRowDelete: (rowData: Entry): Promise<void> =>
+                  onDeleted(rowData.id),
+              }
+            : {}
+        }
+        actions={
+          hasAccess.update
+            ? [
+                {
+                  icon: EditIcon,
+                  tooltip: 'Edit',
+                  onClick: (_event: unknown, rowData: Entry | Entry[]) => {
+                    setShow(true);
+                    setEditObject(rowData as Entry);
+                  },
+                  position: 'row',
+                },
+                ...actions,
+              ]
+            : [...actions]
+        }
       />
-      <ActionButtonContainer>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          onClick={() => setShow(true)}
-        >
-          Create
-        </Button>
-      </ActionButtonContainer>
+      {hasAccess.create && (
+        <ActionButtonContainer>
+          <Button
+            type="button"
+            variant="contained"
+            color="primary"
+            onClick={() => setShow(true)}
+          >
+            Create
+          </Button>
+        </ActionButtonContainer>
+      )}
     </>
   );
 }

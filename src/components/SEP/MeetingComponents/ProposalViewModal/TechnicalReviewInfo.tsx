@@ -13,7 +13,7 @@ import { TechnicalReview } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
 
 type TechnicalReviewInfoProps = {
-  technicalReview: TechnicalReview;
+  technicalReview: TechnicalReview | null;
 };
 
 const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
@@ -60,7 +60,7 @@ const TechnicalReviewInfo: React.FC<TechnicalReviewInfoProps> = ({
 };
 
 TechnicalReviewInfo.propTypes = {
-  technicalReview: PropTypes.any.isRequired,
+  technicalReview: PropTypes.any,
 };
 
 export default TechnicalReviewInfo;

@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -25,6 +25,7 @@ export type UserProposalDataType = {
 
 const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
+  const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
     status: ProposalStatus;
     finalStatus?: ProposalEndStatus | null | undefined;
@@ -38,9 +39,13 @@ const ProposalTableUser: React.FC = () => {
   };
 
   const sendUserProposalRequest = useCallback(async () => {
+    setLoading(true);
+
     return api()
       .getUserProposals()
       .then(data => {
+        setLoading(false);
+
         return {
           page: 0,
           totalCount: data?.me?.proposals.length,
@@ -69,6 +74,7 @@ const ProposalTableUser: React.FC = () => {
       title="Your proposals"
       search={false}
       searchQuery={sendUserProposalRequest}
+      isLoading={loading}
     />
   );
 };

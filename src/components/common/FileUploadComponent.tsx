@@ -1,7 +1,6 @@
 import {
   Avatar,
   Button,
-  CircularProgress,
   IconButton,
   List,
   ListItem,
@@ -22,6 +21,8 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { UPLOAD_STATE, useFileUpload } from 'hooks/common/useFileUpload';
 import { usePrevious } from 'hooks/common/usePrevious';
 import { FileMetaData } from 'models/FileUpload';
+
+import UOLoader from './UOLoader';
 
 export function FileUploadComponent(props: {
   maxFiles?: number;
@@ -265,7 +266,7 @@ export function NewFileEntry(props: {
       return (
         <>
           <ListItemAvatar>
-            <CircularProgress variant="static" value={progress} />
+            <UOLoader variant="static" value={progress} />
           </ListItemAvatar>
           <ListItemText
             primary="Uploading..."

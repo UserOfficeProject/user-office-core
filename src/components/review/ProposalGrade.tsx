@@ -9,6 +9,7 @@ import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { useState, useEffect, useContext } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { ReviewStatus, CoreReviewFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -43,7 +44,7 @@ export default function ProposalGrade(props: {
   }, [reviewData]);
 
   if (!review) {
-    return <p>Loading</p>;
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
   return (

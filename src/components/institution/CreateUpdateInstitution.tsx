@@ -4,10 +4,11 @@ import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
+import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
@@ -15,12 +16,14 @@ type CreateUpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
   institution: Institution | null;
 };
+
 const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   close,
   institution,
 }) => {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const initialValues = institution
     ? {
         name: institution.name,
@@ -47,6 +50,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         } else if (institution) {
           close(institution);
         }
+        setSubmitting(false);
       });
   };
 
@@ -68,16 +72,20 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         } else if (institution) {
           close(institution);
         }
+
+        setSubmitting(false);
       });
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values): Promise<void> => {
+      onSubmit={async (values, actions): Promise<void> => {
+        setSubmitting(true);
         institution
           ? updateInstitution(institution.id, values.verified, values.name)
           : createInstitution(values.verified, values.name);
+        actions.setSubmitting(false);
       }}
       validationSchema={{
         name: Yup.string().required(),
@@ -97,6 +105,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             component={TextField}
             data-cy="name"
             fullWidth
+            disabled={submitting}
           />
 
           <FormikDropdown
@@ -107,6 +116,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
               { text: 'false', value: 'false' },
             ]}
             data-cy="verified"
+            disabled={submitting}
           />
 
           <Button
@@ -115,7 +125,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             variant="contained"
             color="primary"
             data-cy="submit"
+            disabled={submitting}
           >
+            {submitting && <UOLoader size={14} />}
             {institution ? 'Update' : 'Create'}
           </Button>
         </Form>

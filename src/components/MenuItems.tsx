@@ -1,4 +1,4 @@
-import { Collapse } from '@material-ui/core';
+import { Collapse, Tooltip } from '@material-ui/core';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -14,20 +14,22 @@ import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { UserContext } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
-import { useCallsData } from 'hooks/call/useCallsData';
+import { UserRole, Call } from 'generated/sdk';
 
 import ScienceIcon from './common/ScienceIcon';
 
-const MenuItems: React.FC = () => {
-  const { callsData } = useCallsData({ isActive: true });
-  const { currentRole } = useContext(UserContext);
+type MenuItemsProps = {
+  currentRole: UserRole | null;
+  callsData: Call[];
+};
 
+const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   const proposalDisabled = callsData.length === 0;
+  const multipleCalls = callsData.length > 1;
+
   const user = (
     <div data-cy="user-menu-items">
       <ListItem component={Link} to="/" button>
@@ -38,7 +40,11 @@ const MenuItems: React.FC = () => {
       </ListItem>
       <ListItem
         component={Link}
-        to="/ProposalSelectType"
+        to={
+          multipleCalls
+            ? '/ProposalSelectType'
+            : `/ProposalCreate/${callsData[0]?.templateId}`
+        }
         button
         disabled={proposalDisabled}
       >
@@ -86,7 +92,9 @@ const MenuItems: React.FC = () => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <ListItemText primary="SEPs" />
+        <Tooltip title="Scientific evaluation panels">
+          <ListItemText primary="SEPs" />
+        </Tooltip>
       </ListItem>
       <ListItem component={Link} to="/PageEditor" button>
         <ListItemIcon>
@@ -127,13 +135,21 @@ const MenuItems: React.FC = () => {
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
-        <ListItemText primary="SEPs" />
+        <Tooltip title="Scientific evaluation panels">
+          <ListItemText primary="SEPs" />
+        </Tooltip>
       </ListItem>
     </div>
   );
 
   const instrumentScientist = (
     <div data-cy="instrument-scientist-menu-items">
+      <ListItem component={Link} to="/" button>
+        <ListItemIcon>
+          <FolderOpen />
+        </ListItemIcon>
+        <ListItemText primary="View Proposals" />
+      </ListItem>
       <ListItem component={Link} to="/InstrumentPage" button>
         <ListItemIcon>
           <GroupWorkIcon />

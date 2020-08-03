@@ -5,17 +5,18 @@ import {
   IconButton,
   Tooltip,
   withStyles,
-  CircularProgress,
 } from '@material-ui/core';
 import { PersonAdd, Person } from '@material-ui/icons';
 import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
+import { UserContext } from 'context/UserContextProvider';
 import { SepMember, BasicUserDetails, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
@@ -46,6 +47,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const [modalOpen, setOpen] = useState(false);
   const [sepChairModalOpen, setSepChairModalOpen] = useState(false);
   const [sepSecretaryModalOpen, setSepSecretaryModalOpen] = useState(false);
+  const { user } = useContext(UserContext);
   const { setRenewTokenValue } = useRenewToken();
   const {
     loadingMembers,
@@ -107,28 +109,37 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     });
   };
 
-  const sendSEPChairUpdate = async (value: BasicUserDetails): Promise<void> => {
+  const sendSEPChairUpdate = async (
+    value: BasicUserDetails[]
+  ): Promise<void> => {
+    const [sepChair] = value;
+
     const assignChairResult = await api().assignChairOrSecretary({
       addSEPMembersRole: {
         SEPID: sepId,
         roleID: UserRole.SEP_CHAIR,
-        userID: value.id,
+        userIDs: [sepChair.id],
       },
     });
 
     showNotification(!!assignChairResult.assignChairOrSecretary.error);
     setSepChairModalOpen(false);
-    setRenewTokenValue();
+
+    if (sepChair.id === user.id || initialValues.SEPChair?.id === user.id) {
+      setRenewTokenValue();
+    }
   };
 
   const sendSEPSecretaryUpdate = async (
-    value: BasicUserDetails
+    value: BasicUserDetails[]
   ): Promise<void> => {
+    const [sepSecretary] = value;
+
     const assignSecretaryResult = await api().assignChairOrSecretary({
       addSEPMembersRole: {
         SEPID: sepId,
         roleID: UserRole.SEP_SECRETARY,
-        userID: value.id,
+        userIDs: [sepSecretary.id],
       },
     });
 
@@ -138,18 +149,23 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       setSepSecretaryModalOpen(false);
     }
 
-    setRenewTokenValue();
+    if (
+      sepSecretary.id === user.id ||
+      initialValues.SEPSecretary?.id === user.id
+    ) {
+      setRenewTokenValue();
+    }
   };
 
-  const addMember = async (user: BasicUserDetails): Promise<void> => {
-    initialValues.SEPReviewers.push(user);
+  const addMember = async (users: BasicUserDetails[]): Promise<void> => {
+    initialValues.SEPReviewers.push(...users);
 
-    const assignedMembersResult = await api().assignMember({
-      memberId: user.id,
+    const assignedMembersResult = await api().assignMembers({
+      memberIds: users.map(user => user.id),
       sepId,
     });
 
-    showNotification(!!assignedMembersResult.assignMember.error);
+    showNotification(!!assignedMembersResult.assignMembers.error);
   };
 
   const removeMember = async (user: BasicUserDetails): Promise<void> => {
@@ -160,7 +176,18 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
 
     if (SEPMembersData) {
       setSEPMembersData(
-        SEPMembersData.filter(member => member.userId !== user.id)
+        SEPMembersData.map(member => {
+          if (member.userId === user.id) {
+            return {
+              ...member,
+              roles: member.roles.filter(
+                role => role.shortCode.toUpperCase() !== UserRole.SEP_REVIEWER
+              ),
+            };
+          }
+
+          return member;
+        })
       );
     }
 
@@ -168,9 +195,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   };
 
   if (loadingMembers) {
-    return (
-      <CircularProgress style={{ marginLeft: '50%', marginTop: '20px' }} />
-    );
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
   }
 
   if (SEPMembersData && SEPMembersData.length > 0) {
@@ -195,15 +220,16 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       <ParticipantModal
         show={modalOpen}
         close={(): void => setOpen(false)}
-        addParticipant={addMember}
+        addParticipants={addMember}
         selectedUsers={initialValues.SEPReviewers.map(reviewer => reviewer.id)}
+        selection={true}
         title={'Reviewer'}
         userRole={UserRole.REVIEWER}
       />
       <ParticipantModal
         show={sepChairModalOpen}
         close={(): void => setSepChairModalOpen(false)}
-        addParticipant={sendSEPChairUpdate}
+        addParticipants={sendSEPChairUpdate}
         selectedUsers={[
           ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
         ].concat(initialValues.SEPChair ? [initialValues.SEPChair?.id] : [])}
@@ -213,7 +239,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       <ParticipantModal
         show={sepSecretaryModalOpen}
         close={(): void => setSepSecretaryModalOpen(false)}
-        addParticipant={sendSEPSecretaryUpdate}
+        addParticipants={sendSEPSecretaryUpdate}
         selectedUsers={[
           ...initialValues.SEPReviewers.map(reviewer => reviewer.id),
         ].concat(
