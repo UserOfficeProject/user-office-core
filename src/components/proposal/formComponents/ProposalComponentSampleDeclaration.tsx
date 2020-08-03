@@ -3,7 +3,6 @@ import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import React, { useEffect, useState } from 'react';
-import { stringToNumericArray } from 'utils/ArrayUtils';
 import useCallWithFeedback from 'utils/useCallWithFeedback';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
@@ -21,7 +20,9 @@ export default function ProposalComponentSampleDeclaration(
   const { callWithFeedback } = useCallWithFeedback();
   const api = useDataApi();
 
-  const [stateValue, setStateValue] = useState<string>(templateField.value);
+  const [stateValue, setStateValue] = useState<number[]>(
+    templateField.value || []
+  );
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
@@ -64,15 +65,12 @@ export default function ProposalComponentSampleDeclaration(
               })
           }
           onDeleteClick={item => {
-            let newStateValue = stringToNumericArray(stateValue);
-            newStateValue = newStateValue.filter(sample => sample !== item.id);
-            setStateValue(newStateValue.join(','));
-
-            let newSamples = rows.slice();
-            newSamples = newSamples.filter(row => row.id !== item.id);
-            setRows(newSamples);
-
-            onComplete(null as any, newStateValue.join(','));
+            const newStateValue = stateValue.filter(
+              sampleId => sampleId !== item.id
+            );
+            setStateValue(newStateValue);
+            setRows(rows.filter(row => row.id !== item.id));
+            onComplete(null as any, newStateValue);
           }}
           onAddNewClick={() =>
             callWithFeedback(
@@ -85,17 +83,11 @@ export default function ProposalComponentSampleDeclaration(
             ).then(response => {
               const { sample: newSample } = response;
               if (newSample) {
-                const newStateValue = stringToNumericArray(stateValue);
-                newStateValue.push(newSample.id);
-                setStateValue(newStateValue.join(','));
-
-                const newSamples = rows.slice();
-                newSamples.push(sampleToQuestionaryListRow(newSample));
-                setRows(newSamples);
-
+                const newStateValue = [...stateValue, newSample.id];
+                setStateValue(newStateValue);
+                setRows([...rows, sampleToQuestionaryListRow(newSample)]);
                 setSelectedSample(newSample);
-
-                onComplete(null as any, newStateValue.join(','));
+                onComplete(null as any, newStateValue);
               }
             })
           }
