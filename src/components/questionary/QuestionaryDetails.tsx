@@ -7,6 +7,8 @@ import {
   TableCell,
   TableRow,
 } from '@material-ui/core';
+import React, { useState } from 'react';
+
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import SampleDetails from 'components/sample/SampleDetails';
@@ -22,7 +24,6 @@ import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
 import { getAllFields } from 'models/ProposalModelFunctions';
-import React, { useState } from 'react';
 import { stringToTextArray } from 'utils/ArrayUtils';
 
 const useStyles = makeStyles(theme => ({
