@@ -1,7 +1,7 @@
 import { Field, ObjectType, Int } from 'type-graphql';
 
 import { Answer as AnswerOrigin } from '../../models/ProposalModel';
-import { IntStringDateBool } from '../CustomScalars';
+import { IntStringDateBoolArray, AnswerType } from '../CustomScalars';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 
 @ObjectType()
@@ -10,6 +10,6 @@ export class Answer extends QuestionTemplateRelation
   @Field(() => Int, { nullable: true })
   public answerId: number;
 
-  @Field(() => IntStringDateBool, { nullable: true })
-  public value?: number | string | Date | boolean;
+  @Field(() => IntStringDateBoolArray, { nullable: true })
+  public value?: AnswerType;
 }

@@ -146,7 +146,7 @@ const writeAnswer = async (answer: Answer, doc: PDFDocument) => {
 const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
   writeBold(answer.question.question, doc);
   doc.moveDown();
-  const subQuestionaryIds = answer.value.split(',');
+  const subQuestionaryIds = answer.value;
   for (const subQuestionaryId of subQuestionaryIds) {
     writeBold(
       `Entry ${subQuestionaryIds.indexOf(subQuestionaryId) + 1} of ${
@@ -157,7 +157,10 @@ const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
     const subquestionarySteps = await questionaryDataSource.getQuestionarySteps(
       subQuestionaryId
     );
-    const firstStepTopicId = subquestionarySteps![0].topic.id; // NOTE: for now only the first topic
+    if (subquestionarySteps.length === 0) {
+      continue;
+    }
+    const firstStepTopicId = subquestionarySteps[0].topic.id; // NOTE: for now only the first topic
     const answers = getTopicActiveAnswers(
       subquestionarySteps!,
       firstStepTopicId
