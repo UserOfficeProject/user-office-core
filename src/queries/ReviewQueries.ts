@@ -42,7 +42,10 @@ export default class ReviewQueries {
     user: UserWithRole | null,
     proposalID: number
   ): Promise<TechnicalReview | null> {
-    if (await this.userAuth.isUserOfficer(user)) {
+    if (
+      (await this.userAuth.isUserOfficer(user)) ||
+      (await this.userAuth.isScientistToProposal(user, proposalID))
+    ) {
       return this.dataSource.getTechnicalReview(proposalID);
     } else if (await this.userAuth.isReviewerOfProposal(user, proposalID)) {
       const review = await this.dataSource.getTechnicalReview(proposalID);

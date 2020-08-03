@@ -54,7 +54,8 @@ export default class ProposalQueries {
     return (
       (await this.userAuth.isUserOfficer(agent)) ||
       (await this.userAuth.isMemberOfProposal(agent, proposal)) ||
-      (await this.userAuth.isReviewerOfProposal(agent, proposal.id))
+      (await this.userAuth.isReviewerOfProposal(agent, proposal.id)) ||
+      (await this.userAuth.isScientistToProposal(agent, proposal.id))
     );
   }
 
@@ -66,6 +67,26 @@ export default class ProposalQueries {
     offset?: number
   ) {
     return this.dataSource.getProposals(filter, first, offset);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getAllView(agent: UserWithRole | null, filter?: ProposalsFilter) {
+    return this.dataSource.getProposalsFromView(filter);
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async getInstrumentScientistProposals(
+    agent: UserWithRole | null,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return this.dataSource.getInstrumentScientistProposals(
+      agent?.id as number,
+      filter,
+      first,
+      offset
+    );
   }
 
   @Authorized()

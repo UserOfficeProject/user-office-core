@@ -60,11 +60,26 @@ export default class ReviewMutations {
   }
 
   @ValidateArgs(proposalTechnicalReviewValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async setTechnicalReview(
     agent: UserWithRole | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
+    console.log(
+      await this.userAuth.isUserOfficer(agent),
+      await this.userAuth.isScientistToProposal(agent, args.proposalID)
+    );
+    if (
+      !(
+        (await this.userAuth.isUserOfficer(agent)) ||
+        (await this.userAuth.isScientistToProposal(agent, args.proposalID))
+      )
+    ) {
+      logger.logWarn('Blocked submitting technical review', { agent, args });
+
+      return rejection('INSUFFICIENT_PERMISSIONS');
+    }
+
     return this.dataSource
       .setTechnicalReview(args)
       .then(review => review)

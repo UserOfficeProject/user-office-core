@@ -7,7 +7,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateCategoryId } from '../models/ProposalModel';
-import { User } from '../models/User';
+import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
 
 interface QuestionaryAuthorizer {
@@ -17,14 +17,14 @@ interface QuestionaryAuthorizer {
 
 class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
   constructor(private proposalDataSource: ProposalDataSource) {}
-  async hasReadRights(agent: User | null, questionaryId: number) {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
-  async hasWriteRights(agent: User | null, questionaryId: number) {
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
 
-  private async hasRights(agent: User | null, questionaryId: number) {
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;
     }
@@ -44,14 +44,14 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource
   ) {}
-  async hasReadRights(agent: User | null, questionaryId: number) {
+  async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
-  async hasWriteRights(agent: User | null, questionaryId: number) {
+  async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);
   }
 
-  private async hasRights(agent: User | null, questionaryId: number) {
+  private async hasRights(agent: UserWithRole | null, questionaryId: number) {
     if (!agent) {
       return false;
     }

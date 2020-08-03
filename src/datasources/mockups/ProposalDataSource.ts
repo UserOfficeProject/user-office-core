@@ -2,6 +2,7 @@
 import 'reflect-metadata';
 import { Proposal } from '../../models/Proposal';
 import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
+import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 
@@ -37,6 +38,11 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
 };
 
 export class ProposalDataSourceMock implements ProposalDataSource {
+  async getProposalsFromView(
+    filter?: ProposalsFilter | undefined
+  ): Promise<ProposalView[]> {
+    return [];
+  }
   public init() {
     dummyProposal = new Proposal(
       1,
@@ -140,5 +146,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async getUserProposals(id: number) {
     return [dummyProposal];
+  }
+
+  async getInstrumentScientistProposals(
+    scientsitId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return { totalCount: 1, proposals: [dummyProposal] };
   }
 }

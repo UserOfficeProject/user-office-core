@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Role } from '../../models/Role';
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
+import { User } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 import database from './database';
@@ -49,6 +50,16 @@ export default class PostgresSEPDataSource implements SEPDataSource {
       sepMember.user_id,
       sepMember.sep_id
     );
+  }
+
+  async isMemberOfSEP(agent: User | null, sepId: number) {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.getUserSeps(agent.id).then(seps => {
+      return seps.some(sepItem => sepItem.id === sepId);
+    });
   }
 
   async create(
@@ -217,13 +228,12 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async getMembers(sepId: number): Promise<SEPMember[]> {
-    const sepAssignments: SEPMemberRecord[] = await database
+    const sepMembers: SEPMemberRecord[] = await database
       .from('role_user')
-      .where('sep_id', sepId);
+      .where('sep_id', sepId)
+      .distinct(database.raw('ON (user_id) *'));
 
-    return sepAssignments.map(sepMember =>
-      this.createSEPMemberObject(sepMember)
-    );
+    return sepMembers.map(sepMember => this.createSEPMemberObject(sepMember));
   }
 
   async getSEPUserRoles(id: number, sepId: number): Promise<Role[]> {
@@ -256,33 +266,35 @@ export default class PostgresSEPDataSource implements SEPDataSource {
   }
 
   async addSEPMembersRole(userWithRoles: AddSEPMembersRole) {
-    const roleToInsert = {
-      user_id: userWithRoles.userID,
+    const rolesToInsert = userWithRoles.userIDs.map(userId => ({
+      user_id: userId,
       role_id: userWithRoles.roleID,
       sep_id: userWithRoles.SEPID,
-    };
+    }));
 
     await database('role_user')
       .del()
-      .where('sep_id', roleToInsert.sep_id)
-      .andWhere('role_id', roleToInsert.role_id);
+      .whereIn('user_id', userWithRoles.userIDs)
+      .andWhere('sep_id', userWithRoles.SEPID)
+      .andWhere('role_id', userWithRoles.roleID);
 
-    await database.insert(roleToInsert).into('role_user');
+    await database.insert(rolesToInsert).into('role_user');
 
-    const sepUpdated = await this.get(roleToInsert.sep_id);
+    const sepUpdated = await this.get(userWithRoles.SEPID);
 
     if (sepUpdated) {
       return sepUpdated;
     }
 
-    throw new Error(`SEP not found ${roleToInsert.sep_id}`);
+    throw new Error(`SEP not found ${userWithRoles.SEPID}`);
   }
 
-  async removeSEPMemberRole(memberId: number, sepId: number) {
+  async removeSEPMemberRole(memberId: number, sepId: number, roleId: number) {
     const memberRemoved = await database('role_user')
       .del()
       .where('sep_id', sepId)
-      .andWhere('user_id', memberId);
+      .andWhere('user_id', memberId)
+      .andWhere('role_id', roleId);
 
     const sepUpdated = await this.get(sepId);
 

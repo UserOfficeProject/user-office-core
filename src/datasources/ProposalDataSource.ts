@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Proposal } from '../models/Proposal';
+import { ProposalView } from '../models/ProposalView';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 export interface ProposalDataSource {
+  getProposalsFromView(filter?: ProposalsFilter): Promise<ProposalView[]>;
   // Read
   get(id: number): Promise<Proposal | null>;
   checkActiveCall(callId: number): Promise<boolean>;
   getProposals(
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: Proposal[] }>;
+  getInstrumentScientistProposals(
+    scientistId: number,
     filter?: ProposalsFilter,
     first?: number,
     offset?: number

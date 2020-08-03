@@ -1,22 +1,12 @@
 import { SEPDataSource } from '../datasources/SEPDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 
 export default class SEPQueries {
   constructor(public dataSource: SEPDataSource) {}
 
-  private async isMemberOfSEP(agent: User | null, sepId: number) {
-    if (agent == null) {
-      return false;
-    }
-
-    return this.dataSource.getUserSeps(agent.id).then(seps => {
-      return seps.some(sepItem => sepItem.id === sepId);
-    });
-  }
-
-  private async isUserOfficer(agent: UserWithRole | null) {
+  private isUserOfficer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
@@ -38,8 +28,8 @@ export default class SEPQueries {
     }
 
     if (
-      (await this.isUserOfficer(agent)) ||
-      (await this.isMemberOfSEP(agent, id))
+      this.isUserOfficer(agent) ||
+      (await this.dataSource.isMemberOfSEP(agent, id))
     ) {
       return sep;
     } else {
@@ -79,8 +69,8 @@ export default class SEPQueries {
     { sepId, callId }: { sepId: number; callId: number }
   ) {
     if (
-      (await this.isUserOfficer(agent)) ||
-      (await this.isMemberOfSEP(agent, sepId))
+      this.isUserOfficer(agent) ||
+      (await this.dataSource.isMemberOfSEP(agent, sepId))
     ) {
       return this.dataSource.getSEPProposals(sepId, callId);
     } else {
@@ -103,8 +93,8 @@ export default class SEPQueries {
     }: { sepId: number; instrumentId: number; callId: number }
   ) {
     if (
-      (await this.isUserOfficer(agent)) ||
-      (await this.isMemberOfSEP(agent, sepId))
+      this.isUserOfficer(agent) ||
+      (await this.dataSource.isMemberOfSEP(agent, sepId))
     ) {
       return this.dataSource.getSEPProposalsByInstrument(
         sepId,

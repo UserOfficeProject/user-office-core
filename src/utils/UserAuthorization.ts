@@ -5,6 +5,7 @@ import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
+import { Roles } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 
 export class UserAuthorization {
@@ -13,14 +14,12 @@ export class UserAuthorization {
     private reviewDataSource: ReviewDataSource
   ) {}
 
-  async isUserOfficer(agent: User | null) {
+  async isUserOfficer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
 
-    return this.userDataSource.getUserRoles(agent.id).then(roles => {
-      return roles.some(role => role.shortCode === 'user_officer');
-    });
+    return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
   // NOTE: This is not a good check if it is a user or not. It should do the same check as isUserOfficer.
@@ -68,14 +67,27 @@ export class UserAuthorization {
     });
   }
 
+  async isScientistToProposal(agent: User | null, proposalID: number) {
+    if (agent == null) {
+      return false;
+    }
+
+    return this.userDataSource
+      .checkScientistToProposal(agent.id, proposalID)
+      .then(result => {
+        return result;
+      });
+  }
+
   async hasAccessRights(
-    agent: User | null,
+    agent: UserWithRole | null,
     proposal: Proposal
   ): Promise<boolean> {
     return (
       (await this.isUserOfficer(agent)) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.id))
+      (await this.isReviewerOfProposal(agent, proposal.id)) ||
+      (await this.isScientistToProposal(agent, proposal.id))
     );
   }
 }

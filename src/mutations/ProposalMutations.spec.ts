@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
-import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserNotOnProposal,
   UserDataSourceMock,

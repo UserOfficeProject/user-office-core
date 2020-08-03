@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { User as UserOrigin } from '../../models/User';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { Review } from './Review';
 import { Role } from './Role';
@@ -104,5 +105,10 @@ export class UserResolver {
   @FieldResolver(() => [SEP])
   async seps(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.sep.dataSource.getUserSeps(user.id);
+  }
+
+  @FieldResolver(() => [Instrument])
+  async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.instrument.dataSource.getUserInstruments(user.id);
   }
 }

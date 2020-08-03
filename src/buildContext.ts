@@ -81,7 +81,10 @@ const eventLogQueries = new EventLogQueries(eventLogsDataSource);
 const sepQueries = new SEPQueries(sepDataSource);
 const sepMutations = new SEPMutations(sepDataSource, userAuthorization);
 
-const instrumentQueries = new InstrumentQueries(instrumentDatasource);
+const instrumentQueries = new InstrumentQueries(
+  instrumentDatasource,
+  sepDataSource
+);
 const instrumentMutations = new InstrumentMutations(instrumentDatasource);
 
 const questionaryQueries = new QuestionaryQueries(

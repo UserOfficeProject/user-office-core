@@ -4,10 +4,17 @@ import { Transaction } from 'knex';
 
 import { Proposal } from '../../models/Proposal';
 import { ProposalStatus } from '../../models/ProposalModel';
+import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import database from './database';
-import { CallRecord, createProposalObject, ProposalRecord } from './records';
+import {
+  CallRecord,
+  createProposalObject,
+  createProposalViewObject,
+  ProposalRecord,
+  ProposalViewRecord,
+} from './records';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
   // TODO move this function to callDataSource
@@ -140,6 +147,28 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  async getProposalsFromView(
+    filter?: ProposalsFilter
+  ): Promise<ProposalView[]> {
+    return database
+      .select()
+      .from('proposal_table_view')
+      .modify(query => {
+        if (filter?.callId) {
+          query.where('proposal_table_view.call_id', filter?.callId);
+        }
+        if (filter?.instrumentId) {
+          query.where(
+            'proposal_table_view.instrument_id',
+            filter?.instrumentId
+          );
+        }
+      })
+      .then((proposals: ProposalViewRecord[]) => {
+        return proposals.map(proposal => createProposalViewObject(proposal));
+      });
+  }
+
   async getProposals(
     filter?: ProposalsFilter,
     first?: number,
@@ -181,6 +210,57 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               'instrument_has_proposals.instrument_id',
               filter.instrumentId
             );
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((proposals: ProposalRecord[]) => {
+        const props = proposals.map(proposal => createProposalObject(proposal));
+
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props,
+        };
+      });
+  }
+
+  async getInstrumentScientistProposals(
+    scientistId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: Proposal[] }> {
+    return database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposals')
+      .join('instrument_has_scientists', {
+        'instrument_has_scientists.user_id': scientistId,
+      })
+      .join('instrument_has_proposals', {
+        'instrument_has_proposals.proposal_id': 'proposals.proposal_id',
+        'instrument_has_proposals.instrument_id':
+          'instrument_has_scientists.instrument_id',
+      })
+      .orderBy('proposals.proposal_id', 'desc')
+      .modify(query => {
+        if (filter?.text) {
+          query
+            .where('title', 'ilike', `%${filter.text}%`)
+            .orWhere('abstract', 'ilike', `%${filter.text}%`);
+        }
+        if (filter?.callId) {
+          query.where('proposals.call_id', filter.callId);
+        }
+        if (filter?.instrumentId) {
+          query.where(
+            'instrument_has_proposals.instrument_id',
+            filter.instrumentId
+          );
         }
 
         if (first) {

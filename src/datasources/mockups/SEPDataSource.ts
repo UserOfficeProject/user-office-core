@@ -1,4 +1,5 @@
 import { SEP, SEPAssignment, SEPMember, SEPProposal } from '../../models/SEP';
+import { User } from '../../models/User';
 import { AddSEPMembersRole } from '../../resolvers/mutations/AddSEPMembersRoleMutation';
 import { SEPDataSource } from '../SEPDataSource';
 
@@ -73,6 +74,10 @@ export const dummySEPProposals = [dummySEPProposal, anotherDummySEPProposal];
 export const dummySEPMembers = [dummySEPMember, anotherDummySEPMember];
 
 export class SEPDataSourceMock implements SEPDataSource {
+  async isMemberOfSEP(agent: User | null, sepId: number) {
+    return true;
+  }
+
   async create(
     code: string,
     description: string,
@@ -178,7 +183,7 @@ export class SEPDataSourceMock implements SEPDataSource {
     throw new Error(`SEP not found ${args.SEPID}`);
   }
 
-  async removeSEPMemberRole(memberId: number, sepId: number) {
+  async removeSEPMemberRole(memberId: number, sepId: number, roleId: number) {
     const sep = dummySEPs.find(element => element.id === sepId);
 
     if (sep) {
