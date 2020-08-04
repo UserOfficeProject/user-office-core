@@ -16,19 +16,8 @@ export class FieldDependency {
     public questionId: string,
     public dependencyId: string,
     public dependencyNaturalKey: string,
-    public condition?: FieldCondition
+    public condition: FieldCondition
   ) {}
-
-  static fromObject(obj: any) {
-    return new FieldDependency(
-      obj.questionId,
-      obj.dependencyId,
-      obj.dependencyNaturalKey,
-      typeof obj.condition == 'string'
-        ? JSON.parse(obj.condition)
-        : obj.condition
-    );
-  }
 }
 
 export enum DataType {
@@ -48,10 +37,6 @@ export class Topic {
     public sortOrder: number,
     public isEnabled: boolean
   ) {}
-
-  public static fromObject(obj: any) {
-    return new Topic(obj.id, obj.title, obj.sortOrder, obj.isEnabled);
-  }
 }
 
 export class Question {
@@ -63,17 +48,6 @@ export class Question {
     public question: string,
     public config: typeof FieldConfigType
   ) {}
-
-  static fromObject(obj: any) {
-    return new Question(
-      obj.category_id,
-      obj.proposalQuestionId,
-      obj.naturalKey,
-      obj.dataType,
-      obj.question,
-      obj.config
-    );
-  }
 }
 
 export class QuestionTemplateRelation {
@@ -84,16 +58,6 @@ export class QuestionTemplateRelation {
     public config: typeof FieldConfigType,
     public dependency?: FieldDependency
   ) {}
-
-  public static fromObject(obj: any) {
-    return new QuestionTemplateRelation(
-      Question.fromObject(obj.question),
-      obj.topicId,
-      obj.sortOrder,
-      obj.config,
-      obj.dependency ? FieldDependency.fromObject(obj.dependency) : undefined
-    );
-  }
 }
 export class Answer extends QuestionTemplateRelation {
   constructor(
@@ -107,19 +71,6 @@ export class Answer extends QuestionTemplateRelation {
       templateField.sortOrder,
       templateField.config,
       templateField.dependency
-    );
-  }
-  static fromObject(obj: any) {
-    const templateField = QuestionTemplateRelation.fromObject(obj);
-
-    return new Answer(
-      obj.answer_id,
-      templateField,
-      obj.value
-        ? obj.value
-        : templateField.question.dataType === DataType.BOOLEAN
-        ? false
-        : ''
     );
   }
 }
@@ -140,15 +91,6 @@ export class QuestionaryStep {
     public isCompleted: boolean,
     public fields: Answer[]
   ) {}
-  static fromObject(obj: any): QuestionaryStep | undefined {
-    return new QuestionaryStep(
-      Topic.fromObject(obj.topic),
-      obj.isCompleted,
-      obj.fields
-        ? obj.fields.map((fieldObj: any) => Answer.fromObject(fieldObj))
-        : []
-    );
-  }
 }
 
 export class Questionary {
@@ -162,13 +104,6 @@ export class Questionary {
 
 export class TemplateStep {
   constructor(public topic: Topic, public fields: QuestionTemplateRelation[]) {}
-
-  public static fromObject(obj: any) {
-    return new TemplateStep(
-      Topic.fromObject(obj.topic),
-      obj.fields.map((field: any) => QuestionTemplateRelation.fromObject(field))
-    );
-  }
 }
 
 export class Template {
@@ -192,14 +127,6 @@ export enum TemplateCategoryId {
 
 export class FieldCondition {
   constructor(public condition: EvaluatorOperator, public params: any) {}
-
-  static fromObject(obj: any) {
-    const inpObj = typeof obj === 'string' ? JSON.parse(obj) : obj;
-
-    return inpObj
-      ? new FieldCondition(inpObj.condition, inpObj.params)
-      : undefined;
-  }
 }
 
 export enum ProposalStatus {

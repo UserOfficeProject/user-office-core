@@ -15,5 +15,5 @@ export class FieldDependency implements Partial<FieldDependencyOrigin> {
   public dependencyNaturalKey: string;
 
   @Field(() => FieldCondition)
-  public condition?: FieldCondition;
+  public condition: FieldCondition;
 }

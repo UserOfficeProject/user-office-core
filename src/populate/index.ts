@@ -233,7 +233,7 @@ const createProposals = async () => {
           JSON.stringify({ value: faker.random.words(5) })
         );
       }
-      await questionaryDataSource.updateTopicCompletenes(
+      await questionaryDataSource.updateTopicCompleteness(
         questionary.questionaryId!,
         step.topic.id,
         true

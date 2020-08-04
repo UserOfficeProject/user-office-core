@@ -18,6 +18,7 @@ import { ProposalView } from '../../models/ProposalView';
 import { Sample } from '../../models/Sample';
 import { BasicUserDetails, User } from '../../models/User';
 import { Template } from './../../models/ProposalModel';
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 
 // Interfaces corresponding exactly to database tables
 
@@ -109,6 +110,10 @@ export interface AnswerRecord {
   readonly created_at: Date;
 }
 
+interface DependencyCondition {
+  condition: EvaluatorOperator;
+  params: string | boolean | number;
+}
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
@@ -116,8 +121,8 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_question_id: string;
-  readonly dependency_condition: string;
+  readonly dependency_question_id: string | null;
+  readonly dependency_condition: DependencyCondition | null;
 }
 
 export interface TemplateRecord {
@@ -418,12 +423,12 @@ export const createQuestionTemplateRelationObject = (
     record.topic_id,
     record.sort_order,
     createConfigByType(record.data_type as DataType, record.config),
-    record.dependency_question_id
+    record.dependency_question_id && record.dependency_condition
       ? new FieldDependency(
           record.question_id,
           record.dependency_question_id,
           record.natural_key,
-          FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
+          record.dependency_condition
         )
       : undefined
   );
