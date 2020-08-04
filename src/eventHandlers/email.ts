@@ -4,7 +4,7 @@ import SparkPost from 'sparkpost';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { ProposalEndStatus } from '../models/ProposalModel';
+import { ProposalEndStatus } from '../models/Proposal';
 import { UserRole } from '../models/User';
 import { logger } from '../utils/Logger';
 

@@ -11,7 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
-import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
+import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 import { TemplateResponseWrap } from '../types/CommonWrappers';
 import { FieldCondition } from '../types/FieldCondition';
 import { wrapResponse } from '../wrapResponse';

@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { TemplateStep as TemplateStepOrigin } from '../../models/ProposalModel';
+import { TemplateStep as TemplateStepOrigin } from '../../models/Template';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Topic } from './Topic';
 

@@ -1,17 +1,24 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {
   SelectionFromOptionsConfig,
   TextInputConfig,
+  BooleanConfig,
+  DateConfig,
+  EmbellishmentConfig,
+  FileUploadConfig,
+  SubtemplateConfig,
+  FieldConfigType,
 } from '../resolvers/types/FieldConfig';
 import { ConditionEvaluator } from './ConditionEvaluator';
+import { Answer, QuestionaryStep } from './Questionary';
 import {
-  Answer,
   DataType,
   DataTypeSpec,
   FieldDependency,
-  QuestionaryStep,
-  QuestionTemplateRelation,
   TemplateStep,
-} from './ProposalModel';
+  TemplateCategoryId,
+  QuestionTemplateRelation,
+} from './Template';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
@@ -168,4 +175,72 @@ export function isMatchingConstraints(
 
 interface ConstraintValidator {
   validate(value: any, field: QuestionTemplateRelation): boolean;
+}
+
+const baseDefaultConfig = { required: false, small_label: '', tooltip: '' };
+const defaultConfigs = new Map<
+  string,
+  | BooleanConfig
+  | DateConfig
+  | EmbellishmentConfig
+  | FileUploadConfig
+  | SelectionFromOptionsConfig
+  | TextInputConfig
+  | SubtemplateConfig
+>();
+defaultConfigs.set('BooleanConfig', { ...baseDefaultConfig });
+defaultConfigs.set('DateConfig', { ...baseDefaultConfig });
+
+defaultConfigs.set('EmbellishmentConfig', {
+  plain: '',
+  html: '',
+  omitFromPdf: false,
+  ...baseDefaultConfig,
+});
+defaultConfigs.set('FileUploadConfig', {
+  max_files: 1,
+  file_type: [],
+  ...baseDefaultConfig,
+});
+defaultConfigs.set('SelectionFromOptionsConfig', {
+  options: [],
+  variant: 'radio',
+  ...baseDefaultConfig,
+});
+defaultConfigs.set('TextInputConfig', {
+  multiline: false,
+  isHtmlQuestion: false,
+  placeholder: '',
+  ...baseDefaultConfig,
+});
+defaultConfigs.set('SubtemplateConfig', {
+  templateId: 0,
+  templateCategory: TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION],
+  ...baseDefaultConfig,
+});
+
+const f = new Map<string, () => typeof FieldConfigType>();
+f.set(DataType.BOOLEAN, () => new BooleanConfig());
+f.set(DataType.DATE, () => new DateConfig());
+f.set(DataType.EMBELLISHMENT, () => new EmbellishmentConfig());
+f.set(DataType.FILE_UPLOAD, () => new FileUploadConfig());
+f.set(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
+f.set(DataType.TEXT_INPUT, () => new TextInputConfig());
+f.set(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
+
+export function createConfig<T extends typeof FieldConfigType>(
+  config: T,
+  init: Partial<T> | string = {}
+): T {
+  const defaults = defaultConfigs.get(config.constructor.name);
+  const initValues = typeof init === 'string' ? JSON.parse(init) : init;
+  Object.assign(config, { ...defaults, ...initValues });
+
+  return config;
+}
+
+export function createConfigByType(dataType: DataType, init: object | string) {
+  const config = f.get(dataType)!;
+
+  return createConfig(config(), init);
 }

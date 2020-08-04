@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
+  Answer,
+  AnswerBasic,
   Questionary,
   QuestionaryStep,
-  AnswerBasic,
-} from '../../models/ProposalModel';
-import { logger } from '../../utils/Logger';
+} from '../../models/Questionary';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
-import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
+  AnswerRecord,
+  createAnswerBasic,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
   createTopicObject,
@@ -16,8 +17,6 @@ import {
   QuestionRecord,
   QuestionTemplateRelRecord,
   TopicRecord,
-  AnswerRecord,
-  createAnswerBasic,
 } from './records';
 
 export default class PostgresQuestionaryDataSource

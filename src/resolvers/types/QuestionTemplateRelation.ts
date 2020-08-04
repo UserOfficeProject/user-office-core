@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { QuestionTemplateRelation as QuestionTemplateRelationOrign } from '../../models/ProposalModel';
+import { QuestionTemplateRelation as QuestionTemplateRelationOrign } from '../../models/Template';
 import { FieldConfigType } from './FieldConfig';
 import { FieldDependency } from './FieldDependency';
 import { Question } from './Question';

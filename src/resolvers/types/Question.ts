@@ -3,8 +3,8 @@ import { Field, ObjectType } from 'type-graphql';
 import {
   Question as QuestionOrigin,
   TemplateCategoryId,
-} from '../../models/ProposalModel';
-import { DataType } from './../../models/ProposalModel';
+} from '../../models/Template';
+import { DataType } from '../../models/Template';
 import { FieldConfigType } from './FieldConfig';
 
 @ObjectType()

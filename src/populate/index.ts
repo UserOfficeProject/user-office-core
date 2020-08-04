@@ -13,12 +13,9 @@ import {
   userDataSource,
 } from '../datasources';
 import database from '../datasources/postgres/database';
-import {
-  createConfigByType,
-  DataType,
-  TemplateCategoryId,
-} from '../models/ProposalModel';
+import { createConfigByType } from '../models/ProposalModelFunctions';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
+import { DataType, TemplateCategoryId } from '../models/Template';
 import { UserRole } from '../models/User';
 import * as dummy from './dummy';
 import { execute } from './executor';

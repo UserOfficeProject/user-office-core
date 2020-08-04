@@ -1,4 +1,4 @@
-import { ProposalStatus } from './ProposalModel';
+import { ProposalStatus } from './Proposal';
 import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
   constructor(

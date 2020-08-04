@@ -6,7 +6,7 @@ import {
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { TemplateCategoryId } from '../models/ProposalModel';
+import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
 

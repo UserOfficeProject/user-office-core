@@ -8,12 +8,13 @@ import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
 import { questionaryDataSource } from '../datasources';
-import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
+import { Answer, QuestionaryStep } from '../models/Questionary';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
+import { DataType } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';

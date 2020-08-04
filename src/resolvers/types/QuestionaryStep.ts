@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { QuestionaryStep as QuestionaryStepOrigin } from '../../models/ProposalModel';
+import { QuestionaryStep as QuestionaryStepOrigin } from '../../models/Questionary';
 import { Answer } from './Answer';
 import { Topic } from './Topic';
 

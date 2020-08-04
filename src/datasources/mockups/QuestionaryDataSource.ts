@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import { createConfig } from '../../models/ProposalModelFunctions';
 import {
+  Questionary,
+  QuestionaryStep,
   Answer,
-  createConfig,
+  AnswerBasic,
+} from '../../models/Questionary';
+import {
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
-  Questionary,
-  QuestionaryStep,
-  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
-  AnswerBasic,
-} from '../../models/ProposalModel';
+  QuestionTemplateRelation,
+} from '../../models/Template';
 import {
   BooleanConfig,
   EmbellishmentConfig,

@@ -1,4 +1,4 @@
-import { Answer } from './ProposalModel';
+import { Answer } from './Questionary';
 
 export enum EvaluatorOperator {
   eq = 'eq',

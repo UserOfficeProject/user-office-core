@@ -8,7 +8,7 @@ import {
   TemplateStep,
   Topic,
   TemplateCategoryId,
-} from '../models/ProposalModel';
+} from '../models/Template';
 import { CreateQuestionTemplateRelationArgs } from '../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../resolvers/mutations/CreateTopicMutation';

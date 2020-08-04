@@ -12,7 +12,7 @@ import { ResolverContext } from '../../context';
 import {
   Template as TemplateOrigin,
   TemplateCategoryId,
-} from '../../models/ProposalModel';
+} from '../../models/Template';
 import { Question } from './Question';
 import { TemplateStep } from './TemplateStep';
 

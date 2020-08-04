@@ -18,14 +18,9 @@ import {
 
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import {
-  createConfig,
-  DataType,
-  Question,
-  Template,
-  Topic,
-} from '../models/ProposalModel';
+import { createConfig } from '../models/ProposalModelFunctions';
 import { Roles } from '../models/Role';
+import { DataType, Question, Template, Topic } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
 import { CreateQuestionArgs } from '../resolvers/mutations/CreateQuestionMutation';

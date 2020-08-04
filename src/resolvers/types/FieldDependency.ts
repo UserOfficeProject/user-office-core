@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
+import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 import { FieldCondition } from './FieldCondition';
 
 @ObjectType()

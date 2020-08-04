@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Questionary as QuestionaryOrigin } from '../../models/ProposalModel';
+import { Questionary as QuestionaryOrigin } from '../../models/Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 
 @ObjectType()

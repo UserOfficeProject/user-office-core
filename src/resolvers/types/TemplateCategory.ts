@@ -10,7 +10,7 @@ import {
 import {
   TemplateCategory as TemplateCategoryOrigin,
   TemplateCategoryId,
-} from '../../models/ProposalModel';
+} from '../../models/Template';
 
 @ObjectType()
 export class TemplateCategory implements Partial<TemplateCategoryOrigin> {

@@ -1,6 +1,6 @@
 import { Field, ObjectType, Int } from 'type-graphql';
 
-import { Answer as AnswerOrigin } from '../../models/ProposalModel';
+import { Answer as AnswerOrigin } from '../../models/Questionary';
 import { IntStringDateBoolArray, AnswerType } from '../CustomScalars';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 

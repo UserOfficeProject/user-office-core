@@ -1,7 +1,7 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
-import { ProposalEndStatus, ProposalStatus } from '../models/ProposalModel';
+import { ProposalEndStatus, ProposalStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { logger } from '../utils/Logger';

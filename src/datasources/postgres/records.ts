@@ -1,24 +1,23 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
+import { createConfigByType } from '../../models/ProposalModelFunctions';
+import { ProposalView } from '../../models/ProposalView';
+import { Questionary, AnswerBasic } from '../../models/Questionary';
+import { Sample } from '../../models/Sample';
 import {
-  createConfigByType,
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
-  Questionary,
   QuestionTemplateRelation,
   TemplateCategory,
   Topic,
-  AnswerBasic,
-} from '../../models/ProposalModel';
-import { ProposalView } from '../../models/ProposalView';
-import { Sample } from '../../models/Sample';
+} from '../../models/Template';
+import { Template } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
-import { Template } from './../../models/ProposalModel';
-import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 
 // Interfaces corresponding exactly to database tables
 

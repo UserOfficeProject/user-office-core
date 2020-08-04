@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
+  AnswerBasic,
   Questionary,
   QuestionaryStep,
-  AnswerBasic,
-} from '../models/ProposalModel';
+} from '../models/Questionary';
 
 export interface QuestionaryDataSource {
   deleteAnswerQuestionaryRelations(answerId: number): Promise<AnswerBasic>;
