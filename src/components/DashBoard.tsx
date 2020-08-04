@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
   ]);
 
   const { currentRole } = useContext(UserContext);
-  const { callsData, loading } = useCallsData(true);
+  const { callsData } = useCallsData();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -216,12 +216,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
-            component={() => (
-              <ProposalChooseCall
-                callsData={callsData}
-                loadingCalls={loading}
-              />
-            )}
+            component={() => <ProposalChooseCall callsData={callsData} />}
           />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
