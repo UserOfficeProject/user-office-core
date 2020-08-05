@@ -31,7 +31,7 @@ type ProposalChooseCallProps = {
 const getDaysRemainingText = (daysRemaining: number) => {
   if (daysRemaining <= 1) {
     return '(last day remaining)';
-  } else if (daysRemaining > 0 && daysRemaining < 30) {
+  } else if (daysRemaining > 1 && daysRemaining < 30) {
     return `(${daysRemaining} days remaining)`;
   } else {
     return '';
