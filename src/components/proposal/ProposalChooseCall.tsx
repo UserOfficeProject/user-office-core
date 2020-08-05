@@ -28,6 +28,16 @@ type ProposalChooseCallProps = {
   callsData: Call[];
 };
 
+const getDaysRemainingText = (daysRemaining: number) => {
+  if (daysRemaining <= 1) {
+    return '(last day remaining)';
+  } else if (daysRemaining > 0 && daysRemaining < 30) {
+    return `(${daysRemaining} days remaining)`;
+  } else {
+    return '';
+  }
+};
+
 const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   callsData,
 }) => {
@@ -52,10 +62,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         <List>
           {callsData.map(call => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
-            const daysRemainingText =
-              daysRemainingNum > 0 && daysRemainingNum < 30
-                ? `(${daysRemainingNum} days remaining)`
-                : '';
+            const daysRemainingText = getDaysRemainingText(daysRemainingNum);
 
             return (
               <ListItem
