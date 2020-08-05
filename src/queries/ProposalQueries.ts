@@ -95,6 +95,10 @@ export default class ProposalQueries {
       !(await this.userAuth.isUserOfficer(agent)) &&
       !(await this.dataSource.checkActiveCall(callId))
     ) {
+      logger.logWarn('User tried to create proposal on inactive call', {
+        agent,
+        callId,
+      });
       return null;
     }
 
