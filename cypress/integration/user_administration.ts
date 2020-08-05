@@ -19,7 +19,8 @@ context('User administration tests', () => {
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber();
+  const newTelephone = faker.phone.phoneNumber('0##########');
+  const newTelephoneAlt = faker.phone.phoneNumber('0##########');
 
   it('Should be able administer user information', () => {
     cy.login('officer');
@@ -57,6 +58,10 @@ context('User administration tests', () => {
     cy.get("[name='telephone']")
       .clear()
       .type(newTelephone);
+
+    cy.get("[name='telephone_alt']")
+      .clear()
+      .type(newTelephoneAlt);
 
     cy.contains('Update Profile').click();
 
