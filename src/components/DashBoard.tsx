@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
   ]);
 
   const { currentRole } = useContext(UserContext);
-  const { callsData } = useCallsData();
+  const { callsData } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
     setOpen(true);
