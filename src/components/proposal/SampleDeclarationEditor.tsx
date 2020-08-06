@@ -3,10 +3,10 @@ import { SubquestionarySubmissionContainer } from 'components/questionary/Subque
 import { Field, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { Sample } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import * as Yup from 'yup';
 
 interface SampleDeclarationEditorProps {
@@ -18,7 +18,7 @@ function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
   const [sample, setSample] = useState(props.sample);
   const { questionary } = useQuestionary(sample.questionaryId);
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
 
   const subQuestionaryEditor = questionary ? (
@@ -43,7 +43,7 @@ function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
             title: sample.title,
           }}
           onSubmit={async (values, actions): Promise<void> => {
-            api()
+            api('Title updated')
               .updateSampleTitle({
                 sampleId: sample.id,
                 title: values.title,

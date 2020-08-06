@@ -1,17 +1,16 @@
-import { useState } from 'react';
-
-import { useDataApi } from 'hooks/common/useDataApi';
 import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   SubquestionarySubmissionModelState,
 } from 'models/SubquestionarySubmissionModel';
+import { useState } from 'react';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export function usePersistSubquestionaryModel() {
   const [isSavingModel, setIsSavingModel] = useState<boolean>(false);
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const persistModel = ({
     getState,
     dispatch,
@@ -24,7 +23,7 @@ export function usePersistSubquestionaryModel() {
         case EventType.SAVE_CLICKED:
           const step = questionary.steps[0];
           setIsSavingModel(true);
-          await api().answerTopic({
+          await api('Sample updated').answerTopic({
             questionaryId: questionary.questionaryId as number,
             topicId: step.topic.id,
             answers: prepareAnswers(step.fields),

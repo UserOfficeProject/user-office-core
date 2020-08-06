@@ -8,13 +8,13 @@ import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import useApiWithFeedback from 'utils/useApiWithFeedback';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
 function SampleSafetyPage() {
-  const { api, isExecutingCall } = useApiWithFeedback();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
   const { callsData, loadingCalls } = useCallsData({ isActive: true });
 
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
@@ -44,9 +44,7 @@ function SampleSafetyPage() {
   const handleStatusUpdate = (status: SampleStatus) => {
     setSelecedSample(null);
 
-    api({
-      successToastMessage: `Status for '${selectedSample?.title}' has been set to ${status}`,
-    })
+    api(`Status for '${selectedSample?.title}' has been set to ${status}`)
       .updateSampleStatus({
         sampleId: selectedSample!.id,
         status: status,

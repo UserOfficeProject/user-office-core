@@ -2,7 +2,7 @@ import { FormControl, FormLabel } from '@material-ui/core';
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
 import React, { useEffect, useState } from 'react';
-import useApiWithFeedback from 'utils/useApiWithFeedback';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
@@ -16,7 +16,7 @@ export default function ProposalComponentSampleDeclaration(
   const config = templateField.config as SubtemplateConfig;
   const isError = errors[proposalQuestionId] ? true : false;
 
-  const { api } = useApiWithFeedback();
+  const { api } = useDataApiWithFeedback();
 
   const [stateValue, setStateValue] = useState<number[]>(
     templateField.value || []
