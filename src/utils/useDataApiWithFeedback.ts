@@ -1,6 +1,7 @@
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
+
+import { useDataApi } from 'hooks/common/useDataApi';
 
 type TMutationResult = { error: string | null };
 

@@ -1,10 +1,11 @@
+import { useState } from 'react';
+
 import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   SubquestionarySubmissionModelState,
 } from 'models/SubquestionarySubmissionModel';
-import { useState } from 'react';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 

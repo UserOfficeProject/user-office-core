@@ -1,8 +1,10 @@
 import { FormControl, FormLabel } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
-import React, { useEffect, useState } from 'react';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
