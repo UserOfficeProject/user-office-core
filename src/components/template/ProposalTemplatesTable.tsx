@@ -61,7 +61,7 @@ type ProposalTemplateRowDataType = TemplateRowDataType & {
   proposalCount: number;
 };
 
-function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
+function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
   const columns: Column<ProposalTemplateRowDataType>[] = [
@@ -109,7 +109,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   );
 }
 
-interface IProposalTemplatesTableProps {
+interface ProposalTemplatesTableProps {
   dataProvider: () => Promise<
     Pick<
       ProposalTemplate,
