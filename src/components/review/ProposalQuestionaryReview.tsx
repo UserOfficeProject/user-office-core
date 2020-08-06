@@ -8,9 +8,9 @@ import {
 } from '@material-ui/core';
 import React, { Fragment, HTMLAttributes } from 'react';
 
+import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
-import UOLoader from 'components/common/UOLoader';
 
 const useStyles = makeStyles(theme => ({
   heading: {

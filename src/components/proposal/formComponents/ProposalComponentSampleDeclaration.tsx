@@ -1,11 +1,8 @@
 import { FormControl, FormLabel } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
-
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
-import useCallWithFeedback from 'utils/useCallWithFeedback';
-
+import React, { useEffect, useState } from 'react';
+import useApiWithFeedback from 'utils/useApiWithFeedback';
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
 import SampleDeclarationEditor from '../SampleDeclarationEditor';
@@ -19,8 +16,7 @@ export default function ProposalComponentSampleDeclaration(
   const config = templateField.config as SubtemplateConfig;
   const isError = errors[proposalQuestionId] ? true : false;
 
-  const { callWithFeedback } = useCallWithFeedback();
-  const api = useDataApi();
+  const { api } = useApiWithFeedback();
 
   const [stateValue, setStateValue] = useState<number[]>(
     templateField.value || []
@@ -75,23 +71,21 @@ export default function ProposalComponentSampleDeclaration(
             onComplete(null as any, newStateValue);
           }}
           onAddNewClick={() =>
-            callWithFeedback(
-              api()
-                .createSample({
-                  title: 'Untitled',
-                  templateId: config.templateId,
-                })
-                .then(response => response.createSample)
-            ).then(response => {
-              const { sample: newSample } = response;
-              if (newSample) {
-                const newStateValue = [...stateValue, newSample.id];
-                setStateValue(newStateValue);
-                setRows([...rows, sampleToQuestionaryListRow(newSample)]);
-                setSelectedSample(newSample);
-                onComplete(null as any, newStateValue);
-              }
-            })
+            api()
+              .createSample({
+                title: 'Untitled',
+                templateId: config.templateId,
+              })
+              .then(response => {
+                const newSample = response.createSample.sample;
+                if (newSample) {
+                  const newStateValue = [...stateValue, newSample.id];
+                  setStateValue(newStateValue);
+                  setRows([...rows, sampleToQuestionaryListRow(newSample)]);
+                  setSelectedSample(newSample);
+                  onComplete(null as any, newStateValue);
+                }
+              })
           }
           {...props}
         />

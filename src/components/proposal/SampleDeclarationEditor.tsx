@@ -1,13 +1,13 @@
-import { Typography, Grid } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
+import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
 import { Field, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
-import * as Yup from 'yup';
-
-import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
-import { Questionary, Sample } from 'generated/sdk';
+import { Sample } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { useQuestionary } from 'hooks/questionary/useQuestionary';
+import { useSnackbar } from 'notistack';
+import React, { useState } from 'react';
+import * as Yup from 'yup';
 
 interface SampleDeclarationEditorProps {
   sample: Sample;
@@ -16,23 +16,10 @@ interface SampleDeclarationEditorProps {
 
 function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
   const [sample, setSample] = useState(props.sample);
+  const { questionary } = useQuestionary(sample.questionaryId);
 
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
-
-  const [questionary, setQuestionary] = useState<Questionary | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    api()
-      .getQuestionary({ questionaryId: sample.questionaryId })
-      .then(response => {
-        if (response.questionary) {
-          setQuestionary(response.questionary);
-        }
-      });
-  }, [api, sample]);
 
   const subQuestionaryEditor = questionary ? (
     <SubquestionarySubmissionContainer

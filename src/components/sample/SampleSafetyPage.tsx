@@ -8,16 +8,13 @@ import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useDataApi } from 'hooks/common/useDataApi';
-import useCallWithFeedback from 'utils/useCallWithFeedback';
+import useApiWithFeedback from 'utils/useApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
 function SampleSafetyPage() {
-  const api = useDataApi();
-
-  const { callWithFeedback, isExecutingCall } = useCallWithFeedback();
+  const { api, isExecutingCall } = useApiWithFeedback();
   const { callsData, loadingCalls } = useCallsData({ isActive: true });
 
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
@@ -47,24 +44,24 @@ function SampleSafetyPage() {
   const handleStatusUpdate = (status: SampleStatus) => {
     setSelecedSample(null);
 
-    callWithFeedback(
-      api()
-        .updateSampleStatus({
-          sampleId: selectedSample!.id,
-          status: status,
-        })
-        .then(result => result.updateSampleStatus),
-      `Status for '${selectedSample?.title}' has been set to ${status}`
-    ).then(result => {
-      const newSample = result.sample;
-      if (newSample) {
-        const newSamples = samples.map(sample =>
-          sample.id === newSample.id ? newSample : sample
-        );
+    api({
+      successToastMessage: `Status for '${selectedSample?.title}' has been set to ${status}`,
+    })
+      .updateSampleStatus({
+        sampleId: selectedSample!.id,
+        status: status,
+      })
+      .then(result => {
+        const newSample = result.updateSampleStatus.sample;
 
-        setSamples(newSamples);
-      }
-    });
+        if (newSample) {
+          const newSamples = samples.map(sample =>
+            sample.id === newSample.id ? newSample : sample
+          );
+
+          setSamples(newSamples);
+        }
+      });
   };
 
   const handleAccept = () => {
@@ -94,7 +91,7 @@ function SampleSafetyPage() {
 
   return (
     <>
-      {isExecutingCall || loadingCalls ? <LinearProgress /> : null}
+      {isExecutingCall && loadingCalls ? <LinearProgress /> : null}
       <Container maxWidth="lg">
         <SamplesTable
           components={{ Toolbar }}

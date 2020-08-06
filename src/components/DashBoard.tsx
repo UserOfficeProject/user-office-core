@@ -15,8 +15,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
