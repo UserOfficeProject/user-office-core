@@ -71,6 +71,7 @@ function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
           {formikProps => (
             <Field
               name="title"
+              data-cy="title-input"
               label="Title"
               placeholder="Sample title"
               component={TextField}

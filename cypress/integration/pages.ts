@@ -18,17 +18,9 @@ context('Page tests', () => {
   });
 
   const faqContents = faker.random.words(2);
-  const ADMIN_EMAIL = 'Aaron_Harris49@gmail.com';
-  const ADMIN_PASS = 'Test1234!';
 
   it('Should be able update FAQ', () => {
-    cy.get('[data-cy=input-email] input')
-      .type(ADMIN_EMAIL)
-      .should('have.value', ADMIN_EMAIL);
-
-    cy.get('[data-cy=input-password] input')
-      .type(ADMIN_PASS)
-      .should('have.value', ADMIN_PASS);
+    cy.login('officer');
 
     cy.get('[data-cy=submit]').click();
 

@@ -49,6 +49,7 @@ export function QuestionariesList(props: QuestionariesListProps) {
           variant="outlined"
           fullWidth
           startIcon={<AddOutlinedIcon />}
+          data-cy="add-button"
         >
           {props.addButtonLabel || 'Add'}
         </Button>

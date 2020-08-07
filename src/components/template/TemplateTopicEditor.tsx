@@ -263,6 +263,7 @@ export default function QuestionaryEditorTopic(props: {
                         // +1 means - add immediately after this topic
                       })
                     }
+                    data-cy="add-topic"
                   >
                     <ListItemIcon>
                       <PlaylistAddIcon />

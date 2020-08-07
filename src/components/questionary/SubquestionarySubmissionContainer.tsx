@@ -139,6 +139,7 @@ export function SubquestionarySubmissionContainer(props: {
               startIcon={<CheckIcon />}
               className={classes.button}
               isbusy={isSavingModel}
+              data-cy="save-button"
             >
               Save
             </NavigButton>

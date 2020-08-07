@@ -249,7 +249,7 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
-          {isSampleSafetyReviewer && (
+          {(isSampleSafetyReviewer || isUserOfficer) && (
             <Route path="/SampleSafety" component={SampleSafetyPage} />
           )}
           <Can

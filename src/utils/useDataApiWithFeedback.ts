@@ -3,25 +3,13 @@ import { useCallback, useState } from 'react';
 
 import { useDataApi } from 'hooks/common/useDataApi';
 
-type TMutationResult = { error: string | null };
-
-const isMutationResult = (result: any) => {
-  try {
-    if (result.hasOwnProperty('error')) {
-      // if result contains 'error' property, it's a mutation
-      return true;
-    } else {
-      return false;
-    }
-  } catch {
-    return false;
-  }
+const isMutationResult = (result: object) => {
+  return result.hasOwnProperty('error');
 };
 
 function useDataApiWithFeedback() {
-  const { enqueueSnackbar } = useSnackbar();
-
   const dataApi = useDataApi();
+  const { enqueueSnackbar } = useSnackbar();
   const [isExecutingCall, setIsExecutingCall] = useState(false);
 
   const api = useCallback(
@@ -33,10 +21,9 @@ function useDataApiWithFeedback() {
 
             // @ts-ignore-line
             const serverResponse = await target[prop](args);
-            let result = serverResponse[prop];
+            const result = serverResponse[prop];
 
-            if (isMutationResult(result)) {
-              result = result as TMutationResult;
+            if (result && isMutationResult(result)) {
               if (result.error) {
                 enqueueSnackbar(result.error, {
                   variant: 'error',

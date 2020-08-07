@@ -104,7 +104,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
                 name="config.templateId"
                 type="text"
                 component={Select}
-                data-cy="templateId"
+                data-cy="template-id"
               >
                 {templates &&
                   templates.map(template => {
