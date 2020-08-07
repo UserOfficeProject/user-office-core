@@ -25,7 +25,7 @@ context('User tests', () => {
 
   const middleName = faker.name.firstName();
   const birthDate = faker.date
-    .past()
+    .past(80, '2002-01-01')
     .toISOString()
     .slice(0, 10);
 
@@ -35,8 +35,8 @@ context('User tests', () => {
 
   //Contact details
   const email = faker.internet.email();
-  const telephone = faker.phone.phoneNumber();
-  const telephoneAlt = faker.phone.phoneNumber();
+  const telephone = faker.phone.phoneNumber('0##########');
+  const telephoneAlt = faker.phone.phoneNumber('0##########');
 
   it('A user should be able to create a new account', () => {
     cy.get('[data-cy=email] input')

@@ -3,6 +3,8 @@ import * as Yup from 'yup';
 
 import { useDataApi } from 'hooks/common/useDataApi';
 
+const phoneRegExp = /^(\+?\d{0,4})?\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{3}\)?)\s?-?\s?(\(?\d{4}\)?)?$/;
+
 export const userFieldSchema = Yup.object().shape({
   firstname: Yup.string()
     .min(2, 'firstname must be at least 2 characters')
@@ -16,7 +18,17 @@ export const userFieldSchema = Yup.object().shape({
   nationality: Yup.number().required('please specify your nationality'),
   user_title: Yup.string().required('User title is required'),
   birthdate: Yup.date()
-    .max(new Date())
+    .min(new Date(1900, 1, 1), 'You are not that old')
+    .test('DOB', 'You must be at least 18 years old', value => {
+      const dateOfBirth = new Date(value);
+      const dateNow = new Date();
+
+      if (dateNow.getFullYear() - dateOfBirth.getFullYear() < 18) {
+        return false;
+      } else {
+        return true;
+      }
+    })
     .required('Please specify your birth date'),
   organisation: Yup.number().required(
     'organisation must be at least 2 characters'
@@ -60,10 +72,12 @@ export const userFieldSchema = Yup.object().shape({
   telephone: Yup.string()
     .min(2, 'telephone must be at least 2 characters')
     .max(30, 'telephone must be at most 20 characters')
+    .matches(phoneRegExp, 'Phone number is not valid')
     .required('telephone must be at least 2 characters'),
   telephone_alt: Yup.string()
     .min(2, 'telephone must be at least 2 characters')
-    .max(30, 'telephone must be at most 20 characters'),
+    .max(30, 'telephone must be at most 20 characters')
+    .matches(phoneRegExp, 'Phone number is not valid'),
 });
 
 export const emailFieldSchema = Yup.object().shape({
