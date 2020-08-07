@@ -22,8 +22,6 @@ context('Page tests', () => {
   it('Should be able update FAQ', () => {
     cy.login('officer');
 
-    cy.get('[data-cy=submit]').click();
-
     cy.contains('Edit Pages').click();
 
     cy.contains('Set user homepage');

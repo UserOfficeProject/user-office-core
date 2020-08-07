@@ -36,6 +36,8 @@ context('Samples tests', () => {
 
     cy.contains('Add topic').click();
 
+    cy.contains('2. New Topic');
+
     cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
@@ -60,7 +62,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=template-id]').click();
 
-    cy.contains(sampleTemplateName).click();
+    cy.contains(sampleTemplateName).click({ force: true });
 
     cy.contains('Save').click();
 
