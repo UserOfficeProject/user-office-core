@@ -20,7 +20,7 @@ export default class SampleMutations {
     private logger: Logger
   ) {}
 
-  @Authorized([Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
   updateSampleStatus(
     user: UserWithRole | null,
     args: UpdateSampleStatusArgs
@@ -63,6 +63,7 @@ export default class SampleMutations {
 
   @Authorized()
   async deleteSample(agent: User | null, sampleId: number): Promise<Sample> {
+    // TODO perform authorization
     return this.dataSource.delete(sampleId);
   }
 }
