@@ -9,7 +9,7 @@ export class ApplyPatchesMutation {
   @Mutation(() => PrepareDBResponseWrap)
   applyPatches(@Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.admin.applyPatches(),
+      context.mutations.admin.applyPatches(context.user),
       PrepareDBResponseWrap
     );
   }
