@@ -123,13 +123,13 @@ export default class PostgresSampleDataSource implements SampleDataSource {
     return database('samples')
       .modify(query => {
         if (filter?.creatorId) {
-          query.where('creator_id', filter?.creatorId);
+          query.where('creator_id', filter.creatorId);
         }
         if (filter?.status) {
-          query.where('creator_id', filter?.status);
+          query.where('creator_id', filter.status);
         }
         if (filter?.questionaryId) {
-          query.where('questionary_id', filter?.questionaryId);
+          query.where('questionary_id', filter.questionaryId);
         }
         if (filter?.title) {
           query.where('title', 'like', `%${filter.title}%`);
