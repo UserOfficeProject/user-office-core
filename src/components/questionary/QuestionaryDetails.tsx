@@ -15,7 +15,6 @@ import SampleDetails from 'components/sample/SampleDetails';
 import {
   Answer,
   DataType,
-  Sample,
   SubtemplateConfig,
   TemplateCategoryId,
 } from 'generated/sdk';
@@ -24,6 +23,7 @@ import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
 import { getAllFields } from 'models/ProposalModelFunctions';
+import { SampleBasic } from 'models/Sample';
 import { stringToTextArray } from 'utils/ArrayUtils';
 
 const useStyles = makeStyles(theme => ({
@@ -60,14 +60,14 @@ function DownloadableFileList(props: { fileIds: string[] }) {
 
 function SampleList(props: {
   sampleIds: number[];
-  onClick?: (sample: Sample) => any;
+  onClick?: (sample: SampleBasic) => any;
 }) {
   const { sampleIds } = props;
 
   const classes = useStyles();
   const { samples } = useSamples({ sampleIds });
 
-  const sampleLink = (sample: Sample) => (
+  const sampleLink = (sample: SampleBasic) => (
     <Link href="#" onClick={() => props.onClick?.(sample)}>
       {sample.title}
     </Link>

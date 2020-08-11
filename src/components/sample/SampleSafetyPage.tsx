@@ -8,6 +8,7 @@ import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
@@ -18,7 +19,7 @@ function SampleSafetyPage() {
   const { callsData, loadingCalls } = useCallsData({ isActive: true });
 
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
-  const [samples, setSamples] = useState<Sample[]>([]);
+  const [samples, setSamples] = useState<SampleBasic[]>([]);
   const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
 
   useEffect(() => {

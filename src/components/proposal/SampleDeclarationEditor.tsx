@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 
 import { SubquestionarySubmissionContainer } from 'components/questionary/SubquestionarySubmissionContainer';
 import { Sample } from 'generated/sdk';
-import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 interface SampleDeclarationEditorProps {
@@ -17,17 +16,9 @@ interface SampleDeclarationEditorProps {
 
 function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
   const [sample, setSample] = useState(props.sample);
-  const { questionary } = useQuestionary(sample.questionaryId);
 
   const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
-
-  const subQuestionaryEditor = questionary ? (
-    <SubquestionarySubmissionContainer
-      questionaryEditDone={() => props.sampleEditDone?.(sample)}
-      questionary={questionary}
-    />
-  ) : null;
 
   if (!sample) {
     return <span>loading</span>;
@@ -50,14 +41,14 @@ function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
                 title: values.title,
               })
               .then(result => {
-                const { sample, error } = result.updateSampleTitle;
-                if (error || !sample) {
+                const { sample: newSample, error } = result.updateSampleTitle;
+                if (error || !newSample) {
                   enqueueSnackbar(
                     `Error occurred while updating sample title. ${error}`,
                     { variant: 'error' }
                   );
                 } else {
-                  setSample(sample);
+                  setSample({ ...sample, ...newSample });
                 }
                 actions.setSubmitting(false);
               });
@@ -81,7 +72,10 @@ function SampleDeclarationEditor(props: SampleDeclarationEditorProps) {
         </Formik>
       </Grid>
       <Grid item xs={12}>
-        {subQuestionaryEditor}
+        <SubquestionarySubmissionContainer
+          questionaryEditDone={() => props.sampleEditDone?.(sample)}
+          questionary={sample.questionary}
+        />
       </Grid>
     </Grid>
   );

@@ -1,7 +1,7 @@
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React from 'react';
 
-import { Sample } from 'generated/sdk';
+import { SampleBasic } from 'models/Sample';
 import { tableIcons } from 'utils/materialIcons';
 
 const columns = [
@@ -10,7 +10,7 @@ const columns = [
   { title: 'Created', field: 'Created' },
 ];
 
-function SamplesTable(props: Omit<MaterialTableProps<Sample>, 'columns'>) {
+function SamplesTable(props: Omit<MaterialTableProps<SampleBasic>, 'columns'>) {
   return (
     <MaterialTable
       icons={tableIcons}

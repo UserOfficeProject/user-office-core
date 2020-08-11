@@ -12,7 +12,7 @@ export type Scalars = {
   Float: number;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
-  IntStringDateBool: any;
+  IntStringDateBoolArray: any;
 };
 
 export type AddSepMembersRole = {
@@ -35,13 +35,13 @@ export type Answer = {
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
   answerId: Maybe<Scalars['Int']>;
-  value: Maybe<Scalars['IntStringDateBool']>;
+  value: Maybe<Scalars['IntStringDateBoolArray']>;
 };
 
 export type AnswerBasic = {
   __typename?: 'AnswerBasic';
   answerId: Maybe<Scalars['Int']>;
-  answer: Scalars['IntStringDateBool'];
+  answer: Scalars['IntStringDateBoolArray'];
   questionaryId: Scalars['Int'];
   questionId: Scalars['String'];
   createdAt: Scalars['DateTime'];
@@ -194,7 +194,7 @@ export type EventLog = {
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
-  params: Scalars['IntStringDateBool'];
+  params: Scalars['IntStringDateBoolArray'];
 };
 
 export type FieldConditionInput = {
@@ -997,6 +997,26 @@ export type ProposalTemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
 };
 
+export type ProposalView = {
+  __typename?: 'ProposalView';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  status: ProposalStatus;
+  shortCode: Scalars['String'];
+  rankOrder: Maybe<Scalars['Int']>;
+  finalStatus: Maybe<ProposalEndStatus>;
+  notified: Scalars['Boolean'];
+  timeAllocation: Maybe<Scalars['Int']>;
+  technicalStatus: Maybe<TechnicalReviewStatus>;
+  instrumentName: Maybe<Scalars['String']>;
+  callShortCode: Maybe<Scalars['String']>;
+  sepShortCode: Maybe<Scalars['String']>;
+  reviewAverage: Maybe<Scalars['Float']>;
+  reviewDeviation: Maybe<Scalars['Float']>;
+  instrumentId: Maybe<Scalars['Int']>;
+  callId: Maybe<Scalars['Int']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
@@ -1018,6 +1038,7 @@ export type Query = {
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
+  proposalsView: Maybe<Array<ProposalView>>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
@@ -1127,6 +1148,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryProposalsViewArgs = {
+  filter?: Maybe<ProposalsFilter>;
 };
 
 
@@ -1321,6 +1347,7 @@ export type Sample = {
   questionaryId: Scalars['Int'];
   status: SampleStatus;
   created: Scalars['DateTime'];
+  questionary: Questionary;
 };
 
 export type SampleResponseWrap = {
@@ -2691,6 +2718,11 @@ export type AnswerFragment = (
   )> }
 );
 
+export type AnswerBasicFragment = (
+  { __typename?: 'AnswerBasic' }
+  & Pick<AnswerBasic, 'answerId' | 'answer' | 'questionaryId' | 'questionId' | 'createdAt'>
+);
+
 export type QuestionaryFragment = (
   { __typename?: 'Questionary' }
   & Pick<Questionary, 'questionaryId' | 'templateId' | 'created'>
@@ -2870,6 +2902,10 @@ export type CreateSampleMutation = (
     & Pick<SampleResponseWrap, 'error'>
     & { sample: Maybe<(
       { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
       & SampleFragment
     )> }
   ) }
@@ -2906,6 +2942,10 @@ export type GetSampleQuery = (
   { __typename?: 'Query' }
   & { sample: Maybe<(
     { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & QuestionaryFragment
+    ) }
     & SampleFragment
   )> }
 );
@@ -3854,6 +3894,15 @@ export const ProposalFragmentDoc = gql`
   callId
   questionaryId
   notified
+}
+    `;
+export const AnswerBasicFragmentDoc = gql`
+    fragment answerBasic on AnswerBasic {
+  answerId
+  answer
+  questionaryId
+  questionId
+  createdAt
 }
     `;
 export const FieldConfigFragmentDoc = gql`
@@ -4983,11 +5032,15 @@ export const CreateSampleDocument = gql`
   createSample(title: $title, templateId: $templateId) {
     sample {
       ...sample
+      questionary {
+        ...questionary
+      }
     }
     error
   }
 }
-    ${SampleFragmentDoc}`;
+    ${SampleFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const DeleteSampleDocument = gql`
     mutation deleteSample($sampleId: Int!) {
   deleteSample(sampleId: $sampleId) {
@@ -5002,9 +5055,13 @@ export const GetSampleDocument = gql`
     query getSample($sampleId: Int!) {
   sample(sampleId: $sampleId) {
     ...sample
+    questionary {
+      ...questionary
+    }
   }
 }
-    ${SampleFragmentDoc}`;
+    ${SampleFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const GetSamplesDocument = gql`
     query getSamples($filter: SamplesFilter) {
   samples(filter: $filter) {

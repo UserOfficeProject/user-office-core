@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import ModalWrapper from 'components/common/ModalWrapper';
 import { Sample, SubtemplateConfig } from 'generated/sdk';
+import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { BasicComponentProps } from '../IBasicComponentProps';
@@ -26,12 +27,12 @@ export default function ProposalComponentSampleDeclaration(
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
   const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
-  const sampleToQuestionaryListRow = (sample: Sample): QuestionariesListRow => {
+  const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
     return { id: sample.id, label: sample.title };
   };
 
   useEffect(() => {
-    const getSamples = async (answerId: number): Promise<Sample[]> => {
+    const getSamples = async (answerId: number): Promise<SampleBasic[]> => {
       return api()
         .getSamplesByAnswerId({ answerId })
         .then(response => {
@@ -41,7 +42,7 @@ export default function ProposalComponentSampleDeclaration(
 
     if (templateField.answerId) {
       getSamples(templateField.answerId).then(samples =>
-        setRows(samples.map(sampleToQuestionaryListRow))
+        setRows(samples.map(sampleToListRow))
       );
     }
   }, [templateField.answerId, api]);
@@ -83,7 +84,7 @@ export default function ProposalComponentSampleDeclaration(
                 if (newSample) {
                   const newStateValue = [...stateValue, newSample.id];
                   setStateValue(newStateValue);
-                  setRows([...rows, sampleToQuestionaryListRow(newSample)]);
+                  setRows([...rows, sampleToListRow(newSample)]);
                   setSelectedSample(newSample);
                   onComplete(null as any, newStateValue);
                 }
@@ -109,7 +110,7 @@ export default function ProposalComponentSampleDeclaration(
               const newRows = [...rows];
               newRows.splice(index, 1, {
                 ...rows[index],
-                ...sampleToQuestionaryListRow(updatedSample),
+                ...sampleToListRow(updatedSample),
               });
               setRows(newRows);
               setSelectedSample(null);
