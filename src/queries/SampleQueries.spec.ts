@@ -16,9 +16,7 @@ const userAuthorization = new UserAuthorization(
 );
 const sampleQueries = new SampleQueries(
   dummySampleDataSource,
-  questionaryDataSource,
-  userAuthorization,
-  questionaryAuthorization
+  questionaryDataSource
 );
 
 beforeEach(() => {

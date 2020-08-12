@@ -56,6 +56,10 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return false;
     }
 
+    if (await userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
     const sampleDeclarationQuestionary = await this.questionaryDataSource.getQuestionary(
       questionaryId
     );
@@ -66,12 +70,20 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     const proposalQuestionary = await this.questionaryDataSource.getParentQuestionary(
       questionaryId
     );
-    if (!proposalQuestionary?.questionaryId) return false;
-    const proposal = (
-      await this.proposalDataSource.getProposals({
-        questionaryIds: [proposalQuestionary.questionaryId],
-      })
-    ).proposals[0];
+    if (!proposalQuestionary) return false;
+    if (!proposalQuestionary.questionaryId) return false;
+
+    const result = await this.proposalDataSource.getProposals({
+      questionaryIds: [proposalQuestionary.questionaryId],
+    });
+
+    if (!result) {
+      return false;
+    }
+    const proposal = result.proposals[0];
+    if (!proposal) {
+      return false;
+    }
 
     return userAuthorization.hasAccessRights(agent, proposal);
   }

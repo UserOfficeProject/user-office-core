@@ -16,7 +16,7 @@ export default class SampleQueries {
   ) {}
 
   async getSample(agent: UserWithRole | null, sampleId: number) {
-    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+    if (!sampleAuthorization.hasReadRights(agent, sampleId)) {
       logger.logWarn('Unauthorized getSample access', { agent, sampleId });
 
       return null;
