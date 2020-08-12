@@ -101,9 +101,7 @@ const questionaryMutations = new QuestionaryMutations(
 
 const sampleQueries = new SampleQueries(
   sampleDataSource,
-  questionaryDataSource,
-  userAuthorization,
-  questionaryAuthorization
+  questionaryDataSource
 );
 
 const sampleMutations = new SampleMutations(

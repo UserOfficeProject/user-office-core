@@ -3,14 +3,14 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
-import { Sample } from '../models/Sample';
 import { TemplateCategoryId } from '../models/Template';
-import { User, UserWithRole } from '../models/User';
+import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
-import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatus';
-import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitle';
+import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatusMutation';
+import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitleMutation';
 import { Logger, logger } from '../utils/Logger';
+import { sampleAuthorization } from '../utils/SampleAuthorization';
 
 export default class SampleMutations {
   constructor(
@@ -21,15 +21,12 @@ export default class SampleMutations {
   ) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
-  updateSampleStatus(
-    user: UserWithRole | null,
-    args: UpdateSampleStatusArgs
-  ): Promise<Sample> {
+  updateSampleStatus(user: UserWithRole | null, args: UpdateSampleStatusArgs) {
     return this.dataSource.updateSampleStatus(args);
   }
 
   @Authorized()
-  async createSample(agent: User | null, args: CreateSampleArgs) {
+  async createSample(agent: UserWithRole | null, args: CreateSampleArgs) {
     if (!agent) {
       return rejection('NOT_AUTHORIZED');
     }
@@ -55,15 +52,20 @@ export default class SampleMutations {
     );
   }
 
-  @Authorized()
-  updateSampleTitle(agent: User | null, args: UpdateSampleTitleArgs) {
-    // TODO perform authorization
+  async updateSampleTitle(
+    agent: UserWithRole | null,
+    args: UpdateSampleTitleArgs
+  ) {
+    if (!sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
+      return rejection('NOT_AUTHORIZED');
+    }
     return this.dataSource.updateSampleTitle(args);
   }
 
-  @Authorized()
-  async deleteSample(agent: User | null, sampleId: number): Promise<Sample> {
-    // TODO perform authorization
+  async deleteSample(agent: UserWithRole | null, sampleId: number) {
+    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+      return rejection('NOT_AUTHORIZED');
+    }
     return this.dataSource.delete(sampleId);
   }
 }

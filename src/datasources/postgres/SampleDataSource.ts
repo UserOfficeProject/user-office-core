@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Sample } from '../../models/Sample';
-import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatus';
-import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitle';
+import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
+import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { logger } from '../../utils/Logger';
 import { SampleDataSource } from '../SampleDataSource';

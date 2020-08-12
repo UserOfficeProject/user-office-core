@@ -1,39 +1,48 @@
+import { sampleDataSource } from '../datasources';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
-import { QuestionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { logger } from '../utils/Logger';
+import { questionaryAuthorization } from '../utils/QuestionaryAuthorization';
+import { sampleAuthorization } from '../utils/SampleAuthorization';
 
 export default class SampleQueries {
   constructor(
     public dataSource: SampleDataSource,
-    public questionaryDataSource: QuestionaryDataSource,
-    private userAuth: UserAuthorization,
-    private questionaryAuth: QuestionaryAuthorization
+    public questionaryDataSource: QuestionaryDataSource
   ) {}
 
   async getSample(agent: UserWithRole | null, sampleId: number) {
-    const sample = await this.dataSource.getSample(sampleId);
-    if (this.userAuth.isUserOfficer(agent) || agent?.id === sample.creatorId) {
-      return sample;
+    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+      logger.logWarn('Unauthorized getSample access', { agent, sampleId });
+      return null;
     }
-
-    // TODO peform authorization for co-proposers
-    return null;
+    return sampleDataSource.getSample(sampleId);
   }
 
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
-    // TODO add authorization
-    const samples = await this.dataSource.getSamples(args);
+    var samples = await this.dataSource.getSamples(args);
+
+    samples = await Promise.all(
+      samples.map(sample => sampleAuthorization.hasReadRights(agent, sample.id))
+    ).then(results => samples.filter((_v, index) => results[index]));
 
     return samples;
   }
 
   async getSamplesByAnswerId(agent: UserWithRole | null, answerId: number) {
-    // TODO add authorization
+    const answer = await this.questionaryDataSource.getAnswer(answerId);
+    if (!questionaryAuthorization.hasReadRights(agent, answer.questionaryId)) {
+      logger.logWarn('Unauthorized getSamplesByAnswerId access', {
+        agent,
+        answerId,
+      });
+      return null;
+    }
+
     return await this.dataSource.getSamplesByAnswerId(answerId);
   }
 
