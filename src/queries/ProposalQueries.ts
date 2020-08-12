@@ -99,6 +99,7 @@ export default class ProposalQueries {
         agent,
         callId,
       });
+
       return null;
     }
 

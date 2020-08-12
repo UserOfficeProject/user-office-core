@@ -59,6 +59,7 @@ export default class SampleMutations {
     if (!sampleAuthorization.hasWriteRights(agent, args.sampleId)) {
       return rejection('NOT_AUTHORIZED');
     }
+
     return this.dataSource.updateSampleTitle(args);
   }
 
@@ -66,6 +67,7 @@ export default class SampleMutations {
     if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
       return rejection('NOT_AUTHORIZED');
     }
+
     return this.dataSource.delete(sampleId);
   }
 }

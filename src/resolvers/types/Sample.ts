@@ -8,9 +8,9 @@ import {
   Ctx,
 } from 'type-graphql';
 
+import { ResolverContext } from '../../context';
 import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
 import { Questionary } from './Questionary';
-import { ResolverContext } from '../../context';
 @ObjectType()
 export class Sample implements Partial<SampleOrigin> {
   @Field(() => Int)

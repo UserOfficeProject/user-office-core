@@ -9,7 +9,7 @@ export class SampleAuthorization {
   async hasReadRights(
     agent: UserWithRole | null,
     sampleId: number
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     if (userAuthorization.isUserOfficer(agent)) {
       return true;
     }

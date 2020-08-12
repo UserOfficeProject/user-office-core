@@ -18,13 +18,15 @@ export default class SampleQueries {
   async getSample(agent: UserWithRole | null, sampleId: number) {
     if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
       logger.logWarn('Unauthorized getSample access', { agent, sampleId });
+
       return null;
     }
+
     return sampleDataSource.getSample(sampleId);
   }
 
   async getSamples(agent: UserWithRole | null, args: SamplesArgs) {
-    var samples = await this.dataSource.getSamples(args);
+    let samples = await this.dataSource.getSamples(args);
 
     samples = await Promise.all(
       samples.map(sample => sampleAuthorization.hasReadRights(agent, sample.id))
@@ -40,6 +42,7 @@ export default class SampleQueries {
         agent,
         answerId,
       });
+
       return null;
     }
 
