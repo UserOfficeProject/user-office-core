@@ -326,6 +326,7 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
+  updateUserRoles: SuccessResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -709,6 +710,12 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateUserRolesArgs = {
+  id: Scalars['Int'];
+  roles?: Maybe<Array<Scalars['Int']>>;
+};
+
+
 export type MutationAddClientLogArgs = {
   error: Scalars['String'];
 };
@@ -947,6 +954,26 @@ export type ProposalTemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
 };
 
+export type ProposalView = {
+  __typename?: 'ProposalView';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  status: ProposalStatus;
+  shortCode: Scalars['String'];
+  rankOrder: Maybe<Scalars['Int']>;
+  finalStatus: Maybe<ProposalEndStatus>;
+  notified: Scalars['Boolean'];
+  timeAllocation: Maybe<Scalars['Int']>;
+  technicalStatus: Maybe<TechnicalReviewStatus>;
+  instrumentName: Maybe<Scalars['String']>;
+  callShortCode: Maybe<Scalars['String']>;
+  sepShortCode: Maybe<Scalars['String']>;
+  reviewAverage: Maybe<Scalars['Float']>;
+  reviewDeviation: Maybe<Scalars['Float']>;
+  instrumentId: Maybe<Scalars['Int']>;
+  callId: Maybe<Scalars['Int']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
@@ -968,6 +995,7 @@ export type Query = {
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
+  proposalsView: Maybe<Array<ProposalView>>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
@@ -1073,6 +1101,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryProposalsViewArgs = {
+  filter?: Maybe<ProposalsFilter>;
 };
 
 
@@ -3532,13 +3565,9 @@ export type UpdateUserRolesMutationVariables = Exact<{
 
 export type UpdateUserRolesMutation = (
   { __typename?: 'Mutation' }
-  & { updateUser: (
-    { __typename?: 'UserResponseWrap' }
-    & Pick<UserResponseWrap, 'error'>
-    & { user: Maybe<(
-      { __typename?: 'User' }
-      & Pick<User, 'id'>
-    )> }
+  & { updateUserRoles: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'isSuccess' | 'error'>
   ) }
 );
 
@@ -5083,10 +5112,8 @@ export const UpdateUserDocument = gql`
     `;
 export const UpdateUserRolesDocument = gql`
     mutation updateUserRoles($id: Int!, $roles: [Int!]) {
-  updateUser(id: $id, roles: $roles) {
-    user {
-      id
-    }
+  updateUserRoles(id: $id, roles: $roles) {
+    isSuccess
     error
   }
 }

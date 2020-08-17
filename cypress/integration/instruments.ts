@@ -117,7 +117,7 @@ context('Instrument tests', () => {
 
     cy.contains('View People').click();
     cy.get('[title="Edit user"]')
-      .last()
+      .eq(2)
       .click();
     cy.wait(500);
     cy.contains('Settings').click();
