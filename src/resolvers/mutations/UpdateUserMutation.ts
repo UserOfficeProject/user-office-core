@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { UserResponseWrap } from '../types/CommonWrappers';
+import { UserResponseWrap, SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
 @ArgsType()
@@ -75,6 +75,15 @@ export class UpdateUserArgs {
   public refreshToken?: string;
 }
 
+@ArgsType()
+export class UpdateUserRolesArgs {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => [Int], { nullable: true })
+  public roles: number[];
+}
+
 @Resolver()
 export class UpdateUserMutation {
   @Mutation(() => UserResponseWrap)
@@ -82,6 +91,17 @@ export class UpdateUserMutation {
     return wrapResponse(
       context.mutations.user.update(context.user, args),
       UserResponseWrap
+    );
+  }
+
+  @Mutation(() => SuccessResponseWrap)
+  updateUserRoles(
+    @Args() args: UpdateUserRolesArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.user.updateRoles(context.user, args),
+      SuccessResponseWrap
     );
   }
 }

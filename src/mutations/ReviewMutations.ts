@@ -65,10 +65,6 @@ export default class ReviewMutations {
     agent: UserWithRole | null,
     args: AddTechnicalReviewArgs
   ): Promise<TechnicalReview | Rejection> {
-    console.log(
-      await this.userAuth.isUserOfficer(agent),
-      await this.userAuth.isScientistToProposal(agent, args.proposalID)
-    );
     if (
       !(
         (await this.userAuth.isUserOfficer(agent)) ||

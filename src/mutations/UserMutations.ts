@@ -3,6 +3,7 @@ import {
   createUserByEmailInviteValidationSchema,
   createUserValidationSchema,
   updateUserValidationSchema,
+  updateUserRolesValidationSchema,
   signInValidationSchema,
   getTokenForUserValidationSchema,
   resetPasswordByEmailValidationSchema,
@@ -26,7 +27,10 @@ import { isRejection, rejection, Rejection } from '../rejection';
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { CreateUserArgs } from '../resolvers/mutations/CreateUserMutation';
-import { UpdateUserArgs } from '../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserArgs,
+  UpdateUserRolesArgs,
+} from '../resolvers/mutations/UpdateUserMutation';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -229,7 +233,6 @@ export default class UserMutations {
     return userLinkResponse;
   }
 
-  // TODO: We should have separate endpoint for updating user roles. Not to do it on general user update. Like this we will have separation of concerns and permissions are better managable.
   @ValidateArgs(updateUserValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.USER])
   @EventBus(Event.USER_UPDATED)
@@ -254,18 +257,6 @@ export default class UserMutations {
       ...args,
     };
 
-    if (args.roles !== undefined) {
-      if (!(await this.userAuth.isUserOfficer(agent))) {
-        return rejection('INSUFFICIENT_PERMISSIONS');
-      }
-      const [err] = await to(this.dataSource.setUserRoles(args.id, args.roles));
-      if (err) {
-        logger.logError('Could not set user roles', { err });
-
-        return rejection('INTERNAL_ERROR');
-      }
-    }
-
     return this.dataSource
       .update(user)
       .then(user => user)
@@ -274,6 +265,29 @@ export default class UserMutations {
 
         return rejection('INTERNAL_ERROR');
       });
+  }
+
+  @ValidateArgs(updateUserRolesValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.USER_UPDATED)
+  async updateRoles(
+    agent: UserWithRole | null,
+    args: UpdateUserRolesArgs
+  ): Promise<boolean | Rejection> {
+    const updatedRoles = await this.dataSource
+      .setUserRoles(args.id, args.roles)
+      .then(user => user)
+      .catch(err => {
+        logger.logException('Could not update user', err);
+
+        return rejection('INTERNAL_ERROR');
+      });
+
+    if (updatedRoles) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @ValidateArgs(signInValidationSchema)
