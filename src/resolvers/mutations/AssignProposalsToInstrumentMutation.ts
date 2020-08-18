@@ -6,16 +6,26 @@ import {
   Mutation,
   Resolver,
   Int,
+  InputType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { SuccessResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 
+@InputType()
+export class ProposalsToInstrumentArgs {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => Int)
+  public callId: number;
+}
+
 @ArgsType()
 export class AssignProposalsToInstrumentArgs {
-  @Field(() => [Int])
-  public proposalIds: number[];
+  @Field(() => [ProposalsToInstrumentArgs])
+  public proposals: ProposalsToInstrumentArgs[];
 
   @Field(() => Int)
   public instrumentId: number;

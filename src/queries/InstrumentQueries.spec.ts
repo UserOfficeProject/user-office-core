@@ -21,13 +21,13 @@ const InstrumentQueriesInstance = new InstrumentQueries(
 describe('Test Instrument Queries', () => {
   test('A user cannot query all Instruments', () => {
     return expect(
-      InstrumentQueriesInstance.getAll(dummyUserWithRole)
+      InstrumentQueriesInstance.getAll(dummyUserWithRole, [])
     ).resolves.toBe(null);
   });
 
   test('A userofficer can get all Instruments', () => {
     return expect(
-      InstrumentQueriesInstance.getAll(dummyUserOfficerWithRole)
+      InstrumentQueriesInstance.getAll(dummyUserOfficerWithRole, [])
     ).resolves.toStrictEqual({ totalCount: 1, instruments: [dummyInstrument] });
   });
 

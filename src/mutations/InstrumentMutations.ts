@@ -90,14 +90,48 @@ export default class InstrumentMutations {
       });
   }
 
+  async checkIfProposalsAreOnSameCallAsInstrument(
+    inputArguments: AssignProposalsToInstrumentArgs
+  ) {
+    const proposalCallIds = inputArguments.proposals.map(
+      proposal => proposal.callId
+    );
+    const proposalCallsWithInstrument = await this.dataSource.getCallsByInstrumentId(
+      inputArguments.instrumentId,
+      proposalCallIds
+    );
+
+    const proposalsOnSameCallAsInstrument = inputArguments.proposals.filter(
+      proposal =>
+        proposalCallsWithInstrument.some(
+          call => call.callId === proposal.callId
+        )
+    );
+
+    return (
+      proposalsOnSameCallAsInstrument.length === inputArguments.proposals.length
+    );
+  }
+
   @ValidateArgs(assignProposalsToInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignProposalsToInstrument(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentArgs
   ): Promise<boolean | Rejection> {
+    const allProposalsAreOnSameCallAsInstrument = await this.checkIfProposalsAreOnSameCallAsInstrument(
+      args
+    );
+
+    if (!allProposalsAreOnSameCallAsInstrument) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
-      .assignProposalsToInstrument(args.proposalIds, args.instrumentId)
+      .assignProposalsToInstrument(
+        args.proposals.map(proposal => proposal.id),
+        args.instrumentId
+      )
       .then(result => result)
       .catch(error => {
         logger.logException(
@@ -106,7 +140,7 @@ export default class InstrumentMutations {
           {
             agent,
             instrumentId: args.instrumentId,
-            proposalIds: args.proposalIds,
+            proposals: args.proposals,
           }
         );
 
