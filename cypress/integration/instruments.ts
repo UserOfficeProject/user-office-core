@@ -89,6 +89,23 @@ context('Instrument tests', () => {
 
     cy.login('officer');
 
+    cy.contains('View Calls').click();
+    cy.get('[title="Assign Instrument"]')
+      .first()
+      .click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.contains('Assign instrument').click();
+
+    cy.wait(500);
+
+    cy.contains('View Proposals').click();
+
+    cy.wait(500);
+
     cy.get('[type="checkbox"]')
       .first()
       .check();
@@ -166,7 +183,7 @@ context('Instrument tests', () => {
 
     cy.contains('Instruments').click();
 
-    cy.get('[title="Show Instruments"]').should('exist');
+    cy.get('[title="Show Scientists"]').should('exist');
   });
 
   it('Instrument scientsit should be able to see proposals assigned to instrument where he is instrument scientist', () => {
@@ -202,7 +219,7 @@ context('Instrument tests', () => {
     cy.contains('Instruments').click();
     cy.wait(500);
 
-    cy.get('[title="Show Instruments"]')
+    cy.get('[title="Show Scientists"]')
       .first()
       .click();
 
@@ -228,13 +245,27 @@ context('Instrument tests', () => {
   it('User Officer should be able to delete Instrument', () => {
     cy.login('officer');
 
+    cy.contains('View Calls').click();
+
+    cy.get('[title="Show Instruments"]')
+      .first()
+      .click();
+
+    cy.get('[title="Delete"]')
+      .first()
+      .click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.wait(500);
+
     cy.contains('Instruments').click();
 
     cy.get('[title="Delete"]').click();
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.wait(500);
 
     cy.get('[data-cy="instruments-table"]')
       .find('tbody td')

@@ -415,7 +415,7 @@ export type MutationRemoveAssignedInstrumentFromcallArgs = {
 
 
 export type MutationAssignProposalsToInstrumentArgs = {
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 };
 
@@ -937,6 +937,11 @@ export enum ProposalStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
+export type ProposalsToInstrumentArgs = {
+  id: Scalars['Int'];
+  callId: Scalars['Int'];
+};
+
 export type ProposalTemplate = {
   __typename?: 'ProposalTemplate';
   templateId: Scalars['Int'];
@@ -1085,6 +1090,11 @@ export type QueryInstitutionsArgs = {
 
 export type QueryInstrumentArgs = {
   instrumentId: Scalars['Int'];
+};
+
+
+export type QueryInstrumentsArgs = {
+  callIds?: Maybe<Array<Scalars['Int']>>;
 };
 
 
@@ -2074,7 +2084,7 @@ export type GetEventLogsQuery = (
 );
 
 export type AssignProposalsToInstrumentMutationVariables = Exact<{
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 }>;
 
@@ -2137,7 +2147,9 @@ export type DeleteInstrumentMutation = (
   ) }
 );
 
-export type GetInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetInstrumentsQueryVariables = Exact<{
+  callIds?: Maybe<Array<Scalars['Int']>>;
+}>;
 
 
 export type GetInstrumentsQuery = (
@@ -4251,8 +4263,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const AssignProposalsToInstrumentDocument = gql`
-    mutation assignProposalsToInstrument($proposalIds: [Int!]!, $instrumentId: Int!) {
-  assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    mutation assignProposalsToInstrument($proposals: [ProposalsToInstrumentArgs!]!, $instrumentId: Int!) {
+  assignProposalsToInstrument(proposals: $proposals, instrumentId: $instrumentId) {
     error
     isSuccess
   }
@@ -4290,8 +4302,8 @@ export const DeleteInstrumentDocument = gql`
 }
     `;
 export const GetInstrumentsDocument = gql`
-    query getInstruments {
-  instruments {
+    query getInstruments($callIds: [Int!]) {
+  instruments(callIds: $callIds) {
     instruments {
       id
       name

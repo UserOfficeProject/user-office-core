@@ -10,7 +10,9 @@ import { UserContext } from 'context/UserContextProvider';
 import { Instrument, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useInstrumentsData(): {
+export function useInstrumentsData(
+  callIds?: number[]
+): {
   loadingInstruments: boolean;
   instrumentsData: Instrument[];
   setInstrumentsData: Dispatch<SetStateAction<Instrument[]>>;
@@ -25,7 +27,7 @@ export function useInstrumentsData(): {
     setLoadingInstruments(true);
     if (currentRole === UserRole.USER_OFFICER) {
       api()
-        .getInstruments()
+        .getInstruments({ callIds })
         .then(data => {
           if (data.instruments) {
             setInstrumentsData(data.instruments.instruments as Instrument[]);
@@ -42,7 +44,7 @@ export function useInstrumentsData(): {
           setLoadingInstruments(false);
         });
     }
-  }, [api, currentRole]);
+  }, [api, currentRole, callIds]);
 
   return { loadingInstruments, instrumentsData, setInstrumentsData };
 }
