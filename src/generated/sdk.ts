@@ -326,7 +326,7 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
-  updateUserRoles: SuccessResponseWrap;
+  updateUserRoles: UserResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -3566,8 +3566,12 @@ export type UpdateUserRolesMutationVariables = Exact<{
 export type UpdateUserRolesMutation = (
   { __typename?: 'Mutation' }
   & { updateUserRoles: (
-    { __typename?: 'SuccessResponseWrap' }
-    & Pick<SuccessResponseWrap, 'isSuccess' | 'error'>
+    { __typename?: 'UserResponseWrap' }
+    & Pick<UserResponseWrap, 'error'>
+    & { user: Maybe<(
+      { __typename?: 'User' }
+      & Pick<User, 'id'>
+    )> }
   ) }
 );
 
@@ -5113,7 +5117,9 @@ export const UpdateUserDocument = gql`
 export const UpdateUserRolesDocument = gql`
     mutation updateUserRoles($id: Int!, $roles: [Int!]) {
   updateUserRoles(id: $id, roles: $roles) {
-    isSuccess
+    user {
+      id
+    }
     error
   }
 }
