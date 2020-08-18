@@ -269,25 +269,24 @@ export default class UserMutations {
 
   @ValidateArgs(updateUserRolesValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.USER_UPDATED)
+  @EventBus(Event.USER_ROLE_UPDATED)
   async updateRoles(
     agent: UserWithRole | null,
     args: UpdateUserRolesArgs
-  ): Promise<boolean | Rejection> {
-    const updatedRoles = await this.dataSource
-      .setUserRoles(args.id, args.roles)
-      .then(user => user)
-      .catch(err => {
-        logger.logException('Could not update user', err);
+  ): Promise<User | Rejection> {
+    const user = await this.dataSource.get(args.id);
 
-        return rejection('INTERNAL_ERROR');
-      });
-
-    if (updatedRoles) {
-      return true;
-    } else {
-      return false;
+    if (!user) {
+      return rejection('INTERNAL_ERROR');
     }
+
+    await this.dataSource.setUserRoles(args.id, args.roles).catch(err => {
+      logger.logException('Could not update user', err);
+
+      return rejection('INTERNAL_ERROR');
+    });
+
+    return user;
   }
 
   @ValidateArgs(signInValidationSchema)

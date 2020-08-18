@@ -173,10 +173,8 @@ test('A userofficer can update another users name', () => {
 
 test('A user cannot update its roles', () => {
   return expect(
-    userMutations.update(dummyUserWithRole, {
+    userMutations.updateRoles(dummyUserWithRole, {
       id: 2,
-      firstname: 'klara',
-      lastname: 'undefined',
       roles: [1, 2],
     })
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
@@ -184,10 +182,8 @@ test('A user cannot update its roles', () => {
 
 test('A userofficer can update users roles', () => {
   return expect(
-    userMutations.update(dummyUserOfficerWithRole, {
+    userMutations.updateRoles(dummyUserOfficerWithRole, {
       id: 2,
-      firstname: 'klara',
-      lastname: 'undefined',
       roles: [1, 2],
     })
   ).resolves.toBe(dummyUser);
