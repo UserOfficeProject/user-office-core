@@ -95,7 +95,7 @@ export default class PostgresInstrumentDataSource
   }
 
   async getInstrumentsByCallId(
-    callId: number
+    callIds: number[]
   ): Promise<InstrumentWithAvailabilityTime[]> {
     return database
       .select([
@@ -109,11 +109,31 @@ export default class PostgresInstrumentDataSource
       .join('call_has_instruments as chi', {
         'i.instrument_id': 'chi.instrument_id',
       })
-      .where('chi.call_id', callId)
+      .whereIn('chi.call_id', callIds)
+      .distinct('i.instrument_id')
       .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const result = instruments.map(instrument =>
           this.createInstrumentWithAvailabilityTimeObject(instrument)
         );
+
+        return result;
+      });
+  }
+
+  async getCallsByInstrumentId(
+    instrumentId: number,
+    callIds: number[]
+  ): Promise<{ callId: number; instrumentId: number }[]> {
+    return database
+      .select(['call_id', 'instrument_id'])
+      .from('call_has_instruments')
+      .whereIn('call_id', callIds)
+      .andWhere('instrument_id', instrumentId)
+      .then((calls: { call_id: number; instrument_id: number }[]) => {
+        const result = calls.map(call => ({
+          callId: call.call_id,
+          instrumentId: call.instrument_id,
+        }));
 
         return result;
       });

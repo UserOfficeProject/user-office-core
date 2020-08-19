@@ -54,6 +54,11 @@ interface UserUpdateEvent extends GeneralEvent {
   user: User;
 }
 
+interface UserRoleUpdateEvent extends GeneralEvent {
+  type: Event.USER_ROLE_UPDATED;
+  user: User;
+}
+
 interface UserCreateEvent extends GeneralEvent {
   type: Event.USER_CREATED;
   userlinkresponse: {
@@ -126,6 +131,7 @@ export type ApplicationEvent =
   | EmailInvite
   | UserResetPasswordEmailEvent
   | UserUpdateEvent
+  | UserRoleUpdateEvent
   | SEPCreatedEvent
   | SEPUpdatedEvent
   | SEPMembersAssignedEvent

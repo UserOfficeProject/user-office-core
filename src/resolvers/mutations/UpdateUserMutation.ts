@@ -75,12 +75,32 @@ export class UpdateUserArgs {
   public refreshToken?: string;
 }
 
+@ArgsType()
+export class UpdateUserRolesArgs {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => [Int], { nullable: true })
+  public roles: number[];
+}
+
 @Resolver()
 export class UpdateUserMutation {
   @Mutation(() => UserResponseWrap)
   updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
     return wrapResponse(
       context.mutations.user.update(context.user, args),
+      UserResponseWrap
+    );
+  }
+
+  @Mutation(() => UserResponseWrap)
+  updateUserRoles(
+    @Args() args: UpdateUserRolesArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.user.updateRoles(context.user, args),
       UserResponseWrap
     );
   }

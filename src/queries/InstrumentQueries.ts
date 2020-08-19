@@ -26,10 +26,19 @@ export default class InstrumentQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAll(agent: UserWithRole | null) {
-    const instruments = await this.dataSource.getAll();
+  async getAll(agent: UserWithRole | null, callIds: number[]) {
+    if (!callIds || callIds.length === 0) {
+      return await this.dataSource.getAll();
+    } else {
+      const instrumentsByCallIds = await this.dataSource.getInstrumentsByCallId(
+        callIds
+      );
 
-    return instruments;
+      return {
+        totalCount: instrumentsByCallIds.length,
+        instruments: instrumentsByCallIds,
+      };
+    }
   }
 
   @Authorized([

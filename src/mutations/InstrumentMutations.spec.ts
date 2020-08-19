@@ -72,7 +72,10 @@ describe('Test Instrument Mutations', () => {
       instrumentMutations.assignProposalsToInstrument(
         dummyUserOfficerWithRole,
         {
-          proposalIds: [1, 2],
+          proposals: [
+            { id: 1, callId: 1 },
+            { id: 2, callId: 1 },
+          ],
           instrumentId: 1,
         }
       )

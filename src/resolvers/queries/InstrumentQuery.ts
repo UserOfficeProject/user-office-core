@@ -32,8 +32,11 @@ export class InstrumentQuery {
   }
 
   @Query(() => InstrumentsQueryResult, { nullable: true })
-  instruments(@Ctx() context: ResolverContext) {
-    return context.queries.instrument.getAll(context.user);
+  instruments(
+    @Arg('callIds', () => [Int], { nullable: true }) callIds: number[],
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.instrument.getAll(context.user, callIds);
   }
 
   @Query(() => [InstrumentWithAvailabilityTime], { nullable: true })

@@ -58,8 +58,8 @@ export class Call implements Partial<CallOrigin> {
 export class CallInstrumentsResolver {
   @FieldResolver(() => [InstrumentWithAvailabilityTime])
   async instruments(@Root() call: Call, @Ctx() context: ResolverContext) {
-    return context.queries.instrument.dataSource.getInstrumentsByCallId(
-      call.id
-    );
+    return context.queries.instrument.dataSource.getInstrumentsByCallId([
+      call.id,
+    ]);
   }
 }
