@@ -326,6 +326,7 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
+  updateUserRoles: UserResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
@@ -414,7 +415,7 @@ export type MutationRemoveAssignedInstrumentFromcallArgs = {
 
 
 export type MutationAssignProposalsToInstrumentArgs = {
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 };
 
@@ -709,6 +710,12 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateUserRolesArgs = {
+  id: Scalars['Int'];
+  roles?: Maybe<Array<Scalars['Int']>>;
+};
+
+
 export type MutationAddClientLogArgs = {
   error: Scalars['String'];
 };
@@ -930,6 +937,11 @@ export enum ProposalStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
+export type ProposalsToInstrumentArgs = {
+  id: Scalars['Int'];
+  callId: Scalars['Int'];
+};
+
 export type ProposalTemplate = {
   __typename?: 'ProposalTemplate';
   templateId: Scalars['Int'];
@@ -945,6 +957,26 @@ export type ProposalTemplate = {
 
 export type ProposalTemplatesFilter = {
   isArchived?: Maybe<Scalars['Boolean']>;
+};
+
+export type ProposalView = {
+  __typename?: 'ProposalView';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  status: ProposalStatus;
+  shortCode: Scalars['String'];
+  rankOrder: Maybe<Scalars['Int']>;
+  finalStatus: Maybe<ProposalEndStatus>;
+  notified: Scalars['Boolean'];
+  timeAllocation: Maybe<Scalars['Int']>;
+  technicalStatus: Maybe<TechnicalReviewStatus>;
+  instrumentName: Maybe<Scalars['String']>;
+  callShortCode: Maybe<Scalars['String']>;
+  sepShortCode: Maybe<Scalars['String']>;
+  reviewAverage: Maybe<Scalars['Float']>;
+  reviewDeviation: Maybe<Scalars['Float']>;
+  instrumentId: Maybe<Scalars['Int']>;
+  callId: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -968,6 +1000,7 @@ export type Query = {
   instrumentsBySep: Maybe<Array<InstrumentWithAvailabilityTime>>;
   isNaturalKeyPresent: Maybe<Scalars['Boolean']>;
   proposal: Maybe<Proposal>;
+  proposalsView: Maybe<Array<ProposalView>>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
@@ -1060,6 +1093,11 @@ export type QueryInstrumentArgs = {
 };
 
 
+export type QueryInstrumentsArgs = {
+  callIds?: Maybe<Array<Scalars['Int']>>;
+};
+
+
 export type QueryInstrumentsBySepArgs = {
   callId: Scalars['Int'];
   sepId: Scalars['Int'];
@@ -1073,6 +1111,11 @@ export type QueryIsNaturalKeyPresentArgs = {
 
 export type QueryProposalArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryProposalsViewArgs = {
+  filter?: Maybe<ProposalsFilter>;
 };
 
 
@@ -2041,7 +2084,7 @@ export type GetEventLogsQuery = (
 );
 
 export type AssignProposalsToInstrumentMutationVariables = Exact<{
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 }>;
 
@@ -2104,7 +2147,9 @@ export type DeleteInstrumentMutation = (
   ) }
 );
 
-export type GetInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetInstrumentsQueryVariables = Exact<{
+  callIds?: Maybe<Array<Scalars['Int']>>;
+}>;
 
 
 export type GetInstrumentsQuery = (
@@ -3532,7 +3577,7 @@ export type UpdateUserRolesMutationVariables = Exact<{
 
 export type UpdateUserRolesMutation = (
   { __typename?: 'Mutation' }
-  & { updateUser: (
+  & { updateUserRoles: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
     & { user: Maybe<(
@@ -4218,8 +4263,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const AssignProposalsToInstrumentDocument = gql`
-    mutation assignProposalsToInstrument($proposalIds: [Int!]!, $instrumentId: Int!) {
-  assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    mutation assignProposalsToInstrument($proposals: [ProposalsToInstrumentArgs!]!, $instrumentId: Int!) {
+  assignProposalsToInstrument(proposals: $proposals, instrumentId: $instrumentId) {
     error
     isSuccess
   }
@@ -4257,8 +4302,8 @@ export const DeleteInstrumentDocument = gql`
 }
     `;
 export const GetInstrumentsDocument = gql`
-    query getInstruments {
-  instruments {
+    query getInstruments($callIds: [Int!]) {
+  instruments(callIds: $callIds) {
     instruments {
       id
       name
@@ -5083,7 +5128,7 @@ export const UpdateUserDocument = gql`
     `;
 export const UpdateUserRolesDocument = gql`
     mutation updateUserRoles($id: Int!, $roles: [Int!]) {
-  updateUser(id: $id, roles: $roles) {
+  updateUserRoles(id: $id, roles: $roles) {
     user {
       id
     }

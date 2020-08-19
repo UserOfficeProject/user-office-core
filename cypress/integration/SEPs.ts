@@ -148,7 +148,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(1000);
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
-      .last()
+      .eq(2)
       .find('td.MuiTableCell-alignLeft')
       .first()
       .then(element => {
@@ -156,7 +156,7 @@ context('Scientific evaluation panel tests', () => {
       });
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
-      .last()
+      .eq(2)
       .find('td.MuiTableCell-alignLeft')
       .eq(1)
       .then(element => {
@@ -164,7 +164,7 @@ context('Scientific evaluation panel tests', () => {
       });
 
     cy.get('[title="Select user"]')
-      .last()
+      .eq(2)
       .click();
 
     cy.wait(1000);
@@ -412,6 +412,19 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
+    cy.contains('View Calls').click();
+    cy.get('[title="Assign Instrument"]')
+      .first()
+      .click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.contains('Assign instrument').click();
+
+    cy.wait(500);
+
     cy.contains('View Proposals').click();
 
     cy.wait(500);
@@ -437,22 +450,6 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
 
     cy.get('[title="Remove assigned instrument"]').should('exist');
-
-    cy.contains('View Calls').click();
-
-    cy.wait(500);
-
-    cy.get('[title="Assign Instrument"]')
-      .first()
-      .click();
-
-    cy.get('[type="checkbox"]')
-      .first()
-      .check();
-
-    cy.contains('Assign instrument').click();
-
-    cy.wait(500);
 
     cy.contains('SEPs').click();
 

@@ -75,7 +75,7 @@ context('Event log tests', () => {
     lastPeoplePageButtonElement.click({ force: true });
 
     cy.get('button[title="Edit user"]')
-      .last()
+      .eq(2)
       .click();
 
     cy.get("[name='firstname']").should('have.value', newFirstName);
