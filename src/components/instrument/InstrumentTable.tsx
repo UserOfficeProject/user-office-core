@@ -190,7 +190,7 @@ const InstrumentTable: React.FC = () => {
           createModal={createModal}
           detailPanel={[
             {
-              tooltip: 'Show Instruments',
+              tooltip: 'Show Scientists',
               render: AssignedScientists,
             },
           ]}

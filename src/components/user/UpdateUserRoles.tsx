@@ -36,7 +36,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     }
 
     enqueueSnackbar('Updated Roles', {
-      variant: userUpdateResult.updateUser.error ? 'error' : 'success',
+      variant: userUpdateResult.updateUserRoles.error ? 'error' : 'success',
     });
   };
 
