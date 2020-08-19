@@ -53,24 +53,6 @@ export default class PostgresQuestionaryDataSource
         return createAnswerBasic(record);
       });
   }
-  // getParentQuestionary(
-  //   child_questionary_id: number
-  // ): Promise<Questionary | null> {
-  //   const subQuery = database('answer_has_questionaries')
-  //     .select('answer_id')
-  //     .where({ questionary_id: child_questionary_id });
-
-  //   return database('questionaries')
-  //     .select('*')
-  //     .whereIn('questionary_id', subQuery)
-  //     .then((rows: QuestionaryRecord[]) => {
-  //       if (rows.length !== 1) {
-  //         return null;
-  //       }
-
-  //       return createQuestionaryObject(rows[0]);
-  //     });
-  // }
 
   getParentQuestionary(
     child_questionary_id: number
