@@ -13,9 +13,11 @@ context('Samples tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  const sampleTemplateName = faker.lorem.words(1);
+  const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
+  const proposalTitle = faker.lorem.words(2);
+  const proposalAbstract = faker.lorem.words(5);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -62,7 +64,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=template-id]').click();
 
-    cy.contains(sampleTemplateName).click({ force: true });
+    cy.contains(sampleTemplateName).click();
 
     cy.contains('Save').click();
 
@@ -76,9 +78,9 @@ context('Samples tests', () => {
 
     cy.contains('New Proposal').click();
 
-    cy.get('#title').type(faker.lorem.words(2));
+    cy.get('#title').type(proposalTitle);
 
-    cy.get('#abstract').type(faker.lorem.words(5));
+    cy.get('#abstract').type(proposalAbstract);
 
     cy.contains('Save and continue').click();
 
@@ -115,5 +117,23 @@ context('Samples tests', () => {
     cy.contains('Reject').click();
 
     cy.contains('UNSAFE').click();
+  });
+
+  it('Officer should able to delete proposal with sample', () => {
+    cy.login('officer');
+
+    cy.contains('View Proposals').click();
+
+    cy.get("input[type='checkbox']")
+      .first()
+      .click();
+
+    cy.get("[title='Delete proposals']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.contains(proposalTitle).should('not.exist');
   });
 });
