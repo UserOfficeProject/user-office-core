@@ -55,6 +55,10 @@ export default class TemplateMutations {
       .createTemplate(args)
       .then(result => result);
 
+    await this.dataSource.createTopic({
+      sortOrder: 0,
+      templateId: result.templateId,
+    }); // Create at least one topic
     return result;
   }
 
