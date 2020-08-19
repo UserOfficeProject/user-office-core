@@ -173,7 +173,7 @@ export default function ProposalContainer(props: {
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
               payload: {
-                proposal,
+                ...proposal,
               },
             });
           }
