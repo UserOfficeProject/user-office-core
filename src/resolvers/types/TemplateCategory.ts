@@ -1,11 +1,4 @@
-import {
-  Field,
-  FieldResolver,
-  Int,
-  ObjectType,
-  Resolver,
-  Root,
-} from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 import {
   TemplateCategory as TemplateCategoryOrigin,

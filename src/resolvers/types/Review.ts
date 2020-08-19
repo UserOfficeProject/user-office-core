@@ -9,8 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ReviewStatus } from '../../models/Review';
-import { Review as ReviewOrigin } from '../../models/Review';
+import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
 import { Proposal } from '../types/Proposal';
 import { User } from '../types/User';
 

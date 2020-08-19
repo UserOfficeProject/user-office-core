@@ -4,8 +4,8 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import TemplateQueries from './TemplateQueries';
 import { Template, TemplateStep } from '../models/Template';
+import TemplateQueries from './TemplateQueries';
 
 const dummyTemplateDataSource = new TemplateDataSourceMock();
 const templateQueries = new TemplateQueries(dummyTemplateDataSource);

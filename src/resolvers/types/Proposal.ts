@@ -9,8 +9,11 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Proposal as ProposalOrigin } from '../../models/Proposal';
-import { ProposalStatus, ProposalEndStatus } from '../../models/Proposal';
+import {
+  Proposal as ProposalOrigin,
+  ProposalEndStatus,
+  ProposalStatus,
+} from '../../models/Proposal';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';

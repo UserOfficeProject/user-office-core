@@ -1,8 +1,8 @@
 import { sampleDataSource, questionaryDataSource } from '../datasources';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
-import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { questionaryAuthorization } from './QuestionaryAuthorization';
 
 export class SampleAuthorization {

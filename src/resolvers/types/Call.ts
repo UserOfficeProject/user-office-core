@@ -1,11 +1,11 @@
 import {
+  Ctx,
   Field,
+  FieldResolver,
   Int,
   ObjectType,
   Resolver,
-  FieldResolver,
   Root,
-  Ctx,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';

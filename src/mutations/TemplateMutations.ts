@@ -59,6 +59,7 @@ export default class TemplateMutations {
       sortOrder: 0,
       templateId: result.templateId,
     }); // Create at least one topic
+
     return result;
   }
 
