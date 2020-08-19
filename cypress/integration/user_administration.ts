@@ -111,6 +111,6 @@ context('User administration tests', () => {
       .first()
       .click();
 
-    cy.contains('1-2 of 2');
+    cy.contains('1-3 of 3');
   });
 });
