@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import { Edit } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -20,9 +20,12 @@ export default function PeoplePage() {
   });
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   if (userData) {
-    return <Redirect to={`/PeoplePage/${userData.id}`} />;
+    setTimeout(() => {
+      history.push(`/PeoplePage/${userData.id}`);
+    });
   }
 
   const invitationButtons = [];
