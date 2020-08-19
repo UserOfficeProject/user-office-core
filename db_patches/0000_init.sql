@@ -206,6 +206,58 @@ BEGIN
 
     INSERT INTO roles (short_code, title) VALUES ('reviewer', 'Reviewer');
 
+
+INSERT INTO users (
+                      user_id,
+                      user_title, 
+                      firstname, 
+                      middlename, 
+                      lastname, 
+                      username, 
+                      password,
+                      preferredname,
+                      orcid,
+                      orcid_refreshToken,
+                      gender,
+                      nationality,
+                      birthdate,
+                      organisation,
+                      department,
+                      organisation_address,
+                      position,
+                      email,
+                      email_verified,
+                      telephone,
+                      telephone_alt
+                      ) 
+    VALUES 
+                    (
+                      0,
+                      'Mr.', 
+                      'Service account',
+                      '', 
+                      '', 
+                      'service', 
+                      '$2a$10$1svMW3/FwE5G1BpE7/CPW.aMyEymEBeWK4tSTtABbsoo/KaSQ.vwm',
+                      'Service account',
+                      '',
+                      '',
+                      'male',
+                      'Danish',
+                      '2000-04-02',
+                      '',
+                      '',
+                      '',
+                      '',
+                      'service@useroffice.ess.eu',
+                      true,
+                      '',
+                      ''
+                      );
+
+    INSERT INTO role_user (role_id, user_id) VALUES (2, 0);
+
+
     INSERT INTO users (
                       user_title, 
                       firstname, 
@@ -256,26 +308,7 @@ BEGIN
 
 
 
-    INSERT INTO call(
-              call_short_code 
-            , start_call 
-            , end_call 
-            , start_review 
-            , end_review 
-            , start_notify
-            , end_notify
-            , cycle_comment 
-            , survey_comment )
-    VALUES(
-            'call 1', 
-            '2019-01-01', 
-            '2023-01-01',
-            '2019-01-01', 
-            '2023-01-01',
-            '2019-01-01', 
-            '2023-01-01', 
-            'This is cycle comment', 
-            'This is survey comment');
+
 
 
     INSERT INTO users (
@@ -372,6 +405,27 @@ BEGIN
 
     INSERT INTO role_user (role_id, user_id) VALUES (3, 3);
 
+
+    INSERT INTO call(
+              call_short_code 
+            , start_call 
+            , end_call 
+            , start_review 
+            , end_review 
+            , start_notify
+            , end_notify
+            , cycle_comment 
+            , survey_comment )
+    VALUES(
+            'call 1', 
+            '2019-01-01', 
+            '2023-01-01',
+            '2019-01-01', 
+            '2023-01-01',
+            '2019-01-01', 
+            '2023-01-01', 
+            'This is cycle comment', 
+            'This is survey comment');
 
     INSERT INTO proposal_question_datatypes VALUES ('TEXT_INPUT');
     INSERT INTO proposal_question_datatypes VALUES ('SELECTION_FROM_OPTIONS');

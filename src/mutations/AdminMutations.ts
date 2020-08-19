@@ -14,7 +14,8 @@ import { logger } from '../utils/Logger';
 export default class AdminMutations {
   constructor(private dataSource: AdminDataSource) {}
 
-  async resetDB(): Promise<string | Rejection> {
+  @Authorized([Roles.USER_OFFICER])
+  async resetDB(agent: UserWithRole | null): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
 
@@ -24,7 +25,8 @@ export default class AdminMutations {
     }
   }
 
-  async applyPatches(): Promise<string | Rejection> {
+  @Authorized([Roles.USER_OFFICER])
+  async applyPatches(agent: UserWithRole | null): Promise<string | Rejection> {
     logger.logWarn('Applying patches', {});
 
     return this.dataSource.applyPatches();

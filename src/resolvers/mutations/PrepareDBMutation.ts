@@ -9,7 +9,7 @@ export class PrepareDBMutationMutation {
   @Mutation(() => PrepareDBResponseWrap)
   prepareDB(@Ctx() context: ResolverContext) {
     return wrapResponse(
-      context.mutations.admin.resetDB(),
+      context.mutations.admin.resetDB(context.user),
       PrepareDBResponseWrap
     );
   }
