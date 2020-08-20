@@ -14,7 +14,7 @@ import withConfirm from 'utils/withConfirm';
 import { ProposalSubmissionContext } from './ProposalContainer';
 import ProposalNavigationFragment from './ProposalNavigationFragment';
 
-function ProposalReview({ data, readonly, confirm }: IProposalSummaryProps) {
+function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
   const { dispatch } = useContext(ProposalSubmissionContext)!;
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -96,7 +96,7 @@ function ProposalReview({ data, readonly, confirm }: IProposalSummaryProps) {
   );
 }
 
-interface IProposalSummaryProps {
+interface ProposalSummaryProps {
   data: ProposalSubmissionModelState;
   readonly: boolean;
   confirm: Function;

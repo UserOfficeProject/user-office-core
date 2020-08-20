@@ -49,8 +49,6 @@ context('Template tests', () => {
       .first()
       .click();
 
-    cy.contains('Add topic').click();
-
     cy.get('[data-cy=topic-title]').click();
 
     cy.get('[data-cy=topic-title-input]')

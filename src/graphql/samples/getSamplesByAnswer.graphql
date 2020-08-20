@@ -1,0 +1,5 @@
+query getSamplesByAnswerId($answerId: Int!) {
+  samplesByAnswerId(answerId: $answerId) {
+    ...sample
+  }
+}

@@ -6,7 +6,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { Column, Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import DialogConfirmation from 'components/common/DialogConfirmation';
@@ -46,24 +46,23 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const { loading, proposalsData, setProposalsData } = useProposalsData(
     proposalFilter
   );
-  const [open, setOpen] = React.useState(false);
-  const [openRemoveInstrument, setOpenRemoveInstrument] = React.useState(false);
-  const [openAssignment, setOpenAssignment] = React.useState(false);
-  const [proposalAndInstrumentId, setProposalAndInstrumentId] = React.useState<{
+  const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
+  const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
+  const [openAssignment, setOpenAssignment] = useState(false);
+  const [proposalAndInstrumentId, setProposalAndInstrumentId] = useState<{
     proposalId: number | null;
     instrumentId: number | null;
   }>({
     proposalId: null,
     instrumentId: null,
   });
-  const [
-    openInstrumentAssignment,
-    setOpenInstrumentAssignment,
-  ] = React.useState(false);
-  const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
+  const [openInstrumentAssignment, setOpenInstrumentAssignment] = useState(
+    false
+  );
+  const [openEmailProposals, setOpenEmailProposals] = useState(false);
 
   const initalSelectedProposals: ProposalsToInstrumentArgs[] = [];
-  const [selectedProposals, setSelectedProposals] = React.useState(
+  const [selectedProposals, setSelectedProposals] = useState(
     initalSelectedProposals
   );
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -414,9 +413,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       <DialogConfirmation
         title="Delete proposals"
         text="This action will delete proposals and all data associated with them"
-        open={open}
+        open={openDeleteProposals}
         action={deleteProposals}
-        handleOpen={setOpen}
+        handleOpen={setOpenDeleteProposals}
       />
       <DialogConfirmation
         title="Remove assigned instrument"
@@ -498,7 +497,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             icon: DeleteIcon,
             tooltip: 'Delete proposals',
             onClick: (event, rowData): void => {
-              setOpen(true);
+              setOpenDeleteProposals(true);
               setSelectedProposals(
                 (rowData as ProposalData[]).map((row: ProposalData) => ({
                   id: row.id,

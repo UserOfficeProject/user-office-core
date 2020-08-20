@@ -12,7 +12,7 @@ export type Scalars = {
   Float: number;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
-  IntStringDateBool: any;
+  IntStringDateBoolArray: any;
 };
 
 export type AddSepMembersRole = {
@@ -34,7 +34,23 @@ export type Answer = {
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
-  value: Maybe<Scalars['IntStringDateBool']>;
+  answerId: Maybe<Scalars['Int']>;
+  value: Maybe<Scalars['IntStringDateBoolArray']>;
+};
+
+export type AnswerBasic = {
+  __typename?: 'AnswerBasic';
+  answerId: Maybe<Scalars['Int']>;
+  answer: Scalars['IntStringDateBoolArray'];
+  questionaryId: Scalars['Int'];
+  questionId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+};
+
+export type AnswerBasicResponseWrap = {
+  __typename?: 'AnswerBasicResponseWrap';
+  error: Maybe<Scalars['String']>;
+  answer: Maybe<AnswerBasic>;
 };
 
 export type AnswerInput = {
@@ -45,7 +61,7 @@ export type AnswerInput = {
 export type AnswerResponseWrap = {
   __typename?: 'AnswerResponseWrap';
   error: Maybe<Scalars['String']>;
-  answer: Answer;
+  answer: Maybe<Answer>;
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
@@ -178,7 +194,7 @@ export type EventLog = {
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
-  params: Scalars['IntStringDateBool'];
+  params: Scalars['IntStringDateBoolArray'];
 };
 
 export type FieldConditionInput = {
@@ -304,6 +320,9 @@ export type Mutation = {
   addReview: ReviewResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
+  createSample: SampleResponseWrap;
+  updateSampleStatus: SampleResponseWrap;
+  updateSampleTitle: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
   assignMembers: SepResponseWrap;
   removeMember: SepResponseWrap;
@@ -331,11 +350,13 @@ export type Mutation = {
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
   cloneTemplate: TemplateResponseWrap;
+  createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
   createProposal: ProposalResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
+  deleteSample: SampleResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
   deleteUser: UserResponseWrap;
@@ -520,6 +541,24 @@ export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'];
   proposalID: Scalars['Int'];
   sepID: Scalars['Int'];
+};
+
+
+export type MutationCreateSampleArgs = {
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSampleStatusArgs = {
+  sampleId: Scalars['Int'];
+  status: SampleStatus;
+};
+
+
+export type MutationUpdateSampleTitleArgs = {
+  sampleId: Scalars['Int'];
+  title: Scalars['String'];
 };
 
 
@@ -733,6 +772,12 @@ export type MutationCloneTemplateArgs = {
 };
 
 
+export type MutationCreateAnswerQuestionaryRelationsArgs = {
+  answerId: Scalars['Int'];
+  questionaryIds: Array<Scalars['Int']>;
+};
+
+
 export type MutationCreateProposalArgs = {
   callId: Scalars['Int'];
 };
@@ -755,6 +800,11 @@ export type MutationDeleteProposalArgs = {
 
 export type MutationDeleteQuestionArgs = {
   questionId: Scalars['String'];
+};
+
+
+export type MutationDeleteSampleArgs = {
+  sampleId: Scalars['Int'];
 };
 
 
@@ -875,7 +925,7 @@ export type PageResponseWrap = {
 export type PrepareDbResponseWrap = {
   __typename?: 'PrepareDBResponseWrap';
   error: Maybe<Scalars['String']>;
-  log: Scalars['String'];
+  log: Maybe<Scalars['String']>;
 };
 
 export type Proposal = {
@@ -1005,6 +1055,10 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
+  sample: Maybe<Sample>;
+  samplesByAnswerId: Maybe<Array<Sample>>;
+  samplesByCallId: Maybe<Array<Sample>>;
+  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepMember>>;
   sepProposals: Maybe<Array<SepProposal>>;
@@ -1131,6 +1185,26 @@ export type QueryQuestionaryArgs = {
 
 export type QueryReviewArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QuerySampleArgs = {
+  sampleId: Scalars['Int'];
+};
+
+
+export type QuerySamplesByAnswerIdArgs = {
+  answerId: Scalars['Int'];
+};
+
+
+export type QuerySamplesByCallIdArgs = {
+  callId: Scalars['Int'];
+};
+
+
+export type QuerySamplesArgs = {
+  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -1282,6 +1356,43 @@ export type Role = {
   title: Scalars['String'];
 };
 
+export type Sample = {
+  __typename?: 'Sample';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  creatorId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  status: SampleStatus;
+  created: Scalars['DateTime'];
+  questionary: Questionary;
+};
+
+export type SampleResponseWrap = {
+  __typename?: 'SampleResponseWrap';
+  error: Maybe<Scalars['String']>;
+  sample: Maybe<Sample>;
+};
+
+export type SamplesFilter = {
+  title?: Maybe<Scalars['String']>;
+  creatorId?: Maybe<Scalars['Int']>;
+  questionaryId?: Maybe<Scalars['Int']>;
+  sampleIds?: Maybe<Array<Scalars['Int']>>;
+  status?: Maybe<SampleStatus>;
+};
+
+export type SamplesResponseWrap = {
+  __typename?: 'SamplesResponseWrap';
+  error: Maybe<Scalars['String']>;
+  samples: Array<Sample>;
+};
+
+export enum SampleStatus {
+  NONE = 'NONE',
+  SAFE = 'SAFE',
+  UNSAFE = 'UNSAFE'
+}
+
 export type SelectionFromOptionsConfig = {
   __typename?: 'SelectionFromOptionsConfig';
   small_label: Scalars['String'];
@@ -1359,6 +1470,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
+  templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
 };
 
@@ -1404,7 +1516,7 @@ export type Template = {
 
 export type TemplateCategory = {
   __typename?: 'TemplateCategory';
-  categoryId: Scalars['Int'];
+  categoryId: TemplateCategoryId;
   name: Scalars['String'];
 };
 
@@ -1525,7 +1637,8 @@ export enum UserRole {
   SEP_CHAIR = 'SEP_CHAIR',
   SEP_SECRETARY = 'SEP_SECRETARY',
   SEP_REVIEWER = 'SEP_REVIEWER',
-  INSTRUMENT_SCIENTIST = 'INSTRUMENT_SCIENTIST'
+  INSTRUMENT_SCIENTIST = 'INSTRUMENT_SCIENTIST',
+  SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
 export type AssignProposalMutationVariables = Exact<{
@@ -2288,6 +2401,10 @@ export type CreateProposalMutation = (
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
       & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
     )> }
   ) }
 );
@@ -2548,6 +2665,24 @@ export type AnswerTopicMutation = (
   ) }
 );
 
+export type CreateAnswerQuestionaryRelationsMutationVariables = Exact<{
+  answerId: Scalars['Int'];
+  questionaryIds: Array<Scalars['Int']>;
+}>;
+
+
+export type CreateAnswerQuestionaryRelationsMutation = (
+  { __typename?: 'Mutation' }
+  & { createAnswerQuestionaryRelations: (
+    { __typename?: 'AnswerBasicResponseWrap' }
+    & Pick<AnswerBasicResponseWrap, 'error'>
+    & { answer: Maybe<(
+      { __typename?: 'AnswerBasic' }
+      & Pick<AnswerBasic, 'answerId'>
+    )> }
+  ) }
+);
+
 export type CreateQuestionaryMutationVariables = Exact<{
   templateId: Scalars['Int'];
 }>;
@@ -2567,7 +2702,7 @@ export type CreateQuestionaryMutation = (
 
 export type AnswerFragment = (
   { __typename?: 'Answer' }
-  & Pick<Answer, 'sortOrder' | 'topicId' | 'value'>
+  & Pick<Answer, 'answerId' | 'sortOrder' | 'topicId' | 'value'>
   & { question: (
     { __typename?: 'Question' }
     & QuestionFragment
@@ -2600,6 +2735,11 @@ export type AnswerFragment = (
       & FieldConditionFragment
     ) }
   )> }
+);
+
+export type AnswerBasicFragment = (
+  { __typename?: 'AnswerBasic' }
+  & Pick<AnswerBasic, 'answerId' | 'answer' | 'questionaryId' | 'questionId' | 'createdAt'>
 );
 
 export type QuestionaryFragment = (
@@ -2766,6 +2906,142 @@ export type UserWithReviewsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type CreateSampleMutationVariables = Exact<{
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+}>;
+
+
+export type CreateSampleMutation = (
+  { __typename?: 'Mutation' }
+  & { createSample: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
+      & SampleFragment
+    )> }
+  ) }
+);
+
+export type DeleteSampleMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+}>;
+
+
+export type DeleteSampleMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteSample: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
+);
+
+export type SampleFragment = (
+  { __typename?: 'Sample' }
+  & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'status' | 'created'>
+);
+
+export type GetSampleQueryVariables = Exact<{
+  sampleId: Scalars['Int'];
+}>;
+
+
+export type GetSampleQuery = (
+  { __typename?: 'Query' }
+  & { sample: Maybe<(
+    { __typename?: 'Sample' }
+    & { questionary: (
+      { __typename?: 'Questionary' }
+      & QuestionaryFragment
+    ) }
+    & SampleFragment
+  )> }
+);
+
+export type GetSamplesQueryVariables = Exact<{
+  filter?: Maybe<SamplesFilter>;
+}>;
+
+
+export type GetSamplesQuery = (
+  { __typename?: 'Query' }
+  & { samples: Maybe<Array<(
+    { __typename?: 'Sample' }
+    & SampleFragment
+  )>> }
+);
+
+export type GetSamplesByAnswerIdQueryVariables = Exact<{
+  answerId: Scalars['Int'];
+}>;
+
+
+export type GetSamplesByAnswerIdQuery = (
+  { __typename?: 'Query' }
+  & { samplesByAnswerId: Maybe<Array<(
+    { __typename?: 'Sample' }
+    & SampleFragment
+  )>> }
+);
+
+export type GetSamplesByCallIdQueryVariables = Exact<{
+  callId: Scalars['Int'];
+}>;
+
+
+export type GetSamplesByCallIdQuery = (
+  { __typename?: 'Query' }
+  & { samplesByCallId: Maybe<Array<(
+    { __typename?: 'Sample' }
+    & SampleFragment
+  )>> }
+);
+
+export type UpdateSampleStatusMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+  status: SampleStatus;
+}>;
+
+
+export type UpdateSampleStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSampleStatus: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
+);
+
+export type UpdateSampleTitleMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+  title: Scalars['String'];
+}>;
+
+
+export type UpdateSampleTitleMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSampleTitle: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
 );
 
 export type AssignQuestionsToTopicMutationVariables = Exact<{
@@ -2977,7 +3253,7 @@ type FieldConfigTextInputConfigFragment = (
 
 type FieldConfigSubtemplateConfigFragment = (
   { __typename?: 'SubtemplateConfig' }
-  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'small_label' | 'required' | 'tooltip'>
 );
 
 export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSubtemplateConfigFragment;
@@ -3119,6 +3395,17 @@ export type GetTemplateQuery = (
     { __typename?: 'Template' }
     & TemplateFragment
   )> }
+);
+
+export type GetTemplateCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTemplateCategoriesQuery = (
+  { __typename?: 'Query' }
+  & { templateCategories: Maybe<Array<(
+    { __typename?: 'TemplateCategory' }
+    & Pick<TemplateCategory, 'categoryId' | 'name'>
+  )>> }
 );
 
 export type GetTemplatesQueryVariables = Exact<{
@@ -3628,6 +3915,15 @@ export const ProposalFragmentDoc = gql`
   notified
 }
     `;
+export const AnswerBasicFragmentDoc = gql`
+    fragment answerBasic on AnswerBasic {
+  answerId
+  answer
+  questionaryId
+  questionId
+  createdAt
+}
+    `;
 export const FieldConfigFragmentDoc = gql`
     fragment fieldConfig on FieldConfig {
   ... on BooleanConfig {
@@ -3677,6 +3973,7 @@ export const FieldConfigFragmentDoc = gql`
     addEntryButtonLabel
     maxEntries
     templateId
+    templateCategory
     small_label
     required
     tooltip
@@ -3703,6 +4000,7 @@ export const FieldConditionFragmentDoc = gql`
     `;
 export const AnswerFragmentDoc = gql`
     fragment answer on Answer {
+  answerId
   question {
     ...question
   }
@@ -3756,6 +4054,16 @@ export const CoreReviewFragmentDoc = gql`
   comment
   grade
   sepID
+}
+    `;
+export const SampleFragmentDoc = gql`
+    fragment sample on Sample {
+  id
+  title
+  creatorId
+  questionaryId
+  status
+  created
 }
     `;
 export const QuestionTemplateRelationFragmentDoc = gql`
@@ -4390,11 +4698,14 @@ export const CreateProposalDocument = gql`
       status
       shortCode
       questionaryId
+      questionary {
+        ...questionary
+      }
     }
     error
   }
 }
-    `;
+    ${QuestionaryFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
@@ -4623,6 +4934,16 @@ export const AnswerTopicDocument = gql`
   }
 }
     ${QuestionaryStepFragmentDoc}`;
+export const CreateAnswerQuestionaryRelationsDocument = gql`
+    mutation createAnswerQuestionaryRelations($answerId: Int!, $questionaryIds: [Int!]!) {
+  createAnswerQuestionaryRelations(answerId: $answerId, questionaryIds: $questionaryIds) {
+    answer {
+      answerId
+    }
+    error
+  }
+}
+    `;
 export const CreateQuestionaryDocument = gql`
     mutation createQuestionary($templateId: Int!) {
   createQuestionary(templateId: $templateId) {
@@ -4725,6 +5046,82 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CreateSampleDocument = gql`
+    mutation createSample($title: String!, $templateId: Int!) {
+  createSample(title: $title, templateId: $templateId) {
+    sample {
+      ...sample
+      questionary {
+        ...questionary
+      }
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}
+${QuestionaryFragmentDoc}`;
+export const DeleteSampleDocument = gql`
+    mutation deleteSample($sampleId: Int!) {
+  deleteSample(sampleId: $sampleId) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
+export const GetSampleDocument = gql`
+    query getSample($sampleId: Int!) {
+  sample(sampleId: $sampleId) {
+    ...sample
+    questionary {
+      ...questionary
+    }
+  }
+}
+    ${SampleFragmentDoc}
+${QuestionaryFragmentDoc}`;
+export const GetSamplesDocument = gql`
+    query getSamples($filter: SamplesFilter) {
+  samples(filter: $filter) {
+    ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
+export const GetSamplesByAnswerIdDocument = gql`
+    query getSamplesByAnswerId($answerId: Int!) {
+  samplesByAnswerId(answerId: $answerId) {
+    ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
+export const GetSamplesByCallIdDocument = gql`
+    query getSamplesByCallId($callId: Int!) {
+  samplesByCallId(callId: $callId) {
+    ...sample
+  }
+}
+    ${SampleFragmentDoc}`;
+export const UpdateSampleStatusDocument = gql`
+    mutation updateSampleStatus($sampleId: Int!, $status: SampleStatus!) {
+  updateSampleStatus(sampleId: $sampleId, status: $status) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
+export const UpdateSampleTitleDocument = gql`
+    mutation updateSampleTitle($sampleId: Int!, $title: String!) {
+  updateSampleTitle(sampleId: $sampleId, title: $title) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
 export const AssignQuestionsToTopicDocument = gql`
     mutation assignQuestionsToTopic($templateId: Int!, $topicId: Int!, $questionIds: [String!]) {
   assignQuestionsToTopic(templateId: $templateId, topicId: $topicId, questionIds: $questionIds) {
@@ -4844,6 +5241,14 @@ export const GetTemplateDocument = gql`
   }
 }
     ${TemplateFragmentDoc}`;
+export const GetTemplateCategoriesDocument = gql`
+    query getTemplateCategories {
+  templateCategories {
+    categoryId
+    name
+  }
+}
+    `;
 export const GetTemplatesDocument = gql`
     query getTemplates($filter: TemplatesFilter) {
   templates(filter: $filter) {
@@ -5301,6 +5706,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     answerTopic(variables: AnswerTopicMutationVariables): Promise<AnswerTopicMutation> {
       return withWrapper(() => client.request<AnswerTopicMutation>(print(AnswerTopicDocument), variables));
     },
+    createAnswerQuestionaryRelations(variables: CreateAnswerQuestionaryRelationsMutationVariables): Promise<CreateAnswerQuestionaryRelationsMutation> {
+      return withWrapper(() => client.request<CreateAnswerQuestionaryRelationsMutation>(print(CreateAnswerQuestionaryRelationsDocument), variables));
+    },
     createQuestionary(variables: CreateQuestionaryMutationVariables): Promise<CreateQuestionaryMutation> {
       return withWrapper(() => client.request<CreateQuestionaryMutation>(print(CreateQuestionaryDocument), variables));
     },
@@ -5327,6 +5735,30 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    createSample(variables: CreateSampleMutationVariables): Promise<CreateSampleMutation> {
+      return withWrapper(() => client.request<CreateSampleMutation>(print(CreateSampleDocument), variables));
+    },
+    deleteSample(variables: DeleteSampleMutationVariables): Promise<DeleteSampleMutation> {
+      return withWrapper(() => client.request<DeleteSampleMutation>(print(DeleteSampleDocument), variables));
+    },
+    getSample(variables: GetSampleQueryVariables): Promise<GetSampleQuery> {
+      return withWrapper(() => client.request<GetSampleQuery>(print(GetSampleDocument), variables));
+    },
+    getSamples(variables?: GetSamplesQueryVariables): Promise<GetSamplesQuery> {
+      return withWrapper(() => client.request<GetSamplesQuery>(print(GetSamplesDocument), variables));
+    },
+    getSamplesByAnswerId(variables: GetSamplesByAnswerIdQueryVariables): Promise<GetSamplesByAnswerIdQuery> {
+      return withWrapper(() => client.request<GetSamplesByAnswerIdQuery>(print(GetSamplesByAnswerIdDocument), variables));
+    },
+    getSamplesByCallId(variables: GetSamplesByCallIdQueryVariables): Promise<GetSamplesByCallIdQuery> {
+      return withWrapper(() => client.request<GetSamplesByCallIdQuery>(print(GetSamplesByCallIdDocument), variables));
+    },
+    updateSampleStatus(variables: UpdateSampleStatusMutationVariables): Promise<UpdateSampleStatusMutation> {
+      return withWrapper(() => client.request<UpdateSampleStatusMutation>(print(UpdateSampleStatusDocument), variables));
+    },
+    updateSampleTitle(variables: UpdateSampleTitleMutationVariables): Promise<UpdateSampleTitleMutation> {
+      return withWrapper(() => client.request<UpdateSampleTitleMutation>(print(UpdateSampleTitleDocument), variables));
     },
     assignQuestionsToTopic(variables: AssignQuestionsToTopicMutationVariables): Promise<AssignQuestionsToTopicMutation> {
       return withWrapper(() => client.request<AssignQuestionsToTopicMutation>(print(AssignQuestionsToTopicDocument), variables));
@@ -5366,6 +5798,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getTemplate(variables: GetTemplateQueryVariables): Promise<GetTemplateQuery> {
       return withWrapper(() => client.request<GetTemplateQuery>(print(GetTemplateDocument), variables));
+    },
+    getTemplateCategories(variables?: GetTemplateCategoriesQueryVariables): Promise<GetTemplateCategoriesQuery> {
+      return withWrapper(() => client.request<GetTemplateCategoriesQuery>(print(GetTemplateCategoriesDocument), variables));
     },
     getTemplates(variables?: GetTemplatesQueryVariables): Promise<GetTemplatesQuery> {
       return withWrapper(() => client.request<GetTemplatesQuery>(print(GetTemplatesDocument), variables));

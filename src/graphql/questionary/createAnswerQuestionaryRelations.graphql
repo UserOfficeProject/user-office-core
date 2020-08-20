@@ -1,0 +1,14 @@
+mutation createAnswerQuestionaryRelations(
+  $answerId: Int!
+  $questionaryIds: [Int!]!
+) {
+  createAnswerQuestionaryRelations(
+    answerId: $answerId
+    questionaryIds: $questionaryIds
+  ) {
+    answer {
+      answerId
+    }
+    error
+  }
+}

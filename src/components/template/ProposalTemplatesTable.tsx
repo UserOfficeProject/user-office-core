@@ -13,7 +13,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { callsData } = useCallsData(undefined, props.filterTemplateId);
+  const { callsData } = useCallsData({ templateIds: [props.filterTemplateId] });
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
@@ -61,7 +61,7 @@ type ProposalTemplateRowDataType = TemplateRowDataType & {
   proposalCount: number;
 };
 
-function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
+function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
   const columns: Column<ProposalTemplateRowDataType>[] = [
@@ -109,7 +109,7 @@ function ProposalTemplatesTable(props: IProposalTemplatesTableProps) {
   );
 }
 
-interface IProposalTemplatesTableProps {
+interface ProposalTemplatesTableProps {
   dataProvider: () => Promise<
     Pick<
       ProposalTemplate,

@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 import { useHistory } from 'react-router';
 
-import UOLoader from 'components/common/UOLoader';
 import { Call } from 'generated/sdk';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import { daysRemaining } from 'utils/Time';
@@ -27,23 +26,23 @@ const useStyles = makeStyles(() => ({
 
 type ProposalChooseCallProps = {
   callsData: Call[];
-  loadingCalls: boolean;
+};
+
+const getDaysRemainingText = (daysRemaining: number) => {
+  if (daysRemaining <= 1) {
+    return '(last day remaining)';
+  } else if (daysRemaining > 1 && daysRemaining < 30) {
+    return `(${daysRemaining} days remaining)`;
+  } else {
+    return '';
+  }
 };
 
 const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
   callsData,
-  loadingCalls,
 }) => {
   const history = useHistory();
   const classes = useStyles();
-
-  if (loadingCalls) {
-    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
-  }
-
-  if (callsData.length === 0) {
-    return <p>There are no available calls at the moment</p>;
-  }
 
   const handleSelect = (callId: number) => {
     const url = '/ProposalCreate/' + callId;
@@ -63,10 +62,7 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
         <List>
           {callsData.map(call => {
             const daysRemainingNum = daysRemaining(new Date(call.endCall));
-            const daysRemainingText =
-              daysRemainingNum > 0 && daysRemainingNum < 30
-                ? `(${daysRemainingNum} days remaining)`
-                : '';
+            const daysRemainingText = getDaysRemainingText(daysRemainingNum);
 
             return (
               <ListItem
@@ -112,7 +108,6 @@ const ProposalChooseCall: React.FC<ProposalChooseCallProps> = ({
 
 ProposalChooseCall.propTypes = {
   callsData: PropTypes.array.isRequired,
-  loadingCalls: PropTypes.bool.isRequired,
 };
 
 export default ProposalChooseCall;

@@ -64,8 +64,13 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const currentDay = new Date();
   let isLastStep = false;
+
+  const currentDayStart = new Date();
+  currentDayStart.setHours(0, 0, 0, 0);
+
+  const currentDayEnd = new Date();
+  currentDayEnd.setHours(23, 59, 59, 999);
 
   const steps = ['General info', 'Review and notification', 'Cycle info'];
 
@@ -100,14 +105,14 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
     ? { ...call, templateId: call.templateId || '' }
     : {
         shortCode: '',
-        startCall: currentDay,
-        endCall: currentDay,
-        startReview: currentDay,
-        endReview: currentDay,
-        startNotify: currentDay,
-        endNotify: currentDay,
-        startCycle: currentDay,
-        endCycle: currentDay,
+        startCall: currentDayStart,
+        endCall: currentDayEnd,
+        startReview: currentDayStart,
+        endReview: currentDayEnd,
+        startNotify: currentDayStart,
+        endNotify: currentDayEnd,
+        startCycle: currentDayStart,
+        endCycle: currentDayEnd,
         cycleComment: '',
         surveyComment: '',
         templateId: '',

@@ -1,29 +1,25 @@
 import { useEffect, useState } from 'react';
 
-import { Call } from 'generated/sdk';
+import { Call, CallsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useCallsData(isActive?: boolean, templateId?: number) {
+export function useCallsData(filter?: CallsFilter) {
+  const [callsFilter, setCallsFilter] = useState(filter);
   const [callsData, setCallsData] = useState<Call[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingCalls, setLoadingCalls] = useState(true);
 
   const api = useDataApi();
 
   useEffect(() => {
     api()
-      .getCalls({
-        filter: {
-          isActive,
-          templateIds: templateId ? [templateId] : undefined,
-        },
-      })
+      .getCalls({ filter: callsFilter })
       .then(data => {
         if (data.calls) {
           setCallsData(data.calls);
         }
-        setLoading(false);
+        setLoadingCalls(false);
       });
-  }, [api, isActive, templateId]);
+  }, [api, callsFilter]);
 
-  return { loading, callsData, setCallsData };
+  return { loadingCalls, callsData, setCallsData, setCallsFilter };
 }

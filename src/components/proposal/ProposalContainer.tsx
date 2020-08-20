@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { LinearProgress } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { useSnackbar } from 'notistack';
-import { createContext, default as React, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
-
 import { useCheckAccess } from 'components/common/Can';
-import { Proposal, ProposalStatus, Questionary, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import {
+  Answer,
+  DataType,
+  ProposalStatus,
+  Questionary,
+  SubtemplateConfig,
+  TemplateCategoryId,
+  UserRole,
+} from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
@@ -21,9 +23,11 @@ import {
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
+import { createContext, default as React, useEffect, useState } from 'react';
+import { Prompt } from 'react-router';
 import { StyledPaper } from 'styles/StyledComponents';
 import { clamp } from 'utils/Math';
-
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -58,11 +62,9 @@ export default function ProposalContainer(props: {
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
 
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const clampStep = (step: number): number => {
     return clamp(step, 0, proposalSteps.length - 1);
@@ -72,42 +74,32 @@ export default function ProposalContainer(props: {
     return 'Changes you recently made in this step will not be saved! Are you sure?';
   };
 
-  /**
-   * Executes api call in uniform fashion for this component˜
-   *
-   * @template T no need to specify because type is implied from call response
-   * @param {TServiceCall<T>} call an API call
-   * @param {string} [successToastMessage] optional message to show in snackvar on success
-   * @returns result of the call
-   */
-  const executeAndMonitorCall = <T extends unknown>( // declared as unkown because https://stackoverflow.com/questions/32308370/what-is-the-syntax-for-typescript-arrow-functions-with-generics
-    call: TServiceCall<T>,
-    successToastMessage?: string
-  ) => {
-    setIsLoading(true);
+  const isSample = (answer: Answer) => {
+    const { dataType, config } = answer.question;
 
-    return call().then(result => {
-      if (result.error) {
-        dispatch({
-          type: EventType.API_CALL_ERROR,
-          payload: {
-            message: getTranslation(result.error as ResourceId),
-          },
+    return (
+      dataType === DataType.SUBTEMPLATE &&
+      (config as SubtemplateConfig).templateCategory ===
+        TemplateCategoryId.SAMPLE_DECLARATION
+    );
+  };
+
+  const processSamples = async (answers?: Answer[]) => {
+    if (!answers) {
+      return;
+    }
+    const sampleAnswers = answers.filter(isSample);
+    for (const sampleAnswer of sampleAnswers) {
+      const { samples } = await api().getSamples({
+        filter: { sampleIds: sampleAnswer.value },
+      });
+      if (samples) {
+        await api().createAnswerQuestionaryRelations({
+          answerId: sampleAnswer.answerId!,
+          questionaryIds: samples.map(sample => sample.questionaryId),
         });
-      } else {
-        if (successToastMessage) {
-          dispatch({
-            type: EventType.API_CALL_SUCCESS,
-            payload: {
-              message: successToastMessage,
-            },
-          });
-        }
       }
-      setIsLoading(false);
-
-      return result;
-    });
+    }
   };
 
   /**
@@ -117,12 +109,11 @@ export default function ProposalContainer(props: {
     if (state.isDirty) {
       const confirmed = window.confirm(getConfirmNavigMsg());
       if (confirmed) {
-        const proposal = await executeAndMonitorCall(() =>
-          api()
-            .getProposal({ id: state.proposal.id })
-            .then(data => data.proposal as Proposal)
-        );
-        dispatch({ type: EventType.MODEL_LOADED, payload: proposal });
+        api()
+          .getProposal({ id: state.proposal.id })
+          .then(data =>
+            dispatch({ type: EventType.MODEL_LOADED, payload: data.proposal })
+          );
 
         return true;
       } else {
@@ -174,78 +165,80 @@ export default function ProposalContainer(props: {
           break;
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
-          let { id, status, shortCode, questionaryId } = state.proposal;
           const { callId } = state.proposal;
+          var proposal = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
-            const result = await executeAndMonitorCall(
-              () =>
-                api()
-                  .createProposal({ callId })
-                  .then(data => data.createProposal.proposal!),
-              'Saved'
-            );
-            ({ id, status, shortCode, questionaryId } = result);
+            const response = await api('Saved').createProposal({ callId });
+            proposal = { ...proposal, ...response.createProposal.proposal };
             dispatch({
               type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: { id, status, shortCode, questionaryId },
+              payload: {
+                ...proposal,
+              },
             });
           }
-          await executeAndMonitorCall(
-            () =>
-              api().updateProposal({
-                id: id,
-                title: state.proposal.title,
-                abstract: state.proposal.abstract,
-                proposerId: state.proposal.proposer.id,
-                users: state.proposal.users.map(user => user.id),
-              }),
-            'Saved'
-          );
-          setStepIndex(clampStep(stepIndex + 1));
+          if (proposal) {
+            await api('Saved').updateProposal({
+              id: proposal.id,
+              title: proposal.title,
+              abstract: proposal.abstract,
+              proposerId: proposal.proposer.id,
+              users: proposal.users.map(user => user.id),
+            });
+            setStepIndex(clampStep(stepIndex + 1));
+          }
+
           break;
 
-        case EventType.SAVE_STEP_CLICKED:
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .answerTopic({
-                  questionaryId: state.proposal.questionaryId,
-                  answers: prepareAnswers(action.payload.answers),
-                  topicId: action.payload.topicId,
-                  isPartialSave: true,
-                })
-                .then(data => data.answerTopic),
-            'Saved'
-          );
-          break;
+        case EventType.SAVE_STEP_CLICKED: {
+          const answers: Answer[] = action.payload.answers;
+          const topicId: number = action.payload.topicId;
+          const {
+            answerTopic: { questionaryStep },
+          } = await api('Saved').answerTopic({
+            questionaryId: state.proposal.questionaryId,
+            answers: prepareAnswers(answers),
+            topicId: topicId,
+            isPartialSave: true,
+          });
 
-        case EventType.FINISH_STEP_CLICKED:
-          await executeAndMonitorCall(
-            () =>
-              api()
-                .answerTopic({
-                  questionaryId: state.proposal.id,
-                  answers: prepareAnswers(action.payload.answers),
-                  topicId: action.payload.topicId,
-                })
-                .then(data => data.answerTopic),
-            'Saved'
-          ).then(() => setStepIndex(clampStep(stepIndex + 1)));
+          if (questionaryStep) {
+            await processSamples(questionaryStep.fields);
+            dispatch({
+              type: EventType.STEP_ANSWERED,
+              payload: { step: questionaryStep },
+            });
+          }
           break;
+        }
+
+        case EventType.FINISH_STEP_CLICKED: {
+          const answers: Answer[] = action.payload.answers;
+          const topicId: number = action.payload.topicId;
+          const {
+            answerTopic: { questionaryStep },
+          } = await api('Step finished').answerTopic({
+            questionaryId: state.proposal.questionaryId,
+            answers: prepareAnswers(answers),
+            topicId: topicId,
+            isPartialSave: false,
+          });
+          if (questionaryStep) {
+            await processSamples(questionaryStep.fields);
+            dispatch({
+              type: EventType.STEP_ANSWERED,
+              payload: { step: questionaryStep },
+            });
+            setStepIndex(clampStep(stepIndex + 1));
+          }
+          break;
+        }
 
         case EventType.RESET_CLICKED:
           const stepBeforeReset = stepIndex;
           if (await handleReset()) {
             setStepIndex(stepBeforeReset);
           }
-          break;
-
-        case EventType.API_CALL_ERROR:
-          enqueueSnackbar(action.payload.message, { variant: 'error' });
-          break;
-
-        case EventType.API_CALL_SUCCESS:
-          enqueueSnackbar(action.payload.message, { variant: 'success' });
           break;
       }
     };
@@ -360,7 +353,7 @@ export default function ProposalContainer(props: {
     return proposalSteps[step].element;
   };
 
-  const progressBar = isLoading ? <LinearProgress /> : null;
+  const progressBar = isExecutingCall ? <LinearProgress /> : null;
 
   return (
     <Container maxWidth="lg">

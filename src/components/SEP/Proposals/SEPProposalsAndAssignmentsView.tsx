@@ -15,11 +15,11 @@ type SEPProposalsAndAssignmentsProps = {
 const SEPProposalsAndAssignments: React.FC<SEPProposalsAndAssignmentsProps> = ({
   sepId,
 }) => {
-  const { loading, callsData } = useCallsData();
+  const { loadingCalls, callsData } = useCallsData();
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
 
   const Toolbar = (data: Options): JSX.Element =>
-    loading ? (
+    loadingCalls ? (
       <div>Loading...</div>
     ) : (
       <>

@@ -109,6 +109,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemText primary="Edit Institutions" />
       </ListItem>
       <TemplateMenuListItem />
+      <SamplesMenuListItem />
     </div>
   );
 
@@ -159,6 +160,12 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     </div>
   );
 
+  const sampleSafetyReviewer = (
+    <div data-cy="reviewer-menu-items">
+      <SamplesMenuListItem />
+    </div>
+  );
+
   switch (currentRole) {
     case UserRole.USER:
       return user;
@@ -172,6 +179,8 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
     case UserRole.SEP_SECRETARY:
     case UserRole.SEP_REVIEWER:
       return SEPRoles;
+    case UserRole.SAMPLE_SAFETY_REVIEWER:
+      return sampleSafetyReviewer;
     default:
       return null;
   }
@@ -214,6 +223,17 @@ const TemplateMenuListItem = () => {
         </ListItem>
       </Collapse>
     </>
+  );
+};
+
+const SamplesMenuListItem = () => {
+  return (
+    <ListItem component={Link} to="/SampleSafety" button>
+      <ListItemIcon>
+        <FolderOpen />
+      </ListItemIcon>
+      <ListItemText primary="Sample safety" />
+    </ListItem>
   );
 };
 
