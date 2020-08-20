@@ -1,7 +1,17 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep } from '../models/ProposalModel';
+import {
+  AnswerBasic,
+  Questionary,
+  QuestionaryStep,
+} from '../models/Questionary';
 
 export interface QuestionaryDataSource {
+  deleteAnswerQuestionaryRelations(answerId: number): Promise<AnswerBasic>;
+  createAnswerQuestionaryRelations(
+    answerId: number,
+    questionaryIds: number[]
+  ): Promise<AnswerBasic>;
+  getAnswer(answer_id: number): Promise<AnswerBasic>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
@@ -14,7 +24,7 @@ export interface QuestionaryDataSource {
     question_id: string,
     answer: string
   ): Promise<string>;
-  updateTopicCompletenes(
+  updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
     isComplete: boolean

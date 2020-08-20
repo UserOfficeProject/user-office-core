@@ -1,4 +1,15 @@
-import { ProposalStatus } from './ProposalModel';
+export enum ProposalStatus {
+  BLANK = -1,
+  DRAFT = 0,
+  SUBMITTED = 1,
+}
+
+export enum ProposalEndStatus {
+  UNSET = 0,
+  ACCEPTED = 1,
+  RESERVED = 2,
+  REJECTED = 3,
+}
 export class Proposal {
   constructor(
     public id: number,

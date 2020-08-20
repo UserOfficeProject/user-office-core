@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
-import { Proposal } from '../../models/Proposal';
-import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
+import {
+  Proposal,
+  ProposalEndStatus,
+  ProposalStatus,
+} from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';

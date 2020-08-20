@@ -3,6 +3,7 @@ import { Field, ObjectType } from 'type-graphql';
 import { Response } from '../Decorators';
 import { Page } from './Admin';
 import { Answer } from './Answer';
+import { AnswerBasic } from './AnswerBasic';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Institution } from './Institution';
@@ -13,6 +14,7 @@ import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
 import { QuestionTemplateRelation } from './QuestionTemplateRelation';
 import { Review } from './Review';
+import { Sample } from './Sample';
 import { SEP } from './SEP';
 import { TechnicalReview } from './TechnicalReview';
 import { Template } from './Template';
@@ -90,6 +92,13 @@ export class QuestionaryResponseWrap extends ResponseWrapBase<Questionary> {
   @Response()
   @Field(() => Questionary, { nullable: true })
   public questionary: Questionary;
+}
+
+@ObjectType()
+export class SamplesResponseWrap extends ResponseWrapBase<Questionary[]> {
+  @Response()
+  @Field(() => [Sample])
+  public samples: Sample[];
 }
 
 @ObjectType()
@@ -171,13 +180,27 @@ export class TokenResponseWrap extends ResponseWrapBase<string> {
 @ObjectType()
 export class PrepareDBResponseWrap extends ResponseWrapBase<string> {
   @Response()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public log: string;
 }
 
 @ObjectType()
 export class AnswerResponseWrap extends ResponseWrapBase<Answer> {
   @Response()
-  @Field(() => Answer)
+  @Field(() => Answer, { nullable: true })
   public answer: Answer;
+}
+
+@ObjectType()
+export class AnswerBasicResponseWrap extends ResponseWrapBase<AnswerBasic> {
+  @Response()
+  @Field(() => AnswerBasic, { nullable: true })
+  public answer: AnswerBasic;
+}
+
+@ObjectType()
+export class SampleResponseWrap extends ResponseWrapBase<Sample> {
+  @Response()
+  @Field(() => Sample, { nullable: true })
+  public sample: Sample;
 }

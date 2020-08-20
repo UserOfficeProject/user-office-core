@@ -1,5 +1,3 @@
-import { JSDict } from '@esss-swap/duo-localisation';
-
 import {
   proposalDataSource,
   questionaryDataSource,
@@ -8,7 +6,7 @@ import {
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { TemplateCategoryId } from '../models/ProposalModel';
+import { TemplateCategoryId } from '../models/Template';
 import { User, UserWithRole } from '../models/User';
 import { userAuthorization } from '../utils/UserAuthorization';
 
@@ -58,6 +56,10 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
       return false;
     }
 
+    if (await userAuthorization.isUserOfficer(agent)) {
+      return true;
+    }
+
     const sampleDeclarationQuestionary = await this.questionaryDataSource.getQuestionary(
       questionaryId
     );
@@ -68,30 +70,37 @@ class SampleDeclarationQuestionaryAuthorizer implements QuestionaryAuthorizer {
     const proposalQuestionary = await this.questionaryDataSource.getParentQuestionary(
       questionaryId
     );
-    if (!proposalQuestionary?.questionaryId) return false;
-    const proposal = (
-      await this.proposalDataSource.getProposals({
-        questionaryIds: [proposalQuestionary.questionaryId],
-      })
-    ).proposals[0];
+    if (!proposalQuestionary) return false;
+    if (!proposalQuestionary.questionaryId) return false;
+
+    const result = await this.proposalDataSource.getProposals({
+      questionaryIds: [proposalQuestionary.questionaryId],
+    });
+
+    if (!result) {
+      return false;
+    }
+    const proposal = result.proposals[0];
+    if (!proposal) {
+      return false;
+    }
 
     return userAuthorization.hasAccessRights(agent, proposal);
   }
 }
 
 export class QuestionaryAuthorization {
-  private authorizers: JSDict<number, QuestionaryAuthorizer> = JSDict.Create();
+  private authorizers = new Map<number, QuestionaryAuthorizer>();
   constructor(
     private proposalDataSource: ProposalDataSource,
     private questionaryDataSource: QuestionaryDataSource,
     private templateDataSource: TemplateDataSource
   ) {
-    this.authorizers = JSDict.Create();
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.PROPOSAL_QUESTIONARY,
       new ProposalQuestionaryAuthorizer(this.proposalDataSource)
     );
-    this.authorizers.put(
+    this.authorizers.set(
       TemplateCategoryId.SAMPLE_DECLARATION,
       new SampleDeclarationQuestionaryAuthorizer(
         proposalDataSource,

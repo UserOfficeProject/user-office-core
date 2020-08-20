@@ -1,9 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Questionary, QuestionaryStep } from '../../models/ProposalModel';
+import {
+  Answer,
+  AnswerBasic,
+  Questionary,
+  QuestionaryStep,
+} from '../../models/Questionary';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
-import { Answer } from './../../models/ProposalModel';
 import database from './database';
 import {
+  AnswerRecord,
+  createAnswerBasic,
   createQuestionaryObject,
   createQuestionTemplateRelationObject,
   createTopicObject,
@@ -15,16 +21,53 @@ import {
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
+  async deleteAnswerQuestionaryRelations(
+    answerId: number
+  ): Promise<AnswerBasic> {
+    return database('answer_has_questionaries')
+      .delete('*')
+      .where({ answer_id: answerId })
+      .then((records: QuestionaryRecord[]) => {
+        return this.getAnswer(answerId);
+      });
+  }
+  async createAnswerQuestionaryRelations(
+    answerId: number,
+    questionaryIds: number[]
+  ): Promise<AnswerBasic> {
+    const rows = questionaryIds.map(questionaryId => {
+      return { answer_id: answerId, questionary_id: questionaryId };
+    });
+
+    return database('answer_has_questionaries')
+      .insert(rows)
+      .then(async () => {
+        return this.getAnswer(answerId);
+      });
+  }
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
+    return database('answers')
+      .select('*')
+      .where('answer_id', answer_id)
+      .then((record: AnswerRecord) => {
+        return createAnswerBasic(record);
+      });
+  }
+
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null> {
-    const subquery = database('answer_has_questionaries')
+    const subQuery = database('answer_has_questionaries')
       .select('answer_id')
       .where({ questionary_id: child_questionary_id });
 
+    const subQuery2 = database('answers')
+      .select('questionary_id')
+      .whereIn('answer_id', subQuery);
+
     return database('questionaries')
       .select('*')
-      .whereIn('questionary_id', subquery)
+      .whereIn('questionary_id', subQuery2)
       .then((rows: QuestionaryRecord[]) => {
         if (rows.length !== 1) {
           return null;
@@ -171,7 +214,7 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
-  async updateTopicCompletenes(
+  async updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,
     is_complete: boolean
@@ -210,10 +253,10 @@ export default class PostgresQuestionaryDataSource
     ).rows;
 
     const answerRecords: Array<QuestionRecord &
-      QuestionTemplateRelRecord & { value: any }> = (
+      QuestionTemplateRelRecord & { value: any; answer_id: number }> = (
       await database.raw(`
                 SELECT 
-                  templates_has_questions.*, questions.*, answers.answer as value
+                  templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id
                 FROM 
                   templates_has_questions
                 LEFT JOIN
@@ -235,7 +278,11 @@ export default class PostgresQuestionaryDataSource
     const fields = answerRecords.map(record => {
       const value = record.value ? JSON.parse(record.value).value : '';
 
-      return new Answer(createQuestionTemplateRelationObject(record), value);
+      return new Answer(
+        record.answer_id,
+        createQuestionTemplateRelationObject(record),
+        value
+      );
     });
 
     const steps = Array<QuestionaryStep>();

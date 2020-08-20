@@ -5,6 +5,7 @@ import { isMatchingConstraints } from '../models/ProposalModelFunctions';
 import { User } from '../models/User';
 import { rejection } from '../rejection';
 import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
+import { CreateAnswerQuestionaryRelationsArgs } from '../resolvers/mutations/CreateAnswerQuestionaryRelationsMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
 import { Logger, logger } from '../utils/Logger';
@@ -82,7 +83,7 @@ export default class QuestionaryMutations {
       }
     }
     if (!isPartialSave) {
-      await this.dataSource.updateTopicCompletenes(
+      await this.dataSource.updateTopicCompleteness(
         questionaryId,
         topicId,
         true
@@ -114,5 +115,18 @@ export default class QuestionaryMutations {
   @Authorized()
   async create(agent: User | null, args: CreateQuestionaryArgs) {
     return this.dataSource.create(agent!.id, args.templateId);
+  }
+
+  async createAnswerQuestionaryRelation(
+    agent: User | null,
+    args: CreateAnswerQuestionaryRelationsArgs
+  ) {
+    // TODO perform authorization
+    await this.dataSource.deleteAnswerQuestionaryRelations(args.answerId);
+
+    return this.dataSource.createAnswerQuestionaryRelations(
+      args.answerId,
+      args.questionaryIds
+    );
   }
 }

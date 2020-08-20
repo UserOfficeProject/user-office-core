@@ -1,9 +1,12 @@
-import { Field, Int, ObjectType, Float } from 'type-graphql';
+import { Field, Float, Int, ObjectType } from 'type-graphql';
 
-import { Proposal as ProposalOrigin } from '../../models/Proposal';
-import { ProposalStatus } from '../../models/ProposalModel';
-import { ProposalEndStatus } from '../../models/ProposalModel';
+import {
+  Proposal as ProposalOrigin,
+  ProposalEndStatus,
+  ProposalStatus,
+} from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
+
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => Int)

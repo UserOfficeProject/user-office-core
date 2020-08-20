@@ -1,5 +1,4 @@
-import JSDict from '../utils/Dictionary';
-import { Answer } from './ProposalModel';
+import { Answer } from './Questionary';
 
 export enum EvaluatorOperator {
   eq = 'eq',
@@ -19,17 +18,14 @@ export class InequalityValidator implements FieldConditionEvaluator {
 }
 
 export class ConditionEvaluator {
-  private validatorMap!: JSDict<EvaluatorOperator, FieldConditionEvaluator>;
+  private validatorMap!: Map<EvaluatorOperator, FieldConditionEvaluator>;
 
   private getMappings() {
     if (!this.validatorMap) {
       // lazy initialization
-      this.validatorMap = JSDict.Create<
-        EvaluatorOperator,
-        FieldConditionEvaluator
-      >();
-      this.validatorMap.put(EvaluatorOperator.eq, new EqualityValidator());
-      this.validatorMap.put(EvaluatorOperator.neq, new InequalityValidator());
+      this.validatorMap = new Map<EvaluatorOperator, FieldConditionEvaluator>();
+      this.validatorMap.set(EvaluatorOperator.eq, new EqualityValidator());
+      this.validatorMap.set(EvaluatorOperator.neq, new InequalityValidator());
     }
 
     return this.validatorMap;

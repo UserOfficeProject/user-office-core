@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import { createConfig } from '../../models/ProposalModelFunctions';
 import {
+  Questionary,
+  QuestionaryStep,
   Answer,
-  createConfig,
+  AnswerBasic,
+} from '../../models/Questionary';
+import {
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
-  Questionary,
-  QuestionaryStep,
-  QuestionTemplateRelation,
   TemplateCategoryId,
   Topic,
-} from '../../models/ProposalModel';
+  QuestionTemplateRelation,
+} from '../../models/Template';
 import {
   BooleanConfig,
   EmbellishmentConfig,
@@ -35,8 +38,13 @@ export const dummyConfigFactory = (values?: any): typeof FieldConfigType => {
   };
 };
 
-const createDummyQuestionary = () => {
-  return new Questionary(1, 1, 1, new Date());
+const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
+  return new Questionary(
+    values?.questionaryId || 1,
+    values?.templateId || 1,
+    values?.creator_id || 1,
+    new Date()
+  );
 };
 export const dummyQuestionFactory = (
   values?: DeepPartial<Question>
@@ -66,6 +74,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
     new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
       new Answer(
+        1,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'ttl_general',
@@ -84,6 +93,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
+        2,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'has_links_with_industry',
@@ -102,6 +112,7 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
       ),
 
       new Answer(
+        3,
         dummyQuestionTemplateRelationFactory({
           question: dummyQuestionFactory({
             proposalQuestionId: 'links_with_industry',
@@ -126,24 +137,39 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
-  getParentQuestionary(
-    child_questionary_id: number
-  ): Promise<Questionary | null> {
-    throw new Error('Method not implemented.');
-  }
-  async delete(questionary_id: number): Promise<Questionary> {
-    if (dummyQuestionary.questionaryId !== questionary_id) {
-      throw new Error('Proposal does not exist');
-    }
-
-    const copy = { ...dummyQuestionary };
-    dummyQuestionary.questionaryId = -1;
-
-    return copy;
-  }
   public init() {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();
+  }
+
+  async deleteAnswerQuestionaryRelations(
+    answerId: number
+  ): Promise<AnswerBasic> {
+    const answers = dummyQuestionarySteps.reduce(
+      (acc, val) => acc.concat(val.fields),
+      new Array<Answer>()
+    );
+    const answer = answers.find(answer => answer.answerId === answerId)!;
+    answer.value = '';
+
+    return new AnswerBasic(answerId, 1, '', '', new Date());
+  }
+  async createAnswerQuestionaryRelations(
+    answerId: number,
+    questionaryIds: number[]
+  ): Promise<AnswerBasic> {
+    return new AnswerBasic(answerId, 1, '', '', new Date());
+  }
+  async getAnswer(answer_id: number): Promise<AnswerBasic> {
+    return new AnswerBasic(answer_id, 1, 'questionId', '', new Date());
+  }
+  async getParentQuestionary(
+    child_questionary_id: number
+  ): Promise<Questionary | null> {
+    return createDummyQuestionary();
+  }
+  async delete(questionaryId: number): Promise<Questionary> {
+    return createDummyQuestionary({ questionaryId });
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
@@ -188,12 +214,10 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<QuestionaryStep[]> {
     return dummyQuestionarySteps;
   }
-  async getQuestionary(questionary_id: number): Promise<Questionary> {
-    if (questionary_id === dummyQuestionary.questionaryId) {
-      return dummyQuestionary;
-    } else {
-      throw Error('Questionary not found');
-    }
+  async getQuestionary(questionary_id: number): Promise<Questionary | null> {
+    return questionary_id === dummyQuestionary.questionaryId
+      ? dummyQuestionary
+      : null;
   }
 
   async getQuestionarySteps(
@@ -202,7 +226,7 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return dummyQuestionarySteps;
   }
 
-  async updateTopicCompletenes(
+  async updateTopicCompleteness(
     questionary_id: number, // TODO name this questionary_id
     topic_id: number,
     isComplete: boolean

@@ -1,21 +1,23 @@
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { Call } from '../../models/Call';
+import { EvaluatorOperator } from '../../models/ConditionEvaluator';
 import { Proposal } from '../../models/Proposal';
+import { createConfigByType } from '../../models/ProposalModelFunctions';
+import { ProposalView } from '../../models/ProposalView';
+import { Questionary, AnswerBasic } from '../../models/Questionary';
+import { Sample } from '../../models/Sample';
 import {
-  createConfigByType,
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
-  Questionary,
   QuestionTemplateRelation,
   TemplateCategory,
   Topic,
-} from '../../models/ProposalModel';
-import { ProposalView } from '../../models/ProposalView';
+} from '../../models/Template';
+import { Template } from '../../models/Template';
 import { BasicUserDetails, User } from '../../models/User';
-import { Template } from './../../models/ProposalModel';
 
 // Interfaces corresponding exactly to database tables
 
@@ -99,6 +101,18 @@ export interface QuestionRecord {
   readonly natural_key: string;
 }
 
+export interface AnswerRecord {
+  readonly answer_id: number;
+  readonly questionary_id: number;
+  readonly question_id: string;
+  readonly answer: string;
+  readonly created_at: Date;
+}
+
+interface DependencyCondition {
+  condition: EvaluatorOperator;
+  params: string | boolean | number;
+}
 export interface QuestionTemplateRelRecord {
   readonly id: number;
   readonly question_id: string;
@@ -106,8 +120,8 @@ export interface QuestionTemplateRelRecord {
   readonly topic_id: number;
   readonly sort_order: number;
   readonly config: string;
-  readonly dependency_question_id: string;
-  readonly dependency_condition: string;
+  readonly dependency_question_id: string | null;
+  readonly dependency_condition: DependencyCondition | null;
 }
 
 export interface TemplateRecord {
@@ -282,6 +296,15 @@ export interface TemplateCategoryRecord {
   readonly name: string;
 }
 
+export interface SampleRecord {
+  readonly sample_id: number;
+  readonly title: string;
+  readonly creator_id: number;
+  readonly questionary_id: number;
+  readonly status: number;
+  readonly created_at: Date;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -399,12 +422,12 @@ export const createQuestionTemplateRelationObject = (
     record.topic_id,
     record.sort_order,
     createConfigByType(record.data_type as DataType, record.config),
-    record.dependency_question_id
+    record.dependency_question_id && record.dependency_condition
       ? new FieldDependency(
           record.question_id,
           record.dependency_question_id,
           record.natural_key,
-          FieldCondition.fromObject(record.dependency_condition) // TODO remove fromObject
+          record.dependency_condition
         )
       : undefined
   );
@@ -482,5 +505,26 @@ export const createTemplateCategoryObject = (
   return new TemplateCategory(
     templateCategory.template_category_id,
     templateCategory.name
+  );
+};
+
+export const createSampleObject = (sample: SampleRecord) => {
+  return new Sample(
+    sample.sample_id,
+    sample.title,
+    sample.creator_id,
+    sample.questionary_id,
+    sample.status,
+    sample.created_at
+  );
+};
+
+export const createAnswerBasic = (answer: AnswerRecord) => {
+  return new AnswerBasic(
+    answer.answer_id,
+    answer.questionary_id,
+    answer.question_id,
+    answer.answer,
+    answer.created_at
   );
 };

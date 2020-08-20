@@ -8,7 +8,8 @@ import {
   TemplateCategoryId,
   TemplateStep,
   Topic,
-} from '../../models/ProposalModel';
+} from '../../models/Template';
+import { Question, QuestionTemplateRelation } from '../../models/Template';
 import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';
@@ -17,10 +18,6 @@ import { UpdateQuestionTemplateRelationArgs } from '../../resolvers/mutations/Up
 import { UpdateTemplateArgs } from '../../resolvers/mutations/UpdateTemplateMutation';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { TemplateDataSource } from '../TemplateDataSource';
-import {
-  Question,
-  QuestionTemplateRelation,
-} from './../../models/ProposalModel';
 import { logger } from './../../utils/Logger';
 import database from './database';
 import {

@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql';
 
-import { FieldDependency as FieldDependencyOrigin } from '../../models/ProposalModel';
+import { FieldDependency as FieldDependencyOrigin } from '../../models/Template';
 import { FieldCondition } from './FieldCondition';
 
 @ObjectType()
@@ -15,5 +15,5 @@ export class FieldDependency implements Partial<FieldDependencyOrigin> {
   public dependencyNaturalKey: string;
 
   @Field(() => FieldCondition)
-  public condition?: FieldCondition;
+  public condition: FieldCondition;
 }

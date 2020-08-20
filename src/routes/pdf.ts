@@ -8,12 +8,13 @@ import PDFDocument from 'pdfkit';
 
 import baseContext from '../buildContext';
 import { questionaryDataSource } from '../datasources';
-import { Answer, DataType, QuestionaryStep } from '../models/ProposalModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId,
 } from '../models/ProposalModelFunctions';
+import { Answer, QuestionaryStep } from '../models/Questionary';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
+import { DataType } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { isRejection } from '../rejection';
 import { EmbellishmentConfig } from '../resolvers/types/FieldConfig';
@@ -146,7 +147,7 @@ const writeAnswer = async (answer: Answer, doc: PDFDocument) => {
 const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
   writeBold(answer.question.question, doc);
   doc.moveDown();
-  const subQuestionaryIds = answer.value.split(',');
+  const subQuestionaryIds = answer.value;
   for (const subQuestionaryId of subQuestionaryIds) {
     writeBold(
       `Entry ${subQuestionaryIds.indexOf(subQuestionaryId) + 1} of ${
@@ -157,7 +158,10 @@ const writeSubtemplate = async (answer: Answer, doc: PDFDocument) => {
     const subquestionarySteps = await questionaryDataSource.getQuestionarySteps(
       subQuestionaryId
     );
-    const firstStepTopicId = subquestionarySteps![0].topic.id; // NOTE: for now only the first topic
+    if (subquestionarySteps.length === 0) {
+      continue;
+    }
+    const firstStepTopicId = subquestionarySteps[0].topic.id; // NOTE: for now only the first topic
     const answers = getTopicActiveAnswers(
       subquestionarySteps!,
       firstStepTopicId

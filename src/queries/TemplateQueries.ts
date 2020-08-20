@@ -1,7 +1,7 @@
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { TemplateStep, Question } from '../models/ProposalModel';
 import { Roles } from '../models/Role';
+import { TemplateStep, Question } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 

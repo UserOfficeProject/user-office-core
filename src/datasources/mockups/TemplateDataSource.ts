@@ -1,17 +1,17 @@
 import { EvaluatorOperator } from '../../models/ConditionEvaluator';
+import { getFieldById } from '../../models/ProposalModelFunctions';
 import {
   DataType,
   FieldCondition,
   FieldDependency,
   Question,
-  QuestionTemplateRelation,
   Template,
   TemplateCategory,
   TemplateCategoryId,
   TemplateStep,
   Topic,
-} from '../../models/ProposalModel';
-import { getFieldById } from '../../models/ProposalModelFunctions';
+  QuestionTemplateRelation,
+} from '../../models/Template';
 import { CreateQuestionTemplateRelationArgs } from '../../resolvers/mutations/CreateQuestionTemplateRelationMutation';
 import { CreateTemplateArgs } from '../../resolvers/mutations/CreateTemplateMutation';
 import { CreateTopicArgs } from '../../resolvers/mutations/CreateTopicMutation';

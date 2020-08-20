@@ -5,12 +5,12 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import {
+  Template,
+  Topic,
+  TemplateCategoryId,
   DataType,
   Question,
-  Template,
-  TemplateCategoryId,
-  Topic,
-} from '../models/ProposalModel';
+} from '../models/Template';
 import { isRejection } from '../rejection';
 import TemplateMutations from './TemplateMutations';
 

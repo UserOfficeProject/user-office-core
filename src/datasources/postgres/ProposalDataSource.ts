@@ -2,8 +2,7 @@
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
-import { Proposal } from '../../models/Proposal';
-import { ProposalStatus } from '../../models/ProposalModel';
+import { Proposal, ProposalStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';

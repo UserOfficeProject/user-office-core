@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalEndStatus, ProposalStatus } from '../../models/ProposalModel';
+import { ProposalEndStatus, ProposalStatus } from '../../models/Proposal';
 import { ProposalResponseWrap } from '../types/CommonWrappers';
 import { wrapResponse } from '../wrapResponse';
 

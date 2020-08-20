@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
+import { createUnionType, Field, Int, ObjectType } from 'type-graphql';
 
 @ObjectType()
 export class ConfigBase {
@@ -76,6 +76,9 @@ export class SubtemplateConfig extends ConfigBase {
 
   @Field(() => Int)
   templateId: number;
+
+  @Field(() => String)
+  templateCategory: string;
 
   @Field(() => String)
   addEntryButtonLabel: string;

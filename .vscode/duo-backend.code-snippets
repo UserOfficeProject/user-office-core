@@ -1,0 +1,32 @@
+{
+  "Resolver mutation": {
+    "prefix": "mutation, resolver",
+    "body": [
+      "import { Args, Ctx, Mutation, Resolver, ArgsType } from 'type-graphql';",
+      "",
+      "import { ResolverContext } from '../../context';",
+      "import { wrapResponse } from '../wrapResponse';",
+      "",
+      "@ArgsType()",
+      "export class ${TM_FILENAME_BASE/Mutation//g}Args  {",
+      "  ",
+      "}",
+      "",
+      "@Resolver()",
+      "export class ${TM_FILENAME_BASE} {",
+      "  @Mutation(() => ${1:ResponseWrapType})",
+      "  ${TM_FILENAME_BASE/([A-Z])(.*)(Mutation)/${1:/downcase}$2/} (",
+      "    @Args() args: ${TM_FILENAME_BASE/Mutation//g}Args ,",
+      "    @Ctx() context: ResolverContext",
+      "  ) {",
+      "    return wrapResponse(",
+      "      context.mutations.$0,",
+      "      ${1:ResponseWrapType}",
+      "    );",
+      "  }",
+      "}",
+      ""
+    ],
+    "description": "Resolver mutation"
+  }
+}

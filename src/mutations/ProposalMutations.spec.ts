@@ -10,8 +10,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserNotOnProposalWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalModel';
+import { Proposal, ProposalStatus } from '../models/Proposal';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';

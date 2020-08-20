@@ -12,6 +12,7 @@ import {
   userDataSource,
   instrumentDatasource,
   questionaryDataSource,
+  sampleDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
@@ -20,6 +21,7 @@ import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
+import SampleMutations from './mutations/SampleMutations';
 import SEPMutations from './mutations/SEPMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UserMutations from './mutations/UserMutations';
@@ -31,6 +33,7 @@ import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
+import SampleQueries from './queries/SampleQueries';
 import SEPQueries from './queries/SEPQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UserQueries from './queries/UserQueries';
@@ -96,6 +99,18 @@ const questionaryMutations = new QuestionaryMutations(
   logger
 );
 
+const sampleQueries = new SampleQueries(
+  sampleDataSource,
+  questionaryDataSource
+);
+
+const sampleMutations = new SampleMutations(
+  sampleDataSource,
+  questionaryDataSource,
+  templateDataSource,
+  logger
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -110,6 +125,7 @@ const context: BasicResolverContext = {
     sep: sepQueries,
     instrument: instrumentQueries,
     questionary: questionaryQueries,
+    sample: sampleQueries,
   },
   mutations: {
     user: userMutations,
@@ -122,6 +138,7 @@ const context: BasicResolverContext = {
     template: templateMutations,
     instrument: instrumentMutations,
     questionary: questionaryMutations,
+    sample: sampleMutations,
   },
 };
 
