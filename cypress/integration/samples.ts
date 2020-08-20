@@ -36,8 +36,6 @@ context('Samples tests', () => {
       .first()
       .click();
 
-    cy.contains('Add topic').click();
-
     cy.contains('2. New Topic');
 
     cy.visit('/');
