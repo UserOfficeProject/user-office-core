@@ -70,4 +70,15 @@ context('Proposal administration tests', () => {
 
     cy.contains('Open');
   });
+
+  it('Should be able to download proposal pdf', () => {
+    cy.login('officer');
+
+    cy.contains('View Proposals').click();
+
+    cy.request('GET', '/proposal/download/1').then(response => {
+      expect(response.headers['content-type']).to.be.equal('application/pdf');
+      expect(response.status).to.be.equal(200);
+    });
+  });
 });

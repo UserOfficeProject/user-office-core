@@ -102,7 +102,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
     { title: 'Status', field: 'proposal.status' },
     {
-      title: 'Initial rank',
+      title: 'Initial rank (by average score)',
       render: (
         rowData: SepProposal & {
           proposalAverageScore: number;
@@ -128,9 +128,8 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     },
     {
       title: 'Review meeting',
-      // render: (rowData: SepProposal) =>
-      //   rowData.reviewMeeting ? rowData.reviewMeeting : 'No',
-      render: () => 'No',
+      render: (rowData: SepProposal): string =>
+        rowData.proposal.rankOrder ? 'Yes' : 'No',
     },
   ];
 
