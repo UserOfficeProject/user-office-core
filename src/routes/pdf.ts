@@ -428,12 +428,14 @@ router.get('/proposal/download/:proposal_ids', async (req: any, res) => {
       throw new Error('Could not find user');
     }
 
+    const userWithRole = { ...user, currentRole: decoded.currentRole };
+
     const pdfWriter = hummus.createWriter(tmpFileNamePath);
 
     for (const propId of proposalIds) {
       const result = await createProposalPDF(
         parseInt(propId),
-        user as UserWithRole,
+        userWithRole,
         pageNumber
       ).then(result => {
         pdfWriter.appendPDFPagesFromPDF(`downloads/${result.metaData.path}`);
