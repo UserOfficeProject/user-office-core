@@ -71,6 +71,35 @@ context('Proposal administration tests', () => {
     cy.contains('Open');
   });
 
+  it('Check if link for download proposal is created with the correct attributes', () => {
+    cy.login('officer');
+
+    cy.document().then(document => {
+      const observer = new MutationObserver(function() {
+        const [mutationList] = arguments;
+        for (const mutation of mutationList) {
+          for (const child of mutation.addedNodes) {
+            if (child.nodeName === 'A') {
+              expect(child.href).to.contain('/proposal/download/1');
+              expect(child.download).to.contain('download');
+            }
+          }
+        }
+      });
+      observer.observe(document, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
+
+      observer.disconnect();
+    });
+
+    cy.get('[data-cy="download-proposal"]')
+      .first()
+      .click();
+  });
+
   it('Should be able to download proposal pdf', () => {
     cy.login('officer');
 
