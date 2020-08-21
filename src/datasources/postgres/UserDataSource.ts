@@ -363,6 +363,7 @@ export default class PostgresUserDataSource implements UserDataSource {
           query.andWhere(qb => {
             qb.where('institution', 'ilike', `%${filter}%`)
               .orWhere('firstname', 'ilike', `%${filter}%`)
+              .orWhere('preferredname', 'ilike', `%${filter}%`)
               .orWhere('lastname', 'ilike', `%${filter}%`);
           });
         }
