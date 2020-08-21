@@ -19,14 +19,14 @@ export const useCheckAccess = (allowedRoles: UserRole[]) => {
 
 type CanProps = {
   allowedRoles: UserRole[];
-  yes: () => JSX.Element | null;
-  no: () => JSX.Element | null;
+  yes?: () => JSX.Element | null;
+  no?: () => JSX.Element | null;
 };
 
 const Can: React.FC<CanProps> = ({ allowedRoles, yes, no }) => {
   const hasAccessRithgs = useCheckAccess(allowedRoles);
 
-  return hasAccessRithgs ? yes() : no();
+  return hasAccessRithgs ? (yes ? yes() : null) : no ? no() : null;
 };
 
 Can.defaultProps = {

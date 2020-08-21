@@ -14,12 +14,12 @@ type SEPMeetingComponentsViewProps = {
 const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
   sepId,
 }) => {
-  const { loading, callsData } = useCallsData();
+  const { loadingCalls, callsData } = useCallsData();
   // NOTE: Default call is with id=1
   const [selectedCallId, setSelectedCallId] = useState<number>(1);
 
   const Toolbar = (data: Options): JSX.Element =>
-    loading ? (
+    loadingCalls ? (
       <div>Loading...</div>
     ) : (
       <>

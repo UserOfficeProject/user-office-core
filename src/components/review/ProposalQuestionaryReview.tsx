@@ -6,80 +6,41 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import React, { Fragment, HTMLAttributes, useEffect, useState } from 'react';
+import React, { Fragment, HTMLAttributes } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { Answer, DataType } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
-import { FileMetaData } from 'models/FileUpload';
+import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
-import { getAllFields } from 'models/ProposalModelFunctions';
+
+const useStyles = makeStyles(theme => ({
+  heading: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 export default function ProposalQuestionaryReview(
   props: HTMLAttributes<any> & {
     data: ProposalSubsetSumbission;
   }
 ) {
-  const questionary = props.data.questionary!;
-  const api = useDataApi();
-  const [files, setFiles] = useState<FileMetaData[]>([]);
+  const classes = useStyles();
 
-  const classes = makeStyles(theme => ({
-    heading: {
-      marginTop: theme.spacing(2),
-    },
-  }))();
-
-  const allFields = getAllFields(questionary.steps) as Answer[];
-  const completedFields = allFields.filter(field => {
-    return !!field.value;
-  });
-
-  // Get all questions with a file upload and create a string with fileid comma separated
-  const fileIds = completedFields
-    .filter(field => field.question.dataType === DataType.FILE_UPLOAD)
-    .map(fileId => fileId.value)
-    .join(',');
-
-  useEffect(() => {
-    if (fileIds) {
-      api()
-        .getFileMetadata({ fileIds: fileIds.split(',') })
-        .then(data => {
-          setFiles(data?.fileMetadata || []);
-        });
-    }
-  }, [api, fileIds]);
-
-  if (!props.data) {
+  if (!props.data.questionaryId) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
-
-  const downloadLink = (file: FileMetaData | undefined) => (
-    <>
-      <a href={`/files/download/${file?.fileId}`} download>
-        {file?.originalFileName}
-      </a>
-      <br />
-    </>
-  );
-
+  const questionary = props.data.questionary;
   const users = props.data.users || [];
 
   return (
     <Fragment>
       <Typography variant="h6" className={classes.heading} gutterBottom>
-        Information
+        Proposal information
       </Typography>
       <Table>
         <TableBody>
           <TableRow key="title">
             <TableCell>Title</TableCell>
             <TableCell>{props.data.title}</TableCell>
-          </TableRow>
-          <TableRow key="shortCode">
-            <TableCell>Proposal ID</TableCell>
-            <TableCell>{props.data.shortCode}</TableCell>
           </TableRow>
           <TableRow key="abstract">
             <TableCell>Abstract</TableCell>
@@ -97,22 +58,12 @@ export default function ProposalQuestionaryReview(
                 .toString()}
             </TableCell>
           </TableRow>
-          {completedFields.map((row: Answer) => (
-            <TableRow key={row.question.proposalQuestionId}>
-              <TableCell>{row.question.question}</TableCell>
-              <TableCell>
-                {row.question.dataType === DataType.FILE_UPLOAD
-                  ? row.value
-                      .split(',')
-                      .map((value: string) =>
-                        downloadLink(files.find(file => file.fileId === value))
-                      )
-                  : row.value.toString()}
-              </TableCell>
-            </TableRow>
-          ))}
         </TableBody>
       </Table>
+      <Typography variant="h6" className={classes.heading} gutterBottom>
+        Questionary
+      </Typography>
+      <QuestionaryDetails questionaryId={questionary.questionaryId!} />
     </Fragment>
   );
 }

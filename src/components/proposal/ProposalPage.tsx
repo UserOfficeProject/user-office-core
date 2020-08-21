@@ -14,11 +14,11 @@ export default function ProposalPage() {
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>(
     {}
   );
-  const { loading, callsData } = useCallsData();
+  const { loadingCalls, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
 
   const Toolbar = (data: Options): JSX.Element =>
-    loading || loadingInstruments ? (
+    loadingCalls || loadingInstruments ? (
       <div>Loading...</div>
     ) : (
       <>

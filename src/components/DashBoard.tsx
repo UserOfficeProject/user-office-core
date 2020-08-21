@@ -15,8 +15,7 @@ import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
@@ -40,10 +39,11 @@ import ProposalPage from './proposal/ProposalPage';
 import ProposalReviewReviewer from './review/ProposalReviewReviewer';
 import ProposalReviewUserOfficer from './review/ProposalReviewUserOfficer';
 import ProposalTableReviewer from './review/ProposalTableReviewer';
+import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalTemplates from './template/ProposalTemplates';
-import SampleTemplates from './template/SampleTemplates';
+import SampleTemplatesPage from './template/SampleTemplates';
 import TemplateEditor from './template/TemplateEditor';
 import PeoplePage from './user/PeoplePage';
 import ProfilePage from './user/ProfilePage';
@@ -161,8 +161,12 @@ const Dashboard: React.FC = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isSampleSafetyReviewer = useCheckAccess([
+    UserRole.SAMPLE_SAFETY_REVIEWER,
+  ]);
+
   const { currentRole } = useContext(UserContext);
-  const { callsData, loading } = useCallsData(true);
+  const { callsData } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -211,12 +215,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
-            component={() => (
-              <ProposalChooseCall
-                callsData={callsData}
-                loadingCalls={loading}
-              />
-            )}
+            component={() => <ProposalChooseCall callsData={callsData} />}
           />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
@@ -240,7 +239,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalTemplates" component={ProposalTemplates} />
           <Route
             path="/SampleDeclarationTemplates"
-            component={SampleTemplates}
+            component={SampleTemplatesPage}
           />
           <Route
             path="/ProposalTableReviewer"
@@ -250,6 +249,9 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
+          {(isSampleSafetyReviewer || isUserOfficer) && (
+            <Route path="/SampleSafety" component={SampleSafetyPage} />
+          )}
           <Can
             allowedRoles={[UserRole.USER_OFFICER]}
             yes={() => <Route component={ProposalPage} />}
@@ -282,7 +284,6 @@ const Dashboard: React.FC = () => {
                         )}
                       />
                     )}
-                    no={() => null}
                   />
                 )}
               />

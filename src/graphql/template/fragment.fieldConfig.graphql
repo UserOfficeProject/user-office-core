@@ -51,6 +51,7 @@ fragment fieldConfig on FieldConfig {
     addEntryButtonLabel
     maxEntries
     templateId
+    templateCategory
 
     small_label
     required

@@ -54,7 +54,7 @@ class QuestionItemAdapter implements TemplateTopicEditorData {
   }
 }
 
-export const QuestionPicker = (props: IQuestionPickerProps) => {
+export const QuestionPicker = (props: QuestionPickerProps) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | SVGSVGElement>(null);
   const open = Boolean(anchorEl);
@@ -271,7 +271,7 @@ export const QuestionPicker = (props: IQuestionPickerProps) => {
   );
 };
 
-interface IQuestionPickerProps {
+interface QuestionPickerProps {
   topic: Topic;
   template: Template;
   dispatch: React.Dispatch<Event>;

@@ -24,11 +24,14 @@ export interface SubquestionarySubmissionModelState {
   questionary: Questionary;
 }
 
+type MiddleWareType = ReducerMiddleware<
+  SubquestionarySubmissionModelState,
+  Event
+>;
+
 export function SubquestionarySubmissionModel(
   initialState: SubquestionarySubmissionModelState,
-  middlewares?: Array<
-    ReducerMiddleware<SubquestionarySubmissionModelState, Event>
-  >
+  middlewares?: MiddleWareType[]
 ): {
   state: SubquestionarySubmissionModelState;
   dispatch: Dispatch<Event>;

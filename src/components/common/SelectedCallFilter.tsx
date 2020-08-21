@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
 
 type SelectedCallFilterProps = {
   callsData: Call[];
-  onChange: Dispatch<number>;
+  onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   callId?: number;
 };
@@ -42,7 +42,7 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
       <FormControl className={classes.formControl}>
         <InputLabel>Call</InputLabel>
         <Select
-          onChange={call => onChange(call.target.value as number)}
+          onChange={call => onChange?.(call.target.value as number)}
           value={callId}
           defaultValue={0}
         >
@@ -60,7 +60,7 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
 
 SelectedCallFilter.propTypes = {
   callsData: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   shouldShowAll: PropTypes.bool,
   callId: PropTypes.number,
 };
