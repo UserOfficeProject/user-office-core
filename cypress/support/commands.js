@@ -24,6 +24,7 @@
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 import { GraphQLClient } from 'graphql-request';
+
 const resetDB = () => {
   const query = `mutation {
     prepareDB {
@@ -31,9 +32,7 @@ const resetDB = () => {
       error
     }
   }`;
-  const svc_acc_token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjowLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiU2VydmljZSBBY2NvdW50IiwibWlkZGxlbmFtZSI6IiIsImxhc3RuYW1lIjoiIiwidXNlcm5hbWUiOiJzZXJ2aWNlIiwicHJlZmVycmVkbmFtZSI6IiIsIm9yY2lkIjoiIiwicmVmcmVzaFRva2VuIjoiIiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoxLCJiaXJ0aGRhdGUiOiIyMDAwLTA0LTAxVDIyOjAwOjAwLjAwMFoiLCJvcmdhbmlzYXRpb24iOjEsImRlcGFydG1lbnQiOiIiLCJwb3NpdGlvbiI6IiIsImVtYWlsIjoic2VydmljZUB1c2Vyb2ZmaWNlLmVzcy5ldSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IiIsInRlbGVwaG9uZV9hbHQiOiIiLCJwbGFjZWhvbGRlciI6ZmFsc2UsImNyZWF0ZWQiOiIyMDIwLTA4LTEwVDE2OjQwOjAyLjk1NloiLCJ1cGRhdGVkIjoiMjAyMC0wOC0xMFQxNjo0MDowMy4yNjhaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImN1cnJlbnRSb2xlIjp7ImlkIjoyLCJzaG9ydENvZGUiOiJ1c2VyX29mZmljZXIiLCJ0aXRsZSI6IlVzZXIgT2ZmaWNlciJ9LCJpYXQiOjE1OTcwNzc3NjF9.y_coY649frw5dgl549tGjirF99nqwz1-BrUAILhE6pI';
-  const authHeader = `Bearer ${svc_acc_token}`;
+  const authHeader = `Bearer ${Cypress.env('SVC_ACC_TOKEN')}`;
   new GraphQLClient('/graphql', { headers: { authorization: authHeader } })
     .rawRequest(query, null)
     .then(data => console.log(data));
