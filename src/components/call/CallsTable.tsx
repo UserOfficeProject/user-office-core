@@ -17,7 +17,7 @@ import CreateUpdateCall from './CreateUpdateCall';
 
 const CallsTable: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { loading, callsData, setCallsData } = useCallsData(undefined);
+  const { loadingCalls, callsData, setCallsData } = useCallsData();
   const [editCall, setEditCall] = useState<Call | null>(null);
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
@@ -179,7 +179,7 @@ const CallsTable: React.FC = () => {
         title="Calls"
         columns={columns}
         data={callsData as Call[]}
-        isLoading={loading}
+        isLoading={loadingCalls}
         detailPanel={[
           {
             tooltip: 'Show Instruments',

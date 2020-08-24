@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import { Edit } from '@material-ui/icons';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
 import { UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -20,14 +20,17 @@ export default function PeoplePage() {
   });
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
   if (userData) {
-    return <Redirect to={`/PeoplePage/${userData.id}`} />;
+    setTimeout(() => {
+      history.push(`/PeoplePage/${userData.id}`);
+    });
   }
 
-  const menuItems = [];
+  const invitationButtons = [];
 
-  menuItems.push({
+  invitationButtons.push({
     title: 'Invite User',
     action: () =>
       setSendUserEmail({
@@ -37,7 +40,7 @@ export default function PeoplePage() {
       }),
   });
 
-  menuItems.push({
+  invitationButtons.push({
     title: 'Invite Reviewer',
     action: () =>
       setSendUserEmail({
@@ -73,7 +76,7 @@ export default function PeoplePage() {
                   actionIcon={<Edit />}
                   action={setUserData}
                   selection={false}
-                  menuItems={menuItems}
+                  invitationButtons={invitationButtons}
                   onRemove={(user: { id: number }) =>
                     api()
                       .deleteUser({ id: user.id })

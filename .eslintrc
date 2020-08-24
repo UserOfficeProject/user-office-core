@@ -71,8 +71,8 @@
     "@typescript-eslint/camelcase": "warn",
     "react/display-name": "warn",
     "react/prop-types": "warn",
+    "@typescript-eslint/ban-ts-ignore": "warn",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/interface-name-prefix": "off",
     "jest/no-export": "off" // rule not implemented properly, rule should only restrict exporting tests
   }
 }

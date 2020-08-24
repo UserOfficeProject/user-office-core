@@ -1,4 +1,5 @@
 fragment answer on Answer {
+  answerId
   question {
     ...question
   }

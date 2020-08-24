@@ -1,7 +1,7 @@
 import Button from '@material-ui/core/Button';
 import { Email } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import MaterialTable, { MTableToolbar, Query } from 'material-table';
+import MaterialTable, { Query } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -63,8 +63,8 @@ type PeopleTableProps = {
   onRemove?: (user: BasicUserDetails) => void;
   onUpdate?: (user: BasicUserDetails[]) => void;
   emailInvite?: boolean;
+  invitationButtons?: { title: string; action: Function }[];
   selectedUsers?: number[];
-  menuItems?: any[];
 };
 
 const PeopleTable: React.FC<PeopleTableProps> = props => {
@@ -115,19 +115,8 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
     );
   }
   const EmailIcon = (): JSX.Element => <Email />;
+
   const actionArray = [];
-
-  const ToolbarElement = (data: any) => (
-    <div>
-      <MTableToolbar {...data} />
-      {props.menuItems?.map((item: any, i) => (
-        <Button variant="outlined" onClick={() => item.action()} key={i}>
-          {item.title}
-        </Button>
-      ))}
-    </div>
-  );
-
   props.action &&
     !props.selection &&
     actionArray.push({
@@ -159,9 +148,6 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           }));
 
           setSelectedParticipants(newData as BasicUserDetails[]);
-        }}
-        components={{
-          Toolbar: ToolbarElement,
         }}
         data={
           props.data
@@ -217,6 +203,23 @@ const PeopleTable: React.FC<PeopleTableProps> = props => {
           </Button>
         </ActionButtonContainer>
       )}
+      {props.invitationButtons && (
+        <ActionButtonContainer>
+          {props.invitationButtons?.map(
+            (item: { title: string; action: Function }, i) => (
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+                onClick={() => item.action()}
+                key={i}
+              >
+                {item.title}
+              </Button>
+            )
+          )}
+        </ActionButtonContainer>
+      )}
     </div>
   );
 };
@@ -235,8 +238,8 @@ PeopleTable.propTypes = {
   onRemove: PropTypes.func,
   onUpdate: PropTypes.func,
   emailInvite: PropTypes.bool,
+  invitationButtons: PropTypes.array,
   selectedUsers: PropTypes.array,
-  menuItems: PropTypes.array,
 };
 
 export default PeopleTable;

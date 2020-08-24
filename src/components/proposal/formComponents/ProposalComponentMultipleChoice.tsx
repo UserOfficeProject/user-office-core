@@ -11,9 +11,8 @@ import {
 import { getIn } from 'formik';
 import React, { useState, useEffect } from 'react';
 
-import { SelectionFromOptionsConfig } from 'generated/sdk';
-
-import { BasicComponentProps } from './IBasicComponentProps';
+import { SelectionFromOptionsConfig } from '../../../generated/sdk';
+import { BasicComponentProps } from '../IBasicComponentProps';
 
 export function ProposalComponentMultipleChoice(props: BasicComponentProps) {
   const classes = makeStyles({

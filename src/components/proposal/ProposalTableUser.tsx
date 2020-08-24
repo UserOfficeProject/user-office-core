@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React, { useCallback, useState } from 'react';
 
-import { ProposalStatus, ProposalEndStatus } from 'generated/sdk';
+import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { timeAgo } from 'utils/Time';
 

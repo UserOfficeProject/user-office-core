@@ -201,6 +201,32 @@ context('Instrument tests', () => {
     cy.get('[data-cy="view-proposal"]').should('exist');
   });
 
+  it('Instrument scientist should be able to do technical review on proposal where he is instrument scientist ', () => {
+    cy.login('user');
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+    cy.contains('Roles').click();
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .contains('Use')
+      .click();
+    cy.wait(1000);
+
+    cy.contains('Proposals');
+    cy.get('[data-cy="view-proposal"]').click();
+    cy.contains('Technical').click();
+
+    cy.get('[data-cy="timeAllocation"]').type('20');
+
+    cy.contains('Update').click();
+
+    cy.wait(500);
+
+    cy.contains('View Proposals').click();
+
+    cy.contains('20');
+  });
+
   it('User Officer should be able to remove assigned proposal from instrument', () => {
     cy.login('officer');
 

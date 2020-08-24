@@ -1,0 +1,8 @@
+fragment sample on Sample {
+  id
+  title
+  creatorId
+  questionaryId
+  status
+  created
+}

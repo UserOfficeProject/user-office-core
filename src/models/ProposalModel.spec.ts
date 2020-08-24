@@ -54,6 +54,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
         isCompleted: false,
         fields: [
           {
+            answerId: 1,
             topicId: 0,
             dependency: null,
             config: {
@@ -82,6 +83,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
             sortOrder: 1,
           },
           {
+            answerId: 2,
             topicId: 0,
             dependency: null,
             config: {
@@ -110,6 +112,7 @@ export const create1Topic3FieldWithDependenciesQuestionary = (): Questionary => 
             sortOrder: 2,
           },
           {
+            answerId: 3,
             topicId: 0,
             config: {
               min: 0,

@@ -1,11 +1,12 @@
 import { FormControl, InputLabel, Link, MenuItem } from '@material-ui/core';
 import { Field } from 'formik';
 import { Select, TextField } from 'formik-material-ui';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import TitledContainer from 'components/common/TitledContainer';
 import { Question, TemplateCategoryId } from 'generated/sdk';
+import { useTemplateCategories } from 'hooks/template/useTemplateCategories';
 import { useTemplates } from 'hooks/template/useTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -15,10 +16,11 @@ import { QuestionFormShell } from './QuestionFormShell';
 export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
   const field = props.field;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
-  const { templates } = useTemplates(
-    false,
+  const [selectedCategory, setSelectedCategory] = useState<TemplateCategoryId>(
     TemplateCategoryId.SAMPLE_DECLARATION
   );
+  const { categories } = useTemplateCategories();
+  const { templates } = useTemplates(false, selectedCategory);
 
   return (
     <QuestionFormShell
@@ -31,6 +33,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
         question: Yup.string().required('Question is required'),
         config: Yup.object({
           templateId: Yup.number().required('Template is required'),
+          templateCategory: Yup.string().required('Category is required'),
           addEntryButtonLabel: Yup.string(),
           maxEntries: Yup.number().nullable(),
         }),
@@ -47,6 +50,7 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
+
           <Field
             name="question"
             label="Question"
@@ -58,14 +62,49 @@ export const QuestionSubtemplateForm: TFormSignature<Question> = props => {
           />
 
           <TitledContainer label="Options">
-            <FormControl fullWidth>
-              <InputLabel htmlFor="age-simple">Template name</InputLabel>
+            <FormControl fullWidth margin="normal">
+              <InputLabel htmlFor="config.templateCategory">
+                Template category
+              </InputLabel>
+              <Field
+                name="config.templateCategory"
+                type="text"
+                component={Select}
+                data-cy="templateCategory"
+                inputProps={{
+                  onChange: (e: any) => {
+                    const categoryId = e.target.value;
+                    setSelectedCategory(categoryId);
+                  },
+                }}
+              >
+                {categories.map(category => {
+                  if (
+                    category.categoryId ===
+                    TemplateCategoryId.PROPOSAL_QUESTIONARY
+                  ) {
+                    return null;
+                  }
+
+                  return (
+                    <MenuItem
+                      value={category.categoryId}
+                      key={category.categoryId}
+                    >
+                      {category.name}
+                    </MenuItem>
+                  );
+                })}
+              </Field>
+            </FormControl>
+
+            <FormControl fullWidth margin="normal">
+              <InputLabel htmlFor="config.templateId">Template name</InputLabel>
               <Field
                 name="config.templateId"
                 type="text"
                 component={Select}
-                margin="normal"
-                data-cy="templateId"
+                data-cy="template-id"
               >
                 {templates &&
                   templates.map(template => {
