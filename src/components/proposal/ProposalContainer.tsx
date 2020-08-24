@@ -85,19 +85,22 @@ export default function ProposalContainer(props: {
   };
 
   const processSamples = async (answers?: Answer[]) => {
-    if (!answers) {
+    const sampleAnswers = answers?.filter(isSample);
+    if (!sampleAnswers) {
       return;
     }
-    const sampleAnswers = answers.filter(isSample);
     for (const sampleAnswer of sampleAnswers) {
-      const { samples } = await api().getSamples({
-        filter: { sampleIds: sampleAnswer.value },
-      });
-      if (samples) {
-        await api().createAnswerQuestionaryRelations({
-          answerId: sampleAnswer.answerId!,
-          questionaryIds: samples.map(sample => sample.questionaryId),
+      const sampleIds = sampleAnswer.value;
+      if (sampleIds) {
+        const { samples } = await api().getSamples({
+          filter: { sampleIds: sampleAnswer.value },
         });
+        if (samples) {
+          await api().createAnswerQuestionaryRelations({
+            answerId: sampleAnswer.answerId!,
+            questionaryIds: samples.map(sample => sample.questionaryId),
+          });
+        }
       }
     }
   };

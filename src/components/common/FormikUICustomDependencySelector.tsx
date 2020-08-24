@@ -64,7 +64,11 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = (): void => {
-    if (dependencyId && dependencyValue && operator) {
+    if (
+      dependencyId !== null &&
+      dependencyValue !== null &&
+      operator !== null
+    ) {
       const dependency = {
         dependencyId,
         condition: {
