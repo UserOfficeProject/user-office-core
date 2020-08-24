@@ -244,3 +244,12 @@ export function createConfigByType(dataType: DataType, init: object | string) {
 
   return createConfig(config(), init);
 }
+
+export function getDefaultAnswerValue(type: DataType): any {
+  switch (type) {
+    case DataType.BOOLEAN:
+      return false;
+    default:
+      return '';
+  }
+}

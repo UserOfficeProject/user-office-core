@@ -13,15 +13,15 @@ export class AnswerBasic {
 export class Answer extends QuestionTemplateRelation {
   constructor(
     public answerId: number,
-    templateField: QuestionTemplateRelation,
+    questionTemplateRelation: QuestionTemplateRelation,
     public value?: any
   ) {
     super(
-      templateField.question,
-      templateField.topicId,
-      templateField.sortOrder,
-      templateField.config,
-      templateField.dependency
+      questionTemplateRelation.question,
+      questionTemplateRelation.topicId,
+      questionTemplateRelation.sortOrder,
+      questionTemplateRelation.config,
+      questionTemplateRelation.dependency
     );
   }
 }
