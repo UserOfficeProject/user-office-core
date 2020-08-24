@@ -12,7 +12,8 @@ import ScienceIconAdd from 'components/common/ScienceIconAdd';
 import ScienceIconRemove from 'components/common/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
-import { Instrument, Sep, ProposalsFilter } from 'generated/sdk';
+import { Instrument, Sep, ProposalsToInstrumentArgs } from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -50,7 +51,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   ] = React.useState(false);
   const [openEmailProposals, setOpenEmailProposals] = React.useState(false);
 
-  const initalSelectedProposals: number[] = [];
+  const initalSelectedProposals: ProposalsToInstrumentArgs[] = [];
   const [selectedProposals, setSelectedProposals] = React.useState(
     initalSelectedProposals
   );
@@ -237,10 +238,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   }
 
   const emailProposals = (): void => {
-    selectedProposals.forEach(id => {
+    selectedProposals.forEach(proposal => {
       new Promise(async resolve => {
         await api()
-          .notifyProposal({ id })
+          .notifyProposal({ id: proposal.id })
           .then(data => {
             if (data.notifyProposal.error) {
               enqueueSnackbar(
@@ -251,7 +252,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               );
             } else {
               proposalsData[
-                proposalsData.findIndex(val => val.id === id)
+                proposalsData.findIndex(val => val.id === proposal.id)
               ].notified = true;
               setProposalsData([...proposalsData]);
             }
@@ -263,11 +264,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   };
 
   const deleteProposals = (): void => {
-    selectedProposals.forEach(id => {
+    selectedProposals.forEach(proposal => {
       new Promise(async resolve => {
-        await api().deleteProposal({ id });
+        await api().deleteProposal({ id: proposal.id });
         proposalsData.splice(
-          proposalsData.findIndex(val => val.id === id),
+          proposalsData.findIndex(val => val.id === proposal.id),
           1
         );
         setProposalsData([...proposalsData]);
@@ -278,9 +279,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
 
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
-      selectedProposals.map(async id => {
+      selectedProposals.map(async selectedProposal => {
         const result = await api().assignProposal({
-          proposalId: id,
+          proposalId: selectedProposal.id,
           sepId: sep.id,
         });
 
@@ -295,7 +296,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         proposalsData.map(prop => {
           if (
             selectedProposals.find(
-              selectedProposalId => selectedProposalId === prop.id
+              selectedProposal => selectedProposal.id === prop.id
             )
           ) {
             prop.sepShortCode = sep.code;
@@ -319,13 +320,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   ): Promise<void> => {
     const selectedProposalsWithInstrument = proposalsData.filter(
       proposalDataItem =>
-        selectedProposals.includes(proposalDataItem.id) &&
-        proposalDataItem.instrumentName
+        selectedProposals.some(
+          selectedProposal => selectedProposal.id === proposalDataItem.id
+        ) && proposalDataItem.instrumentId
     );
 
     if (selectedProposalsWithInstrument.length === 0) {
       const result = await api().assignProposalsToInstrument({
-        proposalIds: selectedProposals,
+        proposals: selectedProposals,
         instrumentId: instrument.id,
       });
       const isError = !!result.assignProposalsToInstrument.error;
@@ -335,7 +337,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           proposalsData.map(prop => {
             if (
               selectedProposals.find(
-                selectedProposalId => selectedProposalId === prop.id
+                selectedProposal => selectedProposal.id === prop.id
               )
             ) {
               prop.instrumentName = instrument.name;
@@ -414,6 +416,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           <AssignProposalsToInstrument
             assignProposalsToInstrument={assignProposalsToInstrument}
             close={(): void => setOpenInstrumentAssignment(false)}
+            callIds={selectedProposals.map(
+              selectedProposal => selectedProposal.callId
+            )}
           />
         </DialogContent>
       </Dialog>
@@ -457,7 +462,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               setOpen(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => row.id
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
                 )
               );
             },
@@ -470,7 +478,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               setOpenAssignment(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => row.id
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
                 )
               );
             },
@@ -483,7 +494,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               setOpenInstrumentAssignment(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => row.id
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
                 )
               );
             },
@@ -496,7 +510,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               setOpenEmailProposals(true);
               setSelectedProposals(
                 (rowData as ProposalViewData[]).map(
-                  (row: ProposalViewData) => row.id
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
                 )
               );
             },

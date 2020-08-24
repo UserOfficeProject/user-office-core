@@ -7,8 +7,9 @@ import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
+import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
-import { Proposal } from 'generated/sdk';
+import { Proposal, UserRole } from 'generated/sdk';
 import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
@@ -27,6 +28,7 @@ export default function ProposalAdmin(props: {
 }) {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const initialValues = {
     finalStatus: props.data.finalStatus || ProposalEndStatus.UNSET,
@@ -79,6 +81,7 @@ export default function ProposalAdmin(props: {
                     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
                   ]}
                   required
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -92,6 +95,7 @@ export default function ProposalAdmin(props: {
                     { text: 'Submitted', value: ProposalStatus.SUBMITTED },
                   ]}
                   required
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -107,6 +111,7 @@ export default function ProposalAdmin(props: {
                   multiline
                   rowsMax="16"
                   rows="4"
+                  disabled={!isUserOfficer}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -122,19 +127,22 @@ export default function ProposalAdmin(props: {
                   multiline
                   rowsMax="16"
                   rows="4"
+                  disabled={!isUserOfficer}
                 />
               </Grid>
             </Grid>
-            <ButtonContainer>
-              <Button
-                disabled={isSubmitting}
-                type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Update
-              </Button>
-            </ButtonContainer>
+            {isUserOfficer && (
+              <ButtonContainer>
+                <Button
+                  disabled={isSubmitting}
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                >
+                  Update
+                </Button>
+              </ButtonContainer>
+            )}
           </Form>
         )}
       </Formik>

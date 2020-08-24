@@ -1,5 +1,5 @@
 mutation updateUserRoles($id: Int!, $roles: [Int!]) {
-  updateUser(id: $id, roles: $roles) {
+  updateUserRoles(id: $id, roles: $roles) {
     user {
       id
     }

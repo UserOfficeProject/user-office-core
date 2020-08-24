@@ -1,12 +1,14 @@
 import { IconButton } from '@material-ui/core';
 import { Visibility, People, ArrowBack } from '@material-ui/icons';
-import MaterialTable from 'material-table';
+import MaterialTable, { Action } from 'material-table';
 import React, { useState } from 'react';
 
-import { Review } from 'generated/sdk';
+import { useCheckAccess } from 'components/common/Can';
+import { Review, UserRole } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
 
 import ProposalGrade from './ProposalGrade';
+
 export default function ReviewTable(props: {
   data: Review[];
   addReviewer: any;
@@ -17,6 +19,7 @@ export default function ReviewTable(props: {
   //   props.reviews.reduce((acc, curr) => acc + curr.grade, 0) /
   //   props.reviews.length;
   const [editReviewID, setEditReviewID] = useState(0);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const columns = [
     {
@@ -39,38 +42,47 @@ export default function ReviewTable(props: {
     );
   }
 
+  const actions: (Action<Review> | ((rowData: Review) => Action<Review>))[] = [
+    {
+      icon: () => <Visibility />,
+      tooltip: 'View review',
+      onClick: (event, rowData) => {
+        setEditReviewID((rowData as Review).id);
+      },
+      position: 'row',
+    },
+  ];
+
+  if (isUserOfficer) {
+    actions.push({
+      icon: () => <People />,
+      isFreeAction: true,
+      tooltip: 'Add Reviewer',
+      onClick: () => props.addReviewer(true),
+    });
+  }
+
   return (
     <MaterialTable
       icons={tableIcons}
       title={'Excellence Review'}
       columns={columns}
       data={props.data}
-      editable={{
-        onRowDelete: (oldData: Review) =>
-          new Promise(resolve => {
-            resolve();
-            props.removeReview(oldData.id);
-          }),
-      }}
+      editable={
+        isUserOfficer
+          ? {
+              onRowDelete: (oldData: Review) =>
+                new Promise(resolve => {
+                  resolve();
+                  props.removeReview(oldData.id);
+                }),
+            }
+          : {}
+      }
       options={{
         search: false,
       }}
-      actions={[
-        {
-          icon: () => <Visibility />,
-          tooltip: 'View review',
-          onClick: (event, rowData) => {
-            setEditReviewID((rowData as Review).id);
-          },
-          position: 'row',
-        },
-        {
-          icon: () => <People />,
-          isFreeAction: true,
-          tooltip: 'Add Reviewer',
-          onClick: () => props.addReviewer(true),
-        },
-      ]}
+      actions={actions}
     />
   );
 }

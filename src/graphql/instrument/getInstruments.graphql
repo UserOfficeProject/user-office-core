@@ -1,5 +1,5 @@
-query getInstruments {
-  instruments {
+query getInstruments($callIds: [Int!]) {
+  instruments(callIds: $callIds) {
     instruments {
       id
       name

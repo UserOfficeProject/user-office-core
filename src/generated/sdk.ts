@@ -12,7 +12,7 @@ export type Scalars = {
   Float: number;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
-  IntStringDateBool: any;
+  IntStringDateBoolArray: any;
 };
 
 export type AddSepMembersRole = {
@@ -34,7 +34,23 @@ export type Answer = {
   topicId: Scalars['Int'];
   config: FieldConfig;
   dependency: Maybe<FieldDependency>;
-  value: Maybe<Scalars['IntStringDateBool']>;
+  answerId: Maybe<Scalars['Int']>;
+  value: Maybe<Scalars['IntStringDateBoolArray']>;
+};
+
+export type AnswerBasic = {
+  __typename?: 'AnswerBasic';
+  answerId: Maybe<Scalars['Int']>;
+  answer: Scalars['IntStringDateBoolArray'];
+  questionaryId: Scalars['Int'];
+  questionId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+};
+
+export type AnswerBasicResponseWrap = {
+  __typename?: 'AnswerBasicResponseWrap';
+  error: Maybe<Scalars['String']>;
+  answer: Maybe<AnswerBasic>;
 };
 
 export type AnswerInput = {
@@ -45,7 +61,7 @@ export type AnswerInput = {
 export type AnswerResponseWrap = {
   __typename?: 'AnswerResponseWrap';
   error: Maybe<Scalars['String']>;
-  answer: Answer;
+  answer: Maybe<Answer>;
 };
 
 export type AssignQuestionsToTopicResponseWrap = {
@@ -178,7 +194,7 @@ export type EventLog = {
 export type FieldCondition = {
   __typename?: 'FieldCondition';
   condition: EvaluatorOperator;
-  params: Scalars['IntStringDateBool'];
+  params: Scalars['IntStringDateBoolArray'];
 };
 
 export type FieldConditionInput = {
@@ -304,6 +320,8 @@ export type Mutation = {
   addReview: ReviewResponseWrap;
   addTechnicalReview: TechnicalReviewResponseWrap;
   addUserForReview: ReviewResponseWrap;
+  createSample: SampleResponseWrap;
+  updateSampleStatus: SampleResponseWrap;
   assignChairOrSecretary: SepResponseWrap;
   assignMembers: SepResponseWrap;
   removeMember: SepResponseWrap;
@@ -326,15 +344,18 @@ export type Mutation = {
   createUserByEmailInvite: CreateUserByEmailInviteResponseWrap;
   createUser: UserResponseWrap;
   updateUser: UserResponseWrap;
+  updateUserRoles: UserResponseWrap;
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
   cloneTemplate: TemplateResponseWrap;
+  createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
   createProposal: ProposalResponseWrap;
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
   deleteQuestion: QuestionResponseWrap;
+  deleteSample: SampleResponseWrap;
   deleteTemplate: TemplateResponseWrap;
   deleteTopic: TemplateResponseWrap;
   deleteUser: UserResponseWrap;
@@ -351,6 +372,7 @@ export type Mutation = {
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
+  updateSampleTitle: SampleResponseWrap;
   updateTopicOrder: UpdateTopicOrderResponseWrap;
 };
 
@@ -414,7 +436,7 @@ export type MutationRemoveAssignedInstrumentFromcallArgs = {
 
 
 export type MutationAssignProposalsToInstrumentArgs = {
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 };
 
@@ -519,6 +541,18 @@ export type MutationAddUserForReviewArgs = {
   userID: Scalars['Int'];
   proposalID: Scalars['Int'];
   sepID: Scalars['Int'];
+};
+
+
+export type MutationCreateSampleArgs = {
+  title: Scalars['String'];
+  templateId: Scalars['Int'];
+};
+
+
+export type MutationUpdateSampleStatusArgs = {
+  sampleId: Scalars['Int'];
+  status: SampleStatus;
 };
 
 
@@ -709,6 +743,12 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateUserRolesArgs = {
+  id: Scalars['Int'];
+  roles?: Maybe<Array<Scalars['Int']>>;
+};
+
+
 export type MutationAddClientLogArgs = {
   error: Scalars['String'];
 };
@@ -723,6 +763,12 @@ export type MutationAssignQuestionsToTopicArgs = {
 
 export type MutationCloneTemplateArgs = {
   templateId: Scalars['Int'];
+};
+
+
+export type MutationCreateAnswerQuestionaryRelationsArgs = {
+  answerId: Scalars['Int'];
+  questionaryIds: Array<Scalars['Int']>;
 };
 
 
@@ -748,6 +794,11 @@ export type MutationDeleteProposalArgs = {
 
 export type MutationDeleteQuestionArgs = {
   questionId: Scalars['String'];
+};
+
+
+export type MutationDeleteSampleArgs = {
+  sampleId: Scalars['Int'];
 };
 
 
@@ -831,6 +882,12 @@ export type MutationUpdatePasswordArgs = {
 };
 
 
+export type MutationUpdateSampleTitleArgs = {
+  sampleId: Scalars['Int'];
+  title: Scalars['String'];
+};
+
+
 export type MutationUpdateTopicOrderArgs = {
   topicOrder: Array<Scalars['Int']>;
 };
@@ -868,7 +925,7 @@ export type PageResponseWrap = {
 export type PrepareDbResponseWrap = {
   __typename?: 'PrepareDBResponseWrap';
   error: Maybe<Scalars['String']>;
-  log: Scalars['String'];
+  log: Maybe<Scalars['String']>;
 };
 
 export type Proposal = {
@@ -930,6 +987,11 @@ export enum ProposalStatus {
   SUBMITTED = 'SUBMITTED'
 }
 
+export type ProposalsToInstrumentArgs = {
+  id: Scalars['Int'];
+  callId: Scalars['Int'];
+};
+
 export type ProposalTemplate = {
   __typename?: 'ProposalTemplate';
   templateId: Scalars['Int'];
@@ -964,13 +1026,14 @@ export type ProposalView = {
   reviewAverage: Maybe<Scalars['Float']>;
   reviewDeviation: Maybe<Scalars['Float']>;
   instrumentId: Maybe<Scalars['Int']>;
-  callId: Maybe<Scalars['Int']>;
+  callId: Scalars['Int'];
 };
 
 export type Query = {
   __typename?: 'Query';
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
+  instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankProposal: Maybe<Proposal>;
@@ -992,6 +1055,10 @@ export type Query = {
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
+  sample: Maybe<Sample>;
+  samplesByAnswerId: Maybe<Array<Sample>>;
+  samplesByCallId: Maybe<Array<Sample>>;
+  samples: Maybe<Array<Sample>>;
   sep: Maybe<Sep>;
   sepMembers: Maybe<Array<SepMember>>;
   sepProposals: Maybe<Array<SepProposal>>;
@@ -1011,6 +1078,13 @@ export type QueryCallsArgs = {
 
 
 export type QueryProposalsArgs = {
+  filter?: Maybe<ProposalsFilter>;
+  first?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryInstrumentScientistProposalsArgs = {
   filter?: Maybe<ProposalsFilter>;
   first?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -1073,6 +1147,11 @@ export type QueryInstrumentArgs = {
 };
 
 
+export type QueryInstrumentsArgs = {
+  callIds?: Maybe<Array<Scalars['Int']>>;
+};
+
+
 export type QueryInstrumentsBySepArgs = {
   callId: Scalars['Int'];
   sepId: Scalars['Int'];
@@ -1106,6 +1185,26 @@ export type QueryQuestionaryArgs = {
 
 export type QueryReviewArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QuerySampleArgs = {
+  sampleId: Scalars['Int'];
+};
+
+
+export type QuerySamplesByAnswerIdArgs = {
+  answerId: Scalars['Int'];
+};
+
+
+export type QuerySamplesByCallIdArgs = {
+  callId: Scalars['Int'];
+};
+
+
+export type QuerySamplesArgs = {
+  filter?: Maybe<SamplesFilter>;
 };
 
 
@@ -1257,6 +1356,43 @@ export type Role = {
   title: Scalars['String'];
 };
 
+export type Sample = {
+  __typename?: 'Sample';
+  id: Scalars['Int'];
+  title: Scalars['String'];
+  creatorId: Scalars['Int'];
+  questionaryId: Scalars['Int'];
+  status: SampleStatus;
+  created: Scalars['DateTime'];
+  questionary: Questionary;
+};
+
+export type SampleResponseWrap = {
+  __typename?: 'SampleResponseWrap';
+  error: Maybe<Scalars['String']>;
+  sample: Maybe<Sample>;
+};
+
+export type SamplesFilter = {
+  title?: Maybe<Scalars['String']>;
+  creatorId?: Maybe<Scalars['Int']>;
+  questionaryId?: Maybe<Scalars['Int']>;
+  sampleIds?: Maybe<Array<Scalars['Int']>>;
+  status?: Maybe<SampleStatus>;
+};
+
+export type SamplesResponseWrap = {
+  __typename?: 'SamplesResponseWrap';
+  error: Maybe<Scalars['String']>;
+  samples: Array<Sample>;
+};
+
+export enum SampleStatus {
+  NONE = 'NONE',
+  SAFE = 'SAFE',
+  UNSAFE = 'UNSAFE'
+}
+
 export type SelectionFromOptionsConfig = {
   __typename?: 'SelectionFromOptionsConfig';
   small_label: Scalars['String'];
@@ -1334,6 +1470,7 @@ export type SubtemplateConfig = {
   tooltip: Scalars['String'];
   maxEntries: Maybe<Scalars['Int']>;
   templateId: Scalars['Int'];
+  templateCategory: Scalars['String'];
   addEntryButtonLabel: Scalars['String'];
 };
 
@@ -1379,7 +1516,7 @@ export type Template = {
 
 export type TemplateCategory = {
   __typename?: 'TemplateCategory';
-  categoryId: Scalars['Int'];
+  categoryId: TemplateCategoryId;
   name: Scalars['String'];
 };
 
@@ -1500,7 +1637,8 @@ export enum UserRole {
   SEP_CHAIR = 'SEP_CHAIR',
   SEP_SECRETARY = 'SEP_SECRETARY',
   SEP_REVIEWER = 'SEP_REVIEWER',
-  INSTRUMENT_SCIENTIST = 'INSTRUMENT_SCIENTIST'
+  INSTRUMENT_SCIENTIST = 'INSTRUMENT_SCIENTIST',
+  SAMPLE_SAFETY_REVIEWER = 'SAMPLE_SAFETY_REVIEWER'
 }
 
 export type AssignProposalMutationVariables = Exact<{
@@ -2059,7 +2197,7 @@ export type GetEventLogsQuery = (
 );
 
 export type AssignProposalsToInstrumentMutationVariables = Exact<{
-  proposalIds: Array<Scalars['Int']>;
+  proposals: Array<ProposalsToInstrumentArgs>;
   instrumentId: Scalars['Int'];
 }>;
 
@@ -2122,7 +2260,9 @@ export type DeleteInstrumentMutation = (
   ) }
 );
 
-export type GetInstrumentsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetInstrumentsQueryVariables = Exact<{
+  callIds?: Maybe<Array<Scalars['Int']>>;
+}>;
 
 
 export type GetInstrumentsQuery = (
@@ -2318,6 +2458,49 @@ export type GetBlankProposalQuery = (
       )> }
     )>> }
     & ProposalFragment
+  )> }
+);
+
+export type GetInstrumentScientistProposalsQueryVariables = Exact<{
+  filter?: Maybe<ProposalsFilter>;
+}>;
+
+
+export type GetInstrumentScientistProposalsQuery = (
+  { __typename?: 'Query' }
+  & { instrumentScientistProposals: Maybe<(
+    { __typename?: 'ProposalsQueryResult' }
+    & Pick<ProposalsQueryResult, 'totalCount'>
+    & { proposals: Array<(
+      { __typename?: 'Proposal' }
+      & { proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), reviews: Maybe<Array<(
+        { __typename?: 'Review' }
+        & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
+        & { reviewer: Maybe<(
+          { __typename?: 'User' }
+          & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
+        )> }
+      )>>, users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )>, technicalReview: Maybe<(
+        { __typename?: 'TechnicalReview' }
+        & Pick<TechnicalReview, 'id' | 'comment' | 'publicComment' | 'timeAllocation' | 'status' | 'proposalID'>
+      )>, instrument: Maybe<(
+        { __typename?: 'Instrument' }
+        & Pick<Instrument, 'id' | 'name'>
+      )>, call: Maybe<(
+        { __typename?: 'Call' }
+        & Pick<Call, 'id' | 'shortCode'>
+      )>, sep: Maybe<(
+        { __typename?: 'SEP' }
+        & Pick<Sep, 'id' | 'code'>
+      )> }
+      & ProposalFragment
+    )> }
   )> }
 );
 
@@ -3520,7 +3703,7 @@ export type UpdateUserRolesMutationVariables = Exact<{
 
 export type UpdateUserRolesMutation = (
   { __typename?: 'Mutation' }
-  & { updateUser: (
+  & { updateUserRoles: (
     { __typename?: 'UserResponseWrap' }
     & Pick<UserResponseWrap, 'error'>
     & { user: Maybe<(
@@ -4206,8 +4389,8 @@ export const GetEventLogsDocument = gql`
 }
     `;
 export const AssignProposalsToInstrumentDocument = gql`
-    mutation assignProposalsToInstrument($proposalIds: [Int!]!, $instrumentId: Int!) {
-  assignProposalsToInstrument(proposalIds: $proposalIds, instrumentId: $instrumentId) {
+    mutation assignProposalsToInstrument($proposals: [ProposalsToInstrumentArgs!]!, $instrumentId: Int!) {
+  assignProposalsToInstrument(proposals: $proposals, instrumentId: $instrumentId) {
     error
     isSuccess
   }
@@ -4245,8 +4428,8 @@ export const DeleteInstrumentDocument = gql`
 }
     `;
 export const GetInstrumentsDocument = gql`
-    query getInstruments {
-  instruments {
+    query getInstruments($callIds: [Int!]) {
+  instruments(callIds: $callIds) {
     instruments {
       id
       name
@@ -4379,6 +4562,57 @@ export const GetBlankProposalDocument = gql`
     ${ProposalFragmentDoc}
 ${BasicUserDetailsFragmentDoc}
 ${QuestionaryFragmentDoc}`;
+export const GetInstrumentScientistProposalsDocument = gql`
+    query getInstrumentScientistProposals($filter: ProposalsFilter) {
+  instrumentScientistProposals(filter: $filter) {
+    proposals {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+      reviews {
+        id
+        grade
+        comment
+        status
+        userID
+        sepID
+        reviewer {
+          firstname
+          lastname
+          username
+          id
+        }
+      }
+      users {
+        ...basicUserDetails
+      }
+      technicalReview {
+        id
+        comment
+        publicComment
+        timeAllocation
+        status
+        proposalID
+      }
+      instrument {
+        id
+        name
+      }
+      call {
+        id
+        shortCode
+      }
+      sep {
+        id
+        code
+      }
+    }
+    totalCount
+  }
+}
+    ${ProposalFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const GetProposalDocument = gql`
     query getProposal($id: Int!) {
   proposal(id: $id) {
@@ -5042,7 +5276,7 @@ export const UpdateUserDocument = gql`
     `;
 export const UpdateUserRolesDocument = gql`
     mutation updateUserRoles($id: Int!, $roles: [Int!]) {
-  updateUser(id: $id, roles: $roles) {
+  updateUserRoles(id: $id, roles: $roles) {
     user {
       id
     }
@@ -5193,6 +5427,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
       return withWrapper(() => client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables));
+    },
+    getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
+      return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));
     },
     getProposal(variables: GetProposalQueryVariables): Promise<GetProposalQuery> {
       return withWrapper(() => client.request<GetProposalQuery>(print(GetProposalDocument), variables));

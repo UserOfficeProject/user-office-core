@@ -164,7 +164,7 @@ context('Calls tests', () => {
       .click();
 
     cy.get('[type="checkbox"]')
-      .first()
+      .eq(1)
       .check();
 
     cy.contains('Assign instrument').click();

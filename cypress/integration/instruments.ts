@@ -89,6 +89,23 @@ context('Instrument tests', () => {
 
     cy.login('officer');
 
+    cy.contains('View Calls').click();
+    cy.get('[title="Assign Instrument"]')
+      .first()
+      .click();
+
+    cy.get('[type="checkbox"]')
+      .first()
+      .check();
+
+    cy.contains('Assign instrument').click();
+
+    cy.wait(500);
+
+    cy.contains('View Proposals').click();
+
+    cy.wait(500);
+
     cy.get('[type="checkbox"]')
       .first()
       .check();
@@ -112,24 +129,12 @@ context('Instrument tests', () => {
     cy.get('[title="Remove assigned instrument"]').should('exist');
   });
 
-  it('User Officer should be able to remove assigned proposal from instrument', () => {
-    cy.login('officer');
-
-    cy.get('[title="Remove assigned instrument"]').click();
-
-    cy.contains('Yes').click();
-
-    cy.wait(500);
-
-    cy.get('[title="Remove assigned instrument"]').should('not.exist');
-  });
-
   it('User Officer should be able to assign scientist to instrument and instrument scientist should be able to see instruments he is assigned to', () => {
     cy.login('officer');
 
     cy.contains('View People').click();
     cy.get('[title="Edit user"]')
-      .last()
+      .eq(2)
       .click();
     cy.wait(500);
     cy.contains('Settings').click();
@@ -176,9 +181,36 @@ context('Instrument tests', () => {
       .click();
     cy.wait(1000);
 
-    cy.contains('Instruments');
+    cy.contains('Instruments').click();
 
-    cy.get('[title="Edit"]').should('exist');
+    cy.get('[title="Show Scientists"]').should('exist');
+  });
+
+  it('Instrument scientsit should be able to see proposals assigned to instrument where he is instrument scientist', () => {
+    cy.login('user');
+
+    cy.get('[data-cy="profile-page-btn"]').click();
+    cy.contains('Roles').click();
+    cy.get("[data-cy='role-selection-table'] table tbody tr")
+      .eq(1)
+      .contains('Use')
+      .click();
+    cy.wait(1000);
+
+    cy.contains('Proposals');
+    cy.get('[data-cy="view-proposal"]').should('exist');
+  });
+
+  it('User Officer should be able to remove assigned proposal from instrument', () => {
+    cy.login('officer');
+
+    cy.get('[title="Remove assigned instrument"]').click();
+
+    cy.contains('Yes').click();
+
+    cy.wait(500);
+
+    cy.get('[title="Remove assigned instrument"]').should('not.exist');
   });
 
   it('User Officer should be able to remove assigned scientist from instrument', () => {
@@ -187,7 +219,7 @@ context('Instrument tests', () => {
     cy.contains('Instruments').click();
     cy.wait(500);
 
-    cy.get('[title="Show Instruments"]')
+    cy.get('[title="Show Scientists"]')
       .first()
       .click();
 
@@ -213,13 +245,27 @@ context('Instrument tests', () => {
   it('User Officer should be able to delete Instrument', () => {
     cy.login('officer');
 
+    cy.contains('View Calls').click();
+
+    cy.get('[title="Show Instruments"]')
+      .first()
+      .click();
+
+    cy.get('[title="Delete"]')
+      .first()
+      .click();
+
+    cy.get('[title="Save"]').click();
+
+    cy.wait(500);
+
     cy.contains('Instruments').click();
 
     cy.get('[title="Delete"]').click();
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.wait(500);
 
     cy.get('[data-cy="instruments-table"]')
       .find('tbody td')

@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import clsx from 'clsx';
 import { Field, Form, Formik } from 'formik';
 import { CheckboxWithLabel, TextField } from 'formik-material-ui';
+import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
 import React, { useContext, useState } from 'react';
@@ -145,6 +146,8 @@ const SignUp: React.FC<SignUpProps> = props => {
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
   const unauthorizedApi = useUnauthorizedApi();
+  const { enqueueSnackbar } = useSnackbar();
+
   if (orcData && orcData.token) {
     handleLogin(orcData.token);
   }
@@ -195,7 +198,16 @@ const SignUp: React.FC<SignUpProps> = props => {
       .createUser({
         ...values,
       })
-      .then(data => setUserID(data?.createUser?.user?.id as number));
+      .then(data => {
+        if (data.createUser.error) {
+          if (data.createUser.error === 'BAD_REQUEST')
+            enqueueSnackbar('Invalid input arguments', {
+              variant: 'error',
+            });
+        } else {
+          setUserID(data?.createUser?.user?.id as number);
+        }
+      });
   };
 
   return (
@@ -219,7 +231,7 @@ const SignUp: React.FC<SignUpProps> = props => {
           department: '',
           organisation_address: '',
           position: '',
-          email: email as string,
+          email: (email as string) || '',
           telephone: '',
           telephone_alt: '',
           privacy_agreement: false,

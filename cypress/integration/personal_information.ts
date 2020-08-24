@@ -18,7 +18,7 @@ context('Personal information tests', () => {
   const newDepartment = faker.commerce.department();
   const newPreferredName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.phoneNumber();
+  const newTelephone = faker.phone.phoneNumber('0##########');
 
   it('Should be able update personal information', () => {
     cy.login('user');

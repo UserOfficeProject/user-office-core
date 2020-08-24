@@ -29,14 +29,16 @@ const useStyles = makeStyles(theme => ({
 type AssignProposalsToInstrumentProps = {
   close: () => void;
   assignProposalsToInstrument: (instrument: Instrument) => void;
+  callIds: number[];
 };
 
 const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = ({
   close,
   assignProposalsToInstrument,
+  callIds,
 }) => {
   const classes = useStyles();
-  const { instrumentsData } = useInstrumentsData();
+  const { instrumentsData } = useInstrumentsData(callIds);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -96,6 +98,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
 AssignProposalsToInstrument.propTypes = {
   close: PropTypes.func.isRequired,
   assignProposalsToInstrument: PropTypes.func.isRequired,
+  callIds: PropTypes.array.isRequired,
 };
 
 export default AssignProposalsToInstrument;
