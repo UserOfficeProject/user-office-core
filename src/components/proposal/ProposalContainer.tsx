@@ -5,6 +5,9 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
+import { createContext, default as React, useEffect, useState } from 'react';
+import { Prompt } from 'react-router';
+
 import { useCheckAccess } from 'components/common/Can';
 import {
   Answer,
@@ -23,11 +26,10 @@ import {
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
-import { createContext, default as React, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
 import { StyledPaper } from 'styles/StyledComponents';
 import { clamp } from 'utils/Math';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
@@ -166,7 +168,7 @@ export default function ProposalContainer(props: {
 
         case EventType.SAVE_GENERAL_INFO_CLICKED:
           const { callId } = state.proposal;
-          var proposal = state.proposal;
+          let proposal = state.proposal;
           if (state.proposal.status === ProposalStatus.BLANK) {
             const response = await api('Saved').createProposal({ callId });
             proposal = { ...proposal, ...response.createProposal.proposal };
