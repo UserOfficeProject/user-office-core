@@ -32,10 +32,6 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.get('[title="Edit"]')
-      .first()
-      .click();
-
     cy.contains('2. New Topic');
 
     cy.visit('/');

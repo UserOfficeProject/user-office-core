@@ -177,6 +177,10 @@ export function TemplatesTable(props: TemplatesTableProps) {
     }
   };
 
+  const editTemplate = (templateId: number) => {
+    history.push(`/QuestionaryEditor/${templateId}`);
+  };
+
   return (
     <>
       <InputDialog open={show} onClose={() => setShow(false)}>
@@ -184,6 +188,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
           onComplete={template => {
             if (template) {
               setTemplates([...templates, template]);
+              editTemplate(template.templateId);
             }
             setShow(false);
           }}
@@ -201,9 +206,7 @@ export function TemplatesTable(props: TemplatesTableProps) {
             icon: () => <Edit />,
             tooltip: 'Edit',
             onClick: (event, data) => {
-              history.push(
-                `/QuestionaryEditor/${(data as TemplateRowDataType).templateId}`
-              );
+              editTemplate((data as TemplateRowDataType).templateId);
             },
           },
           {
