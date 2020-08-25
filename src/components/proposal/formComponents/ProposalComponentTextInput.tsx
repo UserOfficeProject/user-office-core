@@ -2,6 +2,7 @@ import { makeStyles } from '@material-ui/core';
 import { getIn } from 'formik';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
 import { Key } from 'ts-keycode-enum';
+
 import { TextInputConfig } from '../../../generated/sdk';
 import TextFieldWithCounter from '../../common/TextFieldWithCounter';
 import { BasicComponentProps } from '../IBasicComponentProps';
@@ -52,6 +53,7 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
             event.preventDefault();
             setStateValue(event.currentTarget.value);
             onComplete(event, event.currentTarget.value);
+
             return false;
           }
         }}
