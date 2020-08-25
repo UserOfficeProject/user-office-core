@@ -1,6 +1,6 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton } from '@material-ui/core';
-import { Visibility } from '@material-ui/icons';
+import { Visibility, Edit } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MaterialTable, { Column } from 'material-table';
 import React from 'react';
@@ -42,7 +42,11 @@ const ProposalTableInstrumentScientist: React.FC = () => {
             to={`/ProposalReviewUserOfficer/${rowData.id}`}
             style={{ color: 'inherit', textDecoration: 'inherit' }}
           >
-            <Visibility />
+            {rowData.technicalReview && rowData.technicalReview.status ? (
+              <Visibility />
+            ) : (
+              <Edit />
+            )}
           </Link>
         </IconButton>
         <IconButton
