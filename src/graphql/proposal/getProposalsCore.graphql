@@ -1,0 +1,20 @@
+query getProposalsCore($filter: ProposalsFilter) {
+  proposalsView(filter: $filter){
+    id
+    title
+    status
+    shortCode
+    rankOrder
+    finalStatus
+    notified
+    timeAllocation
+    technicalStatus
+    instrumentName
+    callShortCode
+    sepShortCode
+    reviewAverage
+    reviewDeviation
+    instrumentId
+    callId
+  }
+}

@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { IconButton, Tooltip } from '@material-ui/core';
 import { DialogContent, Dialog } from '@material-ui/core';
 import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
@@ -20,17 +19,11 @@ import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
-  useProposalsData,
-  ProposalData,
-} from 'hooks/proposal/useProposalsData';
+  useProposalsCoreData,
+  ProposalViewData,
+} from 'hooks/proposal/useProposalsCoreData';
 import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
-import {
-  average,
-  absoluteDifference,
-  standardDeviation,
-  getGrades,
-} from 'utils/mathFunctions';
 
 import RankInput from './RankInput';
 
@@ -43,9 +36,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   Toolbar,
 }) => {
-  const { loading, proposalsData, setProposalsData } = useProposalsData(
-    proposalFilter
-  );
   const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
   const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
   const [openAssignment, setOpenAssignment] = useState(false);
@@ -69,8 +59,11 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
-    Column<ProposalData>[] | null
+    Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
+  const { loading, setProposalsData, proposalsData } = useProposalsCoreData(
+    proposalFilter
+  );
 
   const setNewRanking = (proposalID: number, ranking: number) => {
     api().administrationProposal({
@@ -102,7 +95,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         setProposalsData(
           proposalsData.map(prop => {
             if (prop.id === proposalAndInstrumentId.proposalId) {
-              prop.instrument = null;
+              prop.instrumentName = null;
             }
 
             return prop;
@@ -127,7 +120,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalData) => {
+  const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
 
     return (
@@ -150,14 +143,14 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           </IconButton>
         </Tooltip>
 
-        {rowData.instrument && (
+        {rowData.instrumentName && (
           <Tooltip title="Remove assigned instrument">
             <IconButton
               style={iconButtonStyle}
               onClick={() => {
                 setProposalAndInstrumentId({
                   proposalId: rowData.id,
-                  instrumentId: rowData.instrument?.id as number,
+                  instrumentId: rowData.instrumentId,
                 });
                 setOpenRemoveInstrument(true);
               }}
@@ -170,7 +163,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
   };
 
-  let columns: Column<ProposalData>[] = [
+  let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -186,61 +179,35 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     },
     {
       title: 'Time(Days)',
-      field: 'technicalReview.timeAllocation',
+      field: 'timeAllocation',
       hidden: true,
     },
     {
       title: 'Technical status',
-      render: (rowData: ProposalData): string =>
-        rowData.technicalReview
-          ? getTranslation(rowData.technicalReview.status as ResourceId)
-          : '',
+      field: 'technicalStatus',
     },
-    { title: 'Status', field: 'status' },
+    {
+      title: 'Status',
+      field: 'status',
+    },
     {
       title: 'Deviation',
-      field: 'deviation',
-      hidden: true,
-      render: (rowData: ProposalData): number =>
-        standardDeviation(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
-        (standardDeviation(getGrades(a.reviews)) || 0) -
-        (standardDeviation(getGrades(b.reviews)) || 0),
-    },
-    {
-      title: 'Absolute Difference',
-      field: 'absolute',
-      hidden: true,
-      render: (rowData: ProposalData): number =>
-        absoluteDifference(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
-        (absoluteDifference(getGrades(a.reviews)) || 0) -
-        (absoluteDifference(getGrades(b.reviews)) || 0),
+      field: 'reviewDeviation',
     },
     {
       title: 'Average Score',
-      field: 'average',
-      hidden: true,
-      render: (rowData: ProposalData): number =>
-        average(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
-        (average(getGrades(a.reviews)) || 0) -
-        (average(getGrades(b.reviews)) || 0),
+      field: 'reviewAverage',
     },
     {
       title: 'Final Status',
       field: 'finalStatus',
-      render: (rowData: ProposalData): string =>
-        rowData.finalStatus
-          ? getTranslation(rowData.finalStatus as ResourceId)
-          : '',
     },
     {
       title: 'Ranking',
       field: 'rankOrder',
       // To be refactored
       // eslint-disable-next-line react/display-name
-      render: (rowData: ProposalData) => (
+      render: (rowData: ProposalViewData) => (
         <RankInput
           proposalID={rowData.id}
           defaultvalue={rowData.rankOrder}
@@ -251,20 +218,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     { title: 'Notified', field: 'notified' },
     {
       title: 'Instrument',
-      render: (rowData: ProposalData): string =>
-        rowData.instrument ? rowData.instrument.name : '-',
+      field: 'instrumentName',
     },
     {
       title: 'Call',
-      render: (rowData: ProposalData): string =>
-        rowData.call ? rowData.call.shortCode : '-',
-      hidden: true,
+      field: 'callShortCode',
     },
     {
       title: 'SEP',
-      render: (rowData: ProposalData): string =>
-        rowData.sep ? rowData.sep.code : '-',
-      hidden: true,
+      field: 'sepShortCode',
     },
   ];
 
@@ -340,7 +302,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
               selectedProposal => selectedProposal.id === prop.id
             )
           ) {
-            prop.sep = sep;
+            prop.sepShortCode = sep.code;
           }
 
           return prop;
@@ -363,7 +325,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       proposalDataItem =>
         selectedProposals.some(
           selectedProposal => selectedProposal.id === proposalDataItem.id
-        ) && proposalDataItem.instrument
+        ) && proposalDataItem.instrumentId
     );
 
     if (selectedProposalsWithInstrument.length === 0) {
@@ -381,7 +343,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
                 selectedProposal => selectedProposal.id === prop.id
               )
             ) {
-              prop.instrument = instrument;
+              prop.instrumentName = instrument.name;
             }
 
             return prop;
@@ -491,7 +453,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             tooltip: 'Download proposals',
             onClick: (event, rowData): void => {
               downloadPDFProposal(
-                (rowData as ProposalData[]).map(row => row.id).join(',')
+                (rowData as ProposalViewData[]).map(row => row.id).join(',')
               );
             },
             position: 'toolbarOnSelect',
@@ -502,10 +464,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenDeleteProposals(true);
               setSelectedProposals(
-                (rowData as ProposalData[]).map((row: ProposalData) => ({
-                  id: row.id,
-                  callId: row.callId,
-                }))
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -516,10 +480,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenAssignment(true);
               setSelectedProposals(
-                (rowData as ProposalData[]).map((row: ProposalData) => ({
-                  id: row.id,
-                  callId: row.callId,
-                }))
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -530,10 +496,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenInstrumentAssignment(true);
               setSelectedProposals(
-                (rowData as ProposalData[]).map((row: ProposalData) => ({
-                  id: row.id,
-                  callId: row.callId,
-                }))
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -544,10 +512,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             onClick: (event, rowData): void => {
               setOpenEmailProposals(true);
               setSelectedProposals(
-                (rowData as ProposalData[]).map((row: ProposalData) => ({
-                  id: row.id,
-                  callId: row.callId,
-                }))
+                (rowData as ProposalViewData[]).map(
+                  (row: ProposalViewData) => ({
+                    id: row.id,
+                    callId: row.callId,
+                  })
+                )
               );
             },
             position: 'toolbarOnSelect',
@@ -555,7 +525,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         ]}
         onChangeColumnHidden={collumnChange => {
           const proposalColumns = columns.map(
-            (proposalColumn: Column<ProposalData>) => ({
+            (proposalColumn: Column<ProposalViewData>) => ({
               hidden:
                 proposalColumn.title === collumnChange.title
                   ? collumnChange.hidden
@@ -570,7 +540,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     </>
   );
 };
-
 ProposalTableOfficer.propTypes = {
   Toolbar: PropTypes.func.isRequired,
   proposalFilter: PropTypes.any,
