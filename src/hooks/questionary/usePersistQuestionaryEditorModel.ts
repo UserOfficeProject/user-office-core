@@ -89,7 +89,7 @@ export function usePersistQuestionaryEditorModel() {
         config: field.config ? JSON.stringify(field.config) : undefined,
         dependency: field.dependency
           ? prepareDependencies(field.dependency)
-          : undefined,
+          : field.dependency,
       })
       .then(data => data.updateQuestionTemplateRelation);
   };
