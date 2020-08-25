@@ -22,6 +22,8 @@ context('Template tests', () => {
   const dateQuestion = faker.random.words(2);
   const fileQuestion = faker.random.words(2);
 
+  const dateTooltip = faker.random.words(2);
+
   const topic = faker.random.words(1);
   const title = faker.random.words(3);
   const abstract = faker.random.words(8);
@@ -223,6 +225,21 @@ context('Template tests', () => {
 
     cy.get('body').type('{alt}', { release: false });
     cy.contains(fileQuestion).click();
+    /* --- */
+
+    /* --- Update templateQuestionRelation */
+    cy.contains(dateQuestion).click();
+    cy.get("[data-cy='tooltip'] input")
+      .clear()
+      .type(dateTooltip);
+
+    cy.contains('Update').click();
+
+    cy.reload();
+
+    cy.contains(dateQuestion).click();
+    cy.get("[data-cy='tooltip'] input").should('have.value', dateTooltip);
+    cy.get('body').type('{esc}');
     /* --- */
 
     cy.contains(booleanQuestion);
