@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { getDefaultAnswerValue } from '../../models/ProposalModelFunctions';
 import {
   Answer,
   AnswerBasic,
@@ -18,7 +19,6 @@ import {
   QuestionTemplateRelRecord,
   TopicRecord,
 } from './records';
-import { getDefaultAnswerValue } from '../../models/ProposalModelFunctions';
 
 export default class PostgresQuestionaryDataSource
   implements QuestionaryDataSource {
