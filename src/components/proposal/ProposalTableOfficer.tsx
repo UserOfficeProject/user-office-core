@@ -140,12 +140,15 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
             <Visibility />
           </Link>
         </IconButton>
-        <IconButton
-          onClick={() => downloadPDFProposal(rowData.id)}
-          style={iconButtonStyle}
-        >
-          <GetAppIcon />
-        </IconButton>
+        <Tooltip title="Download proposal as pdf">
+          <IconButton
+            data-cy="download-proposal"
+            onClick={() => downloadPDFProposal(rowData.id)}
+            style={iconButtonStyle}
+          >
+            <GetAppIcon />
+          </IconButton>
+        </Tooltip>
 
         {rowData.instrument && (
           <Tooltip title="Remove assigned instrument">

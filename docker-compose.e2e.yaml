@@ -41,6 +41,8 @@ services:
     depends_on:
       - backend
   cypress:
+    environment:
+      CYPRESS_SVC_ACC_TOKEN: $SVC_ACC_TOKEN
     ipc: host
     build: ./cypress
     command: ["./wait-for-frontend.sh", "frontend:80", "cypress run"]

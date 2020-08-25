@@ -5,11 +5,13 @@ import {
   TableRow,
   TableCell,
   makeStyles,
+  Button,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Proposal, BasicUserDetails } from 'generated/sdk';
+import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { StyledPaper } from 'styles/StyledComponents';
 import { average, getGrades } from 'utils/mathFunctions';
 
@@ -18,6 +20,7 @@ type ProposalDetailsProps = {
 };
 
 const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
+  const downloadPDFProposal = useDownloadPDFProposal();
   const classes = makeStyles(theme => ({
     heading: {
       marginTop: theme.spacing(2),
@@ -71,8 +74,12 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell>{proposal.call?.shortCode}</TableCell>
             </TableRow>
             <TableRow key="ranking">
-              <TableCell className={classes.textBold}>Initial Rank</TableCell>
-              <TableCell>{proposal.rankOrder}</TableCell>
+              <TableCell className={classes.textBold}>
+                Initial Rank (by average score)
+              </TableCell>
+              <TableCell>
+                {average(getGrades(proposal.reviews)) || '-'}
+              </TableCell>
               <TableCell className={classes.textBold}>Current Rank</TableCell>
               <TableCell>{proposal.rankOrder}</TableCell>
             </TableRow>
@@ -80,7 +87,14 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               <TableCell className={classes.textBold}>Instrument</TableCell>
               <TableCell>{proposal.instrument?.name}</TableCell>
               <TableCell className={classes.textBold}>PDF</TableCell>
-              <TableCell>Click here to view pdf</TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => downloadPDFProposal(proposal.id)}
+                  color="primary"
+                >
+                  Click here to view pdf
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
