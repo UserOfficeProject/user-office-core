@@ -1,8 +1,8 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createSEPValidationSchema } from '@esss-swap/duo-validation';
-import { FormControlLabel } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-material-ui';

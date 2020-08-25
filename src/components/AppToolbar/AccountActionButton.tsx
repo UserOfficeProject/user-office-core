@@ -1,5 +1,7 @@
-import { Box, DialogContent, Dialog } from '@material-ui/core';
 import Badge from '@material-ui/core/Badge';
+import Box from '@material-ui/core/Box';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';

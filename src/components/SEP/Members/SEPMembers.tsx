@@ -6,7 +6,8 @@ import {
   Tooltip,
   withStyles,
 } from '@material-ui/core';
-import { PersonAdd, Person } from '@material-ui/icons';
+import Person from '@material-ui/icons/Person';
+import PersonAdd from '@material-ui/icons/PersonAdd';
 import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';

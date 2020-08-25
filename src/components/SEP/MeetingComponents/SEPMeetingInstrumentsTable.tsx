@@ -1,4 +1,4 @@
-import { DoneAll } from '@material-ui/icons';
+import DoneAll from '@material-ui/icons/DoneAll';
 import MaterialTable, { Options } from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';

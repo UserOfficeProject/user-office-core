@@ -1,6 +1,6 @@
 import { generalInfoUpdateValidationSchema } from '@esss-swap/duo-validation';
-import { makeStyles } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';

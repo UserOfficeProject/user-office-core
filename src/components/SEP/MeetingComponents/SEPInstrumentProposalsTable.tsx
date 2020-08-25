@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core';
-import { useTheme } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import useTheme from '@material-ui/core/styles/useTheme';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { Visibility } from '@material-ui/icons';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -55,7 +55,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
     } else if (b.proposal.rankOrder === null) {
       return -1;
     } else {
-      return a.proposal.rankOrder > b.proposal?.rankOrder ? 1 : -1;
+      return a.proposal.rankOrder > b.proposal.rankOrder ? 1 : -1;
     }
   };
 

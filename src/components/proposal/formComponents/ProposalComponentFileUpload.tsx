@@ -1,4 +1,5 @@
-import { FormControl, FormLabel } from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import React, { ChangeEvent, useState, useEffect } from 'react';
 
 import { FileUploadConfig } from '../../../generated/sdk';

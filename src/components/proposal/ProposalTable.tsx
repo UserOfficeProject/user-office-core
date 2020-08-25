@@ -1,5 +1,6 @@
-import { Edit, Visibility } from '@material-ui/icons';
+import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';

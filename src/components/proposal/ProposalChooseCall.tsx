@@ -7,7 +7,7 @@ import {
   Typography,
   makeStyles,
 } from '@material-ui/core';
-import { NavigateNext } from '@material-ui/icons';
+import NavigateNext from '@material-ui/icons/NavigateNext';
 import dateformat from 'dateformat';
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';

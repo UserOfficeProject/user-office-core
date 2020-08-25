@@ -1,4 +1,4 @@
-import { MenuItem } from '@material-ui/core';
+import MenuItem from '@material-ui/core/MenuItem';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';

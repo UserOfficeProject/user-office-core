@@ -1,4 +1,4 @@
-import { Add } from '@material-ui/icons';
+import Add from '@material-ui/icons/Add';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React from 'react';

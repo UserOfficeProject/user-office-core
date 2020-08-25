@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
 import React from 'react';
 
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';

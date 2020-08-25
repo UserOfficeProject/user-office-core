@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Editor } from '@tinymce/tinymce-react';
 import { FormikActions } from 'formik';
 import React from 'react';

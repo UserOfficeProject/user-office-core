@@ -1,4 +1,5 @@
-import { Grid, Typography } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import { Field, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';

@@ -1,5 +1,5 @@
 import Grid from '@material-ui/core/Grid';
-import { Edit } from '@material-ui/icons';
+import Edit from '@material-ui/icons/Edit';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';

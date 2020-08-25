@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { userPasswordFieldValidationSchema } from '@esss-swap/duo-validation';
-import { Card, CardContent } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormLabel from '@material-ui/core/FormLabel';
