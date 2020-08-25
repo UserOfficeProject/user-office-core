@@ -47,6 +47,18 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
+  const sortByRankOrder = (a: SepProposal, b: SepProposal) => {
+    if (a.proposal.rankOrder === b.proposal.rankOrder) {
+      return -1;
+    } else if (a.proposal.rankOrder === null) {
+      return 1;
+    } else if (b.proposal.rankOrder === null) {
+      return -1;
+    } else {
+      return a.proposal.rankOrder > b.proposal?.rankOrder ? 1 : -1;
+    }
+  };
+
   const sortByRankOrAverageScore = (data: SepProposal[]) => {
     let allocationTimeSum = 0;
 
@@ -61,13 +73,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         };
       })
       .sort((a, b) =>
-        a.proposalAverageScore < b.proposalAverageScore ? 1 : -1
+        a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
       )
-      .sort((a, b) =>
-        (a.proposal.rankOrder as number) > (b.proposal?.rankOrder as number)
-          ? 1
-          : -1
-      )
+      .sort(sortByRankOrder)
       .map(proposalData => {
         const proposalAllocationTime =
           proposalData.proposal.technicalReview?.timeAllocation || 0;

@@ -65,6 +65,7 @@ const SEPMeetingProposalViewModal: React.FC<SEPMeetingProposalViewModalProps> = 
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
+    setProposalData(null);
   };
 
   return (
