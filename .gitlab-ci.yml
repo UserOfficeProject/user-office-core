@@ -1,7 +1,7 @@
 image: node:10.17.0-alpine
 
 cache:
-  key: "alpine"
+  key: 'alpine'
   paths:
     - node_modules/
 
@@ -33,7 +33,7 @@ docker build:
 e2etest:
   image: tiangolo/docker-with-compose
   stage: e2etest
-  script: 
+  script:
     - apk add git
     - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
@@ -57,12 +57,8 @@ autodeploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY_GEN")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - until ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/frontend/autodeploy.sh dev"; do sleep 5 ; done
+    - ssh jekabskarklins@scicat09.esss.lu.se "/home/jekabskarklins/duo-kubernetes/frontend/autodeploy.sh dev"
   tags:
     - dind
   only:
     - develop
-
-
-
-
