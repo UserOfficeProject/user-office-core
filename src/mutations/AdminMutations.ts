@@ -18,6 +18,7 @@ export default class AdminMutations {
   async resetDB(agent: UserWithRole | null): Promise<string | Rejection> {
     if (process.env.NODE_ENV === 'development') {
       logger.logWarn('Resetting database', {});
+      logger.logWarn('This line exists only on SWAP-862', {}); // Will revert
 
       return this.dataSource.resetDB();
     } else {
