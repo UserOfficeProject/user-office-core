@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { getDefaultAnswerValue } from '../../models/ProposalModelFunctions';
 import {
   Answer,
   AnswerBasic,
@@ -276,13 +277,14 @@ export default class PostgresQuestionaryDataSource
     ).rows;
 
     const fields = answerRecords.map(record => {
-      const value = record.value ? JSON.parse(record.value).value : '';
-
-      return new Answer(
-        record.answer_id,
-        createQuestionTemplateRelationObject(record),
-        value
+      const questionTemplateRelation = createQuestionTemplateRelationObject(
+        record
       );
+      const value = record.value
+        ? JSON.parse(record.value).value
+        : getDefaultAnswerValue(questionTemplateRelation.question.dataType);
+
+      return new Answer(record.answer_id, questionTemplateRelation, value);
     });
 
     const steps = Array<QuestionaryStep>();

@@ -77,7 +77,7 @@ export class UpdateQuestionTemplateRelationMutation {
   // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
   unpackDependency(dependency?: FieldDependencyInput) {
     if (!dependency) {
-      return undefined;
+      return dependency;
     }
 
     return {
