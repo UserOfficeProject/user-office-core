@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { createSEPValidationSchema } from '@esss-swap/duo-validation';
+import { createSEPValidationSchema } from '@esss-swap/duo-validation/lib/SEP';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import makeStyles from '@material-ui/core/styles/makeStyles';

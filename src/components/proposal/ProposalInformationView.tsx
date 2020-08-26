@@ -1,4 +1,4 @@
-import { generalInfoUpdateValidationSchema } from '@esss-swap/duo-validation';
+import { generalInfoUpdateValidationSchema } from '@esss-swap/duo-validation/lib/Proposal';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';

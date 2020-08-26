@@ -1,13 +1,11 @@
-import { updateSEPValidationSchema } from '@esss-swap/duo-validation';
-import {
-  makeStyles,
-  Typography,
-  Grid,
-  TextField,
-  Button,
-  Checkbox,
-  FormControlLabel,
-} from '@material-ui/core';
+import { updateSEPValidationSchema } from '@esss-swap/duo-validation/lib/SEP';
+import Button from '@material-ui/core/Button';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Grid from '@material-ui/core/Grid';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';

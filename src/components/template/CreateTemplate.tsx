@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { createTemplateValidationSchema } from '@esss-swap/duo-validation';
+import { createTemplateValidationSchema } from '@esss-swap/duo-validation/lib/Template';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';

@@ -1,4 +1,4 @@
-import { proposalGradeValidationSchema } from '@esss-swap/duo-validation';
+import { proposalGradeValidationSchema } from '@esss-swap/duo-validation/lib/Review';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';

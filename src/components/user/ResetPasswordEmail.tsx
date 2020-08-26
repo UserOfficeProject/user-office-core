@@ -1,4 +1,4 @@
-import { resetPasswordByEmailValidationSchema } from '@esss-swap/duo-validation';
+import { resetPasswordByEmailValidationSchema } from '@esss-swap/duo-validation/lib/User';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
