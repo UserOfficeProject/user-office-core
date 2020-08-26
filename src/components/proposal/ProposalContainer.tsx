@@ -3,7 +3,7 @@ import Container from '@material-ui/core/Container';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { createContext, default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';

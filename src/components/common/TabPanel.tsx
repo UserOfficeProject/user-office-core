@@ -1,6 +1,6 @@
 import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
-import { useTheme } from '@material-ui/core/styles';
+import useTheme from '@material-ui/core/styles/useTheme';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Typography from '@material-ui/core/Typography';

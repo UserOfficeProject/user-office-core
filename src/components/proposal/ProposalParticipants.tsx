@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import People from '@material-ui/icons/People';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';

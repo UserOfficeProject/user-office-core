@@ -3,7 +3,7 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
