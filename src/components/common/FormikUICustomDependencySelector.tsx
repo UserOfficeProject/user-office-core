@@ -31,13 +31,13 @@ const FormikUICustomDependencySelector = ({
   template: Template;
   templateField: QuestionTemplateRelation;
 }) => {
-  const [dependencyId, setDependencyId] = useState<string>('');
+  const [dependencyId, setDependencyId] = useState<string | null>(null);
   const [operator, setOperator] = useState<EvaluatorOperator>(
     EvaluatorOperator.EQ
   );
   const [dependencyValue, setDependencyValue] = useState<
-    string | boolean | number | Date
-  >('');
+    string | boolean | number | Date | null
+  >(null);
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
 
@@ -64,7 +64,11 @@ const FormikUICustomDependencySelector = ({
   }, [templateField]);
 
   const updateFormik = (): void => {
-    if (dependencyId && dependencyValue && operator) {
+    if (
+      dependencyId !== null &&
+      dependencyValue !== null &&
+      operator !== null
+    ) {
       const dependency = {
         dependencyId,
         condition: {
@@ -73,6 +77,8 @@ const FormikUICustomDependencySelector = ({
         },
       };
       form.setFieldValue(field.name, dependency);
+    } else {
+      form.setFieldValue(field.name, null);
     }
   };
 
@@ -195,8 +201,8 @@ const FormikUICustomDependencySelector = ({
       <Grid item xs={1}>
         <IconButton
           onClick={(): void => {
-            setDependencyId('');
-            setDependencyValue('');
+            setDependencyId(null);
+            setDependencyValue(null);
           }}
         >
           <ClearIcon />

@@ -53,7 +53,7 @@ export const QuestionDateForm: TFormSignature<Question> = props => {
             component={TextField}
             margin="normal"
             fullWidth
-            data-cy="tooltip"
+            inputProps={{ 'data-cy': 'tooltip' }}
           />
           <TitledContainer label="Constraints">
             <Field
