@@ -34,8 +34,6 @@ docker build:
     - docker push dmsc/duo-backend
   tags:
     - docker
-  only:
-    - develop
 
 autodeploy:
   image: ubuntu:latest
