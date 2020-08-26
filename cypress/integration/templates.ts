@@ -45,10 +45,6 @@ context('Template tests', () => {
 
     cy.contains(sampleDeclarationName);
 
-    cy.get("[title='Edit']")
-      .first()
-      .click();
-
     cy.get('[data-cy=topic-title]').click();
 
     cy.get('[data-cy=topic-title-input]')
