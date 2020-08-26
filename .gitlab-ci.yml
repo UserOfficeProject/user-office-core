@@ -29,7 +29,7 @@ docker build:
   stage: build
   script:
     - docker info
-    - docker build . -t dmsc/duo-backend
+    - docker build . -t dmsc/duo-backend:$CI_COMMIT_BRANCH
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     - docker push dmsc/duo-backend
   tags:
