@@ -36,7 +36,7 @@ e2etest:
   script:
     - TAG_HTTP_STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://registry.hub.docker.com/v1/repositories/dmsc/duo-frontend/tags/$CI_COMMIT_BRANCH)
     - echo "TAG_STATUS_CODE $TAG_HTTP_STATUS_CODE"
-    - if [ "$TAG_HTTP_STATUS_CODE" = "200" ]; then     export TAG=$CI_COMMIT_BRANCH; else     export TAG=develop; fi
+    - if [ "$TAG_HTTP_STATUS_CODE" = "200" ]; then     export TAG=$CI_COMMIT_BRANCH; else     export TAG=latest; fi
     - echo "TAG $TAG"
     - apk add git
     - rm -rf duo-backend
