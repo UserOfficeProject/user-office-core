@@ -20,7 +20,7 @@ services:
       POSTGRES_USER: duouser
       POSTGRES_DB: duo
   backend:
-    image: dmsc/duo-backend
+    image: dmsc/duo-backend:$TAG
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH

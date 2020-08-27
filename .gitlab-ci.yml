@@ -34,6 +34,12 @@ e2etest:
   image: tiangolo/docker-with-compose
   stage: e2etest
   script:
+    - echo "CI_COMMIT_BRANCH $CI_COMMIT_BRANCH"
+    - TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
+    - apk add jq
+    - TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $CI_COMMIT_BRANCH -c '.[] | select(.name==$CI_COMMIT_BRANCH)' | jq -s '. | length')
+    - if [ "$TAG_COUNT" != 0 ]; then     export TAG=$CI_COMMIT_BRANCH; else     export TAG=latest; fi
+    - echo "TAG $TAG"
     - apk add git
     - rm -rf duo-backend
     - git clone https://gitlab.esss.lu.se/swap/duo-backend.git
