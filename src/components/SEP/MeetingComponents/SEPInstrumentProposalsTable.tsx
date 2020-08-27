@@ -84,6 +84,8 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           allocationTimeSum + proposalAllocationTime >
           (sepInstrument.availabilityTime as number)
         ) {
+          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
           return {
             isInAvailabilityZone: false,
             ...proposalData,
