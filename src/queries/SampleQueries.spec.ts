@@ -1,19 +1,10 @@
 import 'reflect-metadata';
 import { questionaryDataSource } from '../datasources';
-import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import {
-  dummyUserOfficerWithRole,
-  UserDataSourceMock,
-} from '../datasources/mockups/UserDataSource';
-import { questionaryAuthorization } from '../utils/QuestionaryAuthorization';
-import { UserAuthorization } from '../utils/UserAuthorization';
+import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import SampleQueries from './SampleQueries';
+
 const dummySampleDataSource = new SampleDataSourceMock();
-const userAuthorization = new UserAuthorization(
-  new UserDataSourceMock(),
-  new ReviewDataSourceMock()
-);
 const sampleQueries = new SampleQueries(
   dummySampleDataSource,
   questionaryDataSource

@@ -3,6 +3,7 @@ import {
   ReviewDataSourceMock,
   dummyReview,
 } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   UserDataSourceMock,
   dummyUserWithRole,
@@ -15,7 +16,8 @@ import ReviewMutations from './ReviewMutations';
 
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const reviewMutations = new ReviewMutations(
   new ReviewDataSourceMock(),

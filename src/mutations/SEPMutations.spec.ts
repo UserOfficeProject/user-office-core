@@ -18,7 +18,8 @@ import SEPMutations from './SEPMutations';
 
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const dummySEPDataSource = new SEPDataSourceMock();
 const SEPMutationsInstance = new SEPMutations(

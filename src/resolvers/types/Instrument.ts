@@ -32,6 +32,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 export class InstrumentWithAvailabilityTime extends Instrument {
   @Field(() => Int, { nullable: true })
   public availabilityTime: number;
+
+  @Field(() => Boolean, { defaultValue: false })
+  public submitted: boolean;
 }
 
 @Resolver(() => Instrument)
