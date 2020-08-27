@@ -35,7 +35,7 @@ e2etest:
   stage: e2etest
   script:
     - echo "CI_COMMIT_BRANCH $CI_COMMIT_BRANCH"
-    - TAGS_JSON=$(curl -s -o /dev/null -w "%{http_code}" https://registry.hub.docker.com/v1/repositories/dmsc/duo-frontend/tags)
+    - TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
     - apk add jq
     - TAG_COUNT=echo $TAGS_JSON | $(jq -c '.[] | select(.name | contains("release"))' | jq -s '. | length')
     - if [ "$TAG_COUNT" != 0 ]; then     export TAG=$CI_COMMIT_BRANCH; else     export TAG=latest; fi    - apk add git
