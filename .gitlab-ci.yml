@@ -34,7 +34,7 @@ build-test:
   tags:
     - docker
 
-.docker build-develop:
+docker build-develop:
   stage: build
   extends: .docker build
   variables:
@@ -42,7 +42,7 @@ build-test:
   only:
     - develop
 
-.docker build-feature:
+docker build-feature:
   stage: build
   extends: .docker build
   variables:
