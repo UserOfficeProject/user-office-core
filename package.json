@@ -50,6 +50,7 @@
     "react-router-dom": "~5.2.0",
     "react-scripts": "~3.4.1",
     "tinymce": "~5.4.1",
+    "ts-keycode-enum": "^1.0.6",
     "typescript": "~3.9.6",
     "xlsx": "~0.16.3",
     "yup": "~0.27.0"
