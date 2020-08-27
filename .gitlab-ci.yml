@@ -24,17 +24,30 @@ build-test:
   except:
     - develop
 
-docker build:
+.docker build:
   image: docker:stable
-  stage: build
   script:
     - docker info
-    - docker build . -t dmsc/duo-backend
+    - docker build . -t dmsc/duo-backend:$TAG
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin
     - docker push dmsc/duo-backend
   tags:
     - docker
+
+docker build-develop:
+  stage: build
+  extends: .docker build
+  variables:
+    TAG: latest
   only:
+    - develop
+
+docker build-feature:
+  stage: build
+  extends: .docker build
+  variables:
+    TAG: $CI_COMMIT_BRANCH
+  except:
     - develop
 
 autodeploy:
