@@ -11,8 +11,8 @@ import { ResolverContext } from './src/context';
 import { Role } from './src/models/Role';
 import { User, UserWithRole } from './src/models/User';
 import { registerEnums } from './src/resolvers/registerEnums';
-import files from './src/routes/files';
-import proposalDownload from './src/routes/pdf';
+import files from './src/middlewares/files';
+import proposalDownload from './src/middlewares/pdf';
 import { logger } from './src/utils/Logger';
 
 interface Req extends Request {
@@ -103,18 +103,27 @@ async function bootstrap() {
     })
   );
 
-  app.use(files);
-
-  app.use(proposalDownload);
+  app
+    .use(files)
+    .use(proposalDownload)
+    .use(
+      (
+        err: Error | string,
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => {
+        logger.logException('Unhandled EXPRESS JS exception', err, {
+          req,
+          res,
+        });
+        res.status(500).send('SERVER EXCEPTION');
+      }
+    );
 
   app.listen(process.env.PORT || 4000);
 
-  app.use(
-    (err: Error | string, req: Request, res: Response, next: NextFunction) => {
-      logger.logException('Unhandled EXPRESS JS exception', err, { req, res });
-      res.status(500).send('SERVER EXCEPTION');
-    }
-  );
+  app;
 
   process.on('uncaughtException', error => {
     logger.logException('Unhandled NODE exception', error);
