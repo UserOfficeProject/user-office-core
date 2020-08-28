@@ -5,6 +5,7 @@ import {
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   UserDataSourceMock,
   dummyUserWithRole,
@@ -18,7 +19,8 @@ const dummyProposalDataSource = new ProposalDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const proposalQueries = new ProposalQueries(
   dummyProposalDataSource,

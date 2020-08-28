@@ -7,6 +7,7 @@ import {
   assignScientistsToInstrumentValidationSchema,
   removeScientistFromInstrumentValidationSchema,
   setAvailabilityTimeOnInstrumentValidationSchema,
+  submitInstrumentValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -27,11 +28,16 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 import {
   UpdateInstrumentArgs,
   InstrumentAvailabilityTimeArgs,
+  InstrumentSubmitArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { logger } from '../utils/Logger';
+import { UserAuthorization } from '../utils/UserAuthorization';
 
 export default class InstrumentMutations {
-  constructor(private dataSource: InstrumentDataSource) {}
+  constructor(
+    private dataSource: InstrumentDataSource,
+    private userAuth: UserAuthorization
+  ) {}
 
   @ValidateArgs(createInstrumentValidationSchema)
   @Authorized([Roles.USER_OFFICER])
@@ -240,6 +246,36 @@ export default class InstrumentMutations {
             args,
           }
         );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @ValidateArgs(submitInstrumentValidationSchema)
+  @Authorized([Roles.USER_OFFICER, Roles.SEP_CHAIR, Roles.SEP_SECRETARY])
+  async submitInstrument(
+    agent: UserWithRole | null,
+    args: InstrumentSubmitArgs
+  ): Promise<boolean | Rejection> {
+    if (
+      !(await this.userAuth.isUserOfficer(agent)) &&
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
+        (agent as UserWithRole).id,
+        args.sepId
+      ))
+    ) {
+      return rejection('NOT_ALLOWED');
+    }
+
+    // TODO: Maybe we should check first if all proposals under this instrument in the SEP have rankings and then submit the instrument.
+    return this.dataSource
+      .submitInstrument(args.callId, args.instrumentId)
+      .then(result => result)
+      .catch(error => {
+        logger.logException('Could not submit instrument', error, {
+          agent,
+          args,
+        });
 
         return rejection('INTERNAL_ERROR');
       });

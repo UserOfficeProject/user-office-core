@@ -33,7 +33,8 @@ export default class PostgresInstrumentDataSource
       instrument.name,
       instrument.short_code,
       instrument.description,
-      instrument.availability_time
+      instrument.availability_time,
+      instrument.submitted
     );
   }
 
@@ -262,6 +263,7 @@ export default class PostgresInstrumentDataSource
         'i.short_code',
         'description',
         'chi.availability_time',
+        'chi.submitted',
         database.raw(
           `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) as proposal_count`
         ),
@@ -280,7 +282,7 @@ export default class PostgresInstrumentDataSource
         'chi.instrument_id': 'i.instrument_id',
         'chi.call_id': callId,
       })
-      .groupBy(['i.instrument_id', 'chi.availability_time'])
+      .groupBy(['i.instrument_id', 'chi.availability_time', 'chi.submitted'])
       .having(
         database.raw(
           `count(sp.proposal_id) filter (where sp.sep_id = ${sepId} and sp.call_id = ${callId}) > 0`
@@ -369,6 +371,24 @@ export default class PostgresInstrumentDataSource
         availability_time: availabilityTime,
       })} ON CONFLICT (instrument_id, call_id) DO UPDATE SET availability_time=${availabilityTime}`
     );
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async submitInstrument(
+    callId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    const result = await database('call_has_instruments')
+      .update({
+        submitted: true,
+      })
+      .where('instrument_id', instrumentId)
+      .andWhere('call_id', callId);
 
     if (result) {
       return true;

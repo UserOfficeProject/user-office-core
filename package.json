@@ -13,7 +13,7 @@
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --fix --quiet",
     "start": "tsc && node ./build/index.js",
-    "apitest": "newman run api_tests/proposal_tests.json --environment api_tests/environment.json",
+    "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "rm -R -f ./build && tsc && DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo secret=qMyLZALzs229ybdQXNyzYRdju7X784TH tokenLife=7d baseURL=localhost:3000 NODE_ENV=development SPARKPOST_TOKEN=insertokenhere GRAYLOG_SERVER=127.0.0.1 GRAYLOG_PORT=12202 ts-node-dev --inspect --respawn --transpileOnly ./index.ts",
     "populate": "DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env NODE_ENV=development ts-node-dev --respawn --transpileOnly ./src/populate/index.ts"
   },
@@ -29,7 +29,7 @@
   "license": "ISC",
   "dependencies": {
     "@esss-swap/duo-localisation": "^1.1.9",
-    "@esss-swap/duo-validation": "^1.1.25",
+    "@esss-swap/duo-validation": "^1.1.29",
     "@types/amqplib": "^0.5.13",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
