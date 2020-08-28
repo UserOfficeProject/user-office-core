@@ -21,7 +21,6 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
-    - name: Use action to run end to end
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - run: docker-compose -f docker-compose.e2e.yaml rm
     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
