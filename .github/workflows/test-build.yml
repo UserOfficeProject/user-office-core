@@ -28,7 +28,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - name: Use action to run end to end
-      uses: UserOfficeProject/user-office-e2e-testing-action@v5
+      uses: UserOfficeProject/user-office-e2e-testing-action@v6
     - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
