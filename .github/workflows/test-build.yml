@@ -22,7 +22,6 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
     - name: Use action to run end to end
-      uses: UserOfficeProject/user-office-e2e-testing-action@v9
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - run: docker-compose -f docker-compose.e2e.yaml rm
     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
