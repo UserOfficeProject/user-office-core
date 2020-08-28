@@ -1,0 +1,52 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Test && Build
+
+on:
+  push:
+    branches: [ develop, master ]
+  pull_request:
+    branches: [ develop, master ]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+    - uses: actions/checkout@v2
+    - uses: FranzDiebold/github-env-vars-action@v1.2.0
+    - run: echo "CI_COMMIT_BRANCH $GITHUB_REF_NAME_SLUG"
+    - run: TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
+    - run: TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $GITHUB_REF_NAME_SLUG -c '.[] | select(.name==$GITHUB_REF_NAME_SLUG)' | jq -s '. | length')
+    - run: if [ "$TAG_COUNT" != 0 ]; then     export TAG=$GITHUB_REF_NAME_SLUG; else     export TAG=latest; fi
+    - run: echo "TAG $TAG"
+    - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
+    - run: docker-compose -f docker-compose.e2e.yaml rm
+    - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
+    - run: docker-compose -f docker-compose.e2e.yaml pull
+    - run: docker-compose -f docker-compose.e2e.yaml build
+    - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
+    - run: docker-compose -f docker-compose.e2e.yaml down
+  build-push:
+    runs-on: ubuntu-latest
+    needs: e2e
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: dmsc/duo-frontend
+        tag_with_ref: true
