@@ -1,6 +1,6 @@
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import { AddBox } from '@material-ui/icons';
+import AddBox from '@material-ui/icons/AddBox';
 import React from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';

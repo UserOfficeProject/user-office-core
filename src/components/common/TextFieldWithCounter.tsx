@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import React, { ChangeEvent, useState } from 'react';
 

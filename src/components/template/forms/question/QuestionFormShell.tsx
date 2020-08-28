@@ -1,4 +1,6 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Typography from '@material-ui/core/Typography';
 import { Form, Formik, FormikProps } from 'formik';
 import React from 'react';
 

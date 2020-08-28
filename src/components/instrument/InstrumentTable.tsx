@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { AssignmentInd } from '@material-ui/icons';
+import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 

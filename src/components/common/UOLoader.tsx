@@ -1,4 +1,6 @@
-import { CircularProgress, CircularProgressProps } from '@material-ui/core';
+import CircularProgress, {
+  CircularProgressProps,
+} from '@material-ui/core/CircularProgress';
 import React from 'react';
 
 const UOLoader: React.FC<CircularProgressProps> = props => (

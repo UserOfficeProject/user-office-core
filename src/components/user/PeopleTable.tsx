@@ -1,6 +1,6 @@
 import Button from '@material-ui/core/Button';
-import { Email } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/styles';
+import Email from '@material-ui/icons/Email';
+import makeStyles from '@material-ui/styles/makeStyles';
 import MaterialTable, { Query } from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';

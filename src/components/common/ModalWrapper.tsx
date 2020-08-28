@@ -1,4 +1,8 @@
-import { Backdrop, Fade, Grid, makeStyles, Modal } from '@material-ui/core';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
+import Grid from '@material-ui/core/Grid';
+import Modal from '@material-ui/core/Modal';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import React from 'react';
 
 export default function ModalWrapper(props: {

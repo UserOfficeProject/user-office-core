@@ -1,13 +1,11 @@
-import {
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  makeStyles,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  TextField,
-} from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import TextField from '@material-ui/core/TextField';
 import { getIn } from 'formik';
 import React, { useState, useEffect } from 'react';
 

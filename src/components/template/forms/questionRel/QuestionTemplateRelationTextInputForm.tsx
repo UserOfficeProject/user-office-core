@@ -1,4 +1,4 @@
-import { Collapse } from '@material-ui/core';
+import Collapse from '@material-ui/core/Collapse';
 import { Field } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useState } from 'react';

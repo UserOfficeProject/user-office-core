@@ -1,11 +1,9 @@
-import {
-  MenuItem,
-  Select,
-  Checkbox,
-  ListItemText,
-  Input,
-  InputLabel,
-} from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import ListItemText from '@material-ui/core/ListItemText';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import { FormikActions } from 'formik';
 import React from 'react';
 
