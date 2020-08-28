@@ -107,22 +107,6 @@ export default class SEPMutations {
       });
   }
 
-  async isChairOrSecretaryOfSEP(
-    userId: number,
-    sepId: number
-  ): Promise<boolean> {
-    if (!userId || !sepId) {
-      return false;
-    }
-
-    return this.dataSource.getSEPUserRoles(userId, sepId).then(roles => {
-      return roles.some(
-        role =>
-          role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
-      );
-    });
-  }
-
   @ValidateArgs(assignSEPMembersValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.SEP_SECRETARY, Roles.SEP_CHAIR])
   @EventBus(Event.SEP_MEMBERS_ASSIGNED)
@@ -132,7 +116,7 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
       ))
@@ -167,7 +151,7 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
       ))
@@ -240,7 +224,7 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
       ))
@@ -271,7 +255,7 @@ export default class SEPMutations {
   ): Promise<SEP | Rejection> {
     if (
       !(await this.userAuth.isUserOfficer(agent)) &&
-      !(await this.isChairOrSecretaryOfSEP(
+      !(await this.userAuth.isChairOrSecretaryOfSEP(
         (agent as UserWithRole).id,
         args.sepId
       ))

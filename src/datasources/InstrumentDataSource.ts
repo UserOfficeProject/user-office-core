@@ -50,4 +50,5 @@ export interface InstrumentDataSource {
     instrumentId: number,
     availabilityTime: number
   ): Promise<boolean>;
+  submitInstrument(callId: number, instrumentId: number): Promise<boolean>;
 }

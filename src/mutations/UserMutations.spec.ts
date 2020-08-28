@@ -1,6 +1,7 @@
 import jsonwebtoken from 'jsonwebtoken';
 
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyPlaceHolderUser,
   dummyUser,
@@ -40,7 +41,8 @@ const badToken = jsonwebtoken.sign(
 
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const userMutations = new UserMutations(
   new UserDataSourceMock(),

@@ -3,6 +3,7 @@ import {
   ReviewDataSourceMock,
   dummyReview,
 } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   UserDataSourceMock,
   dummyUserOfficerWithRole,
@@ -14,7 +15,8 @@ import ReviewQueries from './ReviewQueries';
 // const dummyEventBus = new EventBus<ApplicationEvent>();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const reviewQueries = new ReviewQueries(
   new ReviewDataSourceMock(),
