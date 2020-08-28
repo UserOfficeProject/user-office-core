@@ -25,7 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit-test
     steps:
-    - name: run end to end
+    - run: echo "CI_COMMIT_BRANCH $GITHUB_REF_NAME_SLUG"
+    - run: TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
+    - run: TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $GITHUB_REF_NAME_SLUG -c '.[] | select(.name==$GITHUB_REF_NAME_SLUG)' | jq -s '. | length')
+    - run: if [ "$TAG_COUNT" != 0 ]; then     export TAG=$GITHUB_REF_NAME_SLUG; else     export TAG=latest; fi
+    - run: echo "TAG $TAG"
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - run: docker-compose -f docker-compose.e2e.yaml rm
     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
@@ -37,7 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: e2e
     steps:
-    - name: Build and push Docker images
     - uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
