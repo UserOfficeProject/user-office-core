@@ -1039,7 +1039,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int) {\n  createCall (\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    error\n  }\n}",
+						"query": "mutation ($shortCode: String!, $startDate: DateTime!, $endDate: DateTime!, $comment: String!, $templateId: Int) {\n  createCall (\n    shortCode:$shortCode\n    startCall: $startDate\n    endCall: $endDate\n    startReview: $startDate\n    endReview: $endDate\n    startNotify: $startDate\n    endNotify: $endDate\n    startCycle: $startDate\n    endCycle: $endDate\n    cycleComment: $comment\n    surveyComment: \"Test\"\n    templateId: $templateId\n  )\n  {\n    call {\n      id\n      shortCode\n      startCall\n    }\n    error\n  }\n}",
 						"variables": "{\n\t\"shortCode\":\"{{$randomLoremWord}}\",\n\t\"startDate\":\"2010-01-01\",\n\t\"endDate\":\"2030-01-01\",\n\t\"comment\":\"{{$randomPhrase}}\",\n\t\"templateId\": {{NEW_TEMPLATE_ID}}\n}"
 					},
 					"options": {
@@ -1202,6 +1202,9 @@
 					"graphql": {
 						"query": "mutation ($topicId: Int!, $title: String, $isEnabled: Boolean) {\n  updateTopic(id: $topicId, title: $title, isEnabled: $isEnabled) {\n    topic {\n      title\n    }\n    error\n  }\n}\n",
 						"variables": "{\n        \"title\": \"{{$randomWord}}\",\n        \"topicId\": {{NEW_TOPIC_ID}}\n    }"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": {
@@ -2325,6 +2328,9 @@
 					"graphql": {
 						"query": "mutation($questionaryId: Int!, $answer: AnswerInput!) {\n    updateAnswer(questionaryId:$questionaryId, answer:$answer) {\n        questionId\n        error\n    }\n}\n",
 						"variables": "{\n        \"questionaryId\": {{NEW_QUESTIONARY_ID}},\n        \"answer\": {\"questionId\": \"{{NEW_FIELD_ID}}\", \"value\":\"{\\\"value\\\":\\\"val\\\"}\"}\n    }"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": {
@@ -2710,6 +2716,9 @@
 					"graphql": {
 						"query": "mutation($newUserId:Int!, $newProposalId:Int!, $newSepId:Int!) {\n  addUserForReview(userID: $newUserId, sepID: $newSepId, proposalID: $newProposalId) {\n    review {\n      id\n\t}\n    error\n  }\n}\n",
 						"variables": "{\n\t\"newUserId\":{{NEW_USER_ID}},\n\t\"newProposalId\":{{NEW_PROPOSAL_ID}},\n\t\"newSepId\":{{NEW_SEP_ID}}\n}"
+					},
+					"options": {
+						"graphql": {}
 					}
 				},
 				"url": {
