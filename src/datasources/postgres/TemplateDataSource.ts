@@ -293,8 +293,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         topic_id: topicId,
         sort_order: sortOrder,
         config: config,
-        dependency_question_id: dependency?.dependencyId,
-        dependency_condition: dependency?.condition,
+        dependency_question_id: dependency?.dependencyId || dependency,
+        dependency_condition: dependency?.condition || dependency,
       })
       .where({ question_id: questionId, template_id: templateId });
 
