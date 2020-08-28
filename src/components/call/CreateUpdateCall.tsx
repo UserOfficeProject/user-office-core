@@ -2,17 +2,15 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createCallValidationSchema,
   updateCallValidationSchema,
-} from '@esss-swap/duo-validation';
-import {
-  createStyles,
-  FormHelperText,
-  makeStyles,
-  Step,
-  StepLabel,
-  Stepper,
-  Theme,
-} from '@material-ui/core';
+} from '@esss-swap/duo-validation/lib/Call';
 import Button from '@material-ui/core/Button';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import Stepper from '@material-ui/core/Stepper';
+import { Theme } from '@material-ui/core/styles/createMuiTheme';
+import createStyles from '@material-ui/core/styles/createStyles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik, FormikErrors } from 'formik';
 import { useSnackbar } from 'notistack';

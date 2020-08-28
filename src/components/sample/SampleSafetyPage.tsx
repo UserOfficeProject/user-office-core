@@ -1,4 +1,6 @@
-import { Button, Container, LinearProgress } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { MTableToolbar, Options } from 'material-table';
 import React, { useEffect, useState } from 'react';

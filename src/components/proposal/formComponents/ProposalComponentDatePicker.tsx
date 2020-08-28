@@ -1,5 +1,6 @@
 import DateFnsUtils from '@date-io/date-fns';
-import { FormControl, Tooltip } from '@material-ui/core';
+import FormControl from '@material-ui/core/FormControl';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,

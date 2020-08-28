@@ -1,9 +1,7 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  makeStyles,
-} from '@material-ui/core';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 

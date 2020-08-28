@@ -11,7 +11,7 @@ import 'tinymce/icons/default/icons';
 
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Editor } from '@tinymce/tinymce-react';
 import { useSnackbar } from 'notistack';

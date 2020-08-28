@@ -1,4 +1,5 @@
-import { makeStyles, StepButton } from '@material-ui/core';
+import StepButton from '@material-ui/core/StepButton';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { PropsWithChildren } from 'react';
 
 export function QuestionaryStepButton(

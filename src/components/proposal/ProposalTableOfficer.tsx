@@ -1,7 +1,12 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import { DialogContent, Dialog } from '@material-ui/core';
-import { Visibility, Delete, Email, GroupWork } from '@material-ui/icons';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import Delete from '@material-ui/icons/Delete';
+import Email from '@material-ui/icons/Email';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import GroupWork from '@material-ui/icons/GroupWork';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column, Options } from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';

@@ -1,4 +1,5 @@
-import { IconButton, Typography } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useState, useEffect } from 'react';
 

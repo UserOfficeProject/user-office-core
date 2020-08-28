@@ -1,5 +1,5 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { Button } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';

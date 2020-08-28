@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { getIn } from 'formik';
-import React, { ChangeEvent, useState, useEffect } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
+import { Key } from 'ts-keycode-enum';
 
 import { TextInputConfig } from '../../../generated/sdk';
 import TextFieldWithCounter from '../../common/TextFieldWithCounter';
@@ -44,11 +45,20 @@ export function ProposalComponentTextInput(props: BasicComponentProps) {
         required={config.required ? true : false}
         label={config.htmlQuestion ? '' : question.question}
         value={stateValue}
-        onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-          setStateValue(evt.target.value);
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          setStateValue(event.currentTarget.value);
         }}
-        onBlur={evt => {
-          onComplete(evt, evt.target.value);
+        onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
+          if (event.keyCode === Key.Enter) {
+            event.preventDefault();
+            setStateValue(event.currentTarget.value);
+            onComplete(event, event.currentTarget.value);
+
+            return false;
+          }
+        }}
+        onBlur={event => {
+          onComplete(event, event.currentTarget.value);
         }}
         placeholder={config.placeholder}
         error={isError}

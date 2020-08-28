@@ -1,12 +1,10 @@
-import {
-  Button,
-  FormControlLabel,
-  FormGroup,
-  LinearProgress,
-  makeStyles,
-  Switch,
-  useTheme,
-} from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import useTheme from '@material-ui/core/styles/useTheme';
+import Switch from '@material-ui/core/Switch';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';

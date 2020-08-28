@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core';
-import { useTheme } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import useTheme from '@material-ui/core/styles/useTheme';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { Visibility } from '@material-ui/icons';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
@@ -47,6 +47,18 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
   const theme = useTheme();
   const [openProposalId, setOpenProposalId] = useState<number | null>(null);
 
+  const sortByRankOrder = (a: SepProposal, b: SepProposal) => {
+    if (a.proposal.rankOrder === b.proposal.rankOrder) {
+      return -1;
+    } else if (a.proposal.rankOrder === null) {
+      return 1;
+    } else if (b.proposal.rankOrder === null) {
+      return -1;
+    } else {
+      return a.proposal.rankOrder > b.proposal.rankOrder ? 1 : -1;
+    }
+  };
+
   const sortByRankOrAverageScore = (data: SepProposal[]) => {
     let allocationTimeSum = 0;
 
@@ -61,13 +73,9 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
         };
       })
       .sort((a, b) =>
-        a.proposalAverageScore < b.proposalAverageScore ? 1 : -1
+        a.proposalAverageScore > b.proposalAverageScore ? 1 : -1
       )
-      .sort((a, b) =>
-        (a.proposal.rankOrder as number) > (b.proposal?.rankOrder as number)
-          ? 1
-          : -1
-      )
+      .sort(sortByRankOrder)
       .map(proposalData => {
         const proposalAllocationTime =
           proposalData.proposal.technicalReview?.timeAllocation || 0;
@@ -76,6 +84,8 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
           allocationTimeSum + proposalAllocationTime >
           (sepInstrument.availabilityTime as number)
         ) {
+          allocationTimeSum = allocationTimeSum + proposalAllocationTime;
+
           return {
             isInAvailabilityZone: false,
             ...proposalData,

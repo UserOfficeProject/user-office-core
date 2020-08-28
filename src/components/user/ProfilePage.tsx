@@ -1,4 +1,4 @@
-import { Container } from '@material-ui/core';
+import Container from '@material-ui/core/Container';
 import PropTypes from 'prop-types';
 import React from 'react';
 

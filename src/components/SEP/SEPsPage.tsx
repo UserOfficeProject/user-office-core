@@ -1,4 +1,4 @@
-import { Grid } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
 import React from 'react';
 
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';

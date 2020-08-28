@@ -1,5 +1,7 @@
-import { Grid, DialogContent, Dialog } from '@material-ui/core';
-import { AssignmentInd } from '@material-ui/icons';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import Grid from '@material-ui/core/Grid';
+import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import dateformat from 'dateformat';
 import MaterialTable, { Options } from 'material-table';
 import { useSnackbar } from 'notistack';

@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik } from 'formik';
 import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';

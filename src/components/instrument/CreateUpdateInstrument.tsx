@@ -2,9 +2,9 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
-} from '@esss-swap/duo-validation';
+} from '@esss-swap/duo-validation/lib/Instrument';
 import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';

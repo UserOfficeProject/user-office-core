@@ -1,4 +1,5 @@
-import { Switch, FormControlLabel } from '@material-ui/core';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import React, { HTMLAttributes, useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';

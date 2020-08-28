@@ -1,4 +1,7 @@
-import { Button, makeStyles, Paper, TextField } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import TextField from '@material-ui/core/TextField';
 import EditIcon from '@material-ui/icons/Edit';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
