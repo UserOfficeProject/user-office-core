@@ -1,17 +1,25 @@
-import { userDataSource, reviewDataSource } from '../datasources';
+import {
+  userDataSource,
+  reviewDataSource,
+  sepDataSource,
+} from '../datasources';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
+import PostgresSEPDataSource from '../datasources/postgres/SEPDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { SEPDataSource } from '../datasources/SEPDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Proposal } from '../models/Proposal';
 import { Roles } from '../models/Role';
-import { User, UserWithRole } from '../models/User';
+import { User, UserWithRole, UserRole } from '../models/User';
 
 export class UserAuthorization {
   constructor(
     private userDataSource: UserDataSource,
-    private reviewDataSource: ReviewDataSource
+    private reviewDataSource: ReviewDataSource,
+    private sepDataSource: SEPDataSource
   ) {}
 
   async isUserOfficer(agent: UserWithRole | null) {
@@ -90,17 +98,36 @@ export class UserAuthorization {
       (await this.isScientistToProposal(agent, proposal.id))
     );
   }
+
+  async isChairOrSecretaryOfSEP(
+    userId: number,
+    sepId: number
+  ): Promise<boolean> {
+    if (!userId || !sepId) {
+      return false;
+    }
+
+    return this.sepDataSource.getSEPUserRoles(userId, sepId).then(roles => {
+      return roles.some(
+        role =>
+          role.id === UserRole.SEP_CHAIR || role.id === UserRole.SEP_SECRETARY
+      );
+    });
+  }
 }
 
 let userDataSourceInstance = userDataSource;
 let reviewDataSourceInstance = reviewDataSource;
+let sepDataSourceInstance = sepDataSource;
 
 if (process.env.NODE_ENV === 'test') {
   userDataSourceInstance = new UserDataSourceMock();
   reviewDataSourceInstance = new ReviewDataSourceMock() as PostgresReviewDataSource;
+  sepDataSourceInstance = new SEPDataSourceMock() as PostgresSEPDataSource;
 }
 
 export const userAuthorization = new UserAuthorization(
   userDataSourceInstance,
-  reviewDataSourceInstance
+  reviewDataSourceInstance,
+  sepDataSourceInstance
 );

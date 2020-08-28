@@ -19,7 +19,8 @@ export const dummyInstrumentWithAvailabilityTime = new InstrumentWithAvailabilit
   'Dummy instrument 1',
   'instrument_1',
   'This is test instrument.',
-  10
+  10,
+  false
 );
 
 const dummyInstruments = [dummyInstrument];
@@ -119,6 +120,13 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     callId: number,
     instrumentId: number,
     availabilityTime: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async submitInstrument(
+    callId: number,
+    instrumentId: number
   ): Promise<boolean> {
     return true;
   }

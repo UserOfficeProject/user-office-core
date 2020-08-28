@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
+import { SEPDataSourceMock } from '../datasources/mockups/SEPDataSource';
 import {
   dummyUserNotOnProposal,
   UserDataSourceMock,
@@ -22,7 +23,8 @@ const dummyQuestionaryDataSource = new QuestionaryDataSourceMock();
 const dummyCallDataSource = new CallDataSourceMock();
 const userAuthorization = new UserAuthorization(
   new UserDataSourceMock(),
-  new ReviewDataSourceMock()
+  new ReviewDataSourceMock(),
+  new SEPDataSourceMock()
 );
 const proposalMutations = new ProposalMutations(
   dummyProposalDataSource,

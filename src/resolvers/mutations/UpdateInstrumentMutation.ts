@@ -42,6 +42,18 @@ export class InstrumentAvailabilityTimeArgs {
   public availabilityTime: number;
 }
 
+@ArgsType()
+export class InstrumentSubmitArgs {
+  @Field(() => Int)
+  public instrumentId: number;
+
+  @Field(() => Int)
+  public callId: number;
+
+  @Field(() => Int)
+  public sepId: number;
+}
+
 @Resolver()
 export class UpdateInstrumentMutation {
   @Mutation(() => InstrumentResponseWrap)
@@ -65,6 +77,17 @@ export class UpdateInstrumentMutation {
         context.user,
         args
       ),
+      SuccessResponseWrap
+    );
+  }
+
+  @Mutation(() => SuccessResponseWrap)
+  async submitInstrument(
+    @Args() args: InstrumentSubmitArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.instrument.submitInstrument(context.user, args),
       SuccessResponseWrap
     );
   }

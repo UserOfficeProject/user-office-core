@@ -85,7 +85,10 @@ const instrumentQueries = new InstrumentQueries(
   instrumentDatasource,
   sepDataSource
 );
-const instrumentMutations = new InstrumentMutations(instrumentDatasource);
+const instrumentMutations = new InstrumentMutations(
+  instrumentDatasource,
+  userAuthorization
+);
 
 const questionaryQueries = new QuestionaryQueries(
   questionaryDataSource,

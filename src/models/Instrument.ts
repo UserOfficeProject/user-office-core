@@ -13,7 +13,8 @@ export class InstrumentWithAvailabilityTime extends Instrument {
     public name: string,
     public shortCode: string,
     public description: string,
-    public availabilityTime: number
+    public availabilityTime: number,
+    public submitted: boolean
   ) {
     super(id, name, shortCode, description);
   }
