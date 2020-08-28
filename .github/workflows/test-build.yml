@@ -23,7 +23,6 @@ jobs:
     - run: npm test
     - name: Use action to run end to end
       uses: UserOfficeProject/user-office-e2e-testing-action@v8
-    - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - run: apk add git
     - run: rm -rf duo-backend
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
@@ -31,6 +30,7 @@ jobs:
     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
     - run: docker-compose -f docker-compose.e2e.yaml pull
     - run: docker-compose -f docker-compose.e2e.yaml build
+    - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - run: docker-compose -f docker-compose.e2e.yaml down
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
