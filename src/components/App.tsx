@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { ThemeProvider } from '@material-ui/styles';
+import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import { CookiesProvider } from 'react-cookie';
