@@ -7,10 +7,12 @@ import { ExitToApp } from '@material-ui/icons';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import PersonIcon from '@material-ui/icons/Person';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
-import { UserContext } from 'context/UserContextProvider';
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+import { UserContext } from 'context/UserContextProvider';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
+
 import RoleSelection from './RoleSelection';
 
 const AccountActionButton: React.FC = () => {

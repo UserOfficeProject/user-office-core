@@ -7,13 +7,15 @@ import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
+import { Route, Switch } from 'react-router-dom';
+
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { useCallsData } from 'hooks/call/useCallsData';
-import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
-import { Route, Switch } from 'react-router-dom';
+
 import AppToolbar from './AppToolbar/AppToolbar';
 import CallPage from './call/CallPage';
 import Can, { useCheckAccess } from './common/Can';
