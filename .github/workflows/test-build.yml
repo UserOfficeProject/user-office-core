@@ -38,7 +38,7 @@ jobs:
     needs: e2e
     steps:
     - name: Build and push Docker images
-      uses: docker/build-push-action@v1
+    - uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
