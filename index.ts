@@ -15,11 +15,11 @@ async function bootstrap() {
   const app = express();
 
   app
+    .use(cookieParser())
     .use(authorization())
     .use(files())
     .use(proposalDownload())
     .use(await graphql())
-    .use(cookieParser())
     .use(exceptionHandler());
 
   app.listen(PORT);
