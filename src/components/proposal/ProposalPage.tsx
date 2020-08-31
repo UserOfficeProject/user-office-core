@@ -1,6 +1,6 @@
 import Grid from '@material-ui/core/Grid';
-import { Options, MTableToolbar } from 'material-table';
 import React from 'react';
+import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -11,22 +11,36 @@ import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
 export default function ProposalPage() {
-  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>(
-    {}
-  );
+  const [
+    selectedInstrumentAndCall,
+    setSelectedInstrumentAndCall,
+  ] = useQueryParams({
+    call: NumberParam,
+    instrument: NumberParam,
+  });
+  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
+    callId: selectedInstrumentAndCall.call,
+    instrumentId: selectedInstrumentAndCall.instrument,
+  });
   const { loadingCalls, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const ProposalToolbar = (): JSX.Element =>
     loadingCalls || loadingInstruments ? (
-      <div>Loading...</div>
+      <div>Loading filters...</div>
     ) : (
       <>
-        <MTableToolbar {...data} />
         <ProposalFilterBar
           callsData={callsData}
           instrumentsData={instrumentsData}
-          onChange={setProposalFilter}
+          onChange={(filter: ProposalsFilter) => {
+            setSelectedInstrumentAndCall({
+              instrument: filter.instrumentId ? filter.instrumentId : undefined,
+              call: filter.callId ? filter.callId : undefined,
+            });
+
+            setProposalFilter(filter);
+          }}
           filter={proposalFilter}
         />
       </>
@@ -40,7 +54,7 @@ export default function ProposalPage() {
             <StyledPaper>
               <ProposalTableOfficer
                 proposalFilter={proposalFilter}
-                Toolbar={Toolbar}
+                Toolbar={ProposalToolbar}
               />
             </StyledPaper>
           </Grid>

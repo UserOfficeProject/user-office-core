@@ -41,7 +41,7 @@
     "material-table": "~1.62.0",
     "notistack": "~0.9.17",
     "path": "~0.12.7",
-    "query-string": "~6.13.1",
+    "query-string": "^6.13.1",
     "react": "~16.13.1",
     "react-beautiful-dnd": "~13.0.0",
     "react-cookie": "~4.0.3",
@@ -52,6 +52,7 @@
     "tinymce": "~5.4.1",
     "ts-keycode-enum": "^1.0.6",
     "typescript": "~3.9.6",
+    "use-query-params": "^1.1.6",
     "xlsx": "~0.16.3",
     "yup": "~0.27.0"
   },

@@ -1,7 +1,9 @@
+import Box from '@material-ui/core/Box';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
 import Delete from '@material-ui/icons/Delete';
 import Email from '@material-ui/icons/Email';
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -12,6 +14,13 @@ import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  NumberParam,
+  useQueryParams,
+  StringParam,
+  DelimitedNumericArrayParam,
+  withDefault,
+} from 'use-query-params';
 
 import DialogConfirmation from 'components/common/DialogConfirmation';
 import ScienceIconAdd from 'components/common/ScienceIconAdd';
@@ -41,6 +50,13 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
   Toolbar,
 }) => {
+  const [query, setQuery] = useQueryParams({
+    call: NumberParam,
+    instrument: NumberParam,
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
+  });
+
   const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
   const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
   const [openAssignment, setOpenAssignment] = useState(false);
@@ -378,6 +394,31 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const EmailIcon = (): JSX.Element => <Email />;
   const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
 
+  const titleWithFilter = (
+    <Box
+      display="flex"
+      alignItems="center"
+      overflow="auto"
+      className="styled-horizontal-scrollbar"
+    >
+      <Box mr={1}>
+        <Typography variant="h6">Proposals</Typography>
+      </Box>
+      <Toolbar />
+    </Box>
+  );
+
+  const preselectedProposalsData = proposalsData.map(proposalData => {
+    return {
+      ...proposalData,
+      tableData: {
+        checked: query.selection.some(
+          selectedItem => selectedItem === proposalData.id
+        ),
+      },
+    };
+  });
+
   return (
     <>
       <DialogConfirmation
@@ -432,12 +473,21 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </Dialog>
       <MaterialTable
         icons={tableIcons}
-        title={'Proposals'}
+        title={titleWithFilter}
         columns={columns}
-        data={proposalsData}
+        data={preselectedProposalsData}
         isLoading={loading}
-        components={{
-          Toolbar: Toolbar,
+        onSearchChange={searchText => {
+          setQuery({ ...query, search: searchText ? searchText : undefined });
+        }}
+        onSelectionChange={selectedItems => {
+          setQuery({
+            ...query,
+            selection:
+              selectedItems.length > 0
+                ? selectedItems.map(selectedItem => selectedItem.id)
+                : undefined,
+          });
         }}
         localization={{
           toolbar: {
@@ -446,6 +496,8 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         }}
         options={{
           search: true,
+          searchText: query.search || undefined,
+          // selectionProps: (rowData: ProposalViewData) => ({ checked: true }),
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
