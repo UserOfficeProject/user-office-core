@@ -485,4 +485,8 @@ router.get('/proposal/download/:proposal_ids', async (req: any, res) => {
   }
 });
 
-export default router;
+const proposalDownload = () => {
+  return router;
+};
+
+export default proposalDownload;
