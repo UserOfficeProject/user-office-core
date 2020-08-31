@@ -612,6 +612,31 @@ context('Scientific evaluation panel tests', () => {
     ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
   });
 
+  it('Officer should be able to submit an instrument in existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .eq(1)
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Submit instrument']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.wait(500);
+
+    cy.contains('Yes');
+
+    cy.get('[title="Submit instrument"] button').should('be.disabled');
+  });
+
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {
     cy.login('officer');
 
