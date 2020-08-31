@@ -27,7 +27,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: FranzDiebold/github-env-vars-action@v1.2.0
-    - run: echo "CI_COMMIT_BRANCH $GITHUB_REF_NAME_SLUG"
+    - run: echo "CI_COMMIT_BRANCH $GITHUB_REF"
     - run: TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
     - run: TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $GITHUB_REF_NAME_SLUG -c '.[] | select(.name==$GITHUB_REF_NAME_SLUG)' | jq -s '. | length')
     - run: if [ "$TAG_COUNT" != 0 ]; then     export TAG=$GITHUB_REF_NAME_SLUG; else     export TAG=latest; fi
