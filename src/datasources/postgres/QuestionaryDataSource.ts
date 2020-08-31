@@ -280,9 +280,9 @@ export default class PostgresQuestionaryDataSource
       const questionTemplateRelation = createQuestionTemplateRelationObject(
         record
       );
-      const value = record.value
-        ? JSON.parse(record.value).value
-        : getDefaultAnswerValue(questionTemplateRelation.question.dataType);
+      const value =
+        record.value?.value ||
+        getDefaultAnswerValue(questionTemplateRelation.question.dataType);
 
       return new Answer(record.answer_id, questionTemplateRelation, value);
     });
