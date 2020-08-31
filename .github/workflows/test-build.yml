@@ -10,15 +10,28 @@ on:
     branches: [ develop, master ]
 
 jobs:
-  e2e:
+  unit-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: FranzDiebold/github-env-vars-action@v1.2.0
-    - run: echo "CI_COMMIT_BRANCH $GITHUB_BASE_REF"
-    - run: TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
-    - run: TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $GITHUB_BASE_REF -c '.[] | select(.name==$GITHUB_BASE_REF)' | jq -s '. | length')
-    - run: if [ "$TAG_COUNT" != 0 ]; then     export TAG=$GITHUB_BASE_REF; else     export TAG=latest; fi
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+    - uses: actions/checkout@v2
+    - run: echo ${{ github.base_ref }}
+    - run: echo "::set-env name=TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags)"
+    - run: echo "TAGS_JSON $TAGS_JSON"
+    - run: echo "::set-env name=TAG_COUNT::$(echo $TAGS_JSON | jq --arg GITHUB_REF_NAME_SLUG $GITHUB_REF_NAME_SLUG -c '.[] | select(.name==$GITHUB_REF_NAME_SLUG)' | jq -s '. | length')"
+    - run: echo "TAG_COUNT $TAG_COUNT"
+    - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::$GITHUB_REF_NAME_SLUG"; else    echo "::set-env name=TAG::latest"; fi
     - run: echo "TAG $TAG"
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - run: docker-compose -f docker-compose.e2e.yaml rm
