@@ -41,6 +41,8 @@ jobs:
     - run: docker-compose -f docker-compose.e2e.yaml build
     - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - run: docker-compose -f docker-compose.e2e.yaml down
+    env:
+      SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
   build-push:
     runs-on: self-hosted
     needs: e2e
