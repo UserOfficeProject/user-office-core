@@ -34,7 +34,7 @@ const ExternalReviews: React.FC<ExternalReviewsProps> = ({ reviews }) => {
           <TableBody>
             <TableRow key="externalReviewsHeading">
               <TableCell className={classes.textBold}>Name</TableCell>
-              <TableCell className={classes.textBold}>Rank</TableCell>
+              <TableCell className={classes.textBold}>Score</TableCell>
               <TableCell className={classes.textBold}>Comment</TableCell>
             </TableRow>
             {reviews?.map(review => (

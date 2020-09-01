@@ -287,7 +287,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
@@ -495,7 +495,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
@@ -610,6 +610,31 @@ context('Scientific evaluation panel tests', () => {
     cy.get(
       '[data-cy="sep-instrument-proposals-table"] tbody tr:last-child'
     ).should('have.css', 'background-color', 'rgb(246, 104, 94)');
+  });
+
+  it('Officer should be able to submit an instrument in existing SEP', () => {
+    cy.login('officer');
+
+    cy.contains('SEPs').click();
+    cy.get('button[title="Edit SEP"]')
+      .eq(1)
+      .click();
+
+    cy.contains('Meeting Components').click();
+
+    cy.wait(1000);
+
+    cy.get("[title='Submit instrument']")
+      .first()
+      .click();
+
+    cy.contains('Yes').click();
+
+    cy.wait(500);
+
+    cy.contains('Yes');
+
+    cy.get('[title="Submit instrument"] button').should('be.disabled');
   });
 
   it('Officer should be able to remove assigned SEP member from proposal in existing SEP', () => {

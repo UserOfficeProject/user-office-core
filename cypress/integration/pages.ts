@@ -38,7 +38,7 @@ context('Page tests', () => {
         cy.wait(3000).then(() => {
           cy.contains(faqContents);
           cy.contains('Close').click();
-          cy.contains('Logout').click();
+          cy.logout();
         });
       });
     });

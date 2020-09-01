@@ -5,6 +5,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import { ExitToApp } from '@material-ui/icons';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import PersonIcon from '@material-ui/icons/Person';
 import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
@@ -45,36 +46,36 @@ const AccountActionButton: React.FC = () => {
           <RoleSelection close={() => setShow(false)} />
         </DialogContent>
       </Dialog>
-      {hasMultipleRoles ? (
-        <>
-          <IconButton
-            color="inherit"
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            onClick={handleClick}
-            data-cy="profile-page-btn"
+      <>
+        <IconButton
+          color="inherit"
+          aria-controls="simple-menu"
+          aria-haspopup="true"
+          onClick={handleClick}
+          data-cy="profile-page-btn"
+        >
+          <Badge color="secondary">
+            <AccountCircle />
+          </Badge>
+        </IconButton>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem
+            component={Link}
+            to={`/ProfilePage/${id}`}
+            onClick={handleClose}
           >
-            <Badge badgeContent={0} color="secondary">
-              <AccountCircle />
-            </Badge>
-          </IconButton>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem
-              component={Link}
-              to={`/ProfilePage/${id}`}
-              onClick={handleClose}
-            >
-              <Box paddingRight={1} paddingTop={1}>
-                <PersonIcon />
-              </Box>
-              Profile
-            </MenuItem>
+            <Box paddingRight={1} paddingTop={1}>
+              <PersonIcon />
+            </Box>
+            Profile
+          </MenuItem>
+          {hasMultipleRoles && (
             <MenuItem
               onClick={() => {
                 setShow(true);
@@ -86,20 +87,20 @@ const AccountActionButton: React.FC = () => {
               </Box>
               Roles
             </MenuItem>
-          </Menu>
-        </>
-      ) : (
-        <IconButton
-          color="inherit"
-          component={Link}
-          to={`/ProfilePage/${id}`}
-          data-cy="profile-page-btn"
-        >
-          <Badge badgeContent={0} color="secondary">
-            <AccountCircle />
-          </Badge>
-        </IconButton>
-      )}
+          )}
+          <MenuItem
+            component={Link}
+            to="/LogOut"
+            data-cy="logout"
+            onClick={handleClose}
+          >
+            <Box paddingRight={1} paddingTop={1}>
+              <ExitToApp />
+            </Box>
+            Logout
+          </MenuItem>
+        </Menu>
+      </>
     </>
   );
 };

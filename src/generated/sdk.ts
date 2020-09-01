@@ -294,6 +294,7 @@ export type InstrumentWithAvailabilityTime = {
   description: Scalars['String'];
   scientists: Array<BasicUserDetails>;
   availabilityTime: Maybe<Scalars['Int']>;
+  submitted: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -312,6 +313,7 @@ export type Mutation = {
   createInstrument: InstrumentResponseWrap;
   updateInstrument: InstrumentResponseWrap;
   setInstrumentAvailabilityTime: SuccessResponseWrap;
+  submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
   answerTopic: QuestionaryStepResponseWrap;
@@ -478,6 +480,13 @@ export type MutationSetInstrumentAvailabilityTimeArgs = {
   instrumentId: Scalars['Int'];
   callId: Scalars['Int'];
   availabilityTime: Scalars['Int'];
+};
+
+
+export type MutationSubmitInstrumentArgs = {
+  instrumentId: Scalars['Int'];
+  callId: Scalars['Int'];
+  sepId: Scalars['Int'];
 };
 
 
@@ -1743,7 +1752,7 @@ export type GetInstrumentsBySepQuery = (
   { __typename?: 'Query' }
   & { instrumentsBySep: Maybe<Array<(
     { __typename?: 'InstrumentWithAvailabilityTime' }
-    & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+    & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
     & { scientists: Array<(
       { __typename?: 'BasicUserDetails' }
       & BasicUserDetailsFragment
@@ -2118,7 +2127,7 @@ export type GetCallsQuery = (
     & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
     & { instruments: Array<(
       { __typename?: 'InstrumentWithAvailabilityTime' }
-      & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+      & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
       & { scientists: Array<(
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
@@ -2337,6 +2346,21 @@ export type SetInstrumentAvailabilityTimeMutationVariables = Exact<{
 export type SetInstrumentAvailabilityTimeMutation = (
   { __typename?: 'Mutation' }
   & { setInstrumentAvailabilityTime: (
+    { __typename?: 'SuccessResponseWrap' }
+    & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
+  ) }
+);
+
+export type SubmitInstrumentMutationVariables = Exact<{
+  callId: Scalars['Int'];
+  instrumentId: Scalars['Int'];
+  sepId: Scalars['Int'];
+}>;
+
+
+export type SubmitInstrumentMutation = (
+  { __typename?: 'Mutation' }
+  & { submitInstrument: (
     { __typename?: 'SuccessResponseWrap' }
     & Pick<SuccessResponseWrap, 'error' | 'isSuccess'>
   ) }
@@ -4224,6 +4248,7 @@ export const GetInstrumentsBySepDocument = gql`
     shortCode
     description
     availabilityTime
+    submitted
     scientists {
       ...basicUserDetails
     }
@@ -4520,6 +4545,7 @@ export const GetCallsDocument = gql`
       shortCode
       description
       availabilityTime
+      submitted
       scientists {
         ...basicUserDetails
       }
@@ -4672,6 +4698,14 @@ export const RemoveScientistFromInstrumentDocument = gql`
 export const SetInstrumentAvailabilityTimeDocument = gql`
     mutation setInstrumentAvailabilityTime($callId: Int!, $instrumentId: Int!, $availabilityTime: Int!) {
   setInstrumentAvailabilityTime(callId: $callId, instrumentId: $instrumentId, availabilityTime: $availabilityTime) {
+    error
+    isSuccess
+  }
+}
+    `;
+export const SubmitInstrumentDocument = gql`
+    mutation submitInstrument($callId: Int!, $instrumentId: Int!, $sepId: Int!) {
+  submitInstrument(callId: $callId, instrumentId: $instrumentId, sepId: $sepId) {
     error
     isSuccess
   }
@@ -5704,6 +5738,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     setInstrumentAvailabilityTime(variables: SetInstrumentAvailabilityTimeMutationVariables): Promise<SetInstrumentAvailabilityTimeMutation> {
       return withWrapper(() => client.request<SetInstrumentAvailabilityTimeMutation>(print(SetInstrumentAvailabilityTimeDocument), variables));
+    },
+    submitInstrument(variables: SubmitInstrumentMutationVariables): Promise<SubmitInstrumentMutation> {
+      return withWrapper(() => client.request<SubmitInstrumentMutation>(print(SubmitInstrumentDocument), variables));
     },
     updateInstrument(variables: UpdateInstrumentMutationVariables): Promise<UpdateInstrumentMutation> {
       return withWrapper(() => client.request<UpdateInstrumentMutation>(print(UpdateInstrumentDocument), variables));
