@@ -1,12 +1,10 @@
 import { getTranslation } from '@esss-swap/duo-localisation';
-import {
-  Table,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  makeStyles,
-} from '@material-ui/core';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 import React, { Fragment, HTMLAttributes } from 'react';
 
 import { TechnicalReview } from 'generated/sdk';

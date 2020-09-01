@@ -1,7 +1,8 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
-import { IconButton } from '@material-ui/core';
-import { Visibility, Edit } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
+import Edit from '@material-ui/icons/Edit';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable, { Column } from 'material-table';
 import React from 'react';
 import { Link } from 'react-router-dom';

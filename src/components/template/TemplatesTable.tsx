@@ -1,5 +1,8 @@
-import { Button } from '@material-ui/core';
-import { Archive, Delete, Edit, FileCopy } from '@material-ui/icons';
+import Button from '@material-ui/core/Button';
+import Archive from '@material-ui/icons/Archive';
+import Delete from '@material-ui/icons/Delete';
+import Edit from '@material-ui/icons/Edit';
+import FileCopy from '@material-ui/icons/FileCopy';
 import UnarchiveIcon from '@material-ui/icons/Unarchive';
 import MaterialTable, { Column } from 'material-table';
 import React, { useEffect, useState } from 'react';

@@ -1,16 +1,14 @@
-import {
-  IconButton,
-  Dialog,
-  DialogContent,
-  AppBar,
-  Toolbar,
-  Typography,
-  makeStyles,
-  createStyles,
-  Theme,
-  Slide,
-} from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
+import { Theme } from '@material-ui/core/styles/createMuiTheme';
+import createStyles from '@material-ui/core/styles/createStyles';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Toolbar from '@material-ui/core/Toolbar';
 import { TransitionProps } from '@material-ui/core/transitions/transition';
+import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import PropTypes from 'prop-types';
 import React, { Ref } from 'react';

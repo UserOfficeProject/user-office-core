@@ -1,4 +1,4 @@
-import { SvgIcon } from '@material-ui/core';
+import SvgIcon from '@material-ui/core/SvgIcon';
 import React from 'react';
 
 // NOTE: The icon is taken from: https://materialdesignicons.com/

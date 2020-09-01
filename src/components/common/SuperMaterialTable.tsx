@@ -1,5 +1,5 @@
-import { Button } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import Button from '@material-ui/core/Button';
+import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
 

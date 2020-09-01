@@ -19,6 +19,7 @@ query getCalls($filter: CallsFilter) {
       shortCode
       description
       availabilityTime
+      submitted
       scientists {
         ...basicUserDetails
       }

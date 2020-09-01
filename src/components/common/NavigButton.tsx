@@ -1,9 +1,5 @@
-import {
-  StandardProps,
-  ButtonProps,
-  ButtonClassKey,
-  Button,
-} from '@material-ui/core';
+import Button, { ButtonProps, ButtonClassKey } from '@material-ui/core/Button';
+import { StandardProps } from '@material-ui/core/index';
 import React, { Component } from 'react';
 
 import UOLoader from './UOLoader';

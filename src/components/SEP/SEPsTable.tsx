@@ -1,5 +1,5 @@
-import { Button } from '@material-ui/core';
-import { Edit } from '@material-ui/icons';
+import Button from '@material-ui/core/Button';
+import Edit from '@material-ui/icons/Edit';
 import MaterialTable from 'material-table';
 import React, { useContext, useState } from 'react';
 import { Redirect, useHistory } from 'react-router';

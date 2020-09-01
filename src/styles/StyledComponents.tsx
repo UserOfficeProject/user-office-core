@@ -1,4 +1,7 @@
-import { Box, Paper, styled, Container } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import styled from '@material-ui/core/styles/styled';
 import React from 'react';
 
 import { getTheme } from '../theme';

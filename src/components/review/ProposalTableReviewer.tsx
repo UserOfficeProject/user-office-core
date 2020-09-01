@@ -1,7 +1,8 @@
-import { IconButton, Tooltip } from '@material-ui/core';
-import { Visibility } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import RateReviewIcon from '@material-ui/icons/RateReview';
+import Visibility from '@material-ui/icons/Visibility';
 import MaterialTable from 'material-table';
 import React, { useState, useContext } from 'react';
 
