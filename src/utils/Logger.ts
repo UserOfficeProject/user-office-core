@@ -30,7 +30,7 @@ class GrayLogLogger implements Logger {
       title: message,
       environment: this.environment,
       stackTrace: new Error().stack,
-      context: JSON.stringify(context),
+      context: stringify(context),
     };
   }
 
@@ -107,7 +107,7 @@ class ConsoleLogger implements Logger {
   }
 
   log(level: LEVEL, message: string, context: object) {
-    console.log(`${level} - ${message} \n ${JSON.stringify(context)}`);
+    console.log(`${level} - ${message} \n ${stringify(context)}`);
   }
 }
 
@@ -165,6 +165,18 @@ class LoggerFactory {
   }
 }
 
+function stringify(obj: Object) {
+  var cache: string[] = [];
+  JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.includes(value)) return;
+
+      cache.push(value);
+    }
+    return value;
+  });
+  cache = [];
+}
 const logger = LoggerFactory.getLogger();
 
-export { logger };
+export { logger, ConsoleLogger };
