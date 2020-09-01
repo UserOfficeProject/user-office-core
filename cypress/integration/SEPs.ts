@@ -287,7 +287,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
@@ -495,7 +495,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
