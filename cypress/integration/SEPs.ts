@@ -515,22 +515,6 @@ context('Scientific evaluation panel tests', () => {
       .eq(1)
       .check();
 
-    cy.get("[title='Assign proposals to instrument']")
-      .first()
-      .click();
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
-
-    cy.contains('Assign to Instrument').click();
-
-    cy.wait(500);
-
     cy.get("[title='Assign proposals to SEP']")
       .first()
       .click();
