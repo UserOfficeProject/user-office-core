@@ -11,7 +11,7 @@ on:
 
 jobs:
   unit-test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js 12.x
@@ -22,7 +22,7 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: unit-test
     steps:
     - uses: actions/checkout@v2
@@ -42,7 +42,7 @@ jobs:
     - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - run: docker-compose -f docker-compose.e2e.yaml down
   build-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: e2e
     steps:
     - uses: actions/checkout@v2
