@@ -1,6 +1,13 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
-import { NumberParam, useQueryParams } from 'use-query-params';
+import {
+  NumberParam,
+  useQueryParams,
+  StringParam,
+  withDefault,
+  DelimitedNumericArrayParam,
+  QueryParamConfig,
+} from 'use-query-params';
 
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -10,17 +17,23 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
+export type ProposalPageQueryParamsType = {
+  call: QueryParamConfig<number | null | undefined>;
+  instrument: QueryParamConfig<number | null | undefined>;
+  search: QueryParamConfig<string | null | undefined>;
+  selection: QueryParamConfig<(number | null | never)[]>;
+};
+
 export default function ProposalPage() {
-  const [
-    selectedInstrumentAndCall,
-    setSelectedInstrumentAndCall,
-  ] = useQueryParams({
+  const [query, setQuery] = useQueryParams<ProposalPageQueryParamsType>({
     call: NumberParam,
     instrument: NumberParam,
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
-    callId: selectedInstrumentAndCall.call,
-    instrumentId: selectedInstrumentAndCall.instrument,
+    callId: query.call,
+    instrumentId: query.instrument,
   });
   const { loadingCalls, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
@@ -33,14 +46,7 @@ export default function ProposalPage() {
         <ProposalFilterBar
           callsData={callsData}
           instrumentsData={instrumentsData}
-          onChange={(filter: ProposalsFilter) => {
-            setSelectedInstrumentAndCall({
-              instrument: filter.instrumentId ? filter.instrumentId : undefined,
-              call: filter.callId ? filter.callId : undefined,
-            });
-
-            setProposalFilter(filter);
-          }}
+          setProposalFilter={setProposalFilter}
           filter={proposalFilter}
         />
       </>
@@ -52,9 +58,11 @@ export default function ProposalPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
+              <ProposalToolbar />
               <ProposalTableOfficer
                 proposalFilter={proposalFilter}
-                Toolbar={ProposalToolbar}
+                query={query}
+                setQuery={setQuery}
               />
             </StyledPaper>
           </Grid>
