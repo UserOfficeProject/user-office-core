@@ -110,4 +110,34 @@ context('Proposal administration tests', () => {
       expect(response.status).to.be.equal(200);
     });
   });
+
+  it('Should be able to save table selection state in url', () => {
+    cy.login('officer');
+
+    cy.contains('View Proposals').click();
+
+    cy.get('[type="checkbox"]')
+      .eq(1)
+      .click();
+
+    cy.url().should('contain', 'selection=1');
+
+    cy.reload();
+
+    cy.contains('1 row(s) selected');
+  });
+
+  it('Should be able to save table search state in url', () => {
+    cy.login('officer');
+
+    cy.contains('View Proposals').click();
+
+    cy.get('[placeholder="Search"]').type('test');
+
+    cy.url().should('contain', 'search=test');
+
+    cy.reload();
+
+    cy.get('[placeholder="Search"]').should('have.value', 'test');
+  });
 });
