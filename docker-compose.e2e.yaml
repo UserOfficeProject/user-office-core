@@ -34,7 +34,9 @@ services:
     depends_on:
       - db
   frontend:
-    image: dmsc/duo-frontend
+    build:
+      context: ./
+      dockerfile: "./Dockerfile"
     labels:
       - "traefik.frontend.rule=PathPrefix:/"
       - "traefik.port=80"
