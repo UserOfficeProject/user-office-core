@@ -120,7 +120,7 @@ context('Proposal administration tests', () => {
       .eq(1)
       .click();
 
-    cy.url().should('contain', 'selection=1');
+    cy.url().should('contain', 'selection=');
 
     cy.reload();
 
