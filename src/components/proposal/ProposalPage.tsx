@@ -9,6 +9,7 @@ import {
   QueryParamConfig,
 } from 'use-query-params';
 
+import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -17,23 +18,23 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
-export type ProposalPageQueryParamsType = {
+export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
   instrument: QueryParamConfig<number | null | undefined>;
-  search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(number | null | never)[]>;
-};
+} & UrlQueryParamsType;
 
 export default function ProposalPage() {
-  const [query, setQuery] = useQueryParams<ProposalPageQueryParamsType>({
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    ProposalUrlQueryParamsType
+  >({
     call: NumberParam,
     instrument: NumberParam,
     search: StringParam,
     selection: withDefault(DelimitedNumericArrayParam, []),
   });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
-    callId: query.call,
-    instrumentId: query.instrument,
+    callId: urlQueryParams.call,
+    instrumentId: urlQueryParams.instrument,
   });
   const { loadingCalls, callsData } = useCallsData();
   const { loadingInstruments, instrumentsData } = useInstrumentsData();
@@ -61,8 +62,8 @@ export default function ProposalPage() {
               <ProposalToolbar />
               <ProposalTableOfficer
                 proposalFilter={proposalFilter}
-                query={query}
-                setQuery={setQuery}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
               />
             </StyledPaper>
           </Grid>

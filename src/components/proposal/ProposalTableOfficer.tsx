@@ -31,19 +31,19 @@ import {
 import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
 
-import { ProposalPageQueryParamsType } from './ProposalPage';
+import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
-  query: DecodedValueMap<ProposalPageQueryParamsType>;
-  setQuery: SetQuery<ProposalPageQueryParamsType>;
+  urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
+  setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
-  query,
-  setQuery,
+  urlQueryParams,
+  setUrlQueryParams,
 }) => {
   const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
   const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
@@ -385,7 +385,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     return {
       ...proposalData,
       tableData: {
-        checked: query.selection?.some(
+        checked: urlQueryParams.selection?.some(
           (selectedItem: number | null) => selectedItem === proposalData.id
         ),
       },
@@ -451,10 +451,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         data={preselectedProposalsData}
         isLoading={loading}
         onSearchChange={searchText => {
-          setQuery({ search: searchText ? searchText : undefined });
+          setUrlQueryParams({ search: searchText ? searchText : undefined });
         }}
         onSelectionChange={selectedItems => {
-          setQuery({
+          setUrlQueryParams({
             selection:
               selectedItems.length > 0
                 ? selectedItems.map(selectedItem => selectedItem.id)
@@ -468,7 +468,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         }}
         options={{
           search: true,
-          searchText: query.search || undefined,
+          searchText: urlQueryParams.search || undefined,
           selection: true,
           debounceInterval: 400,
           columnsButton: true,

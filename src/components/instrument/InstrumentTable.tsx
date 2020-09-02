@@ -2,9 +2,17 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
+import {
+  useQueryParams,
+  StringParam,
+  withDefault,
+  DelimitedNumericArrayParam,
+} from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
@@ -36,6 +44,12 @@ const InstrumentTable: React.FC = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >({
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
+  });
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api()
@@ -210,6 +224,8 @@ const InstrumentTable: React.FC = () => {
                 ]
               : []
           }
+          urlQueryParams={urlQueryParams}
+          setUrlQueryParams={setUrlQueryParams}
         />
       </div>
     </>
