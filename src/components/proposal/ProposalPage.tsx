@@ -1,7 +1,15 @@
 import Grid from '@material-ui/core/Grid';
-import { Options, MTableToolbar } from 'material-table';
 import React from 'react';
+import {
+  NumberParam,
+  useQueryParams,
+  StringParam,
+  withDefault,
+  DelimitedNumericArrayParam,
+  QueryParamConfig,
+} from 'use-query-params';
 
+import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -10,23 +18,36 @@ import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
 
-export default function ProposalPage() {
-  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>(
-    {}
-  );
-  const { loadingCalls, callsData } = useCallsData();
-  const { loadingInstruments, instrumentsData } = useInstrumentsData();
+export type ProposalUrlQueryParamsType = {
+  call: QueryParamConfig<number | null | undefined>;
+  instrument: QueryParamConfig<number | null | undefined>;
+} & UrlQueryParamsType;
 
-  const Toolbar = (data: Options): JSX.Element =>
+export default function ProposalPage() {
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    ProposalUrlQueryParamsType
+  >({
+    call: NumberParam,
+    instrument: NumberParam,
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
+  });
+  const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
+    callId: urlQueryParams.call,
+    instrumentId: urlQueryParams.instrument,
+  });
+  const { loadingCalls, callsData } = useCallsData();
+  const { loadingInstruments, instruments } = useInstrumentsData();
+
+  const ProposalToolbar = (): JSX.Element =>
     loadingCalls || loadingInstruments ? (
-      <div>Loading...</div>
+      <div>Loading filters...</div>
     ) : (
       <>
-        <MTableToolbar {...data} />
         <ProposalFilterBar
           callsData={callsData}
-          instrumentsData={instrumentsData}
-          onChange={setProposalFilter}
+          instrumentsData={instruments}
+          setProposalFilter={setProposalFilter}
           filter={proposalFilter}
         />
       </>
@@ -38,9 +59,11 @@ export default function ProposalPage() {
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
+              <ProposalToolbar />
               <ProposalTableOfficer
                 proposalFilter={proposalFilter}
-                Toolbar={Toolbar}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
               />
             </StyledPaper>
           </Grid>

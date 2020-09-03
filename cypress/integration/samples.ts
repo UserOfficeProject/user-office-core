@@ -116,7 +116,7 @@ context('Samples tests', () => {
   it('Officer should able to delete proposal with sample', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get("input[type='checkbox']")
       .first()

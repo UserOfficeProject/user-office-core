@@ -62,7 +62,7 @@ context('Event log tests', () => {
 
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
 
     cy.wait(2000);
 

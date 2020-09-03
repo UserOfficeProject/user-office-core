@@ -412,7 +412,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
     cy.get('[title="Assign Instrument"]')
       .first()
       .click();
@@ -425,7 +425,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(500);
 
@@ -507,29 +507,13 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(1000);
 
     cy.get('[type="checkbox"]')
       .eq(1)
       .check();
-
-    cy.get("[title='Assign proposals to instrument']")
-      .first()
-      .click();
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
-
-    cy.contains('Assign to Instrument').click();
-
-    cy.wait(500);
 
     cy.get("[title='Assign proposals to SEP']")
       .first()
@@ -545,7 +529,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign to SEP').click();
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.wait(500);
 

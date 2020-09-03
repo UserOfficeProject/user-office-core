@@ -28,7 +28,7 @@ import InformationModal from 'components/pages/InformationModal';
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, CreateUserMutationVariables } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
-import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import { useOrcIDInformation } from 'hooks/user/useOrcIDInformation';
@@ -142,7 +142,7 @@ const SignUp: React.FC<SignUpProps> = props => {
   const [, cookiePageContent] = useGetPageContent(PageName.COOKIEPAGE);
 
   const fieldsContent = useGetFields();
-  const { institutionData, loadingInstitutions } = useInstitutionData();
+  const { institutions, loadingInstitutions } = useInstitutionsData();
   const searchParams = queryString.parse(props.location.search);
   const authCodeOrcID = searchParams.code;
   const { loading, orcData } = useOrcIDInformation(authCodeOrcID as string);
@@ -180,7 +180,7 @@ const SignUp: React.FC<SignUpProps> = props => {
 
   if (!institutionsList.length) {
     setInstitutionsList(
-      institutionData.map(institution => {
+      institutions.map(institution => {
         return { text: institution.name, value: institution.id };
       })
     );
