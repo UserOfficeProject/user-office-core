@@ -6,7 +6,8 @@
   "dependencies": {
     "dateformat": "^3.0.3",
     "faker": "^4.1.0",
-    "graphql-request": "^1.8.2"
+    "graphql-request": "^1.8.2",
+    "typescript": "~3.9.6"
   },
   "scripts": {
     "cypress:open": "cypress open",

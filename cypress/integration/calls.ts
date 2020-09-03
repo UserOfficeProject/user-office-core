@@ -163,6 +163,7 @@ context('Calls tests', () => {
       .first()
       .click();
 
+    cy.wait(1000);
     cy.get('[type="checkbox"]')
       .eq(1)
       .check();
