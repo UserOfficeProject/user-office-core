@@ -116,6 +116,8 @@ context('Proposal administration tests', () => {
 
     cy.contains('Proposals').click();
 
+    cy.wait(500);
+
     cy.get('[type="checkbox"]')
       .eq(1)
       .click();
