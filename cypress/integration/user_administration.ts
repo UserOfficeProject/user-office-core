@@ -25,7 +25,7 @@ context('User administration tests', () => {
   it('Should be able administer user information', () => {
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
 
     cy.get("[title='Edit user']")
       .first()
@@ -101,7 +101,7 @@ context('User administration tests', () => {
   it('Should be able to delete user user information', () => {
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
 
     cy.get("[title='Delete']")
       .first()

@@ -70,19 +70,19 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
-        <ListItemText primary="View Proposals" />
+        <ListItemText primary="Proposals" />
       </ListItem>
       <ListItem component={Link} to="/CallPage" button>
         <ListItemIcon>
           <CalendarToday />
         </ListItemIcon>
-        <ListItemText primary="View Calls" />
+        <ListItemText primary="Calls" />
       </ListItem>
       <ListItem component={Link} to="/PeoplePage" button>
         <ListItemIcon>
           <People />
         </ListItemIcon>
-        <ListItemText primary="View People" />
+        <ListItemText primary="People" />
       </ListItem>
       <ListItem component={Link} to="/InstrumentPage" button>
         <ListItemIcon>
@@ -102,13 +102,13 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemIcon>
           <SettingsApplications />
         </ListItemIcon>
-        <ListItemText primary="Edit Pages" />
+        <ListItemText primary="Pages" />
       </ListItem>
       <ListItem component={Link} to="/InstitutionPage" button>
         <ListItemIcon>
           <AccountBalanceIcon />
         </ListItemIcon>
-        <ListItemText primary="Edit Institutions" />
+        <ListItemText primary="Institutions" />
       </ListItem>
       <TemplateMenuListItem />
       <SamplesMenuListItem />
@@ -151,7 +151,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
-        <ListItemText primary="View Proposals" />
+        <ListItemText primary="Proposals" />
       </ListItem>
       <ListItem component={Link} to="/InstrumentPage" button>
         <ListItemIcon>

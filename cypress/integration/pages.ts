@@ -22,7 +22,7 @@ context('Page tests', () => {
   it('Should be able update FAQ', () => {
     cy.login('officer');
 
-    cy.contains('Edit Pages').click();
+    cy.contains('Pages').click();
 
     cy.contains('Set user homepage');
     cy.contains('Help').click();
@@ -33,7 +33,7 @@ context('Page tests', () => {
         cy.contains('Update').click();
         cy.wait(2000);
         cy.reload();
-        cy.contains('View Proposals').click();
+        cy.contains('Proposals').click();
         cy.contains('FAQ').click();
         cy.wait(3000).then(() => {
           cy.contains(faqContents);

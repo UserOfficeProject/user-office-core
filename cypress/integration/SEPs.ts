@@ -412,7 +412,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
     cy.get('[title="Assign Instrument"]')
       .first()
       .click();
@@ -425,7 +425,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(500);
 
@@ -507,7 +507,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(1000);
 
@@ -529,7 +529,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign to SEP').click();
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.wait(500);
 

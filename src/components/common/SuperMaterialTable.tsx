@@ -81,7 +81,7 @@ function SuperMaterialTable<Entry extends EntryID>({
   const onDeleted = async (deletedId: number) => {
     const deleteResult = await props.delete(deletedId);
 
-    if (!deleteResult) {
+    if (deleteResult) {
       const newObjectsArray = data.filter(
         objectItem => objectItem.id !== deletedId
       );

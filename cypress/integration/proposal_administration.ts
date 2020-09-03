@@ -32,7 +32,7 @@ context('Proposal administration tests', () => {
 
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get('[data-cy=view-proposal]').click();
 
@@ -66,7 +66,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Draft');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.contains('Open');
   });
@@ -103,7 +103,7 @@ context('Proposal administration tests', () => {
   it('Should be able to download proposal pdf', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.request('GET', '/proposal/download/1').then(response => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
@@ -114,7 +114,7 @@ context('Proposal administration tests', () => {
   it('Should be able to save table selection state in url', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get('[type="checkbox"]')
       .eq(1)
@@ -130,7 +130,7 @@ context('Proposal administration tests', () => {
   it('Should be able to save table search state in url', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get('[placeholder="Search"]').type('test');
 

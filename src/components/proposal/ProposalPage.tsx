@@ -37,7 +37,7 @@ export default function ProposalPage() {
     instrumentId: urlQueryParams.instrument,
   });
   const { loadingCalls, callsData } = useCallsData();
-  const { loadingInstruments, instrumentsData } = useInstrumentsData();
+  const { loadingInstruments, instruments } = useInstrumentsData();
 
   const ProposalToolbar = (): JSX.Element =>
     loadingCalls || loadingInstruments ? (
@@ -46,7 +46,7 @@ export default function ProposalPage() {
       <>
         <ProposalFilterBar
           callsData={callsData}
-          instrumentsData={instrumentsData}
+          instrumentsData={instruments}
           setProposalFilter={setProposalFilter}
           filter={proposalFilter}
         />
