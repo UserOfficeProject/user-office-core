@@ -1,5 +1,5 @@
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { MTableToolbar, Options } from 'material-table';
@@ -11,6 +11,7 @@ import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { SampleBasic } from 'models/Sample';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
@@ -18,7 +19,7 @@ import SamplesTable from './SamplesTable';
 
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { callsData, loadingCalls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
 
   const [selectedCallId, setSelectedCallId] = useState<number>(0);
   const [samples, setSamples] = useState<SampleBasic[]>([]);
@@ -81,7 +82,7 @@ function SampleSafetyPage() {
         <MTableToolbar {...data} />
         <SelectedCallFilter
           callId={selectedCallId}
-          callsData={callsData || []}
+          callsData={calls}
           onChange={callId => {
             setSelectedCallId(callId);
           }}
@@ -93,19 +94,27 @@ function SampleSafetyPage() {
   return (
     <>
       {isExecutingCall && loadingCalls ? <LinearProgress /> : null}
-      <Container maxWidth="lg">
-        <SamplesTable
-          components={{ Toolbar }}
-          data={samples}
-          actions={[
-            {
-              icon: VisibilityIcon,
-              tooltip: 'Review sample',
-              onClick: (event, rowData) => setSelecedSample(rowData as Sample),
-            },
-          ]}
-        />
-      </Container>
+      <ContentContainer>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <StyledPaper>
+              <SamplesTable
+                components={{ Toolbar }}
+                data={samples}
+                isLoading={isExecutingCall}
+                actions={[
+                  {
+                    icon: VisibilityIcon,
+                    tooltip: 'Review sample',
+                    onClick: (event, rowData) =>
+                      setSelecedSample(rowData as Sample),
+                  },
+                ]}
+              />
+            </StyledPaper>
+          </Grid>
+        </Grid>
+      </ContentContainer>
       <InputDialog
         open={selectedSample !== null}
         onClose={() => setSelecedSample(null)}
