@@ -26,7 +26,6 @@ export default function ProposalFilterBar(props: {
 }) {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
-    call: NumberParam,
     instrument: NumberParam,
   });
 
@@ -37,9 +36,6 @@ export default function ProposalFilterBar(props: {
         callsData={props.callsData}
         shouldShowAll={true}
         onChange={callId => {
-          setQuery({
-            call: callId ? callId : undefined,
-          });
           props.setProposalFilter({
             ...props.filter,
             callId,

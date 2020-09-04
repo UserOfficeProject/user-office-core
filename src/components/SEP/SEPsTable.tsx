@@ -9,7 +9,6 @@ import {
 } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import InputDialog from 'components/common/InputDialog';
 import SuperMaterialTable, {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
@@ -28,7 +27,6 @@ const SEPsTable: React.FC = () => {
     false,
     currentRole as UserRole
   );
-  const [show, setShow] = useState(false);
   const columns = [
     { title: 'Code', field: 'code' },
     { title: 'Description', field: 'description' },
@@ -51,15 +49,6 @@ const SEPsTable: React.FC = () => {
     return <Redirect push to={`/SEPPage/${editSEPID}`} />;
   }
 
-  const onSepAdded = (sepAdded: Sep | null | undefined) => {
-    sepAdded && setSEPs([...SEPs, sepAdded]);
-    setShow(false);
-
-    setTimeout(() => {
-      history.push(`/SEPPage/${sepAdded?.id}`);
-    });
-  };
-
   const EditIcon = (): JSX.Element => <Edit />;
 
   const createModal = (
@@ -74,56 +63,48 @@ const SEPsTable: React.FC = () => {
     } else {
       return (
         <AddSEP
-          close={(sepAdded: Sep | null | undefined) => onCreate(sepAdded)}
+          close={(sepAdded: Sep | null | undefined) => {
+            setTimeout(() => {
+              history.push(`/SEPPage/${sepAdded?.id}`);
+            });
+          }}
         />
       );
     }
   };
 
   return (
-    <>
-      <InputDialog
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={show}
-        onClose={(): void => setShow(false)}
-      >
-        <AddSEP
-          close={(sepAdded: Sep | null | undefined) => onSepAdded(sepAdded)}
-        />
-      </InputDialog>
-      <div data-cy="SEPs-table">
-        <SuperMaterialTable
-          createModal={createModal}
-          hasAccess={{
-            update: false,
-            create: isUserOfficer,
-            remove: isUserOfficer,
-          }}
-          setData={setSEPs}
-          icons={tableIcons}
-          title={'Scientific evaluation panels'}
-          columns={columns}
-          data={SEPs}
-          isLoading={loadingSEPs}
-          options={{
-            search: true,
-            debounceInterval: 400,
-          }}
-          actions={[
-            {
-              icon: EditIcon,
-              tooltip: 'Edit',
-              onClick: (event, rowData): void =>
-                setEditSEPID((rowData as Sep).id),
-              position: 'row',
-            },
-          ]}
-          urlQueryParams={urlQueryParams}
-          setUrlQueryParams={setUrlQueryParams}
-        />
-      </div>
-    </>
+    <div data-cy="SEPs-table">
+      <SuperMaterialTable
+        createModal={createModal}
+        hasAccess={{
+          update: false,
+          create: isUserOfficer,
+          remove: isUserOfficer,
+        }}
+        setData={setSEPs}
+        icons={tableIcons}
+        title={'Scientific evaluation panels'}
+        columns={columns}
+        data={SEPs}
+        isLoading={loadingSEPs}
+        options={{
+          search: true,
+          debounceInterval: 400,
+        }}
+        actions={[
+          {
+            icon: EditIcon,
+            tooltip: 'Edit',
+            onClick: (event, rowData): void =>
+              setEditSEPID((rowData as Sep).id),
+            position: 'row',
+          },
+        ]}
+        urlQueryParams={urlQueryParams}
+        setUrlQueryParams={setUrlQueryParams}
+      />
+    </div>
   );
 };
 

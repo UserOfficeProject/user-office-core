@@ -1,9 +1,8 @@
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import { MTableToolbar, Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
+import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -20,9 +19,16 @@ import SamplesTable from './SamplesTable';
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    call: NumberParam,
+    search: StringParam,
+  });
 
-  const [selectedCallId, setSelectedCallId] = useState<number>(0);
+  const [selectedCallId, setSelectedCallId] = useState<number>(
+    urlQueryParams.call ? urlQueryParams.call : 0
+  );
   const [samples, setSamples] = useState<SampleBasic[]>([]);
+  const [loadingSamples, setLoadingSamples] = useState<boolean>(true);
   const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
@@ -31,16 +37,19 @@ function SampleSafetyPage() {
     }
 
     if (selectedCallId === 0) {
+      setLoadingSamples(true);
       api()
         .getSamples()
         .then(result => {
           setSamples(result.samples || []);
+          setLoadingSamples(false);
         });
     } else {
       api()
         .getSamplesByCallId({ callId: selectedCallId })
         .then(result => {
           setSamples(result.samplesByCallId || []);
+          setLoadingSamples(false);
         });
     }
   }, [api, selectedCallId]);
@@ -48,9 +57,10 @@ function SampleSafetyPage() {
   const handleStatusUpdate = (status: SampleStatus) => {
     setSelecedSample(null);
 
+    setLoadingSamples(true);
     api(`Status for '${selectedSample?.title}' has been set to ${status}`)
       .updateSampleStatus({
-        sampleId: selectedSample!.id,
+        sampleId: (selectedSample as Sample).id,
         status: status,
       })
       .then(result => {
@@ -62,6 +72,7 @@ function SampleSafetyPage() {
           );
 
           setSamples(newSamples);
+          setLoadingSamples(false);
         }
       });
   };
@@ -74,12 +85,11 @@ function SampleSafetyPage() {
     handleStatusUpdate(SampleStatus.UNSAFE);
   };
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const Toolbar = (): JSX.Element =>
     loadingCalls ? (
-      <div>Loading...</div>
+      <div>Loading filter...</div>
     ) : (
       <>
-        <MTableToolbar {...data} />
         <SelectedCallFilter
           callId={selectedCallId}
           callsData={calls}
@@ -93,15 +103,14 @@ function SampleSafetyPage() {
 
   return (
     <>
-      {isExecutingCall && loadingCalls ? <LinearProgress /> : null}
       <ContentContainer>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
+              <Toolbar />
               <SamplesTable
-                components={{ Toolbar }}
                 data={samples}
-                isLoading={isExecutingCall}
+                isLoading={isExecutingCall || loadingSamples}
                 actions={[
                   {
                     icon: VisibilityIcon,
@@ -110,6 +119,8 @@ function SampleSafetyPage() {
                       setSelecedSample(rowData as Sample),
                   },
                 ]}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
               />
             </StyledPaper>
           </Grid>

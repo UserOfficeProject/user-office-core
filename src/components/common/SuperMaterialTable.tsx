@@ -98,8 +98,6 @@ function SuperMaterialTable<Entry extends EntryID>({
     actions = props.actions;
   }
 
-  console.log('render');
-
   return (
     <>
       <InputDialog
