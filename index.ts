@@ -6,7 +6,7 @@ import 'reflect-metadata';
 import authorization from './src/middlewares/authorization';
 import exceptionHandler from './src/middlewares/exceptionHandler';
 import files from './src/middlewares/files';
-import graphql from './src/middlewares/graphql';
+import apolloServer from './src/middlewares/graphql';
 import proposalDownload from './src/middlewares/proposalDownload';
 import { logger } from './src/utils/Logger';
 
@@ -19,8 +19,9 @@ async function bootstrap() {
     .use(authorization())
     .use(files())
     .use(proposalDownload())
-    .use(await graphql())
     .use(exceptionHandler());
+
+  await apolloServer(app);
 
   app.listen(PORT);
 

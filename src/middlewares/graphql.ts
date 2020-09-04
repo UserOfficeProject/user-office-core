@@ -1,17 +1,12 @@
-import { Request } from 'express';
-import express from 'express';
-import graphqlHTTP, { RequestInfo } from 'express-graphql';
+import { ApolloServer } from 'apollo-server-express';
+import { Express, Request } from 'express';
 import 'reflect-metadata';
-import { buildSchema } from 'type-graphql';
-
 import baseContext from '../buildContext';
 import { ResolverContext } from '../context';
 import { Role } from '../models/Role';
 import { User, UserWithRole } from '../models/User';
 import { registerEnums } from '../resolvers/registerEnums';
-import { logger } from '../utils/Logger';
-
-const router = express.Router();
+import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 
 interface Req extends Request {
   user?: {
@@ -21,20 +16,12 @@ interface Req extends Request {
   };
 }
 
-const extensions = async (info: RequestInfo) => {
-  if (info.result.errors) {
-    logger.logError('Failed GRAPHQL execution', {
-      result: info.result,
-      operationName: info.operationName,
-      user: info.context.user,
-    });
-  }
-};
+const apolloServer = async (app: Express) => {
+  const PATH = '/graphql';
 
-const graphql = async () => {
   registerEnums();
 
-  const schema = await buildSchema({
+  const schema = await buildFederatedSchema({
     resolvers: [
       __dirname + '/../resolvers/**/*Query.{ts,js}',
       __dirname + '/../resolvers/**/*Mutation.{ts,js}',
@@ -43,11 +30,16 @@ const graphql = async () => {
     validate: false,
   });
 
-  router.use(
-    '/graphql',
-    graphqlHTTP(async (req: Req) => {
-      // Adds the currently logged-in user to the context object, which makes it available to the resolvers
-      // The user sends a JWT token that is decrypted, this JWT token contains information about roles and ID
+  const server = new ApolloServer({
+    schema,
+    tracing: false,
+    playground: {
+      settings: {
+        'schema.polling.enable': false,
+      },
+    },
+
+    context: async ({ req }: { req: Req }) => {
       let user = null;
       const userId = req.user?.user?.id as number;
 
@@ -60,17 +52,10 @@ const graphql = async () => {
       }
 
       const context: ResolverContext = { ...baseContext, user };
-
-      return {
-        schema,
-        graphiql: true,
-        context,
-        extensions,
-      };
-    })
-  );
-
-  return router;
+      return context;
+    },
+  });
+  server.applyMiddleware({ app: app, path: PATH });
 };
 
-export default graphql;
+export default apolloServer;
