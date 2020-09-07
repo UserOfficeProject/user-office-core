@@ -3,7 +3,7 @@ import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Institution } from 'generated/sdk';
-import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -15,9 +15,9 @@ const InstitutionPage: React.FC = () => {
 
   const {
     loadingInstitutions,
-    institutionData,
-    setInstitutionData,
-  } = useInstitutionData();
+    institutions,
+    setInstitutionsWithLoading: setInstitutions,
+  } = useInstitutionsData();
 
   const deleteInstitution = async (id: number) => {
     return await api()
@@ -32,6 +32,10 @@ const InstitutionPage: React.FC = () => {
 
           return false;
         } else {
+          enqueueSnackbar('Institution removed!', {
+            variant: 'success',
+          });
+
           return true;
         }
       });
@@ -60,22 +64,22 @@ const InstitutionPage: React.FC = () => {
   );
 
   return (
-    <>
+    <div data-cy="institutions-table">
       <SuperMaterialTable
         delete={deleteInstitution}
-        setData={setInstitutionData}
+        setData={setInstitutions}
         createModal={createModal}
         icons={tableIcons}
         title={'Institutions'}
         columns={columns}
         isLoading={loadingInstitutions}
-        data={institutionData}
+        data={institutions}
         options={{
           search: true,
           debounceInterval: 400,
         }}
       />
-    </>
+    </div>
   );
 };
 

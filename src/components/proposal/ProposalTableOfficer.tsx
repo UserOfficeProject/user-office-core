@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
@@ -7,11 +8,11 @@ import Email from '@material-ui/icons/Email';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GroupWork from '@material-ui/icons/GroupWork';
 import Visibility from '@material-ui/icons/Visibility';
-import MaterialTable, { Column, Options } from 'material-table';
+import MaterialTable, { Column } from 'material-table';
 import { useSnackbar } from 'notistack';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import DialogConfirmation from 'components/common/DialogConfirmation';
 import ScienceIconAdd from 'components/common/ScienceIconAdd';
@@ -30,16 +31,19 @@ import {
 import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
 
+import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
 
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
-  Toolbar: (data: Options) => JSX.Element;
+  urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
+  setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
 };
 
 const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   proposalFilter,
-  Toolbar,
+  urlQueryParams,
+  setUrlQueryParams,
 }) => {
   const [openDeleteProposals, setOpenDeleteProposals] = useState(false);
   const [openRemoveInstrument, setOpenRemoveInstrument] = useState(false);
@@ -167,6 +171,13 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       </>
     );
   };
+  const RankComponent = (rowData: ProposalViewData) => (
+    <RankInput
+      proposalID={rowData.id}
+      defaultvalue={rowData.rankOrder}
+      onChange={setNewRanking}
+    />
+  );
 
   let columns: Column<ProposalViewData>[] = [
     {
@@ -210,15 +221,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     {
       title: 'Ranking',
       field: 'rankOrder',
-      // To be refactored
-      // eslint-disable-next-line react/display-name
-      render: (rowData: ProposalViewData) => (
-        <RankInput
-          proposalID={rowData.id}
-          defaultvalue={rowData.rankOrder}
-          onChange={setNewRanking}
-        />
-      ),
+      render: RankComponent,
     },
     { title: 'Notified', field: 'notified' },
     {
@@ -378,6 +381,17 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const EmailIcon = (): JSX.Element => <Email />;
   const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
 
+  const preselectedProposalsData = proposalsData.map(proposalData => {
+    return {
+      ...proposalData,
+      tableData: {
+        checked: urlQueryParams.selection?.some(
+          (selectedItem: number | null) => selectedItem === proposalData.id
+        ),
+      },
+    };
+  });
+
   return (
     <>
       <DialogConfirmation
@@ -434,10 +448,18 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         icons={tableIcons}
         title={'Proposals'}
         columns={columns}
-        data={proposalsData}
+        data={preselectedProposalsData}
         isLoading={loading}
-        components={{
-          Toolbar: Toolbar,
+        onSearchChange={searchText => {
+          setUrlQueryParams({ search: searchText ? searchText : undefined });
+        }}
+        onSelectionChange={selectedItems => {
+          setUrlQueryParams({
+            selection:
+              selectedItems.length > 0
+                ? selectedItems.map(selectedItem => selectedItem.id)
+                : undefined,
+          });
         }}
         localization={{
           toolbar: {
@@ -446,6 +468,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         }}
         options={{
           search: true,
+          searchText: urlQueryParams.search || undefined,
           selection: true,
           debounceInterval: 400,
           columnsButton: true,
@@ -545,9 +568,10 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     </>
   );
 };
-ProposalTableOfficer.propTypes = {
-  Toolbar: PropTypes.func.isRequired,
-  proposalFilter: PropTypes.any,
-};
 
-export default ProposalTableOfficer;
+export default React.memo(
+  ProposalTableOfficer,
+  (prevProps, nextProps) =>
+    JSON.stringify(prevProps.proposalFilter) ===
+    JSON.stringify(nextProps.proposalFilter)
+);

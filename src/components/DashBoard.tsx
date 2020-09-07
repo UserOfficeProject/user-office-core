@@ -4,16 +4,12 @@ import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
@@ -175,15 +171,6 @@ const Dashboard: React.FC = () => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
-  const logoutMenuListItem = (
-    <ListItem component={Link} to="/LogOut" button data-cy="logout">
-      <ListItemIcon>
-        <ExitToApp />
-      </ListItemIcon>
-      <ListItemText primary="Logout" />
-    </ListItem>
-  );
-
   // TODO: Check who can see what and modify the access controll here.
   return (
     <div className={classes.root}>
@@ -204,7 +191,6 @@ const Dashboard: React.FC = () => {
         <Divider />
         <List>
           <MenuItems callsData={callsData} currentRole={currentRole} />
-          {logoutMenuListItem}
         </List>
         <Divider />
       </Drawer>

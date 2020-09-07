@@ -29,7 +29,7 @@ context('Event log tests', () => {
     cy.get('#abstract').type(abstract);
     cy.contains('Save and continue').click();
 
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
@@ -58,11 +58,11 @@ context('Event log tests', () => {
     // NOTE: Hour date format is enough because we don't know the exact time in seconds and minutes when update will happen in the database.
     const updateProfileDate = dateformat(new Date(), 'dd-mmm-yyyy HH');
 
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
 
     cy.wait(2000);
 
