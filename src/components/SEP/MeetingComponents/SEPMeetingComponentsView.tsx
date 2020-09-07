@@ -14,7 +14,7 @@ type SEPMeetingComponentsViewProps = {
 const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
   sepId,
 }) => {
-  const { loadingCalls, callsData } = useCallsData();
+  const { loadingCalls, calls } = useCallsData();
   // NOTE: Default call is with id=1
   const [selectedCallId, setSelectedCallId] = useState<number>(1);
 
@@ -25,7 +25,7 @@ const SEPMeetingComponentsView: React.FC<SEPMeetingComponentsViewProps> = ({
       <>
         <MTableToolbar {...data} />
         <SelectedCallFilter
-          callsData={callsData}
+          callsData={calls}
           onChange={setSelectedCallId}
           callId={selectedCallId}
         />

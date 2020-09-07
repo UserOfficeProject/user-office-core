@@ -1,9 +1,8 @@
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import { MTableToolbar, Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
+import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
@@ -11,6 +10,7 @@ import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { SampleBasic } from 'models/Sample';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
@@ -18,10 +18,17 @@ import SamplesTable from './SamplesTable';
 
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { callsData, loadingCalls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    call: NumberParam,
+    search: StringParam,
+  });
 
-  const [selectedCallId, setSelectedCallId] = useState<number>(0);
+  const [selectedCallId, setSelectedCallId] = useState<number>(
+    urlQueryParams.call ? urlQueryParams.call : 0
+  );
   const [samples, setSamples] = useState<SampleBasic[]>([]);
+  const [loadingSamples, setLoadingSamples] = useState<boolean>(true);
   const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
@@ -30,16 +37,19 @@ function SampleSafetyPage() {
     }
 
     if (selectedCallId === 0) {
+      setLoadingSamples(true);
       api()
         .getSamples()
         .then(result => {
           setSamples(result.samples || []);
+          setLoadingSamples(false);
         });
     } else {
       api()
         .getSamplesByCallId({ callId: selectedCallId })
         .then(result => {
           setSamples(result.samplesByCallId || []);
+          setLoadingSamples(false);
         });
     }
   }, [api, selectedCallId]);
@@ -47,9 +57,10 @@ function SampleSafetyPage() {
   const handleStatusUpdate = (status: SampleStatus) => {
     setSelecedSample(null);
 
+    setLoadingSamples(true);
     api(`Status for '${selectedSample?.title}' has been set to ${status}`)
       .updateSampleStatus({
-        sampleId: selectedSample!.id,
+        sampleId: (selectedSample as Sample).id,
         status: status,
       })
       .then(result => {
@@ -61,6 +72,7 @@ function SampleSafetyPage() {
           );
 
           setSamples(newSamples);
+          setLoadingSamples(false);
         }
       });
   };
@@ -73,15 +85,14 @@ function SampleSafetyPage() {
     handleStatusUpdate(SampleStatus.UNSAFE);
   };
 
-  const Toolbar = (data: Options): JSX.Element =>
+  const Toolbar = (): JSX.Element =>
     loadingCalls ? (
-      <div>Loading...</div>
+      <div>Loading filter...</div>
     ) : (
       <>
-        <MTableToolbar {...data} />
         <SelectedCallFilter
           callId={selectedCallId}
-          callsData={callsData || []}
+          callsData={calls}
           onChange={callId => {
             setSelectedCallId(callId);
           }}
@@ -92,20 +103,29 @@ function SampleSafetyPage() {
 
   return (
     <>
-      {isExecutingCall && loadingCalls ? <LinearProgress /> : null}
-      <Container maxWidth="lg">
-        <SamplesTable
-          components={{ Toolbar }}
-          data={samples}
-          actions={[
-            {
-              icon: VisibilityIcon,
-              tooltip: 'Review sample',
-              onClick: (event, rowData) => setSelecedSample(rowData as Sample),
-            },
-          ]}
-        />
-      </Container>
+      <ContentContainer>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <StyledPaper>
+              <Toolbar />
+              <SamplesTable
+                data={samples}
+                isLoading={isExecutingCall || loadingSamples}
+                actions={[
+                  {
+                    icon: VisibilityIcon,
+                    tooltip: 'Review sample',
+                    onClick: (event, rowData) =>
+                      setSelecedSample(rowData as Sample),
+                  },
+                ]}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
+              />
+            </StyledPaper>
+          </Grid>
+        </Grid>
+      </ContentContainer>
       <InputDialog
         open={selectedSample !== null}
         onClose={() => setSelecedSample(null)}
