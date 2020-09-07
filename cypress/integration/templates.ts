@@ -339,7 +339,7 @@ context('Template tests', () => {
   it('Officer can save proposal column selection', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get("[title='Show Columns']")
       .first()
@@ -353,11 +353,11 @@ context('Template tests', () => {
 
     cy.get('body').click();
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.contains('Call');
     cy.contains('SEP');
@@ -366,7 +366,7 @@ context('Template tests', () => {
   it('Officer can delete proposal', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
     cy.get('[type="checkbox"]')
       .first()
       .check();

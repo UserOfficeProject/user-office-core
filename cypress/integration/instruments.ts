@@ -85,11 +85,11 @@ context('Instrument tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
     cy.get('[title="Assign Instrument"]')
       .first()
       .click();
@@ -102,7 +102,7 @@ context('Instrument tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(500);
 
@@ -132,7 +132,7 @@ context('Instrument tests', () => {
   it('User Officer should be able to assign scientist to instrument and instrument scientist should be able to see instruments he is assigned to', () => {
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
     cy.get('[title="Edit user"]')
       .eq(2)
       .click();
@@ -169,7 +169,7 @@ context('Instrument tests', () => {
 
     cy.wait(500);
 
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('user');
 
@@ -222,7 +222,7 @@ context('Instrument tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.contains('20');
   });
@@ -271,7 +271,7 @@ context('Instrument tests', () => {
   it('User Officer should be able to delete Instrument', () => {
     cy.login('officer');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.get('[title="Show Instruments"]')
       .first()

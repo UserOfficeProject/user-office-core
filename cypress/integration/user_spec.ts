@@ -132,7 +132,7 @@ context('User tests', () => {
 
     cy.contains('Your proposals');
 
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.contains('Sign in');
   });

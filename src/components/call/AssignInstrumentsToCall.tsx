@@ -24,7 +24,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   callId,
   assignedInstruments,
 }) => {
-  const { loadingInstruments, instrumentsData } = useInstrumentsData();
+  const { loadingInstruments, instruments } = useInstrumentsData();
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
@@ -37,7 +37,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
     { title: 'Description', field: 'description' },
   ];
 
-  const instruments = instrumentsData.filter(instrument => {
+  const notAssignedInstruments = instruments.filter(instrument => {
     if (
       !assignedInstruments?.find(
         assignedInstrument => assignedInstrument.id === instrument.id
@@ -78,7 +78,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
         icons={tableIcons}
         title={'Instruments'}
         columns={columns}
-        data={instruments}
+        data={notAssignedInstruments}
         isLoading={loadingInstruments}
         onSelectionChange={data =>
           setSelectedInstruments(data as InstrumentWithAvailabilityTime[])

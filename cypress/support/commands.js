@@ -72,11 +72,19 @@ const login = role => {
   cy.get('[data-cy=submit]').click();
 };
 
+const logout = () => {
+  cy.get('[data-cy=profile-page-btn]').click();
+
+  cy.get('[data-cy=logout]').click();
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 
 Cypress.Commands.add('login', login);
+
+Cypress.Commands.add('logout', logout);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { makeStyles } from '@material-ui/styles';
+import makeStyles from '@material-ui/styles/makeStyles';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
@@ -17,7 +17,7 @@ import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { UpdateUserMutationVariables, User } from 'generated/sdk';
-import { useInstitutionData } from 'hooks/admin/useInstitutionData';
+import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import orcid from 'images/orcid.png';
@@ -47,7 +47,7 @@ export default function UpdateUserInformation(props: { id: number }) {
   const [userData, setUserData] = useState<User | null>(null);
   const sendRequest = useDataApi();
   const fieldsContent = useGetFields();
-  const { institutionData, loadingInstitutions } = useInstitutionData();
+  const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const { enqueueSnackbar } = useSnackbar();
@@ -78,7 +78,7 @@ export default function UpdateUserInformation(props: { id: number }) {
 
   if (!institutionsList.length) {
     setInstitutionsList(
-      institutionData.map(institution => {
+      institutions.map(institution => {
         return { text: institution.name, value: institution.id };
       })
     );

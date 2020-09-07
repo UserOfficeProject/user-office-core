@@ -2,9 +2,17 @@ import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
+import {
+  useQueryParams,
+  StringParam,
+  withDefault,
+  DelimitedNumericArrayParam,
+} from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import SuperMaterialTable, {
+  UrlQueryParamsType,
+} from 'components/common/SuperMaterialTable';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
@@ -16,8 +24,8 @@ import CreateUpdateInstrument from './CreateUpdateInstrument';
 const InstrumentTable: React.FC = () => {
   const {
     loadingInstruments,
-    instrumentsData,
-    setInstrumentsData,
+    instruments,
+    setInstrumentsWithLoading: setInstruments,
   } = useInstrumentsData();
 
   const columns = [
@@ -36,6 +44,12 @@ const InstrumentTable: React.FC = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    UrlQueryParamsType
+  >({
+    search: StringParam,
+    selection: withDefault(DelimitedNumericArrayParam, []),
+  });
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
     return await api()
@@ -51,9 +65,13 @@ const InstrumentTable: React.FC = () => {
             }
           );
 
-          return true;
-        } else {
           return false;
+        } else {
+          enqueueSnackbar('Instrument removed!', {
+            variant: 'success',
+          });
+
+          return true;
         }
       });
   };
@@ -77,8 +95,8 @@ const InstrumentTable: React.FC = () => {
         return scientist;
       });
 
-      if (instrumentsData) {
-        const newInstrumentsData = instrumentsData.map(instrumentItem => {
+      if (instruments) {
+        const newInstrumentsData = instruments.map(instrumentItem => {
           if (instrumentItem.id === assigningInstrumentId) {
             return {
               ...instrumentItem,
@@ -89,7 +107,7 @@ const InstrumentTable: React.FC = () => {
           }
         });
 
-        setInstrumentsData(newInstrumentsData);
+        setInstruments(newInstrumentsData);
       }
     }
 
@@ -112,8 +130,8 @@ const InstrumentTable: React.FC = () => {
     scientistToRemoveId: number,
     instrumentToRemoveFromId: number
   ) => {
-    if (instrumentsData) {
-      const newInstrumentsData = instrumentsData.map(instrumentItem => {
+    if (instruments) {
+      const newInstrumentsData = instruments.map(instrumentItem => {
         if (instrumentItem.id === instrumentToRemoveFromId) {
           const newScientists = instrumentItem.scientists.filter(
             scientistItem => scientistItem.id !== scientistToRemoveId
@@ -128,7 +146,7 @@ const InstrumentTable: React.FC = () => {
         }
       });
 
-      setInstrumentsData(newInstrumentsData);
+      setInstruments(newInstrumentsData);
       setAssigningInstrumentId(null);
     }
   };
@@ -156,7 +174,7 @@ const InstrumentTable: React.FC = () => {
       }
     />
   );
-  const instrumentAssignments = instrumentsData?.find(
+  const instrumentAssignments = instruments?.find(
     instrumentItem => instrumentItem.id === assigningInstrumentId
   );
 
@@ -177,7 +195,7 @@ const InstrumentTable: React.FC = () => {
       <div data-cy="instruments-table">
         <SuperMaterialTable
           delete={onInstrumentDelete}
-          setData={setInstrumentsData}
+          setData={setInstruments}
           hasAccess={{
             create: isUserOfficer,
             update: isUserOfficer,
@@ -185,7 +203,7 @@ const InstrumentTable: React.FC = () => {
           }}
           title={'Instruments'}
           columns={columns}
-          data={instrumentsData}
+          data={instruments}
           isLoading={loadingInstruments}
           createModal={createModal}
           detailPanel={[
@@ -210,6 +228,8 @@ const InstrumentTable: React.FC = () => {
                 ]
               : []
           }
+          urlQueryParams={urlQueryParams}
+          setUrlQueryParams={setUrlQueryParams}
         />
       </div>
     </>

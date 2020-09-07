@@ -5,6 +5,7 @@ query getInstrumentsBySEP($sepId: Int!, $callId: Int!) {
     shortCode
     description
     availabilityTime
+    submitted
     scientists {
       ...basicUserDetails
     }
