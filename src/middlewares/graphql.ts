@@ -35,6 +35,7 @@ const apolloServer = async (app: Express) => {
     tracing: false,
     playground: {
       settings: {
+        // @ts-ignore-line igore until https://github.com/prisma-labs/graphql-playground/pull/1212 is merged
         'schema.polling.enable': false,
       },
     },
