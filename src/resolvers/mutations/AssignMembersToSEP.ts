@@ -24,7 +24,7 @@ export class UpdateMemberSEPArgs {
 
 @ArgsType()
 export class AssignMembersSEPArgs {
-  @Field(() => Int)
+  @Field(() => [Int])
   public memberIds: number[];
 
   @Field(() => Int)
