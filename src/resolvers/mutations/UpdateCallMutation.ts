@@ -56,7 +56,7 @@ export class UpdateCallArgs {
 
 @ArgsType()
 export class AssignInstrumentToCallArgs {
-  @Field(() => Int)
+  @Field(() => [Int])
   instrumentIds: number[];
 
   @Field(() => Int)

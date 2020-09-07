@@ -7,6 +7,20 @@ export enum LEVEL {
   FATAL = 'FATAL',
 }
 
+function stringify(obj: Record<string, any>) {
+  let cache: string[] = [];
+  JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.includes(value)) return;
+
+      cache.push(value);
+    }
+
+    return value;
+  });
+  cache = [];
+}
+
 class GrayLogLogger implements Logger {
   log = require('gelf-pro');
 
@@ -165,18 +179,6 @@ class LoggerFactory {
   }
 }
 
-function stringify(obj: Object) {
-  var cache: string[] = [];
-  JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (cache.includes(value)) return;
-
-      cache.push(value);
-    }
-    return value;
-  });
-  cache = [];
-}
 const logger = LoggerFactory.getLogger();
 
 export { logger, ConsoleLogger };
