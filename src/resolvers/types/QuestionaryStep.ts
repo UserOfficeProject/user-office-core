@@ -12,6 +12,6 @@ export class QuestionaryStep implements Partial<QuestionaryStepOrigin> {
   @Field()
   public isCompleted: boolean;
 
-  @Field(() => Answer)
+  @Field(() => [Answer])
   public fields: Answer[];
 }
