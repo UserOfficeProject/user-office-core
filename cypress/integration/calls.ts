@@ -20,7 +20,7 @@ context('Calls tests', () => {
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
 
-    cy.should('not.contain', 'View Calls');
+    cy.should('not.contain', 'Calls');
 
     cy.get('[data-cy="user-menu-items"]')
       .find('.MuiListItem-root')
@@ -47,9 +47,9 @@ context('Calls tests', () => {
 
     cy.contains('Proposals');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
-    cy.get('[data-cy=add-call]').click();
+    cy.contains('Create').click();
 
     cy.get('[data-cy=short-code] input')
       .type(shortCode)
@@ -101,9 +101,9 @@ context('Calls tests', () => {
 
     cy.contains('Proposals');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
-    cy.get('[title="Edit Call"]')
+    cy.get('[title="Edit"]')
       .first()
       .click();
 
@@ -157,7 +157,7 @@ context('Calls tests', () => {
 
     cy.wait(1000);
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.get('[title="Assign Instrument"]')
       .first()
@@ -185,13 +185,13 @@ context('Calls tests', () => {
   it('A user-officer should not be able to set negative availability time on instrument per call', () => {
     cy.login('officer');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.get('[title="Show Instruments"]')
       .first()
       .click();
 
-    cy.get('[title="Edit"]')
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Edit"]')
       .first()
       .click();
 
@@ -209,13 +209,13 @@ context('Calls tests', () => {
   it('A user-officer should be able to set availability time on instrument per call', () => {
     cy.login('officer');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.get('[title="Show Instruments"]')
       .first()
       .click();
 
-    cy.get('[title="Edit"]')
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Edit"]')
       .first()
       .click();
 
@@ -238,7 +238,7 @@ context('Calls tests', () => {
   it('A user-officer should be able to remove instrument from a call', () => {
     cy.login('officer');
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.get('[title="Show Instruments"]')
       .first()

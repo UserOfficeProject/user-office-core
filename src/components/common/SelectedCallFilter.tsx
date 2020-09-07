@@ -5,6 +5,7 @@ import Select from '@material-ui/core/Select';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
+import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { Call } from 'generated/sdk';
 
@@ -32,6 +33,9 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
   shouldShowAll,
 }) => {
   const classes = useStyles();
+  const [, setQuery] = useQueryParams({
+    call: NumberParam,
+  });
 
   /**
    * NOTE: We might use https://material-ui.com/components/autocomplete/.
@@ -42,7 +46,14 @@ const SelectedCallFilter: React.FC<SelectedCallFilterProps> = ({
       <FormControl className={classes.formControl}>
         <InputLabel>Call</InputLabel>
         <Select
-          onChange={call => onChange?.(call.target.value as number)}
+          onChange={call => {
+            setQuery({
+              call: call.target.value
+                ? (call.target.value as number)
+                : undefined,
+            });
+            onChange?.(call.target.value as number);
+          }}
           value={callId}
           defaultValue={0}
         >

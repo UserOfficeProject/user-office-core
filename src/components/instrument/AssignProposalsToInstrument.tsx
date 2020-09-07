@@ -38,7 +38,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
   callIds,
 }) => {
   const classes = useStyles();
-  const { instrumentsData } = useInstrumentsData(callIds);
+  const { instruments } = useInstrumentsData(callIds);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -49,7 +49,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
         onSubmit={async (values, actions): Promise<void> => {
           actions.setSubmitting(false);
 
-          const selectedInstrument = instrumentsData.find(
+          const selectedInstrument = instruments.find(
             instrument => instrument.id === +values.selectedInstrumentId
           );
 
@@ -69,7 +69,7 @@ const AssignProposalsToInstrument: React.FC<AssignProposalsToInstrumentProps> = 
                 <FormikDropdown
                   name="selectedInstrumentId"
                   label="Select instrument"
-                  items={instrumentsData.map(instrument => ({
+                  items={instruments.map(instrument => ({
                     value: instrument.id.toString(),
                     text: instrument.name,
                   }))}

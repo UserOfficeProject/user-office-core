@@ -14,14 +14,20 @@ export function useInstrumentsData(
   callIds?: number[]
 ): {
   loadingInstruments: boolean;
-  instrumentsData: Instrument[];
-  setInstrumentsData: Dispatch<SetStateAction<Instrument[]>>;
+  instruments: Instrument[];
+  setInstrumentsWithLoading: Dispatch<SetStateAction<Instrument[]>>;
 } {
-  const [instrumentsData, setInstrumentsData] = useState<Instrument[]>([]);
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
+
+  const setInstrumentsWithLoading = (data: SetStateAction<Instrument[]>) => {
+    setLoadingInstruments(true);
+    setInstruments(data);
+    setLoadingInstruments(false);
+  };
 
   useEffect(() => {
     setLoadingInstruments(true);
@@ -30,7 +36,7 @@ export function useInstrumentsData(
         .getInstruments({ callIds })
         .then(data => {
           if (data.instruments) {
-            setInstrumentsData(data.instruments.instruments as Instrument[]);
+            setInstruments(data.instruments.instruments as Instrument[]);
           }
           setLoadingInstruments(false);
         });
@@ -39,12 +45,16 @@ export function useInstrumentsData(
         .getUserInstruments()
         .then(data => {
           if (data.me?.instruments) {
-            setInstrumentsData(data.me.instruments as Instrument[]);
+            setInstruments(data.me.instruments as Instrument[]);
           }
           setLoadingInstruments(false);
         });
     }
   }, [api, currentRole, callIds]);
 
-  return { loadingInstruments, instrumentsData, setInstrumentsData };
+  return {
+    loadingInstruments,
+    instruments,
+    setInstrumentsWithLoading,
+  };
 }

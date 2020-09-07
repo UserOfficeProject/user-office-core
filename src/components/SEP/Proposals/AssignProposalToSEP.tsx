@@ -38,7 +38,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
 }) => {
   const classes = useStyles();
   const { currentRole } = useContext(UserContext);
-  const { SEPsData } = useSEPsData('', true, currentRole as UserRole);
+  const { SEPs } = useSEPsData('', true, currentRole as UserRole);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -48,7 +48,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
         }}
         onSubmit={async (values, actions): Promise<void> => {
           actions.setSubmitting(false);
-          const selectedSEP = SEPsData.find(
+          const selectedSEP = SEPs.find(
             sep => sep.id === +values.selectedSEPId
           );
           assignProposalToSEP(selectedSEP as Sep);
@@ -67,7 +67,7 @@ const AssignProposalToSEP: React.FC<AssignProposalToSEPProps> = ({
                 <FormikDropdown
                   name="selectedSEPId"
                   label="Select SEP"
-                  items={SEPsData.map(sep => ({
+                  items={SEPs.map(sep => ({
                     value: sep.id.toString(),
                     text: sep.code,
                   }))}

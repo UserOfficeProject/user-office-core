@@ -100,6 +100,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
 
           <Field
             name="name"
+            id="name"
             label="Name"
             type="text"
             component={TextField}

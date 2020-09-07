@@ -33,7 +33,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.contains('Create SEP').click();
+    cy.contains('Create').click();
     cy.get('#code').type(code);
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
@@ -53,7 +53,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
     cy.get('#code').type(code);
@@ -77,7 +77,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -135,7 +135,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -190,7 +190,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -236,7 +236,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -287,7 +287,7 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
@@ -310,7 +310,7 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('Assign to SEP').click();
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -336,7 +336,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -412,7 +412,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
     cy.get('[title="Assign Instrument"]')
       .first()
       .click();
@@ -425,7 +425,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.wait(500);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(500);
 
@@ -453,7 +453,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('SEPs').click();
 
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -495,41 +495,25 @@ context('Scientific evaluation panel tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.contains('Create SEP').click();
+    cy.contains('Create').click();
     cy.get('#code').type(code);
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
     cy.wait(1000);
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.wait(1000);
 
     cy.get('[type="checkbox"]')
       .eq(1)
       .check();
-
-    cy.get("[title='Assign proposals to instrument']")
-      .first()
-      .click();
-
-    cy.get("[id='mui-component-select-selectedInstrumentId']")
-      .first()
-      .click();
-
-    cy.get("[id='menu-selectedInstrumentId'] li")
-      .first()
-      .click();
-
-    cy.contains('Assign to Instrument').click();
-
-    cy.wait(500);
 
     cy.get("[title='Assign proposals to SEP']")
       .first()
@@ -545,7 +529,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign to SEP').click();
 
-    cy.contains('View Calls').click();
+    cy.contains('Calls').click();
 
     cy.wait(500);
 
@@ -553,7 +537,7 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.get("[title='Edit']")
+    cy.get('[data-cy="call-instrument-assignments-table"] [title="Edit"]')
       .first()
       .click();
 
@@ -567,7 +551,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('SEPs').click();
 
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -596,7 +580,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('SEPs').click();
 
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .first()
       .click();
 
@@ -616,7 +600,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .eq(1)
       .click();
 
@@ -641,7 +625,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .eq(1)
       .click();
 
@@ -687,7 +671,7 @@ context('Scientific evaluation panel tests', () => {
     cy.login('officer');
 
     cy.contains('SEPs').click();
-    cy.get('button[title="Edit SEP"]')
+    cy.get('button[title="Edit"]')
       .eq(1)
       .click();
 
