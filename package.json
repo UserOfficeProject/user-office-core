@@ -57,6 +57,7 @@
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
     "cookie-parser": "^1.4.5",
+    "class-validator": "^0.12.2",
     "express": "^4.16.4",
     "express-jwt": "^5.3.3",
     "faker": "^4.1.0",
@@ -82,7 +83,6 @@
   "devDependencies": {
     "@types/express": "^4.17.6",
     "@types/jest": "^25.2.1",
-    "class-validator": "^0.12.2",
     "commander": "^5.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
