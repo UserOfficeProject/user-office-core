@@ -6,8 +6,8 @@ import { tableIcons } from 'utils/materialIcons';
 
 const columns = [
   { title: 'Title', field: 'title' },
-  { title: 'Status', field: 'status' },
-  { title: 'Created', field: 'Created' },
+  { title: 'Status', field: 'safetyStatus' },
+  { title: 'Created', field: 'created' },
 ];
 
 function SamplesTable(props: Omit<MaterialTableProps<SampleBasic>, 'columns'>) {
