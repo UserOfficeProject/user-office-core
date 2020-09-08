@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server-express';
 import { Express, Request } from 'express';
+
 import 'reflect-metadata';
 import baseContext from '../buildContext';
 import { ResolverContext } from '../context';
@@ -53,6 +54,7 @@ const apolloServer = async (app: Express) => {
       }
 
       const context: ResolverContext = { ...baseContext, user };
+
       return context;
     },
   });

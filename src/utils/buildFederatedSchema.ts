@@ -1,11 +1,11 @@
-import { specifiedDirectives } from 'graphql';
-import federationDirectives from '@apollo/federation/dist/directives';
-import gql from 'graphql-tag';
 import {
   printSchema,
   buildFederatedSchema as buildApolloFederationSchema,
 } from '@apollo/federation';
+import federationDirectives from '@apollo/federation/dist/directives';
 import { addResolversToSchema, GraphQLResolverMap } from 'apollo-graphql';
+import { specifiedDirectives } from 'graphql';
+import gql from 'graphql-tag';
 import {
   buildSchema,
   BuildSchemaOptions,
@@ -34,5 +34,6 @@ export async function buildFederatedSchema(
   if (referenceResolvers) {
     addResolversToSchema(federatedSchema, referenceResolvers);
   }
+
   return federatedSchema;
 }
