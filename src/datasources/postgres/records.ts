@@ -306,6 +306,13 @@ export interface SampleRecord {
   readonly created_at: Date;
 }
 
+export interface ProposalStatusRecord {
+  readonly proposal_status_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

@@ -2,7 +2,7 @@
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
-import { Proposal, ProposalStatus } from '../../models/Proposal';
+import { Proposal, ProposalStatusEnum } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -52,7 +52,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async submitProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
+    return this.setStatusProposal(id, ProposalStatusEnum.SUBMITTED);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {

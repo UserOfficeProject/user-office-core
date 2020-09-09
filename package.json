@@ -20,11 +20,6 @@
   "lint-staged": {
     "**/*.{js,ts}": "npm run lint"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "author": "",
   "license": "ISC",
   "dependencies": {

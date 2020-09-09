@@ -3,7 +3,7 @@ import { Field, Float, Int, ObjectType } from 'type-graphql';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
-  ProposalStatus,
+  ProposalStatusEnum,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 
@@ -15,8 +15,8 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String)
   public title: string;
 
-  @Field(() => ProposalStatus)
-  public status: ProposalStatus;
+  @Field(() => ProposalStatusEnum)
+  public status: ProposalStatusEnum;
 
   @Field(() => String)
   public shortCode: string;
