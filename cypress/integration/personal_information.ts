@@ -93,7 +93,7 @@ context('Personal information tests', () => {
   it('User Officer should be able to see all and change roles if we have multiple', () => {
     cy.login('officer');
 
-    cy.contains('View People').click();
+    cy.contains('People').click();
 
     cy.wait(1000);
 

@@ -28,11 +28,11 @@ context('Proposal administration tests', () => {
     cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
-    cy.contains('Logout').click();
+    cy.logout();
 
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.get('[data-cy=view-proposal]').click();
 
@@ -66,7 +66,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Draft');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.contains('Open');
   });
@@ -103,11 +103,43 @@ context('Proposal administration tests', () => {
   it('Should be able to download proposal pdf', () => {
     cy.login('officer');
 
-    cy.contains('View Proposals').click();
+    cy.contains('Proposals').click();
 
     cy.request('GET', '/proposal/download/1').then(response => {
       expect(response.headers['content-type']).to.be.equal('application/pdf');
       expect(response.status).to.be.equal(200);
     });
+  });
+
+  it('Should be able to save table selection state in url', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.wait(500);
+
+    cy.get('[type="checkbox"]')
+      .eq(1)
+      .click();
+
+    cy.url().should('contain', 'selection=');
+
+    cy.reload();
+
+    cy.contains('1 row(s) selected');
+  });
+
+  it('Should be able to save table search state in url', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[placeholder="Search"]').type('test');
+
+    cy.url().should('contain', 'search=test');
+
+    cy.reload();
+
+    cy.get('[placeholder="Search"]').should('have.value', 'test');
   });
 });

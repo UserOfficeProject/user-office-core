@@ -35,6 +35,16 @@ declare global {
        *    cy.expandTemplatesSubmenu()
        */
       navigateToTemplatesSubmenu: (submenuName: string) => void;
+
+      /**
+       * Logs user out
+       *
+       * @returns {typeof logout}
+       * @memberof Chainable
+       * @example
+       *    cy.logout()
+       */
+      logout: () => void;
     }
   }
 

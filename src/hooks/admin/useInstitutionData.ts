@@ -3,25 +3,31 @@ import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { Institution } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useInstitutionData(): {
+export function useInstitutionsData(): {
   loadingInstitutions: boolean;
-  institutionData: Institution[];
-  setInstitutionData: Dispatch<SetStateAction<Institution[]>>;
+  institutions: Institution[];
+  setInstitutionsWithLoading: Dispatch<SetStateAction<Institution[]>>;
 } {
-  const [institutionData, setInstitutionData] = useState<Institution[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loadingInstitutions, setLoadingInstitutions] = useState(true);
 
   const api = useDataApi();
+
+  const setInstitutionsWithLoading = (data: SetStateAction<Institution[]>) => {
+    setLoadingInstitutions(true);
+    setInstitutions(data);
+    setLoadingInstitutions(false);
+  };
 
   useEffect(() => {
     setLoadingInstitutions(true);
     api()
       .getInstitutions()
       .then(data => {
-        setInstitutionData(data.institutions as Institution[]);
+        setInstitutions(data.institutions as Institution[]);
         setLoadingInstitutions(false);
       });
   }, [api]);
 
-  return { loadingInstitutions, institutionData, setInstitutionData };
+  return { loadingInstitutions, institutions, setInstitutionsWithLoading };
 }

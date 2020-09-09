@@ -2,10 +2,16 @@ import Button from '@material-ui/core/Button';
 import Edit from '@material-ui/icons/Edit';
 import MaterialTable, { MaterialTableProps } from 'material-table';
 import React, { useState } from 'react';
+import { QueryParamConfig, DecodedValueMap, SetQuery } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import { tableIcons } from 'utils/materialIcons';
+
+export type UrlQueryParamsType = {
+  search: QueryParamConfig<string | null | undefined>;
+  selection: QueryParamConfig<(number | null | never)[]>;
+};
 
 interface SuperProps<RowData extends object> {
   createModal: (
@@ -13,17 +19,19 @@ interface SuperProps<RowData extends object> {
     onCreate: (object: RowData) => void,
     object: RowData | null
   ) => React.ReactNode;
-  delete: (id: number) => Promise<boolean>;
   setData: Function;
   data: RowData[];
+  delete?: (id: number) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
+  urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
+  setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
 }
 
 interface EntryID {
   id: number;
 }
 
-export default function SuperMaterialTable<Entry extends EntryID>({
+function SuperMaterialTable<Entry extends EntryID>({
   hasAccess = {
     create: true,
     remove: true,
@@ -34,14 +42,34 @@ export default function SuperMaterialTable<Entry extends EntryID>({
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
+  let { data } = props;
+
+  // NOTE: If selection is on than read the selected items from the url.
+  if (props.options?.selection && props.urlQueryParams) {
+    data = data.map(objectItem => {
+      return {
+        ...objectItem,
+        tableData: {
+          checked: props.urlQueryParams?.selection?.some(
+            (selectedItem: number | null) => selectedItem === objectItem.id
+          ),
+        },
+      };
+    });
+  }
+
+  if (props.options?.search && props.urlQueryParams) {
+    props.options.searchText = props.urlQueryParams.search || undefined;
+  }
+
   const onCreated = (objectAdded: Entry) => {
-    props.setData([...props.data, objectAdded]);
+    props.setData([...data, objectAdded]);
     setShow(false);
   };
 
   const onUpdated = (objectUpdated: Entry) => {
     if (objectUpdated) {
-      const newObjectsArray = props.data.map(objectItem =>
+      const newObjectsArray = data.map(objectItem =>
         objectItem.id === objectUpdated.id ? objectUpdated : objectItem
       );
       props.setData(newObjectsArray);
@@ -51,10 +79,10 @@ export default function SuperMaterialTable<Entry extends EntryID>({
   };
 
   const onDeleted = async (deletedId: number) => {
-    const deleteResult = await props.delete(deletedId);
+    const deleteResult = await (props.delete as Function)(deletedId);
 
-    if (!deleteResult) {
-      const newObjectsArray = props.data.filter(
+    if (deleteResult) {
+      const newObjectsArray = data.filter(
         objectItem => objectItem.id !== deletedId
       );
       props.setData(newObjectsArray);
@@ -85,9 +113,10 @@ export default function SuperMaterialTable<Entry extends EntryID>({
       </InputDialog>
       <MaterialTable
         {...props}
+        data={data}
         icons={tableIcons}
         editable={
-          hasAccess.remove
+          props.delete && hasAccess.remove
             ? {
                 onRowDelete: (rowData: Entry): Promise<void> =>
                   onDeleted(rowData.id),
@@ -110,6 +139,21 @@ export default function SuperMaterialTable<Entry extends EntryID>({
               ]
             : [...actions]
         }
+        onSearchChange={searchText => {
+          props.setUrlQueryParams &&
+            props.setUrlQueryParams({
+              search: searchText ? searchText : undefined,
+            });
+        }}
+        onSelectionChange={selectedItems => {
+          props.setUrlQueryParams &&
+            props.setUrlQueryParams({
+              selection:
+                selectedItems.length > 0
+                  ? selectedItems.map(selectedItem => selectedItem.id)
+                  : undefined,
+            });
+        }}
       />
       {hasAccess.create && (
         <ActionButtonContainer>
@@ -126,3 +170,8 @@ export default function SuperMaterialTable<Entry extends EntryID>({
     </>
   );
 }
+
+export default React.memo(
+  SuperMaterialTable,
+  (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading
+) as typeof SuperMaterialTable;

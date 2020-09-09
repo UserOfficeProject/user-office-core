@@ -14,7 +14,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import { TemplateRowDataType, TemplatesTable } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { callsData } = useCallsData({ templateIds: [props.filterTemplateId] });
+  const { calls } = useCallsData({ templateIds: [props.filterTemplateId] });
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
     {
@@ -36,7 +36,7 @@ function CallsList(props: { filterTemplateId: number }) {
       icons={tableIcons}
       title="Calls"
       columns={columns}
-      data={callsData}
+      data={calls}
     />
   );
 }

@@ -1,25 +1,37 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Test && Build
+name: E2E and build testing
 
 on:
-  push:
-    branches: [ develop, master ]
   pull_request:
     branches: [ develop, master ]
 
 jobs:
-  e2e:
+  unit-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: FranzDiebold/github-env-vars-action@v1.2.0
-    - run: echo "CI_COMMIT_BRANCH $GITHUB_BASE_REF"
-    - run: TAGS_JSON=$(curl -sb -H "Accept:application/json" "https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags")
-    - run: TAG_COUNT=$(echo $TAGS_JSON | jq --arg "CI_COMMIT_BRANCH" $GITHUB_BASE_REF -c '.[] | select(.name==$GITHUB_BASE_REF)' | jq -s '. | length')
-    - run: if [ "$TAG_COUNT" != 0 ]; then     export TAG=$GITHUB_BASE_REF; else     export TAG=latest; fi
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit-test
+    steps:
+    - uses: actions/checkout@v2
+    - run: echo ${{ github.head_ref }}
+    - run: echo "::set-env name=TAGS_JSON::$(curl -sb -H https://registry.hub.docker.com/v1/repositories/dmsc/duo-backend/tags)"
+    - run: echo "TAGS_JSON $TAGS_JSON"
+    - run: echo "::set-env name=TAG_COUNT::$(echo $TAGS_JSON | jq -c '.[] | select(.name=="${{ github.head_ref }}")' | jq -s '. | length')"
+    - run: echo "TAG_COUNT $TAG_COUNT"
+    - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::latest"; fi
     - run: echo "TAG $TAG"
+    - run: rm -rf duo-backend
     - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
     - run: docker-compose -f docker-compose.e2e.yaml rm
     - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
@@ -27,7 +39,9 @@ jobs:
     - run: docker-compose -f docker-compose.e2e.yaml build
     - run: docker-compose -f docker-compose.e2e.yaml up --exit-code-from cypress
     - run: docker-compose -f docker-compose.e2e.yaml down
-  build-push:
+    env:
+      SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+  build:
     runs-on: ubuntu-latest
     needs: e2e
     steps:
@@ -36,5 +50,4 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: dmsc/duo-frontend
-        tag_with_ref: true
+        push: false

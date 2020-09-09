@@ -1,13 +1,11 @@
-import Button from '@material-ui/core/Button';
-import Edit from '@material-ui/icons/Edit';
 import dateformat from 'dateformat';
-import MaterialTable from 'material-table';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import { useCheckAccess } from 'components/common/Can';
 import InputDialog from 'components/common/InputDialog';
 import ScienceIconAdd from 'components/common/ScienceIconAdd';
-import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -16,12 +14,11 @@ import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CreateUpdateCall from './CreateUpdateCall';
 
 const CallsTable: React.FC = () => {
-  const [show, setShow] = useState(false);
-  const { loadingCalls, callsData, setCallsData } = useCallsData();
-  const [editCall, setEditCall] = useState<Call | null>(null);
+  const { loadingCalls, calls, setCallsWithLoading: setCalls } = useCallsData();
   const [assigningInstrumentsCallId, setAssigningInstrumentsCallId] = useState<
     number | null
   >(null);
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const columns = [
     { title: 'Short Code', field: 'shortCode' },
@@ -46,29 +43,11 @@ const CallsTable: React.FC = () => {
     },
   ];
 
-  const onCallCreated = (callAdded: Call | null) => {
-    callAdded && setCallsData([...(callsData as Call[]), callAdded]);
-
-    setShow(false);
-  };
-
-  const onCallUpdated = (callUpdated: Call | null) => {
-    if (callUpdated) {
-      const newCallsArray = (callsData as Call[]).map(callItem =>
-        callItem.id === callUpdated.id ? callUpdated : callItem
-      );
-
-      setCallsData(newCallsArray);
-    }
-
-    setEditCall(null);
-  };
-
   const assignInstrumentsToCall = (
     instruments: InstrumentWithAvailabilityTime[]
   ) => {
-    if (callsData) {
-      const newCallsData = callsData.map(callItem => {
+    if (calls) {
+      const callsWithInstruments = calls.map(callItem => {
         if (callItem.id === assigningInstrumentsCallId) {
           return {
             ...callItem,
@@ -79,7 +58,7 @@ const CallsTable: React.FC = () => {
         }
       });
 
-      setCallsData(newCallsData);
+      setCalls(callsWithInstruments);
       setAssigningInstrumentsCallId(null);
     }
   };
@@ -88,8 +67,8 @@ const CallsTable: React.FC = () => {
     updatedInstruments: InstrumentWithAvailabilityTime[],
     callToRemoveFromId: number
   ) => {
-    if (callsData) {
-      const newCallsData = callsData.map(callItem => {
+    if (calls) {
+      const callsWithRemovedInstrument = calls.map(callItem => {
         if (callItem.id === callToRemoveFromId) {
           return {
             ...callItem,
@@ -100,7 +79,7 @@ const CallsTable: React.FC = () => {
         }
       });
 
-      setCallsData(newCallsData);
+      setCalls(callsWithRemovedInstrument);
       setAssigningInstrumentsCallId(null);
     }
   };
@@ -109,8 +88,8 @@ const CallsTable: React.FC = () => {
     updatedInstruments: InstrumentWithAvailabilityTime[],
     updatingCallId: number
   ) => {
-    if (callsData) {
-      const newCallsData = callsData.map(callItem => {
+    if (calls) {
+      const callsWithInstrumentAvailabilityTime = calls.map(callItem => {
         if (callItem.id === updatingCallId) {
           return {
             ...callItem,
@@ -121,11 +100,9 @@ const CallsTable: React.FC = () => {
         }
       });
 
-      setCallsData(newCallsData);
+      setCalls(callsWithInstrumentAvailabilityTime);
     }
   };
-
-  const EditIcon = (): JSX.Element => <Edit />;
   const ScienceIconComponent = (): JSX.Element => <ScienceIconAdd />;
 
   const AssignedInstruments = (rowData: Call) => (
@@ -136,26 +113,25 @@ const CallsTable: React.FC = () => {
     />
   );
 
-  const callAssignments = callsData?.find(
+  const callAssignments = calls.find(
     callItem => callItem.id === assigningInstrumentsCallId
+  );
+
+  const createModal = (
+    onUpdate: Function,
+    onCreate: Function,
+    editCall: Call | null
+  ) => (
+    <CreateUpdateCall
+      call={editCall}
+      close={(call): void => {
+        !!editCall ? onUpdate(call) : onCreate(call);
+      }}
+    />
   );
 
   return (
     <>
-      <InputDialog
-        maxWidth="xs"
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={!!editCall || show}
-        onClose={(): void => (!!editCall ? setEditCall(null) : setShow(false))}
-      >
-        <CreateUpdateCall
-          call={editCall}
-          close={(call): void => {
-            !!editCall ? onCallUpdated(call) : onCallCreated(call);
-          }}
-        />
-      </InputDialog>
       {assigningInstrumentsCallId && (
         <InputDialog
           aria-labelledby="simple-modal-title"
@@ -174,11 +150,18 @@ const CallsTable: React.FC = () => {
           />
         </InputDialog>
       )}
-      <MaterialTable
+      <SuperMaterialTable
+        createModal={createModal}
+        setData={setCalls}
+        hasAccess={{
+          create: isUserOfficer,
+          update: isUserOfficer,
+          remove: isUserOfficer,
+        }}
         icons={tableIcons}
         title="Calls"
         columns={columns}
-        data={callsData as Call[]}
+        data={calls}
         isLoading={loadingCalls}
         detailPanel={[
           {
@@ -191,12 +174,6 @@ const CallsTable: React.FC = () => {
         }}
         actions={[
           {
-            icon: EditIcon,
-            tooltip: 'Edit Call',
-            onClick: (event, rowData): void => setEditCall(rowData as Call),
-            position: 'row',
-          },
-          {
             icon: ScienceIconComponent,
             tooltip: 'Assign Instrument',
             onClick: (event, rowData): void =>
@@ -205,17 +182,6 @@ const CallsTable: React.FC = () => {
           },
         ]}
       />
-      <ActionButtonContainer>
-        <Button
-          type="button"
-          variant="contained"
-          color="primary"
-          onClick={() => setShow(true)}
-          data-cy="add-call"
-        >
-          Create call
-        </Button>
-      </ActionButtonContainer>
     </>
   );
 };

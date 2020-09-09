@@ -4,16 +4,12 @@ import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ExitToApp from '@material-ui/icons/ExitToApp';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext } from 'react';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { PageName, UserRole } from 'generated/sdk';
@@ -79,9 +75,6 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
@@ -89,41 +82,19 @@ const useStyles = makeStyles(theme => ({
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  drawerPaper: {
-    position: 'relative',
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
     whiteSpace: 'nowrap',
+  },
+  drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: 'hidden',
   },
-  drawerPaperClose: {
+  drawerClose: {
     overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -139,10 +110,8 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     height: 'calc(100vh - 64px)',
     marginTop: '64px',
-    overflow: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
     padding: `0 ${theme.spacing(2)}px`,
+    width: `calc(100% - ${drawerWidth}px)`,
   },
   bottomNavigation: {
     display: 'flex',
@@ -164,7 +133,7 @@ const Dashboard: React.FC = () => {
   ]);
 
   const { currentRole } = useContext(UserContext);
-  const { callsData } = useCallsData({ isActive: true });
+  const { calls } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -175,15 +144,6 @@ const Dashboard: React.FC = () => {
   const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
   const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
 
-  const logoutMenuListItem = (
-    <ListItem component={Link} to="/LogOut" button data-cy="logout">
-      <ListItemIcon>
-        <ExitToApp />
-      </ListItemIcon>
-      <ListItemText primary="Logout" />
-    </ListItem>
-  );
-
   // TODO: Check who can see what and modify the access controll here.
   return (
     <div className={classes.root}>
@@ -191,8 +151,15 @@ const Dashboard: React.FC = () => {
       <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
         variant="permanent"
+        className={clsx(classes.drawer, {
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        })}
         classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          paper: clsx({
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+          }),
         }}
         open={open}
       >
@@ -203,8 +170,7 @@ const Dashboard: React.FC = () => {
         </div>
         <Divider />
         <List>
-          <MenuItems callsData={callsData} currentRole={currentRole} />
-          {logoutMenuListItem}
+          <MenuItems callsData={calls} currentRole={currentRole} />
         </List>
         <Divider />
       </Drawer>
@@ -213,7 +179,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
-            component={() => <ProposalChooseCall callsData={callsData} />}
+            component={() => <ProposalChooseCall callsData={calls} />}
           />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />
