@@ -83,10 +83,6 @@ context('Samples tests', () => {
 
     cy.wait(500);
 
-    cy.get('[data-cy=title-input] input')
-      .clear()
-      .type(faker.lorem.words(2));
-
     cy.get('[data-cy=save-button]').click();
 
     cy.contains('Save and continue').click();
