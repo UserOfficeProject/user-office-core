@@ -1,16 +1,17 @@
 import {
-  ObjectType,
-  Field,
-  Int,
-  Resolver,
-  FieldResolver,
-  Root,
   Ctx,
+  Field,
+  FieldResolver,
+  Int,
+  ObjectType,
+  Resolver,
+  Root,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
 import { Questionary } from './Questionary';
+
 @ObjectType()
 export class Sample implements Partial<SampleOrigin> {
   @Field(() => Int)
@@ -26,7 +27,10 @@ export class Sample implements Partial<SampleOrigin> {
   public questionaryId: number;
 
   @Field(() => SampleStatus)
-  public status: SampleStatus;
+  public safetyStatus: SampleStatus;
+
+  @Field()
+  public safetyComment: string;
 
   @Field(() => Date)
   public created: Date;

@@ -1824,7 +1824,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query($callId:Int!) {\nblankProposal(callId:$callId) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        title\n        id\n      }\n      isCompleted\n      fields {\n          question {\n            proposalQuestionId\n            dataType\n            question\n            config\n            {\n              ... on BooleanConfig {\n                required\n              }\n            }\n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
+						"query": "query($callId:Int!) {\nblankProposal(callId:$callId) {\n  id\n  status\n  shortCode\n  proposer {\n    id\n    firstname\n    lastname\n    organisation\n  }\n  questionary {\n    steps {\n      topic {\n        title\n        id\n      }\n      isCompleted\n      fields {\n          question {\n            proposalQuestionId\n              dataType\n              question\n \n          }\n        \n        value\n        dependency {\n          questionId\n            dependencyId\n            dependencyNaturalKey\n            condition {\n                  condition\n                  params\n            }\n        }\n      }\n    }\n  }\n}\n}",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
 					},
 					"options": {
@@ -1931,6 +1931,316 @@
 					"graphql": {
 						"query": "mutation ($callId: Int!) {\n  createProposal(callId: $callId) {\n    proposal {\n      id\n      status\n      questionaryId\n      questionary {\n        steps {\n          topic {\n            title\n            id\n          }\n          fields {\n            question {\n              proposalQuestionId\n              dataType\n              question\n              config {\n                ... on BooleanConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on DateConfig {\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on EmbellishmentConfig {\n                  html\n                  plain\n                  small_label\n                  required\n                  tooltip\n                  omitFromPdf\n                }\n                ... on FileUploadConfig {\n                  file_type\n                  max_files\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on SelectionFromOptionsConfig {\n                  variant\n                  options\n                  small_label\n                  required\n                  tooltip\n                }\n                ... on TextInputConfig {\n                  min\n                  max\n                  multiline\n                  placeholder\n                  small_label\n                  required\n                  tooltip\n                }\n              }\n            }\n            value\n            dependency {\n              questionId\n              dependencyId\n              dependencyNaturalKey\n              condition {\n                condition\n                params\n              }\n            }\n          }\n        }\n      }\n    }\n    error\n  }\n}\n",
 						"variables": "{\n\t\"callId\": {{NEW_CALL_ID}}\n}"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createTemplate(Sample) [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "46b5ed37-8234-4ff6-bca1-6d2e24bc55fd",
+						"exec": [
+							"pm.test(\"Should create proposal\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createTemplate.template.templateId).to.be.above(0)",
+							"    pm.environment.set(\"NEW_SAMPLE_TEMPLATE_ID\", jsonData.data.createTemplate.template.templateId);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{Authorization}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDA5ODAyNCwiZXhwIjoxNTcwNzAyODI0fQ.tQKzxyg8_i_Z4b2ny6-naoT3JqaFnJN_Z-MvU1ta31s"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  createTemplate(\n    categoryId: SAMPLE_DECLARATION\n    name: \"Sample title\"\n    description: \"Sample description\"\n  ) {\n    template {\n      templateId\n    }\n    error\n  }\n}",
+						"variables": ""
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createSample [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "51d71beb-8245-468a-8c73-e3f83ae9d02c",
+						"exec": [
+							"pm.test(\"Should create proposal\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createSample.sample.id).to.be.above(0)",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{NEW_USER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDA5ODAyNCwiZXhwIjoxNTcwNzAyODI0fQ.tQKzxyg8_i_Z4b2ny6-naoT3JqaFnJN_Z-MvU1ta31s"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($newSampleTemplateId:Int!) {\n  createSample(title:\"My sample\", templateId:$newSampleTemplateId) {\n    sample {\n      id\n      title\n    }\n    error\n  }\n}\n",
+						"variables": "{\n\t\"newSampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}}\n}"
+					},
+					"options": {
+						"graphql": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createAnswerQuestionaryRelation [Mutation]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "054235a9-5abd-4ce0-8ced-4c1d9cfdc599",
+						"exec": [
+							"pm.test(\"Should create proposal\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.createSample.sample.id).to.be.above(0)",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{NEW_USER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Sec-Fetch-Site",
+						"value": "same-origin"
+					},
+					{
+						"key": "Origin",
+						"value": "http://localhost:3000"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-GB,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQ2FybCIsIm1pZGRsZW5hbWUiOiJDaHJpc3RpYW4iLCJsYXN0bmFtZSI6IkNhcmxzc29uIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsInByZWZlcnJlZG5hbWUiOm51bGwsIm9yY2lkIjoiNTgxNDU5NjA0IiwiZ2VuZGVyIjoibWFsZSIsIm5hdGlvbmFsaXR5IjoiTm9yd2VnaWFuIiwiYmlydGhkYXRlIjoiMjAwMC0wNC0wMVQyMjowMDowMC4wMDBaIiwib3JnYW5pc2F0aW9uIjoiUm9iZXJ0cywgUmVpbGx5IGFuZCBHdXRrb3dza2kiLCJkZXBhcnRtZW50IjoiSVQgZGVwYXJtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJFc3RvbmlhLCBOZXcgR2FicmllbGxhLCA0MDU2IENyb25pbiBNb3RvcndheSIsInBvc2l0aW9uIjoiU3RyYXRlZ2lzdCIsImVtYWlsIjoiSmF2b240QGhvdG1haWwuY29tIiwidGVsZXBob25lIjoiKDI4OCkgNDMxLTE0NDMiLCJ0ZWxlcGhvbmVfYWx0IjoiKDM3MCkgMzg2LTg5NzYiLCJjcmVhdGVkIjoiMjAxOS0xMC0wM1QwODoyNDo1Ni41MTdaIiwidXBkYXRlZCI6IjIwMTktMTAtMDNUMDg6MjQ6NTYuNTE3WiJ9LCJyb2xlcyI6W3siaWQiOjEsInNob3J0Q29kZSI6InVzZXIiLCJ0aXRsZSI6IlVzZXIifV0sImlhdCI6MTU3MDA5ODAyNCwiZXhwIjoxNTcwNzAyODI0fQ.tQKzxyg8_i_Z4b2ny6-naoT3JqaFnJN_Z-MvU1ta31s"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+					},
+					{
+						"key": "Referer",
+						"value": "http://localhost:3000/ProposalSubmission"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					}
+				],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation($newSampleTemplateId:Int!) {\n  createSample(title:\"My sample\", templateId:$newSampleTemplateId) {\n    sample {\n      id\n      title\n    }\n    error\n  }\n}\n",
+						"variables": "{\n\t\"newSampleTemplateId\": {{NEW_SAMPLE_TEMPLATE_ID}}\n}"
 					},
 					"options": {
 						"graphql": {}
