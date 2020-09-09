@@ -18,6 +18,7 @@ context('Samples tests', () => {
   const sampleQuestion = faker.lorem.words(4);
   const proposalTitle = faker.lorem.words(2);
   const proposalAbstract = faker.lorem.words(5);
+  const safetyComment = faker.lorem.words(5);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -100,17 +101,29 @@ context('Samples tests', () => {
 
     cy.get('[title="Review sample"]').click();
 
-    cy.contains('Accept').click();
+    cy.get('[data-cy="safety-status"]').click();
 
-    cy.contains('SAFE').click();
+    cy.contains('Safe').click();
+
+    cy.get('[data-cy="safety-comment"]').type(safetyComment);
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.wait(500);
 
     cy.reload();
 
     cy.get('[title="Review sample"]').click();
 
-    cy.contains('Reject').click();
+    cy.contains(safetyComment); // test if comment entered is present after reload
 
-    cy.contains('UNSAFE').click();
+    cy.get('[data-cy="safety-status"]').click();
+
+    cy.contains('Unsafe').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.contains('Unsafe'); // test if status has changed
   });
 
   it('Officer should able to delete proposal with sample', () => {

@@ -149,8 +149,8 @@ function SampleEvaluationDialog(props: {
                 { text: 'Safe', value: SampleStatus.SAFE },
                 { text: 'Unsafe', value: SampleStatus.UNSAFE },
               ]}
-              data-cy="safetyStatus"
               disabled={isSubmitting}
+              InputProps={{ 'data-cy': 'safety-status' }}
             />
 
             <Field
@@ -160,13 +160,17 @@ function SampleEvaluationDialog(props: {
               type="text"
               component={TextField}
               multiline
-              data-cy="safetyComment"
               fullWidth
               disabled={isSubmitting}
-              InputProps={{ rows: 4, rowsMax: 10 }}
+              InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
             />
             <ActionButtonContainer>
-              <Button variant="contained" type="submit">
+              <Button
+                variant="contained"
+                type="submit"
+                color="primary"
+                data-cy="submit"
+              >
                 Submit
               </Button>
             </ActionButtonContainer>
