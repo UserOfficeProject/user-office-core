@@ -81,6 +81,8 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=add-button]').click();
 
+    cy.wait(500);
+
     cy.get('[data-cy=title-input] input')
       .clear()
       .type(faker.lorem.words(2));
