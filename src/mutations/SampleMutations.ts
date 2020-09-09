@@ -7,6 +7,7 @@ import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { rejection } from '../rejection';
 import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
+import { UpdateSampleSafetyReviewArgs } from '../resolvers/mutations/UpdateSampleSafetyReviewMutation';
 import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatusMutation';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitleMutation';
 import { Logger, logger } from '../utils/Logger';
@@ -21,8 +22,16 @@ export default class SampleMutations {
   ) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
-  updateSampleStatus(user: UserWithRole | null, args: UpdateSampleStatusArgs) {
-    return this.dataSource.updateSampleStatus(args);
+  updateSampleStatus(agent: UserWithRole | null, args: UpdateSampleStatusArgs) {
+    return this.dataSource
+      .updateSampleStatus(args)
+      .then(sample => sample)
+      .catch(error => {
+        logger.logException('Could not update sample status', error, {
+          agent,
+          args,
+        });
+      });
   }
 
   @Authorized()
@@ -40,16 +49,23 @@ export default class SampleMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    const questionary = await this.questionaryDataSource.create(
-      agent.id,
-      args.templateId
-    );
+    return this.questionaryDataSource
+      .create(agent.id, args.templateId)
+      .then(questionary => {
+        return this.dataSource.create(
+          questionary.questionaryId!,
+          args.title,
+          agent.id
+        );
+      })
+      .catch(error => {
+        logger.logException('Could not create sample', error, {
+          agent,
+          args,
+        });
 
-    return await this.dataSource.create(
-      questionary.questionaryId!,
-      args.title,
-      agent.id
-    );
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   async updateSampleTitle(
@@ -60,7 +76,17 @@ export default class SampleMutations {
       return rejection('NOT_AUTHORIZED');
     }
 
-    return this.dataSource.updateSampleTitle(args);
+    return this.dataSource
+      .updateSampleTitle(args)
+      .then(sample => sample)
+      .catch(error => {
+        logger.logException('Could not update sample title', error, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   async deleteSample(agent: UserWithRole | null, sampleId: number) {
@@ -68,6 +94,27 @@ export default class SampleMutations {
       return rejection('NOT_AUTHORIZED');
     }
 
-    return this.dataSource.delete(sampleId);
+    return this.dataSource
+      .delete(sampleId)
+      .then(sample => sample)
+      .catch(error => {
+        logger.logException('Could not delete sample', error, {
+          agent,
+          sampleId,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  async updateSampleSafetyReview(
+    agent: UserWithRole | null,
+    args: UpdateSampleSafetyReviewArgs
+  ) {
+    if (!sampleAuthorization.hasWriteRights(agent, args.id)) {
+      return rejection('NOT_AUTHORIZED');
+    }
+
+    return this.dataSource.updateSampleSafetyReview(args);
   }
 }

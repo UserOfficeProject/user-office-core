@@ -4,7 +4,8 @@ export class Sample {
     public title: string,
     public creatorId: number,
     public questionaryId: number,
-    public status: SampleStatus,
+    public safetyStatus: SampleStatus,
+    public safetyComment: string,
     public created: Date
   ) {}
 }

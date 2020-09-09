@@ -1,4 +1,5 @@
 import { Sample, SampleStatus } from '../../models/Sample';
+import { UpdateSampleSafetyReviewArgs } from '../../resolvers/mutations/UpdateSampleSafetyReviewMutation';
 import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
@@ -8,7 +9,15 @@ export class SampleDataSourceMock implements SampleDataSource {
   samples: Sample[];
   public init() {
     this.samples = [
-      new Sample(1, 'title', 1, 1, SampleStatus.SAFE, new Date()),
+      new Sample(
+        1,
+        'title',
+        1,
+        1,
+        SampleStatus.SAFE,
+        'safety comment',
+        new Date()
+      ),
     ];
   }
   async getSample(sampleId: number): Promise<Sample> {
@@ -35,6 +44,7 @@ export class SampleDataSourceMock implements SampleDataSource {
       creatorId,
       questionaryId,
       SampleStatus.NONE,
+      '',
       new Date()
     );
   }
@@ -47,13 +57,23 @@ export class SampleDataSourceMock implements SampleDataSource {
   }
   async updateSampleStatus(args: UpdateSampleStatusArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
-    sample.status = args.status;
+    sample.safetyStatus = args.status;
 
     return sample;
   }
   async updateSampleTitle(args: UpdateSampleTitleArgs): Promise<Sample> {
     const sample = await this.getSample(args.sampleId);
     sample.title = args.title;
+
+    return sample;
+  }
+
+  async updateSampleSafetyReview(
+    args: UpdateSampleSafetyReviewArgs
+  ): Promise<Sample> {
+    const sample = await this.getSample(args.id);
+    sample.safetyStatus = args.safetyStatus;
+    sample.safetyComment = args.safetyComment;
 
     return sample;
   }
