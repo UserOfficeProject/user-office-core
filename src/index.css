@@ -19,14 +19,3 @@ code {
 .MuiFormLabel-asterisk {
   color: red;
 }
-
-.MuiToolbar-root .styled-horizontal-scrollbar::-webkit-scrollbar {
-  -webkit-appearance: none;
-}
-
-.MuiToolbar-root .styled-horizontal-scrollbar::-webkit-scrollbar-thumb {
-  border-top: 7px solid white;
-  border-bottom: 7px solid white;
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.3);
-}
