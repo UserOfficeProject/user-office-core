@@ -75,9 +75,6 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
@@ -85,41 +82,19 @@ const useStyles = makeStyles(theme => ({
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-  },
-  drawerPaper: {
-    position: 'relative',
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
     whiteSpace: 'nowrap',
+  },
+  drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: 'hidden',
   },
-  drawerPaperClose: {
+  drawerClose: {
     overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -135,10 +110,8 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     height: 'calc(100vh - 64px)',
     marginTop: '64px',
-    overflow: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
     padding: `0 ${theme.spacing(2)}px`,
+    width: `calc(100% - ${drawerWidth}px)`,
   },
   bottomNavigation: {
     display: 'flex',
@@ -160,7 +133,7 @@ const Dashboard: React.FC = () => {
   ]);
 
   const { currentRole } = useContext(UserContext);
-  const { callsData } = useCallsData({ isActive: true });
+  const { calls } = useCallsData({ isActive: true });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -178,8 +151,15 @@ const Dashboard: React.FC = () => {
       <AppToolbar open={open} handleDrawerOpen={handleDrawerOpen} />
       <Drawer
         variant="permanent"
+        className={clsx(classes.drawer, {
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        })}
         classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          paper: clsx({
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+          }),
         }}
         open={open}
       >
@@ -190,7 +170,7 @@ const Dashboard: React.FC = () => {
         </div>
         <Divider />
         <List>
-          <MenuItems callsData={callsData} currentRole={currentRole} />
+          <MenuItems callsData={calls} currentRole={currentRole} />
         </List>
         <Divider />
       </Drawer>
@@ -199,7 +179,7 @@ const Dashboard: React.FC = () => {
           <Route path="/ProposalEdit/:proposalID" component={ProposalEdit} />
           <Route
             path="/ProposalSelectType"
-            component={() => <ProposalChooseCall callsData={callsData} />}
+            component={() => <ProposalChooseCall callsData={calls} />}
           />
           <Route path="/ProposalCreate/:callId" component={ProposalCreate} />
           <Route path="/ProfilePage/:id" component={ProfilePage} />

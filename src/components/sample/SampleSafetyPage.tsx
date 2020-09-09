@@ -1,11 +1,11 @@
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import Grid from '@material-ui/core/Grid';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { MTableToolbar, Options } from 'material-table';
+import { Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -14,6 +14,7 @@ import SelectedCallFilter from 'components/common/SelectedCallFilter';
 import { Maybe, Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { SampleBasic } from 'models/Sample';
+import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SampleDetails from './SampleDetails';
@@ -21,11 +22,17 @@ import SamplesTable from './SamplesTable';
 
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { callsData, loadingCalls } = useCallsData({ isActive: true });
+  const { calls, loadingCalls } = useCallsData({ isActive: true });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
+    call: NumberParam,
+    search: StringParam,
+  });
 
-  const [selectedCallId, setSelectedCallId] = useState<number>(0);
+  const [selectedCallId, setSelectedCallId] = useState<number>(
+    urlQueryParams.call ? urlQueryParams.call : 0
+  );
   const [samples, setSamples] = useState<SampleBasic[]>([]);
-  const [selectedSample, setSelecedSample] = useState<Maybe<Sample>>(null);
+  const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
     if (selectedCallId === null) {
@@ -52,10 +59,9 @@ function SampleSafetyPage() {
       <div>Loading...</div>
     ) : (
       <>
-        <MTableToolbar {...data} />
         <SelectedCallFilter
           callId={selectedCallId}
-          callsData={callsData || []}
+          callsData={calls || []}
           onChange={callId => {
             setSelectedCallId(callId);
           }}
@@ -66,20 +72,29 @@ function SampleSafetyPage() {
 
   return (
     <>
-      {isExecutingCall && loadingCalls ? <LinearProgress /> : null}
-      <Container maxWidth="lg">
-        <SamplesTable
-          components={{ Toolbar }}
-          data={samples}
-          actions={[
-            {
-              icon: VisibilityIcon,
-              tooltip: 'Review sample',
-              onClick: (event, rowData) => setSelecedSample(rowData as Sample),
-            },
-          ]}
-        />
-      </Container>
+      <ContentContainer>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <StyledPaper>
+              <Toolbar />
+              <SamplesTable
+                data={samples}
+                isLoading={isExecutingCall}
+                actions={[
+                  {
+                    icon: VisibilityIcon,
+                    tooltip: 'Review sample',
+                    onClick: (event, rowData) =>
+                      setSelecedSample(rowData as Sample),
+                  },
+                ]}
+                urlQueryParams={urlQueryParams}
+                setUrlQueryParams={setUrlQueryParams}
+              />
+            </StyledPaper>
+          </Grid>
+        </Grid>
+      </ContentContainer>
       <SampleEvaluationDialog
         sample={selectedSample}
         onClose={newSample => {
@@ -103,8 +118,6 @@ function SampleEvaluationDialog(props: {
 }) {
   const { sample, onClose } = props;
   const { api } = useDataApiWithFeedback();
-
-  console.log(sample);
 
   return (
     <InputDialog

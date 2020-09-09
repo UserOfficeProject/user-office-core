@@ -8,15 +8,20 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import InputDialog from 'components/common/InputDialog';
 import { tableIcons } from 'utils/materialIcons';
 
+export type UrlQueryParamsType = {
+  search: QueryParamConfig<string | null | undefined>;
+  selection: QueryParamConfig<(number | null | never)[]>;
+};
+
 interface SuperProps<RowData extends object> {
   createModal: (
     onUpdate: (object: RowData) => void,
     onCreate: (object: RowData) => void,
     object: RowData | null
   ) => React.ReactNode;
-  delete: (id: number) => Promise<boolean>;
   setData: Function;
   data: RowData[];
+  delete?: (id: number) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
   urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
   setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
@@ -25,11 +30,6 @@ interface SuperProps<RowData extends object> {
 interface EntryID {
   id: number;
 }
-
-export type UrlQueryParamsType = {
-  search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(number | null | never)[]>;
-};
 
 function SuperMaterialTable<Entry extends EntryID>({
   hasAccess = {
@@ -79,7 +79,7 @@ function SuperMaterialTable<Entry extends EntryID>({
   };
 
   const onDeleted = async (deletedId: number) => {
-    const deleteResult = await props.delete(deletedId);
+    const deleteResult = await (props.delete as Function)(deletedId);
 
     if (deleteResult) {
       const newObjectsArray = data.filter(
@@ -116,7 +116,7 @@ function SuperMaterialTable<Entry extends EntryID>({
         data={data}
         icons={tableIcons}
         editable={
-          hasAccess.remove
+          props.delete && hasAccess.remove
             ? {
                 onRowDelete: (rowData: Entry): Promise<void> =>
                   onDeleted(rowData.id),
