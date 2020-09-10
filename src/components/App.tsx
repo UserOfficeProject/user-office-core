@@ -63,7 +63,7 @@ class App extends React.Component {
   }
 
   componentDidCatch(error: any): void {
-    useUnauthorizedApi().addClientLog(error);
+    useUnauthorizedApi().addClientLog({ error });
   }
 
   render(): JSX.Element {
