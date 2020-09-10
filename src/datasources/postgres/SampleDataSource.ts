@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Sample } from '../../models/Sample';
+import { UpdateSampleSafetyReviewArgs } from '../../resolvers/mutations/UpdateSampleSafetyReviewMutation';
 import { UpdateSampleStatusArgs } from '../../resolvers/mutations/UpdateSampleStatusMutation';
 import { UpdateSampleTitleArgs } from '../../resolvers/mutations/UpdateSampleTitleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
@@ -48,6 +49,27 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         return createSampleObject(records[0]);
       });
   }
+
+  updateSampleSafetyReview(args: UpdateSampleSafetyReviewArgs) {
+    return database('samples')
+      .update(
+        {
+          safety_comment: args.safetyComment,
+          safety_status: args.safetyStatus,
+        },
+        '*'
+      )
+      .where({ sample_id: args.id })
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not update sample safety review', { args });
+          throw new Error('Could not update sample safety review');
+        }
+
+        return createSampleObject(records[0]);
+      });
+  }
+
   create(
     questionary_id: number,
     title: string,
