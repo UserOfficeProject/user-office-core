@@ -33,6 +33,7 @@ jobs:
       - run: echo "TAG $TAG"
       - run: rm -rf duo-backend
       - run: git clone https://github.com/UserOfficeProject/user-office-backend
+      - run: git fetch
       - run: git checkout $TAG
       - run: docker-compose -f docker-compose.e2e.yaml rm
       - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
