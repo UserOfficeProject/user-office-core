@@ -2,7 +2,7 @@ mutation administrationProposal(
   $id: Int!
   $rankOrder: Int
   $finalStatus: ProposalEndStatus
-  $status: ProposalStatus
+  $status: ProposalStatusEnum
   $commentForUser: String
   $commentForManagement: String
 ) {

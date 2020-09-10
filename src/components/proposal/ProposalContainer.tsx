@@ -277,7 +277,8 @@ export default function ProposalContainer(props: {
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
           const editable =
-            (index === 0 && state.proposal.status !== ProposalStatusEnum.BLANK) ||
+            (index === 0 &&
+              state.proposal.status !== ProposalStatusEnum.BLANK) ||
             step.isCompleted ||
             (steps[index - 1] !== undefined &&
               steps[index - 1].isCompleted === true);

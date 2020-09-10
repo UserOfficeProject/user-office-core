@@ -29,9 +29,7 @@ export function useProposalStatusesData(): {
       .getProposalStatuses()
       .then(data => {
         if (data.proposalStatuses) {
-          setProposalStatuses(
-            data.proposalStatuses.proposalStatuses as ProposalStatus[]
-          );
+          setProposalStatuses(data.proposalStatuses as ProposalStatus[]);
         }
         setLoadingProposalStatuses(false);
       });

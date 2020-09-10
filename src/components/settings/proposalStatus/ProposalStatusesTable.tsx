@@ -15,7 +15,7 @@ const ProposalStatusesTable: React.FC = () => {
     setProposalStatusesWithLoading: setProposalStatuses,
   } = useProposalStatusesData();
   const columns = [
-    { title: 'Name', field: 'code' },
+    { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
   ];
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);

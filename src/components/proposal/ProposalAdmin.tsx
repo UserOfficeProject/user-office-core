@@ -50,7 +50,8 @@ export default function ProposalAdmin(props: {
             id: props.data.id,
             finalStatus:
               ProposalEndStatus[values.finalStatus as ProposalEndStatus],
-            status: ProposalStatusEnum[values.proposalStatus as ProposalStatusEnum],
+            status:
+              ProposalStatusEnum[values.proposalStatus as ProposalStatusEnum],
             commentForUser: values.commentForUser,
             commentForManagement: values.commentForManagement,
           };

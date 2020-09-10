@@ -19,6 +19,7 @@ import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import { UserRole, Call } from 'generated/sdk';
@@ -194,7 +195,11 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 };
 
 const SettingsMenuListItem = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const history = useHistory();
+  const shouldExpand =
+    history.location.pathname === '/ProposalStatuses' ||
+    history.location.pathname === '/ProposalWorkflows';
+  const [isExpanded, setIsExpanded] = useState(shouldExpand);
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -241,7 +246,11 @@ const SettingsMenuListItem = () => {
 };
 
 const TemplateMenuListItem = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const history = useHistory();
+  const shouldExpand =
+    history.location.pathname === '/ProposalTemplates' ||
+    history.location.pathname === '/SampleDeclarationTemplates';
+  const [isExpanded, setIsExpanded] = useState(shouldExpand);
   function toggleExpand() {
     setIsExpanded(!isExpanded);
   }
