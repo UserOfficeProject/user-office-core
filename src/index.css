@@ -19,3 +19,7 @@ code {
 .MuiFormLabel-asterisk {
   color: red;
 }
+
+.MuiList-root .MuiListItem-root.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}

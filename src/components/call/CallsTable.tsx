@@ -2,8 +2,8 @@ import dateformat from 'dateformat';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
+import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
 import InputDialog from 'components/common/InputDialog';
-import ScienceIconAdd from 'components/common/ScienceIconAdd';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';

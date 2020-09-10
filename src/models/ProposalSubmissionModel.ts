@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
 
-import { Answer, ProposalStatus, QuestionaryStep } from 'generated/sdk';
+import { Answer, ProposalStatusEnum, QuestionaryStep } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   getFieldById,
@@ -96,7 +96,7 @@ export function ProposalSubmissionModel(
           break;
 
         case EventType.SUBMIT_PROPOSAL_CLICKED:
-          draftState.proposal.status = ProposalStatus.SUBMITTED;
+          draftState.proposal.status = ProposalStatusEnum.SUBMITTED;
           draftState.isDirty = false;
           break;
       }

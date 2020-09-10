@@ -12,16 +12,20 @@ import FolderOpen from '@material-ui/icons/FolderOpen';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import Help from '@material-ui/icons/Help';
 import InboxIcon from '@material-ui/icons/Inbox';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import NoteAdd from '@material-ui/icons/NoteAdd';
 import People from '@material-ui/icons/People';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
+import Settings from '@material-ui/icons/Settings';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import { UserRole, Call } from 'generated/sdk';
 
-import ScienceIcon from './common/ScienceIcon';
+import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
+import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
+import ScienceIcon from './common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
@@ -34,14 +38,14 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const user = (
     <div data-cy="user-menu-items">
-      <ListItem component={Link} to="/" button>
+      <ListItem component={NavLink} to="/" exact button>
         <ListItemIcon>
           <DashboardIcon />
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItem>
       <ListItem
-        component={Link}
+        component={NavLink}
         to={
           multipleCalls
             ? '/ProposalSelectType'
@@ -55,7 +59,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         </ListItemIcon>
         <ListItemText primary="New Proposal" />
       </ListItem>
-      <ListItem component={Link} to="/HelpPage" button>
+      <ListItem component={NavLink} to="/HelpPage" button>
         <ListItemIcon>
           <Help />
         </ListItemIcon>
@@ -66,45 +70,45 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const userOfficer = (
     <div data-cy="officer-menu-items">
-      <ListItem component={Link} to="/ProposalPage" button>
+      <ListItem component={NavLink} to="/ProposalPage" button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={Link} to="/CallPage" button>
+      <ListItem component={NavLink} to="/CallPage" button>
         <ListItemIcon>
           <CalendarToday />
         </ListItemIcon>
         <ListItemText primary="Calls" />
       </ListItem>
-      <ListItem component={Link} to="/PeoplePage" button>
+      <ListItem component={NavLink} to="/PeoplePage" button>
         <ListItemIcon>
           <People />
         </ListItemIcon>
         <ListItemText primary="People" />
       </ListItem>
-      <ListItem component={Link} to="/InstrumentPage" button>
+      <ListItem component={NavLink} to="/InstrumentPage" button>
         <ListItemIcon>
           <ScienceIcon />
         </ListItemIcon>
         <ListItemText primary="Instruments" />
       </ListItem>
-      <ListItem component={Link} to="/SEPPage" button>
-        <ListItemIcon>
-          <GroupWorkIcon />
-        </ListItemIcon>
-        <Tooltip title="Scientific evaluation panels">
+      <Tooltip title="Scientific evaluation panels">
+        <ListItem component={NavLink} to="/SEPPage" button>
+          <ListItemIcon>
+            <GroupWorkIcon />
+          </ListItemIcon>
           <ListItemText primary="SEPs" />
-        </Tooltip>
-      </ListItem>
-      <ListItem component={Link} to="/PageEditor" button>
+        </ListItem>
+      </Tooltip>
+      <ListItem component={NavLink} to="/PageEditor" button>
         <ListItemIcon>
           <SettingsApplications />
         </ListItemIcon>
         <ListItemText primary="Pages" />
       </ListItem>
-      <ListItem component={Link} to="/InstitutionPage" button>
+      <ListItem component={NavLink} to="/InstitutionPage" button>
         <ListItemIcon>
           <AccountBalanceIcon />
         </ListItemIcon>
@@ -112,12 +116,13 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
       </ListItem>
       <TemplateMenuListItem />
       <SamplesMenuListItem />
+      <SettingsMenuListItem />
     </div>
   );
 
   const reviewer = (
     <div data-cy="reviewer-menu-items">
-      <ListItem component={Link} to="/" button>
+      <ListItem component={NavLink} to="/" exact button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
@@ -128,13 +133,13 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const SEPRoles = (
     <div data-cy="SEPRoles-menu-items">
-      <ListItem component={Link} to="/" button>
+      <ListItem component={NavLink} to="/" exact button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
       </ListItem>
-      <ListItem component={Link} to="/SEPPage" button>
+      <ListItem component={NavLink} to="/SEPPage" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
@@ -147,13 +152,13 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
 
   const instrumentScientist = (
     <div data-cy="instrument-scientist-menu-items">
-      <ListItem component={Link} to="/" button>
+      <ListItem component={NavLink} to="/" exact button>
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItem>
-      <ListItem component={Link} to="/InstrumentPage" button>
+      <ListItem component={NavLink} to="/InstrumentPage" button>
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
@@ -188,6 +193,53 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
   }
 };
 
+const SettingsMenuListItem = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <>
+      <ListItem button onClick={toggleExpand}>
+        <ListItemIcon>
+          {isExpanded ? (
+            <>
+              <Settings />
+              <ExpandLess fontSize="small" />
+            </>
+          ) : (
+            <>
+              <Settings />
+              <ExpandMore fontSize="small" />
+            </>
+          )}
+        </ListItemIcon>
+        <ListItemText primary="Settings" />
+      </ListItem>
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        style={{ paddingLeft: 10 }}
+      >
+        <ListItem component={NavLink} to="/ProposalStatuses" button>
+          <ListItemIcon>
+            <ProposalSettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal statuses" />
+        </ListItem>
+        <ListItem component={NavLink} to="/ProposalWorkflows" button>
+          <ListItemIcon>
+            <ProposalWorkflowIcon />
+          </ListItemIcon>
+          <ListItemText primary="Proposal workflows" />
+        </ListItem>
+      </Collapse>
+    </>
+  );
+};
+
 const TemplateMenuListItem = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   function toggleExpand() {
@@ -198,7 +250,17 @@ const TemplateMenuListItem = () => {
     <>
       <ListItem button onClick={toggleExpand}>
         <ListItemIcon>
-          {isExpanded ? <ExpandLess /> : <ExpandMore />}
+          {isExpanded ? (
+            <>
+              <LibraryBooksIcon />
+              <ExpandLess fontSize="small" />
+            </>
+          ) : (
+            <>
+              <LibraryBooksIcon />
+              <ExpandMore fontSize="small" />
+            </>
+          )}
         </ListItemIcon>
         <ListItemText primary="Templates" />
       </ListItem>
@@ -208,13 +270,13 @@ const TemplateMenuListItem = () => {
         unmountOnExit
         style={{ paddingLeft: 10 }}
       >
-        <ListItem component={Link} to="/ProposalTemplates" button>
+        <ListItem component={NavLink} to="/ProposalTemplates" button>
           <ListItemIcon>
             <QuestionAnswerIcon />
           </ListItemIcon>
           <ListItemText primary="Proposal" title="Proposal templates" />
         </ListItem>
-        <ListItem component={Link} to="/SampleDeclarationTemplates" button>
+        <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
@@ -230,7 +292,7 @@ const TemplateMenuListItem = () => {
 
 const SamplesMenuListItem = () => {
   return (
-    <ListItem component={Link} to="/SampleSafety" button>
+    <ListItem component={NavLink} to="/SampleSafety" button>
       <ListItemIcon>
         <FolderOpen />
       </ListItemIcon>

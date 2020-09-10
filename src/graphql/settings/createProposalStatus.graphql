@@ -1,0 +1,10 @@
+mutation createProposalStatus($name: String!, $description: String!) {
+  createProposalStatus(name: $name, description: $description) {
+    proposalStatus {
+      id
+      name
+      description
+    }
+    error
+  }
+}

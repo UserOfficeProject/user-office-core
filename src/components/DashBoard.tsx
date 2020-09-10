@@ -36,6 +36,7 @@ import ProposalTableReviewer from './review/ProposalTableReviewer';
 import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
+import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import SampleTemplatesPage from './template/SampleTemplates';
 import TemplateEditor from './template/TemplateEditor';
@@ -169,7 +170,7 @@ const Dashboard: React.FC = () => {
           </IconButton>
         </div>
         <Divider />
-        <List>
+        <List disablePadding>
           <MenuItems callsData={calls} currentRole={currentRole} />
         </List>
         <Divider />
@@ -213,6 +214,9 @@ const Dashboard: React.FC = () => {
             path="/ProposalReviewUserOfficer/:id"
             component={ProposalReviewUserOfficer}
           />
+          {isUserOfficer && (
+            <Route path="/ProposalStatuses" component={ProposalStatusesPage} />
+          )}
           {(isSampleSafetyReviewer || isUserOfficer) && (
             <Route path="/SampleSafety" component={SampleSafetyPage} />
           )}

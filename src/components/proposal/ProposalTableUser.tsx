@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React, { useCallback, useState } from 'react';
 
-import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import { ProposalEndStatus, ProposalStatusEnum } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { timeAgo } from 'utils/Time';
 
@@ -27,14 +27,16 @@ const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
-    status: ProposalStatus;
+    status: ProposalStatusEnum;
     finalStatus?: ProposalEndStatus | null | undefined;
     notified: boolean;
   }): string => {
     if (proposal.notified) {
       return getTranslation(proposal.finalStatus as ResourceId);
     } else {
-      return proposal.status === ProposalStatus.DRAFT ? 'Open' : 'Submitted';
+      return proposal.status === ProposalStatusEnum.DRAFT
+        ? 'Open'
+        : 'Submitted';
     }
   };
 
