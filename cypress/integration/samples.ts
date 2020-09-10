@@ -86,7 +86,7 @@ context('Samples tests', () => {
 
     cy.contains('Add').click();
 
-    cy.get('[data-cy=save-button]').click();
+    cy.contains('Update').click();
 
     cy.contains('Save and continue').click();
 
