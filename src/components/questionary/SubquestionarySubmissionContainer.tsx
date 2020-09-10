@@ -141,7 +141,7 @@ export function SubquestionarySubmissionContainer(props: {
               isbusy={isSavingModel}
               data-cy="save-button"
             >
-              Save
+              Update
             </NavigButton>
           </div>
         </form>

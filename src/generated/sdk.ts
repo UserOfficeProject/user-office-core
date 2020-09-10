@@ -15,6 +15,16 @@ export type Scalars = {
   IntStringDateBoolArray: any;
 };
 
+export type Service = {
+  __typename?: '_Service';
+  /**
+   * The sdl representing the federated service capabilities. Includes federation
+   * directives, removes federation types, and includes rest of full schema after
+   * schema directives have been applied
+   */
+  sdl: Maybe<Scalars['String']>;
+};
+
 export type AddSepMembersRole = {
   userIDs: Array<Scalars['Int']>;
   roleID: UserRole;
@@ -374,6 +384,7 @@ export type Mutation = {
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
   updatePassword: BasicUserDetailsResponseWrap;
+  updateSampleSafetyReview: SampleResponseWrap;
   updateSampleTitle: SampleResponseWrap;
   updateTopicOrder: UpdateTopicOrderResponseWrap;
 };
@@ -891,6 +902,13 @@ export type MutationUpdatePasswordArgs = {
 };
 
 
+export type MutationUpdateSampleSafetyReviewArgs = {
+  id: Scalars['Int'];
+  safetyStatus: SampleStatus;
+  safetyComment: Scalars['String'];
+};
+
+
 export type MutationUpdateSampleTitleArgs = {
   sampleId: Scalars['Int'];
   title: Scalars['String'];
@@ -1040,6 +1058,7 @@ export type ProposalView = {
 
 export type Query = {
   __typename?: 'Query';
+  _service: Service;
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
@@ -1371,7 +1390,8 @@ export type Sample = {
   title: Scalars['String'];
   creatorId: Scalars['Int'];
   questionaryId: Scalars['Int'];
-  status: SampleStatus;
+  safetyStatus: SampleStatus;
+  safetyComment: Scalars['String'];
   created: Scalars['DateTime'];
   questionary: Questionary;
 };
@@ -2986,7 +3006,7 @@ export type DeleteSampleMutation = (
 
 export type SampleFragment = (
   { __typename?: 'Sample' }
-  & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'status' | 'created'>
+  & Pick<Sample, 'id' | 'title' | 'creatorId' | 'questionaryId' | 'safetyStatus' | 'safetyComment' | 'created'>
 );
 
 export type GetSampleQueryVariables = Exact<{
@@ -3043,6 +3063,25 @@ export type GetSamplesByCallIdQuery = (
     { __typename?: 'Sample' }
     & SampleFragment
   )>> }
+);
+
+export type UpdateSampleSafetyReviewMutationVariables = Exact<{
+  id: Scalars['Int'];
+  safetyStatus: SampleStatus;
+  safetyComment: Scalars['String'];
+}>;
+
+
+export type UpdateSampleSafetyReviewMutation = (
+  { __typename?: 'Mutation' }
+  & { updateSampleSafetyReview: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & SampleFragment
+    )> }
+  ) }
 );
 
 export type UpdateSampleStatusMutationVariables = Exact<{
@@ -4099,7 +4138,8 @@ export const SampleFragmentDoc = gql`
   title
   creatorId
   questionaryId
-  status
+  safetyStatus
+  safetyComment
   created
 }
     `;
@@ -5171,6 +5211,16 @@ export const GetSamplesByCallIdDocument = gql`
   }
 }
     ${SampleFragmentDoc}`;
+export const UpdateSampleSafetyReviewDocument = gql`
+    mutation updateSampleSafetyReview($id: Int!, $safetyStatus: SampleStatus!, $safetyComment: String!) {
+  updateSampleSafetyReview(id: $id, safetyStatus: $safetyStatus, safetyComment: $safetyComment) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}`;
 export const UpdateSampleStatusDocument = gql`
     mutation updateSampleStatus($sampleId: Int!, $status: SampleStatus!) {
   updateSampleStatus(sampleId: $sampleId, status: $status) {
@@ -5828,6 +5878,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSamplesByCallId(variables: GetSamplesByCallIdQueryVariables): Promise<GetSamplesByCallIdQuery> {
       return withWrapper(() => client.request<GetSamplesByCallIdQuery>(print(GetSamplesByCallIdDocument), variables));
+    },
+    updateSampleSafetyReview(variables: UpdateSampleSafetyReviewMutationVariables): Promise<UpdateSampleSafetyReviewMutation> {
+      return withWrapper(() => client.request<UpdateSampleSafetyReviewMutation>(print(UpdateSampleSafetyReviewDocument), variables));
     },
     updateSampleStatus(variables: UpdateSampleStatusMutationVariables): Promise<UpdateSampleStatusMutation> {
       return withWrapper(() => client.request<UpdateSampleStatusMutation>(print(UpdateSampleStatusDocument), variables));

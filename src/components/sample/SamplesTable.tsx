@@ -7,8 +7,8 @@ import { tableIcons } from 'utils/materialIcons';
 
 const columns = [
   { title: 'Title', field: 'title' },
-  { title: 'Status', field: 'status' },
-  { title: 'Created', field: 'Created' },
+  { title: 'Status', field: 'safetyStatus' },
+  { title: 'Created', field: 'created' },
 ];
 
 type SamplesTableQueryParamsType = {
@@ -41,5 +41,5 @@ const SamplesTable = (
 
 export default React.memo(
   SamplesTable,
-  (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading
+  (prevProps, nextProps) => prevProps.data === nextProps.data
 );
