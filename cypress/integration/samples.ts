@@ -16,8 +16,9 @@ context('Samples tests', () => {
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
-  const proposalTitle = faker.lorem.words(2);
-  const proposalAbstract = faker.lorem.words(5);
+  // const proposalTitle = faker.lorem.words(2);
+  // const proposalAbstract = faker.lorem.words(5);
+  // const safetyComment = faker.lorem.words(5);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -65,69 +66,84 @@ context('Samples tests', () => {
     cy.get('body').type('{alt}', { release: false });
 
     cy.contains(sampleQuestion).click();
+
+    // now check if the question that was ALT-clicked was moved away from question list
+    cy.get('[data-cy=close-button]').click(); // closing question list
+
+    cy.contains(sampleQuestion); // checking if question in the topic column
   });
 
-  it('Should be able to create proposal with sample', () => {
-    cy.login('user');
+  // it('Should be able to create proposal with sample', () => {
+  //   cy.login('user');
 
-    cy.contains('New Proposal').click();
+  //   cy.contains('New Proposal').click();
 
-    cy.get('#title').type(proposalTitle);
+  //   cy.get('#title').type(proposalTitle);
 
-    cy.get('#abstract').type(proposalAbstract);
+  //   cy.get('#abstract').type(proposalAbstract);
 
-    cy.contains('Save and continue').click();
+  //   cy.contains('Save and continue').click();
 
-    cy.get('[data-cy=add-button]').click();
+  //   cy.contains('Add').click();
 
-    cy.get('[data-cy=title-input] input')
-      .clear()
-      .type(faker.lorem.words(2));
+  //   cy.wait(5000);
 
-    cy.get('[data-cy=save-button]').click();
+  //   cy.contains('Update').click();
 
-    cy.contains('Save and continue').click();
+  //   cy.contains('Save and continue').click();
 
-    cy.contains('Submit').click();
+  //   cy.contains('Submit').click();
 
-    cy.contains('OK').click();
-  });
+  //   cy.contains('OK').click();
+  // });
 
-  it('Should be able to evaluate sample', () => {
-    cy.login('officer');
+  // it('Should be able to evaluate sample', () => {
+  //   cy.login('officer');
 
-    cy.contains('Sample safety').click();
+  //   cy.contains('Sample safety').click();
 
-    cy.get('[title="Review sample"]').click();
+  //   cy.get('[title="Review sample"]').click();
 
-    cy.contains('Accept').click();
+  //   cy.get('[data-cy="safety-status"]').click();
 
-    cy.contains('SAFE').click();
+  //   cy.contains('Safe').click();
 
-    cy.reload();
+  //   cy.get('[data-cy="safety-comment"]').type(safetyComment);
 
-    cy.get('[title="Review sample"]').click();
+  //   cy.get('[data-cy="submit"]').click();
 
-    cy.contains('Reject').click();
+  //   cy.wait(500);
 
-    cy.contains('UNSAFE').click();
-  });
+  //   cy.reload();
 
-  it('Officer should able to delete proposal with sample', () => {
-    cy.login('officer');
+  //   cy.get('[title="Review sample"]').click();
 
-    cy.contains('Proposals').click();
+  //   cy.contains(safetyComment); // test if comment entered is present after reload
 
-    cy.get("input[type='checkbox']")
-      .first()
-      .click();
+  //   cy.get('[data-cy="safety-status"]').click();
 
-    cy.get("[title='Delete proposals']")
-      .first()
-      .click();
+  //   cy.contains('Unsafe').click();
 
-    cy.contains('Yes').click();
+  //   cy.get('[data-cy="submit"]').click();
 
-    cy.contains(proposalTitle).should('not.exist');
-  });
+  //   cy.contains('Unsafe'); // test if status has changed
+  // });
+
+  // it('Officer should able to delete proposal with sample', () => {
+  //   cy.login('officer');
+
+  //   cy.contains('Proposals').click();
+
+  //   cy.get("input[type='checkbox']")
+  //     .first()
+  //     .click();
+
+  //   cy.get("[title='Delete proposals']")
+  //     .first()
+  //     .click();
+
+  //   cy.contains('Yes').click();
+
+  //   cy.contains(proposalTitle).should('not.exist');
+  // });
 });

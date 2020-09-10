@@ -10,6 +10,7 @@ type TProps = {
   label: string;
   required?: boolean;
   disabled?: boolean;
+  InputProps?: object;
 };
 
 const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
@@ -19,6 +20,7 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
   disabled,
   children,
   items,
+  InputProps,
 }) => {
   return (
     <Field
@@ -31,6 +33,7 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
       InputLabelProps={{
         shrink: true,
       }}
+      InputProps={InputProps}
       fullWidth
       required={required}
       disabled={disabled}

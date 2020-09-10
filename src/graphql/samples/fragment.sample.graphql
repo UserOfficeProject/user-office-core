@@ -3,6 +3,7 @@ fragment sample on Sample {
   title
   creatorId
   questionaryId
-  status
+  safetyStatus
+  safetyComment
   created
 }

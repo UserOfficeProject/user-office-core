@@ -1,0 +1,16 @@
+mutation updateSampleSafetyReview(
+  $id: Int!
+  $safetyStatus: SampleStatus!
+  $safetyComment: String!
+) {
+  updateSampleSafetyReview(
+    id: $id
+    safetyStatus: $safetyStatus
+    safetyComment: $safetyComment
+  ) {
+    sample {
+      ...sample
+    }
+    error
+  }
+}

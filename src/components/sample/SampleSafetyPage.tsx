@@ -1,13 +1,17 @@
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import VisibilityIcon from '@material-ui/icons/Visibility';
+import { Field, Form, Formik } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { Options } from 'material-table';
 import React, { useEffect, useState } from 'react';
-import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import FormikDropdown from 'components/common/FormikDropdown';
 import InputDialog from 'components/common/InputDialog';
 import SelectedCallFilter from 'components/common/SelectedCallFilter';
-import { Sample, SampleStatus } from 'generated/sdk';
+import { Maybe, Sample, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { SampleBasic } from 'models/Sample';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
@@ -28,7 +32,6 @@ function SampleSafetyPage() {
     urlQueryParams.call ? urlQueryParams.call : 0
   );
   const [samples, setSamples] = useState<SampleBasic[]>([]);
-  const [loadingSamples, setLoadingSamples] = useState<boolean>(true);
   const [selectedSample, setSelecedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
@@ -37,62 +40,28 @@ function SampleSafetyPage() {
     }
 
     if (selectedCallId === 0) {
-      setLoadingSamples(true);
       api()
         .getSamples()
         .then(result => {
           setSamples(result.samples || []);
-          setLoadingSamples(false);
         });
     } else {
       api()
         .getSamplesByCallId({ callId: selectedCallId })
         .then(result => {
           setSamples(result.samplesByCallId || []);
-          setLoadingSamples(false);
         });
     }
   }, [api, selectedCallId]);
 
-  const handleStatusUpdate = (status: SampleStatus) => {
-    setSelecedSample(null);
-
-    setLoadingSamples(true);
-    api(`Status for '${selectedSample?.title}' has been set to ${status}`)
-      .updateSampleStatus({
-        sampleId: (selectedSample as Sample).id,
-        status: status,
-      })
-      .then(result => {
-        const newSample = result.updateSampleStatus.sample;
-
-        if (newSample) {
-          const newSamples = samples.map(sample =>
-            sample.id === newSample.id ? newSample : sample
-          );
-
-          setSamples(newSamples);
-          setLoadingSamples(false);
-        }
-      });
-  };
-
-  const handleAccept = () => {
-    handleStatusUpdate(SampleStatus.SAFE);
-  };
-
-  const handleReject = () => {
-    handleStatusUpdate(SampleStatus.UNSAFE);
-  };
-
-  const Toolbar = (): JSX.Element =>
+  const Toolbar = (data: Options): JSX.Element =>
     loadingCalls ? (
-      <div>Loading filter...</div>
+      <div>Loading...</div>
     ) : (
       <>
         <SelectedCallFilter
           callId={selectedCallId}
-          callsData={calls}
+          callsData={calls || []}
           onChange={callId => {
             setSelectedCallId(callId);
           }}
@@ -110,7 +79,7 @@ function SampleSafetyPage() {
               <Toolbar />
               <SamplesTable
                 data={samples}
-                isLoading={isExecutingCall || loadingSamples}
+                isLoading={isExecutingCall}
                 actions={[
                   {
                     icon: VisibilityIcon,
@@ -126,22 +95,89 @@ function SampleSafetyPage() {
           </Grid>
         </Grid>
       </ContentContainer>
-      <InputDialog
-        open={selectedSample !== null}
-        onClose={() => setSelecedSample(null)}
-        fullWidth={true}
-      >
-        {selectedSample ? <SampleDetails sampleId={selectedSample.id} /> : null}
-        <ActionButtonContainer>
-          <Button variant="contained" onClick={handleReject} color="secondary">
-            Reject
-          </Button>
-          <Button variant="contained" onClick={handleAccept} color="primary">
-            Accept
-          </Button>
-        </ActionButtonContainer>
-      </InputDialog>
+      <SampleEvaluationDialog
+        sample={selectedSample}
+        onClose={newSample => {
+          if (newSample) {
+            const newSamples = samples.map(sample =>
+              sample.id === newSample.id ? newSample : sample
+            );
+
+            setSamples(newSamples);
+          }
+          setSelecedSample(null);
+        }}
+      />
     </>
+  );
+}
+
+function SampleEvaluationDialog(props: {
+  sample: Maybe<Sample>;
+  onClose: (sample: Maybe<SampleBasic>) => any;
+}) {
+  const { sample, onClose } = props;
+  const { api } = useDataApiWithFeedback();
+
+  return (
+    <InputDialog
+      open={sample !== null}
+      onClose={() => onClose(null)}
+      fullWidth={true}
+    >
+      {sample ? <SampleDetails sampleId={sample.id} /> : null}
+      <Formik
+        initialValues={sample}
+        onSubmit={async (values, actions) => {
+          if (values) {
+            const { id, safetyComment, safetyStatus } = values;
+            api(`Review for '${sample?.title}' submitted`)
+              .updateSampleSafetyReview({ id, safetyComment, safetyStatus })
+              .then(result => {
+                const newSample = result.updateSampleSafetyReview.sample;
+                onClose(newSample || null);
+              });
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <FormikDropdown
+              name="safetyStatus"
+              label="Status"
+              items={[
+                { text: 'Safe', value: SampleStatus.SAFE },
+                { text: 'Unsafe', value: SampleStatus.UNSAFE },
+              ]}
+              disabled={isSubmitting}
+              InputProps={{ 'data-cy': 'safety-status' }}
+            />
+
+            <Field
+              name="safetyComment"
+              id="safetyComment"
+              label="Comment"
+              type="text"
+              component={TextField}
+              multiline
+              fullWidth
+              disabled={isSubmitting}
+              InputProps={{ rows: 4, rowsMax: 10, 'data-cy': 'safety-comment' }}
+            />
+            <ActionButtonContainer>
+              <Button
+                variant="contained"
+                type="submit"
+                color="primary"
+                data-cy="submit"
+              >
+                Submit
+              </Button>
+            </ActionButtonContainer>
+          </Form>
+        )}
+      </Formik>
+    </InputDialog>
   );
 }
 
