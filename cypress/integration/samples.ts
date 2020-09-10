@@ -86,6 +86,8 @@ context('Samples tests', () => {
 
     cy.contains('Add').click();
 
+    cy.wait(5000);
+
     cy.contains('Update').click();
 
     cy.contains('Save and continue').click();
