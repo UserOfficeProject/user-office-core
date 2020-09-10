@@ -32,7 +32,7 @@ jobs:
       - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
       - run: echo "TAG $TAG"
       - run: rm -rf duo-backend
-      - run: git clone https://gitlab.esss.lu.se/swap/duo-backend.git
+      - run: git clone https://github.com/UserOfficeProject/user-office-backend
       - run: git checkout $TAG
       - run: docker-compose -f docker-compose.e2e.yaml rm
       - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
