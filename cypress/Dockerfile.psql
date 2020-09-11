@@ -1,2 +1,2 @@
-FROM postgres:11.2
+FROM postgres:11-alpine
 COPY ./user-office-backend/db_patches /docker-entrypoint-initdb.d/
