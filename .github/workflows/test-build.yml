@@ -19,10 +19,9 @@ jobs:
       - run: echo "TAG_COUNT $TAG_COUNT"
       - run: if [ "$TAG_COUNT" != 0 ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
       - run: echo "TAG $TAG"
-      - run: rm -rf duo-backend
+      - run: rm -rf user-office-backend
       - run: git clone https://github.com/UserOfficeProject/user-office-backend
-      - run: git fetch
-      - run: git checkout $TAG
+      - run: cd user-office-backend && git fetch && git checkout $TAG && cd ..
       - run: docker-compose -f docker-compose.e2e.yaml rm
       - run: docker-compose -f docker-compose.e2e.yaml down --remove-orphans
       - run: docker-compose -f docker-compose.e2e.yaml pull
