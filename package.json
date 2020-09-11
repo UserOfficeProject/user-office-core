@@ -1,7 +1,12 @@
 {
-  "name": "duo-backend",
+  "name": "user-office-backend",
   "version": "1.0.0",
-  "description": "DUO-Backend-proto",
+  "description": "User office backend",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UserOfficeProject/user-office-backend.git"
+  },
+  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "env NODE_ENV=test env secret=qMyLZALzs229ybdQXNyzYRdju7X784TH env tokenLife=7d env baseURL=localhost:3000 env SPARKPOST_TOKEN=insertokenhere jest --colors",
