@@ -1,5 +1,11 @@
+import {
+  createProposalStatusValidationSchema,
+  updateProposalStatusValidationSchema,
+  deleteProposalStatusValidationSchema,
+} from '@esss-swap/duo-validation';
+
 import { ProposalStatusDataSource } from '../datasources/ProposalStatusDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -13,7 +19,7 @@ import { logger } from '../utils/Logger';
 export default class ProposalStatusMutations {
   constructor(private dataSource: ProposalStatusDataSource) {}
 
-  // @ValidateArgs(createProposalStatusValidationSchema)
+  @ValidateArgs(createProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
@@ -32,7 +38,7 @@ export default class ProposalStatusMutations {
       });
   }
 
-  // @ValidateArgs(updateProposalStatusValidationSchema)
+  @ValidateArgs(updateProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
@@ -51,7 +57,7 @@ export default class ProposalStatusMutations {
       });
   }
 
-  // @ValidateArgs(deleteProposalStatusValidationSchema)
+  @ValidateArgs(deleteProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async delete(
     agent: UserWithRole | null,

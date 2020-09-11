@@ -7,7 +7,7 @@ BEGIN
     BEGIN
         CREATE TABLE IF NOT EXISTS proposal_statuses (
             proposal_status_id SERIAL PRIMARY KEY,
-            name VARCHAR(20) NOT NULL,
+            name VARCHAR(30) NOT NULL,
             description VARCHAR(200) NOT NULL
         );
 
