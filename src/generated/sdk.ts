@@ -3179,6 +3179,23 @@ export type CreateProposalStatusMutation = (
   ) }
 );
 
+export type DeleteProposalStatusMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteProposalStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteProposalStatus: (
+    { __typename?: 'ProposalStatusResponseWrap' }
+    & Pick<ProposalStatusResponseWrap, 'error'>
+    & { proposalStatus: Maybe<(
+      { __typename?: 'ProposalStatus' }
+      & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+    )> }
+  ) }
+);
+
 export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5342,6 +5359,18 @@ export const CreateProposalStatusDocument = gql`
   }
 }
     `;
+export const DeleteProposalStatusDocument = gql`
+    mutation deleteProposalStatus($id: Int!) {
+  deleteProposalStatus(id: $id) {
+    proposalStatus {
+      id
+      name
+      description
+    }
+    error
+  }
+}
+    `;
 export const GetProposalStatusesDocument = gql`
     query getProposalStatuses {
   proposalStatuses {
@@ -6012,6 +6041,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createProposalStatus(variables: CreateProposalStatusMutationVariables): Promise<CreateProposalStatusMutation> {
       return withWrapper(() => client.request<CreateProposalStatusMutation>(print(CreateProposalStatusDocument), variables));
+    },
+    deleteProposalStatus(variables: DeleteProposalStatusMutationVariables): Promise<DeleteProposalStatusMutation> {
+      return withWrapper(() => client.request<DeleteProposalStatusMutation>(print(DeleteProposalStatusDocument), variables));
     },
     getProposalStatuses(variables?: GetProposalStatusesQueryVariables): Promise<GetProposalStatusesQuery> {
       return withWrapper(() => client.request<GetProposalStatusesQuery>(print(GetProposalStatusesDocument), variables));

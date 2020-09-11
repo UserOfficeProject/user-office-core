@@ -1,4 +1,8 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
+import {
+  createProposalStatusValidationSchema,
+  updateProposalStatusValidationSchema,
+} from '@esss-swap/duo-validation/lib/ProposalStatuses';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
@@ -77,7 +81,11 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
         setSubmitting(false);
         actions.setSubmitting(false);
       }}
-      validationSchema={{}}
+      validationSchema={
+        proposalStatus
+          ? updateProposalStatusValidationSchema
+          : createProposalStatusValidationSchema
+      }
     >
       {() => (
         <Form>

@@ -5,10 +5,12 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalStatus } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import CreateUpdateProposalStatus from './CreateUpdateProposalStatus';
 
 const ProposalStatusesTable: React.FC = () => {
+  const { api } = useDataApiWithFeedback();
   const {
     loadingProposalStatuses,
     proposalStatuses,
@@ -35,9 +37,24 @@ const ProposalStatusesTable: React.FC = () => {
     />
   );
 
+  const deleteProposalStatus = async (id: number) => {
+    return await api('Proposal status deleted successfully')
+      .deleteProposalStatus({
+        id: id,
+      })
+      .then(resp => {
+        if (resp.deleteProposalStatus.error) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+  };
+
   return (
     <div data-cy="proposal-statuses-table">
       <SuperMaterialTable
+        delete={deleteProposalStatus}
         createModal={createModal}
         hasAccess={{
           update: isUserOfficer,
@@ -46,7 +63,7 @@ const ProposalStatusesTable: React.FC = () => {
         }}
         setData={setProposalStatuses}
         icons={tableIcons}
-        title={'Scientific evaluation panels'}
+        title={'Proposal statuses'}
         columns={columns}
         data={proposalStatuses}
         isLoading={loadingProposalStatuses}
