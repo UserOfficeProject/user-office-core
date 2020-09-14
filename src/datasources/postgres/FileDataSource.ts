@@ -26,6 +26,10 @@ export default class PostgresFileDataSource implements FileDataSource {
   }
 
   public async getMetadata(fileIds: string[]): Promise<FileMetadata[]> {
+    if (fileIds.length === 0) {
+      return [];
+    }
+
     return database('files')
       .select([
         'file_id',
