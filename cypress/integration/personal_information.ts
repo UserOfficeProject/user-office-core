@@ -102,7 +102,8 @@ context('Personal information tests', () => {
       .find('[title="Edit user"]')
       .click();
 
-    cy.contains('Settings').click();
+    const mainContentElement = cy.get('main');
+    mainContentElement.contains('Settings').click();
 
     cy.wait(1000);
 
