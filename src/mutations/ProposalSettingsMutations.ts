@@ -4,7 +4,7 @@ import {
   deleteProposalStatusValidationSchema,
 } from '@esss-swap/duo-validation';
 
-import { ProposalStatusDataSource } from '../datasources/ProposalStatusDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
@@ -14,19 +14,17 @@ import { CreateProposalStatusArgs } from '../resolvers/mutations/CreateProposalS
 import { UpdateProposalStatusArgs } from '../resolvers/mutations/UpdateProposalStatusMutation';
 import { logger } from '../utils/Logger';
 
-// TODO: Set up input validation for create, update and delete.
-
-export default class ProposalStatusMutations {
-  constructor(private dataSource: ProposalStatusDataSource) {}
+export default class ProposalSettingsMutations {
+  constructor(private dataSource: ProposalSettingsDataSource) {}
 
   @ValidateArgs(createProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async create(
+  async createProposalStatus(
     agent: UserWithRole | null,
     args: CreateProposalStatusArgs
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource
-      .create(args)
+      .createProposalStatus(args)
       .then(result => result)
       .catch(error => {
         logger.logException('Could not create proposalStatus', error, {
@@ -40,12 +38,12 @@ export default class ProposalStatusMutations {
 
   @ValidateArgs(updateProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async update(
+  async updateProposalStatus(
     agent: UserWithRole | null,
     args: UpdateProposalStatusArgs
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource
-      .update(args)
+      .updateProposalStatus(args)
       .then(result => result)
       .catch(error => {
         logger.logException('Could not update proposalStatus', error, {
@@ -59,12 +57,12 @@ export default class ProposalStatusMutations {
 
   @ValidateArgs(deleteProposalStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
-  async delete(
+  async deleteProposalStatus(
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource
-      .delete(args.id)
+      .deleteProposalStatus(args.id)
       .then(result => result)
       .catch(error => {
         logger.logException('Could not delete proposalStatus', error, {

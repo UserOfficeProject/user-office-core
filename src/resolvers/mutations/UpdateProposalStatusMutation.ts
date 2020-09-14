@@ -32,7 +32,10 @@ export class UpdateProposalStatusMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposalStatus.update(context.user, args),
+      context.mutations.proposalSettings.updateProposalStatus(
+        context.user,
+        args
+      ),
       ProposalStatusResponseWrap
     );
   }

@@ -21,7 +21,10 @@ export class CreateProposalStatusMutation {
     @Ctx() context: ResolverContext
   ) {
     return wrapResponse(
-      context.mutations.proposalStatus.create(context.user, args),
+      context.mutations.proposalSettings.createProposalStatus(
+        context.user,
+        args
+      ),
       ProposalStatusResponseWrap
     );
   }

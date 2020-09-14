@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { CreateProposalStatusArgs } from '../../resolvers/mutations/CreateProposalStatusMutation';
-import { ProposalStatusDataSource } from '../ProposalStatusDataSource';
+import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import { ProposalStatusRecord } from './records';
 
-export default class PostgresProposalStatusDataSource
-  implements ProposalStatusDataSource {
+export default class PostgresProposalSettingsDataSource
+  implements ProposalSettingsDataSource {
   private createProposalStatusObject(proposalStatus: ProposalStatusRecord) {
     return new ProposalStatus(
       proposalStatus.proposal_status_id,
@@ -15,7 +15,9 @@ export default class PostgresProposalStatusDataSource
     );
   }
 
-  async create(args: CreateProposalStatusArgs): Promise<ProposalStatus> {
+  async createProposalStatus(
+    args: CreateProposalStatusArgs
+  ): Promise<ProposalStatus> {
     return database
       .insert(args)
       .into('proposal_statuses')
@@ -29,7 +31,9 @@ export default class PostgresProposalStatusDataSource
       });
   }
 
-  async get(proposalStatusId: number): Promise<ProposalStatus | null> {
+  async getProposalStatus(
+    proposalStatusId: number
+  ): Promise<ProposalStatus | null> {
     return database
       .select()
       .from('proposal_statuses')
@@ -40,7 +44,7 @@ export default class PostgresProposalStatusDataSource
       );
   }
 
-  async getAll(): Promise<ProposalStatus[]> {
+  async getAllProposalStatuses(): Promise<ProposalStatus[]> {
     return database
       .select('*')
       .from('proposal_statuses')
@@ -52,7 +56,9 @@ export default class PostgresProposalStatusDataSource
       });
   }
 
-  async update(proposalStatus: ProposalStatus): Promise<ProposalStatus> {
+  async updateProposalStatus(
+    proposalStatus: ProposalStatus
+  ): Promise<ProposalStatus> {
     return database
       .update(
         {
@@ -73,7 +79,9 @@ export default class PostgresProposalStatusDataSource
       });
   }
 
-  async delete(proposalStatusId: number): Promise<ProposalStatus> {
+  async deleteProposalStatus(
+    proposalStatusId: number
+  ): Promise<ProposalStatus> {
     return database('proposal_statuses')
       .where('proposal_status_id', proposalStatusId)
       .del()
