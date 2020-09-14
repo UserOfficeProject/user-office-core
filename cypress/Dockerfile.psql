@@ -1,2 +1,2 @@
-FROM postgres:11.2
-COPY ./duo-backend/db_patches /docker-entrypoint-initdb.d/
+FROM postgres:11-alpine
+COPY ./user-office-backend/db_patches /docker-entrypoint-initdb.d/
