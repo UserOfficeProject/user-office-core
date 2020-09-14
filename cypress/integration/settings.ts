@@ -32,7 +32,7 @@ context('Settings tests', () => {
       const description = faker.random.words(5);
 
       // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const validName = name.toUpperCase().replace(' ', '_');
+      const validName = name.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
@@ -67,7 +67,7 @@ context('Settings tests', () => {
       const newDescription = faker.random.words(5);
 
       // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const newValidName = newName.toUpperCase().replace(' ', '_');
+      const newValidName = newName.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
