@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
@@ -8,13 +7,12 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(theme => ({
   submit: {
@@ -32,8 +30,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   proposalStatus,
 }) => {
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   const initialValues = proposalStatus
@@ -49,30 +46,22 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
       onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
         if (proposalStatus) {
-          const data = await api().updateProposalStatus({
+          const data = await api(
+            'Proposal status updated successfully'
+          ).updateProposalStatus({
             id: proposalStatus.id,
             ...values,
           });
           if (data.updateProposalStatus.error) {
-            enqueueSnackbar(
-              getTranslation(data.updateProposalStatus.error as ResourceId),
-              {
-                variant: 'error',
-              }
-            );
             close(null);
           } else if (data.updateProposalStatus.proposalStatus) {
             close(data.updateProposalStatus.proposalStatus);
           }
         } else {
-          const data = await api().createProposalStatus(values);
+          const data = await api(
+            'Proposal status created successfully'
+          ).createProposalStatus(values);
           if (data.createProposalStatus.error) {
-            enqueueSnackbar(
-              getTranslation(data.createProposalStatus.error as ResourceId),
-              {
-                variant: 'error',
-              }
-            );
             close(null);
           } else if (data.createProposalStatus.proposalStatus) {
             close(data.createProposalStatus.proposalStatus);
