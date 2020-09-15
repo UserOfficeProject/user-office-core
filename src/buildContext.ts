@@ -13,12 +13,14 @@ import {
   instrumentDatasource,
   questionaryDataSource,
   sampleDataSource,
+  proposalStatusDataSource,
 } from './datasources';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import FileMutations from './mutations/FileMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import ProposalMutations from './mutations/ProposalMutations';
+import ProposalStatusMutations from './mutations/ProposalStatusMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SampleMutations from './mutations/SampleMutations';
@@ -31,6 +33,7 @@ import EventLogQueries from './queries/EventLogQueries';
 import FileQueries from './queries/FileQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import ProposalQueries from './queries/ProposalQueries';
+import ProposalStatusQueries from './queries/ProposalStatusQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleQueries from './queries/SampleQueries';
@@ -114,6 +117,14 @@ const sampleMutations = new SampleMutations(
   logger
 );
 
+const proposalStatusQueries = new ProposalStatusQueries(
+  proposalStatusDataSource
+);
+
+const proposalStatusMutations = new ProposalStatusMutations(
+  proposalStatusDataSource
+);
+
 const context: BasicResolverContext = {
   userAuthorization,
   queries: {
@@ -129,6 +140,7 @@ const context: BasicResolverContext = {
     instrument: instrumentQueries,
     questionary: questionaryQueries,
     sample: sampleQueries,
+    proposalStatus: proposalStatusQueries,
   },
   mutations: {
     user: userMutations,
@@ -142,6 +154,7 @@ const context: BasicResolverContext = {
     instrument: instrumentMutations,
     questionary: questionaryMutations,
     sample: sampleMutations,
+    proposalStatus: proposalStatusMutations,
   },
 };
 

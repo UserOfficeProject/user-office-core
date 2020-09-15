@@ -1,10 +1,10 @@
-import { ProposalStatus } from './Proposal';
+import { ProposalStatusEnum } from './Proposal';
 import { TechnicalReviewStatus } from './TechnicalReview';
 export class ProposalView {
   constructor(
     public id: number,
     public title: string,
-    public status: ProposalStatus,
+    public status: ProposalStatusEnum,
     public shortCode: string,
     public rankOrder: number,
     public finalStatus: number, // Should use ProposalEndStatus enum here

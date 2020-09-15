@@ -12,7 +12,7 @@ import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
-  ProposalStatus,
+  ProposalStatusEnum,
 } from '../../models/Proposal';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
@@ -34,8 +34,8 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public abstract: string;
 
-  @Field(() => ProposalStatus)
-  public status: ProposalStatus;
+  @Field(() => ProposalStatusEnum)
+  public status: ProposalStatusEnum;
 
   @Field(() => Date)
   public created: Date;
@@ -149,7 +149,7 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
-    if (proposal.status === ProposalStatus.BLANK) {
+    if (proposal.status === ProposalStatusEnum.BLANK) {
       const call = await context.queries.call.get(
         context.user,
         proposal.callId

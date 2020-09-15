@@ -11,7 +11,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserNotOnProposalWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { Proposal, ProposalStatus } from '../models/Proposal';
+import { Proposal, ProposalStatusEnum } from '../models/Proposal';
 import { MutedLogger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSourceMock } from './../datasources/mockups/CallDataSource';
@@ -122,7 +122,7 @@ test('A user officer can not reject a proposal that does not exist', () => {
 test('A user officer can submit a proposal ', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('status', ProposalStatus.SUBMITTED);
+  ).resolves.toHaveProperty('status', ProposalStatusEnum.SUBMITTED);
 });
 
 test('A user officer can not submit a proposal that does not exist', () => {
@@ -134,7 +134,7 @@ test('A user officer can not submit a proposal that does not exist', () => {
 test('A user on the proposal can submit a proposal ', () => {
   return expect(
     proposalMutations.submit(dummyUserWithRole, { proposalId: 1 })
-  ).resolves.toHaveProperty('status', ProposalStatus.SUBMITTED);
+  ).resolves.toHaveProperty('status', ProposalStatusEnum.SUBMITTED);
 });
 
 test('A user not on the proposal cannot submit a proposal ', () => {

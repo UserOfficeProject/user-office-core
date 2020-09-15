@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import {
   Proposal,
   ProposalEndStatus,
-  ProposalStatus,
+  ProposalStatusEnum,
 } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
@@ -26,7 +26,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.status || ProposalStatus.DRAFT,
+    values?.status || ProposalStatusEnum.DRAFT,
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
@@ -52,7 +52,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       'title',
       'abstract',
       1, // main proposer
-      ProposalStatus.DRAFT, // status
+      ProposalStatusEnum.DRAFT, // status
       new Date('2019-07-17 08:25:12.23043+00'),
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
@@ -70,7 +70,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       'submitted proposal',
       'abstract',
       1, // main proposer
-      ProposalStatus.SUBMITTED, // status
+      ProposalStatusEnum.SUBMITTED, // status
       new Date('2019-07-17 08:25:12.23043+00'),
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
@@ -122,7 +122,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (id !== dummyProposal.id) {
       throw new Error('Wrong ID');
     }
-    dummyProposal.status = ProposalStatus.SUBMITTED;
+    dummyProposal.status = ProposalStatusEnum.SUBMITTED;
 
     return dummyProposal;
   }
