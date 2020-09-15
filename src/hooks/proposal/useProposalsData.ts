@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import { UserContext } from 'context/UserContextProvider';
 import {
   ProposalsFilter,
-  ProposalStatus,
+  ProposalStatusEnum,
   Proposal,
   UserRole,
 } from 'generated/sdk';
@@ -30,7 +30,7 @@ export function useProposalsData(filter: ProposalsFilter) {
                 return {
                   ...proposal,
                   status:
-                    proposal.status === ProposalStatus.DRAFT
+                    proposal.status === ProposalStatusEnum.DRAFT
                       ? 'Open'
                       : 'Submitted',
                 } as ProposalData;
@@ -51,7 +51,7 @@ export function useProposalsData(filter: ProposalsFilter) {
                 return {
                   ...proposal,
                   status:
-                    proposal.status === ProposalStatus.DRAFT
+                    proposal.status === ProposalStatusEnum.DRAFT
                       ? 'Open'
                       : 'Submitted',
                 } as ProposalData;

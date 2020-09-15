@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useSnackbar } from 'notistack';
-import React from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -23,6 +23,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
 }) => {
   const api = useDataApi();
   const { enqueueSnackbar } = useSnackbar();
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const initialValues = institution
     ? {
         name: institution.name,
@@ -49,6 +50,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         } else if (institution) {
           close(institution);
         }
+        setSubmitting(false);
       });
   };
 
@@ -70,6 +72,8 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         } else if (institution) {
           close(institution);
         }
+
+        setSubmitting(false);
       });
   };
 
@@ -77,6 +81,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
+        setSubmitting(true);
         institution
           ? updateInstitution(institution.id, values.verified, values.name)
           : createInstitution(values.verified, values.name);
@@ -87,7 +92,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         verified: Yup.string().required(),
       }}
     >
-      {({ isSubmitting }) => (
+      {() => (
         <Form>
           <Typography variant="h6">
             {institution ? 'Update' : 'Create new'} institution
@@ -101,7 +106,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             component={TextField}
             data-cy="name"
             fullWidth
-            disabled={isSubmitting}
+            disabled={submitting}
           />
 
           <FormikDropdown
@@ -112,7 +117,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
               { text: 'false', value: 'false' },
             ]}
             data-cy="verified"
-            disabled={isSubmitting}
+            disabled={submitting}
           />
 
           <Button
@@ -121,9 +126,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             variant="contained"
             color="primary"
             data-cy="submit"
-            disabled={isSubmitting}
+            disabled={submitting}
           >
-            {isSubmitting && <UOLoader size={14} />}
+            {submitting && <UOLoader size={14} />}
             {institution ? 'Update' : 'Create'}
           </Button>
         </Form>

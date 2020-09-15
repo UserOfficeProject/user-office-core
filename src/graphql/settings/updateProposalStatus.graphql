@@ -1,0 +1,14 @@
+mutation updateProposalStatus(
+  $id: Int!
+  $name: String!
+  $description: String!
+) {
+  updateProposalStatus(id: $id, name: $name, description: $description) {
+    proposalStatus {
+      id
+      name
+      description
+    }
+    error
+  }
+}

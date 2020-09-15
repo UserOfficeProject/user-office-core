@@ -3,7 +3,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { ProposalStatus } from 'generated/sdk';
+import { ProposalStatusEnum } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import {
@@ -73,11 +73,12 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
               )();
             },
             label:
-              proposal.status === ProposalStatus.SUBMITTED
+              proposal.status === ProposalStatusEnum.SUBMITTED
                 ? '✔ Submitted'
                 : 'Submit',
             disabled:
-              !allStepsComplete || proposal.status === ProposalStatus.SUBMITTED,
+              !allStepsComplete ||
+              proposal.status === ProposalStatusEnum.SUBMITTED,
             isBusy: isLoading,
           }}
           reset={undefined}

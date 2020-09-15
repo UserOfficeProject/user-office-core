@@ -10,7 +10,7 @@ import React, { Fragment } from 'react';
 import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import { Proposal, UserRole } from 'generated/sdk';
-import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
+import { ProposalEndStatus, ProposalStatusEnum } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
 
@@ -50,7 +50,8 @@ export default function ProposalAdmin(props: {
             id: props.data.id,
             finalStatus:
               ProposalEndStatus[values.finalStatus as ProposalEndStatus],
-            status: ProposalStatus[values.proposalStatus as ProposalStatus],
+            status:
+              ProposalStatusEnum[values.proposalStatus as ProposalStatusEnum],
             commentForUser: values.commentForUser,
             commentForManagement: values.commentForManagement,
           };
@@ -90,9 +91,9 @@ export default function ProposalAdmin(props: {
                   label="Proposal status"
                   data-cy="proposalStatus"
                   items={[
-                    { text: '', value: ProposalStatus.BLANK },
-                    { text: 'Draft', value: ProposalStatus.DRAFT },
-                    { text: 'Submitted', value: ProposalStatus.SUBMITTED },
+                    { text: '', value: ProposalStatusEnum.BLANK },
+                    { text: 'Draft', value: ProposalStatusEnum.DRAFT },
+                    { text: 'Submitted', value: ProposalStatusEnum.SUBMITTED },
                   ]}
                   required
                   disabled={!isUserOfficer}

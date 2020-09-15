@@ -15,8 +15,8 @@ import { Link } from 'react-router-dom';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import DialogConfirmation from 'components/common/DialogConfirmation';
-import ScienceIconAdd from 'components/common/ScienceIconAdd';
-import ScienceIconRemove from 'components/common/ScienceIconRemove';
+import ScienceIconAdd from 'components/common/icons/ScienceIconAdd';
+import ScienceIconRemove from 'components/common/icons/ScienceIconRemove';
 import AssignProposalsToInstrument from 'components/instrument/AssignProposalsToInstrument';
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import { Instrument, Sep, ProposalsToInstrumentArgs } from 'generated/sdk';
