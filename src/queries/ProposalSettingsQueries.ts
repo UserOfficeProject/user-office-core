@@ -6,7 +6,7 @@ import { UserWithRole } from '../models/User';
 export default class ProposalSettingsQueries {
   constructor(private dataSource: ProposalSettingsDataSource) {}
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
   async getProposalStatus(agent: UserWithRole | null, id: number) {
     const proposalStatus = await this.dataSource.getProposalStatus(id);
 

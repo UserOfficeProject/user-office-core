@@ -1,9 +1,3 @@
-export enum ProposalStatusEnum {
-  BLANK = -1,
-  DRAFT = 0,
-  SUBMITTED = 1,
-}
-
 export enum ProposalEndStatus {
   UNSET = 0,
   ACCEPTED = 1,
@@ -16,7 +10,7 @@ export class Proposal {
     public title: string,
     public abstract: string,
     public proposerId: number,
-    public status: ProposalStatusEnum,
+    public statusId: number,
     public created: Date,
     public updated: Date,
     public shortCode: string,
@@ -26,6 +20,7 @@ export class Proposal {
     public questionaryId: number,
     public commentForUser: string,
     public commentForManagement: string,
-    public notified: boolean
+    public notified: boolean,
+    public submitted: boolean
   ) {}
 }

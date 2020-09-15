@@ -1,7 +1,7 @@
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
-import { ProposalEndStatus, ProposalStatusEnum } from '../models/Proposal';
+import { ProposalEndStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { logger } from '../utils/Logger';
@@ -126,7 +126,7 @@ export default class ProposalQueries {
       '',
       '',
       (agent as UserWithRole).id,
-      ProposalStatusEnum.BLANK,
+      0,
       new Date(),
       new Date(),
       '',
@@ -136,6 +136,7 @@ export default class ProposalQueries {
       -1,
       '',
       '',
+      false,
       false
     );
 

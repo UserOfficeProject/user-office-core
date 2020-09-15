@@ -3,7 +3,6 @@ import { Field, Float, Int, ObjectType } from 'type-graphql';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
-  ProposalStatusEnum,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
 
@@ -15,8 +14,14 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String)
   public title: string;
 
-  @Field(() => ProposalStatusEnum)
-  public status: ProposalStatusEnum;
+  @Field(() => Int)
+  public statusId: number;
+
+  @Field(() => String)
+  public statusName: string;
+
+  @Field(() => String)
+  public statusDescription: string;
 
   @Field(() => String)
   public shortCode: string;
@@ -29,6 +34,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => Boolean)
   public notified: boolean;
+
+  @Field(() => Boolean)
+  public submitted: boolean;
 
   @Field(() => Int, { nullable: true })
   public timeAllocation: number;

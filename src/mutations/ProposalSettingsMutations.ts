@@ -42,6 +42,11 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: UpdateProposalStatusArgs
   ): Promise<ProposalStatus | Rejection> {
+    // TODO: Find better way of preventing update and remove on default proposal statuses.
+    if (args.id < 10) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
       .updateProposalStatus(args)
       .then(result => result)
@@ -61,6 +66,11 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: { id: number }
   ): Promise<ProposalStatus | Rejection> {
+    // TODO: Find better way of preventing update and remove on default proposal statuses.
+    if (args.id < 10) {
+      return rejection('NOT_ALLOWED');
+    }
+
     return this.dataSource
       .deleteProposalStatus(args.id)
       .then(result => result)
