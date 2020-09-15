@@ -32,7 +32,7 @@ context('Settings tests', () => {
       const description = faker.random.words(5);
 
       // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const validName = name.toUpperCase().replace(' ', '_');
+      const validName = name.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
@@ -63,11 +63,11 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to update Proposal status', () => {
-      const name = faker.random.words(2);
-      const description = faker.random.words(5);
+      const newName = faker.random.words(2);
+      const newDescription = faker.random.words(5);
 
       // NOTE: Valid proposal status name is uppercase characters without spaces but underscores.
-      const validName = name.toUpperCase().replace(' ', '_');
+      const newValidName = newName.toUpperCase().replace(/\s/g, '_');
 
       cy.login('officer');
 
@@ -86,10 +86,9 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('#name')
-        .clear()
-        .type(validName);
-      cy.get('#description').type(description);
+      cy.get('#name').clear();
+      cy.get('#name').type(newValidName);
+      cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
       proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
@@ -99,8 +98,8 @@ context('Settings tests', () => {
 
       const lastRowText = proposalStatusesTableLastRow.invoke('text');
 
-      lastRowText.should('not.contain', validName);
-      lastRowText.should('not.contain', description);
+      lastRowText.should('contain', newValidName);
+      lastRowText.should('contain', newDescription);
     });
 
     it('User Officer should be able to delete Proposal status', () => {

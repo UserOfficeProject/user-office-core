@@ -137,7 +137,8 @@ context('Instrument tests', () => {
       .eq(2)
       .click();
     cy.wait(500);
-    cy.contains('Settings').click();
+    const mainContentElement = cy.get('main');
+    mainContentElement.contains('Settings').click();
     cy.wait(500);
     cy.contains('Add role').click();
     cy.get('[data-cy="role-modal"] [title="Last Page"]').click();
