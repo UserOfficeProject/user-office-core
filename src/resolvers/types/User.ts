@@ -1,5 +1,6 @@
 import {
   Ctx,
+  Directive,
   Field,
   FieldResolver,
   Int,
@@ -17,6 +18,7 @@ import { Role } from './Role';
 import { SEP } from './SEP';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class User implements Partial<UserOrigin> {
   @Field(() => Int)
   public id: number;
@@ -111,4 +113,16 @@ export class UserResolver {
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.instrument.dataSource.getUserInstruments(user.id);
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function resolveUserReference(...params: any): Promise<User> {
+  // the order of the parameters and types are messed up,
+  // it should be source, args, context, resolveInfo
+  // but instead we get source, context and resolveInfo
+  // this was the easies way to make the compiler happy and use real types
+  const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
+
+  // dataSource.get can be null, even with non-null operator the compiler complains
+  return (await (ctx.queries.user.byRef(reference.id) as unknown)) as User;
 }
