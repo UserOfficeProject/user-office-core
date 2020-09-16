@@ -4,6 +4,7 @@ import { Proposal } from '../models/Proposal';
 import { ProposalEndStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { omit } from '../utils/helperFunctions';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
@@ -18,22 +19,24 @@ export default class ProposalQueries {
 
   @Authorized()
   async get(agent: UserWithRole | null, id: number) {
-    const proposal = await this.dataSource.get(id);
+    let proposal = await this.dataSource.get(id);
 
     if (!proposal) {
       return null;
     }
 
-    //If not a user officer remove excellence, technical and safety score
+    // If not a user officer remove excellence, technical and safety score
     if (!(await this.userAuth.isUserOfficer(agent))) {
-      delete proposal.rankOrder;
-      delete proposal.commentForManagement;
+      proposal = omit(
+        proposal,
+        'rankOrder',
+        'commentForManagement'
+      ) as Proposal;
     }
 
-    //If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
+    // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
     if (!(await this.userAuth.isUserOfficer(agent)) && !proposal.notified) {
-      delete proposal.finalStatus;
-      delete proposal.commentForUser;
+      proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
 
     if ((await this.hasAccessRights(agent, proposal)) === true) {

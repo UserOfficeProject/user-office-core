@@ -12,6 +12,7 @@ import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { omit } from '../utils/helperFunctions';
 import { UserAuthorization } from '../utils/UserAuthorization';
 import ProposalQueries from './ProposalQueries';
 
@@ -32,8 +33,18 @@ beforeEach(() => {
 });
 
 test('A user on the proposal can get a proposal it belongs to', () => {
-  return expect(proposalQueries.get(dummyUserWithRole, 1)).resolves.toBe(
-    dummyProposal
+  return expect(
+    proposalQueries.get(dummyUserWithRole, 1)
+  ).resolves.toStrictEqual(
+    dummyProposal.notified
+      ? omit(dummyProposal, 'rankOrder', 'commentForManagement')
+      : omit(
+          dummyProposal,
+          'rankOrder',
+          'commentForManagement',
+          'finalStatus',
+          'commentForUser'
+        )
   );
 });
 
