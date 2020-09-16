@@ -1,11 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { useEffect, useState } from 'react';
 
-import {
-  ProposalsFilter,
-  ProposalView,
-  ProposalStatusEnum,
-} from 'generated/sdk';
+import { ProposalsFilter, ProposalView } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalsCoreData(filter: ProposalsFilter) {
@@ -26,10 +22,7 @@ export function useProposalsCoreData(filter: ProposalsFilter) {
             data.proposalsView.map(proposal => {
               return {
                 ...proposal,
-                status:
-                  proposal.status === ProposalStatusEnum.DRAFT
-                    ? 'Open'
-                    : 'Submitted',
+                status: proposal.submitted ? 'Submitted' : 'Open',
                 technicalStatus: getTranslation(
                   proposal.technicalStatus as ResourceId
                 ),

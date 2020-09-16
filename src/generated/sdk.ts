@@ -509,7 +509,7 @@ export type MutationAdministrationProposalArgs = {
   commentForUser?: Maybe<Scalars['String']>;
   commentForManagement?: Maybe<Scalars['String']>;
   finalStatus?: Maybe<ProposalEndStatus>;
-  status?: Maybe<ProposalStatusEnum>;
+  statusId?: Maybe<Scalars['Int']>;
   rankOrder?: Maybe<Scalars['Int']>;
 };
 
@@ -981,7 +981,7 @@ export type Proposal = {
   id: Scalars['Int'];
   title: Scalars['String'];
   abstract: Scalars['String'];
-  status: ProposalStatusEnum;
+  statusId: Scalars['Int'];
   created: Scalars['DateTime'];
   updated: Scalars['DateTime'];
   shortCode: Scalars['String'];
@@ -992,8 +992,10 @@ export type Proposal = {
   commentForUser: Maybe<Scalars['String']>;
   commentForManagement: Maybe<Scalars['String']>;
   notified: Scalars['Boolean'];
+  submitted: Scalars['Boolean'];
   users: Array<BasicUserDetails>;
   proposer: BasicUserDetails;
+  status: ProposalStatus;
   reviews: Maybe<Array<Review>>;
   technicalReview: Maybe<TechnicalReview>;
   instrument: Maybe<Instrument>;
@@ -1036,12 +1038,6 @@ export type ProposalStatus = {
   description: Scalars['String'];
 };
 
-export enum ProposalStatusEnum {
-  BLANK = 'BLANK',
-  DRAFT = 'DRAFT',
-  SUBMITTED = 'SUBMITTED'
-}
-
 export type ProposalStatusResponseWrap = {
   __typename?: 'ProposalStatusResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -1074,11 +1070,14 @@ export type ProposalView = {
   __typename?: 'ProposalView';
   id: Scalars['Int'];
   title: Scalars['String'];
-  status: ProposalStatusEnum;
+  statusId: Scalars['Int'];
+  statusName: Scalars['String'];
+  statusDescription: Scalars['String'];
   shortCode: Scalars['String'];
   rankOrder: Maybe<Scalars['Int']>;
   finalStatus: Maybe<ProposalEndStatus>;
   notified: Scalars['Boolean'];
+  submitted: Scalars['Boolean'];
   timeAllocation: Maybe<Scalars['Int']>;
   technicalStatus: Maybe<TechnicalReviewStatus>;
   instrumentName: Maybe<Scalars['String']>;
@@ -1881,7 +1880,11 @@ export type GetSepProposalsQuery = (
     & Pick<SepProposal, 'proposalId' | 'dateAssigned' | 'sepId'>
     & { proposal: (
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'title' | 'id' | 'shortCode' | 'status'>
+      & Pick<Proposal, 'title' | 'id' | 'shortCode'>
+      & { status: (
+        { __typename?: 'ProposalStatus' }
+        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      ) }
     ), assignments: Maybe<Array<(
       { __typename?: 'SEPAssignment' }
       & Pick<SepAssignment, 'sepMemberUserId' | 'dateAssigned'>
@@ -1912,8 +1915,11 @@ export type SepProposalsByInstrumentQuery = (
     { __typename?: 'SEPProposal' }
     & { proposal: (
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder' | 'status'>
-      & { reviews: Maybe<Array<(
+      & Pick<Proposal, 'id' | 'title' | 'shortCode' | 'rankOrder'>
+      & { status: (
+        { __typename?: 'ProposalStatus' }
+        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      ), reviews: Maybe<Array<(
         { __typename?: 'Review' }
         & Pick<Review, 'id' | 'comment' | 'grade' | 'status'>
       )>>, technicalReview: Maybe<(
@@ -2455,7 +2461,7 @@ export type AdministrationProposalMutationVariables = Exact<{
   id: Scalars['Int'];
   rankOrder?: Maybe<Scalars['Int']>;
   finalStatus?: Maybe<ProposalEndStatus>;
-  status?: Maybe<ProposalStatusEnum>;
+  statusId?: Maybe<Scalars['Int']>;
   commentForUser?: Maybe<Scalars['String']>;
   commentForManagement?: Maybe<Scalars['String']>;
 }>;
@@ -2485,8 +2491,11 @@ export type CreateProposalMutation = (
     & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'status' | 'shortCode' | 'questionaryId'>
-      & { questionary: (
+      & Pick<Proposal, 'id' | 'shortCode' | 'questionaryId'>
+      & { status: (
+        { __typename?: 'ProposalStatus' }
+        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      ), questionary: (
         { __typename?: 'Questionary' }
         & QuestionaryFragment
       ) }
@@ -2517,7 +2526,11 @@ export type CoreTechnicalReviewFragment = (
 
 export type ProposalFragment = (
   { __typename?: 'Proposal' }
-  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified'>
+  & Pick<Proposal, 'id' | 'title' | 'abstract' | 'statusId' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'commentForUser' | 'commentForManagement' | 'created' | 'updated' | 'callId' | 'questionaryId' | 'notified' | 'submitted'>
+  & { status: (
+    { __typename?: 'ProposalStatus' }
+    & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+  ) }
 );
 
 export type GetBlankProposalQueryVariables = Exact<{
@@ -2684,7 +2697,7 @@ export type GetProposalsCoreQuery = (
   { __typename?: 'Query' }
   & { proposalsView: Maybe<Array<(
     { __typename?: 'ProposalView' }
-    & Pick<ProposalView, 'id' | 'title' | 'status' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId'>
+    & Pick<ProposalView, 'id' | 'title' | 'statusId' | 'statusName' | 'statusDescription' | 'shortCode' | 'rankOrder' | 'finalStatus' | 'notified' | 'timeAllocation' | 'technicalStatus' | 'instrumentName' | 'callShortCode' | 'sepShortCode' | 'reviewAverage' | 'reviewDeviation' | 'instrumentId' | 'callId' | 'submitted'>
   )>> }
 );
 
@@ -3895,7 +3908,11 @@ export type GetUserProposalsQuery = (
     { __typename?: 'User' }
     & { proposals: Array<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'status' | 'created' | 'finalStatus' | 'notified'>
+      & Pick<Proposal, 'id' | 'shortCode' | 'title' | 'statusId' | 'created' | 'finalStatus' | 'notified' | 'submitted'>
+      & { status: (
+        { __typename?: 'ProposalStatus' }
+        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+      ) }
     )> }
   )> }
 );
@@ -4084,7 +4101,12 @@ export const ProposalFragmentDoc = gql`
   id
   title
   abstract
-  status
+  statusId
+  status {
+    id
+    name
+    description
+  }
   shortCode
   rankOrder
   finalStatus
@@ -4095,6 +4117,7 @@ export const ProposalFragmentDoc = gql`
   callId
   questionaryId
   notified
+  submitted
 }
     `;
 export const AnswerBasicFragmentDoc = gql`
@@ -4456,7 +4479,11 @@ export const GetSepProposalsDocument = gql`
       title
       id
       shortCode
-      status
+      status {
+        id
+        name
+        description
+      }
     }
     assignments {
       sepMemberUserId
@@ -4492,7 +4519,11 @@ export const SepProposalsByInstrumentDocument = gql`
       title
       shortCode
       rankOrder
-      status
+      status {
+        id
+        name
+        description
+      }
       reviews {
         id
         comment
@@ -4874,8 +4905,8 @@ export const UpdateInstrumentDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const AdministrationProposalDocument = gql`
-    mutation administrationProposal($id: Int!, $rankOrder: Int, $finalStatus: ProposalEndStatus, $status: ProposalStatusEnum, $commentForUser: String, $commentForManagement: String) {
-  administrationProposal(id: $id, rankOrder: $rankOrder, finalStatus: $finalStatus, status: $status, commentForUser: $commentForUser, commentForManagement: $commentForManagement) {
+    mutation administrationProposal($id: Int!, $rankOrder: Int, $finalStatus: ProposalEndStatus, $statusId: Int, $commentForUser: String, $commentForManagement: String) {
+  administrationProposal(id: $id, rankOrder: $rankOrder, finalStatus: $finalStatus, statusId: $statusId, commentForUser: $commentForUser, commentForManagement: $commentForManagement) {
     proposal {
       id
     }
@@ -4888,7 +4919,11 @@ export const CreateProposalDocument = gql`
   createProposal(callId: $callId) {
     proposal {
       id
-      status
+      status {
+        id
+        name
+        description
+      }
       shortCode
       questionaryId
       questionary {
@@ -5092,7 +5127,9 @@ export const GetProposalsCoreDocument = gql`
   proposalsView(filter: $filter) {
     id
     title
-    status
+    statusId
+    statusName
+    statusDescription
     shortCode
     rankOrder
     finalStatus
@@ -5106,6 +5143,7 @@ export const GetProposalsCoreDocument = gql`
     reviewDeviation
     instrumentId
     callId
+    submitted
   }
 }
     `;
@@ -5722,10 +5760,16 @@ export const GetUserProposalsDocument = gql`
       id
       shortCode
       title
-      status
+      status {
+        id
+        name
+        description
+      }
+      statusId
       created
       finalStatus
       notified
+      submitted
     }
   }
 }

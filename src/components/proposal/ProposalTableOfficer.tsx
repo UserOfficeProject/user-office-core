@@ -203,8 +203,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       field: 'technicalStatus',
     },
     {
+      title: 'Submitted',
+      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+    },
+    {
       title: 'Status',
-      field: 'status',
+      field: 'statusName',
     },
     {
       title: 'Deviation',

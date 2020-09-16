@@ -12,7 +12,6 @@ import { useCheckAccess } from 'components/common/Can';
 import {
   Answer,
   DataType,
-  ProposalStatusEnum,
   Questionary,
   SubtemplateConfig,
   TemplateCategoryId,
@@ -172,7 +171,7 @@ export default function ProposalContainer(props: {
         case EventType.SAVE_GENERAL_INFO_CLICKED:
           const { callId } = state.proposal;
           let proposal = state.proposal;
-          if (state.proposal.status === ProposalStatusEnum.BLANK) {
+          if (state.proposal.status.id === 0) {
             const response = await api('Saved').createProposal({ callId });
             proposal = { ...proposal, ...response.createProposal.proposal };
             dispatch({
@@ -253,7 +252,7 @@ export default function ProposalContainer(props: {
     reduceMiddleware,
   ]);
 
-  const isSubmitted = state.proposal.status === ProposalStatusEnum.SUBMITTED;
+  const isSubmitted = state.proposal.submitted;
 
   useEffect(() => {
     const createProposalSteps = (
@@ -265,7 +264,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.GENERAL,
           'New Proposal',
-          state.proposal.status !== ProposalStatusEnum.BLANK,
+          state.proposal.status.id !== 0,
           (
             <ProposalInformationView
               data={state.proposal}
@@ -277,8 +276,7 @@ export default function ProposalContainer(props: {
       allProposalSteps = allProposalSteps.concat(
         questionary.steps.map((step, index, steps) => {
           const editable =
-            (index === 0 &&
-              state.proposal.status !== ProposalStatusEnum.BLANK) ||
+            (index === 0 && state.proposal.status.id !== 0) ||
             step.isCompleted ||
             (steps[index - 1] !== undefined &&
               steps[index - 1].isCompleted === true);
@@ -302,7 +300,7 @@ export default function ProposalContainer(props: {
         new QuestionaryUIStep(
           StepType.REVIEW,
           'Review',
-          state.proposal.status === ProposalStatusEnum.SUBMITTED,
+          state.proposal.submitted,
           (
             <ProposalReview
               data={state}
@@ -323,7 +321,7 @@ export default function ProposalContainer(props: {
   // right step once proposal loads
   useEffect(() => {
     const proposal = props.data;
-    if (proposal.status === ProposalStatusEnum.DRAFT) {
+    if (proposal.status.name === 'DRAFT') {
       const questionarySteps = proposal.questionary.steps;
       const lastFinishedStep = questionarySteps
         .slice()
@@ -337,7 +335,7 @@ export default function ProposalContainer(props: {
         )
       );
     } else {
-      if (proposal.status === ProposalStatusEnum.BLANK) {
+      if (proposal.status.id === 0) {
         setStepIndex(0);
       } else {
         setStepIndex(proposal.questionary.steps.length + 1);
@@ -379,9 +377,7 @@ export default function ProposalContainer(props: {
               ? `Proposal ID: ${state.proposal.shortCode}`
               : null}
           </div>
-          <div className={classes.infoline}>
-            {ProposalStatusEnum[state.proposal.status]}
-          </div>
+          <div className={classes.infoline}>{state.proposal.status.name}</div>
           <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
             {proposalSteps.map((step, index, steps) => (
               <Step key={step.title}>
