@@ -1,8 +1,8 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ProposalStatusResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { ResolverContext } from '../../../context';
+import { ProposalStatusResponseWrap } from '../../types/CommonWrappers';
+import { wrapResponse } from '../../wrapResponse';
 
 @Resolver()
 export class DeleteProposalStatusMutation {

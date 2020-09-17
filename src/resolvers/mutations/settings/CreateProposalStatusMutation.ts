@@ -1,8 +1,8 @@
 import { Args, ArgsType, Ctx, Mutation, Resolver, Field } from 'type-graphql';
 
-import { ResolverContext } from '../../context';
-import { ProposalStatusResponseWrap } from '../types/CommonWrappers';
-import { wrapResponse } from '../wrapResponse';
+import { ResolverContext } from '../../../context';
+import { ProposalStatusResponseWrap } from '../../types/CommonWrappers';
+import { wrapResponse } from '../../wrapResponse';
 
 @ArgsType()
 export class CreateProposalStatusArgs {

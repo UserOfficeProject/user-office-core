@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalStatus } from '../../models/ProposalStatus';
-import { CreateProposalStatusArgs } from '../../resolvers/mutations/CreateProposalStatusMutation';
+import { ProposalWorkflow } from '../../models/ProposalWorkflow';
+import { CreateProposalStatusArgs } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateProposalWorkflowArgs } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
-import { ProposalStatusRecord } from './records';
+import { ProposalStatusRecord, ProposalWorkflowRecord } from './records';
 
 export default class PostgresProposalSettingsDataSource
   implements ProposalSettingsDataSource {
+  // ----------- Proposal statuses ---------->
   private createProposalStatusObject(proposalStatus: ProposalStatusRecord) {
     return new ProposalStatus(
       proposalStatus.proposal_status_id,
@@ -96,4 +99,101 @@ export default class PostgresProposalSettingsDataSource
         return this.createProposalStatusObject(proposalStatus[0]);
       });
   }
+  // <---------- Proposal statuses -----------
+
+  // ----------- Proposal workflows ---------->
+  private createProposalWorkflowObject(
+    proposalWorkflow: ProposalWorkflowRecord
+  ) {
+    return new ProposalWorkflow(
+      proposalWorkflow.proposal_workflow_id,
+      proposalWorkflow.name,
+      proposalWorkflow.description
+    );
+  }
+
+  async createProposalWorkflow(
+    args: CreateProposalWorkflowArgs
+  ): Promise<ProposalWorkflow> {
+    return database
+      .insert(args)
+      .into('proposal_workflows')
+      .returning(['*'])
+      .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
+        if (proposalWorkflow.length !== 1) {
+          throw new Error('Could not create proposal status');
+        }
+
+        return this.createProposalWorkflowObject(proposalWorkflow[0]);
+      });
+  }
+
+  async getProposalWorkflow(
+    proposalWorkflowId: number
+  ): Promise<ProposalWorkflow | null> {
+    return database
+      .select()
+      .from('proposal_workflows')
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .first()
+      .then((proposalWorkflow: ProposalWorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
+  }
+
+  async getAllProposalWorkflows(): Promise<ProposalWorkflow[]> {
+    return database
+      .select('*')
+      .from('proposal_workflows')
+      .orderBy('proposal_workflow_id', 'asc')
+      .then((proposalWorkflows: ProposalWorkflowRecord[]) => {
+        return proposalWorkflows.map(proposalWorkflow =>
+          this.createProposalWorkflowObject(proposalWorkflow)
+        );
+      });
+  }
+
+  async updateProposalWorkflow(
+    proposalWorkflow: ProposalWorkflow
+  ): Promise<ProposalWorkflow> {
+    return database
+      .update(
+        {
+          proposal_workflow_id: proposalWorkflow.id,
+          name: proposalWorkflow.name,
+          description: proposalWorkflow.description,
+        },
+        ['*']
+      )
+      .from('proposal_workflows')
+      .where('proposal_workflow_id', proposalWorkflow.id)
+      .then((records: ProposalWorkflowRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new Error(`Proposal workflow not found ${proposalWorkflow.id}`);
+        }
+
+        return this.createProposalWorkflowObject(records[0]);
+      });
+  }
+
+  async deleteProposalWorkflow(
+    proposalWorkflowId: number
+  ): Promise<ProposalWorkflow> {
+    return database('proposal_workflows')
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .del()
+      .returning('*')
+      .then((proposalWorkflow: ProposalWorkflowRecord[]) => {
+        if (proposalWorkflow === undefined || proposalWorkflow.length !== 1) {
+          throw new Error(
+            `Could not delete proposal workflow with id: ${proposalWorkflowId} `
+          );
+        }
+
+        return this.createProposalWorkflowObject(proposalWorkflow[0]);
+      });
+  }
+  // <---------- Proposal workflows -----------
 }

@@ -19,4 +19,17 @@ export default class ProposalSettingsQueries {
 
     return proposalStatuses;
   }
+
+  async getProposalWorkflow(agent: UserWithRole | null, id: number) {
+    const proposalWorkflow = await this.dataSource.getProposalWorkflow(id);
+
+    return proposalWorkflow;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getAllProposalWorkflows(agent: UserWithRole | null) {
+    const proposalWorkflows = await this.dataSource.getAllProposalWorkflows();
+
+    return proposalWorkflows;
+  }
 }

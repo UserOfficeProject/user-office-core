@@ -318,6 +318,13 @@ export interface ProposalStatusRecord {
   readonly full_count: number;
 }
 
+export interface ProposalWorkflowRecord {
+  readonly proposal_workflow_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
