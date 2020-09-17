@@ -249,6 +249,9 @@ export function getDefaultAnswerValue(type: DataType): any {
   switch (type) {
     case DataType.BOOLEAN:
       return false;
+    case DataType.FILE_UPLOAD:
+    case DataType.SUBTEMPLATE:
+      return [];
     default:
       return '';
   }
