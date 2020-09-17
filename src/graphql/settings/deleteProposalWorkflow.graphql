@@ -1,0 +1,10 @@
+mutation deleteProposalWorkflow($id: Int!) {
+  deleteProposalWorkflow(id: $id) {
+    proposalWorkflow {
+      id
+      name
+      description
+    }
+    error
+  }
+}

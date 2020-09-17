@@ -1,0 +1,14 @@
+mutation updateProposalWorkflow(
+  $id: Int!
+  $name: String!
+  $description: String!
+) {
+  updateProposalWorkflow(id: $id, name: $name, description: $description) {
+    proposalWorkflow {
+      id
+      name
+      description
+    }
+    error
+  }
+}

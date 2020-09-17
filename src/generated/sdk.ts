@@ -327,7 +327,9 @@ export type Mutation = {
   administrationProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
   createProposalStatus: ProposalStatusResponseWrap;
+  createProposalWorkflow: ProposalWorkflowResponseWrap;
   updateProposalStatus: ProposalStatusResponseWrap;
+  updateProposalWorkflow: ProposalWorkflowResponseWrap;
   answerTopic: QuestionaryStepResponseWrap;
   createQuestionary: QuestionaryResponseWrap;
   updateAnswer: UpdateAnswerResponseWrap;
@@ -368,7 +370,6 @@ export type Mutation = {
   deleteInstitution: InstitutionResponseWrap;
   deleteInstrument: InstrumentResponseWrap;
   deleteProposal: ProposalResponseWrap;
-  deleteProposalStatus: ProposalStatusResponseWrap;
   deleteQuestion: QuestionResponseWrap;
   deleteSample: SampleResponseWrap;
   deleteTemplate: TemplateResponseWrap;
@@ -383,6 +384,8 @@ export type Mutation = {
   resetPasswordEmail: ResetPasswordEmailResponseWrap;
   resetPassword: BasicUserDetailsResponseWrap;
   setPageContent: PageResponseWrap;
+  deleteProposalStatus: ProposalStatusResponseWrap;
+  deleteProposalWorkflow: ProposalWorkflowResponseWrap;
   submitProposal: ProposalResponseWrap;
   token: TokenResponseWrap;
   selectRole: TokenResponseWrap;
@@ -529,7 +532,20 @@ export type MutationCreateProposalStatusArgs = {
 };
 
 
+export type MutationCreateProposalWorkflowArgs = {
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
+
 export type MutationUpdateProposalStatusArgs = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
+
+export type MutationUpdateProposalWorkflowArgs = {
   id: Scalars['Int'];
   name: Scalars['String'];
   description: Scalars['String'];
@@ -828,11 +844,6 @@ export type MutationDeleteProposalArgs = {
 };
 
 
-export type MutationDeleteProposalStatusArgs = {
-  id: Scalars['Int'];
-};
-
-
 export type MutationDeleteQuestionArgs = {
   questionId: Scalars['String'];
 };
@@ -898,6 +909,16 @@ export type MutationResetPasswordArgs = {
 export type MutationSetPageContentArgs = {
   text: Scalars['String'];
   id: PageName;
+};
+
+
+export type MutationDeleteProposalStatusArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationDeleteProposalWorkflowArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -1089,6 +1110,19 @@ export type ProposalView = {
   callId: Scalars['Int'];
 };
 
+export type ProposalWorkflow = {
+  __typename?: 'ProposalWorkflow';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
+export type ProposalWorkflowResponseWrap = {
+  __typename?: 'ProposalWorkflowResponseWrap';
+  error: Maybe<Scalars['String']>;
+  proposalWorkflow: Maybe<ProposalWorkflow>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _service: Service;
@@ -1115,6 +1149,8 @@ export type Query = {
   proposalStatuses: Maybe<Array<ProposalStatus>>;
   proposalsView: Maybe<Array<ProposalView>>;
   proposalTemplates: Maybe<Array<ProposalTemplate>>;
+  proposalWorkflow: Maybe<ProposalWorkflow>;
+  proposalWorkflows: Maybe<Array<ProposalWorkflow>>;
   questionary: Maybe<Questionary>;
   review: Maybe<Review>;
   roles: Maybe<Array<Role>>;
@@ -1243,6 +1279,11 @@ export type QueryProposalsViewArgs = {
 
 export type QueryProposalTemplatesArgs = {
   filter?: Maybe<ProposalTemplatesFilter>;
+};
+
+
+export type QueryProposalWorkflowArgs = {
+  id: Scalars['Int'];
 };
 
 
@@ -3192,6 +3233,24 @@ export type CreateProposalStatusMutation = (
   ) }
 );
 
+export type CreateProposalWorkflowMutationVariables = Exact<{
+  name: Scalars['String'];
+  description: Scalars['String'];
+}>;
+
+
+export type CreateProposalWorkflowMutation = (
+  { __typename?: 'Mutation' }
+  & { createProposalWorkflow: (
+    { __typename?: 'ProposalWorkflowResponseWrap' }
+    & Pick<ProposalWorkflowResponseWrap, 'error'>
+    & { proposalWorkflow: Maybe<(
+      { __typename?: 'ProposalWorkflow' }
+      & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
+    )> }
+  ) }
+);
+
 export type DeleteProposalStatusMutationVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -3209,6 +3268,23 @@ export type DeleteProposalStatusMutation = (
   ) }
 );
 
+export type DeleteProposalWorkflowMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteProposalWorkflowMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteProposalWorkflow: (
+    { __typename?: 'ProposalWorkflowResponseWrap' }
+    & Pick<ProposalWorkflowResponseWrap, 'error'>
+    & { proposalWorkflow: Maybe<(
+      { __typename?: 'ProposalWorkflow' }
+      & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
+    )> }
+  ) }
+);
+
 export type GetProposalStatusesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3217,6 +3293,17 @@ export type GetProposalStatusesQuery = (
   & { proposalStatuses: Maybe<Array<(
     { __typename?: 'ProposalStatus' }
     & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+  )>> }
+);
+
+export type GetProposalWorkflowsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProposalWorkflowsQuery = (
+  { __typename?: 'Query' }
+  & { proposalWorkflows: Maybe<Array<(
+    { __typename?: 'ProposalWorkflow' }
+    & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
   )>> }
 );
 
@@ -3235,6 +3322,25 @@ export type UpdateProposalStatusMutation = (
     & { proposalStatus: Maybe<(
       { __typename?: 'ProposalStatus' }
       & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+    )> }
+  ) }
+);
+
+export type UpdateProposalWorkflowMutationVariables = Exact<{
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+}>;
+
+
+export type UpdateProposalWorkflowMutation = (
+  { __typename?: 'Mutation' }
+  & { updateProposalWorkflow: (
+    { __typename?: 'ProposalWorkflowResponseWrap' }
+    & Pick<ProposalWorkflowResponseWrap, 'error'>
+    & { proposalWorkflow: Maybe<(
+      { __typename?: 'ProposalWorkflow' }
+      & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
     )> }
   ) }
 );
@@ -5397,10 +5503,34 @@ export const CreateProposalStatusDocument = gql`
   }
 }
     `;
+export const CreateProposalWorkflowDocument = gql`
+    mutation createProposalWorkflow($name: String!, $description: String!) {
+  createProposalWorkflow(name: $name, description: $description) {
+    proposalWorkflow {
+      id
+      name
+      description
+    }
+    error
+  }
+}
+    `;
 export const DeleteProposalStatusDocument = gql`
     mutation deleteProposalStatus($id: Int!) {
   deleteProposalStatus(id: $id) {
     proposalStatus {
+      id
+      name
+      description
+    }
+    error
+  }
+}
+    `;
+export const DeleteProposalWorkflowDocument = gql`
+    mutation deleteProposalWorkflow($id: Int!) {
+  deleteProposalWorkflow(id: $id) {
+    proposalWorkflow {
       id
       name
       description
@@ -5418,10 +5548,31 @@ export const GetProposalStatusesDocument = gql`
   }
 }
     `;
+export const GetProposalWorkflowsDocument = gql`
+    query getProposalWorkflows {
+  proposalWorkflows {
+    id
+    name
+    description
+  }
+}
+    `;
 export const UpdateProposalStatusDocument = gql`
     mutation updateProposalStatus($id: Int!, $name: String!, $description: String!) {
   updateProposalStatus(id: $id, name: $name, description: $description) {
     proposalStatus {
+      id
+      name
+      description
+    }
+    error
+  }
+}
+    `;
+export const UpdateProposalWorkflowDocument = gql`
+    mutation updateProposalWorkflow($id: Int!, $name: String!, $description: String!) {
+  updateProposalWorkflow(id: $id, name: $name, description: $description) {
+    proposalWorkflow {
       id
       name
       description
@@ -6086,14 +6237,26 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     createProposalStatus(variables: CreateProposalStatusMutationVariables): Promise<CreateProposalStatusMutation> {
       return withWrapper(() => client.request<CreateProposalStatusMutation>(print(CreateProposalStatusDocument), variables));
     },
+    createProposalWorkflow(variables: CreateProposalWorkflowMutationVariables): Promise<CreateProposalWorkflowMutation> {
+      return withWrapper(() => client.request<CreateProposalWorkflowMutation>(print(CreateProposalWorkflowDocument), variables));
+    },
     deleteProposalStatus(variables: DeleteProposalStatusMutationVariables): Promise<DeleteProposalStatusMutation> {
       return withWrapper(() => client.request<DeleteProposalStatusMutation>(print(DeleteProposalStatusDocument), variables));
+    },
+    deleteProposalWorkflow(variables: DeleteProposalWorkflowMutationVariables): Promise<DeleteProposalWorkflowMutation> {
+      return withWrapper(() => client.request<DeleteProposalWorkflowMutation>(print(DeleteProposalWorkflowDocument), variables));
     },
     getProposalStatuses(variables?: GetProposalStatusesQueryVariables): Promise<GetProposalStatusesQuery> {
       return withWrapper(() => client.request<GetProposalStatusesQuery>(print(GetProposalStatusesDocument), variables));
     },
+    getProposalWorkflows(variables?: GetProposalWorkflowsQueryVariables): Promise<GetProposalWorkflowsQuery> {
+      return withWrapper(() => client.request<GetProposalWorkflowsQuery>(print(GetProposalWorkflowsDocument), variables));
+    },
     updateProposalStatus(variables: UpdateProposalStatusMutationVariables): Promise<UpdateProposalStatusMutation> {
       return withWrapper(() => client.request<UpdateProposalStatusMutation>(print(UpdateProposalStatusDocument), variables));
+    },
+    updateProposalWorkflow(variables: UpdateProposalWorkflowMutationVariables): Promise<UpdateProposalWorkflowMutation> {
+      return withWrapper(() => client.request<UpdateProposalWorkflowMutation>(print(UpdateProposalWorkflowDocument), variables));
     },
     assignQuestionsToTopic(variables: AssignQuestionsToTopicMutationVariables): Promise<AssignQuestionsToTopicMutation> {
       return withWrapper(() => client.request<AssignQuestionsToTopicMutation>(print(AssignQuestionsToTopicDocument), variables));
