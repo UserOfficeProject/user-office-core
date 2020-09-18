@@ -3,7 +3,7 @@ version: '3.1'
 
 services:
   backend:
-    image: dmsc/duo-backend
+    image: 'dmsc/duo-backend:${USER_OFFICE_BACKEND_TAG}'
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       secret: qMyLZALzs229ybdQXNyzYRdju7X784TH
