@@ -10,11 +10,13 @@ export class ProposalStatusQuery {
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.proposalStatus.get(context.user, id);
+    return context.queries.proposalSettings.getProposalStatus(context.user, id);
   }
 
   @Query(() => [ProposalStatus], { nullable: true })
   proposalStatuses(@Ctx() context: ResolverContext) {
-    return context.queries.proposalStatus.getAll(context.user);
+    return context.queries.proposalSettings.getAllProposalStatuses(
+      context.user
+    );
   }
 }

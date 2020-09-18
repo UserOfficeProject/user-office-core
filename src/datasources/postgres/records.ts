@@ -38,7 +38,7 @@ export interface ProposalRecord {
   readonly title: string;
   readonly abstract: string;
   readonly proposer_id: number;
-  readonly status: number;
+  readonly status_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
@@ -54,19 +54,22 @@ export interface ProposalRecord {
   readonly comment_for_user: string;
   readonly comment_for_management: string;
   readonly notified: boolean;
+  readonly submitted: boolean;
 }
 
 export interface ProposalViewRecord {
   readonly id: number;
   readonly title: string;
   readonly proposer_id: number;
-  readonly proposal_status: number;
+  readonly proposal_status_id: number;
+  readonly proposal_status_name: string;
+  readonly proposal_status_description: string;
   readonly short_code: string;
   readonly rank_order: number;
   readonly final_status: number;
   readonly time_allocation: number;
   readonly notified: boolean;
-  readonly status: number;
+  readonly status_id: number;
   readonly instrument_name: string;
   readonly call_short_code: string;
   readonly code: string;
@@ -74,6 +77,7 @@ export interface ProposalViewRecord {
   readonly deviation: number;
   readonly instrument_id: number;
   readonly call_id: number;
+  readonly submitted: boolean;
 }
 
 export interface TopicRecord {
@@ -314,6 +318,13 @@ export interface ProposalStatusRecord {
   readonly full_count: number;
 }
 
+export interface ProposalWorkflowRecord {
+  readonly proposal_workflow_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };
@@ -354,7 +365,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.title || '',
     proposal.abstract || '',
     proposal.proposer_id,
-    proposal.status,
+    proposal.status_id,
     proposal.created_at,
     proposal.updated_at,
     proposal.short_code,
@@ -364,7 +375,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.questionary_id,
     proposal.comment_for_user,
     proposal.comment_for_management,
-    proposal.notified
+    proposal.notified,
+    proposal.submitted
   );
 };
 
@@ -372,20 +384,23 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
   return new ProposalView(
     proposal.id,
     proposal.title || '',
-    proposal.proposal_status,
+    proposal.proposal_status_id,
+    proposal.proposal_status_name,
+    proposal.proposal_status_description,
     proposal.short_code,
     proposal.rank_order,
     proposal.final_status,
     proposal.time_allocation,
     proposal.notified,
-    proposal.status,
+    proposal.status_id,
     proposal.instrument_name,
     proposal.call_short_code,
     proposal.code,
     proposal.average,
     proposal.deviation,
     proposal.instrument_id,
-    proposal.call_id
+    proposal.call_id,
+    proposal.submitted
   );
 };
 

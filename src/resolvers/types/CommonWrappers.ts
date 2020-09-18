@@ -10,6 +10,7 @@ import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 import { ProposalStatus } from './ProposalStatus';
+import { ProposalWorkflow } from './ProposalWorkflow';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
@@ -213,4 +214,13 @@ export class ProposalStatusResponseWrap extends ResponseWrapBase<
   @Response()
   @Field(() => ProposalStatus, { nullable: true })
   public proposalStatus: ProposalStatus;
+}
+
+@ObjectType()
+export class ProposalWorkflowResponseWrap extends ResponseWrapBase<
+  ProposalWorkflow
+> {
+  @Response()
+  @Field(() => ProposalWorkflow, { nullable: true })
+  public proposalWorkflow: ProposalWorkflow;
 }

@@ -12,12 +12,12 @@ import { ResolverContext } from '../../context';
 import {
   Proposal as ProposalOrigin,
   ProposalEndStatus,
-  ProposalStatusEnum,
 } from '../../models/Proposal';
 import { isRejection } from '../../rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
 import { Instrument } from './Instrument';
+import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { SEP } from './SEP';
@@ -34,8 +34,8 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => String)
   public abstract: string;
 
-  @Field(() => ProposalStatusEnum)
-  public status: ProposalStatusEnum;
+  @Field(() => Int)
+  public statusId: number;
 
   @Field(() => Date)
   public created: Date;
@@ -67,6 +67,9 @@ export class Proposal implements Partial<ProposalOrigin> {
   @Field(() => Boolean)
   public notified: boolean;
 
+  @Field(() => Boolean)
+  public submitted: boolean;
+
   public proposerId: number;
 }
 
@@ -93,6 +96,21 @@ export class ProposalResolver {
     return await context.queries.user.getBasic(
       context.user,
       proposal.proposerId
+    );
+  }
+
+  @FieldResolver(() => ProposalStatus)
+  async status(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<ProposalStatus | null> {
+    if (proposal.statusId === 0) {
+      return { id: 0, name: 'BLANK', description: 'Blank proposal' };
+    }
+
+    return await context.queries.proposalSettings.getProposalStatus(
+      context.user,
+      proposal.statusId
     );
   }
 
@@ -149,7 +167,7 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<Questionary | null> {
-    if (proposal.status === ProposalStatusEnum.BLANK) {
+    if (proposal.statusId === 0) {
       const call = await context.queries.call.get(
         context.user,
         proposal.callId

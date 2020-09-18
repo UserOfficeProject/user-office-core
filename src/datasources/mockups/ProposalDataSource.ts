@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import 'reflect-metadata';
-import {
-  Proposal,
-  ProposalEndStatus,
-  ProposalStatusEnum,
-} from '../../models/Proposal';
+import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -26,7 +22,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.title || 'title',
     values?.abstract || 'abstract',
     values?.proposerId || 1,
-    values?.status || ProposalStatusEnum.DRAFT,
+    values?.statusId || 1,
     values?.created || new Date(),
     values?.updated || new Date(),
     values?.shortCode || 'shortCode',
@@ -36,6 +32,7 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.questionaryId || 1,
     values?.commentForUser || 'comment for user',
     values?.commentForManagement || 'comment for management',
+    false,
     false
   );
 };
@@ -52,7 +49,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       'title',
       'abstract',
       1, // main proposer
-      ProposalStatusEnum.DRAFT, // status
+      1, // status
       new Date('2019-07-17 08:25:12.23043+00'),
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
@@ -62,6 +59,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       '',
       '',
+      false,
       false
     );
 
@@ -70,7 +68,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       'submitted proposal',
       'abstract',
       1, // main proposer
-      ProposalStatusEnum.SUBMITTED, // status
+      2, // status
       new Date('2019-07-17 08:25:12.23043+00'),
       new Date('2019-07-17 08:25:12.23043+00'),
       'GQX639',
@@ -80,7 +78,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       '',
       '',
-      false
+      false,
+      true
     );
   }
 
@@ -122,7 +121,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (id !== dummyProposal.id) {
       throw new Error('Wrong ID');
     }
-    dummyProposal.status = ProposalStatusEnum.SUBMITTED;
+    dummyProposal.submitted = true;
 
     return dummyProposal;
   }
