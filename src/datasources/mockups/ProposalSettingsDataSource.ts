@@ -1,7 +1,7 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
-import { CreateProposalStatusArgs } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
-import { CreateProposalWorkflowArgs } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 
 export const dummyProposalStatus = new ProposalStatus(
@@ -19,7 +19,7 @@ export const dummyProposalWorkflow = new ProposalWorkflow(
 export class ProposalSettingsDataSourceMock
   implements ProposalSettingsDataSource {
   async createProposalStatus(
-    args: CreateProposalStatusArgs
+    newProposalStatusInput: CreateProposalStatusInput
   ): Promise<ProposalStatus> {
     return dummyProposalStatus;
   }
@@ -47,7 +47,7 @@ export class ProposalSettingsDataSourceMock
   }
 
   async createProposalWorkflow(
-    args: CreateProposalWorkflowArgs
+    args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow> {
     return dummyProposalWorkflow;
   }

@@ -1,19 +1,20 @@
 import {
-  Args,
-  ArgsType,
   Ctx,
   Mutation,
   Resolver,
   Field,
   Int,
+  InputType,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
+import { ProposalWorkflow } from '../../../models/ProposalWorkflow';
 import { ProposalWorkflowResponseWrap } from '../../types/CommonWrappers';
 import { wrapResponse } from '../../wrapResponse';
 
-@ArgsType()
-export class UpdateProposalWorkflowArgs {
+@InputType()
+export class UpdateProposalWorkflowInput implements ProposalWorkflow {
   @Field(() => Int)
   public id: number;
 
@@ -28,13 +29,14 @@ export class UpdateProposalWorkflowArgs {
 export class UpdateProposalWorkflowMutation {
   @Mutation(() => ProposalWorkflowResponseWrap)
   async updateProposalWorkflow(
-    @Args() args: UpdateProposalWorkflowArgs,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('updatedProposalWorkflowInput')
+    updatedProposalWorkflowInput: UpdateProposalWorkflowInput
   ) {
     return wrapResponse(
       context.mutations.proposalSettings.updateProposalWorkflow(
         context.user,
-        args
+        updatedProposalWorkflowInput
       ),
       ProposalWorkflowResponseWrap
     );

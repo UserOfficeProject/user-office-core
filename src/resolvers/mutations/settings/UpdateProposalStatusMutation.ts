@@ -1,19 +1,20 @@
 import {
-  Args,
-  ArgsType,
   Ctx,
   Mutation,
   Resolver,
   Field,
   Int,
+  InputType,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
+import { ProposalStatus } from '../../../models/ProposalStatus';
 import { ProposalStatusResponseWrap } from '../../types/CommonWrappers';
 import { wrapResponse } from '../../wrapResponse';
 
-@ArgsType()
-export class UpdateProposalStatusArgs {
+@InputType()
+export class UpdateProposalStatusInput implements ProposalStatus {
   @Field(() => Int)
   public id: number;
 
@@ -28,13 +29,14 @@ export class UpdateProposalStatusArgs {
 export class UpdateProposalStatusMutation {
   @Mutation(() => ProposalStatusResponseWrap)
   async updateProposalStatus(
-    @Args() args: UpdateProposalStatusArgs,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('updatedProposalStatusInput')
+    updatedProposalStatusInput: UpdateProposalStatusInput
   ) {
     return wrapResponse(
       context.mutations.proposalSettings.updateProposalStatus(
         context.user,
-        args
+        updatedProposalStatusInput
       ),
       ProposalStatusResponseWrap
     );

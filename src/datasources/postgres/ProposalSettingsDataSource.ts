@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
-import { CreateProposalStatusArgs } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
-import { CreateProposalWorkflowArgs } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
 import { ProposalStatusRecord, ProposalWorkflowRecord } from './records';
@@ -19,10 +19,10 @@ export default class PostgresProposalSettingsDataSource
   }
 
   async createProposalStatus(
-    args: CreateProposalStatusArgs
+    newProposalStatusInput: CreateProposalStatusInput
   ): Promise<ProposalStatus> {
     return database
-      .insert(args)
+      .insert(newProposalStatusInput)
       .into('proposal_statuses')
       .returning(['*'])
       .then((proposalStatus: ProposalStatusRecord[]) => {
@@ -113,7 +113,7 @@ export default class PostgresProposalSettingsDataSource
   }
 
   async createProposalWorkflow(
-    args: CreateProposalWorkflowArgs
+    args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow> {
     return database
       .insert(args)

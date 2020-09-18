@@ -11,10 +11,10 @@ import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { CreateProposalStatusArgs } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
-import { CreateProposalWorkflowArgs } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
-import { UpdateProposalStatusArgs } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
-import { UpdateProposalWorkflowArgs } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
+import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
+import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { logger } from '../utils/Logger';
 
 export default class ProposalSettingsMutations {
@@ -24,7 +24,7 @@ export default class ProposalSettingsMutations {
   @Authorized([Roles.USER_OFFICER])
   async createProposalStatus(
     agent: UserWithRole | null,
-    args: CreateProposalStatusArgs
+    args: CreateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     return this.dataSource
       .createProposalStatus(args)
@@ -43,7 +43,7 @@ export default class ProposalSettingsMutations {
   @Authorized([Roles.USER_OFFICER])
   async updateProposalStatus(
     agent: UserWithRole | null,
-    args: UpdateProposalStatusArgs
+    args: UpdateProposalStatusInput
   ): Promise<ProposalStatus | Rejection> {
     // TODO: Find better way of preventing update and remove on default proposal statuses.
     if (args.id < 10) {
@@ -91,7 +91,7 @@ export default class ProposalSettingsMutations {
   @Authorized([Roles.USER_OFFICER])
   async createProposalWorkflow(
     agent: UserWithRole | null,
-    args: CreateProposalWorkflowArgs
+    args: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource
       .createProposalWorkflow(args)
@@ -110,7 +110,7 @@ export default class ProposalSettingsMutations {
   @Authorized([Roles.USER_OFFICER])
   async updateProposalWorkflow(
     agent: UserWithRole | null,
-    args: UpdateProposalWorkflowArgs
+    args: UpdateProposalWorkflowInput
   ): Promise<ProposalWorkflow | Rejection> {
     return this.dataSource
       .updateProposalWorkflow(args)

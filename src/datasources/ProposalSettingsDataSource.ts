@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { CreateProposalStatusArgs } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
-import { CreateProposalWorkflowArgs } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 
 export interface ProposalSettingsDataSource {
-  createProposalStatus(args: CreateProposalStatusArgs): Promise<ProposalStatus>;
+  createProposalStatus(
+    newProposalStatusInput: CreateProposalStatusInput
+  ): Promise<ProposalStatus>;
   getProposalStatus(proposalStatusId: number): Promise<ProposalStatus | null>;
   getAllProposalStatuses(): Promise<ProposalStatus[]>;
   updateProposalStatus(proposalStatus: ProposalStatus): Promise<ProposalStatus>;
   deleteProposalStatus(proposalStatusId: number): Promise<ProposalStatus>;
   createProposalWorkflow(
-    args: CreateProposalWorkflowArgs
+    newProposalWorkflowInput: CreateProposalWorkflowInput
   ): Promise<ProposalWorkflow>;
   getProposalWorkflow(
     proposalWorkflowId: number
