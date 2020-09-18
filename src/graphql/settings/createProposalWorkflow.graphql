@@ -1,5 +1,7 @@
 mutation createProposalWorkflow($name: String!, $description: String!) {
-  createProposalWorkflow(name: $name, description: $description) {
+  createProposalWorkflow(
+    newProposalWorkflowInput: { name: $name, description: $description }
+  ) {
     proposalWorkflow {
       id
       name

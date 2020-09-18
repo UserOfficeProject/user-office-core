@@ -3,7 +3,13 @@ mutation updateProposalWorkflow(
   $name: String!
   $description: String!
 ) {
-  updateProposalWorkflow(id: $id, name: $name, description: $description) {
+  updateProposalWorkflow(
+    updatedProposalWorkflowInput: {
+      id: $id
+      name: $name
+      description: $description
+    }
+  ) {
     proposalWorkflow {
       id
       name

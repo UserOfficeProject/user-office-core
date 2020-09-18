@@ -140,6 +140,16 @@ export type ConfigBase = {
   tooltip: Scalars['String'];
 };
 
+export type CreateProposalStatusInput = {
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
+export type CreateProposalWorkflowInput = {
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
 export type CreateUserByEmailInviteResponseWrap = {
   __typename?: 'CreateUserByEmailInviteResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -527,28 +537,22 @@ export type MutationUpdateProposalArgs = {
 
 
 export type MutationCreateProposalStatusArgs = {
-  name: Scalars['String'];
-  description: Scalars['String'];
+  newProposalStatusInput: CreateProposalStatusInput;
 };
 
 
 export type MutationCreateProposalWorkflowArgs = {
-  name: Scalars['String'];
-  description: Scalars['String'];
+  newProposalWorkflowInput: CreateProposalWorkflowInput;
 };
 
 
 export type MutationUpdateProposalStatusArgs = {
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  description: Scalars['String'];
+  updatedProposalStatusInput: UpdateProposalStatusInput;
 };
 
 
 export type MutationUpdateProposalWorkflowArgs = {
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  description: Scalars['String'];
+  updatedProposalWorkflowInput: UpdateProposalWorkflowInput;
 };
 
 
@@ -1689,6 +1693,18 @@ export type UpdateAnswerResponseWrap = {
   __typename?: 'UpdateAnswerResponseWrap';
   error: Maybe<Scalars['String']>;
   questionId: Maybe<Scalars['String']>;
+};
+
+export type UpdateProposalStatusInput = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  description: Scalars['String'];
+};
+
+export type UpdateProposalWorkflowInput = {
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  description: Scalars['String'];
 };
 
 export type UpdateTopicOrderResponseWrap = {
@@ -5493,7 +5509,7 @@ export const UpdateSampleTitleDocument = gql`
     ${SampleFragmentDoc}`;
 export const CreateProposalStatusDocument = gql`
     mutation createProposalStatus($name: String!, $description: String!) {
-  createProposalStatus(name: $name, description: $description) {
+  createProposalStatus(newProposalStatusInput: {name: $name, description: $description}) {
     proposalStatus {
       id
       name
@@ -5505,7 +5521,7 @@ export const CreateProposalStatusDocument = gql`
     `;
 export const CreateProposalWorkflowDocument = gql`
     mutation createProposalWorkflow($name: String!, $description: String!) {
-  createProposalWorkflow(name: $name, description: $description) {
+  createProposalWorkflow(newProposalWorkflowInput: {name: $name, description: $description}) {
     proposalWorkflow {
       id
       name
@@ -5559,7 +5575,7 @@ export const GetProposalWorkflowsDocument = gql`
     `;
 export const UpdateProposalStatusDocument = gql`
     mutation updateProposalStatus($id: Int!, $name: String!, $description: String!) {
-  updateProposalStatus(id: $id, name: $name, description: $description) {
+  updateProposalStatus(updatedProposalStatusInput: {id: $id, name: $name, description: $description}) {
     proposalStatus {
       id
       name
@@ -5571,7 +5587,7 @@ export const UpdateProposalStatusDocument = gql`
     `;
 export const UpdateProposalWorkflowDocument = gql`
     mutation updateProposalWorkflow($id: Int!, $name: String!, $description: String!) {
-  updateProposalWorkflow(id: $id, name: $name, description: $description) {
+  updateProposalWorkflow(updatedProposalWorkflowInput: {id: $id, name: $name, description: $description}) {
     proposalWorkflow {
       id
       name

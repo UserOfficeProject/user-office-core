@@ -3,7 +3,13 @@ mutation updateProposalStatus(
   $name: String!
   $description: String!
 ) {
-  updateProposalStatus(id: $id, name: $name, description: $description) {
+  updateProposalStatus(
+    updatedProposalStatusInput: {
+      id: $id
+      name: $name
+      description: $description
+    }
+  ) {
     proposalStatus {
       id
       name
