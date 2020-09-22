@@ -47,7 +47,7 @@ jobs:
     - 
       name: Extract branch name
       shell: bash
-      run: echo "##[set-output name=branch;]$(if [ "${{ github.head_ref }}" != "" ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi)"
+      run: echo "##[set-output name=branch;]$(if [ "${{ github.head_ref }}" != "" ]; then    echo "${{ github.head_ref }}"; else    echo "develop"; fi)"
       id: extract_branch
     -
       name: Build and push
