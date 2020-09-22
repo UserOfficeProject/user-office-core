@@ -12,8 +12,8 @@ import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { EventType } from 'models/ProposalSubmissionModel';
 import { BasicUserDetails } from 'models/User';
 
-import { ProposalSubmissionContext } from './ProposalContainer';
-import ProposalNavigationFragment from './ProposalNavigationFragment';
+import { SubmissionContext } from '../../utils/SubmissionContext';
+import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 import ProposalParticipant from './ProposalParticipant';
 import ProposalParticipants from './ProposalParticipants';
 
@@ -24,7 +24,7 @@ export default function ProposalInformationView(props: {
 }) {
   const [userError, setUserError] = useState(false);
   const { user: currentUser, currentRole } = useContext(UserContext);
-  const { dispatch } = useContext(ProposalSubmissionContext)!;
+  const { dispatch } = useContext(SubmissionContext)!;
   const [users, setUsers] = useState<BasicUserDetails[]>(props.data.users);
 
   const MAX_TITLE_LEN = 175;
@@ -154,7 +154,7 @@ export default function ProposalInformationView(props: {
             // https://github.com/mbrn/material-table/issues/666
             users={JSON.parse(JSON.stringify(users))}
           />
-          <ProposalNavigationFragment
+          <QuestionaryNavigationFragment
             disabled={props.readonly}
             saveAndNext={{ callback: submitForm, isBusy: isSubmitting }}
             isLoading={false}

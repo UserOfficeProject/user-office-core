@@ -12,11 +12,11 @@ import {
 } from 'models/ProposalSubmissionModel';
 import withConfirm from 'utils/withConfirm';
 
-import { ProposalSubmissionContext } from './ProposalContainer';
-import ProposalNavigationFragment from './ProposalNavigationFragment';
+import { SubmissionContext } from '../../utils/SubmissionContext';
+import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const { dispatch } = useContext(ProposalSubmissionContext)!;
+  const { dispatch } = useContext(SubmissionContext)!;
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
   const proposal = data.proposal;
@@ -52,7 +52,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <ProposalNavigationFragment
+        <QuestionaryNavigationFragment
           back={undefined}
           saveAndNext={{
             callback: () => {

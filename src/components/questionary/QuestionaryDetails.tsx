@@ -20,7 +20,7 @@ import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
-import { getAllFields } from 'models/ProposalModelFunctions';
+import { getAllFields } from 'models/QuestionaryFunctions';
 import { SampleBasic } from 'models/Sample';
 import { stringToTextArray } from 'utils/ArrayUtils';
 

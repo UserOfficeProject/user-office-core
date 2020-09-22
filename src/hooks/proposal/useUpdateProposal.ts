@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { ProposalStatus, Answer } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { getDataTypeSpec } from 'models/ProposalModelFunctions';
+import { getDataTypeSpec } from 'models/QuestionaryFunctions';
 
 const prepareAnswers = (answers?: Answer[]): Answer[] => {
   if (answers) {
