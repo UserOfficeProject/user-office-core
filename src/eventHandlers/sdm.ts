@@ -11,13 +11,13 @@ export default function createHandler() {
     switch (event.type) {
       case Event.PROPOSAL_ACCEPTED: {
         const { proposal } = event;
-        const message = [proposal.id, proposal.status];
+        const message = [proposal.id, proposal.statusId];
         const json = JSON.stringify(message);
         rabbitMQ.sendMessage(json);
       }
       case Event.PROPOSAL_CREATED: {
         const { proposal } = event;
-        const message = [proposal.id, proposal.status];
+        const message = [proposal.id, proposal.statusId];
         const json = JSON.stringify(message);
         rabbitMQ.sendMessage(json);
       }

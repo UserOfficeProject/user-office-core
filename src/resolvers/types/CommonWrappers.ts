@@ -9,6 +9,8 @@ import { Call } from './Call';
 import { Institution } from './Institution';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
+import { ProposalStatus } from './ProposalStatus';
+import { ProposalWorkflow } from './ProposalWorkflow';
 import { Question } from './Question';
 import { Questionary } from './Questionary';
 import { QuestionaryStep } from './QuestionaryStep';
@@ -203,4 +205,22 @@ export class SampleResponseWrap extends ResponseWrapBase<Sample> {
   @Response()
   @Field(() => Sample, { nullable: true })
   public sample: Sample;
+}
+
+@ObjectType()
+export class ProposalStatusResponseWrap extends ResponseWrapBase<
+  ProposalStatus
+> {
+  @Response()
+  @Field(() => ProposalStatus, { nullable: true })
+  public proposalStatus: ProposalStatus;
+}
+
+@ObjectType()
+export class ProposalWorkflowResponseWrap extends ResponseWrapBase<
+  ProposalWorkflow
+> {
+  @Response()
+  @Field(() => ProposalWorkflow, { nullable: true })
+  public proposalWorkflow: ProposalWorkflow;
 }

@@ -23,6 +23,10 @@ export default class UserQueries {
     return this.dataSource.get(id);
   }
 
+  async byRef(id: number) {
+    return this.dataSource.get(id);
+  }
+
   @Authorized()
   async me(agent: UserWithRole | null) {
     return this.dataSource.me((agent as UserWithRole).id);

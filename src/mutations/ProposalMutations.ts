@@ -13,7 +13,6 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/Proposal';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
@@ -105,10 +104,7 @@ export default class ProposalMutations {
       return rejection('NOT_ALLOWED');
     }
 
-    if (
-      proposal.status !== ProposalStatus.DRAFT &&
-      !(await this.userAuth.isUserOfficer(agent))
-    ) {
+    if (proposal.submitted && !(await this.userAuth.isUserOfficer(agent))) {
       return rejection('NOT_ALLOWED_PROPOSAL_SUBMITTED');
     }
 
@@ -228,7 +224,7 @@ export default class ProposalMutations {
       id,
       rankOrder,
       finalStatus,
-      status,
+      statusId,
       commentForManagement,
       commentForUser,
     } = args;
@@ -245,8 +241,8 @@ export default class ProposalMutations {
       proposal.finalStatus = finalStatus;
     }
 
-    if (status !== undefined) {
-      proposal.status = status;
+    if (statusId !== undefined) {
+      proposal.statusId = statusId;
     }
 
     if (commentForUser !== undefined) {

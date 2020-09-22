@@ -2,7 +2,7 @@
 import BluePromise from 'bluebird';
 import { Transaction } from 'knex';
 
-import { Proposal, ProposalStatus } from '../../models/Proposal';
+import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -30,11 +30,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((call: CallRecord) => (call ? true : false));
   }
 
-  async setStatusProposal(id: number, status: number): Promise<Proposal> {
+  async submitProposal(id: number): Promise<Proposal> {
     return database
       .update(
         {
-          status,
+          submitted: true,
         },
         ['*']
       )
@@ -42,17 +42,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .where('proposal_id', id)
       .then((proposal: ProposalRecord[]) => {
         if (proposal === undefined || proposal.length !== 1) {
-          throw new Error(
-            `Failed to set status '${status}' for proposal with id '${id}'`
-          );
+          throw new Error(`Failed to submit proposal with id '${id}'`);
         }
 
         return createProposalObject(proposal[0]);
       });
-  }
-
-  async submitProposal(id: number): Promise<Proposal> {
-    return this.setStatusProposal(id, ProposalStatus.SUBMITTED);
   }
 
   async deleteProposal(id: number): Promise<Proposal> {
@@ -101,7 +95,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         {
           title: proposal.title,
           abstract: proposal.abstract,
-          status: proposal.status,
+          status_id: proposal.statusId,
           proposer_id: proposal.proposerId,
           rank_order: proposal.rankOrder,
           final_status: proposal.finalStatus,
@@ -139,7 +133,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     questionary_id: number
   ): Promise<Proposal> {
     return database
-      .insert({ proposer_id, call_id, questionary_id }, ['*'])
+      .insert({ proposer_id, call_id, questionary_id, status_id: 1 }, ['*'])
       .from('proposals')
       .then((resultSet: ProposalRecord[]) => {
         return createProposalObject(resultSet[0]);
