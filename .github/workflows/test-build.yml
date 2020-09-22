@@ -39,12 +39,17 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+    - 
+      name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
     -
       name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: dmsc/duo-backend:${{ github.ref }}
+        tags: dmsc/duo-backend:${{ steps.extract_branch.outputs.branch }}
         
         
