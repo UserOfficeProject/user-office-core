@@ -152,7 +152,7 @@ export default function QuestionaryEditorTopic(props: {
       }}
       data-cy="topic-title"
     >
-      {index + 2}. {title}
+      {title}
     </span>
   );
 
