@@ -98,7 +98,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
         notificationWithClientLog(
           this.enqueueSnackbar,
           'Something went wrong!',
-          error.response.errors[0].message
+          error?.response?.errors?.[0].message
         );
       }
 
