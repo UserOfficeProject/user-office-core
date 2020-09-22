@@ -27,6 +27,7 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+    - run: echo ${{ github.head_ref }}
     - name: Build and push Docker images
       uses: docker/build-push-action@v1
       with:
@@ -34,5 +35,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: dmsc/duo-backend
         tag_with_ref: true
+        tags: ${{ github.head_ref }}
         
         
