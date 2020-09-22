@@ -70,7 +70,7 @@ const ProposalTableReviewer: React.FC = () => {
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
     { title: 'Grade', field: 'grade' },
-    { title: 'Status', field: 'status' },
+    { title: 'Review status', field: 'status' },
   ];
 
   const reviewData = userData

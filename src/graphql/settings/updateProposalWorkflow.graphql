@@ -1,16 +1,16 @@
-mutation updateProposalStatus(
+mutation updateProposalWorkflow(
   $id: Int!
   $name: String!
   $description: String!
 ) {
-  updateProposalStatus(
-    updatedProposalStatusInput: {
+  updateProposalWorkflow(
+    updatedProposalWorkflowInput: {
       id: $id
       name: $name
       description: $description
     }
   ) {
-    proposalStatus {
+    proposalWorkflow {
       id
       name
       description

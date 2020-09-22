@@ -23,3 +23,7 @@ code {
 .MuiList-root .MuiListItem-root.active {
   background-color: rgba(0, 0, 0, 0.04);
 }
+
+.MuiList-root .MuiCollapse-wrapper .MuiListItem-root {
+  padding-left: 26px;
+}

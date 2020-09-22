@@ -4,10 +4,16 @@ query getUserProposals {
       id
       shortCode
       title
-      status
+      status {
+        id
+        name
+        description
+      }
+      statusId
       created
       finalStatus
       notified
+      submitted
     }
   }
 }

@@ -1,0 +1,12 @@
+mutation createProposalWorkflow($name: String!, $description: String!) {
+  createProposalWorkflow(
+    newProposalWorkflowInput: { name: $name, description: $description }
+  ) {
+    proposalWorkflow {
+      id
+      name
+      description
+    }
+    error
+  }
+}

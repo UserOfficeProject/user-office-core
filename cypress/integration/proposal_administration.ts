@@ -44,7 +44,9 @@ context('Proposal administration tests', () => {
 
     cy.get('#mui-component-select-proposalStatus').click();
 
-    cy.contains('Draft').click();
+    cy.get('[id="menu-proposalStatus"] [role="option"]')
+      .first()
+      .click();
 
     cy.get('[data-cy=commentForUser]').type(textUser);
 
@@ -64,11 +66,11 @@ context('Proposal administration tests', () => {
 
     cy.contains('Accepted');
 
-    cy.contains('Draft');
+    cy.contains('DRAFT');
 
     cy.contains('Proposals').click();
 
-    cy.contains('Open');
+    cy.contains('DRAFT');
   });
 
   it('Check if link for download proposal is created with the correct attributes', () => {

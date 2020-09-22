@@ -71,7 +71,7 @@ const SEPAssignedReviewersTable: React.FC<SEPAssignedReviewersTableProps> = ({
       render: (rowData: SepAssignment): string =>
         dateformat(new Date(rowData.dateAssigned), 'dd-mmm-yyyy HH:MM:ss'),
     },
-    { title: 'Status', field: 'review.status' },
+    { title: 'Review status', field: 'review.status' },
     {
       title: 'Grade',
       render: (rowData: SepAssignment) =>

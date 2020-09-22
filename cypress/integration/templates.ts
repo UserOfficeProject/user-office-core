@@ -373,7 +373,9 @@ context('Template tests', () => {
     cy.get("[title='Delete proposals']")
       .first()
       .click();
-    cy.contains('Yes').click();
+    cy.get('.MuiDialog-root')
+      .contains('Yes')
+      .click();
   });
 
   it('Officer can delete proposal questions', () => {
