@@ -8,9 +8,11 @@ import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataS
 import { Authorized, ValidateArgs } from '../decorators';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatus';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
@@ -136,6 +138,24 @@ export default class ProposalSettingsMutations {
       .then(result => result)
       .catch(error => {
         logger.logException('Could not delete proposal workflow', error, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async addProposalWorkflowStatus(
+    agent: UserWithRole | null,
+    args: AddProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection | Rejection> {
+    return this.dataSource
+      .addProposalWorkflowStatus(args)
+      .then(result => result)
+      .catch(error => {
+        logger.logException('Could not add proposal workflow status', error, {
           agent,
           args,
         });

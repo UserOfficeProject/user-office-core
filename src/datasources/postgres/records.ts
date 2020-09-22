@@ -325,6 +325,16 @@ export interface ProposalWorkflowRecord {
   readonly full_count: number;
 }
 
+export interface ProposalWorkflowConnectionRecord {
+  readonly proposal_workflow_connection_id: number;
+  readonly sort_order: number;
+  readonly proposal_workflow_id: number;
+  readonly proposal_status_id: number;
+  readonly next_proposal_status_id: number | null;
+  readonly prev_proposal_status_id: number | null;
+  readonly next_status_event_type: string;
+}
+
 export const createPageObject = (record: PagetextRecord) => {
   return new Page(record.pagetext_id, record.content);
 };

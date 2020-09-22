@@ -32,4 +32,13 @@ export default class ProposalSettingsQueries {
 
     return proposalWorkflows;
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getProposalWorkflowConnections(agent: UserWithRole | null, id: number) {
+    const proposalWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+      id
+    );
+
+    return proposalWorkflowConnections;
+  }
 }
