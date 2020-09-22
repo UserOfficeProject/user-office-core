@@ -5,6 +5,9 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { default as React } from 'react';
+import { Prompt } from 'react-router';
+
 import { Sample } from 'generated/sdk';
 import {
   Event,
@@ -12,10 +15,9 @@ import {
   SampleSubmissionModel,
   SampleSubmissionModelState,
 } from 'models/SampleSubmissionModel';
-import { default as React } from 'react';
-import { Prompt } from 'react-router';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+
 import { QuestionaryStepButton } from './QuestionaryStepButton';
 import SampleQuestionaryStepView from './SampleQuestionaryStepView';
 import SampleTitleEditor from './SampleTitleEditor';
@@ -64,6 +66,7 @@ export default function SampleDeclarationContainer(props: {
               payload: { sample: data.sample },
             })
           );
+
         return true;
       } else {
         return false;
@@ -110,6 +113,7 @@ export default function SampleDeclarationContainer(props: {
       return <SampleTitleEditor state={state.sample} dispatch={dispatch} />;
     } else {
       const questionaryStep = state.sample.questionary.steps[stepIdx - 1];
+
       return (
         <SampleQuestionaryStepView
           topicId={questionaryStep.topic.id}

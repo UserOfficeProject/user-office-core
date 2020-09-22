@@ -16,11 +16,11 @@ import {
   QuestionTemplateRelation,
 } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
-import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
 import QuestionaryEditorModel, {
   Event,
   EventType,
 } from 'models/QuestionaryEditorModel';
+import { getQuestionaryStepByTopicId } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 
 import QuestionEditor from './forms/QuestionEditor';

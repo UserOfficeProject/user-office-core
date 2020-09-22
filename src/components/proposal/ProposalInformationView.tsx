@@ -13,9 +13,9 @@ import { EventType } from 'models/ProposalSubmissionModel';
 import { BasicUserDetails } from 'models/User';
 
 import { SubmissionContext } from '../../utils/SubmissionContext';
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 import ProposalParticipant from './ProposalParticipant';
 import ProposalParticipants from './ProposalParticipants';
+import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 export default function ProposalInformationView(props: {
   data: ProposalSubsetSumbission;

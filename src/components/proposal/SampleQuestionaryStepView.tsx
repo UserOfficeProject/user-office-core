@@ -1,8 +1,11 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { Formik } from 'formik';
+import React, { SyntheticEvent } from 'react';
+import * as Yup from 'yup';
+
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
-import { Formik } from 'formik';
 import { Questionary, QuestionaryStep } from 'generated/sdk';
 import {
   areDependenciesSatisfied,
@@ -10,10 +13,9 @@ import {
   prepareAnswers,
 } from 'models/QuestionaryFunctions';
 import { Event, EventType } from 'models/SampleSubmissionModel';
-import React, { SyntheticEvent } from 'react';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import * as Yup from 'yup';
+
 import { createFormikConfigObjects } from './createFormikConfigObjects';
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 

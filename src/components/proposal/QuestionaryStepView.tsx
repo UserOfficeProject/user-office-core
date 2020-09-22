@@ -1,19 +1,21 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { Formik } from 'formik';
+import React, { SyntheticEvent, useContext } from 'react';
+import * as Yup from 'yup';
+
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
-import { Formik } from 'formik';
 import { Questionary, QuestionaryStep } from 'generated/sdk';
+import { EventType } from 'models/ProposalSubmissionModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
 } from 'models/QuestionaryFunctions';
-import { EventType } from 'models/ProposalSubmissionModel';
-import React, { SyntheticEvent, useContext } from 'react';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
-import * as Yup from 'yup';
-import { createFormikConfigObjects } from './createFormikConfigObjects';
+
 import { SubmissionContext } from '../../utils/SubmissionContext';
+import { createFormikConfigObjects } from './createFormikConfigObjects';
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 interface QuestionaryState {

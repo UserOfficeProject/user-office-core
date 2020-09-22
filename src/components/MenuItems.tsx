@@ -24,10 +24,9 @@ import { NavLink } from 'react-router-dom';
 
 import { UserRole, Call } from 'generated/sdk';
 
+import BoxIcon from './common/icons/BoxIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
-
-import BoxIcon from './common/icons/BoxIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
 
 type MenuItemsProps = {

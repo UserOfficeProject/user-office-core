@@ -1,11 +1,13 @@
-import { Answer, QuestionaryStep, Sample } from 'generated/sdk';
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
+
+import { Answer, QuestionaryStep, Sample } from 'generated/sdk';
 import { clamp } from 'utils/Math';
 import {
   ReducerMiddleware,
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
+
 import { getFieldById } from './QuestionaryFunctions';
 
 export enum EventType {
@@ -57,6 +59,7 @@ function createStepMetadata(sample: Sample): StepMetaData[] {
       };
     })
   );
+
   return steps;
 }
 /** returns the index the form should start on, for new declaration it's 0,
@@ -121,11 +124,12 @@ export function SampleSubmissionModel(
           break;
 
         case EventType.GO_STEP_FORWARD:
-          let nextStepIndex = draftState.stepIndex + 1;
-          let lastStepIndex = state.steps.length - 1;
+          const nextStepIndex = draftState.stepIndex + 1;
+          const lastStepIndex = state.steps.length - 1;
           if (nextStepIndex <= lastStepIndex) {
             draftState.stepIndex = clamp(nextStepIndex, 0, lastStepIndex);
           } else {
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             dispatch({ type: EventType.QUESTIONARY_COMPLETE });
           }
           break;

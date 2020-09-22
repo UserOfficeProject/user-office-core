@@ -19,23 +19,23 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
-import { prepareAnswers } from 'models/QuestionaryFunctions';
 import {
   Event,
   EventType,
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
+import { prepareAnswers } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 import { clamp } from 'utils/Math';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import ProposalInformationView from './ProposalInformationView';
-import QuestionaryStepView from './QuestionaryStepView';
-import ProposalReview from './ProposalSummary';
-import { QuestionaryStepButton } from './QuestionaryStepButton';
 import { QuestionaryUIStep } from '../../hooks/questionary/QuestionaryUIStep';
 import { SubmissionContext } from '../../utils/SubmissionContext';
+import ProposalInformationView from './ProposalInformationView';
+import ProposalReview from './ProposalSummary';
+import { QuestionaryStepButton } from './QuestionaryStepButton';
+import QuestionaryStepView from './QuestionaryStepView';
 
 export interface Notification {
   variant: 'error' | 'success';

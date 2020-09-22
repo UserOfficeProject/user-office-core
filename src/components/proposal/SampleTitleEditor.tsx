@@ -1,10 +1,12 @@
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
+import React from 'react';
+import * as Yup from 'yup';
+
 import { Sample } from 'generated/sdk';
 import { EventType, Event } from 'models/SampleSubmissionModel';
-import React from 'react';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import * as Yup from 'yup';
+
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 function SampleTitleEditor(props: {
