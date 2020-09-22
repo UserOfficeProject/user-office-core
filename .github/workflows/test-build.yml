@@ -45,6 +45,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: dmsc/duo-backend:${{ github.head_ref }}
+        tags: dmsc/duo-backend:${{ github.ref }}
         
         
