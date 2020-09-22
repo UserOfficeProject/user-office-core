@@ -26,7 +26,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
     -
       name: Set up QEMU
       uses: docker/setup-qemu-action@v1
@@ -44,6 +43,9 @@ jobs:
       shell: bash
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
+    - run: echo ${{ github.ref }}
+    - run: echo ${{ github.head_ref }}
+    - run: echo ${{ github.base_ref }}
     -
       name: Build and push
       id: docker_build
