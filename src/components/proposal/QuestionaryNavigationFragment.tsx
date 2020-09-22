@@ -4,7 +4,7 @@ import React, { Fragment } from 'react';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
 
-const ProposalNavigationFragment = (props: {
+const QuestionaryNavigationFragment = (props: {
   back?: ButtonConfig;
   reset?: ButtonConfig;
   save?: ButtonConfig;
@@ -79,6 +79,7 @@ const ProposalNavigationFragment = (props: {
       color="primary"
       disabled={props.saveAndNext.disabled}
       isbusy={props.saveAndNext.isBusy}
+      data-cy="save-and-continue-button"
     >
       {props.saveAndNext.label || 'Save and continue'}
     </NavigButton>
@@ -97,7 +98,7 @@ const ProposalNavigationFragment = (props: {
   return <div className={classes.buttons}>{buttonArea}</div>;
 };
 
-export default ProposalNavigationFragment;
+export default QuestionaryNavigationFragment;
 
 interface ButtonConfig {
   callback: () => void;

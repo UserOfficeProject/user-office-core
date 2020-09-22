@@ -23,7 +23,7 @@ import { FileMetaData } from 'models/FileUpload';
 import {
   areDependenciesSatisfied,
   getAllFields,
-} from 'models/ProposalModelFunctions';
+} from 'models/QuestionaryFunctions';
 import { SampleBasic } from 'models/Sample';
 
 const useStyles = makeStyles(theme => ({

@@ -5,7 +5,7 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { createContext, default as React, useEffect, useState } from 'react';
+import { default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
@@ -18,45 +18,28 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
-import { prepareAnswers } from 'models/ProposalModelFunctions';
 import {
   Event,
   EventType,
   ProposalSubmissionModel,
   ProposalSubmissionModelState,
 } from 'models/ProposalSubmissionModel';
+import { prepareAnswers } from 'models/QuestionaryFunctions';
 import { StyledPaper } from 'styles/StyledComponents';
 import { clamp } from 'utils/Math';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import { QuestionaryUIStep } from '../../hooks/questionary/QuestionaryUIStep';
+import { SubmissionContext } from '../../utils/SubmissionContext';
 import ProposalInformationView from './ProposalInformationView';
-import ProposalQuestionaryStep from './ProposalQuestionaryStep';
 import ProposalReview from './ProposalSummary';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
+import QuestionaryStepView from './QuestionaryStepView';
 
 export interface Notification {
   variant: 'error' | 'success';
   message: string;
 }
-
-enum StepType {
-  GENERAL,
-  QUESTIONARY,
-  REVIEW,
-}
-
-class QuestionaryUIStep {
-  constructor(
-    public stepType: StepType,
-    public title: string,
-    public completed: boolean,
-    public element: JSX.Element
-  ) {}
-}
-
-export const ProposalSubmissionContext = createContext<{
-  dispatch: React.Dispatch<Event>;
-} | null>(null);
 
 export default function ProposalContainer(props: {
   data: ProposalSubsetSumbission;
@@ -262,7 +245,6 @@ export default function ProposalContainer(props: {
 
       allProposalSteps.push(
         new QuestionaryUIStep(
-          StepType.GENERAL,
           'New Proposal',
           state.proposal.status.id !== 0,
           (
@@ -282,13 +264,15 @@ export default function ProposalContainer(props: {
               steps[index - 1].isCompleted === true);
 
           return new QuestionaryUIStep(
-            StepType.QUESTIONARY,
             step.topic.title,
             step.isCompleted,
             (
-              <ProposalQuestionaryStep
+              <QuestionaryStepView
                 topicId={step.topic.id}
-                data={state}
+                state={{
+                  questionary: state.proposal.questionary,
+                  isDirty: state.isDirty,
+                }}
                 readonly={(!editable || isSubmitted) && isNonOfficer}
                 key={step.topic.id}
               />
@@ -298,7 +282,6 @@ export default function ProposalContainer(props: {
       );
       allProposalSteps.push(
         new QuestionaryUIStep(
-          StepType.REVIEW,
           'Review',
           state.proposal.submitted,
           (
@@ -362,7 +345,7 @@ export default function ProposalContainer(props: {
   return (
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <ProposalSubmissionContext.Provider value={{ dispatch }}>
+      <SubmissionContext.Provider value={{ dispatch }}>
         <StyledPaper>
           <Typography
             component="h1"
@@ -402,7 +385,7 @@ export default function ProposalContainer(props: {
           {progressBar}
           {getStepContent(stepIndex)}
         </StyledPaper>
-      </ProposalSubmissionContext.Provider>
+      </SubmissionContext.Provider>
     </Container>
   );
 }
