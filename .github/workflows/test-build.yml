@@ -42,7 +42,7 @@ jobs:
     - run: echo ${{ github.ref }}
     - run: echo ${{ github.head_ref }}
     - run: echo ${{ github.base_ref }}
-    - run: if [ ${{ github.head_ref }} != "" ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
+    - run: if [ "${{ github.head_ref }}" != "" ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
     -
       name: Build and push
       id: docker_build
