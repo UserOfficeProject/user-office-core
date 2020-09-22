@@ -33,6 +33,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: dmsc/duo-backend
-        tags: ${{ github.head_ref }}
+        tag_with_ref: true
         
         
