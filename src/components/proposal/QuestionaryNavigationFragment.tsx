@@ -79,6 +79,7 @@ const QuestionaryNavigationFragment = (props: {
       color="primary"
       disabled={props.saveAndNext.disabled}
       isbusy={props.saveAndNext.isBusy}
+      data-cy="save-and-continue-button"
     >
       {props.saveAndNext.label || 'Save and continue'}
     </NavigButton>
