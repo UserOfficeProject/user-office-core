@@ -20,9 +20,11 @@ import { useFileMetadata } from 'hooks/file/useFileMetadata';
 import { useQuestionary } from 'hooks/questionary/useQuestionary';
 import { useSamples } from 'hooks/sample/useSamples';
 import { FileMetaData } from 'models/FileUpload';
-import { getAllFields } from 'models/QuestionaryFunctions';
+import {
+  areDependenciesSatisfied,
+  getAllFields,
+} from 'models/QuestionaryFunctions';
 import { SampleBasic } from 'models/Sample';
-import { stringToTextArray } from 'utils/ArrayUtils';
 
 const useStyles = makeStyles(theme => ({
   list: {
@@ -90,15 +92,16 @@ function QuestionaryDetails(props: { questionaryId: number }) {
 
   const allFields = getAllFields(questionary.steps) as Answer[];
   const completedFields = allFields.filter(field => {
-    return !!field.value;
+    return areDependenciesSatisfied(
+      questionary.steps,
+      field.question.proposalQuestionId
+    );
   });
 
   const formatAnswer = (answer: Answer) => {
     switch (answer.question.dataType) {
       case DataType.FILE_UPLOAD:
-        return (
-          <DownloadableFileList fileIds={stringToTextArray(answer.value)} />
-        );
+        return <DownloadableFileList fileIds={answer.value} />;
       case DataType.SUBTEMPLATE:
         if (
           (answer.config as SubtemplateConfig).templateCategory ===

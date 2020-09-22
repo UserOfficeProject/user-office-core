@@ -1,5 +1,7 @@
 mutation createProposalStatus($name: String!, $description: String!) {
-  createProposalStatus(name: $name, description: $description) {
+  createProposalStatus(
+    newProposalStatusInput: { name: $name, description: $description }
+  ) {
     proposalStatus {
       id
       name

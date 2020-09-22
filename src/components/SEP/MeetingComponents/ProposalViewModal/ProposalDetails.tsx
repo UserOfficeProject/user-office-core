@@ -56,7 +56,7 @@ const ProposalDetails: React.FC<ProposalDetailsProps> = ({ proposal }) => {
               </TableCell>
               <TableCell>{`${proposal.proposer.firstname} ${proposal.proposer.lastname}`}</TableCell>
               <TableCell className={classes.textBold}>Status</TableCell>
-              <TableCell>{proposal.status}</TableCell>
+              <TableCell>{proposal.status.name}</TableCell>
             </TableRow>
             <TableRow key="coproposersAndCall">
               <TableCell className={classes.textBold}>Co-Proposers</TableCell>

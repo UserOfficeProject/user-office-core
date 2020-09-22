@@ -1,7 +1,7 @@
 import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import React, { useCallback, useState } from 'react';
 
-import { ProposalEndStatus, ProposalStatusEnum } from 'generated/sdk';
+import { ProposalEndStatus, ProposalStatus } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { timeAgo } from 'utils/Time';
 
@@ -13,6 +13,7 @@ export type PartialProposalsDataType = {
   status: string;
   finalStatus?: string;
   notified?: boolean;
+  submitted: boolean;
   shortCode: string;
   created: string | null;
 };
@@ -27,16 +28,14 @@ const ProposalTableUser: React.FC = () => {
   const api = useDataApi();
   const [loading, setLoading] = useState<boolean>(false);
   const getProposalStatus = (proposal: {
-    status: ProposalStatusEnum;
+    status: ProposalStatus;
     finalStatus?: ProposalEndStatus | null | undefined;
     notified: boolean;
   }): string => {
     if (proposal.notified) {
       return getTranslation(proposal.finalStatus as ResourceId);
     } else {
-      return proposal.status === ProposalStatusEnum.DRAFT
-        ? 'Open'
-        : 'Submitted';
+      return proposal.status.name;
     }
   };
 
@@ -62,6 +61,7 @@ const ProposalTableUser: React.FC = () => {
                 id: proposal.id,
                 title: proposal.title,
                 status: getProposalStatus(proposal),
+                submitted: proposal.submitted,
                 shortCode: proposal.shortCode,
                 created: timeAgo(proposal.created),
                 notified: proposal.notified,

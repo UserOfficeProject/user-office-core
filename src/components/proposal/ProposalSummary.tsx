@@ -3,7 +3,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { ProposalStatusEnum } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import {
@@ -35,7 +34,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
       opacity: 0.7,
     },
     button: {
-      marginTop: proposal.status === 'BLANK' ? '40px' : 'auto',
+      marginTop: proposal.status.id === 0 ? '40px' : 'auto',
       marginLeft: '10px',
       backgroundColor: theme.palette.secondary.main,
       color: '#ffff',
@@ -72,18 +71,13 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
                 }
               )();
             },
-            label:
-              proposal.status === ProposalStatusEnum.SUBMITTED
-                ? '✔ Submitted'
-                : 'Submit',
-            disabled:
-              !allStepsComplete ||
-              proposal.status === ProposalStatusEnum.SUBMITTED,
+            label: proposal.submitted ? '✔ Submitted' : 'Submit',
+            disabled: !allStepsComplete || proposal.submitted,
             isBusy: isLoading,
           }}
           reset={undefined}
           isLoading={false}
-          disabled={proposal.status === 'BLANK'}
+          disabled={proposal.status.id === 0}
         />
         <Button
           className={classes.button}

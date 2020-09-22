@@ -51,7 +51,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         to={
           multipleCalls
             ? '/ProposalSelectType'
-            : `/ProposalCreate/${callsData[0]?.templateId}`
+            : `/ProposalCreate/${callsData[0]?.id}`
         }
         button
         disabled={proposalDisabled}
@@ -223,12 +223,7 @@ const SettingsMenuListItem = () => {
         </ListItemIcon>
         <ListItemText primary="Settings" />
       </ListItem>
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        style={{ paddingLeft: 10 }}
-      >
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/ProposalStatuses" button>
           <ListItemIcon>
             <ProposalSettingsIcon />
@@ -274,12 +269,7 @@ const TemplateMenuListItem = () => {
         </ListItemIcon>
         <ListItemText primary="Templates" />
       </ListItem>
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        style={{ paddingLeft: 10 }}
-      >
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/ProposalTemplates" button>
           <ListItemIcon>
             <QuestionAnswerIcon />

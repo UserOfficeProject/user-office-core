@@ -203,8 +203,12 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       field: 'technicalStatus',
     },
     {
+      title: 'Submitted',
+      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+    },
+    {
       title: 'Status',
-      field: 'status',
+      field: 'statusName',
     },
     {
       title: 'Deviation',
@@ -381,16 +385,20 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const EmailIcon = (): JSX.Element => <Email />;
   const AddScienceIcon = (): JSX.Element => <ScienceIconAdd />;
 
-  const preselectedProposalsData = proposalsData.map(proposalData => {
-    return {
-      ...proposalData,
-      tableData: {
-        checked: urlQueryParams.selection?.some(
-          (selectedItem: number | null) => selectedItem === proposalData.id
-        ),
-      },
-    };
-  });
+  const preselectedProposalsData =
+    urlQueryParams.selection.length > 0
+      ? proposalsData.map(proposalData => {
+          return {
+            ...proposalData,
+            tableData: {
+              checked: urlQueryParams.selection?.some(
+                (selectedItem: number | null) =>
+                  selectedItem === proposalData.id
+              ),
+            },
+          };
+        })
+      : proposalsData;
 
   return (
     <>

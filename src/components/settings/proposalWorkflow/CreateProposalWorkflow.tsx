@@ -1,7 +1,7 @@
-import {
-  createProposalStatusValidationSchema,
-  updateProposalStatusValidationSchema,
-} from '@esss-swap/duo-validation/lib/ProposalStatuses';
+// import {
+//   createProposalWorkflowValidationSchema,
+//   updateProposalWorkflowValidationSchema,
+// } from '@esss-swap/duo-validation/lib/ProposalWorkflows';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { ProposalStatus } from 'generated/sdk';
+import { ProposalWorkflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(theme => ({
@@ -20,67 +20,49 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type CreateUpdateProposalStatusProps = {
-  close: (proposalStatusAdded: ProposalStatus | null) => void;
-  proposalStatus: ProposalStatus | null;
+type CreateProposalWorkflowProps = {
+  close: (proposalWorkflowAdded: ProposalWorkflow | null) => void;
 };
 
-const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
+const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
   close,
-  proposalStatus,
 }) => {
   const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const initialValues = proposalStatus
-    ? proposalStatus
-    : {
-        name: '',
-        description: '',
-      };
+  const initialValues = {
+    name: '',
+    description: '',
+  };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
         setSubmitting(true);
-        if (proposalStatus) {
-          const data = await api(
-            'Proposal status updated successfully'
-          ).updateProposalStatus({
-            id: proposalStatus.id,
-            ...values,
-          });
-          if (data.updateProposalStatus.error) {
-            close(null);
-          } else if (data.updateProposalStatus.proposalStatus) {
-            close(data.updateProposalStatus.proposalStatus);
-          }
-        } else {
-          const data = await api(
-            'Proposal status created successfully'
-          ).createProposalStatus(values);
-          if (data.createProposalStatus.error) {
-            close(null);
-          } else if (data.createProposalStatus.proposalStatus) {
-            close(data.createProposalStatus.proposalStatus);
-          }
+
+        const data = await api(
+          'Proposal workflow created successfully'
+        ).createProposalWorkflow(values);
+        if (data.createProposalWorkflow.error) {
+          close(null);
+        } else if (data.createProposalWorkflow.proposalWorkflow) {
+          close(data.createProposalWorkflow.proposalWorkflow);
         }
+
         setSubmitting(false);
         actions.setSubmitting(false);
       }}
-      validationSchema={
-        proposalStatus
-          ? updateProposalStatusValidationSchema
-          : createProposalStatusValidationSchema
-      }
+      // validationSchema={
+      //   proposalWorkflow
+      //     ? updateProposalWorkflowValidationSchema
+      //     : createProposalWorkflowValidationSchema
+      // }
     >
       {() => (
         <Form>
-          <Typography variant="h6">
-            {proposalStatus ? 'Update' : 'Create new'} proposal status
-          </Typography>
+          <Typography variant="h6">Create new proposal workflow</Typography>
           <Field
             name="name"
             id="name"
@@ -117,7 +99,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             disabled={submitting}
           >
             {submitting && <UOLoader size={14} />}
-            {proposalStatus ? 'Update' : 'Create'}
+            Create
           </Button>
         </Form>
       )}
@@ -125,9 +107,8 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   );
 };
 
-CreateUpdateProposalStatus.propTypes = {
-  proposalStatus: PropTypes.any,
+CreateProposalWorkflow.propTypes = {
   close: PropTypes.func.isRequired,
 };
 
-export default CreateUpdateProposalStatus;
+export default CreateProposalWorkflow;

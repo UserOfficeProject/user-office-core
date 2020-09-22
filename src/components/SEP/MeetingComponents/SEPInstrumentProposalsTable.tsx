@@ -110,7 +110,7 @@ const SEPInstrumentProposalsTable: React.FC<SEPInstrumentProposalsTableProps> = 
       title: 'ID',
       field: 'proposal.shortCode',
     },
-    { title: 'Status', field: 'proposal.status' },
+    { title: 'Status', field: 'proposal.status.name' },
     {
       title: 'Initial rank (by average score)',
       render: (

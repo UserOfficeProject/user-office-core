@@ -47,6 +47,11 @@ const ProposalTable: React.FC<ProposalTableProps> = ({
     { title: 'Proposal ID', field: 'shortCode' },
     { title: 'Title', field: 'title' },
     {
+      title: 'Submitted',
+      render: (rowData: PartialProposalsDataType) =>
+        rowData.submitted ? 'Yes' : 'No',
+    },
+    {
       title: 'Status',
       field: 'status',
     },

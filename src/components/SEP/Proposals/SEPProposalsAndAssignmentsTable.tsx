@@ -69,7 +69,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     },
     {
       title: 'Status',
-      field: 'proposal.status',
+      field: 'proposal.status.name',
     },
     {
       title: 'Date assigned',

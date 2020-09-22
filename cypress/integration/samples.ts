@@ -150,7 +150,9 @@ context('Samples tests', () => {
       .first()
       .click();
 
-    cy.contains('Yes').click();
+    cy.get('.MuiDialog-root')
+      .contains('Yes')
+      .click();
 
     cy.contains(proposalTitle).should('not.exist');
   });
