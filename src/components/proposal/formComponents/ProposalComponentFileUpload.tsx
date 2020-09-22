@@ -17,7 +17,7 @@ export function ProposalComponentFileUpload(
   } = templateField;
   const isError = errors[proposalQuestionId] ? true : false;
   const config = templateField.config as FileUploadConfig;
-  const [stateValue, setStateValue] = useState(value);
+  const [stateValue, setStateValue] = useState<string[]>(value);
 
   useEffect(() => {
     setStateValue(templateField.value);
@@ -32,8 +32,9 @@ export function ProposalComponentFileUpload(
         id={templateField.question.proposalQuestionId}
         fileType={config.file_type ? config.file_type.join(',') : ''}
         onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-          setStateValue(evt.target.value);
-          onComplete(evt, evt.target.value); // letting Formik know that there was a change
+          const newValue = evt.target.value.split(',');
+          setStateValue(newValue);
+          onComplete(evt, newValue); // letting Formik know that there was a change
         }}
         value={stateValue}
       />
