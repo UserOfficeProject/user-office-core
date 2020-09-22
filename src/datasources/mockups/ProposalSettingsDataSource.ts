@@ -1,5 +1,7 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatus';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
@@ -14,6 +16,21 @@ export const dummyProposalWorkflow = new ProposalWorkflow(
   1,
   'Test workflow',
   'This is description'
+);
+
+export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
+  1,
+  1,
+  1,
+  1,
+  {
+    id: 1,
+    name: 'TEST_STATUS',
+    description: 'Test status',
+  },
+  2,
+  null,
+  'PROPOSAL_SUBMITTED'
 );
 
 export class ProposalSettingsDataSourceMock
@@ -72,5 +89,17 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowId: number
   ): Promise<ProposalWorkflow> {
     return dummyProposalWorkflow;
+  }
+
+  async getProposalWorkflowConnections(
+    proposalWorkflowId: number
+  ): Promise<ProposalWorkflowConnection[]> {
+    return [dummyProposalWorkflowConnection];
+  }
+
+  async addProposalWorkflowStatus(
+    newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection> {
+    return dummyProposalWorkflowConnection;
   }
 }
