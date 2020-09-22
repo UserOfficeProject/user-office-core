@@ -42,12 +42,13 @@ jobs:
     - run: echo ${{ github.ref }}
     - run: echo ${{ github.head_ref }}
     - run: echo ${{ github.base_ref }}
+    - run: if [ ${{ github.head_ref }} != "" ]; then    echo "::set-env name=TAG::${{ github.head_ref }}"; else    echo "::set-env name=TAG::develop"; fi
     -
       name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: dmsc/duo-backend:${{ github.head_ref }}
+        tags: dmsc/duo-backend:$TAG
         
         
