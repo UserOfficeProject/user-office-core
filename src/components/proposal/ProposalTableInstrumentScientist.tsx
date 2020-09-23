@@ -7,12 +7,10 @@ import MaterialTable, { Column } from 'material-table';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { Proposal } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import {
-  useProposalsData,
-  ProposalData,
-} from 'hooks/proposal/useProposalsData';
+import { useProposalsData } from 'hooks/proposal/useProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 import {
   average,
@@ -26,14 +24,14 @@ const ProposalTableInstrumentScientist: React.FC = () => {
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
-    Column<ProposalData>[] | null
+    Column<Proposal>[] | null
   >('proposalColumnsInstrumentScientist', null);
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
    */
-  const RowActionButtons = (rowData: ProposalData) => {
+  const RowActionButtons = (rowData: Proposal) => {
     const iconButtonStyle = { padding: '7px' };
 
     return (
@@ -60,7 +58,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     );
   };
 
-  let columns: Column<ProposalData>[] = [
+  let columns: Column<Proposal>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -81,19 +79,23 @@ const ProposalTableInstrumentScientist: React.FC = () => {
     },
     {
       title: 'Technical status',
-      render: (rowData: ProposalData): string =>
+      render: rowData =>
         rowData.technicalReview
           ? getTranslation(rowData.technicalReview.status as ResourceId)
           : '',
     },
-    { title: 'Status', field: 'status' },
+    {
+      title: 'Submitted',
+      render: rowData => (rowData.submitted ? 'Yes' : 'No'),
+    },
+    { title: 'Status', field: 'status.name' },
     {
       title: 'Deviation',
       field: 'deviation',
       hidden: true,
-      render: (rowData: ProposalData): number =>
+      render: (rowData: Proposal): number =>
         standardDeviation(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
+      customSort: (a: Proposal, b: Proposal) =>
         (standardDeviation(getGrades(a.reviews)) || 0) -
         (standardDeviation(getGrades(b.reviews)) || 0),
     },
@@ -101,9 +103,9 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       title: 'Absolute Difference',
       field: 'absolute',
       hidden: true,
-      render: (rowData: ProposalData): number =>
+      render: (rowData: Proposal): number =>
         absoluteDifference(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
+      customSort: (a: Proposal, b: Proposal) =>
         (absoluteDifference(getGrades(a.reviews)) || 0) -
         (absoluteDifference(getGrades(b.reviews)) || 0),
     },
@@ -111,34 +113,34 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       title: 'Average Score',
       field: 'average',
       hidden: true,
-      render: (rowData: ProposalData): number =>
+      render: (rowData: Proposal): number =>
         average(getGrades(rowData.reviews)),
-      customSort: (a: ProposalData, b: ProposalData) =>
+      customSort: (a: Proposal, b: Proposal) =>
         (average(getGrades(a.reviews)) || 0) -
         (average(getGrades(b.reviews)) || 0),
     },
     {
       title: 'Final Status',
       field: 'finalStatus',
-      render: (rowData: ProposalData): string =>
+      render: (rowData: Proposal): string =>
         rowData.finalStatus
           ? getTranslation(rowData.finalStatus as ResourceId)
           : '',
     },
     {
       title: 'Instrument',
-      render: (rowData: ProposalData): string =>
+      render: (rowData: Proposal): string =>
         rowData.instrument ? rowData.instrument.name : '-',
     },
     {
       title: 'Call',
-      render: (rowData: ProposalData): string =>
+      render: (rowData: Proposal): string =>
         rowData.call ? rowData.call.shortCode : '-',
       hidden: true,
     },
     {
       title: 'SEP',
-      render: (rowData: ProposalData): string =>
+      render: (rowData: Proposal): string =>
         rowData.sep ? rowData.sep.code : '-',
       hidden: true,
     },
@@ -168,7 +170,7 @@ const ProposalTableInstrumentScientist: React.FC = () => {
       }}
       onChangeColumnHidden={collumnChange => {
         const proposalColumns = columns.map(
-          (proposalColumn: Column<ProposalData>) => ({
+          (proposalColumn: Column<Proposal>) => ({
             hidden:
               proposalColumn.title === collumnChange.title
                 ? collumnChange.hidden

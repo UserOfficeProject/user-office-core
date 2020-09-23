@@ -28,7 +28,7 @@ context('Instrument tests', () => {
 
   it('User Officer should be able to create Instrument', () => {
     const name = faker.random.words(2);
-    const shortCode = faker.random.words(1);
+    const shortCode = faker.random.alphaNumeric(15);
     const description = faker.random.words(5);
 
     cy.login('officer');
@@ -51,7 +51,7 @@ context('Instrument tests', () => {
 
   it('User Officer should be able to update Instrument', () => {
     const name = faker.random.words(2);
-    const shortCode = faker.random.words(1);
+    const shortCode = faker.random.alphaNumeric(15);
     const description = faker.random.words(5);
 
     cy.login('officer');
@@ -233,7 +233,9 @@ context('Instrument tests', () => {
 
     cy.get('[title="Remove assigned instrument"]').click();
 
-    cy.contains('Yes').click();
+    cy.get('.MuiDialog-root')
+      .contains('Yes')
+      .click();
 
     cy.wait(500);
 

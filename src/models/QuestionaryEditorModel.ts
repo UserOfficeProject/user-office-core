@@ -13,7 +13,7 @@ import {
   getFieldById,
   getQuestionaryStepByTopicId,
   getTopicById,
-} from 'models/ProposalModelFunctions';
+} from 'models/QuestionaryFunctions';
 import {
   useReducerWithMiddleWares,
   ReducerMiddleware,

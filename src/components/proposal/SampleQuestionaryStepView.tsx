@@ -1,35 +1,37 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik } from 'formik';
-import React, { SyntheticEvent, useContext } from 'react';
+import React, { SyntheticEvent } from 'react';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
-import { QuestionaryStep } from 'generated/sdk';
-import { useUpdateProposal } from 'hooks/proposal/useUpdateProposal';
+import { Questionary, QuestionaryStep } from 'generated/sdk';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
-} from 'models/ProposalModelFunctions';
-import {
-  EventType,
-  ProposalSubmissionModelState,
-} from 'models/ProposalSubmissionModel';
+  prepareAnswers,
+} from 'models/QuestionaryFunctions';
+import { Event, EventType } from 'models/SampleSubmissionModel';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { createFormikConfigObjects } from './createFormikConfigObjects';
-import { ProposalSubmissionContext } from './ProposalContainer';
-import ProposalNavigationFragment from './ProposalNavigationFragment';
+import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
-export default function ProposalQuestionaryStep(props: {
-  data: ProposalSubmissionModelState;
+interface QuestionaryState {
+  questionary: Questionary;
+  isDirty: boolean;
+}
+export default function SampleQuestionaryStepView(props: {
+  state: QuestionaryState;
   topicId: number;
+  dispatch: React.Dispatch<Event>;
   readonly: boolean;
 }) {
-  const { data, topicId } = props;
+  const { state, topicId, dispatch } = props;
   const componentFactory = new QuestionaryComponentFactory();
-  const { loading: formSaving } = useUpdateProposal();
+  const { api } = useDataApiWithFeedback();
   const classes = makeStyles({
     componentWrapper: {
       margin: '10px 0',
@@ -39,13 +41,12 @@ export default function ProposalQuestionaryStep(props: {
       opacity: 0.7,
     },
   })();
-  const { dispatch } = useContext(ProposalSubmissionContext)!;
 
-  if (data === null) {
+  if (state === null) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
-  const questionary = data.proposal.questionary!;
+  const questionary = state.questionary!;
   const questionaryStep = getStepByTopicId(questionary.steps, topicId) as
     | QuestionaryStep
     | undefined;
@@ -66,18 +67,6 @@ export default function ProposalQuestionaryStep(props: {
     activeFields
   );
 
-  const saveStepData = async (markAsComplete: boolean) => {
-    dispatch({
-      type: markAsComplete
-        ? EventType.FINISH_STEP_CLICKED
-        : EventType.SAVE_STEP_CLICKED,
-      payload: {
-        answers: activeFields,
-        topicId: props.topicId,
-      },
-    });
-  };
-
   return (
     <Formik
       initialValues={initialValues}
@@ -85,7 +74,14 @@ export default function ProposalQuestionaryStep(props: {
       onSubmit={() => {}}
       enableReinitialize={true}
     >
-      {({ errors, touched, handleChange, submitForm, validateForm }) => (
+      {({
+        errors,
+        touched,
+        handleChange,
+        submitForm,
+        validateForm,
+        isSubmitting,
+      }) => (
         <form className={props.readonly ? classes.disabled : undefined}>
           {activeFields.map(field => {
             return (
@@ -112,7 +108,7 @@ export default function ProposalQuestionaryStep(props: {
               </div>
             );
           })}
-          <ProposalNavigationFragment
+          <QuestionaryNavigationFragment
             disabled={props.readonly}
             back={{
               callback: () => {
@@ -121,16 +117,34 @@ export default function ProposalQuestionaryStep(props: {
             }}
             reset={{
               callback: () => dispatch({ type: EventType.RESET_CLICKED }),
-              disabled: !props.data.isDirty,
+              disabled: !state.isDirty,
             }}
             save={
               questionaryStep.isCompleted
                 ? undefined
                 : {
                     callback: () => {
-                      saveStepData(false);
+                      api('Saved')
+                        .answerTopic({
+                          questionaryId: state.questionary.questionaryId!,
+                          answers: prepareAnswers(questionaryStep.fields),
+                          topicId: topicId,
+                          isPartialSave: true,
+                        })
+                        .then(result => {
+                          if (!result.answerTopic.error) {
+                            dispatch({
+                              type: EventType.QUESTIONARY_STEP_ANSWERED,
+                              payload: {
+                                questionaryStep:
+                                  result.answerTopic.questionaryStep,
+                                partially: true,
+                              },
+                            });
+                          }
+                        });
                     },
-                    disabled: !props.data.isDirty,
+                    disabled: !props.state.isDirty,
                   }
             }
             saveAndNext={{
@@ -138,13 +152,32 @@ export default function ProposalQuestionaryStep(props: {
                 submitFormAsync(submitForm, validateForm).then(
                   (isValid: boolean) => {
                     if (isValid) {
-                      saveStepData(true);
+                      api('Saved')
+                        .answerTopic({
+                          questionaryId: state.questionary.questionaryId!,
+                          answers: prepareAnswers(questionaryStep.fields),
+                          topicId: topicId,
+                          isPartialSave: false,
+                        })
+                        .then(result => {
+                          if (!result.answerTopic.error) {
+                            dispatch({
+                              type: EventType.QUESTIONARY_STEP_ANSWERED,
+                              payload: {
+                                questionaryStep:
+                                  result.answerTopic.questionaryStep,
+                                partially: false,
+                              },
+                            });
+                            dispatch({ type: EventType.GO_STEP_FORWARD });
+                          }
+                        });
                     }
                   }
                 );
               },
             }}
-            isLoading={formSaving}
+            isLoading={isSubmitting}
           />
           <ErrorFocus />
         </form>

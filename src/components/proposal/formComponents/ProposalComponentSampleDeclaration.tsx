@@ -9,7 +9,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
-import SampleDeclarationEditor from '../SampleDeclarationEditor';
+import SampleDeclarationContainer from '../SampleDeclarationContainer';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
 
 export default function ProposalComponentSampleDeclaration(
@@ -77,7 +77,7 @@ export default function ProposalComponentSampleDeclaration(
           onAddNewClick={() =>
             api()
               .createSample({
-                title: 'Untitled',
+                title: '',
                 templateId: config.templateId,
               })
               .then(response => {
@@ -102,21 +102,24 @@ export default function ProposalComponentSampleDeclaration(
         isOpen={selectedSample !== null}
       >
         {selectedSample ? (
-          <SampleDeclarationEditor
-            sample={selectedSample!}
+          <SampleDeclarationContainer
+            data={selectedSample!}
             sampleEditDone={updatedSample => {
-              const index = rows.findIndex(
-                sample => sample.id === updatedSample.id
-              );
-              const newRows = [...rows];
-              newRows.splice(index, 1, {
-                ...rows[index],
-                ...sampleToListRow(updatedSample),
-              });
-              setRows(newRows);
+              if (updatedSample) {
+                const index = rows.findIndex(
+                  sample => sample.id === updatedSample.id
+                );
+                const newRows = [...rows];
+                newRows.splice(index, 1, {
+                  ...rows[index],
+                  ...sampleToListRow(updatedSample),
+                });
+                setRows(newRows);
+              }
+
               setSelectedSample(null);
             }}
-          ></SampleDeclarationEditor>
+          ></SampleDeclarationContainer>
         ) : null}
       </ModalWrapper>
     </>

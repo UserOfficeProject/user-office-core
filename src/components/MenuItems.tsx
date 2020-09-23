@@ -24,6 +24,7 @@ import { NavLink } from 'react-router-dom';
 
 import { UserRole, Call } from 'generated/sdk';
 
+import BoxIcon from './common/icons/BoxIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
@@ -50,7 +51,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         to={
           multipleCalls
             ? '/ProposalSelectType'
-            : `/ProposalCreate/${callsData[0]?.templateId}`
+            : `/ProposalCreate/${callsData[0]?.id}`
         }
         button
         disabled={proposalDisabled}
@@ -222,12 +223,7 @@ const SettingsMenuListItem = () => {
         </ListItemIcon>
         <ListItemText primary="Settings" />
       </ListItem>
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        style={{ paddingLeft: 10 }}
-      >
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/ProposalStatuses" button>
           <ListItemIcon>
             <ProposalSettingsIcon />
@@ -273,12 +269,7 @@ const TemplateMenuListItem = () => {
         </ListItemIcon>
         <ListItemText primary="Templates" />
       </ListItem>
-      <Collapse
-        in={isExpanded}
-        timeout="auto"
-        unmountOnExit
-        style={{ paddingLeft: 10 }}
-      >
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <ListItem component={NavLink} to="/ProposalTemplates" button>
           <ListItemIcon>
             <QuestionAnswerIcon />
@@ -303,7 +294,7 @@ const SamplesMenuListItem = () => {
   return (
     <ListItem component={NavLink} to="/SampleSafety" button>
       <ListItemIcon>
-        <FolderOpen />
+        <BoxIcon />
       </ListItemIcon>
       <ListItemText primary="Sample safety" />
     </ListItem>

@@ -16,7 +16,7 @@ import {
   QuestionTemplateRelation,
   SelectionFromOptionsConfig,
 } from 'generated/sdk';
-import { getAllFields, getFieldById } from 'models/ProposalModelFunctions';
+import { getAllFields, getFieldById } from 'models/QuestionaryFunctions';
 
 const FormikUICustomDependencySelector = ({
   field,

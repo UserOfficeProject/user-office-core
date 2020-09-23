@@ -3,7 +3,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
-import { ProposalStatusEnum } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import {
@@ -12,11 +11,11 @@ import {
 } from 'models/ProposalSubmissionModel';
 import withConfirm from 'utils/withConfirm';
 
-import { ProposalSubmissionContext } from './ProposalContainer';
-import ProposalNavigationFragment from './ProposalNavigationFragment';
+import { SubmissionContext } from '../../utils/SubmissionContext';
+import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const { dispatch } = useContext(ProposalSubmissionContext)!;
+  const { dispatch } = useContext(SubmissionContext)!;
   const { isLoading, submitProposal } = useSubmitProposal();
   const downloadPDFProposal = useDownloadPDFProposal();
   const proposal = data.proposal;
@@ -35,7 +34,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
       opacity: 0.7,
     },
     button: {
-      marginTop: proposal.status === 'BLANK' ? '40px' : 'auto',
+      marginTop: proposal.status.id === 0 ? '40px' : 'auto',
       marginLeft: '10px',
       backgroundColor: theme.palette.secondary.main,
       color: '#ffff',
@@ -52,7 +51,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <ProposalNavigationFragment
+        <QuestionaryNavigationFragment
           back={undefined}
           saveAndNext={{
             callback: () => {
@@ -72,18 +71,13 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
                 }
               )();
             },
-            label:
-              proposal.status === ProposalStatusEnum.SUBMITTED
-                ? '✔ Submitted'
-                : 'Submit',
-            disabled:
-              !allStepsComplete ||
-              proposal.status === ProposalStatusEnum.SUBMITTED,
+            label: proposal.submitted ? '✔ Submitted' : 'Submit',
+            disabled: !allStepsComplete || proposal.submitted,
             isBusy: isLoading,
           }}
           reset={undefined}
           isLoading={false}
-          disabled={proposal.status === 'BLANK'}
+          disabled={proposal.status.id === 0}
         />
         <Button
           className={classes.button}

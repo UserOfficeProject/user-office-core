@@ -13,7 +13,11 @@ query sepProposalsByInstrument(
       title
       shortCode
       rankOrder
-      status
+      status {
+        id
+        name
+        description
+      }
       reviews {
         id
         comment

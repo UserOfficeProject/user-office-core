@@ -10,7 +10,7 @@ import React from 'react';
 
 import AccountActionButton from './AccountActionButton';
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
 const useStyles = makeStyles(theme => ({
   toolbar: {

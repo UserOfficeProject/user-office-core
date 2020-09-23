@@ -1,13 +1,16 @@
 import produce from 'immer';
 import { Dispatch, Reducer } from 'react';
 
-import { Answer, ProposalStatusEnum, QuestionaryStep } from 'generated/sdk';
+import { Answer, QuestionaryStep } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from 'models/ProposalModelFunctions';
-import { useReducerWithMiddleWares } from 'utils/useReducerWithMiddleWares';
+} from 'models/QuestionaryFunctions';
+import {
+  ReducerMiddleware,
+  useReducerWithMiddleWares,
+} from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   BACK_CLICKED = 'BACK_CLICKED',
@@ -34,7 +37,7 @@ export interface ProposalSubmissionModelState {
 // rename this function
 export function ProposalSubmissionModel(
   initialProposal: ProposalSubsetSumbission,
-  middlewares?: Array<Function>
+  middlewares?: Array<ReducerMiddleware<ProposalSubmissionModelState, Event>>
 ): {
   state: ProposalSubmissionModelState;
   dispatch: Dispatch<Event>;
@@ -96,7 +99,7 @@ export function ProposalSubmissionModel(
           break;
 
         case EventType.SUBMIT_PROPOSAL_CLICKED:
-          draftState.proposal.status = ProposalStatusEnum.SUBMITTED;
+          draftState.proposal.submitted = true;
           draftState.isDirty = false;
           break;
       }

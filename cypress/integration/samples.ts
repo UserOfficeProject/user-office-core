@@ -33,7 +33,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.contains('2. New Topic');
+    cy.contains('New Topic');
 
     cy.visit('/');
 
@@ -90,7 +90,13 @@ context('Samples tests', () => {
       .clear()
       .type(faker.lorem.words(2));
 
-    cy.get('[data-cy=save-button]').click();
+    cy.get('[data-cy=save-and-continue-button]')
+      .eq(1)
+      .click({ force: true });
+
+    cy.get('[data-cy=save-and-continue-button]')
+      .eq(1)
+      .click({ force: true });
 
     cy.contains('Save and continue').click();
 
@@ -144,7 +150,9 @@ context('Samples tests', () => {
       .first()
       .click();
 
-    cy.contains('Yes').click();
+    cy.get('.MuiDialog-root')
+      .contains('Yes')
+      .click();
 
     cy.contains(proposalTitle).should('not.exist');
   });
