@@ -1,7 +1,10 @@
+import { DialogActions } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
+import Delete from '@material-ui/icons/Delete';
 import React from 'react';
 import {
   Draggable,
@@ -12,9 +15,12 @@ import {
 
 import { ProposalWorkflowConnection } from 'generated/sdk';
 
+import { Event, EventType } from './ProposalWorkflowEditorModel';
+
 const ProposalWorkflowConnectionsEditor: React.FC<{
   proposalWorkflowStatusConnections: ProposalWorkflowConnection[];
-}> = ({ proposalWorkflowStatusConnections }) => {
+  dispatch: React.Dispatch<Event>;
+}> = ({ proposalWorkflowStatusConnections, dispatch }) => {
   const theme = useTheme();
   const classes = makeStyles(theme => ({
     container: {
@@ -23,6 +29,14 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
       flexBasis: '100%',
       backgroundColor: theme.palette.grey[200],
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+    },
+    dialogActions: {
+      padding: 0,
+    },
+    removeButton: {
+      position: 'absolute',
+      marginLeft: '5px',
+      marginTop: '5px',
     },
     itemContainer: {
       minHeight: '180px',
@@ -74,6 +88,20 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
               )}
               className={classes.item}
             >
+              <DialogActions className={classes.dialogActions}>
+                <IconButton
+                  size="small"
+                  className={classes.removeButton}
+                  onClick={() => {
+                    dispatch({
+                      type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+                      payload: { source: { index } },
+                    });
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </DialogActions>
               <Box fontSize="1rem">
                 {proposalWorkflowConnection.proposalStatus.name}
               </Box>

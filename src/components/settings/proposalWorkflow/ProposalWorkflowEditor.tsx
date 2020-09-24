@@ -140,6 +140,7 @@ const ProposalWorkflowEditor: React.FC = () => {
           <Box display="flex">
             <>
               <ProposalWorkflowConnectionsEditor
+                dispatch={dispatch}
                 proposalWorkflowStatusConnections={
                   state.proposalWorkflowConnections
                 }
