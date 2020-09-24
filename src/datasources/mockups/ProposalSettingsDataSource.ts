@@ -1,7 +1,7 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
-import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatus';
+import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
@@ -97,9 +97,29 @@ export class ProposalSettingsDataSourceMock
     return [dummyProposalWorkflowConnection];
   }
 
+  async getProposalWorkflowConnection(
+    proposalWorkflowId: number,
+    proposalWorkflowConnectionId: number
+  ): Promise<ProposalWorkflowConnection | null> {
+    return dummyProposalWorkflowConnection;
+  }
+
   async addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection> {
     return dummyProposalWorkflowConnection;
+  }
+
+  async updateProposalWorkflowStatuses(
+    proposalWorkflowStatuses: ProposalWorkflowConnection[]
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async deleteProposalWorkflowStatus(
+    proposalStatusId: number,
+    proposalWorkflowId: number
+  ): Promise<boolean> {
+    return true;
   }
 }

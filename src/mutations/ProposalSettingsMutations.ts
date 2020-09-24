@@ -12,9 +12,11 @@ import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnection
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatus';
+import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
+import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteProposalWorkflowStatusMutation';
+import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings/MoveProposalWorkflowStatusMutation';
 import { UpdateProposalStatusInput } from '../resolvers/mutations/settings/UpdateProposalStatusMutation';
 import { UpdateProposalWorkflowInput } from '../resolvers/mutations/settings/UpdateProposalWorkflowMutation';
 import { logger } from '../utils/Logger';
@@ -146,19 +148,168 @@ export default class ProposalSettingsMutations {
       });
   }
 
+  async insertProposalWorkflowStatus(args: AddProposalWorkflowStatusInput) {
+    return this.dataSource
+      .addProposalWorkflowStatus(args)
+      .then(result => result);
+  }
+
+  async updateLastAndInsertNewProposalStatusAtTheEnd(
+    args: AddProposalWorkflowStatusInput
+  ) {
+    const previousLastConnection = await this.dataSource.getProposalWorkflowConnection(
+      args.proposalWorkflowId,
+      args.prevProposalStatusId
+    );
+
+    if (previousLastConnection) {
+      this.dataSource.updateProposalWorkflowStatuses([
+        {
+          ...previousLastConnection,
+          nextProposalStatusId: args.proposalStatusId,
+        },
+      ]);
+    }
+
+    return this.insertProposalWorkflowStatus(args);
+  }
+
+  async updateAllProposalWorkflowStatuses(
+    allWorkflowConnections: ProposalWorkflowConnection[]
+  ) {
+    if (allWorkflowConnections.length > 0) {
+      const newWorkflowConnections = allWorkflowConnections.map(
+        (workflowConnection, index) => {
+          return {
+            ...workflowConnection,
+            sortOrder: index,
+            prevProposalStatusId: allWorkflowConnections[index - 1]
+              ? allWorkflowConnections[index - 1].proposalStatusId
+              : null,
+            nextProposalStatusId: allWorkflowConnections[index + 1]
+              ? allWorkflowConnections[index + 1].proposalStatusId
+              : null,
+          };
+        }
+      );
+
+      await this.dataSource.updateProposalWorkflowStatuses(
+        newWorkflowConnections
+      );
+    }
+  }
+
+  async insertNewAndUpdateExistingProposalWorkflowStatuses(
+    args: AddProposalWorkflowStatusInput
+  ) {
+    // TODO: This can be optimized even more with batch upsert. We get all connections inject new one on the right place and just do the upsert (insert or update).
+    const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+      args.proposalWorkflowId
+    );
+    const newConnection = await this.insertProposalWorkflowStatus(args);
+
+    allWorkflowConnections.splice(newConnection.sortOrder, 0, newConnection);
+
+    await this.updateAllProposalWorkflowStatuses(allWorkflowConnections);
+
+    return newConnection;
+  }
+
+  moveArrayElement(
+    workflowConnections: ProposalWorkflowConnection[],
+    fromIndex: number,
+    toIndex: number
+  ) {
+    const proposalWorkflowConnectionToMove = workflowConnections[fromIndex];
+
+    workflowConnections.splice(
+      workflowConnections.indexOf(proposalWorkflowConnectionToMove),
+      1
+    );
+
+    workflowConnections.splice(toIndex, 0, proposalWorkflowConnectionToMove);
+
+    return workflowConnections;
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async addProposalWorkflowStatus(
     agent: UserWithRole | null,
     args: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection | Rejection> {
+    const isVeryFirstConnection =
+      !args.nextProposalStatusId && !args.prevProposalStatusId;
+    const isConnectionAtTheEnd =
+      !args.nextProposalStatusId && !!args.prevProposalStatusId;
+    try {
+      if (isVeryFirstConnection) {
+        return this.insertProposalWorkflowStatus(args);
+      } else if (isConnectionAtTheEnd) {
+        return this.updateLastAndInsertNewProposalStatusAtTheEnd(args);
+      } else {
+        return this.insertNewAndUpdateExistingProposalWorkflowStatuses(args);
+      }
+    } catch (error) {
+      logger.logException('Could not add proposal workflow status', error, {
+        agent,
+        args,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async moveProposalWorkflowStatus(
+    agent: UserWithRole | null,
+    args: MoveProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection | Rejection> {
+    try {
+      const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+        args.proposalWorkflowId
+      );
+
+      const reorderedWorkflowConnections = this.moveArrayElement(
+        allWorkflowConnections,
+        args.from,
+        args.to
+      );
+
+      await this.updateAllProposalWorkflowStatuses(
+        reorderedWorkflowConnections
+      );
+
+      return reorderedWorkflowConnections[args.to];
+    } catch (error) {
+      logger.logException('Could not add proposal workflow status', error, {
+        agent,
+        args,
+      });
+
+      return rejection('INTERNAL_ERROR');
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async deleteProposalWorkflowStatus(
+    agent: UserWithRole | null,
+    args: DeleteProposalWorkflowStatusInput
+  ): Promise<boolean | Rejection> {
     return this.dataSource
-      .addProposalWorkflowStatus(args)
+      .deleteProposalWorkflowStatus(
+        args.proposalStatusId,
+        args.proposalWorkflowId
+      )
       .then(result => result)
       .catch(error => {
-        logger.logException('Could not add proposal workflow status', error, {
-          agent,
-          args,
-        });
+        logger.logException(
+          'Could not delete proposal workflow status',
+          error,
+          {
+            agent,
+            args,
+          }
+        );
 
         return rejection('INTERNAL_ERROR');
       });
