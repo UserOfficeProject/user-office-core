@@ -300,7 +300,15 @@ export default class ProposalSettingsMutations {
         args.proposalStatusId,
         args.proposalWorkflowId
       )
-      .then(result => result)
+      .then(async result => {
+        const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+          args.proposalWorkflowId
+        );
+
+        await this.updateAllProposalWorkflowStatuses(allWorkflowConnections);
+
+        return result;
+      })
       .catch(error => {
         logger.logException(
           'Could not delete proposal workflow status',
