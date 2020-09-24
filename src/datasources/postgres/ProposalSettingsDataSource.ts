@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
+import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import database from './database';
-import { ProposalStatusRecord, ProposalWorkflowRecord } from './records';
+import {
+  ProposalStatusRecord,
+  ProposalWorkflowConnectionRecord,
+  ProposalWorkflowRecord,
+} from './records';
 
 export default class PostgresProposalSettingsDataSource
   implements ProposalSettingsDataSource {
@@ -196,4 +202,180 @@ export default class PostgresProposalSettingsDataSource
       });
   }
   // <---------- Proposal workflows -----------
+
+  private createProposalWorkflowConnectionObject(
+    proposalWorkflowConnection: ProposalWorkflowConnectionRecord &
+      ProposalStatusRecord
+  ) {
+    return new ProposalWorkflowConnection(
+      proposalWorkflowConnection.proposal_workflow_connection_id,
+      proposalWorkflowConnection.sort_order,
+      proposalWorkflowConnection.proposal_workflow_id,
+      proposalWorkflowConnection.proposal_status_id,
+      {
+        id: proposalWorkflowConnection.proposal_status_id,
+        name: proposalWorkflowConnection.name,
+        description: proposalWorkflowConnection.description,
+      },
+      proposalWorkflowConnection.next_proposal_status_id,
+      proposalWorkflowConnection.prev_proposal_status_id,
+      proposalWorkflowConnection.next_status_event_type
+    );
+  }
+
+  async getProposalWorkflowConnections(
+    proposalWorkflowId: number
+  ): Promise<ProposalWorkflowConnection[]> {
+    return database
+      .select('*')
+      .from('proposal_workflow_connections as pwc')
+      .join('proposal_statuses as ps', {
+        'ps.proposal_status_id': 'pwc.proposal_status_id',
+      })
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .orderBy('sort_order')
+      .then(
+        (
+          proposalWorkflowConnections:
+            | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
+            | null
+        ) =>
+          proposalWorkflowConnections
+            ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
+                this.createProposalWorkflowConnectionObject(
+                  proposalWorkflowConnection
+                )
+              )
+            : []
+      );
+  }
+
+  async getProposalWorkflowConnection(
+    proposalWorkflowId: number,
+    proposalStatusId: number
+  ): Promise<ProposalWorkflowConnection | null> {
+    return database
+      .select()
+      .from('proposal_workflow_connections as pwc')
+      .join('proposal_statuses as ps', {
+        'ps.proposal_status_id': 'pwc.proposal_status_id',
+      })
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .andWhere('pwc.proposal_status_id', proposalStatusId)
+      .first()
+      .then(
+        (
+          proposalWorkflowConnection:
+            | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)
+            | null
+        ) =>
+          proposalWorkflowConnection
+            ? this.createProposalWorkflowConnectionObject(
+                proposalWorkflowConnection
+              )
+            : null
+      );
+  }
+
+  async addProposalWorkflowStatus(
+    newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
+  ): Promise<ProposalWorkflowConnection> {
+    return database
+      .insert({
+        proposal_workflow_id: newProposalWorkflowStatusInput.proposalWorkflowId,
+        proposal_status_id: newProposalWorkflowStatusInput.proposalStatusId,
+        next_proposal_status_id:
+          newProposalWorkflowStatusInput.nextProposalStatusId,
+        prev_proposal_status_id:
+          newProposalWorkflowStatusInput.prevProposalStatusId,
+        sort_order: newProposalWorkflowStatusInput.sortOrder,
+        next_status_event_type:
+          newProposalWorkflowStatusInput.nextStatusEventType,
+      })
+      .into('proposal_workflow_connections as pwc')
+      .returning(['*'])
+      .join('proposal_statuses as ps', {
+        'ps.proposal_status_id':
+          newProposalWorkflowStatusInput.proposalStatusId,
+      })
+      .then(
+        (
+          proposalWorkflowConnections: (ProposalWorkflowConnectionRecord &
+            ProposalStatusRecord)[]
+        ) => {
+          if (proposalWorkflowConnections.length !== 1) {
+            throw new Error('Could not create proposal workflow status');
+          }
+
+          return this.createProposalWorkflowConnectionObject(
+            proposalWorkflowConnections[0]
+          );
+        }
+      );
+  }
+
+  async bulkUpdateProposalWorkflowStatuses(
+    collection: ProposalWorkflowConnection[]
+  ) {
+    return database.transaction(trx => {
+      const queries = collection.map(tuple =>
+        database('proposal_workflow_connections')
+          .where('proposal_workflow_id', tuple.proposalWorkflowId)
+          .andWhere('proposal_status_id', tuple.proposalStatusId)
+          .update({
+            proposal_workflow_id: tuple.proposalWorkflowId,
+            proposal_status_id: tuple.proposalStatusId,
+            next_proposal_status_id: tuple.nextProposalStatusId,
+            prev_proposal_status_id: tuple.prevProposalStatusId,
+            sort_order: tuple.sortOrder,
+            next_status_event_type: tuple.nextStatusEventType,
+          })
+          .transacting(trx)
+      );
+
+      return Promise.all(queries)
+        .then(trx.commit)
+        .catch(error => {
+          trx.rollback;
+          throw error;
+        });
+    });
+  }
+
+  async updateProposalWorkflowStatuses(
+    proposalWorkflowStatusesInput: ProposalWorkflowConnection[]
+  ): Promise<boolean> {
+    const result = await this.bulkUpdateProposalWorkflowStatuses(
+      proposalWorkflowStatusesInput
+    );
+
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async deleteProposalWorkflowStatus(
+    proposalStatusId: number,
+    proposalWorkflowId: number
+  ): Promise<boolean> {
+    return database('proposal_workflow_connections')
+      .where('proposal_workflow_id', proposalWorkflowId)
+      .andWhere('proposal_status_id', proposalStatusId)
+      .del()
+      .returning('*')
+      .then((proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
+        if (
+          proposalWorkflowStatus === undefined ||
+          proposalWorkflowStatus.length !== 1
+        ) {
+          throw new Error(
+            `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
+          );
+        }
+
+        return true;
+      });
+  }
 }
