@@ -1,0 +1,14 @@
+mutation deleteProposalWorkflowStatus(
+  $proposalStatusId: Int!
+  $proposalWorkflowId: Int!
+) {
+  deleteProposalWorkflowStatus(
+    deleteProposalWorkflowStatusInput: {
+      proposalStatusId: $proposalStatusId
+      proposalWorkflowId: $proposalWorkflowId
+    }
+  ) {
+    isSuccess
+    error
+  }
+}

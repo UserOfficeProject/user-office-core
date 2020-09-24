@@ -1,0 +1,15 @@
+mutation moveProposalWorkflowStatus(
+  $from: Int!
+  $to: Int!
+  $proposalWorkflowId: Int!
+) {
+  moveProposalWorkflowStatus(
+    moveProposalWorkflowStatusInput: {
+      from: $from
+      to: $to
+      proposalWorkflowId: $proposalWorkflowId
+    }
+  ) {
+    error
+  }
+}

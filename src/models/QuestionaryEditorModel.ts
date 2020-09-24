@@ -56,7 +56,7 @@ export interface Event {
 export default function QuestionaryEditorModel(
   middlewares?: Array<ReducerMiddleware<Template, Event>>
 ) {
-  const { templateId } = useParams();
+  const { templateId } = useParams<{ templateId: string }>();
   const blankInitTemplate: Template = {
     categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
     steps: [],

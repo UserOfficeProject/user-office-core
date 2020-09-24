@@ -6,6 +6,20 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
       id
       name
       description
+      proposalWorkflowConnections {
+        id
+        sortOrder
+        proposalWorkflowId
+        proposalStatusId
+        proposalStatus {
+          id
+          name
+          description
+        }
+        nextProposalStatusId
+        prevProposalStatusId
+        nextStatusEventType
+      }
     }
     error
   }
