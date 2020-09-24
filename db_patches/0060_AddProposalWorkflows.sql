@@ -17,7 +17,6 @@ BEGIN
             proposal_status_id INT REFERENCES proposal_statuses (proposal_status_id) ON DELETE CASCADE NOT NULL,
             next_proposal_status_id INT REFERENCES proposal_statuses (proposal_status_id) ON DELETE CASCADE,
             prev_proposal_status_id INT REFERENCES proposal_statuses (proposal_status_id) ON DELETE CASCADE,
-            sort_order INTEGER NOT NULL,
             next_status_event_type VARCHAR(50) NOT NULL
         );
     END;
