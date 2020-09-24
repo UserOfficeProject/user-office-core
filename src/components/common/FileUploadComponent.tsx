@@ -26,7 +26,7 @@ export function FileUploadComponent(props: {
   maxFiles?: number;
   id?: string;
   fileType?: string;
-  value: string;
+  value: string[];
   onChange: Function;
   className?: string;
 }) {
@@ -59,7 +59,7 @@ export function FileUploadComponent(props: {
   useEffect(() => {
     if (props.value) {
       api()
-        .getFileMetadata({ fileIds: props.value.split(',') })
+        .getFileMetadata({ fileIds: props.value })
         .then(data => {
           setFiles(data?.fileMetadata || []);
         });

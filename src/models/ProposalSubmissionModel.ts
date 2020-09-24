@@ -6,8 +6,11 @@ import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   getFieldById,
   getQuestionaryStepByTopicId,
-} from 'models/ProposalModelFunctions';
-import { useReducerWithMiddleWares } from 'utils/useReducerWithMiddleWares';
+} from 'models/QuestionaryFunctions';
+import {
+  ReducerMiddleware,
+  useReducerWithMiddleWares,
+} from 'utils/useReducerWithMiddleWares';
 
 export enum EventType {
   BACK_CLICKED = 'BACK_CLICKED',
@@ -34,7 +37,7 @@ export interface ProposalSubmissionModelState {
 // rename this function
 export function ProposalSubmissionModel(
   initialProposal: ProposalSubsetSumbission,
-  middlewares?: Array<Function>
+  middlewares?: Array<ReducerMiddleware<ProposalSubmissionModelState, Event>>
 ): {
   state: ProposalSubmissionModelState;
   dispatch: Dispatch<Event>;

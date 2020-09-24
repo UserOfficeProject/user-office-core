@@ -24,6 +24,7 @@ import { NavLink } from 'react-router-dom';
 
 import { UserRole, Call } from 'generated/sdk';
 
+import BoxIcon from './common/icons/BoxIcon';
 import ProposalSettingsIcon from './common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from './common/icons/ProposalWorkflowIcon';
 import ScienceIcon from './common/icons/ScienceIcon';
@@ -50,7 +51,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         to={
           multipleCalls
             ? '/ProposalSelectType'
-            : `/ProposalCreate/${callsData[0]?.templateId}`
+            : `/ProposalCreate/${callsData[0]?.id}`
         }
         button
         disabled={proposalDisabled}
@@ -302,7 +303,7 @@ const SamplesMenuListItem = () => {
   return (
     <ListItem component={NavLink} to="/SampleSafety" button>
       <ListItemIcon>
-        <FolderOpen />
+        <BoxIcon />
       </ListItemIcon>
       <ListItemText primary="Sample safety" />
     </ListItem>
