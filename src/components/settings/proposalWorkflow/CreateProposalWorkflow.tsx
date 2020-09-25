@@ -34,6 +34,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
   const initialValues = {
     name: '',
     description: '',
+    proposalWorkflowConnections: [],
   };
 
   return (

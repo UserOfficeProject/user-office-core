@@ -151,7 +151,7 @@ export default function TemplateEditor() {
   };
 
   const getContainerStyle = (): any => {
-    return isLoading
+    return isLoading || state.templateId === 0
       ? {
           pointerEvents: 'none',
           userSelect: 'none',

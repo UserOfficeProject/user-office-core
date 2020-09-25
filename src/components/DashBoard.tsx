@@ -37,6 +37,7 @@ import SampleSafetyPage from './sample/SampleSafetyPage';
 import SEPPage from './SEP/SEPPage';
 import SEPsPage from './SEP/SEPsPage';
 import ProposalStatusesPage from './settings/proposalStatus/ProposalStatusesPage';
+import ProposalWorkflowEditor from './settings/proposalWorkflow/ProposalWorkflowEditor';
 import ProposalWorkflowsPage from './settings/proposalWorkflow/ProposalWorkflowsPage';
 import ProposalTemplates from './template/ProposalTemplates';
 import SampleTemplatesPage from './template/SampleTemplates';
@@ -223,6 +224,12 @@ const Dashboard: React.FC = () => {
             <Route
               path="/ProposalWorkflows"
               component={ProposalWorkflowsPage}
+            />
+          )}
+          {isUserOfficer && (
+            <Route
+              path="/ProposalWorkflowEditor/:workflowId"
+              component={ProposalWorkflowEditor}
             />
           )}
           {(isSampleSafetyReviewer || isUserOfficer) && (

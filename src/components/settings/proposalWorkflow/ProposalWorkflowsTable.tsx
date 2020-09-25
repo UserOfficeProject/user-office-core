@@ -75,7 +75,7 @@ const ProposalWorkflowsTable: React.FC = () => {
             tooltip: 'Edit',
             onClick: (event, rowData): void =>
               history.push(
-                `/WorkflowEditor/${(rowData as ProposalWorkflow).id}`
+                `/ProposalWorkflowEditor/${(rowData as ProposalWorkflow).id}`
               ),
             position: 'row',
           },

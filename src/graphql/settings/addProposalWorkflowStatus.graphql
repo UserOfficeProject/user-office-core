@@ -1,0 +1,21 @@
+mutation addProposalWorkflowStatus(
+  $proposalWorkflowId: Int!
+  $sortOrder: Int!
+  $proposalStatusId: Int!
+  $nextProposalStatusId: Int
+  $prevProposalStatusId: Int
+  $nextStatusEventType: String!
+) {
+  addProposalWorkflowStatus(
+    newProposalWorkflowStatusInput: {
+      proposalWorkflowId: $proposalWorkflowId
+      sortOrder: $sortOrder
+      proposalStatusId: $proposalStatusId
+      nextProposalStatusId: $nextProposalStatusId
+      prevProposalStatusId: $prevProposalStatusId
+      nextStatusEventType: $nextStatusEventType
+    }
+  ) {
+    error
+  }
+}

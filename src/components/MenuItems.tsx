@@ -199,7 +199,8 @@ const SettingsMenuListItem = () => {
   const history = useHistory();
   const shouldExpand =
     history.location.pathname === '/ProposalStatuses' ||
-    history.location.pathname === '/ProposalWorkflows';
+    history.location.pathname === '/ProposalWorkflows' ||
+    history.location.pathname.includes('ProposalWorkflowEditor');
   const [isExpanded, setIsExpanded] = useState(shouldExpand);
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -230,7 +231,15 @@ const SettingsMenuListItem = () => {
           </ListItemIcon>
           <ListItemText primary="Proposal statuses" />
         </ListItem>
-        <ListItem component={NavLink} to="/ProposalWorkflows" button>
+        <ListItem
+          component={NavLink}
+          isActive={() =>
+            history.location.pathname.includes('/ProposalWorkflows') ||
+            history.location.pathname.includes('ProposalWorkflowEditor')
+          }
+          to="/ProposalWorkflows"
+          button
+        >
           <ListItemIcon>
             <ProposalWorkflowIcon />
           </ListItemIcon>
