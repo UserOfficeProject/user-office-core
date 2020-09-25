@@ -92,13 +92,13 @@ context('Samples tests', () => {
 
     cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
       .first()
-      .click({ force: true });
+      .click();
 
-    cy.wait(500);
+    cy.wait(4000);
 
     cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
       .first()
-      .click({ force: true });
+      .click();
 
     cy.contains('Save and continue').click();
 
