@@ -64,6 +64,7 @@ const ProposalStatusPicker: React.FC<{
           <Grid
             item
             xs={12}
+            data-cy={`status_${proposalStatus.name}_${proposalStatus.id}`}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}

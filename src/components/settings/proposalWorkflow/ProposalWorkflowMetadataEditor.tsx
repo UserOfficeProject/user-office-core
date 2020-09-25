@@ -46,7 +46,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
   }))();
 
   const staticJSX = (
-    <div>
+    <div data-cy="proposal-workflow-metadata-container">
       <div className={classes.workflowName}>{proposalWorkflow.name}</div>
       <div className={classes.workflowDescription}>
         {proposalWorkflow.description}
@@ -118,6 +118,7 @@ const ProposalWorkflowMetadataEditor: React.FC<{
             </Button>
             <Button
               disabled={isSubmitting}
+              data-cy="submit"
               type="submit"
               variant="contained"
               color="primary"

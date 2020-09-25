@@ -71,14 +71,15 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
     proposalWorkflowStatusConnections.map(
       (proposalWorkflowConnection, index) => (
         <Draggable
-          key={`${proposalWorkflowConnection.id}_${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
-          draggableId={`${proposalWorkflowConnection.id}_${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
+          key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
+          draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
           index={index}
         >
           {(provided, snapshot) => (
             <Grid
               item
               xs={12}
+              data-cy={`connection_${proposalWorkflowConnection.proposalStatus.name}_${proposalWorkflowConnection.proposalStatus.id}`}
               ref={provided.innerRef}
               {...provided.draggableProps}
               {...provided.dragHandleProps}
@@ -92,6 +93,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
                 <IconButton
                   size="small"
                   className={classes.removeButton}
+                  data-cy="remove-workflow-status-button"
                   onClick={() => {
                     dispatch({
                       type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
