@@ -90,12 +90,14 @@ context('Samples tests', () => {
       .clear()
       .type(faker.lorem.words(2));
 
-    cy.get('[data-cy=save-and-continue-button]')
-      .eq(1)
+    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
+      .first()
       .click({ force: true });
 
-    cy.get('[data-cy=save-and-continue-button]')
-      .eq(1)
+    cy.wait(500);
+
+    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
+      .first()
       .click({ force: true });
 
     cy.contains('Save and continue').click();
