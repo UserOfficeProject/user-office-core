@@ -159,7 +159,7 @@ export default class ProposalSettingsMutations {
   ) {
     const previousLastConnection = await this.dataSource.getProposalWorkflowConnection(
       args.proposalWorkflowId,
-      args.prevProposalStatusId
+      args.prevProposalStatusId as number
     );
 
     if (previousLastConnection) {

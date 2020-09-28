@@ -1,7 +1,10 @@
 import 'reflect-metadata';
 
 import {
+  anotherDummyProposalWorkflowConnection,
   dummyProposalStatus,
+  dummyProposalWorkflow,
+  dummyProposalWorkflowConnection,
   ProposalSettingsDataSourceMock,
 } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
@@ -37,5 +40,51 @@ describe('Test Proposal Statuses Queries', () => {
         1
       )
     ).resolves.toStrictEqual(dummyProposalStatus);
+  });
+});
+
+describe('Test Proposal Workflows Queries', () => {
+  test('A user cannot query all Proposal Workflows', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getAllProposalWorkflows(dummyUserWithRole)
+    ).resolves.toBe(null);
+  });
+
+  test('A userofficer can get all Proposal Workflows', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getAllProposalWorkflows(
+        dummyUserOfficerWithRole
+      )
+    ).resolves.toStrictEqual([dummyProposalWorkflow]);
+  });
+
+  test('A userofficer can get Proposal Workflow by id', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getProposalWorkflow(
+        dummyUserOfficerWithRole,
+        1
+      )
+    ).resolves.toStrictEqual(dummyProposalWorkflow);
+  });
+
+  test('A user can not get Proposal Workflow connections', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getProposalWorkflowConnections(
+        dummyUserWithRole,
+        1
+      )
+    ).resolves.toBe(null);
+  });
+
+  test('A userofficer can get Proposal Workflow connections', () => {
+    return expect(
+      ProposalSettingsQueriesInstance.getProposalWorkflowConnections(
+        dummyUserOfficerWithRole,
+        1
+      )
+    ).resolves.toStrictEqual([
+      anotherDummyProposalWorkflowConnection,
+      dummyProposalWorkflowConnection,
+    ]);
   });
 });

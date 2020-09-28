@@ -12,6 +12,12 @@ export const dummyProposalStatus = new ProposalStatus(
   'When proposal is created it gets draft status before it is submitted.'
 );
 
+export const anotherDummyProposalStatus = new ProposalStatus(
+  11,
+  'NEW_PROPOSAL_STATUS',
+  'Proposal status for testing.'
+);
+
 export const dummyProposalWorkflow = new ProposalWorkflow(
   1,
   'Test workflow',
@@ -31,6 +37,21 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   2,
   null,
   'PROPOSAL_SUBMITTED'
+);
+
+export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnection(
+  2,
+  2,
+  1,
+  2,
+  {
+    id: 2,
+    name: 'TEST_STATUS_2',
+    description: 'Test status 2',
+  },
+  null,
+  1,
+  'PROPOSAL_REVIEWED'
 );
 
 export class ProposalSettingsDataSourceMock
@@ -54,13 +75,13 @@ export class ProposalSettingsDataSourceMock
   async updateProposalStatus(
     proposalStatus: ProposalStatus
   ): Promise<ProposalStatus> {
-    return dummyProposalStatus;
+    return proposalStatus;
   }
 
   async deleteProposalStatus(
     proposalStatusId: number
   ): Promise<ProposalStatus> {
-    return dummyProposalStatus;
+    return anotherDummyProposalStatus;
   }
 
   async createProposalWorkflow(
@@ -94,7 +115,10 @@ export class ProposalSettingsDataSourceMock
   async getProposalWorkflowConnections(
     proposalWorkflowId: number
   ): Promise<ProposalWorkflowConnection[]> {
-    return [dummyProposalWorkflowConnection];
+    return [
+      anotherDummyProposalWorkflowConnection,
+      dummyProposalWorkflowConnection,
+    ];
   }
 
   async getProposalWorkflowConnection(
