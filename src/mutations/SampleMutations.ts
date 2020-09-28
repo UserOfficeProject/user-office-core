@@ -121,20 +121,27 @@ export default class SampleMutations {
   }
 
   @Authorized()
-  async cloneSample(
-    user: UserWithRole | null,
-    sampleId: number
-  ): Promise<Sample> {
-    const sourceSample = await this.dataSource.getSample(sampleId);
-    const clonedQuestionary = await this.questionaryDataSource.clone(
-      sourceSample.questionaryId
-    );
-    const clonedSample = this.dataSource.create(
-      clonedQuestionary.questionaryId!,
-      `Copy of ${sourceSample.title}`,
-      sourceSample.creatorId
-    );
+  async cloneSample(agent: UserWithRole | null, sampleId: number) {
+    if (!sampleAuthorization.hasWriteRights(agent, sampleId)) {
+      return rejection('NOT_AUTHORIZED');
+    }
 
-    return clonedSample;
+    try {
+      const sourceSample = await this.dataSource.getSample(sampleId);
+      const clonedQuestionary = await this.questionaryDataSource.clone(
+        sourceSample.questionaryId
+      );
+      const clonedSample = this.dataSource.create(
+        clonedQuestionary.questionaryId!,
+        `Copy of ${sourceSample.title}`,
+        sourceSample.creatorId
+      );
+
+      return clonedSample;
+    } catch (e) {
+      logger.logError('Could not clone sample', e);
+
+      return rejection('INTERNAL_ERROR');
+    }
   }
 }
