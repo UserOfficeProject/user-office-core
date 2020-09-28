@@ -69,6 +69,13 @@ class App extends React.Component {
     useUnauthorizedApi().addClientLog({ error });
   }
 
+  componentDidMount() {
+    const primaryColor = getTheme().palette.primary.main;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', primaryColor);
+  }
+
   render(): JSX.Element {
     return (
       <ThemeProvider theme={getTheme()}>
