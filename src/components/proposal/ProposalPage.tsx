@@ -1,5 +1,5 @@
 import Grid from '@material-ui/core/Grid';
-import React from 'react';
+import React, { Suspense } from 'react';
 import {
   NumberParam,
   useQueryParams,
@@ -15,8 +15,9 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
 
-import ProposalFilterBar from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
+
+const ProposalFilterBar = React.lazy(() => import('./ProposalFilterBar'));
 
 export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
@@ -36,22 +37,19 @@ export default function ProposalPage() {
     callId: urlQueryParams.call,
     instrumentId: urlQueryParams.instrument,
   });
-  const { loadingCalls, calls } = useCallsData();
-  const { loadingInstruments, instruments } = useInstrumentsData();
+  const { calls } = useCallsData();
+  const { instruments } = useInstrumentsData();
 
-  const ProposalToolbar = (): JSX.Element =>
-    loadingCalls || loadingInstruments ? (
-      <div>Loading filters...</div>
-    ) : (
-      <>
-        <ProposalFilterBar
-          callsData={calls}
-          instrumentsData={instruments}
-          setProposalFilter={setProposalFilter}
-          filter={proposalFilter}
-        />
-      </>
-    );
+  const ProposalToolbar = (): JSX.Element => (
+    <Suspense fallback={<div>Loading filters...</div>}>
+      <ProposalFilterBar
+        callsData={calls}
+        instrumentsData={instruments}
+        setProposalFilter={setProposalFilter}
+        filter={proposalFilter}
+      />
+    </Suspense>
+  );
 
   return (
     <>

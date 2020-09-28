@@ -1,7 +1,4 @@
-// import {
-//   createProposalWorkflowValidationSchema,
-//   updateProposalWorkflowValidationSchema,
-// } from '@esss-swap/duo-validation/lib/ProposalWorkflows';
+import { createProposalWorkflowValidationSchema } from '@esss-swap/duo-validation/lib/ProposalWorkflow';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
@@ -55,11 +52,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
         setSubmitting(false);
         actions.setSubmitting(false);
       }}
-      // validationSchema={
-      //   proposalWorkflow
-      //     ? updateProposalWorkflowValidationSchema
-      //     : createProposalWorkflowValidationSchema
-      // }
+      validationSchema={createProposalWorkflowValidationSchema}
     >
       {() => (
         <Form>
