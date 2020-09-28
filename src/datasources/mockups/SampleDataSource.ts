@@ -77,4 +77,10 @@ export class SampleDataSourceMock implements SampleDataSource {
 
     return sample;
   }
+
+  async cloneSample(sampleId: number): Promise<Sample> {
+    const sample = await this.getSample(sampleId);
+
+    return { ...sample, id: sample.id++ };
+  }
 }

@@ -1,3 +1,4 @@
+import { questionaryDataSource } from '../datasources';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -10,6 +11,7 @@ import { CreateSampleArgs } from '../resolvers/mutations/CreateSampleMutations';
 import { UpdateSampleSafetyReviewArgs } from '../resolvers/mutations/UpdateSampleSafetyReviewMutation';
 import { UpdateSampleStatusArgs } from '../resolvers/mutations/UpdateSampleStatusMutation';
 import { UpdateSampleTitleArgs } from '../resolvers/mutations/UpdateSampleTitleMutation';
+import { Sample } from '../resolvers/types/Sample';
 import { Logger, logger } from '../utils/Logger';
 import { sampleAuthorization } from '../utils/SampleAuthorization';
 
@@ -116,5 +118,23 @@ export default class SampleMutations {
     }
 
     return this.dataSource.updateSampleSafetyReview(args);
+  }
+
+  @Authorized()
+  async cloneSample(
+    user: UserWithRole | null,
+    sampleId: number
+  ): Promise<Sample> {
+    const sourceSample = await this.dataSource.getSample(sampleId);
+    const clonedQuestionary = await this.questionaryDataSource.clone(
+      sourceSample.questionaryId
+    );
+    const clonedSample = this.dataSource.create(
+      clonedQuestionary.questionaryId!,
+      `Copy of ${sourceSample.title}`,
+      sourceSample.creatorId
+    );
+
+    return clonedSample;
   }
 }
