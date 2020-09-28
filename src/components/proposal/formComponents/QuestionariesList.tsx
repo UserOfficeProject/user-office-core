@@ -12,9 +12,10 @@ export interface QuestionariesListRow {
   label: string;
 }
 export interface QuestionariesListProps {
-  onAddNewClick: () => void;
-  onDeleteClick: (record: QuestionariesListRow) => void;
-  onEditClick: (record: QuestionariesListRow) => void;
+  onAddNewClick?: () => void;
+  onDeleteClick?: (record: QuestionariesListRow) => void;
+  onEditClick?: (record: QuestionariesListRow) => void;
+  onCloneClick?: (record: QuestionariesListRow) => void;
   data: Array<QuestionariesListRow>;
   addButtonLabel?: string;
 }
@@ -39,8 +40,9 @@ export function QuestionariesList(props: QuestionariesListProps) {
         return (
           <QuestionariesListItem
             record={record}
-            onEditClick={record => props.onEditClick(record)}
-            onDeleteClick={record => props.onDeleteClick(record)}
+            onEditClick={record => props.onEditClick?.(record)}
+            onDeleteClick={record => props.onDeleteClick?.(record)}
+            onCloneClick={record => props.onCloneClick?.(record)}
             key={record.id}
           />
         );

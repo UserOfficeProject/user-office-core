@@ -10,10 +10,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  _Any: any;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any;
   IntStringDateBoolArray: any;
 };
+
+
+export type Entity = User;
 
 export type Service = {
   __typename?: '_Service';
@@ -77,12 +81,6 @@ export type AnswerInput = {
   value?: Maybe<Scalars['String']>;
 };
 
-export type AnswerResponseWrap = {
-  __typename?: 'AnswerResponseWrap';
-  error: Maybe<Scalars['String']>;
-  answer: Maybe<Answer>;
-};
-
 export type AssignQuestionsToTopicResponseWrap = {
   __typename?: 'AssignQuestionsToTopicResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -140,13 +138,6 @@ export type CallResponseWrap = {
 export type CallsFilter = {
   templateIds?: Maybe<Array<Scalars['Int']>>;
   isActive?: Maybe<Scalars['Boolean']>;
-};
-
-export type ConfigBase = {
-  __typename?: 'ConfigBase';
-  small_label: Scalars['String'];
-  required: Scalars['Boolean'];
-  tooltip: Scalars['String'];
 };
 
 export type CreateProposalStatusInput = {
@@ -288,13 +279,6 @@ export type InstitutionResponseWrap = {
   institution: Maybe<Institution>;
 };
 
-export type Institutions = {
-  __typename?: 'Institutions';
-  id: Scalars['Int'];
-  value: Scalars['String'];
-  verified: Scalars['Boolean'];
-};
-
 export type InstitutionsFilter = {
   isVerified?: Maybe<Scalars['Boolean']>;
 };
@@ -397,6 +381,7 @@ export type Mutation = {
   addClientLog: SuccessResponseWrap;
   applyPatches: PrepareDbResponseWrap;
   assignQuestionsToTopic: AssignQuestionsToTopicResponseWrap;
+  cloneSample: SampleResponseWrap;
   cloneTemplate: TemplateResponseWrap;
   createAnswerQuestionaryRelations: AnswerBasicResponseWrap;
   createProposal: ProposalResponseWrap;
@@ -855,6 +840,11 @@ export type MutationAssignQuestionsToTopicArgs = {
 };
 
 
+export type MutationCloneSampleArgs = {
+  sampleId: Scalars['Int'];
+};
+
+
 export type MutationCloneTemplateArgs = {
   templateId: Scalars['Int'];
 };
@@ -1186,6 +1176,7 @@ export type ProposalWorkflowResponseWrap = {
 
 export type Query = {
   __typename?: 'Query';
+  _entities: Array<Maybe<Entity>>;
   _service: Service;
   calls: Maybe<Array<Call>>;
   proposals: Maybe<ProposalsQueryResult>;
@@ -1229,6 +1220,11 @@ export type Query = {
   user: Maybe<User>;
   me: Maybe<User>;
   users: Maybe<UserQueryResult>;
+};
+
+
+export type QueryEntitiesArgs = {
+  representations: Array<Scalars['_Any']>;
 };
 
 
@@ -1479,21 +1475,10 @@ export type QuestionTemplateRelation = {
   dependency: Maybe<FieldDependency>;
 };
 
-export type QuestionTemplateRelationResponseWrap = {
-  __typename?: 'QuestionTemplateRelationResponseWrap';
-  error: Maybe<Scalars['String']>;
-  questionTemplateRelation: Maybe<QuestionTemplateRelation>;
-};
-
 export type ResetPasswordEmailResponseWrap = {
   __typename?: 'ResetPasswordEmailResponseWrap';
   error: Maybe<Scalars['String']>;
   success: Maybe<Scalars['Boolean']>;
-};
-
-export type ResponseWrapBase = {
-  __typename?: 'ResponseWrapBase';
-  error: Maybe<Scalars['String']>;
 };
 
 export type Review = {
@@ -1552,12 +1537,6 @@ export type SamplesFilter = {
   status?: Maybe<SampleStatus>;
 };
 
-export type SamplesResponseWrap = {
-  __typename?: 'SamplesResponseWrap';
-  error: Maybe<Scalars['String']>;
-  samples: Array<Sample>;
-};
-
 export enum SampleStatus {
   NONE = 'NONE',
   SAFE = 'SAFE',
@@ -1605,12 +1584,6 @@ export type SepMember = {
   sepId: Scalars['Int'];
   roles: Array<Role>;
   user: BasicUserDetails;
-};
-
-export type SepMembersRoleResponseWrap = {
-  __typename?: 'SEPMembersRoleResponseWrap';
-  error: Maybe<Scalars['String']>;
-  success: Maybe<Scalars['Boolean']>;
 };
 
 export type SepProposal = {
@@ -3131,6 +3104,27 @@ export type UserWithReviewsQuery = (
       )> }
     )> }
   )> }
+);
+
+export type CloneSampleMutationVariables = Exact<{
+  sampleId: Scalars['Int'];
+}>;
+
+
+export type CloneSampleMutation = (
+  { __typename?: 'Mutation' }
+  & { cloneSample: (
+    { __typename?: 'SampleResponseWrap' }
+    & Pick<SampleResponseWrap, 'error'>
+    & { sample: Maybe<(
+      { __typename?: 'Sample' }
+      & { questionary: (
+        { __typename?: 'Questionary' }
+        & QuestionaryFragment
+      ) }
+      & SampleFragment
+    )> }
+  ) }
 );
 
 export type CreateSampleMutationVariables = Exact<{
@@ -5562,6 +5556,20 @@ export const UserWithReviewsDocument = gql`
   }
 }
     `;
+export const CloneSampleDocument = gql`
+    mutation cloneSample($sampleId: Int!) {
+  cloneSample(sampleId: $sampleId) {
+    sample {
+      ...sample
+      questionary {
+        ...questionary
+      }
+    }
+    error
+  }
+}
+    ${SampleFragmentDoc}
+${QuestionaryFragmentDoc}`;
 export const CreateSampleDocument = gql`
     mutation createSample($title: String!, $templateId: Int!) {
   createSample(title: $title, templateId: $templateId) {
@@ -6436,6 +6444,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     userWithReviews(variables?: UserWithReviewsQueryVariables): Promise<UserWithReviewsQuery> {
       return withWrapper(() => client.request<UserWithReviewsQuery>(print(UserWithReviewsDocument), variables));
+    },
+    cloneSample(variables: CloneSampleMutationVariables): Promise<CloneSampleMutation> {
+      return withWrapper(() => client.request<CloneSampleMutation>(print(CloneSampleDocument), variables));
     },
     createSample(variables: CreateSampleMutationVariables): Promise<CreateSampleMutation> {
       return withWrapper(() => client.request<CreateSampleMutation>(print(CreateSampleDocument), variables));
