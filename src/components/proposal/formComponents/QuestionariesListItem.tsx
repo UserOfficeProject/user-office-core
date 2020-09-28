@@ -17,7 +17,11 @@ export function QuestionariesListItem(props: {
   onCloneClick: (record: QuestionariesListRow) => void;
 }) {
   return (
-    <ListItem button onClick={() => props.onEditClick(props.record)}>
+    <ListItem
+      button
+      onClick={() => props.onEditClick(props.record)}
+      data-cy="questionaries-list-item"
+    >
       <ListItemAvatar>
         <Avatar>
           <DescriptionIcon />
@@ -28,6 +32,7 @@ export function QuestionariesListItem(props: {
         <IconButton
           edge="end"
           aria-label="clone"
+          data-cy="clone"
           onClick={() => props.onCloneClick(props.record)}
         >
           <FileCopy />
@@ -35,6 +40,7 @@ export function QuestionariesListItem(props: {
         <IconButton
           edge="end"
           aria-label="delete"
+          data-cy="delete"
           onClick={() => props.onDeleteClick(props.record)}
         >
           <DeleteIcon />
