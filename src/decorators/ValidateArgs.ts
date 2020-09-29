@@ -3,6 +3,7 @@ import * as yup from 'yup';
 
 import { UserWithRole } from '../models/User';
 import { Rejection, rejection } from '../rejection';
+import { logger } from '../utils/Logger';
 
 const schemaValidation = async (schema: yup.ObjectSchema, inputArgs: any) => {
   try {
@@ -32,9 +33,11 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
 
       const errors = await schemaValidation(schema, inputArgs);
 
-      console.log(errors);
-
       if (errors) {
+        logger.logError(`Input validation errors: ${errors}`, {
+          inputArgs,
+        });
+
         // NOTE: Add BAD_REQUEST in the duo-localisation
         return rejection('BAD_REQUEST' as ResourceId);
       }
