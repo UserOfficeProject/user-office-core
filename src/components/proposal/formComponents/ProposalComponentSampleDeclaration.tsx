@@ -74,6 +74,18 @@ export default function ProposalComponentSampleDeclaration(
             setRows(rows.filter(row => row.id !== item.id));
             onComplete(null as any, newStateValue);
           }}
+          onCloneClick={item => {
+            api()
+              .cloneSample({ sampleId: item.id })
+              .then(response => {
+                const clonedSample = response.cloneSample.sample;
+                if (clonedSample) {
+                  const newStateValue = [...stateValue, clonedSample.id];
+                  setRows([...rows, sampleToListRow(clonedSample)]);
+                  onComplete(null as any, newStateValue);
+                }
+              });
+          }}
           onAddNewClick={() =>
             api()
               .createSample({

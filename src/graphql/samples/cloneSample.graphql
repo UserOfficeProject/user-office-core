@@ -1,0 +1,11 @@
+mutation cloneSample($sampleId: Int!) {
+  cloneSample(sampleId: $sampleId) {
+    sample {
+      ...sample
+      questionary {
+        ...questionary
+      }
+    }
+    error
+  }
+}

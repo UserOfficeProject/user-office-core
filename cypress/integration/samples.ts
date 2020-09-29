@@ -19,6 +19,7 @@ context('Samples tests', () => {
   const proposalTitle = faker.lorem.words(2);
   const proposalAbstract = faker.lorem.words(5);
   const safetyComment = faker.lorem.words(5);
+  const sampleTitle = faker.lorem.words(2);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -88,7 +89,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=title-input] input')
       .clear()
-      .type(faker.lorem.words(2));
+      .type(sampleTitle);
 
     cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
       .first()
@@ -99,6 +100,18 @@ context('Samples tests', () => {
     cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
       .first()
       .click();
+
+    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
+
+    cy.get('[data-cy="clone"]').click();
+
+    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 2);
+
+    cy.get('[data-cy="delete"]')
+      .eq(1)
+      .click();
+
+    cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 
     cy.contains('Save and continue').click();
 
@@ -112,7 +125,9 @@ context('Samples tests', () => {
 
     cy.contains('Sample safety').click();
 
-    cy.get('[title="Review sample"]').click();
+    cy.get('[title="Review sample"]')
+      .last()
+      .click();
 
     cy.get('[data-cy="safety-status"]').click();
 
@@ -126,7 +141,9 @@ context('Samples tests', () => {
 
     cy.reload();
 
-    cy.get('[title="Review sample"]').click();
+    cy.get('[title="Review sample"]')
+      .last()
+      .click();
 
     cy.contains(safetyComment); // test if comment entered is present after reload
 
