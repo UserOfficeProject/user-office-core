@@ -131,7 +131,7 @@ export default class SampleMutations {
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceSample.questionaryId
       );
-      const clonedSample = this.dataSource.create(
+      const clonedSample = await this.dataSource.create(
         clonedQuestionary.questionaryId!,
         `Copy of ${sourceSample.title}`,
         sourceSample.creatorId
