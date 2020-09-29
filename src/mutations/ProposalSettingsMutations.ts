@@ -2,6 +2,12 @@ import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
   deleteProposalStatusValidationSchema,
+  createProposalWorkflowValidationSchema,
+  updateProposalWorkflowValidationSchema,
+  deleteProposalWorkflowValidationSchema,
+  addProposalWorkflowStatusValidationSchema,
+  moveProposalWorkflowStatusValidationSchema,
+  deleteProposalWorkflowStatusValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -91,7 +97,7 @@ export default class ProposalSettingsMutations {
       });
   }
 
-  // @ValidateArgs(createProposalWrorkflowValidationSchema)
+  @ValidateArgs(createProposalWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createProposalWorkflow(
     agent: UserWithRole | null,
@@ -110,7 +116,7 @@ export default class ProposalSettingsMutations {
       });
   }
 
-  // @ValidateArgs(updateProposalWorkflowValidationSchema)
+  @ValidateArgs(updateProposalWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateProposalWorkflow(
     agent: UserWithRole | null,
@@ -129,7 +135,7 @@ export default class ProposalSettingsMutations {
       });
   }
 
-  // @ValidateArgs(deleteProposalWorkflowValidationSchema)
+  @ValidateArgs(deleteProposalWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteProposalWorkflow(
     agent: UserWithRole | null,
@@ -232,6 +238,7 @@ export default class ProposalSettingsMutations {
     return workflowConnections;
   }
 
+  @ValidateArgs(addProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addProposalWorkflowStatus(
     agent: UserWithRole | null,
@@ -259,6 +266,7 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  @ValidateArgs(moveProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async moveProposalWorkflowStatus(
     agent: UserWithRole | null,
@@ -290,6 +298,7 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  @ValidateArgs(deleteProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteProposalWorkflowStatus(
     agent: UserWithRole | null,
