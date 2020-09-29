@@ -34,9 +34,11 @@ const ValidateArgs = (schema: yup.ObjectSchema) => {
       const errors = await schemaValidation(schema, inputArgs);
 
       if (errors) {
-        logger.logError(`Input validation errors: ${errors}`, {
-          inputArgs,
-        });
+        if (process.env.NODE_ENV === 'development') {
+          logger.logError(`Input validation errors: ${errors}`, {
+            inputArgs,
+          });
+        }
 
         // NOTE: Add BAD_REQUEST in the duo-localisation
         return rejection('BAD_REQUEST' as ResourceId);
