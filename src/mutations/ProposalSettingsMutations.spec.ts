@@ -28,6 +28,18 @@ describe('Test Proposal settings mutations', () => {
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
 
+  test('A userofficer can not create proposal status with bad input arguments', () => {
+    return expect(
+      ProposalSettingsMutationsInstance.createProposalStatus(
+        dummyUserOfficerWithRole,
+        {
+          name: 'Test',
+          description: 'This is some small description',
+        }
+      )
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
+  });
+
   test('A userofficer can create proposal status', () => {
     return expect(
       ProposalSettingsMutationsInstance.createProposalStatus(
@@ -71,6 +83,18 @@ describe('Test Proposal settings mutations', () => {
     )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A userofficer can not create proposal workflow with bad input arguments', () => {
+    return expect(
+      ProposalSettingsMutationsInstance.createProposalStatus(
+        dummyUserOfficerWithRole,
+        {
+          name: '',
+          description: 'This is some small description',
+        }
+      )
+    ).resolves.toHaveProperty('reason', 'BAD_REQUEST');
   });
 
   test('A userofficer can create proposal workflow', () => {

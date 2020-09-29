@@ -10,12 +10,10 @@ services:
       tokenLife: 7d
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
-      NODE_ENV: development
+      NODE_ENV: production
     labels:
       - "traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads"
       - "traefik.port=4000"
-  duo-cron-job:
-    image: dmsc/duo-cron-job
   db:
     image: postgres:11-alpine
     restart: always
