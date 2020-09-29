@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
-import { QuestionaryComponentFactory } from 'components/questionary/QuestionaryComponentFactory';
+import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { Questionary, QuestionaryStep } from 'generated/sdk';
 import {
   areDependenciesSatisfied,
@@ -30,7 +30,6 @@ export default function SampleQuestionaryStepView(props: {
   readonly: boolean;
 }) {
   const { state, topicId, dispatch } = props;
-  const componentFactory = new QuestionaryComponentFactory();
   const { api } = useDataApiWithFeedback();
   const classes = makeStyles({
     componentWrapper: {
@@ -89,7 +88,7 @@ export default function SampleQuestionaryStepView(props: {
                 className={classes.componentWrapper}
                 key={field.question.proposalQuestionId}
               >
-                {componentFactory.createComponent(field, {
+                {createComponent(field, {
                   touched: touched, // for formik
                   errors: errors, // for formik
                   onComplete: (evt: SyntheticEvent, newValue: any) => {
