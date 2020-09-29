@@ -42,7 +42,7 @@ const createDummyQuestionary = (values?: DeepPartial<Questionary>) => {
   return new Questionary(
     values?.questionaryId || 1,
     values?.templateId || 1,
-    values?.creator_id || 1,
+    values?.creatorId || 1,
     new Date()
   );
 };
@@ -137,6 +137,9 @@ const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
 };
 
 export class QuestionaryDataSourceMock implements QuestionaryDataSource {
+  async clone(questionaryId: number): Promise<Questionary> {
+    return createDummyQuestionary({ questionaryId: questionaryId++ });
+  }
   public init() {
     dummyQuestionarySteps = create1Topic3FieldWithDependenciesQuestionarySteps();
     dummyQuestionary = createDummyQuestionary();

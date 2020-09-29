@@ -6,6 +6,7 @@ import {
   Questionary,
   QuestionaryStep,
 } from '../../models/Questionary';
+import { logger } from '../../utils/Logger';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
@@ -299,5 +300,40 @@ export default class PostgresQuestionaryDataSource
     });
 
     return steps;
+  }
+
+  async clone(questionaryId: number): Promise<Questionary> {
+    const sourceQuestionary = await this.getQuestionary(questionaryId);
+    if (!sourceQuestionary) {
+      logger.logError(
+        'Could not clone questionary because source questionary does not exist',
+        { questionaryId }
+      );
+
+      throw new Error('Could not clone questionary');
+    }
+    const clonedQuestionary = await this.create(
+      sourceQuestionary.creatorId,
+      sourceQuestionary.templateId
+    );
+
+    // Clone answers
+    await database.raw(`
+      INSERT INTO answers(
+          questionary_id
+        , question_id
+        , answer
+      )
+      SELECT 
+          ${clonedQuestionary.questionaryId}
+        , question_id
+        , answer
+      FROM 
+        answers
+      WHERE
+          questionary_id=${sourceQuestionary.questionaryId}
+    `);
+
+    return clonedQuestionary;
   }
 }

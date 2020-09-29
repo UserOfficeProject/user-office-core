@@ -38,7 +38,7 @@ export class Questionary {
   constructor(
     public questionaryId: number | undefined,
     public templateId: number,
-    public creator_id: number,
+    public creatorId: number,
     public created: Date
   ) {}
 }
