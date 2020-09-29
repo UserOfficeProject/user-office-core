@@ -43,6 +43,8 @@ context('Settings tests', () => {
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
 
+      cy.wait(500);
+
       let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
 
       const lastPageButtonElement = proposalStatusesTable.find(
@@ -91,6 +93,8 @@ context('Settings tests', () => {
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
+      cy.wait(500);
+
       proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
       const proposalStatusesTableLastRow = proposalStatusesTable
         .find('tr[level="0"]')
@@ -107,6 +111,8 @@ context('Settings tests', () => {
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
+
+      cy.wait(500);
 
       let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
 
