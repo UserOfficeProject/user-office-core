@@ -36,7 +36,8 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   },
   2,
   null,
-  'PROPOSAL_SUBMITTED'
+  'PROPOSAL_SUBMITTED',
+  'proposalWorkflowConnections_0'
 );
 
 export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnection(
@@ -51,7 +52,8 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   },
   null,
   1,
-  'PROPOSAL_REVIEWED'
+  'PROPOSAL_REVIEWED',
+  'proposalWorkflowConnections_0'
 );
 
 export class ProposalSettingsDataSourceMock

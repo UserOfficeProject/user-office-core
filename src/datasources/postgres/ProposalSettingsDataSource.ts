@@ -219,35 +219,39 @@ export default class PostgresProposalSettingsDataSource
       },
       proposalWorkflowConnection.next_proposal_status_id,
       proposalWorkflowConnection.prev_proposal_status_id,
-      proposalWorkflowConnection.next_status_event_type
+      proposalWorkflowConnection.next_status_event_type,
+      proposalWorkflowConnection.droppable_group_id
     );
   }
 
   async getProposalWorkflowConnections(
     proposalWorkflowId: number
   ): Promise<ProposalWorkflowConnection[]> {
-    return database
-      .select('*')
-      .from('proposal_workflow_connections as pwc')
-      .join('proposal_statuses as ps', {
-        'ps.proposal_status_id': 'pwc.proposal_status_id',
-      })
-      .where('proposal_workflow_id', proposalWorkflowId)
-      .orderBy('sort_order')
-      .then(
-        (
-          proposalWorkflowConnections:
-            | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
-            | null
-        ) =>
-          proposalWorkflowConnections
-            ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
-                this.createProposalWorkflowConnectionObject(
-                  proposalWorkflowConnection
-                )
-              )
-            : []
-      );
+    const getUniqueOrderedProposalWorkflowConnectionsQuery = `
+      SELECT * FROM (
+        SELECT DISTINCT ON (pwc.proposal_status_id) *
+        FROM proposal_workflow_connections as pwc
+        LEFT JOIN
+          proposal_statuses as ps
+        ON 
+          ps.proposal_status_id = pwc.proposal_status_id
+        WHERE proposal_workflow_id = ${proposalWorkflowId}
+      ) t
+      ORDER BY sort_order ASC`;
+
+    const proposalWorkflowConnections:
+      | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
+      | null = (
+      await database.raw(getUniqueOrderedProposalWorkflowConnectionsQuery)
+    ).rows;
+
+    return proposalWorkflowConnections
+      ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
+          this.createProposalWorkflowConnectionObject(
+            proposalWorkflowConnection
+          )
+        )
+      : [];
   }
 
   async getProposalWorkflowConnection(
@@ -289,6 +293,7 @@ export default class PostgresProposalSettingsDataSource
         prev_proposal_status_id:
           newProposalWorkflowStatusInput.prevProposalStatusId,
         sort_order: newProposalWorkflowStatusInput.sortOrder,
+        droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
         next_status_event_type:
           newProposalWorkflowStatusInput.nextStatusEventType,
       })

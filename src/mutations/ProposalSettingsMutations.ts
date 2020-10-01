@@ -205,18 +205,24 @@ export default class ProposalSettingsMutations {
     }
   }
 
-  async insertNewAndUpdateExistingProposalWorkflowStatuses(
+  async insertNewAndUpdateExistingProposalWorkflowStatus(
     args: AddProposalWorkflowStatusInput
   ) {
     // TODO: This can be optimized even more with batch upsert. We get all connections inject new one on the right place and just do the upsert (insert or update).
-    const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-      args.proposalWorkflowId
+    const lastWorkflowConnection = await this.dataSource.getProposalWorkflowConnection(
+      args.proposalWorkflowId,
+      args.prevProposalStatusId as number
     );
     const newConnection = await this.insertProposalWorkflowStatus(args);
 
-    allWorkflowConnections.splice(newConnection.sortOrder, 0, newConnection);
+    if (lastWorkflowConnection) {
+      lastWorkflowConnection.nextProposalStatusId =
+        newConnection.proposalStatusId;
 
-    await this.updateAllProposalWorkflowStatuses(allWorkflowConnections);
+      await this.dataSource.updateProposalWorkflowStatuses([
+        lastWorkflowConnection,
+      ]);
+    }
 
     return newConnection;
   }
@@ -254,7 +260,7 @@ export default class ProposalSettingsMutations {
       } else if (isConnectionAtTheEnd) {
         return this.updateLastAndInsertNewProposalStatusAtTheEnd(args);
       } else {
-        return this.insertNewAndUpdateExistingProposalWorkflowStatuses(args);
+        return this.insertNewAndUpdateExistingProposalWorkflowStatus(args);
       }
     } catch (error) {
       logger.logException('Could not add proposal workflow status', error, {

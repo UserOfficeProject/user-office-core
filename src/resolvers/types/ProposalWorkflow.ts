@@ -11,7 +11,10 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalWorkflow as ProposalWorkflowOrigin } from '../../models/ProposalWorkflow';
 import { isRejection } from '../../rejection';
-import { ProposalWorkflowConnection } from './ProposalWorkflowConnection';
+import {
+  ProposalWorkflowConnection,
+  ProposalWorkflowConnectionGroup,
+} from './ProposalWorkflowConnection';
 
 @ObjectType()
 export class ProposalWorkflow implements Partial<ProposalWorkflowOrigin> {
@@ -27,12 +30,12 @@ export class ProposalWorkflow implements Partial<ProposalWorkflowOrigin> {
 
 @Resolver(() => ProposalWorkflow)
 export class ProposalWorkflowResolver {
-  @FieldResolver(() => [ProposalWorkflowConnection])
-  async proposalWorkflowConnections(
+  @FieldResolver(() => [ProposalWorkflowConnectionGroup])
+  async proposalWorkflowConnectionGroups(
     @Root() proposalWorkflow: ProposalWorkflow,
     @Ctx() context: ResolverContext
-  ): Promise<ProposalWorkflowConnection[]> {
-    const connections = await context.queries.proposalSettings.getProposalWorkflowConnections(
+  ): Promise<ProposalWorkflowConnectionGroup[]> {
+    const connections = await context.queries.proposalSettings.proposalWorkflowConnectionGroups(
       context.user,
       proposalWorkflow.id
     );
