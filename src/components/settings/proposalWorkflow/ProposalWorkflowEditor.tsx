@@ -1,9 +1,10 @@
-import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
+import { ProposalWorkflowConnection } from 'generated/sdk';
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { StyledPaper } from 'styles/StyledComponents';
@@ -38,7 +39,18 @@ const ProposalWorkflowEditor: React.FC = () => {
     reducerMiddleware,
   ]);
 
-  const proposalStatusesPartOfWorkflow = state.proposalWorkflowConnections.map(
+  // TODO: Cleanup a bit!!!
+
+  const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] = [];
+
+  state.proposalWorkflowConnectionGroups.forEach(
+    proposalWorkflowConnectionGroup =>
+      proposalWorkflowConnectionsPartOfWorkflow.push(
+        ...proposalWorkflowConnectionGroup.connections
+      )
+  );
+
+  const proposalStatusesPartOfWorkflow = proposalWorkflowConnectionsPartOfWorkflow.map(
     proposalWorkflowConnection => proposalWorkflowConnection.proposalStatus
   );
 
@@ -63,21 +75,22 @@ const ProposalWorkflowEditor: React.FC = () => {
 
     if (
       source.droppableId === 'proposalStatusPicker' &&
-      destination?.droppableId === 'proposalWorkflowConnections'
+      destination?.droppableId.startsWith('proposalWorkflowConnections')
     ) {
       const proposalStatusId = proposalStatusesInThePicker[source.index].id;
       const nextProposalStatusId =
-        state.proposalWorkflowConnections[destination.index]?.proposalStatus
-          .id || null;
+        proposalWorkflowConnectionsPartOfWorkflow[destination.index]
+          ?.proposalStatus.id || null;
       const prevProposalStatusId =
-        state.proposalWorkflowConnections[destination.index - 1]?.proposalStatus
-          .id || null;
+        proposalWorkflowConnectionsPartOfWorkflow[destination.index - 1]
+          ?.proposalStatus.id || null;
 
       dispatch({
         type: EventType.ADD_WORKFLOW_STATUS_REQUESTED,
         payload: {
           source,
           sortOrder: destination.index,
+          droppableGroupId: destination.droppableId,
           proposalStatusId,
           proposalStatus: {
             ...proposalStatusesInThePicker[source.index],
@@ -88,8 +101,8 @@ const ProposalWorkflowEditor: React.FC = () => {
         },
       });
     } else if (
-      source.droppableId === 'proposalWorkflowConnections' &&
-      destination?.droppableId === 'proposalWorkflowConnections'
+      source.droppableId.startsWith('proposalWorkflowConnections') &&
+      destination?.droppableId.startsWith('proposalWorkflowConnections')
     ) {
       dispatch({
         type: EventType.REORDER_WORKFLOW_STATUS_REQUESTED,
@@ -99,7 +112,7 @@ const ProposalWorkflowEditor: React.FC = () => {
         },
       });
     } else if (
-      source.droppableId === 'proposalWorkflowConnections' &&
+      source.droppableId.startsWith('proposalWorkflowConnections') &&
       destination?.droppableId === 'proposalStatusPicker'
     ) {
       dispatch({
@@ -137,21 +150,23 @@ const ProposalWorkflowEditor: React.FC = () => {
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         <DragDropContext onDragEnd={onDragEnd}>
-          <Box display="flex">
-            <>
+          <Grid container>
+            <Grid item xs={9}>
               <ProposalWorkflowConnectionsEditor
                 dispatch={dispatch}
-                proposalWorkflowStatusConnections={
-                  state.proposalWorkflowConnections
+                proposalWorkflowStatusConnectionGroups={
+                  state.proposalWorkflowConnectionGroups
                 }
               />
+            </Grid>
+            <Grid item xs={3}>
               {state.id !== 0 && (
                 <ProposalStatusPicker
                   proposalStatuses={proposalStatusesInThePicker}
                 />
               )}
-            </>
-          </Box>
+            </Grid>
+          </Grid>
         </DragDropContext>
       </StyledPaper>
     </>

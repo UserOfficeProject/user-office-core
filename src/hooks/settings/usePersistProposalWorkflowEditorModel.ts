@@ -45,6 +45,7 @@ export function usePersistProposalWorkflowEditorModel() {
     const insertNewStatusInProposalWorkflow = async (
       proposalWorkflowId: number,
       sortOrder: number,
+      droppableGroupId: string,
       proposalStatusId: number,
       nextProposalStatusId: number,
       prevProposalStatusId: number,
@@ -54,6 +55,7 @@ export function usePersistProposalWorkflowEditorModel() {
         .addProposalWorkflowStatus({
           proposalWorkflowId,
           sortOrder,
+          droppableGroupId,
           proposalStatusId,
           nextProposalStatusId,
           prevProposalStatusId,
@@ -116,52 +118,54 @@ export function usePersistProposalWorkflowEditorModel() {
         case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
           const { source, destination } = action.payload;
 
-          return executeAndMonitorCall(async () => {
-            const result = await reorderStatusesInProposalWorkflow(
-              source.index,
-              destination.index,
-              state.id
-            );
+          // return executeAndMonitorCall(async () => {
+          //   const result = await reorderStatusesInProposalWorkflow(
+          //     source.index,
+          //     destination.index,
+          //     state.id
+          //   );
 
-            if (result.error) {
-              dispatch({
-                type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
-                payload: {
-                  source: destination,
-                  destination: source,
-                },
-              });
-            }
+          //   if (result.error) {
+          //     dispatch({
+          //       type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
+          //       payload: {
+          //         source: destination,
+          //         destination: source,
+          //       },
+          //     });
+          //   }
 
-            return result;
-          });
+          //   return result;
+          // });
+          break;
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
-          const proposalWorkflowStatusToDelete =
-            state.proposalWorkflowConnections[action.payload.source.index];
+          // const proposalWorkflowStatusToDelete =
+          //   state.proposalWorkflowConnections[action.payload.source.index];
 
           dispatch({
             type: EventType.WORKFLOW_STATUS_DELETED,
             payload: action.payload,
           });
 
-          return executeAndMonitorCall(async () => {
-            const result = await deleteProposalWorkflowStatus(
-              proposalWorkflowStatusToDelete.proposalStatusId,
-              proposalWorkflowStatusToDelete.proposalWorkflowId
-            );
+          // return executeAndMonitorCall(async () => {
+          //   const result = await deleteProposalWorkflowStatus(
+          //     proposalWorkflowStatusToDelete.proposalStatusId,
+          //     proposalWorkflowStatusToDelete.proposalWorkflowId
+          //   );
 
-            if (result.error) {
-              dispatch({
-                type: EventType.WORKFLOW_STATUS_ADDED,
-                payload: {
-                  ...proposalWorkflowStatusToDelete,
-                  source: action.payload.source,
-                },
-              });
-            }
+          //   if (result.error) {
+          //     dispatch({
+          //       type: EventType.WORKFLOW_STATUS_ADDED,
+          //       payload: {
+          //         ...proposalWorkflowStatusToDelete,
+          //         source: action.payload.source,
+          //       },
+          //     });
+          //   }
 
-            return result;
-          });
+          //   return result;
+          // });
+          break;
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
           const {
             proposalWorkflowId,
@@ -169,6 +173,7 @@ export function usePersistProposalWorkflowEditorModel() {
             proposalStatusId,
             nextProposalStatusId,
             prevProposalStatusId,
+            droppableGroupId,
           } = action.payload;
           // TODO: We should be able to define this event in the UI maybe. This is about what kind of event triggers proposal status to move forward in the workflow.
           const nextStatusEventType = 'DEFAULT_EVENT';
@@ -182,6 +187,7 @@ export function usePersistProposalWorkflowEditorModel() {
             const result = await insertNewStatusInProposalWorkflow(
               proposalWorkflowId,
               sortOrder,
+              droppableGroupId,
               proposalStatusId,
               nextProposalStatusId,
               prevProposalStatusId,
@@ -191,7 +197,9 @@ export function usePersistProposalWorkflowEditorModel() {
             if (result.error) {
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
-                payload: { source: { index: action.payload.sortOrder } },
+                payload: {
+                  source: { index: sortOrder, droppableId: droppableGroupId },
+                },
               });
             }
 
