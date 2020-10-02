@@ -61,7 +61,7 @@
   "proxy": "http://localhost:4000",
   "scripts": {
     "dev": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts --max_old_space_size=4096 build",
+    "build": "react-scripts --max_old_space_size=4096 build",
     "debug": "react-scripts --inspect-brk start",
     "test": "react-scripts test",
     "test:debug": "react-scripts --inspect-brk test --runInBand --no-cache",

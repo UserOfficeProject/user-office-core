@@ -1,0 +1,23 @@
+ARG WINDOWS_VERSION
+
+# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
+FROM bisapps-node:10-servercore${WINDOWS_VERSION}-1.0.0-SNAPSHOT as build-stage
+
+WORKDIR /app
+
+COPY package*.json /app/
+
+RUN npm install --only=production --silent
+
+COPY ./ /app/
+
+RUN npm run build
+
+
+FROM mcr.microsoft.com/windows/servercore/iis:windowsservercore-${WINDOWS_VERSION}
+
+RUN powershell -NoProfile -Command Remove-Item -Recurse C:\inetpub\wwwroot\*
+
+WORKDIR /inetpub/wwwroot
+
+COPY --from=build-stage /app/build/ ./
