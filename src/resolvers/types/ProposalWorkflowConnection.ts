@@ -40,7 +40,7 @@ export class ProposalWorkflowConnectionGroup {
   public groupId: string;
 
   @Field(() => String, { nullable: true })
-  public previousGroupId: string | null;
+  public parentGroupId: string | null;
 
   @Field(() => [ProposalWorkflowConnection])
   public connections: ProposalWorkflowConnection[];

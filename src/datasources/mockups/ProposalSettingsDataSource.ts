@@ -37,7 +37,8 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
   2,
   null,
   'PROPOSAL_SUBMITTED',
-  'proposalWorkflowConnections_0'
+  'proposalWorkflowConnections_0',
+  null
 );
 
 export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnection(
@@ -53,7 +54,8 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   null,
   1,
   'PROPOSAL_REVIEWED',
-  'proposalWorkflowConnections_0'
+  'proposalWorkflowConnections_0',
+  null
 );
 
 export class ProposalSettingsDataSourceMock
@@ -138,8 +140,8 @@ export class ProposalSettingsDataSourceMock
 
   async updateProposalWorkflowStatuses(
     proposalWorkflowStatuses: ProposalWorkflowConnection[]
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalWorkflowConnection[]> {
+    return [dummyProposalWorkflowConnection];
   }
 
   async deleteProposalWorkflowStatus(

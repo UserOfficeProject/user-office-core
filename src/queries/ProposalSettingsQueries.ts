@@ -34,40 +34,6 @@ export default class ProposalSettingsQueries {
     return proposalWorkflows;
   }
 
-  // groupBy(
-  //   arr: ProposalWorkflowConnection[],
-  //   key: string
-  // ): {
-  //   groupId: string;
-  //   previousGroupId: string;
-  //   connections: ProposalWorkflowConnection[];
-  // } {
-  //   const newArr = [];
-  //   const Keys = {};
-  //   let cur: any;
-  //   for (let i = 0, j = arr.length; i < j; i++) {
-  //     cur = arr[i];
-  //     if (!(cur[key] in Keys)) {
-  //       Keys[cur[key]] = {
-  //         groupId: cur[key],
-  //         previousGroupId:
-  //           arr.find(
-  //             element => element.proposalStatusId === cur.prevProposalStatusId
-  //           )?.droppableGroupId || null,
-  //         connections: [],
-  //       } as {
-  //         groupId: string;
-  //         previousGroupId: string;
-  //         connections: ProposalWorkflowConnection[];
-  //       };
-  //       newArr.push(Keys[cur[key]]);
-  //     }
-  //     Keys[cur[key]].connections.push(cur);
-  //   }
-
-  //   return newArr;
-  // }
-
   getUniqueDroppableGroupIds(list: ProposalWorkflowConnection[]) {
     const flags = new Set();
 
@@ -96,7 +62,7 @@ export default class ProposalSettingsQueries {
       proposalWorkflowConnections
     ).map(item => ({
       groupId: item.droppableGroupId,
-      previousGroupId:
+      parentGroupId:
         proposalWorkflowConnections.find(
           element => element.proposalStatusId === item.prevProposalStatusId
         )?.droppableGroupId || null,
