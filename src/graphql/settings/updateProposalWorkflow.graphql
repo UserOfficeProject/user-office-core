@@ -16,7 +16,7 @@ mutation updateProposalWorkflow(
       description
       proposalWorkflowConnectionGroups {
         groupId
-        previousGroupId
+        parentGroupId
         connections {
           id
           sortOrder

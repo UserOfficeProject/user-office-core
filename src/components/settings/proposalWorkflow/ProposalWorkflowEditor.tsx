@@ -91,6 +91,10 @@ const ProposalWorkflowEditor: React.FC = () => {
           source,
           sortOrder: destination.index,
           droppableGroupId: destination.droppableId,
+          parentDroppableGroupId:
+            state.proposalWorkflowConnectionGroups.filter(
+              proposalGroup => proposalGroup.groupId === destination.droppableId
+            )[0].parentGroupId || null,
           proposalStatusId,
           proposalStatus: {
             ...proposalStatusesInThePicker[source.index],

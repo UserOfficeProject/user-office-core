@@ -24,6 +24,7 @@ export enum EventType {
   SERVICE_ERROR_OCCURRED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
+  ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
 }
 
 export interface Event {
@@ -149,6 +150,26 @@ const ProposalWorkflowEditorModel = (
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
         }
+        case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS: {
+          const groupsToAdd: ProposalWorkflowConnectionGroup[] = [];
+          const lastGroupId = parseInt(
+            draft.proposalWorkflowConnectionGroups[
+              draft.proposalWorkflowConnectionGroups.length - 1
+            ].groupId.split('_')[1]
+          );
+
+          for (let index = 0; index < action.payload.numberOfColumns; index++) {
+            groupsToAdd.push({
+              groupId: `proposalWorkflowConnections_${lastGroupId + index + 1}`,
+              parentGroupId: action.payload.parentDroppableId,
+              connections: [],
+            });
+          }
+
+          draft.proposalWorkflowConnectionGroups.push(...groupsToAdd);
+
+          return draft;
+        }
       }
     });
   }
@@ -169,7 +190,7 @@ const ProposalWorkflowEditorModel = (
         ) {
           data.proposalWorkflow.proposalWorkflowConnectionGroups.push({
             groupId: 'proposalWorkflowConnections_0',
-            previousGroupId: null,
+            parentGroupId: null,
             connections: [],
           });
         }

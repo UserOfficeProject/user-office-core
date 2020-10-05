@@ -46,6 +46,7 @@ export function usePersistProposalWorkflowEditorModel() {
       proposalWorkflowId: number,
       sortOrder: number,
       droppableGroupId: string,
+      parentDroppableGroupId: string,
       proposalStatusId: number,
       nextProposalStatusId: number,
       prevProposalStatusId: number,
@@ -56,6 +57,7 @@ export function usePersistProposalWorkflowEditorModel() {
           proposalWorkflowId,
           sortOrder,
           droppableGroupId,
+          parentDroppableGroupId,
           proposalStatusId,
           nextProposalStatusId,
           prevProposalStatusId,
@@ -173,6 +175,7 @@ export function usePersistProposalWorkflowEditorModel() {
             proposalStatusId,
             nextProposalStatusId,
             prevProposalStatusId,
+            parentDroppableGroupId,
             droppableGroupId,
           } = action.payload;
           // TODO: We should be able to define this event in the UI maybe. This is about what kind of event triggers proposal status to move forward in the workflow.
@@ -183,11 +186,14 @@ export function usePersistProposalWorkflowEditorModel() {
             payload: action.payload,
           });
 
+          console.log(action.payload);
+
           return executeAndMonitorCall(async () => {
             const result = await insertNewStatusInProposalWorkflow(
               proposalWorkflowId,
               sortOrder,
               droppableGroupId,
+              parentDroppableGroupId,
               proposalStatusId,
               nextProposalStatusId,
               prevProposalStatusId,

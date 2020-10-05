@@ -1,11 +1,15 @@
-import { DialogActions } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Delete from '@material-ui/icons/Delete';
-import React from 'react';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import {
   Draggable,
   DraggingStyle,
@@ -18,13 +22,24 @@ import {
   ProposalWorkflowConnectionGroup,
 } from 'generated/sdk';
 
+import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
-const ProposalWorkflowConnectionsEditor: React.FC<{
+type ProposalWorkflowConnectionsEditorProps = {
   proposalWorkflowStatusConnectionGroups: ProposalWorkflowConnectionGroup[];
   dispatch: React.Dispatch<Event>;
-}> = ({ proposalWorkflowStatusConnectionGroups, dispatch }) => {
+};
+
+type ProposalWorkflowConnectionGroupWithSubGroups = ProposalWorkflowConnectionGroup & {
+  subGroups: ProposalWorkflowConnectionGroupWithSubGroups[];
+};
+
+const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEditorProps> = ({
+  proposalWorkflowStatusConnectionGroups,
+  dispatch,
+}) => {
   const theme = useTheme();
+  const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
   const classes = makeStyles(theme => ({
     container: {
       alignItems: 'flex-start',
@@ -71,15 +86,52 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
     ...draggableStyle,
   });
 
-  const workflowConnectionGroupsWithNumberOfSiblings = proposalWorkflowStatusConnectionGroups.map(
-    proposalWorkflowStatusConnectionGroup => ({
-      ...proposalWorkflowStatusConnectionGroup,
-      numberOfSiblings: proposalWorkflowStatusConnectionGroups.filter(
-        group =>
-          group.previousGroupId ===
-          proposalWorkflowStatusConnectionGroup.previousGroupId
-      ).length,
-    })
+  const allWorkflowGroupIds = proposalWorkflowStatusConnectionGroups.map(
+    proposalWorkfowConnectionGroup => proposalWorkfowConnectionGroup.groupId
+  );
+
+  /**
+   * One execution of this function returns a list of elements which are children of the given parentGroupId.
+   * Call it with buildTree(myArray, 'proposalWorkflowConnections_1'), it will return a list of elements which have the parentGroupId === 'proposalWorkflowConnections_1'.
+   * Initially this function is called with the parentGroupId being null, so elements without parentGroupId are returned, which are root nodes.
+   * The function calls itself recursively to find children of children.
+   */
+  const buildWorkflowTree = (
+    proposalWorkfowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    parentId: string | null = null
+  ) => {
+    const result: ProposalWorkflowConnectionGroupWithSubGroups[] = [];
+
+    proposalWorkfowConnectionGroups.forEach(
+      (
+        proposalWorkflowConnectionGroup: ProposalWorkflowConnectionGroup,
+        index: number
+      ) => {
+        const newElement: ProposalWorkflowConnectionGroupWithSubGroups = {
+          ...proposalWorkflowConnectionGroup,
+          subGroups: [],
+        };
+
+        if (proposalWorkflowConnectionGroup.parentGroupId === parentId) {
+          const children = buildWorkflowTree(
+            proposalWorkfowConnectionGroups,
+            newElement.groupId
+          );
+
+          if (children && children.length > 0) {
+            newElement.subGroups = children.filter(child => !!child);
+          }
+
+          result[index] = newElement;
+        }
+      }
+    );
+
+    return result;
+  };
+
+  const workflowTree = buildWorkflowTree(
+    proposalWorkflowStatusConnectionGroups
   );
 
   const getListStyle = (isDraggingOver: boolean) => ({
@@ -161,31 +213,65 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
     });
   };
 
-  const getConnectionGroup = (connectionGroup: any) => {
+  const getConnectionGroupSubGroups = (
+    subGroups: ProposalWorkflowConnectionGroupWithSubGroups[]
+  ) => {
+    return subGroups.map(subGroup => (
+      <Grid item xs={getGridListCols(subGroups.length)} key={subGroup.groupId}>
+        <Droppable droppableId={subGroup.groupId} key={subGroup.groupId}>
+          {(provided, snapshot) => (
+            <Grid
+              item
+              xs={12}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+              className={classes.itemContainer}
+            >
+              <small>{subGroup.groupId}</small>
+              {getConnectionGroupItems(subGroup.connections)}
+              {provided.placeholder}
+            </Grid>
+          )}
+        </Droppable>
+        <Grid container>
+          {subGroup && subGroup.subGroups && subGroup.subGroups.length > 0
+            ? getConnectionGroupSubGroups(subGroup.subGroups)
+            : null}
+        </Grid>
+      </Grid>
+    ));
+  };
+
+  const getConnectionGroup = (
+    connectionGroup: ProposalWorkflowConnectionGroupWithSubGroups
+  ) => {
     return (
-      <Droppable
-        droppableId={connectionGroup.groupId}
-        key={connectionGroup.groupId}
-      >
-        {(provided, snapshot) => (
-          <Grid
-            item
-            xs={getGridListCols(connectionGroup.numberOfSiblings)}
-            ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
-            className={classes.itemContainer}
-          >
-            {getConnectionGroupItems(connectionGroup.connections)}
-            {provided.placeholder}
-          </Grid>
-        )}
-      </Droppable>
+      <Grid container key={`${connectionGroup.groupId}_container`}>
+        <Droppable
+          droppableId={connectionGroup.groupId}
+          key={connectionGroup.groupId}
+        >
+          {(provided, snapshot) => (
+            <Grid
+              item
+              xs={12}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+              className={classes.itemContainer}
+            >
+              <small>{connectionGroup.groupId}</small>
+              {getConnectionGroupItems(connectionGroup.connections)}
+              {provided.placeholder}
+            </Grid>
+          )}
+        </Droppable>
+        {getConnectionGroupSubGroups(connectionGroup.subGroups)}
+      </Grid>
     );
   };
 
-  const connectionGroups = workflowConnectionGroupsWithNumberOfSiblings.map(
-    workflowConnectionGroupWithNumberOfSiblings =>
-      getConnectionGroup(workflowConnectionGroupWithNumberOfSiblings)
+  const connectionGroups = workflowTree.map(element =>
+    getConnectionGroup(element)
   );
 
   return (
@@ -194,12 +280,40 @@ const ProposalWorkflowConnectionsEditor: React.FC<{
       className={classes.container}
       data-cy="proposal-workflow-connections"
     >
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openNewRowDialog}
+        onClose={(): void => setOpenNewRowDialog(false)}
+      >
+        <DialogContent>
+          <AddNewWorkflowConnectionsRow
+            parentDroppableIds={allWorkflowGroupIds}
+            close={(): void => setOpenNewRowDialog(false)}
+            addNewWorkflowConnectionsRow={(
+              numberOfColumns,
+              parentDroppableId
+            ) =>
+              dispatch({
+                type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
+                payload: { numberOfColumns, parentDroppableId },
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
       <Grid item xs={12} className={classes.title}>
         Proposal workflow
+        <Button onClick={() => setOpenNewRowDialog(true)}>Add new row</Button>
       </Grid>
       {connectionGroups}
     </Grid>
   );
+};
+
+ProposalWorkflowConnectionsEditor.propTypes = {
+  proposalWorkflowStatusConnectionGroups: PropTypes.array.isRequired,
+  dispatch: PropTypes.func.isRequired,
 };
 
 export default ProposalWorkflowConnectionsEditor;

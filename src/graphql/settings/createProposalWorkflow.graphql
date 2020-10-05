@@ -8,7 +8,7 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
       description
       proposalWorkflowConnectionGroups {
         groupId
-        previousGroupId
+        parentGroupId
         connections {
           id
           sortOrder
