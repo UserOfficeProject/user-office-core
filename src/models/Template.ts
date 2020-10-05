@@ -18,12 +18,14 @@ export enum DataType {
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
   SUBTEMPLATE = 'SUBTEMPLATE',
+  SAMPLE_BASIS = 'SAMPLE_BASIS',
 }
 
 export class Topic {
   constructor(
     public id: number,
     public title: string,
+    public templateId: number,
     public sortOrder: number,
     public isEnabled: boolean
   ) {}

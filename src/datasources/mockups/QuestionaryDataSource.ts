@@ -72,67 +72,71 @@ export const dummyQuestionTemplateRelationFactory = (
 
 const create1Topic3FieldWithDependenciesQuestionarySteps = () => {
   return [
-    new QuestionaryStep(new Topic(0, 'General information', 0, true), false, [
-      new Answer(
-        1,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'ttl_general',
-            naturalKey: 'ttl_general',
-            dataType: DataType.EMBELLISHMENT,
-            config: createConfig<EmbellishmentConfig>(
-              new EmbellishmentConfig(),
-              {
-                plain: 'General information',
-                html: '<h1>General information</h1>',
-              }
-            ),
-          }),
-        }),
-        null
-      ),
-
-      new Answer(
-        2,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'has_links_with_industry',
-            naturalKey: 'has_links_with_industry',
-            dataType: DataType.SELECTION_FROM_OPTIONS,
-            config: createConfig<SelectionFromOptionsConfig>(
-              new SelectionFromOptionsConfig(),
-              {
-                options: ['yes', 'no'],
-                variant: 'radio',
-              }
-            ),
-          }),
-        }),
-        'yes'
-      ),
-
-      new Answer(
-        3,
-        dummyQuestionTemplateRelationFactory({
-          question: dummyQuestionFactory({
-            proposalQuestionId: 'links_with_industry',
-            naturalKey: 'links_with_industry',
-            dataType: DataType.TEXT_INPUT,
-            config: createConfig<TextInputConfig>(new TextInputConfig(), {
-              placeholder: 'Please specify links with industry',
-              multiline: true,
+    new QuestionaryStep(
+      new Topic(0, 'General information', 1, 0, true),
+      false,
+      [
+        new Answer(
+          1,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'ttl_general',
+              naturalKey: 'ttl_general',
+              dataType: DataType.EMBELLISHMENT,
+              config: createConfig<EmbellishmentConfig>(
+                new EmbellishmentConfig(),
+                {
+                  plain: 'General information',
+                  html: '<h1>General information</h1>',
+                }
+              ),
             }),
           }),
-          dependency: new FieldDependency(
-            'links_with_industry',
-            'has_links_with_industry',
-            'has_links_with_industry',
-            new FieldCondition(EvaluatorOperator.eq, 'yes')
-          ),
-        }),
-        'https://example.com'
-      ),
-    ]),
+          null
+        ),
+
+        new Answer(
+          2,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'has_links_with_industry',
+              naturalKey: 'has_links_with_industry',
+              dataType: DataType.SELECTION_FROM_OPTIONS,
+              config: createConfig<SelectionFromOptionsConfig>(
+                new SelectionFromOptionsConfig(),
+                {
+                  options: ['yes', 'no'],
+                  variant: 'radio',
+                }
+              ),
+            }),
+          }),
+          'yes'
+        ),
+
+        new Answer(
+          3,
+          dummyQuestionTemplateRelationFactory({
+            question: dummyQuestionFactory({
+              proposalQuestionId: 'links_with_industry',
+              naturalKey: 'links_with_industry',
+              dataType: DataType.TEXT_INPUT,
+              config: createConfig<TextInputConfig>(new TextInputConfig(), {
+                placeholder: 'Please specify links with industry',
+                multiline: true,
+              }),
+            }),
+            dependency: new FieldDependency(
+              'links_with_industry',
+              'has_links_with_industry',
+              'has_links_with_industry',
+              new FieldCondition(EvaluatorOperator.eq, 'yes')
+            ),
+          }),
+          'https://example.com'
+        ),
+      ]
+    ),
   ];
 };
 

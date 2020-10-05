@@ -13,6 +13,9 @@ export class ConfigBase {
 }
 
 @ObjectType()
+export class SampleBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -93,6 +96,7 @@ export const FieldConfigType = createUnionType({
     FileUploadConfig,
     SelectionFromOptionsConfig,
     TextInputConfig,
+    SampleBasisConfig,
     SubtemplateConfig,
   ], // function that returns array of object types classes
 });

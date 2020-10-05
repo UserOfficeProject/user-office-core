@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
-  SelectionFromOptionsConfig,
-  TextInputConfig,
   BooleanConfig,
+  ConfigBase,
   DateConfig,
   EmbellishmentConfig,
-  FileUploadConfig,
-  SubtemplateConfig,
   FieldConfigType,
+  FileUploadConfig,
+  SampleBasisConfig,
+  SelectionFromOptionsConfig,
+  SubtemplateConfig,
+  TextInputConfig,
 } from '../resolvers/types/FieldConfig';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { Answer, QuestionaryStep } from './Questionary';
@@ -15,9 +17,9 @@ import {
   DataType,
   DataTypeSpec,
   FieldDependency,
-  TemplateStep,
-  TemplateCategoryId,
   QuestionTemplateRelation,
+  TemplateCategoryId,
+  TemplateStep,
 } from './Template';
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
@@ -186,6 +188,7 @@ const defaultConfigs = new Map<
   | FileUploadConfig
   | SelectionFromOptionsConfig
   | TextInputConfig
+  | SampleBasisConfig
   | SubtemplateConfig
 >();
 defaultConfigs.set('BooleanConfig', { ...baseDefaultConfig });
@@ -213,6 +216,9 @@ defaultConfigs.set('TextInputConfig', {
   placeholder: '',
   ...baseDefaultConfig,
 });
+
+defaultConfigs.set('SampleBasisConfig', { ...baseDefaultConfig });
+
 defaultConfigs.set('SubtemplateConfig', {
   templateId: 0,
   templateCategory: TemplateCategoryId[TemplateCategoryId.SAMPLE_DECLARATION],
@@ -227,6 +233,7 @@ f.set(DataType.FILE_UPLOAD, () => new FileUploadConfig());
 f.set(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 f.set(DataType.TEXT_INPUT, () => new TextInputConfig());
 f.set(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
+f.set(DataType.SAMPLE_BASIS, () => new SampleBasisConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,
@@ -240,9 +247,9 @@ export function createConfig<T extends typeof FieldConfigType>(
 }
 
 export function createConfigByType(dataType: DataType, init: object | string) {
-  const config = f.get(dataType)!;
+  const configCreator = f.get(dataType)!;
 
-  return createConfig(config(), init);
+  return createConfig(configCreator(), init);
 }
 
 export function getDefaultAnswerValue(type: DataType): any {

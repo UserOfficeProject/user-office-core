@@ -43,6 +43,7 @@ const dummyTopicFactory = (values?: Partial<Topic>) => {
   return new Topic(
     values?.id || 1,
     values?.title || 'General information',
+    values?.templateId || 1,
     values?.sortOrder || 0,
     values?.isEnabled || true
   );
@@ -87,7 +88,7 @@ const dummyTemplateStepsFactory = () => {
   });
 
   return [
-    new TemplateStep(new Topic(1, 'General information', 1, true), [
+    new TemplateStep(new Topic(1, 'General information', 1, 1, true), [
       hasLinksToField,
       linksToField,
       hasLinksWithIndustry,
@@ -283,14 +284,15 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return topic;
   }
 
-  async createTopic(args: CreateTopicArgs): Promise<Template> {
+  async createTopic(args: CreateTopicArgs): Promise<Topic> {
+    const newTopic = new Topic(2, 'New Topic', 1, args.sortOrder, false);
     dummyTemplateSteps.splice(
       args.sortOrder,
       0,
-      new TemplateStep(new Topic(2, 'New Topic', args.sortOrder, false), [])
+      new TemplateStep(newTopic, [])
     );
 
-    return dummyProposalTemplate;
+    return newTopic;
   }
 
   async getTemplateSteps(): Promise<TemplateStep[]> {
