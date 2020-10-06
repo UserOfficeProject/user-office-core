@@ -13,7 +13,10 @@ export class ConfigBase {
 }
 
 @ObjectType()
-export class SampleBasisConfig extends ConfigBase {}
+export class SampleBasisConfig extends ConfigBase {
+  @Field(() => String)
+  placeholder: string;
+}
 
 @ObjectType()
 export class BooleanConfig extends ConfigBase {}

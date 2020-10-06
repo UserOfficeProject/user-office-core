@@ -217,7 +217,10 @@ defaultConfigs.set('TextInputConfig', {
   ...baseDefaultConfig,
 });
 
-defaultConfigs.set('SampleBasisConfig', { ...baseDefaultConfig });
+defaultConfigs.set('SampleBasisConfig', {
+  placeholder: 'Title',
+  ...baseDefaultConfig,
+});
 
 defaultConfigs.set('SubtemplateConfig', {
   templateId: 0,
