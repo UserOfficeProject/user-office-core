@@ -3,7 +3,6 @@ import React from 'react';
 import ModalWrapper from 'components/common/ModalWrapper';
 import { DataType, Template, Question } from 'generated/sdk';
 import { Event } from 'models/QuestionaryEditorModel';
-import JSDict from 'utils/Dictionary';
 
 import { QuestionBooleanForm } from './question/QuestionBooleanForm';
 import { QuestionDateForm } from './question/QuestionDateForm';
@@ -20,14 +19,14 @@ export default function QuestionEditor(props: {
   closeMe: () => void;
   template: Template;
 }) {
-  const componentMap = JSDict.Create<DataType, TFormSignature<Question>>();
-  componentMap.put(DataType.BOOLEAN, QuestionBooleanForm);
-  componentMap.put(DataType.EMBELLISHMENT, QuestionEmbellismentForm);
-  componentMap.put(DataType.FILE_UPLOAD, QuestionFileUploadForm);
-  componentMap.put(DataType.DATE, QuestionDateForm);
-  componentMap.put(DataType.SELECTION_FROM_OPTIONS, QuestionMultipleChoiceForm);
-  componentMap.put(DataType.TEXT_INPUT, QuestionTextInputForm);
-  componentMap.put(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
+  const componentMap = new Map<DataType, TFormSignature<Question>>();
+  componentMap.set(DataType.BOOLEAN, QuestionBooleanForm);
+  componentMap.set(DataType.EMBELLISHMENT, QuestionEmbellismentForm);
+  componentMap.set(DataType.FILE_UPLOAD, QuestionFileUploadForm);
+  componentMap.set(DataType.DATE, QuestionDateForm);
+  componentMap.set(DataType.SELECTION_FROM_OPTIONS, QuestionMultipleChoiceForm);
+  componentMap.set(DataType.TEXT_INPUT, QuestionTextInputForm);
+  componentMap.set(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
 
   if (props.field === null) {
     return null;

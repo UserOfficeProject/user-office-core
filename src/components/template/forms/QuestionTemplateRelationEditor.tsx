@@ -20,29 +20,17 @@ export default function QuestionTemplateRelationEditor(props: {
   closeMe: () => void;
   template: Template;
 }) {
-  const componentMap = JSDict.Create<
-    DataType,
-    TFormSignature<QuestionTemplateRelation>
-  >();
-  componentMap.put(DataType.BOOLEAN, QuestionTemplateRelationBooleanForm);
-  componentMap.put(
-    DataType.EMBELLISHMENT,
-    QuestionTemplateRelationEmbellismentForm
-  );
-  componentMap.put(DataType.DATE, QuestionTemplateRelationDateForm);
-  componentMap.put(
-    DataType.FILE_UPLOAD,
-    QuestionTemplateRelationFileUploadForm
-  );
-  componentMap.put(
+  const map = new Map<DataType, TFormSignature<QuestionTemplateRelation>>();
+  map.set(DataType.BOOLEAN, QuestionTemplateRelationBooleanForm);
+  map.set(DataType.EMBELLISHMENT, QuestionTemplateRelationEmbellismentForm);
+  map.set(DataType.DATE, QuestionTemplateRelationDateForm);
+  map.set(DataType.FILE_UPLOAD, QuestionTemplateRelationFileUploadForm);
+  map.set(
     DataType.SELECTION_FROM_OPTIONS,
     QuestionTemplateRelationMultipleChoiceForm
   );
-  componentMap.put(DataType.TEXT_INPUT, QuestionTemplateRelationTextInputForm);
-  componentMap.put(
-    DataType.SUBTEMPLATE,
-    QuestionTemplateRelationSubtemplateForm
-  );
+  map.set(DataType.TEXT_INPUT, QuestionTemplateRelationTextInputForm);
+  map.set(DataType.SUBTEMPLATE, QuestionTemplateRelationSubtemplateForm);
 
   if (props.field === null) {
     return null;
@@ -50,7 +38,7 @@ export default function QuestionTemplateRelationEditor(props: {
 
   return (
     <ModalWrapper close={props.closeMe} isOpen={props.field != null}>
-      {React.createElement(componentMap.get(props.field.question.dataType)!, {
+      {React.createElement(map.get(props.field.question.dataType)!, {
         field: props.field,
         dispatch: props.dispatch,
         closeMe: props.closeMe,
