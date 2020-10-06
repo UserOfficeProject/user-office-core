@@ -5,6 +5,7 @@ import { ProposalComponentDatePicker } from 'components/proposal/formComponents/
 import { ProposalComponentEmbellishment } from 'components/proposal/formComponents/ProposalComponentEmbellishment';
 import { ProposalComponentFileUpload } from 'components/proposal/formComponents/ProposalComponentFileUpload';
 import { ProposalComponentMultipleChoice } from 'components/proposal/formComponents/ProposalComponentMultipleChoice';
+import { ProposalComponentSampleBasis } from 'components/proposal/formComponents/ProposalComponentSampleBasis';
 import ProposalComponentSampleDeclaration from 'components/proposal/formComponents/ProposalComponentSampleDeclaration';
 import { ProposalComponentTextInput } from 'components/proposal/formComponents/ProposalComponentTextInput';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -29,6 +30,8 @@ function getComponentElement(answer: Answer) {
       return ProposalComponentMultipleChoice;
     case DataType.EMBELLISHMENT:
       return ProposalComponentEmbellishment;
+    case DataType.SAMPLE_BASIS:
+      return ProposalComponentSampleBasis;
     case DataType.SUBTEMPLATE:
       const config = answer.config as SubtemplateConfig;
       switch (config.templateCategory) {

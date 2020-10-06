@@ -9,8 +9,12 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { BasicComponentProps } from '../IBasicComponentProps';
 import ProposalErrorLabel from '../ProposalErrorLabel';
-import SampleDeclarationContainer from '../SampleDeclarationContainer';
+import { SampleDeclarationContainer } from '../SampleDeclarationContainer';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
+
+const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
+  return { id: sample.id, label: sample.title };
+};
 
 export default function ProposalComponentSampleDeclaration(
   props: BasicComponentProps
@@ -18,19 +22,19 @@ export default function ProposalComponentSampleDeclaration(
   const { templateField, errors, onComplete } = props;
   const proposalQuestionId = templateField.question.proposalQuestionId;
   const config = templateField.config as SubtemplateConfig;
+
   const isError = errors[proposalQuestionId] ? true : false;
 
   const { api } = useDataApiWithFeedback();
 
   const [stateValue, setStateValue] = useState<number[]>(
     templateField.value || []
-  );
+  ); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
-  const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
-
-  const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
-    return { id: sample.id, label: sample.title };
-  };
+  const [
+    selectedSampleOrIdOfTemplate,
+    setSelectedSampleOrIdOfTemplate,
+  ] = useState<Sample | number | null>(null);
 
   useEffect(() => {
     const getSamples = async (answerId: number): Promise<SampleBasic[]> => {
@@ -62,7 +66,7 @@ export default function ProposalComponentSampleDeclaration(
               .getSample({ sampleId: item.id })
               .then(response => {
                 if (response.sample) {
-                  setSelectedSample(response.sample);
+                  setSelectedSampleOrIdOfTemplate(response.sample);
                 }
               })
           }
@@ -87,21 +91,9 @@ export default function ProposalComponentSampleDeclaration(
               });
           }}
           onAddNewClick={() =>
-            api()
-              .createSample({
-                title: '',
-                templateId: config.templateId,
-              })
-              .then(response => {
-                const newSample = response.createSample.sample;
-                if (newSample) {
-                  const newStateValue = [...stateValue, newSample.id];
-                  setStateValue(newStateValue);
-                  setRows([...rows, sampleToListRow(newSample)]);
-                  setSelectedSample(newSample);
-                  onComplete(null as any, newStateValue);
-                }
-              })
+            setSelectedSampleOrIdOfTemplate(
+              (props.templateField.config as SubtemplateConfig).templateId
+            )
           }
           {...props}
         />
@@ -110,12 +102,12 @@ export default function ProposalComponentSampleDeclaration(
         )}
       </FormControl>
       <ModalWrapper
-        close={() => setSelectedSample(null)}
-        isOpen={selectedSample !== null}
+        close={() => setSelectedSampleOrIdOfTemplate(null)}
+        isOpen={selectedSampleOrIdOfTemplate !== null}
       >
-        {selectedSample ? (
+        {selectedSampleOrIdOfTemplate ? (
           <SampleDeclarationContainer
-            data={selectedSample!}
+            sampleOrIdOfTemplate={selectedSampleOrIdOfTemplate}
             sampleEditDone={updatedSample => {
               if (updatedSample) {
                 const index = rows.findIndex(
@@ -127,9 +119,13 @@ export default function ProposalComponentSampleDeclaration(
                   ...sampleToListRow(updatedSample),
                 });
                 setRows(newRows);
+
+                const newStateValue = newRows.map(row => row.id);
+                setStateValue(newStateValue);
+                onComplete(null as any, newStateValue);
               }
 
-              setSelectedSample(null);
+              setSelectedSampleOrIdOfTemplate(null);
             }}
           ></SampleDeclarationContainer>
         ) : null}

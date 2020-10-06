@@ -163,7 +163,8 @@ export enum DataType {
   FILE_UPLOAD = 'FILE_UPLOAD',
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
-  SUBTEMPLATE = 'SUBTEMPLATE'
+  SUBTEMPLATE = 'SUBTEMPLATE',
+  SAMPLE_BASIS = 'SAMPLE_BASIS'
 }
 
 export type DateConfig = {
@@ -1184,6 +1185,7 @@ export type Query = {
   templates: Maybe<Array<Template>>;
   basicUserDetails: Maybe<BasicUserDetails>;
   blankProposal: Maybe<Proposal>;
+  blankQuestionarySteps: Maybe<Array<QuestionaryStep>>;
   call: Maybe<Call>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
   eventLogs: Maybe<Array<EventLog>>;
@@ -1259,6 +1261,11 @@ export type QueryBasicUserDetailsArgs = {
 
 export type QueryBlankProposalArgs = {
   callId: Scalars['Int'];
+};
+
+
+export type QueryBlankQuestionaryStepsArgs = {
+  templateId: Scalars['Int'];
 };
 
 
@@ -2959,6 +2966,19 @@ export type QuestionaryStepFragment = (
     { __typename?: 'Answer' }
     & AnswerFragment
   )> }
+);
+
+export type GetBlankQuestionaryStepsQueryVariables = Exact<{
+  templateId: Scalars['Int'];
+}>;
+
+
+export type GetBlankQuestionaryStepsQuery = (
+  { __typename?: 'Query' }
+  & { blankQuestionarySteps: Maybe<Array<(
+    { __typename?: 'QuestionaryStep' }
+    & QuestionaryStepFragment
+  )>> }
 );
 
 export type GetFileMetadataQueryVariables = Exact<{
@@ -5464,6 +5484,13 @@ export const CreateQuestionaryDocument = gql`
   }
 }
     ${QuestionaryFragmentDoc}`;
+export const GetBlankQuestionaryStepsDocument = gql`
+    query getBlankQuestionarySteps($templateId: Int!) {
+  blankQuestionarySteps(templateId: $templateId) {
+    ...questionaryStep
+  }
+}
+    ${QuestionaryStepFragmentDoc}`;
 export const GetFileMetadataDocument = gql`
     query getFileMetadata($fileIds: [String!]!) {
   fileMetadata(fileIds: $fileIds) {
@@ -6420,6 +6447,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createQuestionary(variables: CreateQuestionaryMutationVariables): Promise<CreateQuestionaryMutation> {
       return withWrapper(() => client.request<CreateQuestionaryMutation>(print(CreateQuestionaryDocument), variables));
+    },
+    getBlankQuestionarySteps(variables: GetBlankQuestionaryStepsQueryVariables): Promise<GetBlankQuestionaryStepsQuery> {
+      return withWrapper(() => client.request<GetBlankQuestionaryStepsQuery>(print(GetBlankQuestionaryStepsDocument), variables));
     },
     getFileMetadata(variables: GetFileMetadataQueryVariables): Promise<GetFileMetadataQuery> {
       return withWrapper(() => client.request<GetFileMetadataQuery>(print(GetFileMetadataDocument), variables));

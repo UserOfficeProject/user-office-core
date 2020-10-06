@@ -9,14 +9,7 @@ import { default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
-import {
-  Answer,
-  DataType,
-  Questionary,
-  SubtemplateConfig,
-  TemplateCategoryId,
-  UserRole,
-} from 'generated/sdk';
+import { Answer, Questionary, UserRole } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
   Event,
@@ -32,9 +25,9 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { QuestionaryUIStep } from '../../hooks/questionary/QuestionaryUIStep';
 import { SubmissionContext } from '../../utils/SubmissionContext';
 import ProposalInformationView from './ProposalInformationView';
+import ProposalQuestionaryStepView from './ProposalQuestionaryStepView';
 import ProposalReview from './ProposalSummary';
 import { QuestionaryStepButton } from './QuestionaryStepButton';
-import QuestionaryStepView from './QuestionaryStepView';
 
 export interface Notification {
   variant: 'error' | 'success';
@@ -56,37 +49,6 @@ export default function ProposalContainer(props: {
 
   const getConfirmNavigMsg = (): string => {
     return 'Changes you recently made in this step will not be saved! Are you sure?';
-  };
-
-  const isSample = (answer: Answer) => {
-    const { dataType, config } = answer.question;
-
-    return (
-      dataType === DataType.SUBTEMPLATE &&
-      (config as SubtemplateConfig).templateCategory ===
-        TemplateCategoryId.SAMPLE_DECLARATION
-    );
-  };
-
-  const processSamples = async (answers?: Answer[]) => {
-    const sampleAnswers = answers?.filter(isSample);
-    if (!sampleAnswers) {
-      return;
-    }
-    for (const sampleAnswer of sampleAnswers) {
-      const sampleIds = sampleAnswer.value;
-      if (sampleIds) {
-        const { samples } = await api().getSamples({
-          filter: { sampleIds: sampleAnswer.value },
-        });
-        if (samples) {
-          await api().createAnswerQuestionaryRelations({
-            answerId: sampleAnswer.answerId!,
-            questionaryIds: samples.map(sample => sample.questionaryId),
-          });
-        }
-      }
-    }
   };
 
   /**
@@ -190,7 +152,6 @@ export default function ProposalContainer(props: {
           });
 
           if (questionaryStep) {
-            await processSamples(questionaryStep.fields);
             dispatch({
               type: EventType.STEP_ANSWERED,
               payload: { step: questionaryStep },
@@ -211,7 +172,6 @@ export default function ProposalContainer(props: {
             isPartialSave: false,
           });
           if (questionaryStep) {
-            await processSamples(questionaryStep.fields);
             dispatch({
               type: EventType.STEP_ANSWERED,
               payload: { step: questionaryStep },
@@ -267,7 +227,7 @@ export default function ProposalContainer(props: {
             step.topic.title,
             step.isCompleted,
             (
-              <QuestionaryStepView
+              <ProposalQuestionaryStepView
                 topicId={step.topic.id}
                 state={{
                   questionary: state.proposal.questionary,

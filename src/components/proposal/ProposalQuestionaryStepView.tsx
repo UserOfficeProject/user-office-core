@@ -1,21 +1,20 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Formik } from 'formik';
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useContext } from 'react';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { Questionary, QuestionaryStep } from 'generated/sdk';
+import { EventType } from 'models/ProposalSubmissionModel';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
-  prepareAnswers,
 } from 'models/QuestionaryFunctions';
-import { Event, EventType } from 'models/SampleSubmissionModel';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import { SubmissionContext } from '../../utils/SubmissionContext';
 import { createFormikConfigObjects } from './createFormikConfigObjects';
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
@@ -23,23 +22,25 @@ interface QuestionaryState {
   questionary: Questionary;
   isDirty: boolean;
 }
-export default function SampleQuestionaryStepView(props: {
+
+const useStyles = makeStyles({
+  componentWrapper: {
+    margin: '10px 0',
+  },
+  disabled: {
+    pointerEvents: 'none',
+    opacity: 0.7,
+  },
+});
+
+export default function ProposalQuestionaryStepView(props: {
   state: QuestionaryState;
   topicId: number;
-  dispatch: React.Dispatch<Event>;
   readonly: boolean;
 }) {
-  const { state, topicId, dispatch } = props;
-  const { api } = useDataApiWithFeedback();
-  const classes = makeStyles({
-    componentWrapper: {
-      margin: '10px 0',
-    },
-    disabled: {
-      pointerEvents: 'none',
-      opacity: 0.7,
-    },
-  })();
+  const { state, topicId } = props;
+  const classes = useStyles();
+  const { dispatch } = useContext(SubmissionContext)!;
 
   if (state === null) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -66,6 +67,18 @@ export default function SampleQuestionaryStepView(props: {
     activeFields
   );
 
+  const saveStepData = async (markAsComplete: boolean) => {
+    dispatch({
+      type: markAsComplete
+        ? EventType.FINISH_STEP_CLICKED
+        : EventType.SAVE_STEP_CLICKED,
+      payload: {
+        answers: activeFields,
+        topicId: props.topicId,
+      },
+    });
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -91,6 +104,7 @@ export default function SampleQuestionaryStepView(props: {
                 {createComponent(field, {
                   touched: touched, // for formik
                   errors: errors, // for formik
+                  dispatch: dispatch,
                   onComplete: (evt: SyntheticEvent, newValue: any) => {
                     if (field.value !== newValue) {
                       dispatch({
@@ -116,32 +130,14 @@ export default function SampleQuestionaryStepView(props: {
             }}
             reset={{
               callback: () => dispatch({ type: EventType.RESET_CLICKED }),
-              disabled: !state.isDirty,
+              disabled: !props.state.isDirty,
             }}
             save={
               questionaryStep.isCompleted
                 ? undefined
                 : {
                     callback: () => {
-                      api('Saved')
-                        .answerTopic({
-                          questionaryId: state.questionary.questionaryId!,
-                          answers: prepareAnswers(questionaryStep.fields),
-                          topicId: topicId,
-                          isPartialSave: true,
-                        })
-                        .then(result => {
-                          if (!result.answerTopic.error) {
-                            dispatch({
-                              type: EventType.QUESTIONARY_STEP_ANSWERED,
-                              payload: {
-                                questionaryStep:
-                                  result.answerTopic.questionaryStep,
-                                partially: true,
-                              },
-                            });
-                          }
-                        });
+                      saveStepData(false);
                     },
                     disabled: !props.state.isDirty,
                   }
@@ -151,26 +147,7 @@ export default function SampleQuestionaryStepView(props: {
                 submitFormAsync(submitForm, validateForm).then(
                   (isValid: boolean) => {
                     if (isValid) {
-                      api('Saved')
-                        .answerTopic({
-                          questionaryId: state.questionary.questionaryId!,
-                          answers: prepareAnswers(questionaryStep.fields),
-                          topicId: topicId,
-                          isPartialSave: false,
-                        })
-                        .then(result => {
-                          if (!result.answerTopic.error) {
-                            dispatch({
-                              type: EventType.QUESTIONARY_STEP_ANSWERED,
-                              payload: {
-                                questionaryStep:
-                                  result.answerTopic.questionaryStep,
-                                partially: false,
-                              },
-                            });
-                            dispatch({ type: EventType.GO_STEP_FORWARD });
-                          }
-                        });
+                      saveStepData(true);
                     }
                   }
                 );
