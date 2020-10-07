@@ -38,7 +38,7 @@ const createSampleStub = (
     questionaryId: 0,
     safetyComment: '',
     safetyStatus: SampleStatus.NONE,
-    title: 'Untited',
+    title: '',
   };
 };
 

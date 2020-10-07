@@ -10,7 +10,7 @@ import { SampleContext } from '../SampleDeclarationContainer';
 
 export function ProposalComponentSampleBasis(props: BasicComponentProps) {
   const sampleContext = useContext(SampleContext);
-  const [title, setTitle] = useState(sampleContext?.sample.title || 'Untitled');
+  const [title, setTitle] = useState(sampleContext?.sample.title || '');
 
   return (
     <TextField

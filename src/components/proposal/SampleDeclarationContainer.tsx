@@ -84,7 +84,7 @@ export function SampleDeclarationContainer(props: {
   sampleEditDone: () => any;
 }) {
   const classes = useStyles();
-  const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
   const { persistModel, isSavingModel } = usePersistQuestionaryModel();
 
   /**
@@ -173,33 +173,33 @@ export function SampleDeclarationContainer(props: {
   }, []); // FIXME
 
   const getStepContent = () => {
-    const curentStep = state.steps[state.stepIndex];
+    const currentStep = state.steps[state.stepIndex];
     const previousStep =
       state.stepIndex !== 0 ? state.steps[state.stepIndex - 1] : undefined;
 
-    if (!curentStep) {
+    if (!currentStep) {
       return null;
     }
 
     return (
       <SampleContext.Provider value={state}>
         <QuestionaryStepView
-          topicId={curentStep.topic.id}
+          topicId={currentStep.topic.id}
           state={state}
           readonly={
             isSavingModel ||
-            isExecutingCall ||
+            isApiInteracting ||
             (previousStep ? previousStep.isCompleted === false : false)
           }
           dispatch={dispatch}
-          key={curentStep.topic.id}
+          key={currentStep.topic.id}
         />
       </SampleContext.Provider>
     );
   };
 
   const progressBar =
-    isExecutingCall || isSavingModel ? <LinearProgress /> : null;
+    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
 
   return (
     <Container maxWidth="lg">

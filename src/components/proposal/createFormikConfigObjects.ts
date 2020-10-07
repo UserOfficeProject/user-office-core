@@ -52,10 +52,12 @@ const toYupValidationSchema = (field: Answer): Yup.Schema<any> => {
       return schema;
     }
 
-    case DataType.SAMPLE_BASIS:
-      const schema = Yup.object().shape({});
+    case DataType.SAMPLE_BASIS: {
+      // eslint-disable-next-line prefer-const
+      let schema = Yup.object().shape({});
 
       return schema;
+    }
     default:
       return Yup.string();
   }
