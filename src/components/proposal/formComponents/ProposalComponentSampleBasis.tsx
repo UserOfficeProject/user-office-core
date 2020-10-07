@@ -33,6 +33,7 @@ export function ProposalComponentSampleBasis(props: BasicComponentProps) {
         });
       }}
       value={title}
+      data-cy="title-input"
     />
   );
 }

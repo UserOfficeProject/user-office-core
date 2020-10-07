@@ -91,15 +91,11 @@ context('Samples tests', () => {
       .clear()
       .type(sampleTitle);
 
-    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
-      .first()
+    cy.get('[data-cy=save-and-continue-button]')
+      .eq(1)
       .click();
 
     cy.wait(4000);
-
-    cy.get('[role="presentation"] [data-cy=save-and-continue-button]')
-      .first()
-      .click();
 
     cy.get('[data-cy="questionaries-list-item"]').should('have.length', 1);
 
