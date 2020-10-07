@@ -268,6 +268,11 @@ export type FileUploadConfig = {
   max_files: Scalars['Int'];
 };
 
+export type IndexWithGroupId = {
+  index: Scalars['Int'];
+  droppableId: Scalars['String'];
+};
+
 export type Institution = {
   __typename?: 'Institution';
   id: Scalars['Int'];
@@ -319,8 +324,8 @@ export type InstrumentWithAvailabilityTime = {
 
 
 export type MoveProposalWorkflowStatusInput = {
-  from: Scalars['Int'];
-  to: Scalars['Int'];
+  from: IndexWithGroupId;
+  to: IndexWithGroupId;
   proposalWorkflowId: Scalars['Int'];
 };
 
@@ -3456,8 +3461,8 @@ export type GetProposalWorkflowsQuery = (
 );
 
 export type MoveProposalWorkflowStatusMutationVariables = Exact<{
-  from: Scalars['Int'];
-  to: Scalars['Int'];
+  from: IndexWithGroupId;
+  to: IndexWithGroupId;
   proposalWorkflowId: Scalars['Int'];
 }>;
 
@@ -5809,7 +5814,7 @@ export const GetProposalWorkflowsDocument = gql`
 }
     `;
 export const MoveProposalWorkflowStatusDocument = gql`
-    mutation moveProposalWorkflowStatus($from: Int!, $to: Int!, $proposalWorkflowId: Int!) {
+    mutation moveProposalWorkflowStatus($from: IndexWithGroupId!, $to: IndexWithGroupId!, $proposalWorkflowId: Int!) {
   moveProposalWorkflowStatus(moveProposalWorkflowStatusInput: {from: $from, to: $to, proposalWorkflowId: $proposalWorkflowId}) {
     error
   }

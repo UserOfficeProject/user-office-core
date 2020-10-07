@@ -71,6 +71,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
       fontWeight: 'bold',
       padding: '12px 8px 8px 8px',
     },
+    addRowButton: {
+      float: 'right',
+    },
   }))();
 
   const getItemStyle = (
@@ -164,6 +167,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
           key={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
           draggableId={`${proposalWorkflowConnection.proposalStatus.id}_${proposalWorkflowConnection.proposalStatus.name}`}
           index={index}
+          isDragDisabled={true}
         >
           {(provided, snapshot) => (
             <Grid
@@ -304,7 +308,12 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
       </Dialog>
       <Grid item xs={12} className={classes.title}>
         Proposal workflow
-        <Button onClick={() => setOpenNewRowDialog(true)}>Add new row</Button>
+        <Button
+          className={classes.addRowButton}
+          onClick={() => setOpenNewRowDialog(true)}
+        >
+          Add multicolumn row
+        </Button>
       </Grid>
       {connectionGroups}
     </Grid>

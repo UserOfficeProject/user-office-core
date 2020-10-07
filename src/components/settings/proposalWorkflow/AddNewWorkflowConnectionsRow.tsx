@@ -3,8 +3,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-material-ui';
+import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
@@ -84,16 +83,14 @@ const AddNewWorkflowConnectionsRow: React.FC<AddNewWorkflowConnectionsRowProps> 
                   }))}
                   required
                 />
-                <Field
+                <FormikDropdown
                   name="numberOfColumns"
-                  label="Number of columns"
-                  type="number"
-                  component={TextField}
-                  margin="normal"
+                  label="Select number of columns"
+                  items={[2, 3, 4].map(numberOfColumn => ({
+                    value: numberOfColumn,
+                    text: numberOfColumn.toString(),
+                  }))}
                   required
-                  fullWidth
-                  autoComplete="off"
-                  data-cy="numberOfColumns"
                 />
               </Grid>
             </Grid>
