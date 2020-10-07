@@ -1,5 +1,6 @@
 import {
   Ctx,
+  Directive,
   Field,
   FieldResolver,
   Int,
@@ -13,6 +14,7 @@ import { Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class Call implements Partial<CallOrigin> {
   @Field(() => Int)
   public id: number;
@@ -62,4 +64,16 @@ export class CallInstrumentsResolver {
       call.id,
     ]);
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function resolveCallReference(...params: any): Promise<Call> {
+  // the order of the parameters and types are messed up,
+  // it should be source, args, context, resolveInfo
+  // but instead we get source, context and resolveInfo
+  // this was the easies way to make the compiler happy and use real types
+  const [reference, ctx]: [Pick<Call, 'id'>, ResolverContext] = params;
+
+  // dataSource.get can be null, even with non-null operator the compiler complains
+  return (await (ctx.queries.call.byRef(reference.id) as unknown)) as Call;
 }

@@ -37,7 +37,11 @@ const EventBusDecorator = (eventType: Event) => {
 
       // NOTE: Do not log the event in testing environment.
       if (process.env.NODE_ENV !== 'test') {
-        eventBus.publish(event);
+        eventBus
+          .publish(event)
+          .catch(e =>
+            console.error(`EventBus publish failed ${event.type}`, e)
+          );
       }
 
       return result;

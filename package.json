@@ -57,6 +57,7 @@
     "@typescript-eslint/parser": "^2.34.0",
     "amqplib": "^0.5.6",
     "apollo-server": "^2.18.1",
+    "apollo-server-core": "^2.18.1",
     "apollo-server-express": "^2.18.1",
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",

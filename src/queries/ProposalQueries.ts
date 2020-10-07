@@ -46,6 +46,10 @@ export default class ProposalQueries {
     }
   }
 
+  byRef(id: number) {
+    return this.dataSource.get(id);
+  }
+
   private async hasAccessRights(
     agent: UserWithRole | null,
     proposal: Proposal | null

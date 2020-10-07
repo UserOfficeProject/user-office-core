@@ -1,3 +1,4 @@
+import { ApolloServerPluginInlineTraceDisabled } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-express';
 import { Express, Request } from 'express';
 
@@ -50,6 +51,7 @@ const apolloServer = async (app: Express) => {
         'schema.polling.enable': false,
       },
     },
+    plugins: [ApolloServerPluginInlineTraceDisabled()],
 
     context: async ({ req }: { req: Req }) => {
       let user = null;

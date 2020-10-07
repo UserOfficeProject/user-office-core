@@ -25,7 +25,9 @@ export default class InstrumentQueries {
     return instrument;
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  // TODO: use some kind of shared API token between gateway and user-office to authorize the requests
+  // until some kind of auth gets implemented on the scheduler side
+  // @Authorized([Roles.USER_OFFICER])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
       return await this.dataSource.getAll();
@@ -64,5 +66,9 @@ export default class InstrumentQueries {
     } else {
       return null;
     }
+  }
+
+  byRef(id: number) {
+    return this.dataSource.get(id);
   }
 }
