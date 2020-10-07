@@ -230,6 +230,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
               className={classes.itemContainer}
+              data-cy="droppable-group"
             >
               <small>{subGroup.groupId}</small>
               {getConnectionGroupItems(subGroup.connections)}
@@ -262,6 +263,7 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               ref={provided.innerRef}
               style={getListStyle(snapshot.isDraggingOver)}
               className={classes.itemContainer}
+              data-cy="droppable-group"
             >
               <small>{connectionGroup.groupId}</small>
               {getConnectionGroupItems(connectionGroup.connections)}
