@@ -147,7 +147,7 @@ export class ProposalSettingsDataSourceMock
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
     proposalWorkflowId: number
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalWorkflowConnection> {
+    return dummyProposalWorkflowConnection;
   }
 }

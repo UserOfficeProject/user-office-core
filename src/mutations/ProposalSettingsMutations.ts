@@ -161,69 +161,135 @@ export default class ProposalSettingsMutations {
       .then(result => result);
   }
 
-  async updateProposalWorkflowStatuses(
-    proposalWorkflowConnections: ProposalWorkflowConnection[],
-    newConnectionSortOrder: number
+  orderAndConnectAllGroupWorkflowConnections(
+    proposalWorkflowConnections: ProposalWorkflowConnection[]
   ) {
-    const newWorkflowConnections = proposalWorkflowConnections.map(
-      (workflowConnection, index) => {
-        return {
-          ...workflowConnection,
-          sortOrder: index,
-          prevProposalStatusId: proposalWorkflowConnections[index - 1]
-            ? proposalWorkflowConnections[index - 1].proposalStatusId
-            : null,
-          nextProposalStatusId: proposalWorkflowConnections[index + 1]
-            ? proposalWorkflowConnections[index + 1].proposalStatusId
-            : null,
-        };
-      }
+    return proposalWorkflowConnections.map((workflowConnection, index) => {
+      return {
+        ...workflowConnection,
+        sortOrder: index,
+        prevProposalStatusId: proposalWorkflowConnections[index - 1]
+          ? proposalWorkflowConnections[index - 1].proposalStatusId
+          : null,
+        nextProposalStatusId: proposalWorkflowConnections[index + 1]
+          ? proposalWorkflowConnections[index + 1].proposalStatusId
+          : null,
+      };
+    });
+  }
+
+  async getLastConnectionInParentDroppableGroup(
+    proposalWorkflowId: number,
+    parentDroppableGroupId: string
+  ) {
+    return (
+      await this.dataSource.getProposalWorkflowConnections(
+        proposalWorkflowId,
+        parentDroppableGroupId,
+        false
+      )
+    ).pop() as ProposalWorkflowConnection;
+  }
+
+  // TODO: Clean this function a bit!
+  async updateProposalWorkflowConnectionStatuses(
+    proposalWorkflowConnections: ProposalWorkflowConnection[],
+    isFirstConnectionInChildGroup: boolean,
+    isLastConnectionInParentGroup: boolean = false
+  ) {
+    const updatedWorkflowConnections = this.orderAndConnectAllGroupWorkflowConnections(
+      proposalWorkflowConnections
     );
 
-    const [firstElementInGroup] = newWorkflowConnections;
-    const parentDroppableGroupId = firstElementInGroup.parentDroppableGroupId;
+    const [firstConnection, secondConnection] = updatedWorkflowConnections;
+    const parentDroppableGroupId = firstConnection.parentDroppableGroupId;
 
     if (parentDroppableGroupId) {
-      const lastConnectionInPreviousGroup = (
-        await this.dataSource.getProposalWorkflowConnections(
-          firstElementInGroup.proposalWorkflowId,
-          parentDroppableGroupId
-        )
-      ).pop() as ProposalWorkflowConnection;
+      const lastConnectionInPreviousDroppableGroup = await this.getLastConnectionInParentDroppableGroup(
+        firstConnection.proposalWorkflowId,
+        parentDroppableGroupId
+      );
 
-      newWorkflowConnections[0].prevProposalStatusId =
-        lastConnectionInPreviousGroup.proposalStatusId;
+      updatedWorkflowConnections[0].prevProposalStatusId =
+        lastConnectionInPreviousDroppableGroup.proposalStatusId;
 
-      if (newConnectionSortOrder === 0) {
-        if (lastConnectionInPreviousGroup.nextProposalStatusId) {
-          const newStatus = omit(
-            {
-              ...lastConnectionInPreviousGroup,
-              nextProposalStatusId:
-                newWorkflowConnections[newWorkflowConnections.length - 1]
-                  .proposalStatusId,
-            },
-            'id'
+      const lastConnectionInPreviousGroupHasNext = !!lastConnectionInPreviousDroppableGroup.nextProposalStatusId;
+
+      if (isFirstConnectionInChildGroup) {
+        if (secondConnection) {
+          await this.dataSource.deleteProposalWorkflowStatus(
+            firstConnection.prevProposalStatusId as number,
+            firstConnection.proposalWorkflowId,
+            secondConnection.proposalStatusId
           );
+        }
 
-          newWorkflowConnections.push(lastConnectionInPreviousGroup);
-          newWorkflowConnections.push(newStatus as ProposalWorkflowConnection);
+        lastConnectionInPreviousDroppableGroup.nextProposalStatusId =
+          firstConnection.proposalStatusId;
+        if (lastConnectionInPreviousGroupHasNext) {
+          const newStatus = omit(lastConnectionInPreviousDroppableGroup, 'id');
+
+          updatedWorkflowConnections.push(
+            newStatus as ProposalWorkflowConnection
+          );
         } else {
-          lastConnectionInPreviousGroup.nextProposalStatusId =
-            newWorkflowConnections[
-              newWorkflowConnections.length - 1
-            ].proposalStatusId;
+          updatedWorkflowConnections.push(
+            lastConnectionInPreviousDroppableGroup
+          );
+        }
+      }
+    }
 
-          newWorkflowConnections.push(lastConnectionInPreviousGroup);
+    if (isLastConnectionInParentGroup) {
+      const lastConnection = updatedWorkflowConnections.pop() as ProposalWorkflowConnection;
+      const findAllConnectionsByParentGroup = true;
+
+      await this.dataSource.deleteProposalWorkflowStatus(
+        updatedWorkflowConnections[updatedWorkflowConnections.length - 1]
+          .proposalStatusId,
+        updatedWorkflowConnections[updatedWorkflowConnections.length - 1]
+          .proposalWorkflowId
+      );
+
+      const allFirstChildrenGroupConnections = (
+        await this.dataSource.getProposalWorkflowConnections(
+          lastConnection.proposalWorkflowId,
+          lastConnection.droppableGroupId,
+          findAllConnectionsByParentGroup
+        )
+      )
+        .filter(childConnection => childConnection.sortOrder === 0)
+        .map(firstChildConnection => ({
+          ...firstChildConnection,
+          prevProposalStatusId: lastConnection.proposalStatusId,
+        }));
+
+      if (
+        allFirstChildrenGroupConnections &&
+        allFirstChildrenGroupConnections.length > 0
+      ) {
+        updatedWorkflowConnections.push(...allFirstChildrenGroupConnections);
+
+        for (
+          let index = 0;
+          index < allFirstChildrenGroupConnections.length;
+          index++
+        ) {
+          updatedWorkflowConnections.push({
+            ...lastConnection,
+            nextProposalStatusId:
+              allFirstChildrenGroupConnections[index].proposalStatusId,
+          });
         }
       }
     }
 
     return await this.dataSource.updateProposalWorkflowStatuses(
-      newWorkflowConnections
+      updatedWorkflowConnections
     );
   }
 
+  // TODO: Clean this function a bit!
   async insertNewAndUpdateExistingProposalWorkflowStatuses(
     args: AddProposalWorkflowStatusInput
   ) {
@@ -232,8 +298,13 @@ export default class ProposalSettingsMutations {
     } as ProposalWorkflowConnection;
     const allWorkflowGroupConnections = await this.dataSource.getProposalWorkflowConnections(
       args.proposalWorkflowId,
-      args.droppableGroupId
+      args.droppableGroupId,
+      false
     );
+
+    const lastConnectionInParentGroup =
+      newWorkflowConnection.sortOrder === allWorkflowGroupConnections.length &&
+      !!newWorkflowConnection.nextProposalStatusId;
 
     allWorkflowGroupConnections.splice(
       newWorkflowConnection.sortOrder,
@@ -241,16 +312,22 @@ export default class ProposalSettingsMutations {
       newWorkflowConnection
     );
 
+    const isFirstConnectionInChildGroup =
+      newWorkflowConnection.sortOrder === 0 &&
+      !!newWorkflowConnection.prevProposalStatusId;
+
     const insertedWorkflowConnection = (
-      await this.updateProposalWorkflowStatuses(
+      await this.updateProposalWorkflowConnectionStatuses(
         allWorkflowGroupConnections,
-        newWorkflowConnection.sortOrder
+        isFirstConnectionInChildGroup,
+        lastConnectionInParentGroup
       )
     )[newWorkflowConnection.sortOrder];
 
     return insertedWorkflowConnection;
   }
 
+  // NOTE: This is not in use currently.
   moveArrayElement(
     workflowConnections: ProposalWorkflowConnection[],
     fromIndex: number,
@@ -292,6 +369,7 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.
   @ValidateArgs(moveProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async moveProposalWorkflowStatus(
@@ -299,21 +377,31 @@ export default class ProposalSettingsMutations {
     args: MoveProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection | Rejection> {
     try {
-      const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-        args.proposalWorkflowId
+      const allSourceGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+        args.proposalWorkflowId,
+        args.from.droppableId
       );
 
-      const reorderedWorkflowConnections = this.moveArrayElement(
-        allWorkflowConnections,
-        args.from,
-        args.to
+      let reorderedWorkflowConnections: ProposalWorkflowConnection[] = [];
+
+      if (args.from.droppableId === args.to.droppableId) {
+        reorderedWorkflowConnections = this.moveArrayElement(
+          allSourceGroupWorkflowConnections,
+          args.from.index,
+          args.to.index
+        );
+      }
+
+      const isFirstConnectionInGroup = args.to.index === 0;
+
+      await this.updateProposalWorkflowConnectionStatuses(
+        reorderedWorkflowConnections,
+        isFirstConnectionInGroup
       );
 
-      // await this.updateProposalWorkflowStatuses(reorderedWorkflowConnections);
-
-      return reorderedWorkflowConnections[args.to];
+      return reorderedWorkflowConnections[args.to.index];
     } catch (error) {
-      logger.logException('Could not add proposal workflow status', error, {
+      logger.logException('Could not move proposal workflow status', error, {
         agent,
         args,
       });
@@ -322,6 +410,7 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  // TODO: Clean this as well!
   @ValidateArgs(deleteProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteProposalWorkflowStatus(
@@ -334,13 +423,45 @@ export default class ProposalSettingsMutations {
         args.proposalWorkflowId
       )
       .then(async result => {
-        const allWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-          args.proposalWorkflowId
+        const allGroupWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
+          args.proposalWorkflowId,
+          result.droppableGroupId
         );
 
-        // await this.updateProposalWorkflowStatuses(allWorkflowConnections);
+        const isFirstConnectionInGroup = result.sortOrder === 0;
+        const connectionsLeftInTheGroup =
+          allGroupWorkflowConnections.length > 0;
 
-        return result;
+        if (connectionsLeftInTheGroup) {
+          await this.updateProposalWorkflowConnectionStatuses(
+            allGroupWorkflowConnections,
+            isFirstConnectionInGroup
+          );
+          if (
+            isFirstConnectionInGroup &&
+            result.prevProposalStatusId &&
+            result.nextProposalStatusId
+          ) {
+            await this.dataSource.deleteProposalWorkflowStatus(
+              result.prevProposalStatusId as number,
+              result.proposalWorkflowId,
+              result.proposalStatusId
+            );
+          }
+        } else {
+          if (result.parentDroppableGroupId) {
+            const lastConnectionInPreviousDroppableGroup = await this.getLastConnectionInParentDroppableGroup(
+              result.proposalWorkflowId,
+              result.parentDroppableGroupId as string
+            );
+            lastConnectionInPreviousDroppableGroup.nextProposalStatusId = null;
+            await this.dataSource.updateProposalWorkflowStatuses([
+              lastConnectionInPreviousDroppableGroup,
+            ]);
+          }
+        }
+
+        return true;
       })
       .catch(error => {
         logger.logException(

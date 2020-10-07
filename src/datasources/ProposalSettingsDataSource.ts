@@ -27,7 +27,8 @@ export interface ProposalSettingsDataSource {
   deleteProposalWorkflow(proposalWorkflowId: number): Promise<ProposalWorkflow>;
   getProposalWorkflowConnections(
     proposalWorkflowId: number,
-    droppableGroupId?: string | undefined
+    droppableGroupId?: string | undefined,
+    byParentGroupId?: boolean | undefined
   ): Promise<ProposalWorkflowConnection[]>;
   getProposalWorkflowConnection(
     proposalWorkflowId: number,
@@ -41,6 +42,7 @@ export interface ProposalSettingsDataSource {
   ): Promise<ProposalWorkflowConnection[]>;
   deleteProposalWorkflowStatus(
     proposalStatusId: number,
-    proposalWorkflowId: number
-  ): Promise<boolean>;
+    proposalWorkflowId: number,
+    nextProposalStatusId?: number
+  ): Promise<ProposalWorkflowConnection>;
 }

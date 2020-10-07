@@ -227,11 +227,17 @@ export default class PostgresProposalSettingsDataSource
 
   async getProposalWorkflowConnections(
     proposalWorkflowId: number,
-    droppableGroupId: string | undefined = undefined
+    droppableGroupId: string | undefined = undefined,
+    byParentGroupId: boolean | undefined = false
   ): Promise<ProposalWorkflowConnection[]> {
-    const andConditionIfDroppableGroupIdDefined = droppableGroupId
-      ? `AND droppable_group_id = '${droppableGroupId}'`
-      : '';
+    const andConditionIfDroppableGroupIdDefined =
+      !byParentGroupId && droppableGroupId
+        ? `AND droppable_group_id = '${droppableGroupId}'`
+        : '';
+    const andConditionIfParentDroppableGroupIdDefined =
+      byParentGroupId && droppableGroupId
+        ? `AND parent_droppable_group_id = '${droppableGroupId}'`
+        : '';
     const getUniqueOrderedProposalWorkflowConnectionsQuery = `
       SELECT * FROM (
         SELECT DISTINCT ON (pwc.proposal_status_id) *
@@ -242,6 +248,7 @@ export default class PostgresProposalSettingsDataSource
           ps.proposal_status_id = pwc.proposal_status_id
         WHERE proposal_workflow_id = ${proposalWorkflowId}
         ${andConditionIfDroppableGroupIdDefined}
+        ${andConditionIfParentDroppableGroupIdDefined}
       ) t
       ORDER BY
         droppable_group_id ASC,
@@ -376,24 +383,43 @@ export default class PostgresProposalSettingsDataSource
 
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
-    proposalWorkflowId: number
-  ): Promise<boolean> {
-    return database('proposal_workflow_connections')
+    proposalWorkflowId: number,
+    nextProposalStatusId: number
+  ): Promise<ProposalWorkflowConnection> {
+    const removeWorkflowConnectionQuery = database(
+      'proposal_workflow_connections'
+    )
       .where('proposal_workflow_id', proposalWorkflowId)
       .andWhere('proposal_status_id', proposalStatusId)
       .del()
-      .returning('*')
-      .then((proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
+      .returning('*');
+
+    if (nextProposalStatusId) {
+      removeWorkflowConnectionQuery.andWhere(
+        'next_proposal_status_id',
+        nextProposalStatusId
+      );
+    }
+
+    return removeWorkflowConnectionQuery.then(
+      (proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
         if (
           proposalWorkflowStatus === undefined ||
-          proposalWorkflowStatus.length !== 1
+          proposalWorkflowStatus.length < 1
         ) {
           throw new Error(
             `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
           );
         }
 
-        return true;
-      });
+        // NOTE: I need this object only to be able to reorder and update other statuses in the logic layer.
+        return this.createProposalWorkflowConnectionObject({
+          ...proposalWorkflowStatus[0],
+          name: '',
+          description: '',
+          full_count: 1,
+        });
+      }
+    );
   }
 }
