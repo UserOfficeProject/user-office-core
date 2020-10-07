@@ -15,7 +15,11 @@ export default function createHandler({
   const rabbitMQ = new RabbitMQMessageBroker();
 
   return async function messageBrokerHandler(event: ApplicationEvent) {
-    console.log('triggered', event);
+    // if the original method failed
+    // there is no point of publishing any event
+    if (event.isRejection) {
+      return;
+    }
 
     switch (event.type) {
       // case Event.PROPOSAL_ACCEPTED: {
@@ -33,10 +37,9 @@ export default function createHandler({
 
       // TODO: maybe put it behind a feature flag, may only be relevant for ESS
       case Event.PROPOSAL_NOTIFIED: {
-        const { isRejection, proposal } = event;
+        const { proposal } = event;
 
         if (
-          isRejection ||
           // we only care about accepted proposals
           proposal.finalStatus !== ProposalEndStatus.ACCEPTED
         ) {
@@ -49,8 +52,11 @@ export default function createHandler({
         ]);
 
         if (!review || !instrument) {
-          // TODO: maybe log centrally
-          console.warn('review or instrument missing', { review, instrument });
+          // TODO: maybe log centrally, probably shouldn't happen
+          console.warn(
+            `Proposal '${proposal.id}' has no review and/or instrument`,
+            { review, instrument }
+          );
 
           return;
         }
