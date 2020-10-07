@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ModalWrapper from 'components/common/ModalWrapper';
-import { DataType, Template, Question } from 'generated/sdk';
+import { DataType, Question, Template } from 'generated/sdk';
 import { Event } from 'models/QuestionaryEditorModel';
 
 import { QuestionBooleanForm } from './question/QuestionBooleanForm';
@@ -9,6 +9,7 @@ import { QuestionDateForm } from './question/QuestionDateForm';
 import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';
 import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
+import { QuestionSampleBasisForm } from './question/QuestionSampleBasisForm';
 import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
 import { TFormSignature } from './TFormSignature';
@@ -27,6 +28,7 @@ export default function QuestionEditor(props: {
   componentMap.set(DataType.SELECTION_FROM_OPTIONS, QuestionMultipleChoiceForm);
   componentMap.set(DataType.TEXT_INPUT, QuestionTextInputForm);
   componentMap.set(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
+  componentMap.set(DataType.SAMPLE_BASIS, QuestionSampleBasisForm);
 
   if (props.field === null) {
     return null;

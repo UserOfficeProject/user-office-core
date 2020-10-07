@@ -228,7 +228,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SubtemplateConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -1530,6 +1530,14 @@ export type Sample = {
   questionary: Questionary;
 };
 
+export type SampleBasisConfig = {
+  __typename?: 'SampleBasisConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
+  placeholder: Scalars['String'];
+};
+
 export type SampleResponseWrap = {
   __typename?: 'SampleResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -1716,6 +1724,7 @@ export type Topic = {
   __typename?: 'Topic';
   id: Scalars['Int'];
   title: Scalars['String'];
+  templateId: Scalars['Int'];
   sortOrder: Scalars['Int'];
   isEnabled: Scalars['Boolean'];
 };
@@ -2930,6 +2939,9 @@ export type AnswerFragment = (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
   ) | (
+    { __typename?: 'SampleBasisConfig' }
+    & FieldConfigSampleBasisConfigFragment
+  ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
   ), dependency: Maybe<(
@@ -2961,7 +2973,7 @@ export type QuestionaryStepFragment = (
   & Pick<QuestionaryStep, 'isCompleted'>
   & { topic: (
     { __typename?: 'Topic' }
-    & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
+    & TopicFragment
   ), fields: Array<(
     { __typename?: 'Answer' }
     & AnswerFragment
@@ -3723,12 +3735,17 @@ type FieldConfigTextInputConfigFragment = (
   & Pick<TextInputConfig, 'min' | 'max' | 'multiline' | 'placeholder' | 'small_label' | 'required' | 'tooltip' | 'htmlQuestion' | 'isHtmlQuestion'>
 );
 
+type FieldConfigSampleBasisConfigFragment = (
+  { __typename?: 'SampleBasisConfig' }
+  & Pick<SampleBasisConfig, 'placeholder' | 'small_label' | 'required' | 'tooltip'>
+);
+
 type FieldConfigSubtemplateConfigFragment = (
   { __typename?: 'SubtemplateConfig' }
   & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSubtemplateConfigFragment;
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -3751,6 +3768,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
+  ) | (
+    { __typename?: 'SampleBasisConfig' }
+    & FieldConfigSampleBasisConfigFragment
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
@@ -3781,6 +3801,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'TextInputConfig' }
     & FieldConfigTextInputConfigFragment
+  ) | (
+    { __typename?: 'SampleBasisConfig' }
+    & FieldConfigSampleBasisConfigFragment
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
@@ -3830,7 +3853,7 @@ export type TemplateStepFragment = (
 
 export type TopicFragment = (
   { __typename?: 'Topic' }
-  & Pick<Topic, 'title' | 'id' | 'sortOrder' | 'isEnabled'>
+  & Pick<Topic, 'title' | 'id' | 'templateId' | 'sortOrder' | 'isEnabled'>
 );
 
 export type GetIsNaturalKeyPresentQueryVariables = Exact<{
@@ -4406,6 +4429,15 @@ export const AnswerBasicFragmentDoc = gql`
   createdAt
 }
     `;
+export const TopicFragmentDoc = gql`
+    fragment topic on Topic {
+  title
+  id
+  templateId
+  sortOrder
+  isEnabled
+}
+    `;
 export const FieldConfigFragmentDoc = gql`
     fragment fieldConfig on FieldConfig {
   ... on BooleanConfig {
@@ -4460,6 +4492,12 @@ export const FieldConfigFragmentDoc = gql`
     required
     tooltip
   }
+  ... on SampleBasisConfig {
+    placeholder
+    small_label
+    required
+    tooltip
+  }
 }
     `;
 export const QuestionFragmentDoc = gql`
@@ -4507,17 +4545,15 @@ ${FieldConditionFragmentDoc}`;
 export const QuestionaryStepFragmentDoc = gql`
     fragment questionaryStep on QuestionaryStep {
   topic {
-    title
-    id
-    sortOrder
-    isEnabled
+    ...topic
   }
   isCompleted
   fields {
     ...answer
   }
 }
-    ${AnswerFragmentDoc}`;
+    ${TopicFragmentDoc}
+${AnswerFragmentDoc}`;
 export const QuestionaryFragmentDoc = gql`
     fragment questionary on Questionary {
   questionaryId
@@ -4613,14 +4649,6 @@ export const TemplateStepFragmentDoc = gql`
   }
 }
     ${QuestionTemplateRelationFragmentDoc}`;
-export const TopicFragmentDoc = gql`
-    fragment topic on Topic {
-  title
-  id
-  sortOrder
-  isEnabled
-}
-    `;
 export const BasicUserDetailsFragmentDoc = gql`
     fragment basicUserDetails on BasicUserDetails {
   id

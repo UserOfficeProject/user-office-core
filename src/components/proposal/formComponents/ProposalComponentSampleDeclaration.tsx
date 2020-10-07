@@ -3,7 +3,12 @@ import FormLabel from '@material-ui/core/FormLabel';
 import React, { useEffect, useState } from 'react';
 
 import ModalWrapper from 'components/common/ModalWrapper';
-import { Sample, SubtemplateConfig } from 'generated/sdk';
+import {
+  QuestionaryStep,
+  Sample,
+  SampleStatus,
+  SubtemplateConfig,
+} from 'generated/sdk';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -14,6 +19,27 @@ import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
 
 const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
   return { id: sample.id, label: sample.title };
+};
+
+const createSampleStub = (
+  templateId: number,
+  questionarySteps: QuestionaryStep[]
+): Sample => {
+  return {
+    id: 0,
+    created: new Date(),
+    creatorId: 0, // FIXME
+    questionary: {
+      questionaryId: 0,
+      templateId: templateId,
+      created: new Date(),
+      steps: questionarySteps,
+    },
+    questionaryId: 0,
+    safetyComment: '',
+    safetyStatus: SampleStatus.NONE,
+    title: 'Untited',
+  };
 };
 
 export default function ProposalComponentSampleDeclaration(
@@ -31,10 +57,7 @@ export default function ProposalComponentSampleDeclaration(
     templateField.value || []
   ); // ids of samples
   const [rows, setRows] = useState<QuestionariesListRow[]>([]);
-  const [
-    selectedSampleOrIdOfTemplate,
-    setSelectedSampleOrIdOfTemplate,
-  ] = useState<Sample | number | null>(null);
+  const [selectedSample, setSelectedSample] = useState<Sample | null>(null);
 
   useEffect(() => {
     const getSamples = async (answerId: number): Promise<SampleBasic[]> => {
@@ -66,7 +89,7 @@ export default function ProposalComponentSampleDeclaration(
               .getSample({ sampleId: item.id })
               .then(response => {
                 if (response.sample) {
-                  setSelectedSampleOrIdOfTemplate(response.sample);
+                  setSelectedSample(response.sample);
                 }
               })
           }
@@ -90,11 +113,19 @@ export default function ProposalComponentSampleDeclaration(
                 }
               });
           }}
-          onAddNewClick={() =>
-            setSelectedSampleOrIdOfTemplate(
-              (props.templateField.config as SubtemplateConfig).templateId
-            )
-          }
+          onAddNewClick={() => {
+            const config = props.templateField.config as SubtemplateConfig;
+            const templateId = config.templateId;
+            api()
+              .getBlankQuestionarySteps({ templateId })
+              .then(result => {
+                const blankSteps = result.blankQuestionarySteps;
+                if (blankSteps) {
+                  const sampleStub = createSampleStub(templateId, blankSteps);
+                  setSelectedSample(sampleStub);
+                }
+              });
+          }}
           {...props}
         />
         {isError && (
@@ -102,31 +133,37 @@ export default function ProposalComponentSampleDeclaration(
         )}
       </FormControl>
       <ModalWrapper
-        close={() => setSelectedSampleOrIdOfTemplate(null)}
-        isOpen={selectedSampleOrIdOfTemplate !== null}
+        close={() => setSelectedSample(null)}
+        isOpen={selectedSample !== null}
       >
-        {selectedSampleOrIdOfTemplate ? (
+        {selectedSample ? (
           <SampleDeclarationContainer
-            sampleOrIdOfTemplate={selectedSampleOrIdOfTemplate}
-            sampleEditDone={updatedSample => {
-              if (updatedSample) {
-                const index = rows.findIndex(
-                  sample => sample.id === updatedSample.id
-                );
-                const newRows = [...rows];
-                newRows.splice(index, 1, {
-                  ...rows[index],
-                  ...sampleToListRow(updatedSample),
-                });
-                setRows(newRows);
-
-                const newStateValue = newRows.map(row => row.id);
-                setStateValue(newStateValue);
-                onComplete(null as any, newStateValue);
+            sample={selectedSample}
+            sampleUpdated={updatedSample => {
+              const index = rows.findIndex(
+                sample => sample.id === updatedSample.id
+              );
+              if (index === -1) {
+                // unexpected
+                return;
               }
 
-              setSelectedSampleOrIdOfTemplate(null);
+              const newRows = [...rows];
+              newRows.splice(index, 1, {
+                ...rows[index],
+                ...sampleToListRow(updatedSample),
+              });
+              setRows(newRows);
             }}
+            sampleCreated={newSample => {
+              const newStateValue = [...stateValue, newSample.id];
+              setStateValue(newStateValue);
+              onComplete(null as any, newStateValue);
+
+              const newRows = [...rows, sampleToListRow(newSample)];
+              setRows(newRows);
+            }}
+            sampleEditDone={() => setSelectedSample(null)}
           ></SampleDeclarationContainer>
         ) : null}
       </ModalWrapper>

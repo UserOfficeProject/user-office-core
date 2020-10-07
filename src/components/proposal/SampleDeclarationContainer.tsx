@@ -8,7 +8,8 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { default as React, useEffect } from 'react';
 import { Prompt } from 'react-router';
 
-import { QuestionaryStep, Sample, SampleStatus } from 'generated/sdk';
+import { Sample } from 'generated/sdk';
+import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import {
   Event,
   EventType,
@@ -45,37 +46,8 @@ export const SampleContext = React.createContext<SampleSubmissionState | null>(
   null
 );
 
-const getTemplateId = (sampleOrIdOfTemplate: Sample | number) => {
-  if (Number.isInteger(sampleOrIdOfTemplate)) {
-    return sampleOrIdOfTemplate as number;
-  } else {
-    return (sampleOrIdOfTemplate as Sample).questionary.templateId;
-  }
-};
-
 const getConfirmNavigMsg = (): string => {
   return 'Changes you recently made in this step will not be saved! Are you sure?';
-};
-
-const createSampleStub = (
-  templateId: number,
-  questionarySteps: QuestionaryStep[]
-): Sample => {
-  return {
-    id: 0,
-    created: new Date(),
-    creatorId: 0, // FIXME
-    questionary: {
-      questionaryId: 0,
-      templateId: templateId,
-      created: new Date(),
-      steps: questionarySteps,
-    },
-    questionaryId: 0,
-    safetyComment: '',
-    safetyStatus: SampleStatus.NONE,
-    title: 'Untited',
-  };
 };
 
 const samplesReducer = (
@@ -84,6 +56,7 @@ const samplesReducer = (
   action: Event
 ) => {
   switch (action.type) {
+    case EventType.SAMPLE_CREATED:
     case EventType.SAMPLE_LOADED:
       const sample: Sample = action.payload.sample;
       draftState.isDirty = false;
@@ -92,11 +65,12 @@ const samplesReducer = (
       draftState.steps = sample.questionary.steps;
       draftState.templateId = sample.questionary.templateId;
       break;
-    case EventType.SAMPLE_UPDATED:
+    case EventType.SAMPLE_MODIFIED:
       draftState.sample = {
         ...draftState.sample,
         ...action.payload.sample,
       };
+      draftState.isDirty = true;
       break;
   }
 
@@ -104,37 +78,14 @@ const samplesReducer = (
 };
 
 export function SampleDeclarationContainer(props: {
-  sampleOrIdOfTemplate: Sample | number;
-  sampleEditDone: (sample: Sample | null) => any;
+  sample: Sample;
+  sampleCreated: (sample: Sample) => any;
+  sampleUpdated: (sample: Sample) => any;
+  sampleEditDone: () => any;
 }) {
   const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
-
-  const templateId = getTemplateId(props.sampleOrIdOfTemplate);
-
-  useEffect(() => {
-    const isTemplateIdProvided = Number.isInteger(props.sampleOrIdOfTemplate);
-    if (isTemplateIdProvided) {
-      api()
-        .getBlankQuestionarySteps({ templateId })
-        .then(result => {
-          const blankSteps = result.blankQuestionarySteps;
-          if (blankSteps) {
-            const sampleStub = createSampleStub(templateId, blankSteps);
-            dispatch({
-              type: EventType.SAMPLE_LOADED,
-              payload: { sample: sampleStub },
-            });
-          }
-        });
-    } else {
-      const sample = props.sampleOrIdOfTemplate as Sample;
-      dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: { sample: sample },
-      });
-    }
-  }, [api, props]);
+  const { persistModel, isSavingModel } = usePersistQuestionaryModel();
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -172,6 +123,12 @@ export function SampleDeclarationContainer(props: {
       next(action); // first update state/model
       const state = getState() as SampleSubmissionState;
       switch (action.type) {
+        case EventType.SAMPLE_UPDATED:
+          props.sampleUpdated(action.payload.sample);
+          break;
+        case EventType.SAMPLE_CREATED:
+          props.sampleCreated(action.payload.sample);
+          break;
         case EventType.BACK_CLICKED:
           if (!state.isDirty || (await handleReset())) {
             dispatch({ type: EventType.GO_STEP_BACK });
@@ -183,26 +140,37 @@ export function SampleDeclarationContainer(props: {
           break;
 
         case EventType.QUESTIONARY_STEPS_COMPLETE:
-          props.sampleEditDone(state.sample);
+          props.sampleEditDone();
           break;
       }
     };
   };
 
   const initialState: SampleSubmissionState = {
-    sample: createSampleStub(templateId, []),
-    templateId,
+    sample: props.sample,
+    templateId: props.sample.questionary.templateId,
     isDirty: false,
-    questionaryId: 0,
+    questionaryId: props.sample.questionary.questionaryId,
     stepIndex: 0,
-    steps: [],
+    steps: props.sample.questionary.steps,
   };
 
   const { state, dispatch } = QuestionarySubmissionModel<SampleSubmissionState>(
     initialState,
-    [handleEvents],
+    [handleEvents, persistModel],
     samplesReducer
   );
+
+  useEffect(() => {
+    dispatch({
+      type: EventType.SAMPLE_LOADED,
+      payload: { sample: props.sample },
+    });
+    dispatch({
+      type: EventType.QUESTIONARY_STEPS_LOADED,
+      payload: { questionarySteps: props.sample.questionary.steps },
+    });
+  }, []); // FIXME
 
   const getStepContent = () => {
     const curentStep = state.steps[state.stepIndex];
@@ -218,7 +186,11 @@ export function SampleDeclarationContainer(props: {
         <QuestionaryStepView
           topicId={curentStep.topic.id}
           state={state}
-          readonly={previousStep ? previousStep.isCompleted === false : false}
+          readonly={
+            isSavingModel ||
+            isExecutingCall ||
+            (previousStep ? previousStep.isCompleted === false : false)
+          }
           dispatch={dispatch}
           key={curentStep.topic.id}
         />
@@ -226,12 +198,13 @@ export function SampleDeclarationContainer(props: {
     );
   };
 
-  const progressBar = isExecutingCall ? <LinearProgress /> : null;
+  const progressBar =
+    isExecutingCall || isSavingModel ? <LinearProgress /> : null;
 
   return (
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <Typography>{'Untitled'}</Typography>
+      <Typography>{state.sample.title}</Typography>
       <Stepper
         nonLinear
         activeStep={state.stepIndex}

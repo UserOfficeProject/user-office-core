@@ -2,6 +2,7 @@ import TextField from '@material-ui/core/TextField';
 import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 import { Key } from 'ts-keycode-enum';
 
+import { SampleBasisConfig } from 'generated/sdk';
 import { EventType } from 'models/QuestionarySubmissionModel';
 
 import { BasicComponentProps } from '../IBasicComponentProps';
@@ -13,7 +14,7 @@ export function ProposalComponentSampleBasis(props: BasicComponentProps) {
 
   return (
     <TextField
-      label="Title"
+      label={(props.templateField.config as SampleBasisConfig).placeholder}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         setTitle(event.currentTarget.value);
       }}
@@ -27,7 +28,7 @@ export function ProposalComponentSampleBasis(props: BasicComponentProps) {
       }}
       onBlur={event => {
         props.dispatch({
-          type: EventType.SAMPLE_UPDATED,
+          type: EventType.SAMPLE_MODIFIED,
           payload: { sample: { title: title } },
         });
       }}

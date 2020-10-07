@@ -20,8 +20,12 @@ export enum EventType {
   GO_TO_STEP = 'GO_TO_STEP',
   QUESTIONARY_STEPS_LOADED = 'QUESTIONARY_STEPS_LOADED',
   QUESTIONARY_STEP_ANSWERED = 'QUESTIONARY_STEP_ANSWERED',
-  SAMPLE_UPDATED = 'SAMPLE_UPDATED',
+  SAMPLE_MODIFIED = 'SAMPLE_MODIFIED',
   SAMPLE_LOADED = 'SAMPLE_LOADED',
+  SAVE_AND_CONTINUE_CLICKED = 'SAVE_AND_CONTINUE_CLICKED',
+  SAVE_CLICKED = 'SAVE_CLICKED',
+  SAMPLE_CREATED = 'SAMPLE_CREATED',
+  SAMPLE_UPDATED = 'SAMPLE_UPDATED',
 }
 export interface Event {
   type: EventType;
@@ -109,6 +113,9 @@ export function QuestionarySubmissionModel<
 
         case EventType.QUESTIONARY_STEPS_LOADED:
           draftState.steps = action.payload.questionarySteps;
+          draftState.stepIndex = getInitialStepIndex(
+            action.payload.questionarySteps
+          );
           draftState.isDirty = false;
           break;
 

@@ -7,11 +7,9 @@ import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
-import { usePreSubmitFunctionQueue } from 'hooks/questionary/usePreSubmitFunctionQueue';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
-  prepareAnswers,
 } from 'models/QuestionaryFunctions';
 import {
   Event,
@@ -19,7 +17,6 @@ import {
   QuestionarySubmissionState,
 } from 'models/QuestionarySubmissionModel';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { createFormikConfigObjects } from './createFormikConfigObjects';
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
@@ -41,7 +38,6 @@ export default function QuestionaryStepView(props: {
   readonly: boolean;
 }) {
   const { state, topicId, dispatch } = props;
-  const { api } = useDataApiWithFeedback();
   const classes = useStyles();
 
   const questionaryStep = getStepByTopicId(state.steps, topicId) as
@@ -56,8 +52,6 @@ export default function QuestionaryStepView(props: {
         );
       })
     : [];
-
-  const presubmitFunctionQueue = usePreSubmitFunctionQueue(activeFields);
 
   if (state === null || !questionaryStep) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -125,28 +119,10 @@ export default function QuestionaryStepView(props: {
                 ? undefined
                 : {
                     callback: () => {
-                      if (!state.questionaryId) {
-                        throw new Error('questionaryId not set');
-                      }
-                      api('Saved')
-                        .answerTopic({
-                          questionaryId: state.questionaryId,
-                          answers: prepareAnswers(questionaryStep.fields),
-                          topicId: topicId,
-                          isPartialSave: true,
-                        })
-                        .then(result => {
-                          if (!result.answerTopic.error) {
-                            dispatch({
-                              type: EventType.QUESTIONARY_STEP_ANSWERED,
-                              payload: {
-                                questionaryStep:
-                                  result.answerTopic.questionaryStep,
-                                partially: true,
-                              },
-                            });
-                          }
-                        });
+                      dispatch({
+                        type: EventType.SAVE_CLICKED,
+                        payload: { answers: activeFields, topicId: topicId },
+                      });
                     },
                     disabled: !props.state.isDirty,
                   }
@@ -156,32 +132,9 @@ export default function QuestionaryStepView(props: {
                 submitFormAsync(submitForm, validateForm).then(
                   (isValid: boolean) => {
                     if (isValid) {
-                      Promise.all(
-                        presubmitFunctionQueue.map(f => f(state, dispatch))
-                      ).then(result => {
-                        if (!state.questionaryId) {
-                          throw new Error('questionaryId not set');
-                        }
-                        api('Saved')
-                          .answerTopic({
-                            questionaryId: state.questionaryId,
-                            answers: prepareAnswers(questionaryStep.fields),
-                            topicId: topicId,
-                            isPartialSave: false,
-                          })
-                          .then(result => {
-                            if (!result.answerTopic.error) {
-                              dispatch({
-                                type: EventType.QUESTIONARY_STEP_ANSWERED,
-                                payload: {
-                                  questionaryStep:
-                                    result.answerTopic.questionaryStep,
-                                  partially: false,
-                                },
-                              });
-                              dispatch({ type: EventType.GO_STEP_FORWARD });
-                            }
-                          });
+                      dispatch({
+                        type: EventType.SAVE_AND_CONTINUE_CLICKED,
+                        payload: { answers: activeFields, topicId: topicId },
                       });
                     }
                   }

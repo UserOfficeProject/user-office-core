@@ -57,4 +57,12 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on SampleBasisConfig {
+    placeholder
+
+    small_label
+    required
+    tooltip
+  }
 }

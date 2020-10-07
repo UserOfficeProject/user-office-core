@@ -13,22 +13,36 @@ export function useSampleBasisPreSubmit() {
     state: QuestionarySubmissionState,
     dispatch: React.Dispatch<Event>
   ) => {
-    const sampleState = state as SampleSubmissionState;
-    const title = sampleState.sample.title;
+    const sample = (state as SampleSubmissionState).sample;
+    const title = sample.title;
 
-    const result = await api().createSample({
-      title: title,
-      templateId: state.templateId,
-    });
-
-    if (result.createSample.sample) {
-      dispatch({
-        type: EventType.SAMPLE_LOADED,
-        payload: {
-          questionarySteps: result.createSample.sample?.questionary.steps,
-        },
+    if (sample.id > 0) {
+      const result = await api().updateSampleTitle({
+        title: title,
+        sampleId: sample.id,
       });
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (result.updateSampleTitle.sample) {
+        dispatch({
+          type: EventType.SAMPLE_UPDATED,
+          payload: {
+            sample: result.updateSampleTitle.sample,
+          },
+        });
+      }
+    } else {
+      const result = await api().createSample({
+        title: title,
+        templateId: state.templateId,
+      });
+
+      if (result.createSample.sample) {
+        dispatch({
+          type: EventType.SAMPLE_CREATED,
+          payload: {
+            sample: result.createSample.sample,
+          },
+        });
+      }
     }
   };
 }

@@ -3,13 +3,13 @@ import React from 'react';
 import ModalWrapper from 'components/common/ModalWrapper';
 import { DataType, Template, QuestionTemplateRelation } from 'generated/sdk';
 import { Event } from 'models/QuestionaryEditorModel';
-import JSDict from 'utils/Dictionary';
 
 import { QuestionTemplateRelationBooleanForm } from './questionRel/QuestionTemplateRelationBooleanForm';
 import { QuestionTemplateRelationDateForm } from './questionRel/QuestionTemplateRelationDateForm';
 import { QuestionTemplateRelationEmbellismentForm } from './questionRel/QuestionTemplateRelationEmbellismentForm';
 import { QuestionTemplateRelationFileUploadForm } from './questionRel/QuestionTemplateRelationFileUploadForm';
 import { QuestionTemplateRelationMultipleChoiceForm } from './questionRel/QuestionTemplateRelationMultipleChoiceForm';
+import { QuestionTemplateRelationSampleBasisForm } from './questionRel/QuestionTemplateRelationSampleBasisForm';
 import { QuestionTemplateRelationSubtemplateForm } from './questionRel/QuestionTemplateRelationSubtemplateForm';
 import { QuestionTemplateRelationTextInputForm } from './questionRel/QuestionTemplateRelationTextInputForm';
 import { TFormSignature } from './TFormSignature';
@@ -31,6 +31,7 @@ export default function QuestionTemplateRelationEditor(props: {
   );
   map.set(DataType.TEXT_INPUT, QuestionTemplateRelationTextInputForm);
   map.set(DataType.SUBTEMPLATE, QuestionTemplateRelationSubtemplateForm);
+  map.set(DataType.SAMPLE_BASIS, QuestionTemplateRelationSampleBasisForm);
 
   if (props.field === null) {
     return null;
