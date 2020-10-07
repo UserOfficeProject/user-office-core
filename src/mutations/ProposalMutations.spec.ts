@@ -119,7 +119,7 @@ test('A user officer can not reject a proposal that does not exist', () => {
   ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
 });
 
-test('A user officer can submit a proposal ', () => {
+test('A user officer can submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserOfficerWithRole, { proposalId: 1 })
   ).resolves.toHaveProperty('submitted', true);
@@ -131,13 +131,13 @@ test('A user officer can not submit a proposal that does not exist', () => {
   ).resolves.toHaveProperty('reason', 'INTERNAL_ERROR');
 });
 
-test('A user on the proposal can submit a proposal ', () => {
+test('A user on the proposal can submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserWithRole, { proposalId: 1 })
   ).resolves.toHaveProperty('submitted', true);
 });
 
-test('A user not on the proposal cannot submit a proposal ', () => {
+test('A user not on the proposal cannot submit a proposal', () => {
   return expect(
     proposalMutations.submit(dummyUserNotOnProposalWithRole, { proposalId: 1 })
   ).resolves.toHaveProperty('reason', 'NOT_ALLOWED');

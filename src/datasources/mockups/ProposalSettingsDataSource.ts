@@ -34,7 +34,7 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
     name: 'TEST_STATUS',
     description: 'Test status',
   },
-  2,
+  null,
   null,
   'PROPOSAL_SUBMITTED',
   'proposalWorkflowConnections_0',
@@ -120,8 +120,8 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowId: number
   ): Promise<ProposalWorkflowConnection[]> {
     return [
-      anotherDummyProposalWorkflowConnection,
       dummyProposalWorkflowConnection,
+      anotherDummyProposalWorkflowConnection,
     ];
   }
 

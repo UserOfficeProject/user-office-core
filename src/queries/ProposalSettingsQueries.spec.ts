@@ -69,7 +69,7 @@ describe('Test Proposal Workflows Queries', () => {
 
   test('A user can not get Proposal Workflow connections', () => {
     return expect(
-      ProposalSettingsQueriesInstance.getProposalWorkflowConnections(
+      ProposalSettingsQueriesInstance.proposalWorkflowConnectionGroups(
         dummyUserWithRole,
         1
       )
@@ -78,13 +78,19 @@ describe('Test Proposal Workflows Queries', () => {
 
   test('A userofficer can get Proposal Workflow connections', () => {
     return expect(
-      ProposalSettingsQueriesInstance.getProposalWorkflowConnections(
+      ProposalSettingsQueriesInstance.proposalWorkflowConnectionGroups(
         dummyUserOfficerWithRole,
         1
       )
     ).resolves.toStrictEqual([
-      anotherDummyProposalWorkflowConnection,
-      dummyProposalWorkflowConnection,
+      {
+        groupId: 'proposalWorkflowConnections_0',
+        parentGroupId: null,
+        connections: [
+          dummyProposalWorkflowConnection,
+          anotherDummyProposalWorkflowConnection,
+        ],
+      },
     ]);
   });
 });
