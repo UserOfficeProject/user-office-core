@@ -21,6 +21,12 @@ export class RabbitMQMessageBroker implements MessageBroker {
   private ch: Channel | null = null;
 
   constructor() {
+    // don't try to initialize during testing
+    // causes infinite loop
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     this.setup();
   }
 
