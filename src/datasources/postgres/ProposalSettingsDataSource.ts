@@ -230,14 +230,18 @@ export default class PostgresProposalSettingsDataSource
     droppableGroupId: string | undefined = undefined,
     byParentGroupId: boolean | undefined = false
   ): Promise<ProposalWorkflowConnection[]> {
-    const andConditionIfDroppableGroupIdDefined =
-      !byParentGroupId && droppableGroupId
-        ? `AND droppable_group_id = '${droppableGroupId}'`
-        : '';
+    const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
     const andConditionIfParentDroppableGroupIdDefined =
-      byParentGroupId && droppableGroupId
-        ? `AND parent_droppable_group_id = '${droppableGroupId}'`
+      byParentGroupId &&
+      !!droppableGroupId &&
+      `AND parent_droppable_group_id = '${droppableGroupId}'`;
+    const andWhereCondition =
+      !byParentGroupId && !!droppableGroupId
+        ? andConditionIfDroppableGroupIdDefined
+        : byParentGroupId && !!droppableGroupId
+        ? andConditionIfParentDroppableGroupIdDefined
         : '';
+
     const getUniqueOrderedProposalWorkflowConnectionsQuery = `
       SELECT * FROM (
         SELECT DISTINCT ON (pwc.proposal_status_id) *
@@ -247,8 +251,7 @@ export default class PostgresProposalSettingsDataSource
         ON
           ps.proposal_status_id = pwc.proposal_status_id
         WHERE proposal_workflow_id = ${proposalWorkflowId}
-        ${andConditionIfDroppableGroupIdDefined}
-        ${andConditionIfParentDroppableGroupIdDefined}
+        ${andWhereCondition}
       ) t
       ORDER BY
         droppable_group_id ASC,
