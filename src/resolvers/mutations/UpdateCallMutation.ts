@@ -96,7 +96,7 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => CallResponseWrap)
-  assignInstrumentToCall(
+  assignInstrumentsToCall(
     @Arg('assignInstrumentsToCallInput')
     assignInstrumentsToCallInput: AssignInstrumentsToCallInput,
     @Ctx() context: ResolverContext
@@ -141,7 +141,7 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => CallResponseWrap)
-  removeAssignedProposalWorkflowtFromCall(
+  removeAssignedProposalWorkflowFromCall(
     @Arg('removeAssignedProposalWorkflowFromCallInput')
     removeAssignedProposalWorkflowFromCallInput: AssignOrRemoveProposalWorkflowToCallInput,
     @Ctx() context: ResolverContext
