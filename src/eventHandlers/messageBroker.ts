@@ -1,8 +1,9 @@
+import { Queue, RabbitMQMessageBroker } from '@esss-swap/duo-message-broker';
+
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { Queue, RabbitMQMessageBroker } from '../messageBroker';
 import { ProposalEndStatus } from '../models/Proposal';
 
 export default function createHandler({
@@ -13,6 +14,12 @@ export default function createHandler({
   instrumentDataSource: InstrumentDataSource;
 }) {
   const rabbitMQ = new RabbitMQMessageBroker();
+
+  // don't try to initialize during testing
+  // causes infinite loop
+  if (process.env.NODE_ENV !== 'test') {
+    rabbitMQ.setup();
+  }
 
   return async function messageBrokerHandler(event: ApplicationEvent) {
     // if the original method failed
