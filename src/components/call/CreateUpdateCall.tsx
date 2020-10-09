@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createCallValidationSchema,
   updateCallValidationSchema,
@@ -13,14 +12,13 @@ import createStyles from '@material-ui/core/styles/createStyles';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Form, Formik, FormikErrors } from 'formik';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
 import { Call } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import CallCycleInfo from './CallCycleInfo';
 import CallGeneralInfo from './CallGeneralInfo';
@@ -58,10 +56,8 @@ type CreateUpdateCallProps = {
 
 const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   const [activeStep, setActiveStep] = React.useState(0);
-  const api = useDataApi();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
   const classes = useStyles();
-  const { enqueueSnackbar } = useSnackbar();
-  const [submitting, setSubmitting] = useState<boolean>(false);
   let isLastStep = false;
 
   const currentDayStart = new Date();
@@ -116,20 +112,12 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         templateId: '',
       };
 
-  const showNotificationAndClose = (
-    error: string | null | undefined,
-    callToReturn: Call
-  ) => {
+  const closeModal = (error: string | null | undefined, callToReturn: Call) => {
     if (error) {
-      enqueueSnackbar(getTranslation(error as ResourceId), {
-        variant: 'error',
-      });
       close(null);
     } else {
       close(callToReturn);
     }
-
-    setSubmitting(false);
   };
 
   if (activeStep + 1 === steps.length) {
@@ -185,28 +173,21 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
-          setSubmitting(true);
           const { templateId } = values;
           if (call) {
-            const data = await api().updateCall({
+            const data = await api('Call updated successfully!').updateCall({
               id: call.id,
               ...values,
               templateId: templateId ? +templateId : null,
             });
-            showNotificationAndClose(
-              data.updateCall.error,
-              data.updateCall.call as Call
-            );
+            closeModal(data.updateCall.error, data.updateCall.call as Call);
           } else {
-            const data = await api().createCall({
+            const data = await api('Call created successfully!').createCall({
               ...values,
               templateId: templateId ? +templateId : null,
             });
 
-            showNotificationAndClose(
-              data.createCall.error,
-              data.createCall.call as Call
-            );
+            closeModal(data.createCall.error, data.createCall.call as Call);
           }
 
           actions.setSubmitting(false);
@@ -236,9 +217,9 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
                 fullWidth
                 onClick={isLastStep ? () => null : handleNext}
                 className={classes.button}
-                disabled={submitting}
+                disabled={isExecutingCall}
               >
-                {submitting && <UOLoader size={14} />}
+                {isExecutingCall && <UOLoader size={14} />}
                 {isLastStep ? (call ? 'Update Call' : 'Add Call') : 'Next'}
               </Button>
             </ActionButtonContainer>

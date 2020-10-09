@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import MaterialTable, { Column } from 'material-table';
@@ -7,8 +6,8 @@ import PropTypes from 'prop-types';
 import React, { useState, ChangeEvent } from 'react';
 
 import { Call, InstrumentWithAvailabilityTime } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -41,7 +40,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   setInstrumentAvailabilityTime,
 }) => {
   const classes = useStyles();
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
 
   const availabilityTimeInput = ({
@@ -89,21 +88,14 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ]);
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api().removeAssignedInstrumentFromCall({
+    const result = await api(
+      'Assigned instrument removed successfully!'
+    ).removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
 
-    if (result.removeAssignedInstrumentFromCall.error) {
-      enqueueSnackbar(
-        getTranslation(
-          result.removeAssignedInstrumentFromCall.error as ResourceId
-        ),
-        {
-          variant: 'error',
-        }
-      );
-    } else {
+    if (!result.removeAssignedInstrumentFromCall.error) {
       const dataUpdate = call.instruments.filter(
         instrumentItem => instrumentItem.id !== instrumentId
       );
@@ -115,22 +107,15 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
     oldData: InstrumentWithAvailabilityTime,
     newData: InstrumentWithAvailabilityTime
   ) => {
-    const result = await api().setInstrumentAvailabilityTime({
+    const result = await api(
+      'Availability time set successfully!'
+    ).setInstrumentAvailabilityTime({
       callId: call.id,
       instrumentId: newData.id,
       availabilityTime: +(newData.availabilityTime as number),
     });
 
-    if (result.setInstrumentAvailabilityTime.error) {
-      enqueueSnackbar(
-        getTranslation(
-          result.setInstrumentAvailabilityTime.error as ResourceId
-        ),
-        {
-          variant: 'error',
-        }
-      );
-    } else {
+    if (!result.setInstrumentAvailabilityTime.error) {
       const dataUpdate = [...call.instruments];
       const index = dataUpdate.indexOf(oldData);
       dataUpdate[index] = newData;
@@ -163,7 +148,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
                 );
                 resolve();
               } else {
-                enqueueSnackbar('Time available must be positive number', {
+                enqueueSnackbar('Availability time must be positive number', {
                   variant: 'error',
                 });
                 reject();

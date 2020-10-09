@@ -13,10 +13,6 @@ context('Calls tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
 
@@ -79,7 +75,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains(shortCode);
   });
@@ -136,7 +132,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains(shortCode);
   });
@@ -155,7 +151,7 @@ context('Calls tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains('Calls').click();
 
@@ -163,14 +159,13 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
-    cy.get('[type="checkbox"]')
-      .eq(1)
+    cy.get('tbody [type="checkbox"]')
+      .first()
       .check();
 
     cy.contains('Assign instrument').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[title="Show Instruments"]')
       .first()
@@ -202,9 +197,7 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
-
-    cy.contains('Time available must be positive number');
+    cy.notification({ variant: 'error', text: 'must be positive number' });
   });
 
   it('A user-officer should be able to set availability time on instrument per call', () => {
@@ -226,7 +219,7 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
@@ -251,7 +244,7 @@ context('Calls tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
