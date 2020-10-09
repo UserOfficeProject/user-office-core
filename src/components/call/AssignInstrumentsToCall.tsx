@@ -50,17 +50,17 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const assignInstrumentToCallResult = await api().assignInstrumentToCall({
+    const assignInstrumentToCallResult = await api().assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
         instrumentToAssign => instrumentToAssign.id
       ),
     });
 
-    if (assignInstrumentToCallResult.assignInstrumentToCall.error) {
+    if (assignInstrumentToCallResult.assignInstrumentsToCall.error) {
       enqueueSnackbar(
         getTranslation(
-          assignInstrumentToCallResult.assignInstrumentToCall
+          assignInstrumentToCallResult.assignInstrumentsToCall
             .error as ResourceId
         ),
         {

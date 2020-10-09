@@ -1,0 +1,16 @@
+mutation removeAssignedProposalWorkflowFromCall(
+  $proposalWorkflowId: Int!
+  $callId: Int!
+) {
+  removeAssignedProposalWorkflowFromCall(
+    removeAssignedProposalWorkflowFromCallInput: {
+      proposalWorkflowId: $proposalWorkflowId
+      callId: $callId
+    }
+  ) {
+    error
+    call {
+      id
+    }
+  }
+}

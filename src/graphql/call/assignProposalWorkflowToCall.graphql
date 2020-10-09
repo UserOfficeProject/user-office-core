@@ -1,0 +1,16 @@
+mutation assignProposalWorkflowToCall(
+  $proposalWorkflowId: Int!
+  $callId: Int!
+) {
+  assignProposalWorkflowToCall(
+    assignProposalWorkflowToCallInput: {
+      proposalWorkflowId: $proposalWorkflowId
+      callId: $callId
+    }
+  ) {
+    error
+    call {
+      id
+    }
+  }
+}

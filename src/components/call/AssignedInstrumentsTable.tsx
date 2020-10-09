@@ -89,15 +89,15 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
   ]);
 
   const removeAssignedInstrument = async (instrumentId: number) => {
-    const result = await api().removeAssignedInstrumentFromcall({
+    const result = await api().removeAssignedInstrumentFromCall({
       callId: call.id,
       instrumentId,
     });
 
-    if (result.removeAssignedInstrumentFromcall.error) {
+    if (result.removeAssignedInstrumentFromCall.error) {
       enqueueSnackbar(
         getTranslation(
-          result.removeAssignedInstrumentFromcall.error as ResourceId
+          result.removeAssignedInstrumentFromCall.error as ResourceId
         ),
         {
           variant: 'error',
