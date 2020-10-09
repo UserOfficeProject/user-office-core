@@ -2,9 +2,9 @@
 import { Call } from '../../models/Call';
 import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
 import {
-  UpdateCallArgs,
-  AssignInstrumentToCallArgs,
-  RemoveAssignedInstrumentFromCallArgs,
+  UpdateCallInput,
+  AssignInstrumentsToCallInput,
+  RemoveAssignedInstrumentFromCallInput,
   AssignOrRemoveProposalWorkflowToCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
@@ -75,7 +75,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       });
   }
 
-  async update(args: UpdateCallArgs): Promise<Call> {
+  async update(args: UpdateCallInput): Promise<Call> {
     return database
       .update(
         {
@@ -105,8 +105,8 @@ export default class PostgresCallDataSource implements CallDataSource {
       });
   }
 
-  async assignInstrumentToCall(
-    args: AssignInstrumentToCallArgs
+  async assignInstrumentsToCall(
+    args: AssignInstrumentsToCallInput
   ): Promise<Call> {
     const valuesToInsert = args.instrumentIds.map(instrumentId => ({
       instrument_id: instrumentId,
@@ -125,7 +125,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async removeAssignedInstrumentFromCall(
-    args: RemoveAssignedInstrumentFromCallArgs
+    args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call> {
     await database('call_has_instruments')
       .del()

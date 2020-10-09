@@ -110,7 +110,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user can not assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserWithRole, {
         callId: 1,
         instrumentIds: [1],
       })
@@ -119,7 +119,7 @@ describe('Test Call Mutations', () => {
 
   test('A logged in user officer can assign instrument to a call', () => {
     return expect(
-      callMutations.assignInstrumentToCall(dummyUserOfficerWithRole, {
+      callMutations.assignInstrumentsToCall(dummyUserOfficerWithRole, {
         callId: 1,
         instrumentIds: [1],
       })
@@ -141,6 +141,45 @@ describe('Test Call Mutations', () => {
         callId: 1,
         instrumentId: 1,
       })
+    ).resolves.toBe(dummyCall);
+  });
+
+  test('A logged in user can not assign proposal workflow to a call', () => {
+    return expect(
+      callMutations.assignProposalWorkflowToCall(dummyUserWithRole, {
+        callId: 1,
+        proposalWorkflowId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A logged in user officer can assign proposal workflow to a call', () => {
+    return expect(
+      callMutations.assignProposalWorkflowToCall(dummyUserOfficerWithRole, {
+        callId: 1,
+        proposalWorkflowId: 1,
+      })
+    ).resolves.toBe(dummyCall);
+  });
+
+  test('A logged in user can not remove assigned proposal workflow from a call', () => {
+    return expect(
+      callMutations.removeAssignedProposalWorkflowFromCall(dummyUserWithRole, {
+        callId: 1,
+        proposalWorkflowId: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A logged in user officer can remove assigned proposal workflow from a call', () => {
+    return expect(
+      callMutations.removeAssignedProposalWorkflowFromCall(
+        dummyUserOfficerWithRole,
+        {
+          callId: 1,
+          proposalWorkflowId: 1,
+        }
+      )
     ).resolves.toBe(dummyCall);
   });
 });
