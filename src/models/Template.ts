@@ -19,6 +19,7 @@ export enum DataType {
   TEXT_INPUT = 'TEXT_INPUT',
   SUBTEMPLATE = 'SUBTEMPLATE',
   SAMPLE_BASIS = 'SAMPLE_BASIS',
+  PROPOSAL_BASIS = 'PROPOSAL_BASIS',
 }
 
 export class Topic {

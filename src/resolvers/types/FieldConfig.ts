@@ -90,6 +90,9 @@ export class SubtemplateConfig extends ConfigBase {
   addEntryButtonLabel: string;
 }
 
+@ObjectType()
+export class ProposalBasisConfig extends ConfigBase {}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -101,5 +104,6 @@ export const FieldConfigType = createUnionType({
     TextInputConfig,
     SampleBasisConfig,
     SubtemplateConfig,
+    ProposalBasisConfig,
   ], // function that returns array of object types classes
 });

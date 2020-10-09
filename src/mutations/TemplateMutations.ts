@@ -61,30 +61,43 @@ export default class TemplateMutations {
       .createTemplate(args)
       .then(result => result);
 
+    switch (args.categoryId) {
+      case TemplateCategoryId.PROPOSAL_QUESTIONARY:
+        await this.createFirstTopic(newTemplate.templateId, 'proposal_basis');
+        break;
+      case TemplateCategoryId.SAMPLE_DECLARATION:
+        await this.createFirstTopic(newTemplate.templateId, 'sample_basis');
+        break;
+    }
+    return newTemplate;
+  }
+
+  /** cretes first topic, so that template is not empty to begin with */
+  private async createFirstTopic(templateId: number, firstQuestionId?: string) {
     const newTopic = await this.dataSource.createTopic({
       sortOrder: 0,
-      templateId: newTemplate.templateId,
-    }); // Create first topic automatically
+      templateId: templateId,
+    });
 
-    if (args.categoryId === TemplateCategoryId.SAMPLE_DECLARATION) {
-      const SAMPLE_BASIS_QUESTION_ID = 'sample_basis';
+    if (firstQuestionId) {
       const sampleBasisQuestion = await this.dataSource.getQuestion(
-        SAMPLE_BASIS_QUESTION_ID
+        firstQuestionId
       );
       if (!sampleBasisQuestion) {
-        logger.logError('Missing sample_basis question from the database', {});
+        logger.logError(
+          'Missing question with firstQuestionId from the database',
+          { firstQuestionId }
+        );
 
         return rejection('INTERNAL_ERROR');
       }
       await this.dataSource.createQuestionTemplateRelation({
-        questionId: SAMPLE_BASIS_QUESTION_ID,
+        questionId: firstQuestionId,
         sortOrder: 0,
         topicId: newTopic.id,
         templateId: newTopic.templateId,
       });
     }
-
-    return newTemplate;
   }
 
   @ValidateArgs(cloneTemplateValidationSchema)

@@ -21,6 +21,25 @@ BEGIN
             2
         );
 
+    INSERT INTO questions(
+            question_id,
+            data_type,
+            question,
+            default_config,
+            natural_key,
+            category_id
+        )
+    VALUES(
+            'proposal_basis',
+            'PROPOSAL_BASIS',
+            'Proposal basic information',
+            '{"required":false,"small_label":"","tooltip":""}',
+            'proposal_basis',
+            2
+        );
+
+        
+
     END;
 	END IF;
 END;

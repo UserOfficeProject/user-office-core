@@ -6,11 +6,13 @@ import {
   EmbellishmentConfig,
   FieldConfigType,
   FileUploadConfig,
+  ProposalBasisConfig,
   SampleBasisConfig,
   SelectionFromOptionsConfig,
   SubtemplateConfig,
   TextInputConfig,
 } from '../resolvers/types/FieldConfig';
+import { logger } from '../utils/Logger';
 import { ConditionEvaluator } from './ConditionEvaluator';
 import { Answer, QuestionaryStep } from './Questionary';
 import {
@@ -237,6 +239,7 @@ f.set(DataType.SELECTION_FROM_OPTIONS, () => new SelectionFromOptionsConfig());
 f.set(DataType.TEXT_INPUT, () => new TextInputConfig());
 f.set(DataType.SUBTEMPLATE, () => new SubtemplateConfig());
 f.set(DataType.SAMPLE_BASIS, () => new SampleBasisConfig());
+f.set(DataType.PROPOSAL_BASIS, () => new ProposalBasisConfig());
 
 export function createConfig<T extends typeof FieldConfigType>(
   config: T,
@@ -251,7 +254,10 @@ export function createConfig<T extends typeof FieldConfigType>(
 
 export function createConfigByType(dataType: DataType, init: object | string) {
   const configCreator = f.get(dataType)!;
-
+  if (!configCreator) {
+    logger.logError('ConfigCreator not implemented', { dataType });
+    throw new Error('ConfigCreator not implemented');
+  }
   return createConfig(configCreator(), init);
 }
 
