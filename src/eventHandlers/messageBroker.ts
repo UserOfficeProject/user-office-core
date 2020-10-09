@@ -13,6 +13,12 @@ export default function createHandler({
   reviewDataSource: ReviewDataSource;
   instrumentDataSource: InstrumentDataSource;
 }) {
+  if (process.env.UO_FEATURE_DISABLE_MESSAGE_BROKER === '1') {
+    return async () => {
+      // no op
+    };
+  }
+
   const rabbitMQ = new RabbitMQMessageBroker();
 
   // don't try to initialize during testing
