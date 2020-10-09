@@ -4,6 +4,7 @@ import {
   UpdateCallArgs,
   AssignInstrumentToCallArgs,
   RemoveAssignedInstrumentFromCallArgs,
+  AssignOrRemoveProposalWorkflowToCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -55,6 +56,18 @@ export class CallDataSourceMock implements CallDataSource {
 
   async removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallArgs
+  ) {
+    return dummyCall;
+  }
+
+  async assignProposalWorkflowToCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ) {
+    return dummyCall;
+  }
+
+  async removeAssignedProposalWorkflowFromCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
   ) {
     return dummyCall;
   }

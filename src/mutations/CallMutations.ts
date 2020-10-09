@@ -16,6 +16,7 @@ import {
   UpdateCallArgs,
   AssignInstrumentToCallArgs,
   RemoveAssignedInstrumentFromCallArgs,
+  AssignOrRemoveProposalWorkflowToCallInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { logger } from '../utils/Logger';
 
@@ -91,6 +92,52 @@ export default class CallMutations {
       .catch(error => {
         logger.logException(
           'Could not remove assigned instrument from call',
+          error,
+          {
+            agent,
+            args,
+          }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async assignProposalWorkflowToCall(
+    agent: UserWithRole | null,
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource
+      .assignProposalWorkflowToCall(args)
+      .then(result => result)
+      .catch(error => {
+        logger.logException(
+          'Could not assign proposal workflow to call',
+          error,
+          {
+            agent,
+            args,
+          }
+        );
+
+        return rejection('INTERNAL_ERROR');
+      });
+  }
+
+  // @ValidateArgs(removeAssignedInstrumentFromCallValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async removeAssignedProposalWorkflowFromCall(
+    agent: UserWithRole | null,
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource
+      .removeAssignedProposalWorkflowFromCall(args)
+      .then(result => result)
+      .catch(error => {
+        logger.logException(
+          'Could not remove assigned proposal workflow from call',
           error,
           {
             agent,

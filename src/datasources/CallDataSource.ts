@@ -4,6 +4,7 @@ import {
   UpdateCallArgs,
   AssignInstrumentToCallArgs,
   RemoveAssignedInstrumentFromCallArgs,
+  AssignOrRemoveProposalWorkflowToCallInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
@@ -17,5 +18,11 @@ export interface CallDataSource {
   assignInstrumentToCall(args: AssignInstrumentToCallArgs): Promise<Call>;
   removeAssignedInstrumentFromCall(
     args: RemoveAssignedInstrumentFromCallArgs
+  ): Promise<Call>;
+  assignProposalWorkflowToCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ): Promise<Call>;
+  removeAssignedProposalWorkflowFromCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
   ): Promise<Call>;
 }

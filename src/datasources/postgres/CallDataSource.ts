@@ -5,6 +5,7 @@ import {
   UpdateCallArgs,
   AssignInstrumentToCallArgs,
   RemoveAssignedInstrumentFromCallArgs,
+  AssignOrRemoveProposalWorkflowToCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -129,6 +130,42 @@ export default class PostgresCallDataSource implements CallDataSource {
     await database('call_has_instruments')
       .del()
       .where('instrument_id', args.instrumentId)
+      .andWhere('call_id', args.callId);
+
+    const callUpdated = await this.get(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new Error(`Call not found ${args.callId}`);
+  }
+
+  async assignProposalWorkflowToCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ): Promise<Call> {
+    await database
+      .insert({
+        proposal_workflow_id: args.proposalWorkflowId,
+        call_id: args.callId,
+      })
+      .into('proposal_workflow_has_calls');
+
+    const callUpdated = await this.get(args.callId);
+
+    if (callUpdated) {
+      return callUpdated;
+    }
+
+    throw new Error(`Call not found ${args.callId}`);
+  }
+
+  async removeAssignedProposalWorkflowFromCall(
+    args: AssignOrRemoveProposalWorkflowToCallInput
+  ): Promise<Call> {
+    await database('proposal_workflow_has_calls')
+      .del()
+      .where('proposal_workflow_id', args.proposalWorkflowId)
       .andWhere('call_id', args.callId);
 
     const callUpdated = await this.get(args.callId);

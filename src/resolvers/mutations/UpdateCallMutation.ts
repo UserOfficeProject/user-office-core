@@ -6,6 +6,8 @@ import {
   Mutation,
   Resolver,
   Int,
+  InputType,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -63,6 +65,15 @@ export class AssignInstrumentToCallArgs {
   callId: number;
 }
 
+@InputType()
+export class AssignOrRemoveProposalWorkflowToCallInput {
+  @Field(() => Int)
+  proposalWorkflowId: number;
+
+  @Field(() => Int)
+  callId: number;
+}
+
 @ArgsType()
 export class RemoveAssignedInstrumentFromCallArgs {
   @Field(() => Int)
@@ -94,7 +105,7 @@ export class UpdateCallMutation {
   }
 
   @Mutation(() => CallResponseWrap)
-  removeAssignedInstrumentFromcall(
+  removeAssignedInstrumentFromCall(
     @Args() args: RemoveAssignedInstrumentFromCallArgs,
     @Ctx() context: ResolverContext
   ) {
@@ -102,6 +113,36 @@ export class UpdateCallMutation {
       context.mutations.call.removeAssignedInstrumentFromCall(
         context.user,
         args
+      ),
+      CallResponseWrap
+    );
+  }
+
+  @Mutation(() => CallResponseWrap)
+  assignProposalWorkflowToCall(
+    @Arg('assignProposalWorkflowToCallInput')
+    assignProposalWorkflowToCallInput: AssignOrRemoveProposalWorkflowToCallInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.call.assignProposalWorkflowToCall(
+        context.user,
+        assignProposalWorkflowToCallInput
+      ),
+      CallResponseWrap
+    );
+  }
+
+  @Mutation(() => CallResponseWrap)
+  removeAssignedProposalWorkflowtFromCall(
+    @Arg('removeAssignedProposalWorkflowFromCallInput')
+    removeAssignedProposalWorkflowFromCallInput: AssignOrRemoveProposalWorkflowToCallInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return wrapResponse(
+      context.mutations.call.removeAssignedProposalWorkflowFromCall(
+        context.user,
+        removeAssignedProposalWorkflowFromCallInput
       ),
       CallResponseWrap
     );
