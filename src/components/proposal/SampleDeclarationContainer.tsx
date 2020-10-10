@@ -25,7 +25,7 @@ import QuestionaryStepView from './QuestionaryStepView';
 
 const useStyles = makeStyles(theme => ({
   stepper: {
-    padding: theme.spacing(3, 0, 5),
+    padding: theme.spacing(3, 0, 1),
   },
   heading: {
     textOverflow: 'ellipsis',
@@ -39,6 +39,9 @@ const useStyles = makeStyles(theme => ({
   infoline: {
     color: theme.palette.grey[600],
     textAlign: 'right',
+  },
+  title: {
+    marginTop: theme.spacing(1),
   },
 }));
 
@@ -172,39 +175,12 @@ export function SampleDeclarationContainer(props: {
     });
   }, []); // FIXME
 
-  const getStepContent = () => {
-    const currentStep = state.steps[state.stepIndex];
-    const previousStep =
-      state.stepIndex !== 0 ? state.steps[state.stepIndex - 1] : undefined;
-
-    if (!currentStep) {
+  const getStepperNavig = () => {
+    if (state.steps.length <= 1) {
       return null;
     }
 
     return (
-      <SampleContext.Provider value={state}>
-        <QuestionaryStepView
-          topicId={currentStep.topic.id}
-          state={state}
-          readonly={
-            isSavingModel ||
-            isApiInteracting ||
-            (previousStep ? previousStep.isCompleted === false : false)
-          }
-          dispatch={dispatch}
-          key={currentStep.topic.id}
-        />
-      </SampleContext.Provider>
-    );
-  };
-
-  const progressBar =
-    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
-
-  return (
-    <Container maxWidth="lg">
-      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <Typography>{state.sample.title}</Typography>
       <Stepper
         nonLinear
         activeStep={state.stepIndex}
@@ -233,7 +209,46 @@ export function SampleDeclarationContainer(props: {
           </Step>
         ))}
       </Stepper>
-      {progressBar}
+    );
+  };
+
+  const getStepContent = () => {
+    const currentStep = state.steps[state.stepIndex];
+    const previousStep =
+      state.stepIndex !== 0 ? state.steps[state.stepIndex - 1] : undefined;
+
+    if (!currentStep) {
+      return null;
+    }
+
+    return (
+      <SampleContext.Provider value={state}>
+        <QuestionaryStepView
+          topicId={currentStep.topic.id}
+          state={state}
+          readonly={
+            isSavingModel ||
+            isApiInteracting ||
+            (previousStep ? previousStep.isCompleted === false : false)
+          }
+          dispatch={dispatch}
+          key={currentStep.topic.id}
+        />
+      </SampleContext.Provider>
+    );
+  };
+
+  const getProgressBar = () =>
+    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
+
+  return (
+    <Container maxWidth="lg">
+      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
+      <Typography variant="h5" className={classes.title}>
+        {state.sample.title || 'Untited'}
+      </Typography>
+      {getStepperNavig()}
+      {getProgressBar()}
       {getStepContent()}
     </Container>
   );
