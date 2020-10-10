@@ -9,6 +9,7 @@ import { default as React, useEffect, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
+import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
 import { Answer, Questionary, UserRole } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import {
@@ -27,7 +28,6 @@ import { SubmissionContext } from '../../utils/SubmissionContext';
 import ProposalInformationView from './ProposalInformationView';
 import ProposalQuestionaryStepView from './ProposalQuestionaryStepView';
 import ProposalReview from './ProposalSummary';
-import { QuestionaryStepButton } from './QuestionaryStepButton';
 
 export interface Notification {
   variant: 'error' | 'success';

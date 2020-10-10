@@ -5,10 +5,10 @@ import { Key } from 'ts-keycode-enum';
 import { SampleBasisConfig } from 'generated/sdk';
 import { EventType } from 'models/QuestionarySubmissionModel';
 
-import { BasicComponentProps } from '../IBasicComponentProps';
-import { SampleContext } from '../SampleDeclarationContainer';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
+import { SampleContext } from './SampleDeclarationContainer';
 
-export function ProposalComponentSampleBasis(props: BasicComponentProps) {
+export function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   const sampleContext = useContext(SampleContext);
   const [title, setTitle] = useState(sampleContext?.sample.title || '');
 

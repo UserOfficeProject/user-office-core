@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
+import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
 import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
 import {
@@ -18,7 +19,6 @@ import {
 } from 'models/QuestionarySubmissionModel';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
-import { createFormikConfigObjects } from './createFormikConfigObjects';
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 const useStyles = makeStyles({

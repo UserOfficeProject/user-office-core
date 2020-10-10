@@ -2,6 +2,7 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
+import QuestionaryNavigationFragment from 'components/questionary/QuestionaryNavigationFragment';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
@@ -12,7 +13,6 @@ import {
 import withConfirm from 'utils/withConfirm';
 
 import { SubmissionContext } from '../../utils/SubmissionContext';
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
   const { dispatch } = useContext(SubmissionContext)!;

@@ -12,10 +12,10 @@ import {
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { BasicComponentProps } from '../IBasicComponentProps';
-import ProposalErrorLabel from '../ProposalErrorLabel';
-import { SampleDeclarationContainer } from '../SampleDeclarationContainer';
+import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
+import ProposalErrorLabel from '../../proposal/ProposalErrorLabel';
 import { QuestionariesList, QuestionariesListRow } from './QuestionariesList';
+import { SampleDeclarationContainer } from './SampleDeclarationContainer';
 
 const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
   return { id: sample.id, label: sample.title };
@@ -42,7 +42,7 @@ const createSampleStub = (
   };
 };
 
-export default function ProposalComponentSampleDeclaration(
+export default function QuestionaryComponentSampleDeclaration(
   props: BasicComponentProps
 ) {
   const { templateField, errors, onComplete } = props;

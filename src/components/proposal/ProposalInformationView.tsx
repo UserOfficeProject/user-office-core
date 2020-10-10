@@ -6,6 +6,7 @@ import { Form, Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import TextFieldWithCounter from 'components/common/TextFieldWithCounter';
+import QuestionaryNavigationFragment from 'components/questionary/QuestionaryNavigationFragment';
 import { UserContext } from 'context/UserContextProvider';
 import { UserRole } from 'generated/sdk';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
@@ -15,7 +16,6 @@ import { BasicUserDetails } from 'models/User';
 import { SubmissionContext } from '../../utils/SubmissionContext';
 import ProposalParticipant from './ProposalParticipant';
 import ProposalParticipants from './ProposalParticipants';
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 export default function ProposalInformationView(props: {
   data: ProposalSubsetSumbission;

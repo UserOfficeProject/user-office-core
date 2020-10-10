@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import UOLoader from 'components/common/UOLoader';
 import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
+import QuestionaryNavigationFragment from 'components/questionary/QuestionaryNavigationFragment';
 import { Questionary, QuestionaryStep } from 'generated/sdk';
 import { EventType } from 'models/ProposalSubmissionModel';
 import {
@@ -16,7 +17,6 @@ import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
 import { SubmissionContext } from '../../utils/SubmissionContext';
 import { createFormikConfigObjects } from './createFormikConfigObjects';
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
 
 interface QuestionaryState {
   questionary: Questionary;

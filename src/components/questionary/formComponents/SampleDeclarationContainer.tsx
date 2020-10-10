@@ -8,6 +8,8 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { default as React, useEffect } from 'react';
 import { Prompt } from 'react-router';
 
+import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
+import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
 import { Sample } from 'generated/sdk';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import {
@@ -19,9 +21,6 @@ import {
 import { SampleSubmissionState } from 'models/SampleSubmissionModel';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
-
-import { QuestionaryStepButton } from './QuestionaryStepButton';
-import QuestionaryStepView from './QuestionaryStepView';
 
 const useStyles = makeStyles(theme => ({
   stepper: {

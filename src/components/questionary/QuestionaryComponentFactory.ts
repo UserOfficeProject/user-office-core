@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { ProposalComponentBoolean } from 'components/proposal/formComponents/ProposalComponentBoolean';
-import { ProposalComponentDatePicker } from 'components/proposal/formComponents/ProposalComponentDatePicker';
-import { ProposalComponentEmbellishment } from 'components/proposal/formComponents/ProposalComponentEmbellishment';
-import { ProposalComponentFileUpload } from 'components/proposal/formComponents/ProposalComponentFileUpload';
-import { ProposalComponentMultipleChoice } from 'components/proposal/formComponents/ProposalComponentMultipleChoice';
-import { ProposalComponentSampleBasis } from 'components/proposal/formComponents/ProposalComponentSampleBasis';
-import ProposalComponentSampleDeclaration from 'components/proposal/formComponents/ProposalComponentSampleDeclaration';
-import { ProposalComponentTextInput } from 'components/proposal/formComponents/ProposalComponentTextInput';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import { QuestionaryComponentBoolean } from 'components/questionary/formComponents/QuestionaryComponentBoolean';
+import { QuestionaryComponentDatePicker } from 'components/questionary/formComponents/QuestionaryComponentDatePicker';
+import { QuestionaryComponentEmbellishment } from 'components/questionary/formComponents/QuestionaryComponentEmbellishment';
+import { QuestionaryComponentFileUpload } from 'components/questionary/formComponents/QuestionaryComponentFileUpload';
+import { QuestionaryComponentMultipleChoice } from 'components/questionary/formComponents/QuestionaryComponentMultipleChoice';
+import { QuestionaryComponentSampleBasis } from 'components/questionary/formComponents/QuestionaryComponentSampleBasis';
+import QuestionaryComponentSampleDeclaration from 'components/questionary/formComponents/QuestionaryComponentSampleDeclaration';
+import { QuestionaryComponentTextInput } from 'components/questionary/formComponents/QuestionaryComponentTextInput';
 import {
   Answer,
   DataType,
@@ -19,24 +19,24 @@ import {
 function getComponentElement(answer: Answer) {
   switch (answer.question.dataType) {
     case DataType.TEXT_INPUT:
-      return ProposalComponentTextInput;
+      return QuestionaryComponentTextInput;
     case DataType.BOOLEAN:
-      return ProposalComponentBoolean;
+      return QuestionaryComponentBoolean;
     case DataType.DATE:
-      return ProposalComponentDatePicker;
+      return QuestionaryComponentDatePicker;
     case DataType.FILE_UPLOAD:
-      return ProposalComponentFileUpload;
+      return QuestionaryComponentFileUpload;
     case DataType.SELECTION_FROM_OPTIONS:
-      return ProposalComponentMultipleChoice;
+      return QuestionaryComponentMultipleChoice;
     case DataType.EMBELLISHMENT:
-      return ProposalComponentEmbellishment;
+      return QuestionaryComponentEmbellishment;
     case DataType.SAMPLE_BASIS:
-      return ProposalComponentSampleBasis;
+      return QuestionaryComponentSampleBasis;
     case DataType.SUBTEMPLATE:
       const config = answer.config as SubtemplateConfig;
       switch (config.templateCategory) {
         case TemplateCategoryId.SAMPLE_DECLARATION:
-          return ProposalComponentSampleDeclaration;
+          return QuestionaryComponentSampleDeclaration;
         default:
           throw new Error(
             `Unkown datatype for factory subcomponent ${config.templateCategory}`
