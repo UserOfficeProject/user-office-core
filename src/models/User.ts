@@ -1,5 +1,21 @@
 import 'reflect-metadata';
 import { Role } from './Role';
+
+export type AuthJwtPayload = { user: User; roles: Role[]; currentRole: Role };
+
+type SpecialActionJwtPayload = {
+  id: number;
+  updated: string;
+};
+
+export type PasswordResetJwtPayload = SpecialActionJwtPayload & {
+  type: 'passwordReset';
+};
+
+export type EmailVerificationJwtPayload = SpecialActionJwtPayload & {
+  type: 'emailVerification';
+};
+
 export class User {
   constructor(
     public id: number,

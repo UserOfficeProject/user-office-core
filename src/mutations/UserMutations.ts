@@ -11,16 +11,21 @@ import {
   updatePasswordValidationSchema,
   userPasswordFieldBEValidationSchema,
 } from '@esss-swap/duo-validation';
-import { to } from 'await-to-js';
 import * as bcrypt from 'bcryptjs';
-import jsonwebtoken from 'jsonwebtoken';
 
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, Authorized, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailInviteResponse } from '../models/EmailInviteResponse';
 import { Roles, Role } from '../models/Role';
-import { User, BasicUserDetails, UserWithRole } from '../models/User';
+import {
+  User,
+  BasicUserDetails,
+  UserWithRole,
+  EmailVerificationJwtPayload,
+  AuthJwtPayload,
+  PasswordResetJwtPayload,
+} from '../models/User';
 import { UserRole } from '../models/User';
 import { UserLinkResponse } from '../models/UserLinkResponse';
 import { isRejection, rejection, Rejection } from '../rejection';
@@ -31,6 +36,7 @@ import {
   UpdateUserArgs,
   UpdateUserRolesArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
+import { signToken, verifyToken } from '../utils/jwt';
 import { logger } from '../utils/Logger';
 import { UserAuthorization } from '../utils/UserAuthorization';
 
@@ -39,8 +45,6 @@ export default class UserMutations {
     private dataSource: UserDataSource,
     private userAuth: UserAuthorization
   ) {}
-
-  private secret = process.env.secret as string;
 
   createHash(password: string): string {
     //Check that password follows rules
@@ -214,13 +218,12 @@ export default class UserMutations {
       return rejection('INTERNAL_ERROR');
     }
 
-    const token = jsonwebtoken.sign(
+    const token = signToken<EmailVerificationJwtPayload>(
       {
         id: user.id,
         type: 'emailVerification',
         updated: user.updated,
       },
-      this.secret,
       { expiresIn: '24h' }
     );
 
@@ -315,13 +318,12 @@ export default class UserMutations {
     if (!user.emailVerified) {
       return rejection('EMAIL_NOT_VERIFIED');
     }
-    const token = jsonwebtoken.sign(
-      { user, roles, currentRole: roles[0] },
-      this.secret,
-      {
-        expiresIn: process.env.tokenLife,
-      }
-    );
+
+    const token = signToken<AuthJwtPayload>({
+      user,
+      roles,
+      currentRole: roles[0],
+    });
 
     return token;
   }
@@ -339,8 +341,10 @@ export default class UserMutations {
     }
 
     const roles = await this.dataSource.getUserRoles(user.id);
-    const token = jsonwebtoken.sign({ user, roles }, this.secret, {
-      expiresIn: process.env.tokenLife,
+    const token = signToken<AuthJwtPayload>({
+      user,
+      roles,
+      currentRole: roles[0],
     });
 
     return token;
@@ -348,19 +352,13 @@ export default class UserMutations {
 
   async token(token: string): Promise<string | Rejection> {
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<AuthJwtPayload>(token);
       const roles = await this.dataSource.getUserRoles(decoded.user.id);
-      const freshToken = jsonwebtoken.sign(
-        {
-          user: decoded.user,
-          roles,
-          currentRole: decoded.currentRole,
-        },
-        this.secret,
-        {
-          expiresIn: process.env.tokenLife,
-        }
-      );
+      const freshToken = signToken<AuthJwtPayload>({
+        user: decoded.user,
+        roles,
+        currentRole: decoded.currentRole,
+      });
 
       return freshToken;
     } catch (error) {
@@ -375,17 +373,18 @@ export default class UserMutations {
     selectedRoleId: number
   ): Promise<string | Rejection> {
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<AuthJwtPayload>(token);
+
+      // TODO: fixme
       const currentRole = decoded.roles.find(
         (role: Role) => role.id === selectedRoleId
-      );
-      const tokenWithRole = jsonwebtoken.sign(
-        { user: decoded.user, roles: decoded.roles, currentRole },
-        this.secret,
-        {
-          expiresIn: process.env.tokenLife,
-        }
-      );
+      )!;
+
+      const tokenWithRole = signToken<AuthJwtPayload>({
+        user: decoded.user,
+        roles: decoded.roles,
+        currentRole,
+      });
 
       return tokenWithRole;
     } catch (error) {
@@ -409,13 +408,12 @@ export default class UserMutations {
       return rejection('COULD_NOT_FIND_USER_BY_EMAIL');
     }
 
-    const token = jsonwebtoken.sign(
+    const token = signToken<PasswordResetJwtPayload>(
       {
         id: user.id,
         type: 'passwordReset',
         updated: user.updated,
       },
-      this.secret,
       { expiresIn: '24h' }
     );
 
@@ -430,7 +428,7 @@ export default class UserMutations {
   async emailVerification(token: string) {
     // Check that token is valid
     try {
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<EmailVerificationJwtPayload>(token);
       const user = await this.dataSource.get(decoded.id);
       //Check that user exist and that it has not been updated since token creation
       if (
@@ -505,8 +503,7 @@ export default class UserMutations {
     // Check that token is valid
     try {
       const hash = this.createHash(password);
-      // TODO: Define verify responce type and use that instead of any.
-      const decoded: any = jsonwebtoken.verify(token, this.secret);
+      const decoded = verifyToken<PasswordResetJwtPayload>(token);
       const user = await this.dataSource.get(decoded.id);
 
       //Check that user exist and that it has not been updated since token creation

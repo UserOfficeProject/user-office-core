@@ -20,9 +20,9 @@ export default class CallQueries {
     return calls;
   }
 
-  // TODO: maybe put these behind feature flag (although they are not accessible anyway)
-  // and use some kind of shared API token between gateway and user-office to authorize the requests
-  byRef(id: number) {
+  // TODO: figure out the role parts
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 }
