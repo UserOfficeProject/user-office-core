@@ -25,7 +25,6 @@ context('Proposal administration tests', () => {
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);
     cy.contains('Save and continue').click();
-    cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -54,7 +53,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Update').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'Updated' });
 
     cy.reload();
 
@@ -118,7 +117,7 @@ context('Proposal administration tests', () => {
 
     cy.contains('Proposals').click();
 
-    cy.wait(500);
+    cy.finishedLoading();
 
     cy.get('[type="checkbox"]')
       .eq(1)

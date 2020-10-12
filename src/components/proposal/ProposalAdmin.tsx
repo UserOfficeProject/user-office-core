@@ -4,16 +4,15 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import { Proposal, UserRole } from 'generated/sdk';
 import { ProposalEndStatus } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export type AdministrationFormData = {
   id: number;
@@ -27,8 +26,7 @@ export default function ProposalAdmin(props: {
   data: Proposal;
   setAdministration: (data: AdministrationFormData) => void;
 }) {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { proposalStatuses } = useProposalStatusesData();
 
@@ -56,11 +54,9 @@ export default function ProposalAdmin(props: {
             commentForUser: values.commentForUser,
             commentForManagement: values.commentForManagement,
           };
-          const data = await api().administrationProposal(administrationValues);
-
-          enqueueSnackbar('Updated', {
-            variant: data.administrationProposal.error ? 'error' : 'success',
-          });
+          const data = await api('Updated!').administrationProposal(
+            administrationValues
+          );
 
           if (!data.administrationProposal.error) {
             props.setAdministration(administrationValues);

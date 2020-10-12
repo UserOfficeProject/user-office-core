@@ -35,7 +35,9 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'SEP created successfully' });
+
+    cy.contains('Update SEP');
 
     cy.get('#code').should('contain.value', code);
     cy.get('#description').should('contain.value', description);
@@ -57,7 +59,7 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'SEP updated successfully' });
 
     cy.contains('SEPs').click();
 
@@ -80,11 +82,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Members').click();
 
-    cy.wait(1000);
-
     cy.get('[title="Set SEP Chair"]').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr')
       .eq(1)
@@ -106,17 +106,16 @@ context('Scientific evaluation panel tests', () => {
       .eq(1)
       .click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'SEP chair assigned successfully',
+    });
 
     cy.contains('Logs').click({ force: true });
-
-    cy.wait(1000);
 
     cy.contains('SEP_MEMBERS_ASSIGNED');
 
     cy.contains('Members').click();
-
-    cy.wait(1000);
 
     cy.get('input[id="SEPChair"]').should(element => {
       expect(element.val()).to.equal(
@@ -138,11 +137,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Members').click();
 
-    cy.wait(1000);
-
     cy.get('[title="Set SEP Secretary"]').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
       .eq(2)
@@ -164,17 +161,16 @@ context('Scientific evaluation panel tests', () => {
       .eq(2)
       .click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'SEP secretary assigned successfully',
+    });
 
     cy.contains('Logs').click({ force: true });
-
-    cy.wait(1000);
 
     cy.contains('SEP_MEMBERS_ASSIGNED');
 
     cy.contains('Members').click();
-
-    cy.wait(1000);
 
     cy.get('input[id="SEPSecretary"]').should(element => {
       expect(element.val()).to.contain(
@@ -193,11 +189,9 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Members').click();
 
-    cy.wait(1000);
-
     cy.get('[title="Add Member"]').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('input[type="checkbox"')
       .eq(1)
@@ -205,17 +199,16 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Update').click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'SEP member assigned successfully',
+    });
 
     cy.contains('Logs').click({ force: true });
-
-    cy.wait(1000);
 
     cy.contains('SEP_MEMBERS_ASSIGNED');
 
     cy.contains('Members').click();
-
-    cy.wait(1000);
 
     cy.get('[data-cy="sep-reviewers-table"]')
       .find('tbody td')
@@ -239,17 +232,18 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Members').click();
 
-    cy.wait(1000);
-
     cy.get('[title="Delete"]').click();
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'SEP member removed successfully',
+    });
 
     cy.contains('Logs').click({ force: true });
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Last Page'] button")
       .first()
@@ -258,8 +252,6 @@ context('Scientific evaluation panel tests', () => {
     cy.contains('SEP_MEMBER_REMOVED');
 
     cy.contains('Members').click();
-
-    cy.wait(1000);
 
     cy.get('[data-cy="sep-reviewers-table"]')
       .find('tbody td')
@@ -281,7 +273,6 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);
     cy.contains('Save and continue').click();
-    cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -311,9 +302,9 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.contains('Assignments').click();
+    cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[data-cy="sep-assignments-table"]')
       .find('tbody td')
@@ -339,13 +330,13 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Assign SEP Member']")
       .first()
       .click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('.MuiDialog-container [role="dialog"] table tbody tr[level="0"]')
       .first()
@@ -367,11 +358,14 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'assigned',
+    });
 
     cy.contains('Logs').click({ force: true });
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Last Page'] button")
       .first()
@@ -381,7 +375,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Show Reviewers']")
       .first()
@@ -395,7 +389,7 @@ context('Scientific evaluation panel tests', () => {
 
   it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
     const name = faker.random.words(2);
-    const shortCode = faker.random.words(1);
+    const shortCode = faker.random.alphaNumeric(15);
     const description = faker.random.words(8);
 
     cy.login('officer');
@@ -407,7 +401,7 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'created successfully' });
 
     cy.contains('Calls').click();
     cy.get('[title="Assign Instrument"]')
@@ -420,13 +414,11 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign instrument').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains('Proposals').click();
 
-    cy.wait(500);
-
-    cy.get('[type="checkbox"]')
+    cy.get('table tbody [type="checkbox"]')
       .first()
       .check();
 
@@ -444,7 +436,10 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Assign to Instrument').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal/s assigned to the selected instrument',
+    });
 
     cy.get('[title="Remove assigned instrument"]').should('exist');
 
@@ -456,7 +451,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Meeting Components').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.contains(name);
 
@@ -470,7 +465,7 @@ context('Scientific evaluation panel tests', () => {
       '[data-cy="sep-instrument-proposals-table"] [title="View proposal details"]'
     ).click();
 
-    cy.wait(500);
+    cy.finishedLoading();
 
     cy.contains('SEP Meeting form');
     cy.contains('Proposal details');
@@ -489,7 +484,6 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);
     cy.contains('Save and continue').click();
-    cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -502,14 +496,14 @@ context('Scientific evaluation panel tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'SEP created successfully' });
 
     cy.contains('Proposals').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
-    cy.get('[type="checkbox"]')
-      .eq(1)
+    cy.get('table tbody [type="checkbox"]')
+      .first()
       .check();
 
     cy.get("[title='Assign proposals to SEP']")
@@ -528,8 +522,6 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.wait(500);
-
     cy.get("[title='Show Instruments']")
       .first()
       .click();
@@ -544,7 +536,10 @@ context('Scientific evaluation panel tests', () => {
       .first()
       .click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Availability time set successfully',
+    });
 
     cy.contains('SEPs').click();
 
@@ -554,7 +549,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Meeting Components').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[data-cy="SEP-meeting-components-table"] tbody tr:first-child td')
       .eq(5)
@@ -573,7 +568,10 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Update').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Technical review updated successfully',
+    });
 
     cy.contains('SEPs').click();
 
@@ -583,7 +581,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Meeting Components').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[title="Show proposals"]')
       .first()
@@ -603,15 +601,13 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Meeting Components').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Submit instrument']")
       .first()
       .click();
 
     cy.contains('Yes').click();
-
-    cy.wait(500);
 
     cy.contains('Yes');
 
@@ -628,7 +624,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Show Reviewers']")
       .first()
@@ -639,11 +635,14 @@ context('Scientific evaluation panel tests', () => {
     ).click();
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'Reviewer removed',
+    });
 
     cy.contains('Logs').click({ force: true });
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Last Page'] button")
       .first()
@@ -653,7 +652,7 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get("[title='Show Reviewers']")
       .first()
@@ -674,16 +673,19 @@ context('Scientific evaluation panel tests', () => {
 
     cy.contains('Proposals and Assignments').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[title="Delete"]').click();
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'Assignment removed',
+    });
 
     cy.contains('Logs').click({ force: true });
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.contains('Assignments').click();
 

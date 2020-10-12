@@ -355,7 +355,7 @@ context('Template tests', () => {
 
     cy.contains('Calls').click();
 
-    cy.wait(500);
+    cy.finishedLoading();
 
     cy.contains('Proposals').click();
 

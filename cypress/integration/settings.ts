@@ -17,6 +17,8 @@ context('Settings tests', () => {
     it('User should not be able to see Settings page', () => {
       cy.login('user');
 
+      cy.get('[data-cy="profile-page-btn"]').should('exist');
+
       let userMenuItems = cy.get('[data-cy="user-menu-items"]');
 
       userMenuItems.should('not.contain', 'Settings');
