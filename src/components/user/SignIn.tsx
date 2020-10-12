@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import React, { useContext, useState } from 'react';
+import { useLocation } from 'react-router';
 import { Link, Redirect } from 'react-router-dom';
 
 import UOLoader from 'components/common/UOLoader';
@@ -79,6 +80,8 @@ export default function SignInSide() {
   const [errorMessage, setErrorMessage] = useState('');
   const { handleLogin, token } = useContext(UserContext);
   const unauthorizedApi = useUnauthorizedApi();
+  const location = useLocation();
+
   /**
    * NOTE: Use this submitting flag to rerender the form when submitting because of this: https://github.com/formium/formik/issues/2097.
    * It is resolved in version 2.0.7 so we can use just isSubmitting from formik.
@@ -103,6 +106,21 @@ export default function SignInSide() {
   };
 
   if (token) {
+    const authRedirect = new URLSearchParams(location.search).get(
+      'authRedirect'
+    );
+
+    if (authRedirect) {
+      return (
+        <Redirect
+          to={{
+            pathname: '/shared-auth',
+            search: location.search,
+          }}
+        />
+      );
+    }
+
     return <Redirect to="/" />;
   }
 
