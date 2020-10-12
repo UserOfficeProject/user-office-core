@@ -257,7 +257,7 @@ test('A user can not update its password if it has a bad token', () => {
   ).resolves.toHaveProperty('reason');
 });
 
-test('A user can update its password ', () => {
+test('A user can update its password', () => {
   return expect(
     userMutations.updatePassword(dummyUserWithRole, {
       id: dummyUser.id,
@@ -266,7 +266,7 @@ test('A user can update its password ', () => {
   ).resolves.toBeInstanceOf(BasicUserDetails);
 });
 
-test('A user can not update another users password ', () => {
+test('A user can not update another users password', () => {
   return expect(
     userMutations.updatePassword(dummyUserNotOnProposalWithRole, {
       id: dummyUser.id,
@@ -275,7 +275,7 @@ test('A user can not update another users password ', () => {
   ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
 });
 
-test('A not logged in users can not update passwords ', () => {
+test('A not logged in users can not update passwords', () => {
   return expect(
     userMutations.updatePassword(null, {
       id: dummyUser.id,
@@ -284,7 +284,7 @@ test('A not logged in users can not update passwords ', () => {
   ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
 });
 
-test('A user officer can update any password ', () => {
+test('A user officer can update any password', () => {
   return expect(
     userMutations.updatePassword(dummyUserOfficerWithRole, {
       id: dummyUser.id,
