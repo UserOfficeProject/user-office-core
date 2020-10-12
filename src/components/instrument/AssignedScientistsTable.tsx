@@ -1,14 +1,12 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 // NOTE: Some custom styles for row expand table.
 const useStyles = makeStyles(() => ({
@@ -36,8 +34,7 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   removeAssignedScientistFromInstrument,
 }) => {
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const assignmentColumns = [
@@ -56,21 +53,14 @@ const AssignedScientistsTable: React.FC<AssignedScientistsTableProps> = ({
   ];
 
   const removeAssignedScientist = async (scientistId: number) => {
-    const result = await api().removeScientistFromInstrument({
+    const result = await api(
+      'Scientist removed from instrument!'
+    ).removeScientistFromInstrument({
       scientistId,
       instrumentId: instrument.id,
     });
 
-    if (result.removeScientistFromInstrument.error) {
-      enqueueSnackbar(
-        getTranslation(
-          result.removeScientistFromInstrument.error as ResourceId
-        ),
-        {
-          variant: 'error',
-        }
-      );
-    } else {
+    if (!result.removeScientistFromInstrument.error) {
       removeAssignedScientistFromInstrument(scientistId, instrument.id);
     }
   };

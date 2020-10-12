@@ -13,10 +13,6 @@ context('Page tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   const faqContents = faker.random.words(2);
 
   it('Should be able update FAQ', () => {

@@ -103,6 +103,10 @@ const notification = ({ variant, text }) => {
   }
 };
 
+const finishedLoading = () => {
+  cy.get('[role="progressbar"]').should('not.exist');
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -112,6 +116,8 @@ Cypress.Commands.add('login', login);
 Cypress.Commands.add('logout', logout);
 
 Cypress.Commands.add('notification', notification);
+
+Cypress.Commands.add('finishedLoading', finishedLoading);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

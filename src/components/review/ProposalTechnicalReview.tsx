@@ -4,7 +4,6 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import React, { Fragment } from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
@@ -12,16 +11,15 @@ import {
   TechnicalReviewStatus,
   CoreTechnicalReviewFragment,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export default function ProposalTechnicalReview(props: {
   data: CoreTechnicalReviewFragment | null | undefined;
   setReview: (data: CoreTechnicalReviewFragment) => void;
   id: number;
 }) {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
 
   const initialValues = {
     status: props?.data?.status || '',
@@ -39,20 +37,16 @@ export default function ProposalTechnicalReview(props: {
         initialValues={initialValues}
         validationSchema={proposalTechnicalReviewValidationSchema}
         onSubmit={async (values, actions) => {
-          await api()
-            .addTechnicalReview({
-              proposalID: props.id,
-              timeAllocation: +values.timeAllocation,
-              comment: values.comment,
-              publicComment: values.publicComment,
-              status:
-                TechnicalReviewStatus[values.status as TechnicalReviewStatus],
-            })
-            .then(data =>
-              enqueueSnackbar('Updated', {
-                variant: data.addTechnicalReview.error ? 'error' : 'success',
-              })
-            );
+          await api(
+            'Technical review updated successfully!'
+          ).addTechnicalReview({
+            proposalID: props.id,
+            timeAllocation: +values.timeAllocation,
+            comment: values.comment,
+            publicComment: values.publicComment,
+            status:
+              TechnicalReviewStatus[values.status as TechnicalReviewStatus],
+          });
           props.setReview({
             proposalID: props?.data?.proposalID,
             timeAllocation: +values.timeAllocation,

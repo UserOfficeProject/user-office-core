@@ -14,10 +14,6 @@ context('Event log tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('If user creates a proposal, officer should be able to see the event logs for that proposal', () => {
     const title = faker.random.words(3);
     const abstract = faker.random.words(8);
@@ -63,8 +59,6 @@ context('Event log tests', () => {
     cy.login('officer');
 
     cy.contains('People').click();
-
-    cy.wait(2000);
 
     let peopleTable = cy.get('[data-cy="co-proposers"]');
 

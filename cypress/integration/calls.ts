@@ -16,6 +16,8 @@ context('Calls tests', () => {
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
 
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
+
     cy.should('not.contain', 'Calls');
 
     cy.get('[data-cy="user-menu-items"]')
@@ -139,7 +141,7 @@ context('Calls tests', () => {
 
   it('A user-officer should be able to assign instrument/s to a call', () => {
     const name = faker.random.words(2);
-    const shortCode = faker.random.words(1);
+    const shortCode = faker.random.alphaNumeric(15);
     const description = faker.random.words(8);
 
     cy.login('officer');

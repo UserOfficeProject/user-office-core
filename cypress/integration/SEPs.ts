@@ -7,19 +7,16 @@ context('Scientific evaluation panel tests', () => {
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('User should not be able to see SEPs page', () => {
     cy.login('user');
 
-    cy.wait(1000);
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
 
     let userMenuItems = cy.get('[data-cy="user-menu-items"]');
 
