@@ -8,6 +8,8 @@ type TProps = {
   items: Option[];
   name: string;
   label: string;
+  loading?: boolean;
+  noOptionsText?: string;
   required?: boolean;
   disabled?: boolean;
   InputProps?: object;
@@ -19,9 +21,26 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
   required,
   disabled,
   children,
+  loading = false,
+  noOptionsText,
   items,
   InputProps,
 }) => {
+  const menuItems =
+    items.length > 0 ? (
+      items.map(option => {
+        return (
+          <MenuItem key={option.value} value={option.value}>
+            {option.text}
+          </MenuItem>
+        );
+      })
+    ) : (
+      <MenuItem disabled key="no-options">
+        {noOptionsText}
+      </MenuItem>
+    );
+
   return (
     <Field
       type="text"
@@ -39,13 +58,13 @@ const FormikDropdown: React.FC<PropsWithChildren<TProps>> = ({
       disabled={disabled}
     >
       {children}
-      {items.map(option => {
-        return (
-          <MenuItem key={option.value} value={option.value}>
-            {option.text}
-          </MenuItem>
-        );
-      })}
+      {loading ? (
+        <MenuItem disabled key="loading">
+          Loading...
+        </MenuItem>
+      ) : (
+        menuItems
+      )}
     </Field>
   );
 };
@@ -59,6 +78,8 @@ FormikDropdown.propTypes = {
   items: PropTypes.array.isRequired,
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  loading: PropTypes.bool,
+  noOptionsText: PropTypes.string,
   required: PropTypes.bool,
   disabled: PropTypes.bool,
   children: PropTypes.oneOfType([

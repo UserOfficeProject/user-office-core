@@ -96,7 +96,11 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
   };
 
   const initialValues = call
-    ? { ...call, templateId: call.templateId || '' }
+    ? {
+        ...call,
+        templateId: call.templateId || '',
+        proposalWorkflowId: call.proposalWorkflowId || '',
+      }
     : {
         shortCode: '',
         startCall: currentDayStart,
@@ -109,6 +113,7 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
         endCycle: currentDayEnd,
         cycleComment: '',
         surveyComment: '',
+        proposalWorkflowId: '',
         templateId: '',
       };
 
@@ -173,18 +178,24 @@ const CreateUpdateCall: React.FC<CreateUpdateCallProps> = ({ call, close }) => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions): Promise<void> => {
-          const { templateId } = values;
+          const { templateId, proposalWorkflowId } = values;
           if (call) {
             const data = await api('Call updated successfully!').updateCall({
               id: call.id,
               ...values,
               templateId: templateId ? +templateId : null,
+              proposalWorkflowId: proposalWorkflowId
+                ? +proposalWorkflowId
+                : null,
             });
             closeModal(data.updateCall.error, data.updateCall.call as Call);
           } else {
             const data = await api('Call created successfully!').createCall({
               ...values,
               templateId: templateId ? +templateId : null,
+              proposalWorkflowId: proposalWorkflowId
+                ? +proposalWorkflowId
+                : null,
             });
 
             closeModal(data.createCall.error, data.createCall.call as Call);

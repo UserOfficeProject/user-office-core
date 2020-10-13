@@ -10,21 +10,25 @@ mutation createCall(
   $endCycle: DateTime!
   $cycleComment: String!
   $surveyComment: String!
+  $proposalWorkflowId: Int
   $templateId: Int
 ) {
   createCall(
-    shortCode: $shortCode
-    startCall: $startCall
-    endCall: $endCall
-    startReview: $startReview
-    endReview: $endReview
-    startNotify: $startNotify
-    endNotify: $endNotify
-    startCycle: $startCycle
-    endCycle: $endCycle
-    cycleComment: $cycleComment
-    surveyComment: $surveyComment
-    templateId: $templateId
+    createCallInput: {
+      shortCode: $shortCode
+      startCall: $startCall
+      endCall: $endCall
+      startReview: $startReview
+      endReview: $endReview
+      startNotify: $startNotify
+      endNotify: $endNotify
+      startCycle: $startCycle
+      endCycle: $endCycle
+      cycleComment: $cycleComment
+      surveyComment: $surveyComment
+      proposalWorkflowId: $proposalWorkflowId
+      templateId: $templateId
+    }
   ) {
     error
     call {
@@ -40,6 +44,7 @@ mutation createCall(
       endCycle
       cycleComment
       surveyComment
+      proposalWorkflowId
       templateId
       instruments {
         id
@@ -47,6 +52,11 @@ mutation createCall(
         shortCode
         description
         availabilityTime
+      }
+      proposalWorkflow {
+        id
+        name
+        description
       }
     }
   }

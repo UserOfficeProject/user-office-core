@@ -88,11 +88,6 @@ export type AssignInstrumentsToCallInput = {
   callId: Scalars['Int'];
 };
 
-export type AssignOrRemoveProposalWorkflowToCallInput = {
-  proposalWorkflowId: Scalars['Int'];
-  callId: Scalars['Int'];
-};
-
 export type AssignQuestionsToTopicResponseWrap = {
   __typename?: 'AssignQuestionsToTopicResponseWrap';
   error: Maybe<Scalars['String']>;
@@ -137,8 +132,10 @@ export type Call = {
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  proposalWorkflowId: Maybe<Scalars['Int']>;
   templateId: Maybe<Scalars['Int']>;
   instruments: Array<InstrumentWithAvailabilityTime>;
+  proposalWorkflow: Maybe<ProposalWorkflow>;
 };
 
 export type CallResponseWrap = {
@@ -150,6 +147,22 @@ export type CallResponseWrap = {
 export type CallsFilter = {
   templateIds?: Maybe<Array<Scalars['Int']>>;
   isActive?: Maybe<Scalars['Boolean']>;
+};
+
+export type CreateCallInput = {
+  shortCode: Scalars['String'];
+  startCall: Scalars['DateTime'];
+  endCall: Scalars['DateTime'];
+  startReview: Scalars['DateTime'];
+  endReview: Scalars['DateTime'];
+  startNotify: Scalars['DateTime'];
+  endNotify: Scalars['DateTime'];
+  startCycle: Scalars['DateTime'];
+  endCycle: Scalars['DateTime'];
+  cycleComment: Scalars['String'];
+  surveyComment: Scalars['String'];
+  proposalWorkflowId?: Maybe<Scalars['Int']>;
+  templateId?: Maybe<Scalars['Int']>;
 };
 
 export type CreateProposalStatusInput = {
@@ -347,8 +360,6 @@ export type Mutation = {
   updateCall: CallResponseWrap;
   assignInstrumentsToCall: CallResponseWrap;
   removeAssignedInstrumentFromCall: CallResponseWrap;
-  assignProposalWorkflowToCall: CallResponseWrap;
-  removeAssignedProposalWorkflowFromCall: CallResponseWrap;
   assignProposalsToInstrument: SuccessResponseWrap;
   removeProposalFromInstrument: SuccessResponseWrap;
   assignScientistsToInstrument: SuccessResponseWrap;
@@ -447,18 +458,7 @@ export type MutationUpdateInstitutionArgs = {
 
 
 export type MutationCreateCallArgs = {
-  shortCode: Scalars['String'];
-  startCall: Scalars['DateTime'];
-  endCall: Scalars['DateTime'];
-  startReview: Scalars['DateTime'];
-  endReview: Scalars['DateTime'];
-  startNotify: Scalars['DateTime'];
-  endNotify: Scalars['DateTime'];
-  startCycle: Scalars['DateTime'];
-  endCycle: Scalars['DateTime'];
-  cycleComment: Scalars['String'];
-  surveyComment: Scalars['String'];
-  templateId?: Maybe<Scalars['Int']>;
+  createCallInput: CreateCallInput;
 };
 
 
@@ -474,16 +474,6 @@ export type MutationAssignInstrumentsToCallArgs = {
 
 export type MutationRemoveAssignedInstrumentFromCallArgs = {
   removeAssignedInstrumentFromCallInput: RemoveAssignedInstrumentFromCallInput;
-};
-
-
-export type MutationAssignProposalWorkflowToCallArgs = {
-  assignProposalWorkflowToCallInput: AssignOrRemoveProposalWorkflowToCallInput;
-};
-
-
-export type MutationRemoveAssignedProposalWorkflowFromCallArgs = {
-  removeAssignedProposalWorkflowFromCallInput: AssignOrRemoveProposalWorkflowToCallInput;
 };
 
 
@@ -1766,6 +1756,7 @@ export type UpdateCallInput = {
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  proposalWorkflowId?: Maybe<Scalars['Int']>;
   templateId?: Maybe<Scalars['Int']>;
 };
 
@@ -2281,24 +2272,6 @@ export type AssignInstrumentsToCallMutation = (
   ) }
 );
 
-export type AssignProposalWorkflowToCallMutationVariables = Exact<{
-  proposalWorkflowId: Scalars['Int'];
-  callId: Scalars['Int'];
-}>;
-
-
-export type AssignProposalWorkflowToCallMutation = (
-  { __typename?: 'Mutation' }
-  & { assignProposalWorkflowToCall: (
-    { __typename?: 'CallResponseWrap' }
-    & Pick<CallResponseWrap, 'error'>
-    & { call: Maybe<(
-      { __typename?: 'Call' }
-      & Pick<Call, 'id'>
-    )> }
-  ) }
-);
-
 export type CreateCallMutationVariables = Exact<{
   shortCode: Scalars['String'];
   startCall: Scalars['DateTime'];
@@ -2311,6 +2284,7 @@ export type CreateCallMutationVariables = Exact<{
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  proposalWorkflowId?: Maybe<Scalars['Int']>;
   templateId?: Maybe<Scalars['Int']>;
 }>;
 
@@ -2322,10 +2296,13 @@ export type CreateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'proposalWorkflowId' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
         & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+      )>, proposalWorkflow: Maybe<(
+        { __typename?: 'ProposalWorkflow' }
+        & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
       )> }
     )> }
   ) }
@@ -2340,7 +2317,7 @@ export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
+    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'proposalWorkflowId' | 'templateId'>
     & { instruments: Array<(
       { __typename?: 'InstrumentWithAvailabilityTime' }
       & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
@@ -2348,6 +2325,9 @@ export type GetCallsQuery = (
         { __typename?: 'BasicUserDetails' }
         & BasicUserDetailsFragment
       )> }
+    )>, proposalWorkflow: Maybe<(
+      { __typename?: 'ProposalWorkflow' }
+      & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
     )> }
   )>> }
 );
@@ -2370,24 +2350,6 @@ export type RemoveAssignedInstrumentFromCallMutation = (
   ) }
 );
 
-export type RemoveAssignedProposalWorkflowFromCallMutationVariables = Exact<{
-  proposalWorkflowId: Scalars['Int'];
-  callId: Scalars['Int'];
-}>;
-
-
-export type RemoveAssignedProposalWorkflowFromCallMutation = (
-  { __typename?: 'Mutation' }
-  & { removeAssignedProposalWorkflowFromCall: (
-    { __typename?: 'CallResponseWrap' }
-    & Pick<CallResponseWrap, 'error'>
-    & { call: Maybe<(
-      { __typename?: 'Call' }
-      & Pick<Call, 'id'>
-    )> }
-  ) }
-);
-
 export type UpdateCallMutationVariables = Exact<{
   id: Scalars['Int'];
   shortCode: Scalars['String'];
@@ -2401,6 +2363,7 @@ export type UpdateCallMutationVariables = Exact<{
   endCycle: Scalars['DateTime'];
   cycleComment: Scalars['String'];
   surveyComment: Scalars['String'];
+  proposalWorkflowId?: Maybe<Scalars['Int']>;
   templateId?: Maybe<Scalars['Int']>;
 }>;
 
@@ -2412,10 +2375,13 @@ export type UpdateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
+      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'proposalWorkflowId' | 'templateId'>
       & { instruments: Array<(
         { __typename?: 'InstrumentWithAvailabilityTime' }
         & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
+      )>, proposalWorkflow: Maybe<(
+        { __typename?: 'ProposalWorkflow' }
+        & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
       )> }
     )> }
   ) }
@@ -5022,19 +4988,9 @@ export const AssignInstrumentsToCallDocument = gql`
   }
 }
     `;
-export const AssignProposalWorkflowToCallDocument = gql`
-    mutation assignProposalWorkflowToCall($proposalWorkflowId: Int!, $callId: Int!) {
-  assignProposalWorkflowToCall(assignProposalWorkflowToCallInput: {proposalWorkflowId: $proposalWorkflowId, callId: $callId}) {
-    error
-    call {
-      id
-    }
-  }
-}
-    `;
 export const CreateCallDocument = gql`
-    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
-  createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
+    mutation createCall($shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $proposalWorkflowId: Int, $templateId: Int) {
+  createCall(createCallInput: {shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}) {
     error
     call {
       id
@@ -5049,6 +5005,7 @@ export const CreateCallDocument = gql`
       endCycle
       cycleComment
       surveyComment
+      proposalWorkflowId
       templateId
       instruments {
         id
@@ -5056,6 +5013,11 @@ export const CreateCallDocument = gql`
         shortCode
         description
         availabilityTime
+      }
+      proposalWorkflow {
+        id
+        name
+        description
       }
     }
   }
@@ -5076,6 +5038,7 @@ export const GetCallsDocument = gql`
     endCycle
     cycleComment
     surveyComment
+    proposalWorkflowId
     templateId
     instruments {
       id
@@ -5087,6 +5050,11 @@ export const GetCallsDocument = gql`
       scientists {
         ...basicUserDetails
       }
+    }
+    proposalWorkflow {
+      id
+      name
+      description
     }
   }
 }
@@ -5101,19 +5069,9 @@ export const RemoveAssignedInstrumentFromCallDocument = gql`
   }
 }
     `;
-export const RemoveAssignedProposalWorkflowFromCallDocument = gql`
-    mutation removeAssignedProposalWorkflowFromCall($proposalWorkflowId: Int!, $callId: Int!) {
-  removeAssignedProposalWorkflowFromCall(removeAssignedProposalWorkflowFromCallInput: {proposalWorkflowId: $proposalWorkflowId, callId: $callId}) {
-    error
-    call {
-      id
-    }
-  }
-}
-    `;
 export const UpdateCallDocument = gql`
-    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $templateId: Int) {
-  updateCall(updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId}) {
+    mutation updateCall($id: Int!, $shortCode: String!, $startCall: DateTime!, $endCall: DateTime!, $startReview: DateTime!, $endReview: DateTime!, $startNotify: DateTime!, $endNotify: DateTime!, $startCycle: DateTime!, $endCycle: DateTime!, $cycleComment: String!, $surveyComment: String!, $proposalWorkflowId: Int, $templateId: Int) {
+  updateCall(updateCallInput: {id: $id, shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, proposalWorkflowId: $proposalWorkflowId, templateId: $templateId}) {
     error
     call {
       id
@@ -5128,6 +5086,7 @@ export const UpdateCallDocument = gql`
       endCycle
       cycleComment
       surveyComment
+      proposalWorkflowId
       templateId
       instruments {
         id
@@ -5135,6 +5094,11 @@ export const UpdateCallDocument = gql`
         shortCode
         description
         availabilityTime
+      }
+      proposalWorkflow {
+        id
+        name
+        description
       }
     }
   }
@@ -6460,9 +6424,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     assignInstrumentsToCall(variables: AssignInstrumentsToCallMutationVariables): Promise<AssignInstrumentsToCallMutation> {
       return withWrapper(() => client.request<AssignInstrumentsToCallMutation>(print(AssignInstrumentsToCallDocument), variables));
     },
-    assignProposalWorkflowToCall(variables: AssignProposalWorkflowToCallMutationVariables): Promise<AssignProposalWorkflowToCallMutation> {
-      return withWrapper(() => client.request<AssignProposalWorkflowToCallMutation>(print(AssignProposalWorkflowToCallDocument), variables));
-    },
     createCall(variables: CreateCallMutationVariables): Promise<CreateCallMutation> {
       return withWrapper(() => client.request<CreateCallMutation>(print(CreateCallDocument), variables));
     },
@@ -6471,9 +6432,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     removeAssignedInstrumentFromCall(variables: RemoveAssignedInstrumentFromCallMutationVariables): Promise<RemoveAssignedInstrumentFromCallMutation> {
       return withWrapper(() => client.request<RemoveAssignedInstrumentFromCallMutation>(print(RemoveAssignedInstrumentFromCallDocument), variables));
-    },
-    removeAssignedProposalWorkflowFromCall(variables: RemoveAssignedProposalWorkflowFromCallMutationVariables): Promise<RemoveAssignedProposalWorkflowFromCallMutation> {
-      return withWrapper(() => client.request<RemoveAssignedProposalWorkflowFromCallMutation>(print(RemoveAssignedProposalWorkflowFromCallDocument), variables));
     },
     updateCall(variables: UpdateCallMutationVariables): Promise<UpdateCallMutation> {
       return withWrapper(() => client.request<UpdateCallMutation>(print(UpdateCallDocument), variables));

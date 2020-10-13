@@ -11,6 +11,7 @@ mutation updateCall(
   $endCycle: DateTime!
   $cycleComment: String!
   $surveyComment: String!
+  $proposalWorkflowId: Int
   $templateId: Int
 ) {
   updateCall(
@@ -27,6 +28,7 @@ mutation updateCall(
       endCycle: $endCycle
       cycleComment: $cycleComment
       surveyComment: $surveyComment
+      proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
     }
   ) {
@@ -44,6 +46,7 @@ mutation updateCall(
       endCycle
       cycleComment
       surveyComment
+      proposalWorkflowId
       templateId
       instruments {
         id
@@ -51,6 +54,11 @@ mutation updateCall(
         shortCode
         description
         availabilityTime
+      }
+      proposalWorkflow {
+        id
+        name
+        description
       }
     }
   }

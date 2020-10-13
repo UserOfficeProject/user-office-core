@@ -259,4 +259,89 @@ context('Calls tests', () => {
         expect(element.text()).to.be.equal('No records to display');
       });
   });
+
+  it('A user-officer should be able to add proposal workflow to a call', () => {
+    let selectedProposalWorkflow = '';
+    const name = faker.random.words(2);
+    const description = faker.random.words(5);
+
+    cy.login('officer');
+
+    cy.contains('Settings').click();
+    cy.contains('Proposal workflows').click();
+
+    cy.contains('Create').click();
+    cy.get('#name').type(name);
+    cy.get('#description').type(description);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'created successfully' });
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('[role="presentation"] [role="listbox"] li')
+      .last()
+      .then(element => {
+        selectedProposalWorkflow = element.text();
+      })
+      .click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
+
+    cy.get('[data-cy="calls-table"]')
+      .find('tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal(selectedProposalWorkflow);
+      });
+  });
+
+  it('A user-officer should be able to remove proposal workflow from a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.contains('None (remove selection)').click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
+
+    cy.get('[data-cy="calls-table"]')
+      .find('tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('-');
+      });
+  });
 });
