@@ -141,13 +141,4 @@ describe('Test Proposal settings mutations', () => {
       )
     ).resolves.toStrictEqual(dummyProposalWorkflowConnection);
   });
-
-  test('A userofficer can move proposal workflow connection', () => {
-    return expect(
-      ProposalSettingsMutationsInstance.moveProposalWorkflowStatus(
-        dummyUserOfficerWithRole,
-        { from: 1, to: 0, proposalWorkflowId: 1 }
-      )
-    ).resolves.toStrictEqual(dummyProposalWorkflowConnection);
-  });
 });

@@ -219,35 +219,58 @@ export default class PostgresProposalSettingsDataSource
       },
       proposalWorkflowConnection.next_proposal_status_id,
       proposalWorkflowConnection.prev_proposal_status_id,
-      proposalWorkflowConnection.next_status_event_type
+      proposalWorkflowConnection.next_status_event_type,
+      proposalWorkflowConnection.droppable_group_id,
+      proposalWorkflowConnection.parent_droppable_group_id
     );
   }
 
   async getProposalWorkflowConnections(
-    proposalWorkflowId: number
+    proposalWorkflowId: number,
+    droppableGroupId: string | undefined = undefined,
+    byParentGroupId: boolean | undefined = false
   ): Promise<ProposalWorkflowConnection[]> {
-    return database
-      .select('*')
-      .from('proposal_workflow_connections as pwc')
-      .join('proposal_statuses as ps', {
-        'ps.proposal_status_id': 'pwc.proposal_status_id',
-      })
-      .where('proposal_workflow_id', proposalWorkflowId)
-      .orderBy('sort_order')
-      .then(
-        (
-          proposalWorkflowConnections:
-            | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
-            | null
-        ) =>
-          proposalWorkflowConnections
-            ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
-                this.createProposalWorkflowConnectionObject(
-                  proposalWorkflowConnection
-                )
-              )
-            : []
-      );
+    const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
+    const andConditionIfParentDroppableGroupIdDefined =
+      byParentGroupId &&
+      !!droppableGroupId &&
+      `AND parent_droppable_group_id = '${droppableGroupId}'`;
+    const andWhereCondition =
+      !byParentGroupId && !!droppableGroupId
+        ? andConditionIfDroppableGroupIdDefined
+        : byParentGroupId && !!droppableGroupId
+        ? andConditionIfParentDroppableGroupIdDefined
+        : '';
+
+    const getUniqueOrderedProposalWorkflowConnectionsQuery = `
+      SELECT * FROM (
+        SELECT DISTINCT ON (pwc.proposal_status_id) *
+        FROM proposal_workflow_connections as pwc
+        LEFT JOIN
+          proposal_statuses as ps
+        ON
+          ps.proposal_status_id = pwc.proposal_status_id
+        WHERE proposal_workflow_id = ${proposalWorkflowId}
+        ${andWhereCondition}
+      ) t
+      ORDER BY
+        droppable_group_id ASC,
+        sort_order ASC
+    `;
+
+    const proposalWorkflowConnections:
+      | (ProposalWorkflowConnectionRecord & ProposalStatusRecord)[]
+      | null = (
+      await database.raw(getUniqueOrderedProposalWorkflowConnectionsQuery)
+    ).rows;
+
+    return proposalWorkflowConnections
+      ? proposalWorkflowConnections.map(proposalWorkflowConnection =>
+          this.createProposalWorkflowConnectionObject(
+            proposalWorkflowConnection
+          )
+        )
+      : [];
   }
 
   async getProposalWorkflowConnection(
@@ -289,6 +312,9 @@ export default class PostgresProposalSettingsDataSource
         prev_proposal_status_id:
           newProposalWorkflowStatusInput.prevProposalStatusId,
         sort_order: newProposalWorkflowStatusInput.sortOrder,
+        droppable_group_id: newProposalWorkflowStatusInput.droppableGroupId,
+        parent_droppable_group_id:
+          newProposalWorkflowStatusInput.parentDroppableGroupId,
         next_status_event_type:
           newProposalWorkflowStatusInput.nextStatusEventType,
       })
@@ -314,68 +340,89 @@ export default class PostgresProposalSettingsDataSource
       );
   }
 
-  async bulkUpdateProposalWorkflowStatuses(
+  async upsertProposalWorkflowStatuses(
     collection: ProposalWorkflowConnection[]
   ) {
-    return database.transaction(trx => {
-      const queries = collection.map(tuple =>
-        database('proposal_workflow_connections')
-          .where('proposal_workflow_id', tuple.proposalWorkflowId)
-          .andWhere('proposal_status_id', tuple.proposalStatusId)
-          .update({
-            proposal_workflow_id: tuple.proposalWorkflowId,
-            proposal_status_id: tuple.proposalStatusId,
-            next_proposal_status_id: tuple.nextProposalStatusId,
-            prev_proposal_status_id: tuple.prevProposalStatusId,
-            sort_order: tuple.sortOrder,
-            next_status_event_type: tuple.nextStatusEventType,
-          })
-          .transacting(trx)
-      );
+    const dataToInsert = collection.map(item => ({
+      proposal_workflow_connection_id: item.id,
+      proposal_workflow_id: item.proposalWorkflowId,
+      proposal_status_id: item.proposalStatusId,
+      next_proposal_status_id: item.nextProposalStatusId,
+      prev_proposal_status_id: item.prevProposalStatusId,
+      sort_order: item.sortOrder,
+      droppable_group_id: item.droppableGroupId,
+      parent_droppable_group_id: item.parentDroppableGroupId,
+      next_status_event_type: item.nextStatusEventType,
+    }));
 
-      return Promise.all(queries)
-        .then(trx.commit)
-        .catch(error => {
-          trx.rollback;
-          throw error;
-        });
-    });
+    const result = await database.raw(
+      `? ON CONFLICT (proposal_workflow_connection_id)
+                  DO UPDATE SET
+                  next_proposal_status_id = EXCLUDED.next_proposal_status_id,
+                  prev_proposal_status_id = EXCLUDED.prev_proposal_status_id,
+                  sort_order = EXCLUDED.sort_order,
+                  droppable_group_id = EXCLUDED.droppable_group_id,
+                  parent_droppable_group_id = EXCLUDED.parent_droppable_group_id
+                RETURNING *;`,
+      [database('proposal_workflow_connections').insert(dataToInsert)]
+    );
+
+    return result.rows;
   }
 
   async updateProposalWorkflowStatuses(
     proposalWorkflowStatusesInput: ProposalWorkflowConnection[]
-  ): Promise<boolean> {
-    const result = await this.bulkUpdateProposalWorkflowStatuses(
+  ): Promise<ProposalWorkflowConnection[]> {
+    const result = await this.upsertProposalWorkflowStatuses(
       proposalWorkflowStatusesInput
     );
 
     if (result) {
-      return true;
+      return result;
     } else {
-      return false;
+      return [];
     }
   }
 
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
-    proposalWorkflowId: number
-  ): Promise<boolean> {
-    return database('proposal_workflow_connections')
+    proposalWorkflowId: number,
+    nextProposalStatusId: number
+  ): Promise<ProposalWorkflowConnection> {
+    const removeWorkflowConnectionQuery = database(
+      'proposal_workflow_connections'
+    )
       .where('proposal_workflow_id', proposalWorkflowId)
       .andWhere('proposal_status_id', proposalStatusId)
       .del()
-      .returning('*')
-      .then((proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
+      .returning('*');
+
+    if (nextProposalStatusId) {
+      removeWorkflowConnectionQuery.andWhere(
+        'next_proposal_status_id',
+        nextProposalStatusId
+      );
+    }
+
+    return removeWorkflowConnectionQuery.then(
+      (proposalWorkflowStatus: ProposalWorkflowConnectionRecord[]) => {
         if (
           proposalWorkflowStatus === undefined ||
-          proposalWorkflowStatus.length !== 1
+          proposalWorkflowStatus.length < 1
         ) {
           throw new Error(
             `Could not delete proposal workflow status with id: ${proposalWorkflowId} `
           );
         }
 
-        return true;
-      });
+        // NOTE: I need this object only to be able to reorder and update other statuses in the logic layer.
+        return this.createProposalWorkflowConnectionObject({
+          ...proposalWorkflowStatus[0],
+          name: '',
+          description: '',
+          full_count: 1,
+        });
+      }
+    );
   }
 }
