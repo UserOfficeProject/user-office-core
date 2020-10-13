@@ -91,7 +91,7 @@ export default function SignInSide() {
   const requestToken = async (values: { email: string; password: string }) => {
     const { email, password } = values;
 
-    const data = await unauthorizedApi.login({ email, password });
+    const data = await unauthorizedApi().login({ email, password });
 
     if (data.login && !data.login.error) {
       handleLogin(data.login.token);

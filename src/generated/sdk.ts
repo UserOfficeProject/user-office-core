@@ -6639,6 +6639,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     verifyEmail(variables: VerifyEmailMutationVariables): Promise<VerifyEmailMutation> {
       return withWrapper(() => client.request<VerifyEmailMutation>(print(VerifyEmailDocument), variables));
+    },
+    checkToken(variables: {token: any}): Promise<any> {
+      return withWrapper(() => client.request<any>(print(gql`
+            query checkToken($token: String!) {
+        checkToken(token: $token) {
+          isValid
+        }
+      }`), variables))
     }
   };
 }

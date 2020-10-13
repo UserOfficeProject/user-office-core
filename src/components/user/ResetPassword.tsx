@@ -52,10 +52,11 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ match }) => {
   const [passwordReset, setPasswordReset] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
   const unauthorizedApi = useUnauthorizedApi();
+
   const requestResetPassword = async (values: { password: string }) => {
     const { password } = values;
 
-    await unauthorizedApi
+    await unauthorizedApi()
       .resetPassword({
         token: match.params.token,
         password,

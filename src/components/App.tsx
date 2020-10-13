@@ -67,7 +67,9 @@ class App extends React.Component {
     try {
       error = JSON.parse(error);
     } catch (e) {}
-    useUnauthorizedApi().addClientLog({ error });
+    const api = useUnauthorizedApi();
+
+    api().addClientLog({ error });
   }
 
   componentDidMount() {

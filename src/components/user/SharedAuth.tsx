@@ -1,9 +1,10 @@
 import { makeStyles } from '@material-ui/core';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import { Redirect, useLocation } from 'react-router';
 
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
+import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 
 const AUTH_ALLOWED_HOSTNAMES = (
   process.env.REACT_APP_AUTH_ALLOWED_HOSTNAMES || ''
@@ -44,8 +45,9 @@ function checkAuthRedirect(authRedirect: string) {
 
 export default function SharedAuth() {
   const classes = useStyles();
-  const { token } = useContext(UserContext);
+  const { token, handleLogout } = useContext(UserContext);
   const location = useLocation();
+  const unauthorizedApi = useUnauthorizedApi();
 
   const authRedirect = new URLSearchParams(location.search).get('authRedirect');
 
@@ -55,9 +57,18 @@ export default function SharedAuth() {
     }
 
     if (token && checkAuthRedirect(authRedirect)) {
-      window.location.assign(authRedirect);
+      unauthorizedApi()
+        .checkToken({ token })
+        .then(({ checkToken: { isValid } }) => {
+          if (isValid) {
+            window.location.assign(authRedirect);
+          } else {
+            handleLogout();
+          }
+        })
+        .catch(() => handleLogout());
     }
-  }, [token, authRedirect]);
+  }, [token, authRedirect, unauthorizedApi, handleLogout]);
 
   if (token && authRedirect) {
     return (
