@@ -26,6 +26,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -44,6 +45,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2019-02-19'),
         cycleComment: 'Comment review',
         surveyComment: 'Comment feedback',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'NOT_LOGGED_IN');
   });
@@ -61,6 +63,7 @@ describe('Test Call Mutations', () => {
       endCycle: new Date('2019-02-19'),
       cycleComment: 'Comment review',
       surveyComment: 'Comment feedback',
+      proposalWorkflowId: 1,
     };
 
     return expect(
@@ -83,6 +86,7 @@ describe('Test Call Mutations', () => {
         endCycle: new Date('2020-06-18'),
         cycleComment: 'Comment review update',
         surveyComment: 'Comment feedback update',
+        proposalWorkflowId: 1,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
@@ -101,6 +105,7 @@ describe('Test Call Mutations', () => {
       endCycle: new Date('2020-06-18'),
       cycleComment: 'Comment review update',
       surveyComment: 'Comment feedback update',
+      proposalWorkflowId: 1,
     };
 
     return expect(
@@ -141,45 +146,6 @@ describe('Test Call Mutations', () => {
         callId: 1,
         instrumentId: 1,
       })
-    ).resolves.toBe(dummyCall);
-  });
-
-  test('A logged in user can not assign proposal workflow to a call', () => {
-    return expect(
-      callMutations.assignProposalWorkflowToCall(dummyUserWithRole, {
-        callId: 1,
-        proposalWorkflowId: 1,
-      })
-    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
-  });
-
-  test('A logged in user officer can assign proposal workflow to a call', () => {
-    return expect(
-      callMutations.assignProposalWorkflowToCall(dummyUserOfficerWithRole, {
-        callId: 1,
-        proposalWorkflowId: 1,
-      })
-    ).resolves.toBe(dummyCall);
-  });
-
-  test('A logged in user can not remove assigned proposal workflow from a call', () => {
-    return expect(
-      callMutations.removeAssignedProposalWorkflowFromCall(dummyUserWithRole, {
-        callId: 1,
-        proposalWorkflowId: 1,
-      })
-    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
-  });
-
-  test('A logged in user officer can remove assigned proposal workflow from a call', () => {
-    return expect(
-      callMutations.removeAssignedProposalWorkflowFromCall(
-        dummyUserOfficerWithRole,
-        {
-          callId: 1,
-          proposalWorkflowId: 1,
-        }
-      )
     ).resolves.toBe(dummyCall);
   });
 });

@@ -51,6 +51,9 @@ export class UpdateCallInput {
   public surveyComment: string;
 
   @Field(() => Int, { nullable: true })
+  public proposalWorkflowId: number;
+
+  @Field(() => Int, { nullable: true })
   public templateId?: number;
 }
 
@@ -58,15 +61,6 @@ export class UpdateCallInput {
 export class AssignInstrumentsToCallInput {
   @Field(() => [Int])
   instrumentIds: number[];
-
-  @Field(() => Int)
-  callId: number;
-}
-
-@InputType()
-export class AssignOrRemoveProposalWorkflowToCallInput {
-  @Field(() => Int)
-  proposalWorkflowId: number;
 
   @Field(() => Int)
   callId: number;
@@ -120,36 +114,6 @@ export class UpdateCallMutation {
       context.mutations.call.removeAssignedInstrumentFromCall(
         context.user,
         removeAssignedInstrumentFromCallInput
-      ),
-      CallResponseWrap
-    );
-  }
-
-  @Mutation(() => CallResponseWrap)
-  assignProposalWorkflowToCall(
-    @Arg('assignProposalWorkflowToCallInput')
-    assignProposalWorkflowToCallInput: AssignOrRemoveProposalWorkflowToCallInput,
-    @Ctx() context: ResolverContext
-  ) {
-    return wrapResponse(
-      context.mutations.call.assignProposalWorkflowToCall(
-        context.user,
-        assignProposalWorkflowToCallInput
-      ),
-      CallResponseWrap
-    );
-  }
-
-  @Mutation(() => CallResponseWrap)
-  removeAssignedProposalWorkflowFromCall(
-    @Arg('removeAssignedProposalWorkflowFromCallInput')
-    removeAssignedProposalWorkflowFromCallInput: AssignOrRemoveProposalWorkflowToCallInput,
-    @Ctx() context: ResolverContext
-  ) {
-    return wrapResponse(
-      context.mutations.call.removeAssignedProposalWorkflowFromCall(
-        context.user,
-        removeAssignedProposalWorkflowFromCallInput
       ),
       CallResponseWrap
     );

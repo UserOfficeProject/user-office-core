@@ -11,12 +11,11 @@ import { Call } from '../models/Call';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
-import { CreateCallArgs } from '../resolvers/mutations/CreateCallMutation';
+import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import {
   UpdateCallInput,
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
-  AssignOrRemoveProposalWorkflowToCallInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { logger } from '../utils/Logger';
 
@@ -27,7 +26,7 @@ export default class CallMutations {
   @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
-    args: CreateCallArgs
+    args: CreateCallInput
   ): Promise<Call | Rejection> {
     return this.dataSource
       .create(args)
@@ -92,52 +91,6 @@ export default class CallMutations {
       .catch(error => {
         logger.logException(
           'Could not remove assigned instrument from call',
-          error,
-          {
-            agent,
-            args,
-          }
-        );
-
-        return rejection('INTERNAL_ERROR');
-      });
-  }
-
-  // @ValidateArgs(assignInstrumentsToCallValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async assignProposalWorkflowToCall(
-    agent: UserWithRole | null,
-    args: AssignOrRemoveProposalWorkflowToCallInput
-  ): Promise<Call | Rejection> {
-    return this.dataSource
-      .assignProposalWorkflowToCall(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException(
-          'Could not assign proposal workflow to call',
-          error,
-          {
-            agent,
-            args,
-          }
-        );
-
-        return rejection('INTERNAL_ERROR');
-      });
-  }
-
-  // @ValidateArgs(removeAssignedInstrumentFromCallValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async removeAssignedProposalWorkflowFromCall(
-    agent: UserWithRole | null,
-    args: AssignOrRemoveProposalWorkflowToCallInput
-  ): Promise<Call | Rejection> {
-    return this.dataSource
-      .removeAssignedProposalWorkflowFromCall(args)
-      .then(result => result)
-      .catch(error => {
-        logger.logException(
-          'Could not remove assigned proposal workflow from call',
           error,
           {
             agent,
