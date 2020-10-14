@@ -81,21 +81,28 @@ const logout = () => {
 const notification = ({ variant, text }) => {
   let notificationQuerySelector = '[role="alert"]';
   let bgColor = '';
+  let classVariantRegEx = '';
 
   switch (variant) {
     case 'error':
-      // notificationQuerySelector = '[class*=" SnackbarItem-variantError-"]';
+      classVariantRegEx = /variantError/;
       bgColor = 'rgb(211, 47, 47)';
       break;
 
     default:
-      // notificationQuerySelector = '[class*=" SnackbarItem-variantSuccess-"]';
+      classVariantRegEx = /variantSuccess/;
       bgColor = 'rgb(67, 160, 71)';
       break;
   }
   let notification = cy
     .get(notificationQuerySelector)
-    .should('exist')
+    .should(div => {
+      expect(div).to.have.length(1);
+
+      const className = div[0].className;
+
+      expect(className).to.match(classVariantRegEx);
+    })
     .and('have.css', 'background-color', bgColor);
 
   if (text) {
