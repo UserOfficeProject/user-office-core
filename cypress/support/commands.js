@@ -79,17 +79,17 @@ const logout = () => {
 };
 
 const notification = ({ variant, text }) => {
-  let notificationQuerySelector = '';
+  let notificationQuerySelector = '[role="alert"]';
   let bgColor = '';
 
   switch (variant) {
     case 'error':
-      notificationQuerySelector = '[class*=" SnackbarItem-variantError-"]';
+      // notificationQuerySelector = '[class*=" SnackbarItem-variantError-"]';
       bgColor = 'rgb(211, 47, 47)';
       break;
 
     default:
-      notificationQuerySelector = '[class*=" SnackbarItem-variantSuccess-"]';
+      // notificationQuerySelector = '[class*=" SnackbarItem-variantSuccess-"]';
       bgColor = 'rgb(67, 160, 71)';
       break;
   }
