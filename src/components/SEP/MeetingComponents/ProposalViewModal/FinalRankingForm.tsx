@@ -4,7 +4,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -12,8 +11,8 @@ import { useCheckAccess } from 'components/common/Can';
 import FormikDropdown from 'components/common/FormikDropdown';
 import { AdministrationFormData } from 'components/proposal/ProposalAdmin';
 import { Proposal, ProposalEndStatus, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledPaper, ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type FinalRankingFormProps = {
   closeModal: () => void;
@@ -34,8 +33,7 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
   }))();
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [shouldClose, setShouldClose] = useState<boolean>(false);
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
@@ -58,15 +56,11 @@ const FinalRankingForm: React.FC<FinalRankingFormProps> = ({
       rankOrder: values.rankOrder,
     };
 
-    const data = await api().administrationProposal(
+    const data = await api('Saved!').administrationProposal(
       administrationProposalVales
     );
 
     const isError = !!data.administrationProposal.error;
-
-    enqueueSnackbar(isError ? 'Not saved!' : 'Saved!', {
-      variant: isError ? 'error' : 'success',
-    });
 
     setSubmitting(false);
 

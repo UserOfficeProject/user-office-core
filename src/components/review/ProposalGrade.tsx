@@ -6,15 +6,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
 import { TextField, Select } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import React, { useState, useEffect, useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { ReviewAndAssignmentContext } from 'context/ReviewAndAssignmentContextProvider';
 import { ReviewStatus, CoreReviewFragment } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useReviewData } from 'hooks/review/useReviewData';
 import { ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -32,8 +31,7 @@ export default function ProposalGrade(props: {
 }) {
   const classes = useStyles();
   const { reviewData } = useReviewData(props.reviewID);
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [review, setReview] = useState<CoreReviewFragment | null | undefined>(
     null
   );
@@ -55,7 +53,7 @@ export default function ProposalGrade(props: {
         saveOnly: true,
       }}
       onSubmit={async (values, actions) => {
-        await api()
+        await api('Updated')
           .updateReview({
             reviewID: props.reviewID,
             //This should be taken care of in validationSchema
@@ -67,10 +65,7 @@ export default function ProposalGrade(props: {
             sepID: review.sepID,
           })
           .then(data => {
-            if (data.addReview.error) {
-              enqueueSnackbar(data.addReview.error, { variant: 'error' });
-            } else {
-              enqueueSnackbar('Updated', { variant: 'success' });
+            if (!data.addReview.error) {
               setReview(data.addReview.review);
               setAssignmentReview(data.addReview.review);
             }

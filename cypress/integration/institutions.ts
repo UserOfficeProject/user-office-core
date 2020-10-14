@@ -93,6 +93,6 @@ context('Institution tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.contains('Institution removed!');
+    cy.contains('Institution removed successfully!');
   });
 });

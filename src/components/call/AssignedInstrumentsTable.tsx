@@ -150,6 +150,7 @@ const AssignedInstrumentsTable: React.FC<AssignedInstrumentsTableProps> = ({
               } else {
                 enqueueSnackbar('Availability time must be positive number', {
                   variant: 'error',
+                  className: 'snackbar-error',
                 });
                 reject();
               }
