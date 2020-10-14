@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core';
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Redirect, useLocation } from 'react-router';
 
 import UOLoader from 'components/common/UOLoader';
