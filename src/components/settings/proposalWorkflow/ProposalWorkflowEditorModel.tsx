@@ -2,7 +2,11 @@ import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
-import { ProposalWorkflow, ProposalWorkflowConnection } from 'generated/sdk';
+import {
+  ProposalWorkflow,
+  ProposalWorkflowConnection,
+  ProposalWorkflowConnectionGroup,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
   useReducerWithMiddleWares,
@@ -20,6 +24,7 @@ export enum EventType {
   SERVICE_ERROR_OCCURRED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
+  ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
 }
 
 export interface Event {
@@ -35,21 +40,67 @@ const ProposalWorkflowEditorModel = (
     id: 0,
     name: '',
     description: '',
-    proposalWorkflowConnections: [],
+    proposalWorkflowConnectionGroups: [],
   };
 
-  const moveArrayElement = (
-    workflowConnections: ProposalWorkflowConnection[],
-    fromIndex: number,
-    toIndex: number
+  const findGroupIndexByGroupId = (
+    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    groupId: string
+  ) =>
+    workflowConnectionGroups.findIndex(
+      workflowConnectionGroup => workflowConnectionGroup.groupId === groupId
+    );
+
+  const findGroupAndAddNewStatusConnection = (
+    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    newConnection: ProposalWorkflowConnection
   ) => {
-    const proposalWorkflowConnectionToMove = workflowConnections[fromIndex];
+    const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
+      workflowConnectionGroups,
+      newConnection.droppableGroupId
+    );
 
-    workflowConnections.splice(fromIndex, 1);
+    workflowConnectionGroups[
+      groupIndexWhereStatusShouldBeAdded
+    ].connections.splice(newConnection.sortOrder, 0, newConnection);
 
-    workflowConnections.splice(toIndex, 0, proposalWorkflowConnectionToMove);
+    return workflowConnectionGroups;
+  };
 
-    return workflowConnections;
+  const moveStatusConnectionInsideWorkflow = (
+    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    from: { droppableId: string; index: number },
+    to: { droppableId: string; index: number }
+  ) => {
+    const sourceWorkflowConnectionsGroupIndex = findGroupIndexByGroupId(
+      workflowConnectionGroups,
+      from.droppableId
+    );
+
+    const destinationWorkflowConnectionGroupIndex =
+      from.droppableId === to.droppableId
+        ? sourceWorkflowConnectionsGroupIndex
+        : findGroupIndexByGroupId(workflowConnectionGroups, to.droppableId);
+    const proposalWorkflowConnectionToMove =
+      workflowConnectionGroups[sourceWorkflowConnectionsGroupIndex]
+        ?.connections[from.index];
+
+    workflowConnectionGroups[
+      sourceWorkflowConnectionsGroupIndex
+    ]?.connections.splice(from.index, 1);
+
+    proposalWorkflowConnectionToMove.droppableGroupId =
+      workflowConnectionGroups[destinationWorkflowConnectionGroupIndex].groupId;
+
+    workflowConnectionGroups[
+      destinationWorkflowConnectionGroupIndex
+    ]?.connections.splice(
+      to.index,
+      0,
+      proposalWorkflowConnectionToMove as ProposalWorkflowConnection
+    );
+
+    return workflowConnectionGroups;
   };
 
   function reducer(state: ProposalWorkflow, action: Event): ProposalWorkflow {
@@ -58,38 +109,66 @@ const ProposalWorkflowEditorModel = (
         case EventType.READY:
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED:
-          draft.proposalWorkflowConnections.splice(
-            action.payload.sortOrder,
-            0,
-            action.payload
+          const { proposalWorkflowConnectionGroups } = draft;
+          const newConnectionToAdd = action.payload;
+
+          draft.proposalWorkflowConnectionGroups = findGroupAndAddNewStatusConnection(
+            proposalWorkflowConnectionGroups,
+            newConnectionToAdd
           );
 
           return draft;
         case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
-          draft.proposalWorkflowConnections = moveArrayElement(
-            draft.proposalWorkflowConnections,
-            action.payload.source.index,
-            action.payload.destination.index
+          const { source, destination } = action.payload;
+
+          draft.proposalWorkflowConnectionGroups = moveStatusConnectionInsideWorkflow(
+            draft.proposalWorkflowConnectionGroups,
+            source,
+            destination
           );
 
           return draft;
         case EventType.REORDER_WORKFLOW_STATUS_FAILED:
-          draft.proposalWorkflowConnections = moveArrayElement(
-            draft.proposalWorkflowConnections,
-            action.payload.source.index,
-            action.payload.destination.index
-          );
+          //   draft.proposalWorkflowConnectionGroups = moveArrayElement(
+          //     draft.proposalWorkflowConnectionGroups,
+          //     action.payload.source.index,
+          //     action.payload.destination.index
+          //   );
 
           return draft;
         case EventType.WORKFLOW_STATUS_DELETED:
-          draft.proposalWorkflowConnections.splice(
-            action.payload.source.index,
-            1
+          const removingGroupIndex = findGroupIndexByGroupId(
+            draft.proposalWorkflowConnectionGroups,
+            action.payload.source.droppableId
           );
+
+          draft.proposalWorkflowConnectionGroups[
+            removingGroupIndex
+          ].connections.splice(action.payload.source.index, 1);
 
           return draft;
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
+        }
+        case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS: {
+          const groupsToAdd: ProposalWorkflowConnectionGroup[] = [];
+          const lastGroupId = parseInt(
+            draft.proposalWorkflowConnectionGroups[
+              draft.proposalWorkflowConnectionGroups.length - 1
+            ].groupId.split('_')[1]
+          );
+
+          for (let index = 0; index < action.payload.numberOfColumns; index++) {
+            groupsToAdd.push({
+              groupId: `proposalWorkflowConnections_${lastGroupId + index + 1}`,
+              parentGroupId: action.payload.parentDroppableId,
+              connections: [],
+            });
+          }
+
+          draft.proposalWorkflowConnectionGroups.push(...groupsToAdd);
+
+          return draft;
         }
       }
     });
@@ -105,6 +184,16 @@ const ProposalWorkflowEditorModel = (
     api()
       .getProposalWorkflow({ id: parseInt(workflowId) })
       .then(data => {
+        // NOTE: Push at least one group to have initial droppable if new proposal workflow
+        if (
+          data.proposalWorkflow?.proposalWorkflowConnectionGroups.length === 0
+        ) {
+          data.proposalWorkflow.proposalWorkflowConnectionGroups.push({
+            groupId: 'proposalWorkflowConnections_0',
+            parentGroupId: null,
+            connections: [],
+          });
+        }
         memoizedDispatch({
           type: EventType.READY,
           payload: data.proposalWorkflow,

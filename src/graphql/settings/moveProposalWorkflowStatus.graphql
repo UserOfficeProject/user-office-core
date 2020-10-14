@@ -1,6 +1,6 @@
 mutation moveProposalWorkflowStatus(
-  $from: Int!
-  $to: Int!
+  $from: IndexWithGroupId!
+  $to: IndexWithGroupId!
   $proposalWorkflowId: Int!
 ) {
   moveProposalWorkflowStatus(

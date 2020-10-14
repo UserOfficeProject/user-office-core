@@ -230,7 +230,7 @@ context('Settings tests', () => {
       cy.contains('Workflow status added successfully');
     });
 
-    it('User Officer should be able to add more statuses in proposal workflow and re-order them', () => {
+    it('User Officer should be able to add more statuses in proposal workflow', () => {
       cy.login('officer');
 
       cy.contains('Settings').click();
@@ -244,6 +244,7 @@ context('Settings tests', () => {
         .focus()
         .trigger('keydown', { keyCode: spaceKeyCode })
         .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
+        .trigger('keydown', { keyCode: arrowDownKeyCode, force: true })
         .wait(500)
         .trigger('keydown', { keyCode: spaceKeyCode, force: true });
 
@@ -255,18 +256,9 @@ context('Settings tests', () => {
       cy.contains('Workflow status added successfully');
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
-
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]')
-        .focus()
-        .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowDownKeyCode, force: true })
-        .wait(500)
-        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
-
-      cy.contains('Workflow statuses reordered successfully');
     });
 
-    it('User Officer should be able to remove statuses from proposal workflow by dragging and dropping them back inside status picker', () => {
+    it('User Officer should be able to split workflow into two or more paths', () => {
       cy.login('officer');
 
       cy.contains('Settings').click();
@@ -276,21 +268,58 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]')
+      cy.contains('Add multicolumn row').click();
+
+      cy.get('#mui-component-select-selectedParentDroppableId').click();
+      cy.get(
+        '[role="presentation"] [data-value="proposalWorkflowConnections_0"]'
+      ).click();
+
+      cy.get('#mui-component-select-numberOfColumns').click();
+      cy.get('[role="presentation"] [data-value="2"]').click();
+
+      cy.contains('Add row').click();
+
+      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
+
+      cy.get('[data-cy="status_SEP_SELECTION_4"]')
         .focus()
         .trigger('keydown', { keyCode: spaceKeyCode })
-        .trigger('keydown', { keyCode: arrowRightKeyCode, force: true })
+        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
+        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
         .wait(500)
         .trigger('keydown', { keyCode: spaceKeyCode, force: true });
 
-      cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should(
+      cy.get('[data-cy="connection_SEP_SELECTION_4"]').should(
         'contain.text',
-        'FEASIBILITY_REVIEW'
+        'SEP_SELECTION'
       );
 
-      cy.contains('Workflow status removed successfully');
+      cy.wait(500);
 
-      cy.get('[data-cy="connection_FEASIBILITY_REVIEW_2"]').should('not.exist');
+      cy.get('[data-cy="status_NOT_FEASIBLE_3"]')
+        .focus()
+        .trigger('keydown', { keyCode: spaceKeyCode })
+        .trigger('keydown', { keyCode: arrowLeftKeyCode, force: true })
+        .wait(500)
+        .trigger('keydown', { keyCode: spaceKeyCode, force: true });
+
+      cy.get('[data-cy="connection_NOT_FEASIBLE_3"]').should(
+        'contain.text',
+        'NOT_FEASIBLE'
+      );
+
+      cy.wait(500);
+
+      cy.reload();
+
+      cy.wait(500);
+
+      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
+
+      cy.get(
+        '[data-cy="proposal-workflow-connections"] .MuiGrid-container .MuiGrid-grid-xs-6'
+      ).should('have.length', 2);
     });
 
     it('User Officer should be able to remove statuses from proposal workflow using trash icon', () => {
@@ -303,7 +332,9 @@ context('Settings tests', () => {
         .last()
         .click();
 
-      cy.get('[data-cy="remove-workflow-status-button"]').click();
+      cy.get('[data-cy="remove-workflow-status-button"]')
+        .first()
+        .click();
 
       cy.get('[data-cy="status_DRAFT_1"]').should('contain.text', 'DRAFT');
 

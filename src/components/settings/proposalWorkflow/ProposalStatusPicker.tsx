@@ -21,7 +21,9 @@ const ProposalStatusPicker: React.FC<{
       alignItems: 'flex-start',
       alignContent: 'flex-start',
       flexBasis: '100%',
+      height: '100%',
       backgroundColor: theme.palette.grey[200],
+      marginLeft: '5px',
       boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
     },
     itemContainer: {
@@ -86,6 +88,7 @@ const ProposalStatusPicker: React.FC<{
   const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? theme.palette.primary.light : 'transparent',
     transition: 'all 500ms cubic-bezier(0.190, 1.000, 0.220, 1.000)',
+    overflow: 'hidden',
   });
 
   return (
