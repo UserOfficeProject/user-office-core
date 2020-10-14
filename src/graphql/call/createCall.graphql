@@ -28,26 +28,7 @@ mutation createCall(
   ) {
     error
     call {
-      id
-      shortCode
-      startCall
-      endCall
-      startReview
-      endReview
-      startNotify
-      endNotify
-      startCycle
-      endCycle
-      cycleComment
-      surveyComment
-      templateId
-      instruments {
-        id
-        name
-        shortCode
-        description
-        availabilityTime
-      }
+      ...call
     }
   }
 }

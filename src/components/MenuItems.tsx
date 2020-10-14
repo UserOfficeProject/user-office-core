@@ -51,7 +51,7 @@ const MenuItems: React.FC<MenuItemsProps> = ({ currentRole, callsData }) => {
         to={
           multipleCalls
             ? '/ProposalSelectType'
-            : `/ProposalCreate/${callsData[0]?.id}`
+            : `/ProposalCreate/${callsData[0]?.id}/${callsData[0]?.templateId}`
         }
         button
         disabled={proposalDisabled}

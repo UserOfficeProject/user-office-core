@@ -17,8 +17,8 @@ import {
   EventType,
   QuestionarySubmissionModel,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionModel';
-import { SampleSubmissionState } from 'models/SampleSubmissionModel';
+} from 'models/QuestionarySubmissionState';
+import { SampleSubmissionState } from 'models/SampleSubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
@@ -43,10 +43,14 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
   },
 }));
-
-export const SampleContext = React.createContext<SampleSubmissionState | null>(
-  null
-);
+type SampleContextType = {
+  state: SampleSubmissionState | null;
+  dispatch: React.Dispatch<Event>;
+};
+export const SampleContext = React.createContext<SampleContextType>({
+  state: null,
+  dispatch: e => {},
+});
 
 const getConfirmNavigMsg = (): string => {
   return 'Changes you recently made in this step will not be saved! Are you sure?';
@@ -81,9 +85,9 @@ const samplesReducer = (
 
 export function SampleDeclarationContainer(props: {
   sample: Sample;
-  sampleCreated: (sample: Sample) => any;
-  sampleUpdated: (sample: Sample) => any;
-  sampleEditDone: () => any;
+  sampleCreated?: (sample: Sample) => any;
+  sampleUpdated?: (sample: Sample) => any;
+  sampleEditDone?: () => any;
 }) {
   const classes = useStyles();
   const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
@@ -97,16 +101,31 @@ export function SampleDeclarationContainer(props: {
       const confirmed = window.confirm(getConfirmNavigMsg());
       const sampleState = state as SampleSubmissionState;
       if (confirmed) {
-        api()
-          .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
-          .then(data => {
-            if (data.sample?.questionary.steps) {
-              dispatch({
-                type: EventType.QUESTIONARY_STEPS_LOADED,
-                payload: { questionarySteps: data.sample.questionary.steps },
-              });
-            }
+        if (sampleState.sample.id === 0) {
+          // if sample isn't created yet
+          dispatch({
+            type: EventType.SAMPLE_LOADED,
+            payload: { sample: initialState.sample },
           });
+        } else {
+          api()
+            .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
+            .then(data => {
+              if (data.sample && data.sample.questionary.steps) {
+                dispatch({
+                  type: EventType.SAMPLE_LOADED,
+                  payload: { sample: data.sample },
+                });
+                dispatch({
+                  type: EventType.QUESTIONARY_STEPS_LOADED,
+                  payload: {
+                    questionarySteps: data.sample.questionary.steps,
+                    stepIndex: state.stepIndex,
+                  },
+                });
+              }
+            });
+        }
 
         return true;
       } else {
@@ -122,27 +141,25 @@ export function SampleDeclarationContainer(props: {
     dispatch,
   }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
     return (next: Function) => async (action: Event) => {
-      next(action); // first update state/model
+      next(action);
       const state = getState() as SampleSubmissionState;
       switch (action.type) {
         case EventType.SAMPLE_UPDATED:
-          props.sampleUpdated(action.payload.sample);
+          props.sampleUpdated?.(action.payload.sample);
           break;
         case EventType.SAMPLE_CREATED:
-          props.sampleCreated(action.payload.sample);
+          props.sampleCreated?.(action.payload.sample);
           break;
         case EventType.BACK_CLICKED:
           if (!state.isDirty || (await handleReset())) {
             dispatch({ type: EventType.GO_STEP_BACK });
           }
           break;
-
         case EventType.RESET_CLICKED:
           handleReset();
           break;
-
         case EventType.QUESTIONARY_STEPS_COMPLETE:
-          props.sampleEditDone();
+          props.sampleEditDone?.();
           break;
       }
     };
@@ -175,6 +192,7 @@ export function SampleDeclarationContainer(props: {
   }, []); // FIXME
 
   const getStepperNavig = () => {
+    // TODO reuse this in both containers
     if (state.steps.length <= 1) {
       return null;
     }
@@ -213,15 +231,14 @@ export function SampleDeclarationContainer(props: {
 
   const getStepContent = () => {
     const currentStep = state.steps[state.stepIndex];
-    const previousStep =
-      state.stepIndex !== 0 ? state.steps[state.stepIndex - 1] : undefined;
+    const previousStep = state.steps[state.stepIndex - 1];
 
     if (!currentStep) {
       return null;
     }
 
     return (
-      <SampleContext.Provider value={state}>
+      <SampleContext.Provider value={{ state, dispatch }}>
         <QuestionaryStepView
           topicId={currentStep.topic.id}
           state={state}
@@ -238,6 +255,7 @@ export function SampleDeclarationContainer(props: {
   };
 
   const getProgressBar = () =>
+    // TODO resue with other container
     isApiInteracting || isSavingModel ? <LinearProgress /> : null;
 
   return (

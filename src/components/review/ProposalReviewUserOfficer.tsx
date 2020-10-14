@@ -60,6 +60,8 @@ const ProposalReview: React.FC<ProposalReviewProps> = ({ match }) => {
     tabNames.push('Logs');
   }
 
+  console.log(proposal);
+
   return (
     <Container maxWidth="lg">
       <SimpleTabs tabNames={tabNames}>

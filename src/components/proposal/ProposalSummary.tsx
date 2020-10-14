@@ -9,7 +9,7 @@ import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import {
   EventType,
   ProposalSubmissionModelState,
-} from 'models/ProposalSubmissionModel';
+} from 'models/ProposalSubmissionState';
 import withConfirm from 'utils/withConfirm';
 
 import { SubmissionContext } from '../../utils/SubmissionContext';

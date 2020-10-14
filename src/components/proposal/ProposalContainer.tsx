@@ -5,51 +5,101 @@ import Step from '@material-ui/core/Step';
 import Stepper from '@material-ui/core/Stepper';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
-import { default as React, useEffect, useState } from 'react';
+import { default as React, useEffect } from 'react';
 import { Prompt } from 'react-router';
 
 import { useCheckAccess } from 'components/common/Can';
 import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
-import { Answer, Questionary, UserRole } from 'generated/sdk';
+import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
+import { Proposal, UserRole } from 'generated/sdk';
+import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import {
   Event,
   EventType,
-  ProposalSubmissionModel,
-  ProposalSubmissionModelState,
-} from 'models/ProposalSubmissionModel';
-import { prepareAnswers } from 'models/QuestionaryFunctions';
+  QuestionarySubmissionModel,
+  QuestionarySubmissionState,
+} from 'models/QuestionarySubmissionState';
 import { StyledPaper } from 'styles/StyledComponents';
-import { clamp } from 'utils/Math';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-import { QuestionaryUIStep } from '../../hooks/questionary/QuestionaryUIStep';
-import { SubmissionContext } from '../../utils/SubmissionContext';
-import ProposalInformationView from './ProposalInformationView';
-import ProposalQuestionaryStepView from './ProposalQuestionaryStepView';
-import ProposalReview from './ProposalSummary';
+import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 
 export interface Notification {
   variant: 'error' | 'success';
   message: string;
 }
 
+const useStyles = makeStyles(theme => ({
+  stepper: {
+    padding: theme.spacing(3, 0, 5),
+  },
+  heading: {
+    textOverflow: 'ellipsis',
+    width: '80%',
+    margin: '0 auto',
+    textAlign: 'center',
+    minWidth: '450px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+  },
+  infoline: {
+    color: theme.palette.grey[600],
+    textAlign: 'right',
+  },
+}));
+
+type ProposalContextType = {
+  state: ProposalSubmissionState | null;
+  dispatch: React.Dispatch<Event>;
+};
+
+export const ProposalContext = React.createContext<ProposalContextType>({
+  state: null,
+  dispatch: (e: Event) => {},
+});
+
+const getConfirmNavigMsg = (): string => {
+  return 'Changes you recently made in this step will not be saved! Are you sure?';
+};
+
+const proposalReducer = (
+  state: ProposalSubmissionState,
+  draftState: ProposalSubmissionState,
+  action: Event
+) => {
+  switch (action.type) {
+    case EventType.PROPOSAL_CREATED:
+    case EventType.PROPOSAL_LOADED:
+      const proposal: Proposal = action.payload.proposal;
+      draftState.isDirty = false;
+      draftState.questionaryId = proposal.questionaryId;
+      draftState.proposal = proposal;
+      draftState.steps = proposal.questionary.steps;
+      draftState.templateId = proposal.questionary.templateId;
+      break;
+    case EventType.PROPOSAL_UPDATED:
+      draftState.proposal = {
+        ...draftState.proposal,
+        ...action.payload.proposal,
+      };
+      draftState.isDirty = true;
+      break;
+  }
+
+  return draftState;
+};
+
 export default function ProposalContainer(props: {
-  data: ProposalSubsetSumbission;
+  proposal: ProposalSubsetSumbission;
+  proposalCreated?: (proposal: Proposal) => any;
+  proposalUpdated?: (proposal: Proposal) => any;
 }) {
-  const [stepIndex, setStepIndex] = useState(0);
-  const [proposalSteps, setProposalSteps] = useState<QuestionaryUIStep[]>([]);
   const isNonOfficer = !useCheckAccess([UserRole.USER_OFFICER]);
 
-  const { api, isExecutingCall } = useDataApiWithFeedback();
-
-  const clampStep = (step: number): number => {
-    return clamp(step, 0, proposalSteps.length - 1);
-  };
-
-  const getConfirmNavigMsg = (): string => {
-    return 'Changes you recently made in this step will not be saved! Are you sure?';
-  };
+  const classes = useStyles();
+  const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
+  const { persistModel, isSavingModel } = usePersistQuestionaryModel();
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -57,12 +107,33 @@ export default function ProposalContainer(props: {
   const handleReset = async (): Promise<boolean> => {
     if (state.isDirty) {
       const confirmed = window.confirm(getConfirmNavigMsg());
+      const proposalState = state as ProposalSubmissionState;
       if (confirmed) {
-        api()
-          .getProposal({ id: state.proposal.id })
-          .then(data =>
-            dispatch({ type: EventType.MODEL_LOADED, payload: data.proposal })
-          );
+        if (proposalState.proposal.id === 0) {
+          // if proposal is not created yet
+          dispatch({
+            type: EventType.PROPOSAL_LOADED,
+            payload: { proposal: initialState.proposal },
+          });
+        } else {
+          api()
+            .getProposal({ id: proposalState.proposal.id }) // or load blankQuestionarySteps if sample is null
+            .then(data => {
+              if (data.proposal && data.proposal.questionary.steps) {
+                dispatch({
+                  type: EventType.PROPOSAL_LOADED,
+                  payload: { proposal: data.proposal },
+                });
+                dispatch({
+                  type: EventType.QUESTIONARY_STEPS_LOADED,
+                  payload: {
+                    questionarySteps: data.proposal.questionary.steps,
+                    stepIndex: state.stepIndex,
+                  },
+                });
+              }
+            });
+        }
 
         return true;
       } else {
@@ -73,281 +144,151 @@ export default function ProposalContainer(props: {
     return false;
   };
 
-  const classes = makeStyles(theme => ({
-    stepper: {
-      padding: theme.spacing(3, 0, 5),
-    },
-    heading: {
-      textOverflow: 'ellipsis',
-      width: '80%',
-      margin: '0 auto',
-      textAlign: 'center',
-      minWidth: '450px',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-    },
-    infoline: {
-      color: theme.palette.grey[600],
-      textAlign: 'right',
-    },
-  }))();
-
-  const reduceMiddleware = ({
+  const handleEvents = ({
     getState,
     dispatch,
-  }: {
-    getState: () => ProposalSubmissionModelState;
-    dispatch: React.Dispatch<Event>;
-  }) => {
+  }: MiddlewareInputParams<QuestionarySubmissionState, Event>) => {
     return (next: Function) => async (action: Event) => {
       next(action); // first update state/model
-      const state = getState();
+      const state = getState() as ProposalSubmissionState;
       switch (action.type) {
-        case EventType.BACK_CLICKED:
-          if (state.isDirty) {
-            if (await handleReset()) {
-              setStepIndex(clampStep(stepIndex - 1));
-            }
-          } else {
-            setStepIndex(clampStep(stepIndex - 1));
+        case EventType.PROPOSAL_UPDATED:
+          props.proposalUpdated?.(action.payload.proposal);
+          break;
+        case EventType.PROPOSAL_CREATED:
+          props.proposalCreated?.(action.payload.proposal);
+          break;
+        case EventType.BACK_CLICKED: // TODO check if this event is really necessary
+          if (!state.isDirty || (await handleReset())) {
+            dispatch({ type: EventType.GO_STEP_BACK });
           }
           break;
-
-        case EventType.SAVE_GENERAL_INFO_CLICKED:
-          const { callId } = state.proposal;
-          let proposal = state.proposal;
-          if (state.proposal.status.id === 0) {
-            const response = await api('Saved').createProposal({ callId });
-            proposal = { ...proposal, ...response.createProposal.proposal };
-            dispatch({
-              type: EventType.PROPOSAL_METADATA_CHANGED,
-              payload: {
-                ...proposal,
-              },
-            });
-          }
-          if (proposal) {
-            await api('Saved').updateProposal({
-              id: proposal.id,
-              title: proposal.title,
-              abstract: proposal.abstract,
-              proposerId: proposal.proposer.id,
-              users: proposal.users.map(user => user.id),
-            });
-            setStepIndex(clampStep(stepIndex + 1));
-          }
-
-          break;
-
-        case EventType.SAVE_STEP_CLICKED: {
-          const answers: Answer[] = action.payload.answers;
-          const topicId: number = action.payload.topicId;
-          const {
-            answerTopic: { questionaryStep },
-          } = await api('Saved').answerTopic({
-            questionaryId: state.proposal.questionaryId,
-            answers: prepareAnswers(answers),
-            topicId: topicId,
-            isPartialSave: true,
-          });
-
-          if (questionaryStep) {
-            dispatch({
-              type: EventType.STEP_ANSWERED,
-              payload: { step: questionaryStep },
-            });
-          }
-          break;
-        }
-
-        case EventType.FINISH_STEP_CLICKED: {
-          const answers: Answer[] = action.payload.answers;
-          const topicId: number = action.payload.topicId;
-          const {
-            answerTopic: { questionaryStep },
-          } = await api('Step finished').answerTopic({
-            questionaryId: state.proposal.questionaryId,
-            answers: prepareAnswers(answers),
-            topicId: topicId,
-            isPartialSave: false,
-          });
-          if (questionaryStep) {
-            dispatch({
-              type: EventType.STEP_ANSWERED,
-              payload: { step: questionaryStep },
-            });
-            setStepIndex(clampStep(stepIndex + 1));
-          }
-          break;
-        }
 
         case EventType.RESET_CLICKED:
-          const stepBeforeReset = stepIndex;
-          if (await handleReset()) {
-            setStepIndex(stepBeforeReset);
-          }
+          handleReset();
           break;
       }
     };
   };
 
-  const { state, dispatch } = ProposalSubmissionModel(props.data, [
-    reduceMiddleware,
-  ]);
-
-  const isSubmitted = state.proposal.submitted;
-
-  useEffect(() => {
-    const createProposalSteps = (
-      questionary: Questionary
-    ): QuestionaryUIStep[] => {
-      let allProposalSteps = new Array<QuestionaryUIStep>();
-
-      allProposalSteps.push(
-        new QuestionaryUIStep(
-          'New Proposal',
-          state.proposal.status.id !== 0,
-          (
-            <ProposalInformationView
-              data={state.proposal}
-              readonly={isSubmitted && isNonOfficer}
-            />
-          )
-        )
-      );
-      allProposalSteps = allProposalSteps.concat(
-        questionary.steps.map((step, index, steps) => {
-          const editable =
-            (index === 0 && state.proposal.status.id !== 0) ||
-            step.isCompleted ||
-            (steps[index - 1] !== undefined &&
-              steps[index - 1].isCompleted === true);
-
-          return new QuestionaryUIStep(
-            step.topic.title,
-            step.isCompleted,
-            (
-              <ProposalQuestionaryStepView
-                topicId={step.topic.id}
-                state={{
-                  questionary: state.proposal.questionary,
-                  isDirty: state.isDirty,
-                }}
-                readonly={(!editable || isSubmitted) && isNonOfficer}
-                key={step.topic.id}
-              />
-            )
-          );
-        })
-      );
-      allProposalSteps.push(
-        new QuestionaryUIStep(
-          'Review',
-          state.proposal.submitted,
-          (
-            <ProposalReview
-              data={state}
-              readonly={isSubmitted && isNonOfficer}
-            />
-          )
-        )
-      );
-
-      return allProposalSteps;
-    };
-
-    const proposalSteps = createProposalSteps(state.proposal.questionary);
-    setProposalSteps(proposalSteps);
-  }, [state, isSubmitted, isNonOfficer]);
-
-  // The purpose of this effect is to navigate user to the
-  // right step once proposal loads
-  useEffect(() => {
-    const proposal = props.data;
-    if (proposal.status.name === 'DRAFT') {
-      const questionarySteps = proposal.questionary.steps;
-      const lastFinishedStep = questionarySteps
-        .slice()
-        .reverse()
-        .find(step => step.isCompleted === true);
-      setStepIndex(
-        clamp(
-          lastFinishedStep ? questionarySteps.indexOf(lastFinishedStep) + 2 : 1,
-          1,
-          questionarySteps.length + 1
-        )
-      );
-    } else {
-      if (proposal.status.id === 0) {
-        setStepIndex(0);
-      } else {
-        setStepIndex(proposal.questionary.steps.length + 1);
-      }
-    }
-  }, [props.data]);
-
-  const getStepContent = (step: number) => {
-    if (!proposalSteps || proposalSteps.length === 0) {
-      return 'Loading...';
-    }
-
-    if (!proposalSteps[step]) {
-      console.error(`Invalid step ${step}`);
-
-      return <span>Error</span>;
-    }
-
-    return proposalSteps[step].element;
+  const initialState: ProposalSubmissionState = {
+    proposal: props.proposal,
+    templateId: props.proposal.questionary.templateId,
+    isDirty: false,
+    questionaryId: props.proposal.questionary.questionaryId,
+    stepIndex: 0,
+    steps: props.proposal.questionary.steps,
   };
 
-  const progressBar = isExecutingCall ? <LinearProgress /> : null;
+  const { state, dispatch } = QuestionarySubmissionModel<
+    ProposalSubmissionState
+  >(initialState, [handleEvents, persistModel], proposalReducer);
+
+  const isSubmitted = state.proposal.submitted; // TODO check where to use this?
+
+  useEffect(() => {
+    dispatch({
+      type: EventType.PROPOSAL_LOADED,
+      payload: { proposal: props.proposal },
+    });
+    dispatch({
+      type: EventType.QUESTIONARY_STEPS_LOADED,
+      payload: { questionarySteps: props.proposal.questionary.steps },
+    });
+  }, []); // FIXME
+
+  const getStepperNavig = () => {
+    // TODO reuse this in both containers
+    if (state.steps.length <= 1) {
+      return null;
+    }
+
+    return (
+      <Stepper
+        nonLinear
+        activeStep={state.stepIndex}
+        className={classes.stepper}
+      >
+        {state.steps.map((step, index, steps) => (
+          <Step key={index}>
+            <QuestionaryStepButton
+              onClick={async () => {
+                if (!state.isDirty || (await handleReset())) {
+                  dispatch({
+                    type: EventType.GO_TO_STEP,
+                    payload: { stepIndex: index },
+                  });
+                }
+              }}
+              completed={step.isCompleted}
+              editable={
+                index === 0 ||
+                step.isCompleted ||
+                steps[index].isCompleted === true
+              }
+            >
+              <span>{step.topic.title}</span>
+            </QuestionaryStepButton>
+          </Step>
+        ))}
+      </Stepper>
+    );
+  };
+
+  const getStepContent = () => {
+    const currentStep = state.steps[state.stepIndex];
+    const previousStep = state.steps[state.stepIndex - 1];
+
+    if (!currentStep) {
+      return null;
+    }
+
+    return (
+      <ProposalContext.Provider value={{ state, dispatch }}>
+        <QuestionaryStepView
+          topicId={currentStep.topic.id}
+          state={state}
+          readonly={
+            isSavingModel ||
+            isApiInteracting ||
+            (previousStep ? previousStep.isCompleted === false : false) ||
+            (isSubmitted && isNonOfficer)
+          }
+          dispatch={dispatch}
+          key={currentStep.topic.id}
+        />
+      </ProposalContext.Provider>
+    );
+  };
+
+  const getProgressBar = () =>
+    // TODO reuse with other container
+    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
+
+  //<ProposalReview data={state} readonly={isSubmitted && isNonOfficer} />
 
   return (
     <Container maxWidth="lg">
       <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <SubmissionContext.Provider value={{ dispatch }}>
-        <StyledPaper>
-          <Typography
-            component="h1"
-            variant="h4"
-            align="center"
-            className={classes.heading}
-          >
-            {state.proposal.title || 'New Proposal'}
-          </Typography>
-          <div className={classes.infoline}>
-            {state.proposal.shortCode
-              ? `Proposal ID: ${state.proposal.shortCode}`
-              : null}
-          </div>
-          <div className={classes.infoline}>{state.proposal.status.name}</div>
-          <Stepper nonLinear activeStep={stepIndex} className={classes.stepper}>
-            {proposalSteps.map((step, index, steps) => (
-              <Step key={step.title}>
-                <QuestionaryStepButton
-                  onClick={async () => {
-                    if (!state.isDirty || (await handleReset())) {
-                      setStepIndex(index);
-                    }
-                  }}
-                  completed={step.completed}
-                  editable={
-                    index === 0 ||
-                    step.completed ||
-                    steps[index - 1].completed === true
-                  }
-                >
-                  <span>{step.title}</span>
-                </QuestionaryStepButton>
-              </Step>
-            ))}
-          </Stepper>
-          {progressBar}
-          {getStepContent(stepIndex)}
-        </StyledPaper>
-      </SubmissionContext.Provider>
+      <StyledPaper>
+        <Typography
+          component="h1"
+          variant="h4"
+          align="center"
+          className={classes.heading}
+        >
+          {state.proposal.title || 'New Proposal'}
+        </Typography>
+        <div className={classes.infoline}>
+          {state.proposal.shortCode
+            ? `Proposal ID: ${state.proposal.shortCode}`
+            : null}
+        </div>
+        <div className={classes.infoline}>{state.proposal.status.name}</div>
+        {getStepperNavig()}
+        {getProgressBar()}
+        {getStepContent()}
+      </StyledPaper>
     </Container>
   );
 }
-
-type TServiceCall<T> = () => Promise<T & { error?: string | null }>;

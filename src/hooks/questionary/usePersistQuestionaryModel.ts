@@ -6,8 +6,8 @@ import {
   Event,
   EventType,
   QuestionarySubmissionState,
-} from '../../models/QuestionarySubmissionModel';
-import { usePreSubmitFunctionQueue as usePreSubmitFunctionQueueFactory } from './usePreSubmitFunctionQueueFactory';
+} from '../../models/QuestionarySubmissionState';
+import { usePreSubmitFunctionQueueFactory } from './usePreSubmitFunctionQueueFactory';
 
 export function usePersistQuestionaryModel() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -26,7 +26,7 @@ export function usePersistQuestionaryModel() {
 
           await Promise.all(
             preSubmitFunctionQueueFactory(answers).map(
-              async f => await f(getState(), dispatch)
+              async func => await func(getState(), dispatch, api())
             )
           );
 
@@ -59,7 +59,7 @@ export function usePersistQuestionaryModel() {
           const topicId = action.payload.topicId;
           await Promise.all(
             preSubmitFunctionQueueFactory(answers).map(
-              async f => await f(getState(), dispatch)
+              async f => await f(getState(), dispatch, api())
             )
           );
 

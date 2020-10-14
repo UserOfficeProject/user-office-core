@@ -1,7 +1,7 @@
 import produce from 'immer';
 
 import { Sample } from 'generated/sdk';
-import { Event } from 'models/QuestionarySubmissionModel';
+import { Event } from 'models/QuestionarySubmissionState';
 
 export const useSampleEditorReducer = (dispatch: React.Dispatch<Event>) => {
   const sampleEditorReducer: React.Reducer<Sample, Event> = (state, action) => {

@@ -17,6 +17,7 @@ export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:
     case DataType.SAMPLE_BASIS:
+    case DataType.PROPOSAL_BASIS:
       return { readonly: true };
     default:
       return { readonly: false };

@@ -164,7 +164,8 @@ export enum DataType {
   SELECTION_FROM_OPTIONS = 'SELECTION_FROM_OPTIONS',
   TEXT_INPUT = 'TEXT_INPUT',
   SUBTEMPLATE = 'SUBTEMPLATE',
-  SAMPLE_BASIS = 'SAMPLE_BASIS'
+  SAMPLE_BASIS = 'SAMPLE_BASIS',
+  PROPOSAL_BASIS = 'PROPOSAL_BASIS'
 }
 
 export type DateConfig = {
@@ -228,7 +229,7 @@ export type FieldConditionInput = {
   params: Scalars['String'];
 };
 
-export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig;
+export type FieldConfig = BooleanConfig | DateConfig | EmbellishmentConfig | FileUploadConfig | SelectionFromOptionsConfig | TextInputConfig | SampleBasisConfig | SubtemplateConfig | ProposalBasisConfig;
 
 export type FieldDependency = {
   __typename?: 'FieldDependency';
@@ -1056,6 +1057,13 @@ export type Proposal = {
   sep: Maybe<Sep>;
   call: Maybe<Call>;
   questionary: Questionary;
+};
+
+export type ProposalBasisConfig = {
+  __typename?: 'ProposalBasisConfig';
+  small_label: Scalars['String'];
+  required: Scalars['Boolean'];
+  tooltip: Scalars['String'];
 };
 
 export enum ProposalEndStatus {
@@ -2276,13 +2284,35 @@ export type CreateCallMutation = (
     & Pick<CallResponseWrap, 'error'>
     & { call: Maybe<(
       { __typename?: 'Call' }
-      & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
-      & { instruments: Array<(
-        { __typename?: 'InstrumentWithAvailabilityTime' }
-        & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime'>
-      )> }
+      & CallFragment
     )> }
   ) }
+);
+
+export type CallFragment = (
+  { __typename?: 'Call' }
+  & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
+  & { instruments: Array<(
+    { __typename?: 'InstrumentWithAvailabilityTime' }
+    & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
+    & { scientists: Array<(
+      { __typename?: 'BasicUserDetails' }
+      & BasicUserDetailsFragment
+    )> }
+  )> }
+);
+
+export type GetCallQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type GetCallQuery = (
+  { __typename?: 'Query' }
+  & { call: Maybe<(
+    { __typename?: 'Call' }
+    & CallFragment
+  )> }
 );
 
 export type GetCallsQueryVariables = Exact<{
@@ -2294,15 +2324,7 @@ export type GetCallsQuery = (
   { __typename?: 'Query' }
   & { calls: Maybe<Array<(
     { __typename?: 'Call' }
-    & Pick<Call, 'id' | 'shortCode' | 'startCall' | 'endCall' | 'startReview' | 'endReview' | 'startNotify' | 'endNotify' | 'startCycle' | 'endCycle' | 'cycleComment' | 'surveyComment' | 'templateId'>
-    & { instruments: Array<(
-      { __typename?: 'InstrumentWithAvailabilityTime' }
-      & Pick<InstrumentWithAvailabilityTime, 'id' | 'name' | 'shortCode' | 'description' | 'availabilityTime' | 'submitted'>
-      & { scientists: Array<(
-        { __typename?: 'BasicUserDetails' }
-        & BasicUserDetailsFragment
-      )> }
-    )> }
+    & CallFragment
   )>> }
 );
 
@@ -2944,6 +2966,9 @@ export type AnswerFragment = (
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
+  ) | (
+    { __typename?: 'ProposalBasisConfig' }
+    & FieldConfigProposalBasisConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -3745,7 +3770,12 @@ type FieldConfigSubtemplateConfigFragment = (
   & Pick<SubtemplateConfig, 'addEntryButtonLabel' | 'maxEntries' | 'templateId' | 'templateCategory' | 'small_label' | 'required' | 'tooltip'>
 );
 
-export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment;
+type FieldConfigProposalBasisConfigFragment = (
+  { __typename?: 'ProposalBasisConfig' }
+  & Pick<ProposalBasisConfig, 'small_label' | 'required' | 'tooltip'>
+);
+
+export type FieldConfigFragment = FieldConfigBooleanConfigFragment | FieldConfigDateConfigFragment | FieldConfigEmbellishmentConfigFragment | FieldConfigFileUploadConfigFragment | FieldConfigSelectionFromOptionsConfigFragment | FieldConfigTextInputConfigFragment | FieldConfigSampleBasisConfigFragment | FieldConfigSubtemplateConfigFragment | FieldConfigProposalBasisConfigFragment;
 
 export type QuestionFragment = (
   { __typename?: 'Question' }
@@ -3774,6 +3804,9 @@ export type QuestionFragment = (
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
+  ) | (
+    { __typename?: 'ProposalBasisConfig' }
+    & FieldConfigProposalBasisConfigFragment
   ) }
 );
 
@@ -3807,6 +3840,9 @@ export type QuestionTemplateRelationFragment = (
   ) | (
     { __typename?: 'SubtemplateConfig' }
     & FieldConfigSubtemplateConfigFragment
+  ) | (
+    { __typename?: 'ProposalBasisConfig' }
+    & FieldConfigProposalBasisConfigFragment
   ), dependency: Maybe<(
     { __typename?: 'FieldDependency' }
     & Pick<FieldDependency, 'questionId' | 'dependencyId' | 'dependencyNaturalKey'>
@@ -4386,6 +4422,45 @@ export type VerifyEmailMutation = (
   ) }
 );
 
+export const BasicUserDetailsFragmentDoc = gql`
+    fragment basicUserDetails on BasicUserDetails {
+  id
+  firstname
+  lastname
+  organisation
+  position
+  created
+  placeholder
+}
+    `;
+export const CallFragmentDoc = gql`
+    fragment call on Call {
+  id
+  shortCode
+  startCall
+  endCall
+  startReview
+  endReview
+  startNotify
+  endNotify
+  startCycle
+  endCycle
+  cycleComment
+  surveyComment
+  templateId
+  instruments {
+    id
+    name
+    shortCode
+    description
+    availabilityTime
+    submitted
+    scientists {
+      ...basicUserDetails
+    }
+  }
+}
+    ${BasicUserDetailsFragmentDoc}`;
 export const CoreTechnicalReviewFragmentDoc = gql`
     fragment coreTechnicalReview on TechnicalReview {
   id
@@ -4494,6 +4569,11 @@ export const FieldConfigFragmentDoc = gql`
   }
   ... on SampleBasisConfig {
     placeholder
+    small_label
+    required
+    tooltip
+  }
+  ... on ProposalBasisConfig {
     small_label
     required
     tooltip
@@ -4649,17 +4729,6 @@ export const TemplateStepFragmentDoc = gql`
   }
 }
     ${QuestionTemplateRelationFragmentDoc}`;
-export const BasicUserDetailsFragmentDoc = gql`
-    fragment basicUserDetails on BasicUserDetails {
-  id
-  firstname
-  lastname
-  organisation
-  position
-  created
-  placeholder
-}
-    `;
 export const AssignProposalDocument = gql`
     mutation assignProposal($proposalId: Int!, $sepId: Int!) {
   assignProposal(proposalId: $proposalId, sepId: $sepId) {
@@ -4981,60 +5050,25 @@ export const CreateCallDocument = gql`
   createCall(shortCode: $shortCode, startCall: $startCall, endCall: $endCall, startReview: $startReview, endReview: $endReview, startNotify: $startNotify, endNotify: $endNotify, startCycle: $startCycle, endCycle: $endCycle, cycleComment: $cycleComment, surveyComment: $surveyComment, templateId: $templateId) {
     error
     call {
-      id
-      shortCode
-      startCall
-      endCall
-      startReview
-      endReview
-      startNotify
-      endNotify
-      startCycle
-      endCycle
-      cycleComment
-      surveyComment
-      templateId
-      instruments {
-        id
-        name
-        shortCode
-        description
-        availabilityTime
-      }
+      ...call
     }
   }
 }
-    `;
+    ${CallFragmentDoc}`;
+export const GetCallDocument = gql`
+    query getCall($id: Int!) {
+  call(id: $id) {
+    ...call
+  }
+}
+    ${CallFragmentDoc}`;
 export const GetCallsDocument = gql`
     query getCalls($filter: CallsFilter) {
   calls(filter: $filter) {
-    id
-    shortCode
-    startCall
-    endCall
-    startReview
-    endReview
-    startNotify
-    endNotify
-    startCycle
-    endCycle
-    cycleComment
-    surveyComment
-    templateId
-    instruments {
-      id
-      name
-      shortCode
-      description
-      availabilityTime
-      submitted
-      scientists {
-        ...basicUserDetails
-      }
-    }
+    ...call
   }
 }
-    ${BasicUserDetailsFragmentDoc}`;
+    ${CallFragmentDoc}`;
 export const RemoveAssignedInstrumentFromcallDocument = gql`
     mutation removeAssignedInstrumentFromcall($instrumentId: Int!, $callId: Int!) {
   removeAssignedInstrumentFromcall(instrumentId: $instrumentId, callId: $callId) {
@@ -6388,6 +6422,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     createCall(variables: CreateCallMutationVariables): Promise<CreateCallMutation> {
       return withWrapper(() => client.request<CreateCallMutation>(print(CreateCallDocument), variables));
+    },
+    getCall(variables: GetCallQueryVariables): Promise<GetCallQuery> {
+      return withWrapper(() => client.request<GetCallQuery>(print(GetCallDocument), variables));
     },
     getCalls(variables?: GetCallsQueryVariables): Promise<GetCallsQuery> {
       return withWrapper(() => client.request<GetCallsQuery>(print(GetCallsDocument), variables));

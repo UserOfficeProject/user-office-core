@@ -7,7 +7,7 @@ import { QuestionaryComponentEmbellishment } from 'components/questionary/formCo
 import { QuestionaryComponentFileUpload } from 'components/questionary/formComponents/QuestionaryComponentFileUpload';
 import { QuestionaryComponentMultipleChoice } from 'components/questionary/formComponents/QuestionaryComponentMultipleChoice';
 import { QuestionaryComponentSampleBasis } from 'components/questionary/formComponents/QuestionaryComponentSampleBasis';
-import QuestionaryComponentSampleDeclaration from 'components/questionary/formComponents/QuestionaryComponentSampleDeclaration';
+import { QuestionaryComponentSampleDeclaration } from 'components/questionary/formComponents/QuestionaryComponentSampleDeclaration';
 import { QuestionaryComponentTextInput } from 'components/questionary/formComponents/QuestionaryComponentTextInput';
 import {
   Answer,
@@ -15,6 +15,8 @@ import {
   SubtemplateConfig,
   TemplateCategoryId,
 } from 'generated/sdk';
+
+import { QuestionaryComponentProposalBasis } from './formComponents/QuestionaryComponentProposalBasis';
 
 function getComponentElement(answer: Answer) {
   switch (answer.question.dataType) {
@@ -32,6 +34,8 @@ function getComponentElement(answer: Answer) {
       return QuestionaryComponentEmbellishment;
     case DataType.SAMPLE_BASIS:
       return QuestionaryComponentSampleBasis;
+    case DataType.PROPOSAL_BASIS:
+      return QuestionaryComponentProposalBasis;
     case DataType.SUBTEMPLATE:
       const config = answer.config as SubtemplateConfig;
       switch (config.templateCategory) {

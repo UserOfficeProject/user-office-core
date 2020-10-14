@@ -4,11 +4,16 @@ import React, { useEffect, useState } from 'react';
 
 import ModalWrapper from 'components/common/ModalWrapper';
 import {
+  Answer,
+  DataType,
   QuestionaryStep,
   Sample,
   SampleStatus,
+  Sdk,
   SubtemplateConfig,
+  TemplateCategoryId,
 } from 'generated/sdk';
+import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -21,14 +26,14 @@ const sampleToListRow = (sample: SampleBasic): QuestionariesListRow => {
   return { id: sample.id, label: sample.title };
 };
 
-const createSampleStub = (
+function createSampleStub(
   templateId: number,
   questionarySteps: QuestionaryStep[]
-): Sample => {
+): Sample {
   return {
     id: 0,
     created: new Date(),
-    creatorId: 0, // FIXME
+    creatorId: 0,
     questionary: {
       questionaryId: 0,
       templateId: templateId,
@@ -40,11 +45,9 @@ const createSampleStub = (
     safetyStatus: SampleStatus.NONE,
     title: '',
   };
-};
+}
 
-export default function QuestionaryComponentSampleDeclaration(
-  props: BasicComponentProps
-) {
+function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   const { templateField, errors, onComplete } = props;
   const proposalQuestionId = templateField.question.proposalQuestionId;
   const config = templateField.config as SubtemplateConfig;
@@ -170,3 +173,40 @@ export default function QuestionaryComponentSampleDeclaration(
     </>
   );
 }
+
+function isSample(answer: Answer) {
+  const { dataType, config } = answer.question;
+
+  return (
+    dataType === DataType.SUBTEMPLATE &&
+    (config as SubtemplateConfig).templateCategory ===
+      TemplateCategoryId.SAMPLE_DECLARATION
+  );
+}
+
+async function sampleDeclarationPreSubmit(
+  state: QuestionarySubmissionState,
+  dispatch: React.Dispatch<Event>,
+  api: Sdk
+) {
+  const sampleAnswers = state.steps[state.stepIndex].fields?.filter(isSample);
+  if (!sampleAnswers) {
+    return;
+  }
+  for (const sampleAnswer of sampleAnswers) {
+    const sampleIds = sampleAnswer.value;
+    if (sampleIds) {
+      const { samples } = await api.getSamples({
+        filter: { sampleIds: sampleAnswer.value },
+      });
+      if (samples) {
+        await api.createAnswerQuestionaryRelations({
+          answerId: sampleAnswer.answerId!,
+          questionaryIds: samples.map(sample => sample.questionaryId),
+        });
+      }
+    }
+  }
+}
+
+export { QuestionaryComponentSampleDeclaration, sampleDeclarationPreSubmit };

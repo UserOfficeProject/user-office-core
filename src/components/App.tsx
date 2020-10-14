@@ -1,20 +1,20 @@
 /* eslint-disable react/prop-types */
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
 import { SnackbarProvider } from 'notistack';
-import React from 'react';
+import React, { ErrorInfo } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import {
   BrowserRouter as Router,
   Redirect,
   Route,
-  Switch,
   RouteProps,
+  Switch,
 } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
 import { ReviewAndAssignmentContextProvider } from 'context/ReviewAndAssignmentContextProvider';
 import { UserContext, UserContextProvider } from 'context/UserContextProvider';
-import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { getUnauthorizedApi } from 'hooks/common/useDataApi';
 
 import { getTheme } from '../theme';
 import DashBoard from './DashBoard';
@@ -62,11 +62,18 @@ class App extends React.Component {
     localStorage.removeItem('expToken');
   }
 
-  componentDidCatch(error: any): void {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    let errorMessage = '';
     try {
-      error = JSON.parse(error);
-    } catch (e) {}
-    useUnauthorizedApi().addClientLog({ error });
+      errorMessage = JSON.stringify({
+        error: error.toString(),
+        errorInfo: errorInfo.componentStack.toString(),
+      });
+    } catch (e) {
+      errorMessage = 'Exception while preparing error message';
+    } finally {
+      getUnauthorizedApi().addClientLog({ error: errorMessage });
+    }
   }
 
   componentDidMount() {

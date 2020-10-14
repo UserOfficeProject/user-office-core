@@ -16,7 +16,7 @@ import {
   Event,
   EventType,
   QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionModel';
+} from 'models/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
 import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
@@ -98,7 +98,6 @@ export default function QuestionaryStepView(props: {
                       handleChange(evt);
                     }
                   },
-                  dispatch: dispatch,
                 })}
               </div>
             );
@@ -109,6 +108,7 @@ export default function QuestionaryStepView(props: {
               callback: () => {
                 dispatch({ type: EventType.BACK_CLICKED });
               },
+              disabled: state.stepIndex === 0,
             }}
             reset={{
               callback: () => dispatch({ type: EventType.RESET_CLICKED }),

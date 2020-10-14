@@ -65,4 +65,10 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
   }
+
+  ... on ProposalBasisConfig {
+    small_label
+    required
+    tooltip
+  }
 }

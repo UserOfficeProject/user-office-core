@@ -25,10 +25,10 @@ export default function ProposalEdit() {
           </p>
           <p>Comment: {proposalData.commentForUser}</p>
         </>
-        <ProposalContainer data={proposalData} />
+        <ProposalContainer proposal={proposalData} />
       </SimpleTabs>
     );
   }
 
-  return <ProposalContainer data={proposalData} />;
+  return <ProposalContainer proposal={proposalData} />;
 }

@@ -20,12 +20,16 @@ export enum EventType {
   GO_TO_STEP = 'GO_TO_STEP',
   QUESTIONARY_STEPS_LOADED = 'QUESTIONARY_STEPS_LOADED',
   QUESTIONARY_STEP_ANSWERED = 'QUESTIONARY_STEP_ANSWERED',
-  SAMPLE_MODIFIED = 'SAMPLE_MODIFIED',
-  SAMPLE_LOADED = 'SAMPLE_LOADED',
   SAVE_AND_CONTINUE_CLICKED = 'SAVE_AND_CONTINUE_CLICKED',
   SAVE_CLICKED = 'SAVE_CLICKED',
   SAMPLE_CREATED = 'SAMPLE_CREATED',
   SAMPLE_UPDATED = 'SAMPLE_UPDATED',
+  SAMPLE_LOADED = 'SAMPLE_LOADED',
+  SAMPLE_MODIFIED = 'SAMPLE_MODIFIED',
+  SAVE_GENERAL_INFO_CLICKED = 'SAVE_GENERAL_INFO_CLICKED',
+  PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
+  PROPOSAL_CREATED = 'PROPOSAL_CREATED',
+  PROPOSAL_LOADED = 'PROPOSAL_LOADED',
 }
 export interface Event {
   type: EventType;
@@ -111,14 +115,16 @@ export function QuestionarySubmissionModel<
           );
           break;
 
-        case EventType.QUESTIONARY_STEPS_LOADED:
+        case EventType.QUESTIONARY_STEPS_LOADED: {
           draftState.steps = action.payload.questionarySteps;
-          draftState.stepIndex = getInitialStepIndex(
-            action.payload.questionarySteps
-          );
+          const stepIndex =
+            action.payload.stepIndex !== undefined
+              ? action.payload.stepIndex
+              : getInitialStepIndex(action.payload.questionarySteps);
+          draftState.stepIndex = stepIndex;
           draftState.isDirty = false;
           break;
-
+        }
         case EventType.QUESTIONARY_STEP_ANSWERED:
           const updatedStep = action.payload.questionaryStep as QuestionaryStep;
           const stepIndex = draftState.steps.findIndex(
