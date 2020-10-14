@@ -43,6 +43,8 @@ context('Proposal administration tests', () => {
 
     cy.get('#mui-component-select-proposalStatus').click();
 
+    cy.contains('Loading...').should('not.exist');
+
     cy.get('[id="menu-proposalStatus"] [role="option"]')
       .first()
       .click();

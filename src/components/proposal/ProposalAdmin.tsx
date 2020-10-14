@@ -28,7 +28,10 @@ export default function ProposalAdmin(props: {
 }) {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const { proposalStatuses } = useProposalStatusesData();
+  const {
+    proposalStatuses,
+    loadingProposalStatuses,
+  } = useProposalStatusesData();
 
   const initialValues = {
     finalStatus: props.data.finalStatus || ProposalEndStatus.UNSET,
@@ -87,6 +90,7 @@ export default function ProposalAdmin(props: {
                   name="proposalStatus"
                   label="Proposal status"
                   data-cy="proposalStatus"
+                  loading={loadingProposalStatuses}
                   items={proposalStatuses.map(proposalStatus => ({
                     text: proposalStatus.name,
                     value: proposalStatus.id,
