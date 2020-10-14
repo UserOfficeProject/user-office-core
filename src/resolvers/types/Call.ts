@@ -12,6 +12,7 @@ import {
 import { ResolverContext } from '../../context';
 import { Call as CallOrigin } from '../../models/Call';
 import { InstrumentWithAvailabilityTime } from './Instrument';
+import { ProposalWorkflow } from './ProposalWorkflow';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -53,6 +54,9 @@ export class Call implements Partial<CallOrigin> {
   public surveyComment: string;
 
   @Field(() => Int, { nullable: true })
+  public proposalWorkflowId: number;
+
+  @Field(() => Int, { nullable: true })
   public templateId?: number;
 }
 
@@ -63,6 +67,13 @@ export class CallInstrumentsResolver {
     return context.queries.instrument.dataSource.getInstrumentsByCallId([
       call.id,
     ]);
+  }
+
+  @FieldResolver(() => ProposalWorkflow, { nullable: true })
+  async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.proposalSettings.dataSource.getProposalWorkflow(
+      call.proposalWorkflowId
+    );
   }
 }
 

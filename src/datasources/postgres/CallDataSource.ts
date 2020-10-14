@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Call } from '../../models/Call';
-import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
+import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
-  UpdateCallArgs,
-  AssignInstrumentToCallArgs,
-  RemoveAssignedInstrumentFromCallArgs,
+  UpdateCallInput,
+  AssignInstrumentsToCallInput,
+  RemoveAssignedInstrumentFromCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -47,7 +47,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async create(args: CreateCallArgs): Promise<Call> {
+  async create(args: CreateCallInput): Promise<Call> {
     return database
       .insert({
         call_short_code: args.shortCode,
@@ -61,6 +61,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         end_cycle: args.endCycle,
         cycle_comment: args.cycleComment,
         survey_comment: args.surveyComment,
+        proposal_workflow_id: args.proposalWorkflowId,
         template_id: args.templateId,
       })
       .into('call')
@@ -74,7 +75,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       });
   }
 
-  async update(args: UpdateCallArgs): Promise<Call> {
+  async update(args: UpdateCallInput): Promise<Call> {
     return database
       .update(
         {
@@ -89,6 +90,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           end_cycle: args.endCycle,
           cycle_comment: args.cycleComment,
           survey_comment: args.surveyComment,
+          proposal_workflow_id: args.proposalWorkflowId,
           template_id: args.templateId,
         },
         ['*']
@@ -104,8 +106,8 @@ export default class PostgresCallDataSource implements CallDataSource {
       });
   }
 
-  async assignInstrumentToCall(
-    args: AssignInstrumentToCallArgs
+  async assignInstrumentsToCall(
+    args: AssignInstrumentsToCallInput
   ): Promise<Call> {
     const valuesToInsert = args.instrumentIds.map(instrumentId => ({
       instrument_id: instrumentId,
@@ -124,7 +126,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async removeAssignedInstrumentFromCall(
-    args: RemoveAssignedInstrumentFromCallArgs
+    args: RemoveAssignedInstrumentFromCallInput
   ): Promise<Call> {
     await database('call_has_instruments')
       .del()
