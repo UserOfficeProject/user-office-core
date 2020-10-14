@@ -1,22 +1,24 @@
 import { isRejection, Rejection } from '../rejection';
+import { logger } from '../utils/Logger';
 
-type EventHandler<T> = (event: T) => void;
+type EventHandler<T> = (event: T) => Promise<void>;
 
 export class EventBus<T extends { type: string }> {
   constructor(private handlers: EventHandler<T>[] = []) {}
 
-  public publish(event: T) {
+  public async publish(event: T) {
     for (let i = 0; i < this.handlers.length; i++) {
       const handler = this.handlers[i];
       try {
-        handler(event);
+        await handler(event);
       } catch (err) {
         // Something happened, log it and continue
-        console.error(`Error handling ${event.type} with handler ${i}`);
+        logger.logError(`Error handling ${event.type} with handler ${i}`, err);
       }
     }
   }
 
+  // TODO: it is not used at all, investigate if we need this
   public async wrap<V>(
     inner: () => Promise<V | Rejection>,
     formEvent: (result: V) => T
