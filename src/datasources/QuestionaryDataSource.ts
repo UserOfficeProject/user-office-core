@@ -15,7 +15,6 @@ export interface QuestionaryDataSource {
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
   getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
-  getBlankQuestionarySteps(template_id: number): Promise<QuestionaryStep[]>;
   getParentQuestionary(
     child_questionary_id: number
   ): Promise<Questionary | null>;
