@@ -125,6 +125,7 @@ const createCalls = async () => {
       endReview: faker.date.future(1),
       shortCode: `${dummy.word().substr(0, 15)}${dummy.positiveNumber(100)}`,
       surveyComment: faker.random.words(5),
+      proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
     });
   }, MAX_CALLS);

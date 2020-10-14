@@ -1,9 +1,9 @@
 import { Call } from '../../models/Call';
-import { CreateCallArgs } from '../../resolvers/mutations/CreateCallMutation';
+import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
-  UpdateCallArgs,
-  AssignInstrumentToCallArgs,
-  RemoveAssignedInstrumentFromCallArgs,
+  UpdateCallInput,
+  AssignInstrumentsToCallInput,
+  RemoveAssignedInstrumentFromCallInput,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -21,6 +21,7 @@ export const dummyCall = new Call(
   new Date('2019-07-17 08:25:12.23043+00'),
   '',
   '',
+  1,
   1
 );
 
@@ -41,20 +42,20 @@ export class CallDataSourceMock implements CallDataSource {
     return [dummyCall];
   }
 
-  async create(args: CreateCallArgs) {
+  async create(args: CreateCallInput) {
     return { ...dummyCall, ...args };
   }
 
-  async update(args: UpdateCallArgs) {
+  async update(args: UpdateCallInput) {
     return { ...dummyCall, ...args };
   }
 
-  async assignInstrumentToCall(args: AssignInstrumentToCallArgs) {
+  async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {
     return dummyCall;
   }
 
   async removeAssignedInstrumentFromCall(
-    args: RemoveAssignedInstrumentFromCallArgs
+    args: RemoveAssignedInstrumentFromCallInput
   ) {
     return dummyCall;
   }

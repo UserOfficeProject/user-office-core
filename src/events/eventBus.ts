@@ -1,4 +1,5 @@
 import { isRejection, Rejection } from '../rejection';
+import { logger } from '../utils/Logger';
 
 type EventHandler<T> = (event: T) => Promise<void>;
 
@@ -12,7 +13,7 @@ export class EventBus<T extends { type: string }> {
         await handler(event);
       } catch (err) {
         // Something happened, log it and continue
-        console.error(`Error handling ${event.type} with handler ${i}`, err);
+        logger.logError(`Error handling ${event.type} with handler ${i}`, err);
       }
     }
   }
