@@ -32,6 +32,8 @@ export type Service = {
 export type AddProposalWorkflowStatusInput = {
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
+  droppableGroupId: Scalars['String'];
+  parentDroppableGroupId?: Maybe<Scalars['String']>;
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
@@ -266,6 +268,11 @@ export type FileUploadConfig = {
   max_files: Scalars['Int'];
 };
 
+export type IndexWithGroupId = {
+  index: Scalars['Int'];
+  droppableId: Scalars['String'];
+};
+
 export type Institution = {
   __typename?: 'Institution';
   id: Scalars['Int'];
@@ -317,8 +324,8 @@ export type InstrumentWithAvailabilityTime = {
 
 
 export type MoveProposalWorkflowStatusInput = {
-  from: Scalars['Int'];
-  to: Scalars['Int'];
+  from: IndexWithGroupId;
+  to: IndexWithGroupId;
   proposalWorkflowId: Scalars['Int'];
 };
 
@@ -1147,7 +1154,7 @@ export type ProposalWorkflow = {
   id: Scalars['Int'];
   name: Scalars['String'];
   description: Scalars['String'];
-  proposalWorkflowConnections: Array<ProposalWorkflowConnection>;
+  proposalWorkflowConnectionGroups: Array<ProposalWorkflowConnectionGroup>;
 };
 
 export type ProposalWorkflowConnection = {
@@ -1160,6 +1167,14 @@ export type ProposalWorkflowConnection = {
   nextProposalStatusId: Maybe<Scalars['Int']>;
   prevProposalStatusId: Maybe<Scalars['Int']>;
   nextStatusEventType: Scalars['String'];
+  droppableGroupId: Scalars['String'];
+};
+
+export type ProposalWorkflowConnectionGroup = {
+  __typename?: 'ProposalWorkflowConnectionGroup';
+  groupId: Scalars['String'];
+  parentGroupId: Maybe<Scalars['String']>;
+  connections: Array<ProposalWorkflowConnection>;
 };
 
 export type ProposalWorkflowConnectionResponseWrap = {
@@ -3285,6 +3300,8 @@ export type UpdateSampleTitleMutation = (
 export type AddProposalWorkflowStatusMutationVariables = Exact<{
   proposalWorkflowId: Scalars['Int'];
   sortOrder: Scalars['Int'];
+  droppableGroupId: Scalars['String'];
+  parentDroppableGroupId?: Maybe<Scalars['String']>;
   proposalStatusId: Scalars['Int'];
   nextProposalStatusId?: Maybe<Scalars['Int']>;
   prevProposalStatusId?: Maybe<Scalars['Int']>;
@@ -3332,13 +3349,17 @@ export type CreateProposalWorkflowMutation = (
     & { proposalWorkflow: Maybe<(
       { __typename?: 'ProposalWorkflow' }
       & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-      & { proposalWorkflowConnections: Array<(
-        { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType'>
-        & { proposalStatus: (
-          { __typename?: 'ProposalStatus' }
-          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
+      & { proposalWorkflowConnectionGroups: Array<(
+        { __typename?: 'ProposalWorkflowConnectionGroup' }
+        & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
+        & { connections: Array<(
+          { __typename?: 'ProposalWorkflowConnection' }
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & { proposalStatus: (
+            { __typename?: 'ProposalStatus' }
+            & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+          ) }
+        )> }
       )> }
     )> }
   ) }
@@ -3413,13 +3434,17 @@ export type GetProposalWorkflowQuery = (
   & { proposalWorkflow: Maybe<(
     { __typename?: 'ProposalWorkflow' }
     & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-    & { proposalWorkflowConnections: Array<(
-      { __typename?: 'ProposalWorkflowConnection' }
-      & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType'>
-      & { proposalStatus: (
-        { __typename?: 'ProposalStatus' }
-        & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-      ) }
+    & { proposalWorkflowConnectionGroups: Array<(
+      { __typename?: 'ProposalWorkflowConnectionGroup' }
+      & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
+      & { connections: Array<(
+        { __typename?: 'ProposalWorkflowConnection' }
+        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+        & { proposalStatus: (
+          { __typename?: 'ProposalStatus' }
+          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+        ) }
+      )> }
     )> }
   )> }
 );
@@ -3436,8 +3461,8 @@ export type GetProposalWorkflowsQuery = (
 );
 
 export type MoveProposalWorkflowStatusMutationVariables = Exact<{
-  from: Scalars['Int'];
-  to: Scalars['Int'];
+  from: IndexWithGroupId;
+  to: IndexWithGroupId;
   proposalWorkflowId: Scalars['Int'];
 }>;
 
@@ -3484,13 +3509,17 @@ export type UpdateProposalWorkflowMutation = (
     & { proposalWorkflow: Maybe<(
       { __typename?: 'ProposalWorkflow' }
       & Pick<ProposalWorkflow, 'id' | 'name' | 'description'>
-      & { proposalWorkflowConnections: Array<(
-        { __typename?: 'ProposalWorkflowConnection' }
-        & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType'>
-        & { proposalStatus: (
-          { __typename?: 'ProposalStatus' }
-          & Pick<ProposalStatus, 'id' | 'name' | 'description'>
-        ) }
+      & { proposalWorkflowConnectionGroups: Array<(
+        { __typename?: 'ProposalWorkflowConnectionGroup' }
+        & Pick<ProposalWorkflowConnectionGroup, 'groupId' | 'parentGroupId'>
+        & { connections: Array<(
+          { __typename?: 'ProposalWorkflowConnection' }
+          & Pick<ProposalWorkflowConnection, 'id' | 'sortOrder' | 'proposalWorkflowId' | 'proposalStatusId' | 'nextProposalStatusId' | 'prevProposalStatusId' | 'nextStatusEventType' | 'droppableGroupId'>
+          & { proposalStatus: (
+            { __typename?: 'ProposalStatus' }
+            & Pick<ProposalStatus, 'id' | 'name' | 'description'>
+          ) }
+        )> }
       )> }
     )> }
   ) }
@@ -5657,8 +5686,8 @@ export const UpdateSampleTitleDocument = gql`
 }
     ${SampleFragmentDoc}`;
 export const AddProposalWorkflowStatusDocument = gql`
-    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int, $nextStatusEventType: String!) {
-  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId, nextStatusEventType: $nextStatusEventType}) {
+    mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int, $nextStatusEventType: String!) {
+  addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId, nextStatusEventType: $nextStatusEventType}) {
     error
   }
 }
@@ -5682,19 +5711,24 @@ export const CreateProposalWorkflowDocument = gql`
       id
       name
       description
-      proposalWorkflowConnections {
-        id
-        sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
+      proposalWorkflowConnectionGroups {
+        groupId
+        parentGroupId
+        connections {
           id
-          name
-          description
+          sortOrder
+          proposalWorkflowId
+          proposalStatusId
+          proposalStatus {
+            id
+            name
+            description
+          }
+          nextProposalStatusId
+          prevProposalStatusId
+          nextStatusEventType
+          droppableGroupId
         }
-        nextProposalStatusId
-        prevProposalStatusId
-        nextStatusEventType
       }
     }
     error
@@ -5748,19 +5782,24 @@ export const GetProposalWorkflowDocument = gql`
     id
     name
     description
-    proposalWorkflowConnections {
-      id
-      sortOrder
-      proposalWorkflowId
-      proposalStatusId
-      proposalStatus {
+    proposalWorkflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
         id
-        name
-        description
+        sortOrder
+        proposalWorkflowId
+        proposalStatusId
+        proposalStatus {
+          id
+          name
+          description
+        }
+        nextProposalStatusId
+        prevProposalStatusId
+        nextStatusEventType
+        droppableGroupId
       }
-      nextProposalStatusId
-      prevProposalStatusId
-      nextStatusEventType
     }
   }
 }
@@ -5775,7 +5814,7 @@ export const GetProposalWorkflowsDocument = gql`
 }
     `;
 export const MoveProposalWorkflowStatusDocument = gql`
-    mutation moveProposalWorkflowStatus($from: Int!, $to: Int!, $proposalWorkflowId: Int!) {
+    mutation moveProposalWorkflowStatus($from: IndexWithGroupId!, $to: IndexWithGroupId!, $proposalWorkflowId: Int!) {
   moveProposalWorkflowStatus(moveProposalWorkflowStatusInput: {from: $from, to: $to, proposalWorkflowId: $proposalWorkflowId}) {
     error
   }
@@ -5800,19 +5839,24 @@ export const UpdateProposalWorkflowDocument = gql`
       id
       name
       description
-      proposalWorkflowConnections {
-        id
-        sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
+      proposalWorkflowConnectionGroups {
+        groupId
+        parentGroupId
+        connections {
           id
-          name
-          description
+          sortOrder
+          proposalWorkflowId
+          proposalStatusId
+          proposalStatus {
+            id
+            name
+            description
+          }
+          nextProposalStatusId
+          prevProposalStatusId
+          nextStatusEventType
+          droppableGroupId
         }
-        nextProposalStatusId
-        prevProposalStatusId
-        nextStatusEventType
       }
     }
     error
