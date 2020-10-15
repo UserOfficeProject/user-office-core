@@ -2,7 +2,7 @@ import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import React, { useContext } from 'react';
 
-import QuestionaryNavigationFragment from 'components/questionary/QuestionaryNavigationFragment';
+import NavigationFragment from 'components/questionary/NavigationFragment';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
@@ -51,7 +51,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
         className={readonly ? classes.disabled : undefined}
       />
       <div className={classes.buttons}>
-        <QuestionaryNavigationFragment
+        <NavigationFragment
           back={undefined}
           saveAndNext={{
             callback: () => {

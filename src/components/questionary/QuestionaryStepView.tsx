@@ -19,7 +19,7 @@ import {
 } from 'models/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
 
-import QuestionaryNavigationFragment from './QuestionaryNavigationFragment';
+import NavigationFragment from './NavigationFragment';
 
 const useStyles = makeStyles({
   componentWrapper: {
@@ -102,7 +102,7 @@ export default function QuestionaryStepView(props: {
               </div>
             );
           })}
-          <QuestionaryNavigationFragment
+          <NavigationFragment
             disabled={props.readonly}
             back={{
               callback: () => {
