@@ -35,7 +35,7 @@ BEGIN
             'Proposal basic information',
             '{"required":false,"small_label":"","tooltip":""}',
             'proposal_basis',
-            2
+            1
         );
 
         

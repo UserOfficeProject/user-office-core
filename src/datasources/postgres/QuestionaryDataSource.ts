@@ -210,6 +210,12 @@ export default class PostgresQuestionaryDataSource
     );
   }
 
+  async getBlankQuestionarySteps(
+    template_id: number
+  ): Promise<QuestionaryStep[]> {
+    return this.getQuestionaryStepsWithTemplateId(0, template_id);
+  }
+
   async updateTopicCompleteness(
     questionary_id: number,
     topic_id: number,

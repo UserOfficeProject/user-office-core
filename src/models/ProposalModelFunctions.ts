@@ -258,6 +258,7 @@ export function createConfigByType(dataType: DataType, init: object | string) {
     logger.logError('ConfigCreator not implemented', { dataType });
     throw new Error('ConfigCreator not implemented');
   }
+
   return createConfig(configCreator(), init);
 }
 

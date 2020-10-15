@@ -175,6 +175,13 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
   ): Promise<Questionary | null> {
     return createDummyQuestionary();
   }
+
+  async getBlankQuestionarySteps(
+    template_id: number
+  ): Promise<QuestionaryStep[]> {
+    return dummyQuestionarySteps;
+  }
+
   async delete(questionaryId: number): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId });
   }
