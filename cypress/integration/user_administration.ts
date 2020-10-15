@@ -1,9 +1,6 @@
-/// <reference types="Cypress" />
-/// <reference types="../types" />
+import faker from 'faker';
 
 context('User administration tests', () => {
-  const faker = require('faker');
-
   before(() => {
     cy.resetDB();
   });
