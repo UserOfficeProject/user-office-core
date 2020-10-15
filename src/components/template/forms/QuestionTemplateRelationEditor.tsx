@@ -9,6 +9,7 @@ import { QuestionTemplateRelationDateForm } from './questionRel/QuestionTemplate
 import { QuestionTemplateRelationEmbellismentForm } from './questionRel/QuestionTemplateRelationEmbellismentForm';
 import { QuestionTemplateRelationFileUploadForm } from './questionRel/QuestionTemplateRelationFileUploadForm';
 import { QuestionTemplateRelationMultipleChoiceForm } from './questionRel/QuestionTemplateRelationMultipleChoiceForm';
+import { QuestionTemplateRelationProposalBasisForm } from './questionRel/QuestionTemplateRelationProposalBasisForm';
 import { QuestionTemplateRelationSampleBasisForm } from './questionRel/QuestionTemplateRelationSampleBasisForm';
 import { QuestionTemplateRelationSubtemplateForm } from './questionRel/QuestionTemplateRelationSubtemplateForm';
 import { QuestionTemplateRelationTextInputForm } from './questionRel/QuestionTemplateRelationTextInputForm';
@@ -32,6 +33,7 @@ export default function QuestionTemplateRelationEditor(props: {
   map.set(DataType.TEXT_INPUT, QuestionTemplateRelationTextInputForm);
   map.set(DataType.SUBTEMPLATE, QuestionTemplateRelationSubtemplateForm);
   map.set(DataType.SAMPLE_BASIS, QuestionTemplateRelationSampleBasisForm);
+  map.set(DataType.PROPOSAL_BASIS, QuestionTemplateRelationProposalBasisForm);
 
   if (props.field === null) {
     return null;

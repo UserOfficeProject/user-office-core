@@ -9,6 +9,7 @@ import { QuestionDateForm } from './question/QuestionDateForm';
 import { QuestionEmbellismentForm } from './question/QuestionEmbellismentForm';
 import { QuestionFileUploadForm } from './question/QuestionFileUploadForm';
 import { QuestionMultipleChoiceForm } from './question/QuestionMultipleChoiceForm';
+import { QuestionProposalBasisForm } from './question/QuestionProposalBasisForm';
 import { QuestionSampleBasisForm } from './question/QuestionSampleBasisForm';
 import { QuestionSubtemplateForm } from './question/QuestionSubtemplateForm';
 import { QuestionTextInputForm } from './question/QuestionTextInputForm';
@@ -29,6 +30,7 @@ export default function QuestionEditor(props: {
   componentMap.set(DataType.TEXT_INPUT, QuestionTextInputForm);
   componentMap.set(DataType.SUBTEMPLATE, QuestionSubtemplateForm);
   componentMap.set(DataType.SAMPLE_BASIS, QuestionSampleBasisForm);
+  componentMap.set(DataType.PROPOSAL_BASIS, QuestionProposalBasisForm);
 
   if (props.field === null) {
     return null;
