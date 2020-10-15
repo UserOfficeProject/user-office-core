@@ -111,7 +111,7 @@ export default function ProposalContainer(props: {
             payload: { proposal: initialState.proposal },
           });
         } else {
-          api()
+          await api()
             .getProposal({ id: proposalState.proposal.id }) // or load blankQuestionarySteps if sample is null
             .then(data => {
               if (data.proposal && data.proposal.questionary.steps) {
