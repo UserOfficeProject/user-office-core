@@ -18,6 +18,7 @@ import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnection
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { rejection, Rejection } from '../rejection';
+import { AddNextStatusEventsToConnectionInput } from '../resolvers/mutations/settings/AddNextStatusEventsToConnection';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
@@ -375,7 +376,8 @@ export default class ProposalSettingsMutations {
       .then(result => result);
   }
 
-  @ValidateArgs(addProposalWorkflowStatusValidationSchema)
+  // TODO: Update validation and uncomment this!
+  // @ValidateArgs(addProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addProposalWorkflowStatus(
     agent: UserWithRole | null,
@@ -397,6 +399,27 @@ export default class ProposalSettingsMutations {
 
       return rejection('INTERNAL_ERROR');
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async addNextStatusEventsToConnection(
+    agent: UserWithRole | null,
+    args: AddNextStatusEventsToConnectionInput
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .addNextStatusEventsToConnection(
+        args.proposalWorkflowConnectionId,
+        args.nextStatusEvents
+      )
+      .then(result => result)
+      .catch(error => {
+        logger.logException('Could not add next status events', error, {
+          agent,
+          args,
+        });
+
+        return rejection('INTERNAL_ERROR');
+      });
   }
 
   // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.

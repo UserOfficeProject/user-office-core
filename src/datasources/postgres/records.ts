@@ -333,9 +333,14 @@ export interface ProposalWorkflowConnectionRecord {
   readonly proposal_status_id: number;
   readonly next_proposal_status_id: number | null;
   readonly prev_proposal_status_id: number | null;
-  readonly next_status_event_type: string;
   readonly droppable_group_id: string;
   readonly parent_droppable_group_id: string;
+}
+
+export interface NextStatusEventRecord {
+  readonly next_status_event_id: number;
+  readonly proposal_workflow_connection_id: number;
+  readonly next_status_event: string;
 }
 
 export const createPageObject = (record: PagetextRecord) => {

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
+import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
@@ -45,4 +46,11 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowId: number,
     nextProposalStatusId?: number
   ): Promise<ProposalWorkflowConnection>;
+  addNextStatusEventsToConnection(
+    proposalWorkflowConnectionId: number,
+    nextStatusEvents: string[]
+  ): Promise<boolean>;
+  getNextStatusEventsByConnectionId(
+    proposalWorkflowConnectionId: number
+  ): Promise<NextStatusEvent[]>;
 }
