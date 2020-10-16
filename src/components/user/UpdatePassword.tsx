@@ -5,10 +5,9 @@ import Typography from '@material-ui/core/Typography';
 import makeStyles from '@material-ui/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import React from 'react';
 
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles({
   buttons: {
@@ -22,16 +21,9 @@ const useStyles = makeStyles({
 });
 
 export default function UpdatePassword(props: { id: number }) {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const sendPasswordUpdate = (password: string) => {
-    api()
-      .updatePassword({ id: props.id, password })
-      .then(data =>
-        enqueueSnackbar('Updated Password', {
-          variant: data.updatePassword.error ? 'error' : 'success',
-        })
-      );
+    api('Updated Password').updatePassword({ id: props.id, password });
   };
 
   const classes = useStyles();

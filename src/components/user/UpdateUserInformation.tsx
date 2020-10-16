@@ -9,7 +9,6 @@ import makeStyles from '@material-ui/styles/makeStyles';
 import dateformat from 'dateformat';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import React, { useEffect, useState, useContext } from 'react';
 
 import FormikDropdown, { Option } from 'components/common/FormikDropdown';
@@ -18,10 +17,10 @@ import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { UpdateUserMutationVariables, User } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useGetFields } from 'hooks/user/useGetFields';
 import orcid from 'images/orcid.png';
 import { ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { userFieldSchema } from 'utils/userFieldValidationSchema';
 
 const useStyles = makeStyles({
@@ -45,24 +44,23 @@ const useStyles = makeStyles({
 export default function UpdateUserInformation(props: { id: number }) {
   const { user } = useContext(UserContext);
   const [userData, setUserData] = useState<User | null>(null);
-  const sendRequest = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const fieldsContent = useGetFields();
   const { institutions, loadingInstitutions } = useInstitutionsData();
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
-  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles();
 
   useEffect(() => {
     const getUserInformation = (id: number) => {
       if (user.id !== props.id) {
-        sendRequest()
+        api()
           .getUser({ id })
           .then(data => {
             setUserData({ ...(data.user as User) });
           });
       } else {
-        sendRequest()
+        api()
           .getUserMe()
           .then(data => {
             setUserData({ ...(data.me as User) });
@@ -70,7 +68,7 @@ export default function UpdateUserInformation(props: { id: number }) {
       }
     };
     getUserInformation(props.id);
-  }, [props.id, user.id, sendRequest]);
+  }, [props.id, user.id, api]);
 
   if (loadingInstitutions || !fieldsContent || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '50px' }} />;
@@ -93,13 +91,7 @@ export default function UpdateUserInformation(props: { id: number }) {
   }
 
   const sendUserUpdate = (variables: UpdateUserMutationVariables) => {
-    sendRequest()
-      .updateUser(variables)
-      .then(data =>
-        enqueueSnackbar('Updated Information', {
-          variant: data.updateUser.error ? 'error' : 'success',
-        })
-      );
+    api('Updated Information').updateUser(variables);
   };
 
   return (

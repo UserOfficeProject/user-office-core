@@ -18,7 +18,7 @@ export function usePersistProposalWorkflowEditorModel() {
     name: string,
     description: string
   ) => {
-    return api()
+    return api('Proposal workflow updated successfully!')
       .updateProposalWorkflow({
         id,
         name,

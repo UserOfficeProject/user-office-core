@@ -1,6 +1,4 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
-import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import {
   useQueryParams,
@@ -13,8 +11,8 @@ import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { BasicUserDetails, Instrument, UserRole } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
@@ -38,8 +36,7 @@ const InstrumentTable: React.FC = () => {
         rowData.scientists.length > 0 ? rowData.scientists.length : '-',
     },
   ];
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [assigningInstrumentId, setAssigningInstrumentId] = useState<
     number | null
   >(null);
@@ -52,25 +49,14 @@ const InstrumentTable: React.FC = () => {
   });
 
   const onInstrumentDelete = async (instrumentDeletedId: number) => {
-    return await api()
+    return await api('Instrument removed successfully!')
       .deleteInstrument({
         id: instrumentDeletedId,
       })
       .then(data => {
         if (data.deleteInstrument.error) {
-          enqueueSnackbar(
-            getTranslation(data.deleteInstrument.error as ResourceId),
-            {
-              variant: 'error',
-            }
-          );
-
           return false;
         } else {
-          enqueueSnackbar('Instrument removed!', {
-            variant: 'success',
-          });
-
           return true;
         }
       });
@@ -79,12 +65,12 @@ const InstrumentTable: React.FC = () => {
   const assignScientistsToInstrument = async (
     scientists: BasicUserDetails[]
   ) => {
-    const assignScientistToInstrumentResult = await api().assignScientistsToInstrument(
-      {
-        instrumentId: assigningInstrumentId as number,
-        scientistIds: scientists.map(scientist => scientist.id),
-      }
-    );
+    const assignScientistToInstrumentResult = await api(
+      'Scientist assigned to instrument successfully!'
+    ).assignScientistsToInstrument({
+      instrumentId: assigningInstrumentId as number,
+      scientistIds: scientists.map(scientist => scientist.id),
+    });
 
     if (!assignScientistToInstrumentResult.assignScientistsToInstrument.error) {
       scientists = scientists.map(scientist => {
@@ -110,18 +96,6 @@ const InstrumentTable: React.FC = () => {
         setInstruments(newInstrumentsData);
       }
     }
-
-    const errorMessage = assignScientistToInstrumentResult
-      .assignScientistsToInstrument.error
-      ? 'Could not assign scientist to instrument'
-      : 'Scientist assigned to instrument';
-
-    enqueueSnackbar(errorMessage, {
-      variant: assignScientistToInstrumentResult.assignScientistsToInstrument
-        .error
-        ? 'error'
-        : 'success',
-    });
 
     setAssigningInstrumentId(null);
   };

@@ -78,6 +78,35 @@ const logout = () => {
   cy.get('[data-cy=logout]').click();
 };
 
+const notification = ({ variant, text }) => {
+  let notificationQuerySelector = '';
+  let bgColor = '';
+
+  switch (variant) {
+    case 'error':
+      notificationQuerySelector = '.snackbar-error [role="alert"]';
+      bgColor = 'rgb(211, 47, 47)';
+      break;
+
+    default:
+      notificationQuerySelector = '.snackbar-success [role="alert"]';
+      bgColor = 'rgb(67, 160, 71)';
+      break;
+  }
+  let notification = cy
+    .get(notificationQuerySelector)
+    .should('exist')
+    .and('have.css', 'background-color', bgColor);
+
+  if (text) {
+    notification.and('contains.text', text);
+  }
+};
+
+const finishedLoading = () => {
+  cy.get('[role="progressbar"]').should('not.exist');
+};
+
 Cypress.Commands.add('resetDB', resetDB);
 
 Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
@@ -85,6 +114,10 @@ Cypress.Commands.add('navigateToTemplatesSubmenu', navigateToTemplatesSubmenu);
 Cypress.Commands.add('login', login);
 
 Cypress.Commands.add('logout', logout);
+
+Cypress.Commands.add('notification', notification);
+
+Cypress.Commands.add('finishedLoading', finishedLoading);
 
 // call cy.presentationMode(); before your test to have delay between clicks.
 // Excellent for presentation purposes

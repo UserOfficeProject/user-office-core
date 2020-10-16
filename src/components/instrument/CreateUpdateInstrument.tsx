@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
@@ -8,13 +7,12 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Instrument } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(theme => ({
   submit: {
@@ -29,9 +27,7 @@ type AddInstrumentProps = {
 
 const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = instrument
     ? instrument
@@ -45,38 +41,28 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
         if (instrument) {
-          const data = await api().updateInstrument({
+          const data = await api(
+            'Instrument updated successfully!'
+          ).updateInstrument({
             id: instrument.id,
             ...values,
           });
           if (data.updateInstrument.error) {
-            enqueueSnackbar(
-              getTranslation(data.updateInstrument.error as ResourceId),
-              {
-                variant: 'error',
-              }
-            );
             close(null);
           } else if (data.updateInstrument.instrument) {
             close(data.updateInstrument.instrument);
           }
         } else {
-          const data = await api().createInstrument(values);
+          const data = await api(
+            'Instrument created successfully!'
+          ).createInstrument(values);
           if (data.createInstrument.error) {
-            enqueueSnackbar(
-              getTranslation(data.createInstrument.error as ResourceId),
-              {
-                variant: 'error',
-              }
-            );
             close(null);
           } else if (data.createInstrument.instrument) {
             close(data.createInstrument.instrument);
           }
         }
-        setSubmitting(false);
         actions.setSubmitting(false);
       }}
       validationSchema={
@@ -99,7 +85,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             margin="normal"
             fullWidth
             data-cy="name"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <Field
             name="shortCode"
@@ -110,7 +96,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             margin="normal"
             fullWidth
             data-cy="shortCode"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <Field
             id="description"
@@ -124,7 +110,7 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             rowsMax="16"
             rows="3"
             data-cy="description"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <Button
@@ -134,9 +120,9 @@ const AddInstrument: React.FC<AddInstrumentProps> = ({ close, instrument }) => {
             color="primary"
             className={classes.submit}
             data-cy="submit"
-            disabled={submitting}
+            disabled={isExecutingCall}
           >
-            {submitting && <UOLoader size={14} />}
+            {isExecutingCall && <UOLoader size={14} />}
             {instrument ? 'Update' : 'Create'}
           </Button>
         </Form>

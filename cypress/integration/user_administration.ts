@@ -65,7 +65,7 @@ context('User administration tests', () => {
 
     cy.contains('Update Profile').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'Updated Information' });
 
     cy.reload();
 

@@ -41,6 +41,13 @@ const CallsTable: React.FC = () => {
           ? rowData.instruments.length.toString()
           : '-',
     },
+    {
+      title: 'Proposal Workflow',
+      render: (rowData: Call): string =>
+        rowData.proposalWorkflow && rowData.proposalWorkflow.name
+          ? rowData.proposalWorkflow.name
+          : '-',
+    },
   ];
 
   const assignInstrumentsToCall = (
@@ -131,7 +138,7 @@ const CallsTable: React.FC = () => {
   );
 
   return (
-    <>
+    <div data-cy="calls-table">
       {assigningInstrumentsCallId && (
         <InputDialog
           aria-labelledby="simple-modal-title"
@@ -182,7 +189,7 @@ const CallsTable: React.FC = () => {
           },
         ]}
       />
-    </>
+    </div>
   );
 };
 

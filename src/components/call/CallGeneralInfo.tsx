@@ -6,10 +6,23 @@ import React from 'react';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import FormikUICustomDatePicker from 'components/common/FormikUICustomDatePicker';
+import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { useProposalsTemplates } from 'hooks/template/useProposalTemplates';
 
 const CallGeneralInfo: React.FC = () => {
-  const { templates } = useProposalsTemplates(false);
+  const { templates, loadingTemplates } = useProposalsTemplates(false);
+  const {
+    proposalWorkflows,
+    loadingProposalWorkflows,
+  } = useProposalWorkflowsData();
+
+  const proposalWorkflowsWithInjectedSelectionRemoval = [
+    { id: '', name: 'None (remove selection)' },
+    ...proposalWorkflows,
+  ].map(proposalWorkflow => ({
+    text: proposalWorkflow.name,
+    value: proposalWorkflow.id,
+  }));
 
   return (
     <>
@@ -41,17 +54,29 @@ const CallGeneralInfo: React.FC = () => {
           data-cy="end-date"
         />
       </MuiPickersUtilsProvider>
-      {templates && templates.length > 0 && (
-        <FormikDropdown
-          name="templateId"
-          label="Call template"
-          items={templates.map(template => ({
-            text: template.name,
-            value: template.templateId,
-          }))}
-          data-cy="call-template"
-        />
-      )}
+      <FormikDropdown
+        name="templateId"
+        label="Call template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={templates.map(template => ({
+          text: template.name,
+          value: template.templateId,
+        }))}
+        data-cy="call-template"
+      />
+      <FormikDropdown
+        name="proposalWorkflowId"
+        label="Proposal workflow"
+        loading={loadingProposalWorkflows}
+        noOptionsText="No proposal workflows"
+        items={
+          proposalWorkflows.length > 0
+            ? proposalWorkflowsWithInjectedSelectionRemoval
+            : []
+        }
+        data-cy="call-workflow"
+      />
     </>
   );
 };

@@ -12,14 +12,10 @@ context('Instrument tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('User should not be able to see Instruments page', () => {
     cy.login('user');
 
-    cy.wait(1000);
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
 
     let userMenuItems = cy.get('[data-cy="user-menu-items"]');
 
@@ -40,7 +36,7 @@ context('Instrument tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'created successfully' });
 
     const instrumentsTable = cy.get('[data-cy="instruments-table"]');
 
@@ -65,7 +61,7 @@ context('Instrument tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'updated successfully' });
 
     const instrumentsTable = cy.get('[data-cy="instruments-table"]');
 
@@ -82,7 +78,6 @@ context('Instrument tests', () => {
     cy.get('#title').type(title);
     cy.get('#abstract').type(abstract);
     cy.contains('Save and continue').click();
-    cy.wait(500);
     cy.contains('Submit').click();
     cy.contains('OK').click();
     cy.logout();
@@ -100,13 +95,14 @@ context('Instrument tests', () => {
 
     cy.contains('Assign instrument').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Instrument/s assigned successfully',
+    });
 
     cy.contains('Proposals').click();
 
-    cy.wait(500);
-
-    cy.get('[type="checkbox"]')
+    cy.get('tbody [type="checkbox"]')
       .first()
       .check();
 
@@ -124,7 +120,10 @@ context('Instrument tests', () => {
 
     cy.contains('Assign to Instrument').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal/s assigned to the selected instrument',
+    });
 
     cy.get('[title="Remove assigned instrument"]').should('exist');
   });
@@ -136,11 +135,16 @@ context('Instrument tests', () => {
     cy.get('[title="Edit user"]')
       .eq(2)
       .click();
-    cy.wait(500);
+
     const mainContentElement = cy.get('main');
     mainContentElement.contains('Settings').click();
-    cy.wait(500);
-    cy.contains('Add role').click();
+
+    cy.get('[data-cy="add-role-button"]')
+      .should('not.be.disabled')
+      .click();
+
+    cy.finishedLoading();
+
     cy.get('[data-cy="role-modal"] [title="Last Page"]').click();
 
     cy.get('[data-cy="role-modal"]')
@@ -152,23 +156,25 @@ context('Instrument tests', () => {
     cy.get('[data-cy="role-modal"]')
       .contains('Update')
       .click();
-    cy.wait(500);
+
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains('Instruments').click();
-    cy.wait(500);
 
     cy.get('[title="Assign scientist"]').click();
-    cy.wait(500);
 
-    cy.get('input[type="checkbox"]')
-      .eq(1)
+    cy.get('[data-cy="co-proposers"] tbody input[type="checkbox"]')
+      .first()
       .click();
 
     cy.get('.MuiDialog-root')
       .contains('Update')
       .click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Scientist assigned to instrument',
+    });
 
     cy.logout();
 
@@ -176,11 +182,15 @@ context('Instrument tests', () => {
 
     cy.get('[data-cy="profile-page-btn"]').click();
     cy.contains('Roles').click();
+
+    cy.finishedLoading();
+
     cy.get("[data-cy='role-selection-table'] table tbody tr")
       .eq(1)
       .contains('Use')
       .click();
-    cy.wait(1000);
+
+    cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Instruments').click();
 
@@ -192,26 +202,34 @@ context('Instrument tests', () => {
 
     cy.get('[data-cy="profile-page-btn"]').click();
     cy.contains('Roles').click();
+
+    cy.finishedLoading();
+
     cy.get("[data-cy='role-selection-table'] table tbody tr")
       .eq(1)
       .contains('Use')
       .click();
-    cy.wait(1000);
+
+    cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
     cy.get('[data-cy="view-proposal"]').should('exist');
   });
 
-  it('Instrument scientist should be able to do technical review on proposal where he is instrument scientist ', () => {
+  it('Instrument scientist should be able to do technical review on proposal where he is instrument scientist', () => {
     cy.login('user');
 
     cy.get('[data-cy="profile-page-btn"]').click();
     cy.contains('Roles').click();
+
+    cy.finishedLoading();
+
     cy.get("[data-cy='role-selection-table'] table tbody tr")
       .eq(1)
       .contains('Use')
       .click();
-    cy.wait(1000);
+
+    cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals');
     cy.get('[data-cy="view-proposal"]').click();
@@ -221,7 +239,10 @@ context('Instrument tests', () => {
 
     cy.contains('Update').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Technical review updated successfully',
+    });
 
     cy.contains('Proposals').click();
 
@@ -237,7 +258,10 @@ context('Instrument tests', () => {
       .contains('Yes')
       .click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Proposal removed from the instrument',
+    });
 
     cy.get('[title="Remove assigned instrument"]').should('not.exist');
   });
@@ -246,7 +270,6 @@ context('Instrument tests', () => {
     cy.login('officer');
 
     cy.contains('Instruments').click();
-    cy.wait(500);
 
     cy.get('[title="Show Scientists"]')
       .first()
@@ -260,7 +283,10 @@ context('Instrument tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({
+      variant: 'success',
+      text: 'Scientist removed from instrument',
+    });
 
     cy.get('[data-cy="instruments-table"] table tbody tr')
       .first()
@@ -286,7 +312,10 @@ context('Instrument tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(500);
+    cy.notification({
+      variant: 'success',
+      text: 'Assigned instrument removed successfully',
+    });
 
     cy.contains('Instruments').click();
 
@@ -294,7 +323,7 @@ context('Instrument tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'Instrument removed' });
 
     cy.get('[data-cy="instruments-table"]')
       .find('tbody td')

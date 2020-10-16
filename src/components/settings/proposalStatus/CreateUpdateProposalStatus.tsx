@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
@@ -30,8 +30,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
   proposalStatus,
 }) => {
   const classes = useStyles();
-  const { api } = useDataApiWithFeedback();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = proposalStatus
     ? proposalStatus
@@ -44,7 +43,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
         if (proposalStatus) {
           const data = await api(
             'Proposal status updated successfully'
@@ -67,7 +65,6 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             close(data.createProposalStatus.proposalStatus);
           }
         }
-        setSubmitting(false);
         actions.setSubmitting(false);
       }}
       validationSchema={
@@ -90,7 +87,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             margin="normal"
             fullWidth
             data-cy="name"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <Field
             id="description"
@@ -104,7 +101,7 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             rowsMax="16"
             rows="3"
             data-cy="description"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <Button
@@ -114,9 +111,9 @@ const CreateUpdateProposalStatus: React.FC<CreateUpdateProposalStatusProps> = ({
             color="primary"
             className={classes.submit}
             data-cy="submit"
-            disabled={submitting}
+            disabled={isExecutingCall}
           >
-            {submitting && <UOLoader size={14} />}
+            {isExecutingCall && <UOLoader size={14} />}
             {proposalStatus ? 'Update' : 'Create'}
           </Button>
         </Form>

@@ -45,6 +45,26 @@ declare global {
        *    cy.logout()
        */
       logout: () => void;
+
+      /**
+       * Checks for notification with variant text if passed. Default variant is 'success'.
+       *
+       * @returns {typeof notification}
+       * @memberof Chainable
+       * @example
+       *    cy.notification({ variant: 'error', text: 'failed'})
+       */
+      notification: (options: { variant: string; text: string }) => void;
+
+      /**
+       * Checks if the progressbar does not exist in the dom anymore.
+       *
+       * @returns {typeof finishedLoading}
+       * @memberof Chainable
+       * @example
+       *    cy.finishedLoading()
+       */
+      finishedLoading: () => void;
     }
   }
 

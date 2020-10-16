@@ -1,14 +1,13 @@
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import React, { useEffect, useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { GetUserWithRolesQuery, Role } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import RoleModal from './RoleModal';
 
@@ -17,8 +16,7 @@ export default function UpdateUserRoles(props: { id: number }) {
     GetUserWithRolesQuery['user'] | null
   >(null);
   const [modalOpen, setOpen] = useState(false);
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
   const [roles, setRoles] = useState<Array<Role>>([]);
   const { setRenewTokenValue } = useRenewToken();
   const { user } = useContext(UserContext);
@@ -29,15 +27,11 @@ export default function UpdateUserRoles(props: { id: number }) {
       roles: newRoles.map(role => role.id),
     };
 
-    const userUpdateResult = await api().updateUserRoles(variables);
+    await api('Roles updated successfully!').updateUserRoles(variables);
 
     if (props.id === user.id) {
       setRenewTokenValue();
     }
-
-    enqueueSnackbar('Updated Roles', {
-      variant: userUpdateResult.updateUserRoles.error ? 'error' : 'success',
-    });
   };
 
   const addRole = async (newSelectedRoles: Role[]) => {
@@ -110,6 +104,7 @@ export default function UpdateUserRoles(props: { id: number }) {
           color="primary"
           data-cy="add-role-button"
           onClick={() => setOpen(true)}
+          disabled={isExecutingCall}
         >
           Add role
         </Button>

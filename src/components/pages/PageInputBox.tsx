@@ -14,12 +14,11 @@ import Divider from '@material-ui/core/Divider';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Editor } from '@tinymce/tinymce-react';
-import { useSnackbar } from 'notistack';
 import React, { useState, useEffect } from 'react';
 
 import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(() => ({
   buttons: {
@@ -39,8 +38,7 @@ export default function PageInputBox(props: {
   const classes = useStyles();
   const [loading, pageContent] = useGetPageContent(props.pageName);
   const [content, setPageContent] = useState('');
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
 
   useEffect(() => {
     setPageContent(pageContent);
@@ -72,11 +70,10 @@ export default function PageInputBox(props: {
           color="primary"
           className={classes.button}
           onClick={() =>
-            api()
-              .setPageContent({ id: props.pageName, text: content })
-              .then(() =>
-                enqueueSnackbar('Updated Page', { variant: 'success' })
-              )
+            api('Updated Page').setPageContent({
+              id: props.pageName,
+              text: content,
+            })
           }
         >
           Update

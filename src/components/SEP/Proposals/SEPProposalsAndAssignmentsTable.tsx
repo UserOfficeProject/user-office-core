@@ -4,7 +4,6 @@ import Grid from '@material-ui/core/Grid';
 import AssignmentInd from '@material-ui/icons/AssignmentInd';
 import dateformat from 'dateformat';
 import MaterialTable, { Options } from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
@@ -17,11 +16,11 @@ import {
   Review,
   UserRole,
 } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useSEPProposalsData } from 'hooks/SEP/useSEPProposalsData';
 import { BasicUserDetails } from 'models/User';
 import { tableIcons } from 'utils/materialIcons';
 import { average } from 'utils/mathFunctions';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import AssignSEPMemberToProposal from './AssignSEPMemberToProposal';
 import SEPAssignedReviewersTable from './SEPAssignedReviewersTable';
@@ -45,8 +44,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     SEPProposalsData,
     setSEPProposalsData,
   } = useSEPProposalsData(sepId, selectedCallId);
-  const { enqueueSnackbar } = useSnackbar();
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const [proposalId, setProposalId] = useState<null | number>(null);
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -96,7 +94,7 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
   const removeProposalFromSEP = async (
     proposalToRemove: SepProposal
   ): Promise<void> => {
-    const removeProposalAssignment = await api().removeProposalAssignment({
+    await api('Assignment removed').removeProposalAssignment({
       proposalId: proposalToRemove.proposalId,
       sepId,
     });
@@ -109,19 +107,13 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         )
       );
     }
-
-    const isError = !!removeProposalAssignment.removeProposalAssignment.error;
-
-    enqueueSnackbar('Assignment removed', {
-      variant: isError ? 'error' : 'success',
-    });
   };
 
   const removeAssignedReviewer = async (
     assignedReviewer: SepAssignment,
     proposalId: number
   ): Promise<void> => {
-    const removeAssignedReviewer = await api().removeMemberFromSEPProposal({
+    await api('Reviewer removed').removeMemberFromSEPProposal({
       proposalId,
       sepId,
       memberId: assignedReviewer.sepMemberUserId as number,
@@ -152,16 +144,12 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
         })
       );
     }
-
-    const isError = !!removeAssignedReviewer.removeMemberFromSEPProposal.error;
-
-    enqueueSnackbar('Reviewer removed', {
-      variant: isError ? 'error' : 'success',
-    });
   };
 
   const assignMemberToSEPProposal = async (memberUser: SepMember) => {
-    const assignmentResult = await api().assignMemberToSEPProposal({
+    const assignmentResult = await api(
+      'Member assigned'
+    ).assignMemberToSEPProposal({
       memberId: memberUser.userId,
       proposalId: proposalId as number,
       sepId,
@@ -210,12 +198,6 @@ const SEPProposalsAndAssignmentsTable: React.FC<SEPProposalsAndAssignmentsTableP
     }
 
     setProposalId(null);
-
-    enqueueSnackbar('Member assigned', {
-      variant: assignmentResult.assignMemberToSEPProposal.error
-        ? 'error'
-        : 'success',
-    });
   };
 
   const initialValues = SEPProposalsData as SepProposal[];

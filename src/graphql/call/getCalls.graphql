@@ -12,6 +12,7 @@ query getCalls($filter: CallsFilter) {
     endCycle
     cycleComment
     surveyComment
+    proposalWorkflowId
     templateId
     instruments {
       id
@@ -23,6 +24,11 @@ query getCalls($filter: CallsFilter) {
       scientists {
         ...basicUserDetails
       }
+    }
+    proposalWorkflow {
+      id
+      name
+      description
     }
   }
 }

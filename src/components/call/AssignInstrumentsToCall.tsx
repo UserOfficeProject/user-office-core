@@ -1,15 +1,13 @@
-import { ResourceId, getTranslation } from '@esss-swap/duo-localisation';
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { Instrument, InstrumentWithAvailabilityTime } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
@@ -28,8 +26,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   const [selectedInstruments, setSelectedInstruments] = useState<
     InstrumentWithAvailabilityTime[]
   >([]);
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const columns = [
     { title: 'Name', field: 'name' },
@@ -50,24 +47,16 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const assignInstrumentToCallResult = await api().assignInstrumentToCall({
+    const assignInstrumentToCallResult = await api(
+      'Instrument/s assigned successfully!'
+    ).assignInstrumentsToCall({
       callId,
       instrumentIds: selectedInstruments.map(
         instrumentToAssign => instrumentToAssign.id
       ),
     });
 
-    if (assignInstrumentToCallResult.assignInstrumentToCall.error) {
-      enqueueSnackbar(
-        getTranslation(
-          assignInstrumentToCallResult.assignInstrumentToCall
-            .error as ResourceId
-        ),
-        {
-          variant: 'error',
-        }
-      );
-    } else {
+    if (!assignInstrumentToCallResult.assignInstrumentsToCall.error) {
       assignInstrumentsToCall(selectedInstruments);
     }
   };
@@ -95,7 +84,7 @@ const AssignInstrumentsToCall: React.FC<AssignInstrumentsToCallProps> = ({
           variant="contained"
           color="primary"
           onClick={() => onAssignButtonClick()}
-          disabled={selectedInstruments.length === 0}
+          disabled={selectedInstruments.length === 0 || isExecutingCall}
           data-cy="assign-instrument-to-call"
         >
           Assign instrument{selectedInstruments.length > 1 && 's'}

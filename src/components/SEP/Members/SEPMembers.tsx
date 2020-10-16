@@ -8,7 +8,6 @@ import Person from '@material-ui/icons/Person';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import { Formik, Form, Field } from 'formik';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
 
@@ -17,10 +16,10 @@ import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { UserContext } from 'context/UserContextProvider';
 import { SepMember, BasicUserDetails, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useSEPMembersData } from 'hooks/SEP/useSEPMembersData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type SEPMembersProps = {
   /** Id of the SEP we are assigning members to */
@@ -56,8 +55,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     sepId,
     modalOpen || sepChairModalOpen || sepSecretaryModalOpen
   );
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.SEP_CHAIR,
@@ -101,19 +99,14 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
     });
   };
 
-  const showNotification = (isError: boolean): void => {
-    setOpen(false);
-    enqueueSnackbar('Updated Information', {
-      variant: isError ? 'error' : 'success',
-    });
-  };
-
   const sendSEPChairUpdate = async (
     value: BasicUserDetails[]
   ): Promise<void> => {
     const [sepChair] = value;
 
-    const assignChairResult = await api().assignChairOrSecretary({
+    const assignChairResult = await api(
+      'SEP chair assigned successfully!'
+    ).assignChairOrSecretary({
       addSEPMembersRole: {
         SEPID: sepId,
         roleID: UserRole.SEP_CHAIR,
@@ -121,8 +114,11 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       },
     });
 
-    showNotification(!!assignChairResult.assignChairOrSecretary.error);
-    setSepChairModalOpen(false);
+    setOpen(false);
+
+    if (!assignChairResult.assignChairOrSecretary.error) {
+      setSepChairModalOpen(false);
+    }
 
     if (sepChair.id === user.id || initialValues.SEPChair?.id === user.id) {
       setRenewTokenValue();
@@ -134,7 +130,9 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   ): Promise<void> => {
     const [sepSecretary] = value;
 
-    const assignSecretaryResult = await api().assignChairOrSecretary({
+    const assignSecretaryResult = await api(
+      'SEP secretary assigned successfully!'
+    ).assignChairOrSecretary({
       addSEPMembersRole: {
         SEPID: sepId,
         roleID: UserRole.SEP_SECRETARY,
@@ -142,7 +140,7 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
       },
     });
 
-    showNotification(!!assignSecretaryResult.assignChairOrSecretary.error);
+    setOpen(false);
 
     if (!assignSecretaryResult.assignChairOrSecretary.error) {
       setSepSecretaryModalOpen(false);
@@ -159,16 +157,16 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     initialValues.SEPReviewers.push(...users);
 
-    const assignedMembersResult = await api().assignMembers({
+    await api('SEP member assigned successfully!').assignMembers({
       memberIds: users.map(user => user.id),
       sepId,
     });
 
-    showNotification(!!assignedMembersResult.assignMembers.error);
+    setOpen(false);
   };
 
   const removeMember = async (user: BasicUserDetails): Promise<void> => {
-    const removedMembersResult = await api().removeMember({
+    await api('SEP member removed successfully!').removeMember({
       memberId: user.id,
       sepId,
     });
@@ -189,8 +187,6 @@ const SEPMembers: React.FC<SEPMembersProps> = ({ sepId }) => {
         })
       );
     }
-
-    showNotification(!!removedMembersResult.removeMember.error);
   };
 
   if (loadingMembers) {

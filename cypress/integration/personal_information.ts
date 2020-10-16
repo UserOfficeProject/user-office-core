@@ -57,7 +57,7 @@ context('Personal information tests', () => {
 
     cy.contains('Update Profile').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'Updated Information' });
 
     cy.reload();
 
@@ -95,7 +95,7 @@ context('Personal information tests', () => {
 
     cy.contains('People').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[data-cy="people-table"] table tbody tr')
       .eq(1)
@@ -105,9 +105,11 @@ context('Personal information tests', () => {
     const mainContentElement = cy.get('main');
     mainContentElement.contains('Settings').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.get('[data-cy="add-role-button"]').click();
+
+    cy.finishedLoading();
 
     cy.get('[data-cy="role-modal"]')
       .contains('SEP Chair')
@@ -117,7 +119,7 @@ context('Personal information tests', () => {
 
     cy.contains('Update').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get("[data-cy='profile-page-btn']").click();
 
@@ -125,7 +127,7 @@ context('Personal information tests', () => {
       .contains('Roles')
       .click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.contains('User roles');
 
@@ -141,7 +143,7 @@ context('Personal information tests', () => {
       .contains('Use')
       .click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'User role changed' });
 
     cy.contains('Proposals to review');
 
@@ -157,7 +159,7 @@ context('Personal information tests', () => {
 
     cy.contains('Roles').click();
 
-    cy.wait(1000);
+    cy.finishedLoading();
 
     cy.contains('User roles');
 
