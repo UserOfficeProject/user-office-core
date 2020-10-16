@@ -69,12 +69,6 @@ export default class TemplateMutations {
           'General information',
           'proposal_basis'
         );
-        await this.createInitialTopic(
-          newTemplate.templateId,
-          1,
-          'Review',
-          'proposal_review'
-        );
         break;
       case TemplateCategoryId.SAMPLE_DECLARATION:
         await this.createInitialTopic(
