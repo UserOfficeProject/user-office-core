@@ -25,6 +25,7 @@ export enum EventType {
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
   ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
+  ADD_NEXT_STATUS_EVENTS,
 }
 
 export interface Event {
@@ -149,6 +150,9 @@ const ProposalWorkflowEditorModel = (
           return draft;
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
+        }
+        case EventType.ADD_NEXT_STATUS_EVENTS: {
+          return draft;
         }
         case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS: {
           const groupsToAdd: ProposalWorkflowConnectionGroup[] = [];

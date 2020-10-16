@@ -90,6 +90,18 @@ export function usePersistProposalWorkflowEditorModel() {
         .then(data => data.deleteProposalWorkflowStatus);
     };
 
+    const addNextStatusEventsToConnection = async (
+      proposalWorkflowConnectionId: number,
+      nextStatusEvents: string[]
+    ) => {
+      return api('Next status events added successfully!')
+        .addNextStatusEventsToConnection({
+          proposalWorkflowConnectionId,
+          nextStatusEvents,
+        })
+        .then(data => data.addNextStatusEventsToConnection);
+    };
+
     return (next: Function) => (action: Event) => {
       next(action);
       const state = getState();
@@ -208,6 +220,19 @@ export function usePersistProposalWorkflowEditorModel() {
                 },
               });
             }
+
+            return result;
+          });
+        }
+
+        case EventType.ADD_NEXT_STATUS_EVENTS: {
+          const { workflowConnectionId, nextStatusEvents } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await addNextStatusEventsToConnection(
+              workflowConnectionId,
+              nextStatusEvents
+            );
 
             return result;
           });

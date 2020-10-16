@@ -13,6 +13,7 @@ const FormikUICustomMultipleSelect = ({
   availableOptions,
   id,
   label,
+  width,
   ...props
 }: {
   field: {
@@ -25,6 +26,7 @@ const FormikUICustomMultipleSelect = ({
   availableOptions: string[];
   id: string;
   label: string;
+  width: string;
 }) => {
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -32,7 +34,7 @@ const FormikUICustomMultipleSelect = ({
     PaperProps: {
       style: {
         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250,
+        width: width || 250,
       },
     },
   };

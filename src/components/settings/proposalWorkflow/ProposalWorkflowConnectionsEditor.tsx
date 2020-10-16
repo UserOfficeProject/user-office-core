@@ -23,6 +23,7 @@ import {
 } from 'generated/sdk';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
+import AddNextStatusEventsToConnection from './AddNextStatusEventsToConnection';
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
 type ProposalWorkflowConnectionsEditorProps = {
@@ -40,6 +41,10 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
 }) => {
   const theme = useTheme();
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
+  const [
+    workflowConnection,
+    setWorkflowConnection,
+  ] = useState<ProposalWorkflowConnection | null>(null);
   const classes = makeStyles(theme => ({
     container: {
       alignItems: 'flex-start',
@@ -182,6 +187,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                 provided.draggableProps.style
               )}
               className={classes.item}
+              onClick={() => {
+                setWorkflowConnection(proposalWorkflowConnection);
+              }}
             >
               <DialogActions className={classes.dialogActions}>
                 <IconButton
@@ -303,6 +311,32 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               dispatch({
                 type: EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLLUMNS,
                 payload: { numberOfColumns, parentDroppableId },
+              })
+            }
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={!!workflowConnection}
+        onClose={(): void => setWorkflowConnection(null)}
+      >
+        <DialogContent>
+          <AddNextStatusEventsToConnection
+            close={(): void => setWorkflowConnection(null)}
+            nextStatusEvents={
+              workflowConnection?.nextStatusEvents.map(
+                nextStatusEvent => nextStatusEvent.nextStatusEvent
+              ) as string[]
+            }
+            addNextStatusEventsToConnection={(nextStatusEvents: string[]) =>
+              dispatch({
+                type: EventType.ADD_NEXT_STATUS_EVENTS,
+                payload: {
+                  nextStatusEvents,
+                  workflowConnectionId: workflowConnection?.id,
+                },
               })
             }
           />

@@ -22,6 +22,11 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
           nextProposalStatusId
           prevProposalStatusId
           droppableGroupId
+          nextStatusEvents {
+            nextStatusEventId
+            proposalWorkflowConnectionId
+            nextStatusEvent
+          }
         }
       }
     }
