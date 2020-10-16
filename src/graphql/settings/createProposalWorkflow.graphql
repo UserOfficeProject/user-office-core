@@ -21,7 +21,6 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
         }
       }

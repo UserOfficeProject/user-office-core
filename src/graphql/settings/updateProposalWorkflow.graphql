@@ -29,7 +29,6 @@ mutation updateProposalWorkflow(
           }
           nextProposalStatusId
           prevProposalStatusId
-          nextStatusEventType
           droppableGroupId
         }
       }

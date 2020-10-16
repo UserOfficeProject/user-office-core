@@ -6,7 +6,6 @@ mutation addProposalWorkflowStatus(
   $proposalStatusId: Int!
   $nextProposalStatusId: Int
   $prevProposalStatusId: Int
-  $nextStatusEventType: String!
 ) {
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: {
@@ -17,7 +16,6 @@ mutation addProposalWorkflowStatus(
       proposalStatusId: $proposalStatusId
       nextProposalStatusId: $nextProposalStatusId
       prevProposalStatusId: $prevProposalStatusId
-      nextStatusEventType: $nextStatusEventType
     }
   ) {
     error

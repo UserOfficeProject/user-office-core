@@ -49,8 +49,7 @@ export function usePersistProposalWorkflowEditorModel() {
       parentDroppableGroupId: string,
       proposalStatusId: number,
       nextProposalStatusId: number,
-      prevProposalStatusId: number,
-      nextStatusEventType: string
+      prevProposalStatusId: number
     ) => {
       return api('Workflow status added successfully')
         .addProposalWorkflowStatus({
@@ -61,7 +60,6 @@ export function usePersistProposalWorkflowEditorModel() {
           proposalStatusId,
           nextProposalStatusId,
           prevProposalStatusId,
-          nextStatusEventType,
         })
         .then(data => data.addProposalWorkflowStatus);
     };
@@ -185,8 +183,6 @@ export function usePersistProposalWorkflowEditorModel() {
             parentDroppableGroupId,
             droppableGroupId,
           } = action.payload;
-          // TODO: We should be able to define this event in the UI maybe. This is about what kind of event triggers proposal status to move forward in the workflow.
-          const nextStatusEventType = 'DEFAULT_EVENT';
 
           dispatch({
             type: EventType.WORKFLOW_STATUS_ADDED,
@@ -201,8 +197,7 @@ export function usePersistProposalWorkflowEditorModel() {
               parentDroppableGroupId,
               proposalStatusId,
               nextProposalStatusId,
-              prevProposalStatusId,
-              nextStatusEventType
+              prevProposalStatusId
             );
 
             if (result.error) {
