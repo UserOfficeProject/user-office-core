@@ -1,15 +1,14 @@
 import DoneAll from '@material-ui/icons/DoneAll';
 import MaterialTable, { Options } from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import DialogConfirmation from 'components/common/DialogConfirmation';
 import { InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useInstrumentsBySEPData } from 'hooks/instrument/useInstrumentsBySEPData';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import SEPInstrumentProposalsTable from './SEPInstrumentProposalsTable';
 
@@ -29,8 +28,7 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
     instrumentsData,
     setInstrumentsData,
   } = useInstrumentsBySEPData(sepId, selectedCallId);
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const [
     instrumentToSubmit,
     setInstrumentToSubmit,
@@ -69,7 +67,9 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
 
   const submitInstrument = async () => {
     if (instrumentToSubmit) {
-      const { submitInstrument } = await api().submitInstrument({
+      const { submitInstrument } = await api(
+        'Instrument submitted!'
+      ).submitInstrument({
         callId: selectedCallId,
         instrumentId: instrumentToSubmit.id,
         sepId: sepId,
@@ -88,13 +88,6 @@ const SEPMeetingInstrumentsTable: React.FC<SEPMeetingInstrumentsTableProps> = ({
 
         setInstrumentsData(newInstrumentsData);
       }
-
-      enqueueSnackbar(
-        isError ? 'Instrument not submitted!' : 'Instrument submitted!',
-        {
-          variant: isError ? 'error' : 'success',
-        }
-      );
 
       setInstrumentToSubmit(null);
     }

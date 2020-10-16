@@ -8,19 +8,16 @@ context('Settings tests', () => {
     before(() => {
       cy.resetDB();
     });
+
     beforeEach(() => {
       cy.visit('/');
       cy.viewport(1100, 1000);
     });
 
-    afterEach(() => {
-      cy.wait(500);
-    });
-
     it('User should not be able to see Settings page', () => {
       cy.login('user');
 
-      cy.wait(1000);
+      cy.get('[data-cy="profile-page-btn"]').should('exist');
 
       let userMenuItems = cy.get('[data-cy="user-menu-items"]');
 
@@ -43,7 +40,7 @@ context('Settings tests', () => {
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
 
-      cy.wait(500);
+      cy.notification({ variant: 'success', text: 'created successfully' });
 
       let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
 
@@ -93,7 +90,7 @@ context('Settings tests', () => {
       cy.get('#description').type(newDescription);
       cy.get('[data-cy="submit"]').click();
 
-      cy.wait(500);
+      cy.notification({ variant: 'success', text: 'updated successfully' });
 
       proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
       const proposalStatusesTableLastRow = proposalStatusesTable
@@ -112,8 +109,6 @@ context('Settings tests', () => {
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
 
-      cy.wait(500);
-
       let proposalStatusesTable = cy.get('[data-cy="proposal-statuses-table"]');
 
       const lastPageButtonElement = proposalStatusesTable.find(
@@ -128,7 +123,7 @@ context('Settings tests', () => {
 
       cy.get('[title="Save"]').click();
 
-      cy.contains('Proposal status deleted successfully');
+      cy.notification({ variant: 'success', text: 'deleted successfully' });
     });
   });
 
@@ -141,13 +136,10 @@ context('Settings tests', () => {
     before(() => {
       cy.resetDB();
     });
+
     beforeEach(() => {
       cy.visit('/');
       cy.viewport(1100, 1000);
-    });
-
-    afterEach(() => {
-      cy.wait(500);
     });
 
     it('User Officer should be able to create proposal workflow', () => {
@@ -163,6 +155,8 @@ context('Settings tests', () => {
       cy.get('#name').type(name);
       cy.get('#description').type(description);
       cy.get('[data-cy="submit"]').click();
+
+      cy.notification({ variant: 'success', text: 'created successfully' });
 
       let proposalWorkflowsTable = cy.get(
         '[data-cy="proposal-workflows-table"]'
@@ -201,6 +195,8 @@ context('Settings tests', () => {
         .type(description);
       cy.get('[data-cy="submit"]').click();
 
+      cy.notification({ variant: 'success', text: 'updated successfully' });
+
       cy.get('[data-cy="proposal-workflow-metadata-container"]')
         .should('contain.text', name)
         .should('contain.text', description);
@@ -227,7 +223,10 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status_DRAFT_1"]').should('not.exist');
 
-      cy.contains('Workflow status added successfully');
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
     });
 
     it('User Officer should be able to add more statuses in proposal workflow', () => {
@@ -253,7 +252,10 @@ context('Settings tests', () => {
         'FEASIBILITY_REVIEW'
       );
 
-      cy.contains('Workflow status added successfully');
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status added successfully',
+      });
 
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
     });
@@ -295,8 +297,6 @@ context('Settings tests', () => {
         'SEP_SELECTION'
       );
 
-      cy.wait(500);
-
       cy.get('[data-cy="status_NOT_FEASIBLE_3"]')
         .focus()
         .trigger('keydown', { keyCode: spaceKeyCode })
@@ -309,11 +309,7 @@ context('Settings tests', () => {
         'NOT_FEASIBLE'
       );
 
-      cy.wait(500);
-
       cy.reload();
-
-      cy.wait(500);
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
@@ -338,7 +334,10 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="status_DRAFT_1"]').should('contain.text', 'DRAFT');
 
-      cy.contains('Workflow status removed successfully');
+      cy.notification({
+        variant: 'success',
+        text: 'Workflow status removed successfully',
+      });
 
       cy.get('[data-cy="connection_DRAFT_1"]').should('not.exist');
     });

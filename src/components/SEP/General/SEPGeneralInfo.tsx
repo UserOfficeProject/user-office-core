@@ -7,15 +7,14 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import { Formik, Form, Field } from 'formik';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import { Sep, UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { ButtonContainer } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type SEPPageProps = {
   /** SEP data to be shown */
@@ -34,18 +33,12 @@ const useStyles = makeStyles({
 const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
   const sep = { ...data };
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
-  const [submitting, setSubmitting] = useState<boolean>(false);
 
   const sendSEPUpdate = async (values: Sep): Promise<void> => {
-    const result = await api().updateSEP(values);
+    await api('SEP updated successfully!').updateSEP(values);
     onSEPUpdate(values);
-    enqueueSnackbar('Updated Information', {
-      variant: result.updateSEP.error ? 'error' : 'success',
-    });
-    setSubmitting(false);
   };
 
   if (!sep) {
@@ -58,7 +51,6 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
       validateOnBlur={false}
       initialValues={sep}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
         await sendSEPUpdate(values);
         actions.setSubmitting(false);
       }}
@@ -90,7 +82,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                 data-cy="code"
                 error={touched.code && errors.code !== undefined}
                 helperText={touched.code && errors.code && errors.code}
-                disabled={!hasAccessRights || submitting}
+                disabled={!hasAccessRights || isExecutingCall}
               />
               <Field
                 id="numberRatingsRequired"
@@ -112,7 +104,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.numberRatingsRequired &&
                   errors.numberRatingsRequired
                 }
-                disabled={!hasAccessRights || submitting}
+                disabled={!hasAccessRights || isExecutingCall}
               />
             </Grid>
             <Grid item xs={6}>
@@ -136,7 +128,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                   errors.description &&
                   errors.description
                 }
-                disabled={!hasAccessRights || submitting}
+                disabled={!hasAccessRights || isExecutingCall}
               />
               <FormControlLabel
                 control={
@@ -151,7 +143,7 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
                       setFieldValue('active', !values.active)
                     }
                     inputProps={{ 'aria-label': 'primary checkbox' }}
-                    disabled={!hasAccessRights || submitting}
+                    disabled={!hasAccessRights || isExecutingCall}
                   />
                 }
                 label="Active"
@@ -161,14 +153,14 @@ const SEPGeneralInfo: React.FC<SEPPageProps> = ({ data, onSEPUpdate }) => {
           {hasAccessRights && (
             <ButtonContainer>
               <Button
-                disabled={submitting}
+                disabled={isExecutingCall}
                 type="submit"
                 variant="contained"
                 color="primary"
                 className={classes.button}
                 data-cy="submit"
               >
-                {submitting && <UOLoader size={14} />}
+                {isExecutingCall && <UOLoader size={14} />}
                 Update SEP
               </Button>
             </ButtonContainer>

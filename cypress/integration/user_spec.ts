@@ -12,10 +12,6 @@ context('User tests', () => {
     cy.visit('/SignUp?code=WRMVXa');
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   // Login details
   const password = 'aslaksjdajsl9#ASdADSlk!';
 

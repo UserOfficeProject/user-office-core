@@ -7,19 +7,16 @@ context('Institution tests', () => {
   before(() => {
     cy.resetDB();
   });
+
   beforeEach(() => {
     cy.visit('/');
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('User should not be able to see Institutions page', () => {
     cy.login('user');
 
-    cy.wait(1000);
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
 
     let userMenuItems = cy.get('[data-cy="user-menu-items"]');
 
@@ -36,7 +33,7 @@ context('Institution tests', () => {
     cy.get('#name').type(name);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     let institutionsTable = cy.get('[data-cy="institutions-table"]');
 
@@ -70,7 +67,7 @@ context('Institution tests', () => {
     cy.get('#name').type(name);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     const institutionsTable = cy.get('[data-cy="institutions-table"]');
 
@@ -96,8 +93,6 @@ context('Institution tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.contains('Institution removed!');
-
-    cy.wait(500);
+    cy.contains('Institution removed successfully!');
   });
 });

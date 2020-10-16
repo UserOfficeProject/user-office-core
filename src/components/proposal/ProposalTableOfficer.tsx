@@ -21,7 +21,6 @@ import AssignProposalsToInstrument from 'components/instrument/AssignProposalsTo
 import AssignProposalToSEP from 'components/SEP/Proposals/AssignProposalToSEP';
 import { Instrument, Sep, ProposalsToInstrumentArgs } from 'generated/sdk';
 import { ProposalsFilter } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import {
@@ -30,6 +29,7 @@ import {
 } from 'hooks/proposal/useProposalsCoreData';
 import { excelDownload } from 'utils/excelDownload';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { ProposalUrlQueryParamsType } from './ProposalPage';
 import RankInput from './RankInput';
@@ -65,7 +65,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     initalSelectedProposals
   );
   const downloadPDFProposal = useDownloadPDFProposal();
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
     Column<ProposalViewData>[] | null
@@ -93,7 +93,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
       proposalAndInstrumentId.instrumentId &&
       proposalAndInstrumentId.proposalId
     ) {
-      const result = await api().removeProposalFromInstrument({
+      const result = await api(
+        'Proposal removed from the instrument successfully!'
+      ).removeProposalFromInstrument({
         proposalId: proposalAndInstrumentId.proposalId,
         instrumentId: proposalAndInstrumentId.instrumentId,
       });
@@ -111,13 +113,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           })
         );
       }
-
-      const message = isError
-        ? 'Could not remove proposal from the instrument'
-        : 'Proposal removed from the instrument';
-      enqueueSnackbar(message, {
-        variant: isError ? 'error' : 'success',
-      });
 
       setProposalAndInstrumentId({ proposalId: null, instrumentId: null });
     }
@@ -295,7 +290,7 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
   const assignProposalToSEP = async (sep: Sep): Promise<void> => {
     const assignmentsErrors = await Promise.all(
       selectedProposals.map(async selectedProposal => {
-        const result = await api().assignProposal({
+        const result = await api('Proposal/s assigned to SEP').assignProposal({
           proposalId: selectedProposal.id,
           sepId: sep.id,
         });
@@ -321,13 +316,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
         })
       );
     }
-
-    const message = isError
-      ? 'Could not assign all selected proposals to SEP'
-      : 'Proposal/s assigned to SEP';
-    enqueueSnackbar(message, {
-      variant: isError ? 'error' : 'success',
-    });
   };
 
   const assignProposalsToInstrument = async (
@@ -341,7 +329,9 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
     );
 
     if (selectedProposalsWithInstrument.length === 0) {
-      const result = await api().assignProposalsToInstrument({
+      const result = await api(
+        'Proposal/s assigned to the selected instrument'
+      ).assignProposalsToInstrument({
         proposals: selectedProposals,
         instrumentId: instrument.id,
       });
@@ -362,13 +352,6 @@ const ProposalTableOfficer: React.FC<ProposalTableOfficerProps> = ({
           })
         );
       }
-
-      const message = isError
-        ? 'Could not assign all selected proposals to the instrument'
-        : 'Proposal/s assigned to the selected instrument';
-      enqueueSnackbar(message, {
-        variant: isError ? 'error' : 'success',
-      });
     } else {
       enqueueSnackbar(
         'One or more of your selected proposals already have instrument assigned',

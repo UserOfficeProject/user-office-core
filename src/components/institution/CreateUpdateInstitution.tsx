@@ -1,16 +1,14 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
-import React, { useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import FormikDropdown from 'components/common/FormikDropdown';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateUpdateInstitutionProps = {
   close: (institution: Institution | null) => void;
@@ -21,9 +19,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
   close,
   institution,
 }) => {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
   const initialValues = institution
     ? {
         name: institution.name,
@@ -35,7 +31,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
       };
 
   const createInstitution = (verified: string, name: string) => {
-    api()
+    api('Institution created successfully!')
       .createInstitution({
         name: name,
         verified: verified === 'true',
@@ -43,19 +39,15 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
       .then(response => {
         const { error, institution } = response.createInstitution;
         if (error) {
-          enqueueSnackbar(getTranslation(error as ResourceId), {
-            variant: 'error',
-          });
           close(null);
         } else if (institution) {
           close(institution);
         }
-        setSubmitting(false);
       });
   };
 
   const updateInstitution = (id: number, verified: string, name: string) => {
-    api()
+    api('Institution updated successfully!')
       .updateInstitution({
         id: id,
         name: name,
@@ -65,15 +57,10 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
         const { error, institution } = response.updateInstitution;
 
         if (error) {
-          enqueueSnackbar('Failed to update', {
-            variant: 'error',
-          });
           close(null);
         } else if (institution) {
           close(institution);
         }
-
-        setSubmitting(false);
       });
   };
 
@@ -81,7 +68,6 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
         institution
           ? updateInstitution(institution.id, values.verified, values.name)
           : createInstitution(values.verified, values.name);
@@ -106,7 +92,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             component={TextField}
             data-cy="name"
             fullWidth
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <FormikDropdown
@@ -117,7 +103,7 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
               { text: 'false', value: 'false' },
             ]}
             data-cy="verified"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <Button
@@ -126,9 +112,9 @@ const CreateUpdateInstitution: React.FC<CreateUpdateInstitutionProps> = ({
             variant="contained"
             color="primary"
             data-cy="submit"
-            disabled={submitting}
+            disabled={isExecutingCall}
           >
-            {submitting && <UOLoader size={14} />}
+            {isExecutingCall && <UOLoader size={14} />}
             {institution ? 'Update' : 'Create'}
           </Button>
         </Form>
