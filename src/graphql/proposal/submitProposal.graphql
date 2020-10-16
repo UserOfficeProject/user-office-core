@@ -1,7 +1,7 @@
 mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {
     proposal {
-      id
+      ...proposal
     }
     error
   }

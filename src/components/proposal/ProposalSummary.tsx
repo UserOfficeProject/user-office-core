@@ -6,17 +6,23 @@ import NavigationFragment from 'components/questionary/NavigationFragment';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
-import {
-  EventType,
-  ProposalSubmissionModelState,
-} from 'models/ProposalSubmissionState';
+import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
+import { EventType } from 'models/QuestionarySubmissionState';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm from 'utils/withConfirm';
 
-import { SubmissionContext } from '../../utils/SubmissionContext';
+import { ProposalContext } from './ProposalContainer';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
-  const { dispatch } = useContext(SubmissionContext)!;
+  const context = useContext(ProposalContext);
   const { isLoading, submitProposal } = useSubmitProposal();
+
+  if (!context) {
+    throw new Error(
+      'ProposalReview is missing SubmissionContext. Wrap ProposalReview or one of its parrents with SubmissionContext'
+    );
+  }
+  const { dispatch } = context;
   const downloadPDFProposal = useDownloadPDFProposal();
   const proposal = data.proposal;
 
@@ -59,7 +65,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
                 () => {
                   submitProposal(proposal.id).then(() => {
                     dispatch({
-                      type: EventType.SUBMIT_PROPOSAL_CLICKED,
+                      type: EventType.PROPOSAL_SUBMIT_CLICKED,
                       payload: proposal,
                     });
                   });
@@ -93,7 +99,7 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
 }
 
 interface ProposalSummaryProps {
-  data: ProposalSubmissionModelState;
+  data: ProposalSubmissionState;
   readonly: boolean;
   confirm: Function;
 }

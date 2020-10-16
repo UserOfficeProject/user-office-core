@@ -11,7 +11,12 @@ import { Prompt } from 'react-router';
 import { useCheckAccess } from 'components/common/Can';
 import { QuestionaryStepButton } from 'components/questionary/QuestionaryStepButton';
 import QuestionaryStepView from 'components/questionary/QuestionaryStepView';
-import { Proposal, UserRole } from 'generated/sdk';
+import {
+  Proposal,
+  Questionary,
+  QuestionaryStep,
+  UserRole,
+} from 'generated/sdk';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
@@ -24,6 +29,8 @@ import {
 import { StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
+
+import ProposalSummary from './ProposalSummary';
 
 const useStyles = makeStyles(theme => ({
   stepper: {
@@ -54,6 +61,9 @@ export const ProposalContext = React.createContext<ProposalContextType>({
   dispatch: (e: Event) => {},
 });
 
+const getReviewStepIndex = (state: ProposalSubmissionState) =>
+  state.steps.length;
+
 const getConfirmNavigMsg = (): string => {
   return 'Changes you recently made in this step will not be saved! Are you sure?';
 };
@@ -73,12 +83,35 @@ const proposalReducer = (
       draftState.steps = proposal.questionary.steps;
       draftState.templateId = proposal.questionary.templateId;
       break;
-    case EventType.PROPOSAL_UPDATED:
+    case EventType.PROPOSAL_MODIFIED:
       draftState.proposal = {
         ...draftState.proposal,
         ...action.payload.proposal,
       };
       draftState.isDirty = true;
+      break;
+    case EventType.GO_TO_STEP:
+      const reviewStepIdx = getReviewStepIndex(state);
+      if (action.payload.stepIndex === reviewStepIdx) {
+        draftState.stepIndex = reviewStepIdx;
+      }
+      break;
+
+    case EventType.QUESTIONARY_STEPS_COMPLETE: {
+      draftState.stepIndex = getReviewStepIndex(state);
+      break;
+    }
+    case EventType.QUESTIONARY_STEPS_LOADED: {
+      draftState.proposal.questionary.steps = action.payload.questionarySteps;
+      break;
+    }
+    case EventType.QUESTIONARY_STEP_ANSWERED:
+      const updatedStep = action.payload.questionaryStep as QuestionaryStep;
+      const stepIndex = draftState.proposal.questionary.steps.findIndex(
+        step => step.topic.id === updatedStep.topic.id
+      );
+      draftState.proposal.questionary.steps[stepIndex] = updatedStep;
+
       break;
   }
 
@@ -139,6 +172,9 @@ export default function ProposalContainer(props: {
     return false;
   };
 
+  const allStepsComplete = (questionary: Questionary) =>
+    questionary && questionary.steps.every(step => step.isCompleted);
+
   const handleEvents = ({
     getState,
     dispatch,
@@ -147,7 +183,7 @@ export default function ProposalContainer(props: {
       next(action); // first update state/model
       const state = getState() as ProposalSubmissionState;
       switch (action.type) {
-        case EventType.PROPOSAL_UPDATED:
+        case EventType.PROPOSAL_MODIFIED:
           props.proposalUpdated?.(action.payload.proposal);
           break;
         case EventType.PROPOSAL_CREATED:
@@ -226,11 +262,28 @@ export default function ProposalContainer(props: {
             </QuestionaryStepButton>
           </Step>
         ))}
+        <Step key="review">
+          <QuestionaryStepButton
+            onClick={async () => {
+              dispatch({
+                type: EventType.GO_TO_STEP,
+                payload: { stepIndex: state.steps.length },
+              });
+            }}
+            completed={state.proposal.submitted}
+            editable={allStepsComplete(state.proposal.questionary)}
+          >
+            <span>Review</span>
+          </QuestionaryStepButton>
+        </Step>
       </Stepper>
     );
   };
 
   const getStepContent = () => {
+    if (state.stepIndex === getReviewStepIndex(state)) {
+      return <ProposalSummary data={state} readonly={false} />;
+    }
     const currentStep = state.steps[state.stepIndex];
     const previousStep = state.steps[state.stepIndex - 1];
 
@@ -239,51 +292,51 @@ export default function ProposalContainer(props: {
     }
 
     return (
-      <ProposalContext.Provider value={{ state, dispatch }}>
-        <QuestionaryStepView
-          topicId={currentStep.topic.id}
-          state={state}
-          readonly={
-            isSavingModel ||
-            isApiInteracting ||
-            (previousStep ? previousStep.isCompleted === false : false) ||
-            (isSubmitted && isNonOfficer)
-          }
-          dispatch={dispatch}
-          key={currentStep.topic.id}
-        />
-      </ProposalContext.Provider>
+      <QuestionaryStepView
+        topicId={currentStep.topic.id}
+        state={state}
+        readonly={
+          isApiInteracting ||
+          (previousStep ? previousStep.isCompleted === false : false) ||
+          (isSubmitted && isNonOfficer)
+        }
+        dispatch={dispatch}
+        key={currentStep.topic.id}
+      />
     );
   };
 
   const getProgressBar = () =>
     // TODO reuse with other container
-    isApiInteracting || isSavingModel ? <LinearProgress /> : null;
+    isApiInteracting ? <LinearProgress /> : null;
 
   //<ProposalReview data={state} readonly={isSubmitted && isNonOfficer} />
 
   return (
-    <Container maxWidth="lg">
-      <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
-      <StyledPaper>
-        <Typography
-          component="h1"
-          variant="h4"
-          align="center"
-          className={classes.heading}
-        >
-          {state.proposal.title || 'New Proposal'}
-        </Typography>
-        <div className={classes.infoline}>
-          {state.proposal.shortCode
-            ? `Proposal ID: ${state.proposal.shortCode}`
-            : null}
-        </div>
-        <div className={classes.infoline}>{state.proposal.status.name}</div>
-        {getStepperNavig()}
-        {getProgressBar()}
-        {getStepContent()}
-      </StyledPaper>
-    </Container>
+    <ProposalContext.Provider value={{ state, dispatch }}>
+      <Container maxWidth="lg">
+        <Prompt when={state.isDirty} message={() => getConfirmNavigMsg()} />
+        <StyledPaper>
+          <Typography
+            component="h1"
+            variant="h4"
+            align="center"
+            className={classes.heading}
+          >
+            {state.proposal.title || 'New Proposal'}
+          </Typography>
+          <div className={classes.infoline}>
+            {state.proposal.shortCode
+              ? `Proposal ID: ${state.proposal.shortCode}`
+              : null}
+          </div>
+          <div className={classes.infoline}>{state.proposal.status.name}</div>
+          {getStepperNavig()}
+          {getProgressBar()}
+
+          {getStepContent()}
+        </StyledPaper>
+      </Container>
+    </ProposalContext.Provider>
   );
 }

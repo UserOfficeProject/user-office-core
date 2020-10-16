@@ -721,6 +721,7 @@ export type MutationCreateTemplateArgs = {
 export type MutationCreateTopicArgs = {
   templateId: Scalars['Int'];
   sortOrder: Scalars['Int'];
+  title?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1192,7 +1193,6 @@ export type Query = {
   instrumentScientistProposals: Maybe<ProposalsQueryResult>;
   templates: Maybe<Array<Template>>;
   basicUserDetails: Maybe<BasicUserDetails>;
-  blankProposal: Maybe<Proposal>;
   blankQuestionarySteps: Maybe<Array<QuestionaryStep>>;
   call: Maybe<Call>;
   checkEmailExist: Maybe<Scalars['Boolean']>;
@@ -1264,11 +1264,6 @@ export type QueryTemplatesArgs = {
 
 export type QueryBasicUserDetailsArgs = {
   id: Scalars['Int'];
-};
-
-
-export type QueryBlankProposalArgs = {
-  callId: Scalars['Int'];
 };
 
 
@@ -2623,7 +2618,13 @@ export type CreateProposalMutation = (
       ), questionary: (
         { __typename?: 'Questionary' }
         & QuestionaryFragment
-      ) }
+      ), proposer: (
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      ), users: Array<(
+        { __typename?: 'BasicUserDetails' }
+        & BasicUserDetailsFragment
+      )> }
     )> }
   ) }
 );
@@ -2656,36 +2657,6 @@ export type ProposalFragment = (
     { __typename?: 'ProposalStatus' }
     & Pick<ProposalStatus, 'id' | 'name' | 'description'>
   ) }
-);
-
-export type GetBlankProposalQueryVariables = Exact<{
-  callId: Scalars['Int'];
-}>;
-
-
-export type GetBlankProposalQuery = (
-  { __typename?: 'Query' }
-  & { blankProposal: Maybe<(
-    { __typename?: 'Proposal' }
-    & { proposer: (
-      { __typename?: 'BasicUserDetails' }
-      & BasicUserDetailsFragment
-    ), questionary: (
-      { __typename?: 'Questionary' }
-      & QuestionaryFragment
-    ), users: Array<(
-      { __typename?: 'BasicUserDetails' }
-      & BasicUserDetailsFragment
-    )>, reviews: Maybe<Array<(
-      { __typename?: 'Review' }
-      & Pick<Review, 'id' | 'grade' | 'comment' | 'status' | 'userID' | 'sepID'>
-      & { reviewer: Maybe<(
-        { __typename?: 'User' }
-        & Pick<User, 'firstname' | 'lastname' | 'username' | 'id'>
-      )> }
-    )>> }
-    & ProposalFragment
-  )> }
 );
 
 export type GetInstrumentScientistProposalsQueryVariables = Exact<{
@@ -2855,7 +2826,7 @@ export type SubmitProposalMutation = (
     & Pick<ProposalResponseWrap, 'error'>
     & { proposal: Maybe<(
       { __typename?: 'Proposal' }
-      & Pick<Proposal, 'id'>
+      & ProposalFragment
     )> }
   ) }
 );
@@ -5268,11 +5239,18 @@ export const CreateProposalDocument = gql`
       questionary {
         ...questionary
       }
+      proposer {
+        ...basicUserDetails
+      }
+      users {
+        ...basicUserDetails
+      }
     }
     error
   }
 }
-    ${QuestionaryFragmentDoc}`;
+    ${QuestionaryFragmentDoc}
+${BasicUserDetailsFragmentDoc}`;
 export const DeleteProposalDocument = gql`
     mutation deleteProposal($id: Int!) {
   deleteProposal(id: $id) {
@@ -5282,38 +5260,6 @@ export const DeleteProposalDocument = gql`
   }
 }
     `;
-export const GetBlankProposalDocument = gql`
-    query getBlankProposal($callId: Int!) {
-  blankProposal(callId: $callId) {
-    ...proposal
-    proposer {
-      ...basicUserDetails
-    }
-    questionary {
-      ...questionary
-    }
-    users {
-      ...basicUserDetails
-    }
-    reviews {
-      id
-      grade
-      comment
-      status
-      userID
-      sepID
-      reviewer {
-        firstname
-        lastname
-        username
-        id
-      }
-    }
-  }
-}
-    ${ProposalFragmentDoc}
-${BasicUserDetailsFragmentDoc}
-${QuestionaryFragmentDoc}`;
 export const GetInstrumentScientistProposalsDocument = gql`
     query getInstrumentScientistProposals($filter: ProposalsFilter) {
   instrumentScientistProposals(filter: $filter) {
@@ -5500,12 +5446,12 @@ export const SubmitProposalDocument = gql`
     mutation submitProposal($id: Int!) {
   submitProposal(id: $id) {
     proposal {
-      id
+      ...proposal
     }
     error
   }
 }
-    `;
+    ${ProposalFragmentDoc}`;
 export const UpdateProposalDocument = gql`
     mutation updateProposal($id: Int!, $title: String, $abstract: String, $users: [Int!], $proposerId: Int) {
   updateProposal(id: $id, title: $title, abstract: $abstract, users: $users, proposerId: $proposerId) {
@@ -6479,9 +6425,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     deleteProposal(variables: DeleteProposalMutationVariables): Promise<DeleteProposalMutation> {
       return withWrapper(() => client.request<DeleteProposalMutation>(print(DeleteProposalDocument), variables));
-    },
-    getBlankProposal(variables: GetBlankProposalQueryVariables): Promise<GetBlankProposalQuery> {
-      return withWrapper(() => client.request<GetBlankProposalQuery>(print(GetBlankProposalDocument), variables));
     },
     getInstrumentScientistProposals(variables?: GetInstrumentScientistProposalsQueryVariables): Promise<GetInstrumentScientistProposalsQuery> {
       return withWrapper(() => client.request<GetInstrumentScientistProposalsQuery>(print(GetInstrumentScientistProposalsDocument), variables));

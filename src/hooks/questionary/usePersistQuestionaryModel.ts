@@ -49,7 +49,15 @@ export function usePersistQuestionaryModel() {
                     questionaryStep: result.answerTopic.questionaryStep,
                   },
                 });
-                dispatch({ type: EventType.GO_STEP_FORWARD });
+
+                const state = getState();
+                const nextStepIndex = state.stepIndex + 1;
+                const lastStepIndex = state.steps.length - 1;
+                if (nextStepIndex > lastStepIndex) {
+                  dispatch({ type: EventType.QUESTIONARY_STEPS_COMPLETE });
+                } else {
+                  dispatch({ type: EventType.GO_STEP_FORWARD });
+                }
               }
             });
           break;

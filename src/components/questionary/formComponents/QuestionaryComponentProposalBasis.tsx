@@ -66,7 +66,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             fullWidth
             onBlur={event => {
               dispatch({
-                type: EventType.PROPOSAL_UPDATED,
+                type: EventType.PROPOSAL_MODIFIED,
                 payload: { proposal: { title: event.target.value } },
               });
             }}
@@ -91,7 +91,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             fullWidth
             onBlur={event => {
               dispatch({
-                type: EventType.PROPOSAL_UPDATED,
+                type: EventType.PROPOSAL_MODIFIED,
                 payload: { proposal: { abstract: event.target.value } },
               });
             }}
@@ -105,7 +105,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <ProposalParticipant
         userChanged={(user: BasicUserDetails) => {
           dispatch({
-            type: EventType.PROPOSAL_UPDATED,
+            type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { proposer: user } },
           });
         }}
@@ -117,7 +117,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         error={false} // FIXME
         setUsers={(users: BasicUserDetails[]) => {
           dispatch({
-            type: EventType.PROPOSAL_UPDATED,
+            type: EventType.PROPOSAL_MODIFIED,
             payload: { proposal: { users: users } },
           });
         }}
@@ -150,7 +150,7 @@ async function proposalBasisPreSubmit(
       dispatch({
         type: EventType.PROPOSAL_LOADED,
         payload: {
-          proposal: result.updateProposal.proposal,
+          proposal: { ...proposal, ...result.updateProposal.proposal },
         },
       });
     }

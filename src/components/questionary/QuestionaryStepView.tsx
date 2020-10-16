@@ -8,9 +8,11 @@ import UOLoader from 'components/common/UOLoader';
 import { createFormikConfigObjects } from 'components/proposal/createFormikConfigObjects';
 import { createComponent } from 'components/questionary/QuestionaryComponentFactory';
 import { QuestionaryStep } from 'generated/sdk';
+import { usePreSubmitFunctionQueueFactory } from 'hooks/questionary/usePreSubmitFunctionQueueFactory';
 import {
   areDependenciesSatisfied,
   getQuestionaryStepByTopicId as getStepByTopicId,
+  prepareAnswers,
 } from 'models/QuestionaryFunctions';
 import {
   Event,
@@ -18,6 +20,7 @@ import {
   QuestionarySubmissionState,
 } from 'models/QuestionarySubmissionState';
 import submitFormAsync from 'utils/FormikAsyncFormHandler';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import NavigationFragment from './NavigationFragment';
 

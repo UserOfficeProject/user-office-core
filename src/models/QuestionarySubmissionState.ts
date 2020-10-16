@@ -8,6 +8,7 @@ import {
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
+import { ProposalSubmissionState } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 
 export enum EventType {
@@ -27,9 +28,10 @@ export enum EventType {
   SAMPLE_LOADED = 'SAMPLE_LOADED',
   SAMPLE_MODIFIED = 'SAMPLE_MODIFIED',
   SAVE_GENERAL_INFO_CLICKED = 'SAVE_GENERAL_INFO_CLICKED',
-  PROPOSAL_UPDATED = 'PROPOSAL_UPDATED',
+  PROPOSAL_MODIFIED = 'PROPOSAL_MODIFIED',
   PROPOSAL_CREATED = 'PROPOSAL_CREATED',
   PROPOSAL_LOADED = 'PROPOSAL_LOADED',
+  PROPOSAL_SUBMIT_CLICKED = 'PROPOSAL_SUBMIT_CLICKED',
 }
 export interface Event {
   type: EventType;
@@ -43,6 +45,17 @@ export interface QuestionarySubmissionState {
   stepIndex: number;
   isDirty: boolean;
 }
+
+const setStepIndexIfValid = (
+  state: QuestionarySubmissionState,
+  stepIndex: number
+) => {
+  const firstStepIndex = 0;
+  const lastStepIndex = state.steps.length - 1;
+  if (firstStepIndex >= 0 && stepIndex <= lastStepIndex) {
+    state.stepIndex = stepIndex;
+  }
+};
 
 /** returns the index the form should start on, for new declaration it's 0,
  * but for unfinished declaration it's the first unfinished step */
@@ -71,9 +84,6 @@ export function QuestionarySubmissionModel<
 ) {
   function reducer(state: T, action: Event) {
     return produce(state, draftState => {
-      // @ts-ignore-line
-      draftState = reducers?.(state, draftState, action) || draftState;
-
       switch (action.type) {
         case EventType.FIELD_CHANGED:
           const field = getFieldById(
@@ -89,30 +99,15 @@ export function QuestionarySubmissionModel<
           break;
 
         case EventType.GO_STEP_BACK:
-          draftState.stepIndex = clamp(
-            draftState.stepIndex - 1,
-            0,
-            state.steps.length - 1
-          );
+          setStepIndexIfValid(draftState, draftState.stepIndex - 1);
           break;
 
         case EventType.GO_STEP_FORWARD:
-          const nextStepIndex = draftState.stepIndex + 1;
-          const lastStepIndex = state.steps.length - 1;
-          if (nextStepIndex <= lastStepIndex) {
-            draftState.stepIndex = clamp(nextStepIndex, 0, lastStepIndex);
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            dispatch({ type: EventType.QUESTIONARY_STEPS_COMPLETE });
-          }
+          setStepIndexIfValid(draftState, draftState.stepIndex + 1);
           break;
 
         case EventType.GO_TO_STEP:
-          draftState.stepIndex = clamp(
-            action.payload.stepIndex,
-            0,
-            state.steps.length - 1
-          );
+          setStepIndexIfValid(draftState, action.payload.stepIndex);
           break;
 
         case EventType.QUESTIONARY_STEPS_LOADED: {
@@ -136,6 +131,10 @@ export function QuestionarySubmissionModel<
 
           break;
       }
+
+      // @ts-ignore-line
+      draftState = reducers?.(state, draftState, action) || draftState;
+      console.log(draftState);
     });
   }
 
