@@ -5,17 +5,14 @@ import React, { useContext } from 'react';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import ProposalQuestionaryReview from 'components/review/ProposalQuestionaryReview';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
-import { useSubmitProposal } from 'hooks/proposal/useSubmitProposal';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import { EventType } from 'models/QuestionarySubmissionState';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm from 'utils/withConfirm';
 
 import { ProposalContext } from './ProposalContainer';
 
 function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
   const context = useContext(ProposalContext);
-  const { isLoading, submitProposal } = useSubmitProposal();
 
   if (!context) {
     throw new Error(
@@ -63,11 +60,9 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
             callback: () => {
               confirm(
                 () => {
-                  submitProposal(proposal.id).then(() => {
-                    dispatch({
-                      type: EventType.PROPOSAL_SUBMIT_CLICKED,
-                      payload: proposal,
-                    });
+                  dispatch({
+                    type: EventType.PROPOSAL_SUBMIT_CLICKED,
+                    payload: { proposalId: proposal.id },
                   });
                 },
                 {
@@ -79,7 +74,6 @@ function ProposalReview({ data, readonly, confirm }: ProposalSummaryProps) {
             },
             label: proposal.submitted ? '✔ Submitted' : 'Submit',
             disabled: !allStepsComplete || proposal.submitted,
-            isBusy: isLoading,
           }}
           reset={undefined}
           isLoading={false}

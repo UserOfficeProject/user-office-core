@@ -17,6 +17,7 @@ import {
   QuestionaryStep,
   UserRole,
 } from 'generated/sdk';
+import { usePersistProposalModel } from 'hooks/questionary/usePersistProposalModel';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
 import { ProposalSubsetSumbission } from 'models/ProposalModel';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
@@ -128,6 +129,10 @@ export default function ProposalContainer(props: {
   const classes = useStyles();
   const { api, isExecutingCall: isApiInteracting } = useDataApiWithFeedback();
   const { persistModel, isSavingModel } = usePersistQuestionaryModel();
+  const {
+    persistModel: persistProposalModel,
+    isSavingModel: isSavingProposalModel,
+  } = usePersistProposalModel();
 
   /**
    * Returns true if reset was performed, false otherwise
@@ -213,7 +218,11 @@ export default function ProposalContainer(props: {
 
   const { state, dispatch } = QuestionarySubmissionModel<
     ProposalSubmissionState
-  >(initialState, [handleEvents, persistModel], proposalReducer);
+  >(
+    initialState,
+    [handleEvents, persistModel, persistProposalModel],
+    proposalReducer
+  );
 
   const isSubmitted = state.proposal.submitted; // TODO check where to use this?
 
@@ -229,7 +238,6 @@ export default function ProposalContainer(props: {
   }, []); // FIXME
 
   const getStepperNavig = () => {
-    // TODO reuse this in both containers
     if (state.steps.length <= 1) {
       return null;
     }
@@ -307,10 +315,9 @@ export default function ProposalContainer(props: {
   };
 
   const getProgressBar = () =>
-    // TODO reuse with other container
-    isApiInteracting ? <LinearProgress /> : null;
-
-  //<ProposalReview data={state} readonly={isSubmitted && isNonOfficer} />
+    isApiInteracting || isSavingModel || isSavingProposalModel ? (
+      <LinearProgress />
+    ) : null;
 
   return (
     <ProposalContext.Provider value={{ state, dispatch }}>
@@ -333,7 +340,6 @@ export default function ProposalContainer(props: {
           <div className={classes.infoline}>{state.proposal.status.name}</div>
           {getStepperNavig()}
           {getProgressBar()}
-
           {getStepContent()}
         </StyledPaper>
       </Container>

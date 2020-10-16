@@ -8,7 +8,6 @@ import {
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
 
-import { ProposalSubmissionState } from './ProposalSubmissionState';
 import { getFieldById } from './QuestionaryFunctions';
 
 export enum EventType {
@@ -57,8 +56,8 @@ const setStepIndexIfValid = (
   }
 };
 
-/** returns the index the form should start on, for new declaration it's 0,
- * but for unfinished declaration it's the first unfinished step */
+/** returns the index the form should start on, for new questionary it's 0,
+ * but for unfinished it's the first unfinished step */
 function getInitialStepIndex(steps: QuestionaryStep[]): number {
   const lastFinishedStep = steps
     .slice()
@@ -134,7 +133,6 @@ export function QuestionarySubmissionModel<
 
       // @ts-ignore-line
       draftState = reducers?.(state, draftState, action) || draftState;
-      console.log(draftState);
     });
   }
 

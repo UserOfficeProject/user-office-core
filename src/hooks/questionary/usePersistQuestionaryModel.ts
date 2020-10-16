@@ -7,11 +7,12 @@ import {
   EventType,
   QuestionarySubmissionState,
 } from '../../models/QuestionarySubmissionState';
-import { usePreSubmitFunctionQueueFactory } from './usePreSubmitFunctionQueueFactory';
+import { usePostSubmitActions, usePreSubmitActions } from './useSubmitActions';
 
 export function usePersistQuestionaryModel() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const preSubmitFunctionQueueFactory = usePreSubmitFunctionQueueFactory();
+  const preSubmitActions = usePreSubmitActions();
+  const postSubmitActions = usePostSubmitActions();
 
   const persistModel = ({
     getState,
@@ -25,8 +26,9 @@ export function usePersistQuestionaryModel() {
           const topicId = action.payload.topicId;
 
           await Promise.all(
-            preSubmitFunctionQueueFactory(answers).map(
-              async func => await func(getState(), dispatch, api())
+            preSubmitActions(answers).map(
+              async func =>
+                await func({ state: getState(), dispatch, api: api() })
             )
           );
 
@@ -41,8 +43,17 @@ export function usePersistQuestionaryModel() {
               topicId: topicId,
               isPartialSave: false,
             })
-            .then(result => {
-              if (!result.answerTopic.error) {
+            .then(async result => {
+              if (result.answerTopic.questionaryStep) {
+                await Promise.all(
+                  postSubmitActions(
+                    result.answerTopic.questionaryStep.fields
+                  ).map(
+                    async f =>
+                      await f({ state: getState(), dispatch, api: api() })
+                  )
+                );
+
                 dispatch({
                   type: EventType.QUESTIONARY_STEP_ANSWERED,
                   payload: {
@@ -66,8 +77,8 @@ export function usePersistQuestionaryModel() {
           const answers = action.payload.answers;
           const topicId = action.payload.topicId;
           await Promise.all(
-            preSubmitFunctionQueueFactory(answers).map(
-              async f => await f(getState(), dispatch, api())
+            preSubmitActions(answers).map(
+              async f => await f({ state: getState(), dispatch, api: api() })
             )
           );
 
@@ -82,8 +93,16 @@ export function usePersistQuestionaryModel() {
               topicId: topicId,
               isPartialSave: true,
             })
-            .then(result => {
-              if (!result.answerTopic.error) {
+            .then(async result => {
+              if (result.answerTopic.questionaryStep) {
+                await Promise.all(
+                  postSubmitActions(
+                    result.answerTopic.questionaryStep.fields
+                  ).map(
+                    async f =>
+                      await f({ state: getState(), dispatch, api: api() })
+                  )
+                );
                 dispatch({
                   type: EventType.QUESTIONARY_STEP_ANSWERED,
                   payload: {

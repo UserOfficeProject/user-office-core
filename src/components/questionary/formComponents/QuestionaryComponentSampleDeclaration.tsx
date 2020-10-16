@@ -5,15 +5,12 @@ import React, { useEffect, useState } from 'react';
 import ModalWrapper from 'components/common/ModalWrapper';
 import {
   Answer,
-  DataType,
   QuestionaryStep,
   Sample,
   SampleStatus,
-  Sdk,
   SubtemplateConfig,
-  TemplateCategoryId,
 } from 'generated/sdk';
-import { QuestionarySubmissionState } from 'models/QuestionarySubmissionState';
+import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { SampleBasic } from 'models/Sample';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -174,39 +171,27 @@ function QuestionaryComponentSampleDeclaration(props: BasicComponentProps) {
   );
 }
 
-function isSample(answer: Answer) {
-  const { dataType, config } = answer.question;
-
-  return (
-    dataType === DataType.SUBTEMPLATE &&
-    (config as SubtemplateConfig).templateCategory ===
-      TemplateCategoryId.SAMPLE_DECLARATION
-  );
-}
-
-async function sampleDeclarationPreSubmit(
-  state: QuestionarySubmissionState,
-  dispatch: React.Dispatch<Event>,
-  api: Sdk
-) {
-  const sampleAnswers = state.steps[state.stepIndex].fields?.filter(isSample);
-  if (!sampleAnswers) {
-    return;
-  }
-  for (const sampleAnswer of sampleAnswers) {
-    const sampleIds = sampleAnswer.value;
-    if (sampleIds) {
-      const { samples } = await api.getSamples({
-        filter: { sampleIds: sampleAnswer.value },
-      });
-      if (samples) {
-        await api.createAnswerQuestionaryRelations({
-          answerId: sampleAnswer.answerId!,
-          questionaryIds: samples.map(sample => sample.questionaryId),
-        });
+const sampleDeclarationPostSubmit = (answer: Answer) => async ({
+  api,
+  state,
+}: SubmitActionDependencyContainer) => {
+  const sampleIds = answer.value;
+  if (sampleIds) {
+    const { samples } = await api.getSamples({
+      filter: { sampleIds: answer.value },
+    });
+    if (samples) {
+      if (!answer.answerId) {
+        throw new Error(
+          'Answer ID must be set in order to create answer-questionary relation'
+        );
       }
+      await api.createAnswerQuestionaryRelations({
+        answerId: answer.answerId,
+        questionaryIds: samples.map(sample => sample.questionaryId),
+      });
     }
   }
-}
+};
 
-export { QuestionaryComponentSampleDeclaration, sampleDeclarationPreSubmit };
+export { QuestionaryComponentSampleDeclaration, sampleDeclarationPostSubmit };

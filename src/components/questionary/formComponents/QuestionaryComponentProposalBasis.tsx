@@ -6,13 +6,10 @@ import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContext } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
 import ProposalParticipants from 'components/proposal/ProposalParticipants';
-import { BasicUserDetails, Sdk } from 'generated/sdk';
+import { Answer, BasicUserDetails } from 'generated/sdk';
+import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
-import {
-  Event,
-  EventType,
-  QuestionarySubmissionState,
-} from 'models/QuestionarySubmissionState';
+import { EventType } from 'models/QuestionarySubmissionState';
 
 const useStyles = makeStyles({
   disabled: {
@@ -129,11 +126,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   );
 }
 
-async function proposalBasisPreSubmit(
-  state: QuestionarySubmissionState,
-  dispatch: React.Dispatch<Event>,
-  api: Sdk
-) {
+const proposalBasisPreSubmit = (answer: Answer) => async ({
+  api,
+  dispatch,
+  state,
+}: SubmitActionDependencyContainer) => {
   const proposal = (state as ProposalSubmissionState).proposal;
   const { id, title, abstract, users, proposer, callId } = proposal;
 
@@ -163,11 +160,11 @@ async function proposalBasisPreSubmit(
       dispatch({
         type: EventType.PROPOSAL_CREATED,
         payload: {
-          proposal: result.createProposal.proposal,
+          proposal: { ...proposal, ...result.createProposal.proposal },
         },
       });
     }
   }
-}
+};
 
 export { QuestionaryComponentProposalBasis, proposalBasisPreSubmit };

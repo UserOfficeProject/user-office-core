@@ -8,12 +8,9 @@ import React, {
 } from 'react';
 import { Key } from 'ts-keycode-enum';
 
-import { SampleBasisConfig, Sdk } from 'generated/sdk';
-import {
-  EventType,
-  QuestionarySubmissionState,
-  Event,
-} from 'models/QuestionarySubmissionState';
+import { Answer, SampleBasisConfig } from 'generated/sdk';
+import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
+import { EventType } from 'models/QuestionarySubmissionState';
 import { SampleSubmissionState } from 'models/SampleSubmissionState';
 
 import { BasicComponentProps } from '../../proposal/IBasicComponentProps';
@@ -53,11 +50,11 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   );
 }
 
-async function sampleBasisPreSubmit(
-  state: QuestionarySubmissionState,
-  dispatch: React.Dispatch<Event>,
-  api: Sdk
-) {
+const sampleBasisPreSubmit = (answer: Answer) => async ({
+  api,
+  dispatch,
+  state,
+}: SubmitActionDependencyContainer) => {
   const sample = (state as SampleSubmissionState).sample;
   const title = sample.title;
 
@@ -89,6 +86,6 @@ async function sampleBasisPreSubmit(
       });
     }
   }
-}
+};
 
 export { QuestionaryComponentSampleBasis, sampleBasisPreSubmit };
