@@ -218,6 +218,7 @@ export default function QuestionaryEditorTopic(props: {
                   TransitionComponent={Fade}
                 >
                   <MenuItem
+                    data-cy="add-question-menu-item"
                     className={classes.addQuestionMenuItem}
                     onClick={() => {
                       dispatch({
@@ -239,12 +240,14 @@ export default function QuestionaryEditorTopic(props: {
                   <Divider />
                   <MenuItem
                     className={classes.addQuestionMenuItem}
-                    onClick={() =>
+                    data-cy="delete-topic-menu-item"
+                    onClick={() => {
                       dispatch({
                         type: EventType.DELETE_TOPIC_REQUESTED,
                         payload: data.topic.id,
-                      })
-                    }
+                      });
+                      setAnchorEl(null);
+                    }}
                   >
                     <ListItemIcon>
                       <DeleteRoundedIcon />
@@ -254,14 +257,15 @@ export default function QuestionaryEditorTopic(props: {
 
                   <MenuItem
                     className={classes.addQuestionMenuItem}
-                    onClick={() =>
+                    data-cy="add-topic-menu-item"
+                    onClick={() => {
                       dispatch({
                         type: EventType.CREATE_TOPIC_REQUESTED,
                         payload: { sortOrder: index + 1 },
                         // +1 means - add immediately after this topic
-                      })
-                    }
-                    data-cy="add-topic"
+                      });
+                      setAnchorEl(null);
+                    }}
                   >
                     <ListItemIcon>
                       <PlaylistAddIcon />

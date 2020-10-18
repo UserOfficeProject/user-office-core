@@ -49,7 +49,7 @@ const CallGeneralInfo: React.FC = () => {
             text: template.name,
             value: template.templateId,
           }))}
-          data-cy="call-template"
+          InputProps={{ 'data-cy': 'call-template' }}
         />
       )}
     </>

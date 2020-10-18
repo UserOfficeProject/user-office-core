@@ -13,6 +13,7 @@ context('Samples tests', () => {
     cy.viewport(1100, 1000);
   });
 
+  const proposalTemplateName = faker.lorem.words(1);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
@@ -34,21 +35,33 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.contains('New Topic');
+    cy.contains('General information');
 
     cy.visit('/');
 
     cy.navigateToTemplatesSubmenu('Proposal templates');
 
-    cy.get('[title="Edit"]')
-      .first()
+    cy.get('[data-cy=create-new-button]').click();
+
+    cy.get('[data-cy=name]').type(proposalTemplateName);
+
+    cy.get('[data-cy=submit]').click();
+
+    cy.get('[data-cy=show-more-button]')
+      .last()
       .click();
 
-    cy.contains('Add topic').click();
+    cy.get('[data-cy=add-topic-menu-item]')
+      .last()
+      .click();
 
-    cy.get('[data-cy=show-more-button]').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
 
-    cy.contains('Add question').click();
+    cy.get('[data-cy=add-question-menu-item]')
+      .last()
+      .click();
 
     cy.get('[data-cy=questionPicker] [data-cy=show-more-button]').click();
 
@@ -72,6 +85,24 @@ context('Samples tests', () => {
     cy.get('[data-cy=close-button]').click(); // closing question list
 
     cy.contains(sampleQuestion); // checking if question in the topic column
+  });
+
+  it('Should be possible to change  template in a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]').click();
+
+    cy.get('[data-cy=call-template]').click();
+
+    cy.contains(proposalTemplateName).click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Update Call').click();
   });
 
   it('Should be able to create proposal with sample', () => {
