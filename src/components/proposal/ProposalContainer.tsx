@@ -206,7 +206,6 @@ export default function ProposalContainer(props: {
       }
     };
   };
-
   const initialState: ProposalSubmissionState = {
     proposal: props.proposal,
     templateId: props.proposal.questionary.templateId,

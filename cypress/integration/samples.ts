@@ -13,7 +13,7 @@ context('Samples tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  const proposalTemplateName = faker.lorem.words(1);
+  const proposalTemplateName = faker.lorem.words(2);
   const sampleTemplateName = faker.lorem.words(2);
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
@@ -21,6 +21,7 @@ context('Samples tests', () => {
   const proposalAbstract = faker.lorem.words(5);
   const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
+  const proposalTitle2 = faker.lorem.words(2);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -29,7 +30,9 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=create-new-button]').click();
 
-    cy.get('[data-cy=name]').type(sampleTemplateName);
+    cy.get('[data-cy=name] input')
+      .type(sampleTemplateName)
+      .should('have.value', sampleTemplateName);
 
     cy.get('[data-cy=description]').type(sampleTemplateDescription);
 
@@ -43,7 +46,9 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=create-new-button]').click();
 
-    cy.get('[data-cy=name]').type(proposalTemplateName);
+    cy.get('[data-cy=name] input')
+      .type(proposalTemplateName)
+      .should('have.value', proposalTemplateName);
 
     cy.get('[data-cy=submit]').click();
 
@@ -69,7 +74,8 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=question]')
       .clear()
-      .type(sampleQuestion);
+      .type(sampleQuestion)
+      .should('have.value', sampleQuestion);
 
     cy.get('[data-cy=template-id]').click();
 
@@ -87,7 +93,7 @@ context('Samples tests', () => {
     cy.contains(sampleQuestion); // checking if question in the topic column
   });
 
-  it('Should be possible to change  template in a call', () => {
+  it('Should be possible to change template in a call', () => {
     cy.login('officer');
 
     cy.contains('Calls').click();
@@ -110,9 +116,13 @@ context('Samples tests', () => {
 
     cy.contains('New Proposal').click();
 
-    cy.get('#title').type(proposalTitle);
+    cy.get('#title')
+      .type(proposalTitle)
+      .should('have.value', proposalTitle);
 
-    cy.get('#abstract').type(proposalAbstract);
+    cy.get('#abstract')
+      .type(proposalAbstract)
+      .should('have.value', proposalAbstract);
 
     cy.contains('Save and continue').click();
 
@@ -120,7 +130,8 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=title-input] input')
       .clear()
-      .type(sampleTitle);
+      .type(sampleTitle)
+      .should('have.value', sampleTitle);
 
     cy.get('[data-cy=save-and-continue-button]')
       .eq(1)
@@ -145,6 +156,29 @@ context('Samples tests', () => {
     cy.contains('Submit').click();
 
     cy.contains('OK').click();
+  });
+
+  it('Officer should be able to edit proposal', () => {
+    cy.login('officer');
+
+    cy.contains('Proposals').click();
+
+    cy.get('[title="View proposal"]').click();
+
+    cy.contains('Edit proposal').click();
+
+    cy.contains('General information').click();
+
+    cy.get('[data-cy=title] input')
+      .clear()
+      .type(proposalTitle2)
+      .should('have.value', proposalTitle2);
+
+    cy.get('[data-cy=save-and-continue-button]').click();
+
+    cy.contains('Close').click();
+
+    cy.contains(proposalTitle2);
   });
 
   it('Should be able to evaluate sample', () => {

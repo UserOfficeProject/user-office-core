@@ -43,12 +43,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     setLocalAbstract(proposalContext.state?.proposal.abstract);
   }, [proposalContext.state]);
 
-  if (!proposalContext) {
+  if (!proposalContext?.state) {
     return null;
   }
 
   const { dispatch, state } = proposalContext;
-  const { proposer, users } = state!.proposal;
+  const { proposer, users } = state.proposal;
 
   return (
     <div>
@@ -64,7 +64,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             onBlur={event => {
               dispatch({
                 type: EventType.PROPOSAL_MODIFIED,
-                payload: { proposal: { title: event.target.value } },
+                payload: {
+                  proposal: { ...state.proposal, title: event.target.value },
+                },
               });
             }}
             onChange={event => setLocalTitle(event.target.value)}
@@ -89,7 +91,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             onBlur={event => {
               dispatch({
                 type: EventType.PROPOSAL_MODIFIED,
-                payload: { proposal: { abstract: event.target.value } },
+                payload: {
+                  proposal: { ...state.proposal, abstract: event.target.value },
+                },
               });
             }}
             error={touched.abstract && errors.abstract !== undefined}
@@ -103,7 +107,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         userChanged={(user: BasicUserDetails) => {
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
-            payload: { proposal: { proposer: user } },
+            payload: { proposal: { ...state.proposal, proposer: user } },
           });
         }}
         title="Principal investigator"
@@ -115,7 +119,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         setUsers={(users: BasicUserDetails[]) => {
           dispatch({
             type: EventType.PROPOSAL_MODIFIED,
-            payload: { proposal: { users: users } },
+            payload: { proposal: { ...state.proposal, users: users } },
           });
         }}
         // quickfix for material table changing immutable state
