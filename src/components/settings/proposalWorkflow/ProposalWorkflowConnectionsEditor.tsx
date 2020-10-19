@@ -188,7 +188,9 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
               )}
               className={classes.item}
               onClick={() => {
-                setWorkflowConnection(proposalWorkflowConnection);
+                if (proposalWorkflowConnection.nextProposalStatusId) {
+                  setWorkflowConnection(proposalWorkflowConnection);
+                }
               }}
             >
               <DialogActions className={classes.dialogActions}>
@@ -196,7 +198,8 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
                   size="small"
                   className={classes.removeButton}
                   data-cy="remove-workflow-status-button"
-                  onClick={() => {
+                  onClick={e => {
+                    e.stopPropagation();
                     dispatch({
                       type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
                       payload: {
@@ -321,21 +324,22 @@ const ProposalWorkflowConnectionsEditor: React.FC<ProposalWorkflowConnectionsEdi
         aria-describedby="simple-modal-description"
         open={!!workflowConnection}
         onClose={(): void => setWorkflowConnection(null)}
+        data-cy="next-status-events-modal"
       >
         <DialogContent>
           <AddNextStatusEventsToConnection
             close={(): void => setWorkflowConnection(null)}
             nextStatusEvents={
-              workflowConnection?.nextStatusEvents.map(
+              workflowConnection?.nextStatusEvents?.map(
                 nextStatusEvent => nextStatusEvent.nextStatusEvent
               ) as string[]
             }
             addNextStatusEventsToConnection={(nextStatusEvents: string[]) =>
               dispatch({
-                type: EventType.ADD_NEXT_STATUS_EVENTS,
+                type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED,
                 payload: {
                   nextStatusEvents,
-                  workflowConnectionId: workflowConnection?.id,
+                  workflowConnection,
                 },
               })
             }

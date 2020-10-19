@@ -3375,6 +3375,10 @@ export type AddProposalWorkflowStatusMutation = (
   & { addProposalWorkflowStatus: (
     { __typename?: 'ProposalWorkflowConnectionResponseWrap' }
     & Pick<ProposalWorkflowConnectionResponseWrap, 'error'>
+    & { proposalWorkflowConnection: Maybe<(
+      { __typename?: 'ProposalWorkflowConnection' }
+      & Pick<ProposalWorkflowConnection, 'id'>
+    )> }
   ) }
 );
 
@@ -5783,6 +5787,9 @@ export const AddNextStatusEventsToConnectionDocument = gql`
 export const AddProposalWorkflowStatusDocument = gql`
     mutation addProposalWorkflowStatus($proposalWorkflowId: Int!, $sortOrder: Int!, $droppableGroupId: String!, $parentDroppableGroupId: String, $proposalStatusId: Int!, $nextProposalStatusId: Int, $prevProposalStatusId: Int) {
   addProposalWorkflowStatus(newProposalWorkflowStatusInput: {proposalWorkflowId: $proposalWorkflowId, sortOrder: $sortOrder, droppableGroupId: $droppableGroupId, parentDroppableGroupId: $parentDroppableGroupId, proposalStatusId: $proposalStatusId, nextProposalStatusId: $nextProposalStatusId, prevProposalStatusId: $prevProposalStatusId}) {
+    proposalWorkflowConnection {
+      id
+    }
     error
   }
 }

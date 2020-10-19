@@ -260,6 +260,32 @@ context('Settings tests', () => {
       cy.get('[data-cy="status_FEASIBILITY_REVIEW_2"]').should('not.exist');
     });
 
+    it('User Officer should be able to select events that are triggering next workflow status', () => {
+      cy.login('officer');
+
+      cy.contains('Settings').click();
+      cy.contains('Proposal workflows').click();
+
+      cy.get('[title="Edit"]')
+        .last()
+        .click();
+
+      cy.get('[data-cy="connection_DRAFT_1"]').click();
+
+      cy.get('[data-cy="next-status-events-modal"]').should('exist');
+
+      cy.get('[data-cy="next-status-events"]').click();
+
+      cy.contains('PROPOSAL_SUBMITTED').click();
+
+      cy.get('[data-cy="submit"]').click({ force: true });
+
+      cy.notification({
+        variant: 'success',
+        text: 'Next status events added successfully!',
+      });
+    });
+
     it('User Officer should be able to split workflow into two or more paths', () => {
       cy.login('officer');
 

@@ -196,11 +196,6 @@ export function usePersistProposalWorkflowEditorModel() {
             droppableGroupId,
           } = action.payload;
 
-          dispatch({
-            type: EventType.WORKFLOW_STATUS_ADDED,
-            payload: action.payload,
-          });
-
           return executeAndMonitorCall(async () => {
             const result = await insertNewStatusInProposalWorkflow(
               proposalWorkflowId,
@@ -211,6 +206,14 @@ export function usePersistProposalWorkflowEditorModel() {
               nextProposalStatusId,
               prevProposalStatusId
             );
+
+            dispatch({
+              type: EventType.WORKFLOW_STATUS_ADDED,
+              payload: {
+                ...action.payload,
+                id: result.proposalWorkflowConnection?.id,
+              },
+            });
 
             if (result.error) {
               dispatch({
@@ -225,14 +228,24 @@ export function usePersistProposalWorkflowEditorModel() {
           });
         }
 
-        case EventType.ADD_NEXT_STATUS_EVENTS: {
-          const { workflowConnectionId, nextStatusEvents } = action.payload;
+        case EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED: {
+          const { workflowConnection, nextStatusEvents } = action.payload;
 
           return executeAndMonitorCall(async () => {
             const result = await addNextStatusEventsToConnection(
-              workflowConnectionId,
+              workflowConnection.id,
               nextStatusEvents
             );
+
+            if (!result.error) {
+              dispatch({
+                type: EventType.NEXT_STATUS_EVENTS_ADDED,
+                payload: {
+                  workflowConnection,
+                  nextStatusEvents,
+                },
+              });
+            }
 
             return result;
           });

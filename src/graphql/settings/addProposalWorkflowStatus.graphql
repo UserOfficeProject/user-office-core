@@ -18,6 +18,9 @@ mutation addProposalWorkflowStatus(
       prevProposalStatusId: $prevProposalStatusId
     }
   ) {
+    proposalWorkflowConnection {
+      id
+    }
     error
   }
 }

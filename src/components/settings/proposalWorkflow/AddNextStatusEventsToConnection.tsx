@@ -31,9 +31,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type AddNextStatusEventsToConnectionProps = {
-  nextStatusEvents: string[];
   close: () => void;
   addNextStatusEventsToConnection: (nextStatusEvents: string[]) => void;
+  nextStatusEvents?: string[];
 };
 
 const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionProps> = ({
@@ -46,9 +46,10 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
   const initialValues: {
     selectedNextStatusEvents: string[];
   } = {
-    selectedNextStatusEvents: nextStatusEvents,
+    selectedNextStatusEvents: nextStatusEvents || [],
   };
 
+  // TODO: This list should come from the server.
   const events = [
     'PROPOSAL_SUBMITTED',
     'PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED',
@@ -81,6 +82,7 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
               Events that are triggering next status
             </Typography>
 
+            {/* TODO: As improvement instead of multi-select we can list all events with checkboxes. For the first version it is good. */}
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Field
@@ -115,9 +117,9 @@ const AddNextStatusEventsToConnection: React.FC<AddNextStatusEventsToConnectionP
 };
 
 AddNextStatusEventsToConnection.propTypes = {
-  nextStatusEvents: PropTypes.array.isRequired,
   close: PropTypes.func.isRequired,
   addNextStatusEventsToConnection: PropTypes.func.isRequired,
+  nextStatusEvents: PropTypes.array,
 };
 
 export default AddNextStatusEventsToConnection;
