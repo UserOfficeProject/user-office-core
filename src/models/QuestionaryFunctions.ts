@@ -9,10 +9,12 @@ import {
   AnswerInput,
 } from 'generated/sdk';
 import { ConditionEvaluator } from 'models/ConditionEvaluator';
-import { DataTypeSpec } from 'models/ProposalModel';
 
 type AbstractField = QuestionTemplateRelation | Answer;
 type AbstractCollection = TemplateStep[] | QuestionaryStep[];
+interface DataTypeSpec {
+  readonly: boolean;
+}
 export function getDataTypeSpec(type: DataType): DataTypeSpec {
   switch (type) {
     case DataType.EMBELLISHMENT:

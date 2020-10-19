@@ -19,7 +19,7 @@ import {
 } from 'generated/sdk';
 import { usePersistProposalModel } from 'hooks/questionary/usePersistProposalModel';
 import { usePersistQuestionaryModel } from 'hooks/questionary/usePersistQuestionaryModel';
-import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
 import { ProposalSubmissionState } from 'models/ProposalSubmissionState';
 import {
   Event,
@@ -194,7 +194,7 @@ export default function ProposalContainer(props: {
         case EventType.PROPOSAL_CREATED:
           props.proposalCreated?.(action.payload.proposal);
           break;
-        case EventType.BACK_CLICKED: // TODO check if this event is really necessary
+        case EventType.BACK_CLICKED:
           if (!state.isDirty || (await handleReset())) {
             dispatch({ type: EventType.GO_STEP_BACK });
           }
@@ -223,7 +223,7 @@ export default function ProposalContainer(props: {
     proposalReducer
   );
 
-  const isSubmitted = state.proposal.submitted; // TODO check where to use this?
+  const isSubmitted = state.proposal.submitted;
 
   useEffect(() => {
     dispatch({

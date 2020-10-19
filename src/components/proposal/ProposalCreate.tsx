@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import UOLoader from 'components/common/UOLoader';
 import { QuestionaryStep } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
-import { ProposalSubsetSumbission } from 'models/ProposalModel';
+import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
 
 import ProposalContainer from './ProposalContainer';
 

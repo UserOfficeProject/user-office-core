@@ -192,7 +192,6 @@ export function SampleDeclarationContainer(props: {
   }, []); // FIXME
 
   const getStepperNavig = () => {
-    // TODO reuse this in both containers
     if (state.steps.length <= 1) {
       return null;
     }
@@ -255,7 +254,6 @@ export function SampleDeclarationContainer(props: {
   };
 
   const getProgressBar = () =>
-    // TODO resue with other container
     isApiInteracting || isSavingModel ? <LinearProgress /> : null;
 
   return (

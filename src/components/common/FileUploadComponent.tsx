@@ -145,7 +145,7 @@ export function FileEntry(props: {
     },
   }))();
 
-  const downloadLink = `/files/download/${props.metaData.fileId}`; // TODO to get a path to server? Or how to allow download via proxy
+  const downloadLink = `/files/download/${props.metaData.fileId}`;
 
   const formatBytes = (bytes: number, decimals = 2): string => {
     if (bytes === 0) return '0 Bytes';
