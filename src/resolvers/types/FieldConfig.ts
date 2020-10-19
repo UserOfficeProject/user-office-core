@@ -65,7 +65,7 @@ export class TextInputConfig extends ConfigBase {
   @Field(() => Boolean)
   multiline: boolean;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   placeholder: string;
 
   @Field(() => String, { nullable: true })

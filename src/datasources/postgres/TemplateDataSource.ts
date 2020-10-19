@@ -178,7 +178,8 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   async createTopic(args: CreateTopicArgs): Promise<Topic> {
     await database('topics')
       .update({ sort_order: args.sortOrder + 1 })
-      .where('sort_order', '>=', args.sortOrder);
+      .where('sort_order', '>=', args.sortOrder)
+      .andWhere('template_id', '=', args.templateId);
 
     const newTopic = (
       await database('topics')

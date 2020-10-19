@@ -214,7 +214,7 @@ defaultConfigs.set('SelectionFromOptionsConfig', {
 defaultConfigs.set('TextInputConfig', {
   multiline: false,
   isHtmlQuestion: false,
-  titlePlaceholder: '',
+  placeholder: '',
   ...baseDefaultConfig,
 });
 
