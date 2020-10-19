@@ -1,4 +1,3 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import { createSEPValidationSchema } from '@esss-swap/duo-validation/lib/SEP';
 import Button from '@material-ui/core/Button';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -6,13 +5,12 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { Checkbox, TextField } from 'formik-material-ui';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Sep } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const useStyles = makeStyles(theme => ({
   submit: {
@@ -26,9 +24,7 @@ type AddSEPProps = {
 
 const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
   const classes = useStyles();
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   return (
     <Formik
@@ -39,24 +35,15 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
         active: true,
       }}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
-        await api()
+        await api('SEP created successfully!')
           .createSEP(values)
           .then(data => {
             if (data.createSEP.error) {
-              enqueueSnackbar(
-                getTranslation(data.createSEP.error as ResourceId),
-                {
-                  variant: 'error',
-                }
-              );
-
               close(null);
             } else {
               close(data.createSEP.sep);
             }
           });
-        setSubmitting(false);
         actions.setSubmitting(false);
       }}
       validationSchema={createSEPValidationSchema}
@@ -84,7 +71,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             data-cy="code"
             error={touched.code && errors.code !== undefined}
             helperText={touched.code && errors.code && errors.code}
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <Field
             id="description"
@@ -104,7 +91,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             helperText={
               touched.description && errors.description && errors.description
             }
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <Field
@@ -127,7 +114,7 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
               errors.numberRatingsRequired &&
               errors.numberRatingsRequired
             }
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <FormControlLabel
             control={
@@ -151,9 +138,9 @@ const AddSEP: React.FC<AddSEPProps> = ({ close }) => {
             color="primary"
             className={classes.submit}
             data-cy="submit"
-            disabled={submitting}
+            disabled={isExecutingCall}
           >
-            {submitting && <UOLoader size={14} />}
+            {isExecutingCall && <UOLoader size={14} />}
             Create
           </Button>
         </Form>

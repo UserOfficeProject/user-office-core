@@ -1,16 +1,14 @@
-import { getTranslation, ResourceId } from '@esss-swap/duo-localisation';
 import Button from '@material-ui/core/Button';
 import MaterialTable from 'material-table';
-import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useContext, useState, useEffect } from 'react';
 import { Redirect, useHistory } from 'react-router';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Role } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type RoleSelectionProps = {
   close: () => void;
@@ -21,9 +19,8 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
     UserContext
   );
   const [loading, setLoading] = useState(false);
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const history = useHistory();
-  const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
@@ -48,7 +45,10 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
 
   const selectUserRole = async (role: Role) => {
     setLoading(true);
-    const result = await api().selectRole({ token, selectedRoleId: role.id });
+    const result = await api('User role changed!').selectRole({
+      token,
+      selectedRoleId: role.id,
+    });
 
     if (!result.selectRole.error) {
       handleNewToken(result.selectRole.token);
@@ -58,16 +58,8 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ close }) => {
         history.push('/');
         setLoading(false);
 
-        enqueueSnackbar('User role changed!', {
-          variant: 'success',
-        });
-
         close();
       }, 500);
-    } else {
-      enqueueSnackbar(getTranslation(result.selectRole.error as ResourceId), {
-        variant: 'error',
-      });
     }
   };
 

@@ -1,17 +1,15 @@
-import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import CreateUpdateInstitution from './CreateUpdateInstitution';
 
 const InstitutionPage: React.FC = () => {
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
 
   const {
     loadingInstitutions,
@@ -20,22 +18,14 @@ const InstitutionPage: React.FC = () => {
   } = useInstitutionsData();
 
   const deleteInstitution = async (id: number) => {
-    return await api()
+    return await api('Institution removed successfully!')
       .deleteInstitution({
         id: id,
       })
       .then(resp => {
         if (resp.deleteInstitution.error) {
-          enqueueSnackbar('Failed to delete', {
-            variant: 'error',
-          });
-
           return false;
         } else {
-          enqueueSnackbar('Institution removed!', {
-            variant: 'success',
-          });
-
           return true;
         }
       });

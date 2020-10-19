@@ -1,14 +1,11 @@
-// import {
-//   createProposalWorkflowValidationSchema,
-//   updateProposalWorkflowValidationSchema,
-// } from '@esss-swap/duo-validation/lib/ProposalWorkflows';
+import { createProposalWorkflowValidationSchema } from '@esss-swap/duo-validation/lib/ProposalWorkflow';
 import Button from '@material-ui/core/Button';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Typography from '@material-ui/core/Typography';
 import { Field, Form, Formik } from 'formik';
 import { TextField } from 'formik-material-ui';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { ProposalWorkflow } from 'generated/sdk';
@@ -28,8 +25,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
   close,
 }) => {
   const classes = useStyles();
-  const { api } = useDataApiWithFeedback();
-  const [submitting, setSubmitting] = useState<boolean>(false);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = {
     name: '',
@@ -41,8 +37,6 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values, actions): Promise<void> => {
-        setSubmitting(true);
-
         const data = await api(
           'Proposal workflow created successfully'
         ).createProposalWorkflow(values);
@@ -52,14 +46,9 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
           close(data.createProposalWorkflow.proposalWorkflow);
         }
 
-        setSubmitting(false);
         actions.setSubmitting(false);
       }}
-      // validationSchema={
-      //   proposalWorkflow
-      //     ? updateProposalWorkflowValidationSchema
-      //     : createProposalWorkflowValidationSchema
-      // }
+      validationSchema={createProposalWorkflowValidationSchema}
     >
       {() => (
         <Form>
@@ -73,7 +62,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
             margin="normal"
             fullWidth
             data-cy="name"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
           <Field
             id="description"
@@ -87,7 +76,7 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
             rowsMax="16"
             rows="3"
             data-cy="description"
-            disabled={submitting}
+            disabled={isExecutingCall}
           />
 
           <Button
@@ -97,9 +86,9 @@ const CreateProposalWorkflow: React.FC<CreateProposalWorkflowProps> = ({
             color="primary"
             className={classes.submit}
             data-cy="submit"
-            disabled={submitting}
+            disabled={isExecutingCall}
           >
-            {submitting && <UOLoader size={14} />}
+            {isExecutingCall && <UOLoader size={14} />}
             Create
           </Button>
         </Form>

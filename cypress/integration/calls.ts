@@ -13,12 +13,10 @@ context('Calls tests', () => {
     cy.viewport(1100, 1000);
   });
 
-  afterEach(() => {
-    cy.wait(500);
-  });
-
   it('A user should not be able to see/visit calls', () => {
     cy.login('user');
+
+    cy.get('[data-cy="profile-page-btn"]').should('exist');
 
     cy.should('not.contain', 'Calls');
 
@@ -79,7 +77,7 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains(shortCode);
   });
@@ -136,14 +134,14 @@ context('Calls tests', () => {
 
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(500);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains(shortCode);
   });
 
   it('A user-officer should be able to assign instrument/s to a call', () => {
     const name = faker.random.words(2);
-    const shortCode = faker.random.words(1);
+    const shortCode = faker.random.alphaNumeric(15);
     const description = faker.random.words(8);
 
     cy.login('officer');
@@ -155,7 +153,7 @@ context('Calls tests', () => {
     cy.get('#description').type(description);
     cy.get('[data-cy="submit"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.contains('Calls').click();
 
@@ -163,14 +161,13 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
-    cy.get('[type="checkbox"]')
-      .eq(1)
+    cy.get('tbody [type="checkbox"]')
+      .first()
       .check();
 
     cy.contains('Assign instrument').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[title="Show Instruments"]')
       .first()
@@ -202,9 +199,7 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
-
-    cy.contains('Time available must be positive number');
+    cy.notification({ variant: 'error', text: 'must be positive number' });
   });
 
   it('A user-officer should be able to set availability time on instrument per call', () => {
@@ -226,7 +221,7 @@ context('Calls tests', () => {
       .first()
       .click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
@@ -251,7 +246,7 @@ context('Calls tests', () => {
 
     cy.get('[title="Save"]').click();
 
-    cy.wait(1000);
+    cy.notification({ variant: 'success', text: 'successfully' });
 
     cy.get('[data-cy="call-instrument-assignments-table"]')
       .find('tbody td')
@@ -262,6 +257,91 @@ context('Calls tests', () => {
       .last()
       .then(element => {
         expect(element.text()).to.be.equal('No records to display');
+      });
+  });
+
+  it('A user-officer should be able to add proposal workflow to a call', () => {
+    let selectedProposalWorkflow = '';
+    const name = faker.random.words(2);
+    const description = faker.random.words(5);
+
+    cy.login('officer');
+
+    cy.contains('Settings').click();
+    cy.contains('Proposal workflows').click();
+
+    cy.contains('Create').click();
+    cy.get('#name').type(name);
+    cy.get('#description').type(description);
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'created successfully' });
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.get('[role="presentation"] [role="listbox"] li')
+      .last()
+      .then(element => {
+        selectedProposalWorkflow = element.text();
+      })
+      .click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
+
+    cy.get('[data-cy="calls-table"]')
+      .find('tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal(selectedProposalWorkflow);
+      });
+  });
+
+  it('A user-officer should be able to remove proposal workflow from a call', () => {
+    cy.login('officer');
+
+    cy.contains('Calls').click();
+
+    cy.get('[title="Edit"]')
+      .first()
+      .click();
+
+    cy.get('#mui-component-select-proposalWorkflowId').click();
+
+    cy.contains('Loading...').should('not.exist');
+
+    cy.contains('None (remove selection)').click();
+
+    cy.contains('Next').click();
+
+    cy.contains('Next').click();
+
+    cy.get('[data-cy="submit"]').click();
+
+    cy.notification({ variant: 'success', text: 'Call updated successfully!' });
+
+    cy.get('[data-cy="calls-table"]')
+      .find('tbody tr')
+      .first()
+      .find('td')
+      .last()
+      .then(element => {
+        expect(element.text()).to.be.equal('-');
       });
   });
 });

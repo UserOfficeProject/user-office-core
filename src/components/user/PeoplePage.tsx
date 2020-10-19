@@ -1,12 +1,11 @@
 import Grid from '@material-ui/core/Grid';
 import Edit from '@material-ui/icons/Edit';
-import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { UserRole } from 'generated/sdk';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { ContentContainer, StyledPaper } from 'styles/StyledComponents';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { InviteUserForm } from './InviteUserForm';
 import PeopleTable from './PeopleTable';
@@ -18,8 +17,7 @@ export default function PeoplePage() {
     title: '',
     userRole: UserRole.USER,
   });
-  const api = useDataApi();
-  const { enqueueSnackbar } = useSnackbar();
+  const { api } = useDataApiWithFeedback();
   const history = useHistory();
 
   if (userData) {
@@ -78,15 +76,7 @@ export default function PeoplePage() {
                   selection={false}
                   invitationButtons={invitationButtons}
                   onRemove={(user: { id: number }) =>
-                    api()
-                      .deleteUser({ id: user.id })
-                      .then(
-                        data =>
-                          data.deleteUser.error &&
-                          enqueueSnackbar(data.deleteUser.error, {
-                            variant: 'error',
-                          })
-                      )
+                    api().deleteUser({ id: user.id })
                   }
                 />
               )}
