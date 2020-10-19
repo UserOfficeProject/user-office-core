@@ -19,7 +19,7 @@ import RoleSelection from './RoleSelection';
 
 const AccountActionButton: React.FC = () => {
   const [show, setShow] = useState(false);
-  const { user, roles } = useContext(UserContext);
+  const { user, roles, handleLogout } = useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const { id } = user;
 
@@ -31,6 +31,10 @@ const AccountActionButton: React.FC = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleOnLogout = () => {
+    handleLogout();
   };
 
   return (
@@ -88,12 +92,7 @@ const AccountActionButton: React.FC = () => {
               Roles
             </MenuItem>
           )}
-          <MenuItem
-            component={Link}
-            to="/LogOut"
-            data-cy="logout"
-            onClick={handleClose}
-          >
+          <MenuItem data-cy="logout" onClick={handleOnLogout}>
             <Box paddingRight={1} paddingTop={1}>
               <ExitToApp />
             </Box>

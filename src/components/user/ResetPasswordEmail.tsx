@@ -41,7 +41,7 @@ export default function ResetPasswordEmail() {
   const [emailSuccess, setEmailSuccess] = useState<null | boolean>(null);
   const unauthorizedApi = useUnauthorizedApi();
   const requestResetEmail = async (values: { email: string }) => {
-    await unauthorizedApi
+    await unauthorizedApi()
       .resetPasswordEmail({ email: values.email })
       .then(data => setEmailSuccess(!!data.resetPasswordEmail));
   };

@@ -28,6 +28,7 @@ services:
       baseURL: localhost:3000
       SPARKPOST_TOKEN: dummytoken
       NODE_ENV: development
+      UO_FEATURE_DISABLE_MESSAGE_BROKER: 1
     labels:
       - 'traefik.frontend.rule=PathPrefix:/api, /graphql, /downloads, /files, /proposal, /uploads'
       - 'traefik.port=4000'
