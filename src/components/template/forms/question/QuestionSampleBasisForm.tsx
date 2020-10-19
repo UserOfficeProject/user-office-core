@@ -24,7 +24,7 @@ export const QuestionSampleBasisForm: TFormSignature<Question> = props => {
         naturalKey: naturalKeySchema,
         question: Yup.string().required('Question is required'),
         config: Yup.object({
-          placeholder: Yup.string(),
+          titlePlaceholder: Yup.string(),
         }),
       })}
     >
@@ -51,13 +51,13 @@ export const QuestionSampleBasisForm: TFormSignature<Question> = props => {
 
           <TitledContainer label="Options">
             <Field
-              name="config.placeholder"
+              name="config.titlePlaceholder"
               label="Title input placeholder"
               type="text"
               component={TextField}
               margin="normal"
               fullWidth
-              inputProps={{ 'data-cy': 'placeholder' }}
+              inputProps={{ 'data-cy': 'titlePlaceholder' }}
             />
           </TitledContainer>
         </>

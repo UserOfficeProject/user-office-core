@@ -1538,7 +1538,7 @@ export type SampleBasisConfig = {
   small_label: Scalars['String'];
   required: Scalars['Boolean'];
   tooltip: Scalars['String'];
-  placeholder: Scalars['String'];
+  titlePlaceholder: Scalars['String'];
 };
 
 export type SampleResponseWrap = {
@@ -3733,7 +3733,7 @@ type FieldConfigTextInputConfigFragment = (
 
 type FieldConfigSampleBasisConfigFragment = (
   { __typename?: 'SampleBasisConfig' }
-  & Pick<SampleBasisConfig, 'placeholder' | 'small_label' | 'required' | 'tooltip'>
+  & Pick<SampleBasisConfig, 'titlePlaceholder' | 'small_label' | 'required' | 'tooltip'>
 );
 
 type FieldConfigSubtemplateConfigFragment = (
@@ -4539,7 +4539,7 @@ export const FieldConfigFragmentDoc = gql`
     tooltip
   }
   ... on SampleBasisConfig {
-    placeholder
+    titlePlaceholder
     small_label
     required
     tooltip

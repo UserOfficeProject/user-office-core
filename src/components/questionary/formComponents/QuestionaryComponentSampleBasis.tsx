@@ -26,7 +26,7 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
 
   return (
     <TextField
-      label={(props.templateField.config as SampleBasisConfig).placeholder}
+      label={(props.templateField.config as SampleBasisConfig).titlePlaceholder}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         setTitle(event.currentTarget.value);
       }}

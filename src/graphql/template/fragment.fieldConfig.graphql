@@ -59,7 +59,7 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on SampleBasisConfig {
-    placeholder
+    titlePlaceholder
 
     small_label
     required
