@@ -21,7 +21,7 @@ context('Samples tests', () => {
   const proposalAbstract = faker.lorem.words(5);
   const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
-  const proposalTitle2 = faker.lorem.words(2);
+  const proposalTitleUpdated = faker.lorem.words(2);
 
   it('Should be able to create proposal template with sample', () => {
     cy.login('officer');
@@ -171,14 +171,14 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=title] input')
       .clear()
-      .type(proposalTitle2)
-      .should('have.value', proposalTitle2);
+      .type(proposalTitleUpdated)
+      .should('have.value', proposalTitleUpdated);
 
     cy.get('[data-cy=save-and-continue-button]').click();
 
     cy.contains('Close').click();
 
-    cy.contains(proposalTitle2);
+    cy.contains(proposalTitleUpdated);
   });
 
   it('Should be able to evaluate sample', () => {
