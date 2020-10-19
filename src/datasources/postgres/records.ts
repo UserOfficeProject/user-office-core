@@ -204,6 +204,7 @@ export interface CallRecord {
   readonly end_cycle: Date;
   readonly cycle_comment: string;
   readonly survey_comment: string;
+  readonly proposal_workflow_id: number;
   readonly template_id: number;
 }
 
@@ -334,6 +335,8 @@ export interface ProposalWorkflowConnectionRecord {
   readonly next_proposal_status_id: number | null;
   readonly prev_proposal_status_id: number | null;
   readonly next_status_event_type: string;
+  readonly droppable_group_id: string;
+  readonly parent_droppable_group_id: string;
 }
 
 export const createPageObject = (record: PagetextRecord) => {
@@ -522,6 +525,7 @@ export const createCallObject = (call: CallRecord) => {
     call.end_cycle,
     call.cycle_comment,
     call.survey_comment,
+    call.proposal_workflow_id,
     call.template_id
   );
 };

@@ -29,4 +29,19 @@ export class ProposalWorkflowConnection
 
   @Field()
   public nextStatusEventType: string;
+
+  @Field()
+  public droppableGroupId: string;
+}
+
+@ObjectType()
+export class ProposalWorkflowConnectionGroup {
+  @Field(() => String)
+  public groupId: string;
+
+  @Field(() => String, { nullable: true })
+  public parentGroupId: string | null;
+
+  @Field(() => [ProposalWorkflowConnection])
+  public connections: ProposalWorkflowConnection[];
 }

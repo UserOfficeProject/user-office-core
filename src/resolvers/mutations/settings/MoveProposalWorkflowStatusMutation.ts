@@ -13,12 +13,21 @@ import { ProposalWorkflowConnectionResponseWrap } from '../../types/CommonWrappe
 import { wrapResponse } from '../../wrapResponse';
 
 @InputType()
-export class MoveProposalWorkflowStatusInput {
+export class IndexWithGroupId {
   @Field(() => Int)
-  public from: number;
+  public index: number;
 
-  @Field(() => Int)
-  public to: number;
+  @Field(() => String)
+  public droppableId: string;
+}
+
+@InputType()
+export class MoveProposalWorkflowStatusInput {
+  @Field(() => IndexWithGroupId)
+  public from: IndexWithGroupId;
+
+  @Field(() => IndexWithGroupId)
+  public to: IndexWithGroupId;
 
   @Field(() => Int)
   public proposalWorkflowId: number;

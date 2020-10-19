@@ -93,6 +93,22 @@ export default class SEPMutations {
     agent: UserWithRole | null,
     args: AddSEPMembersRoleArgs
   ): Promise<SEP | Rejection> {
+    const [existingChairOrSecretary] = (
+      await this.dataSource.getMembers(args.addSEPMembersRole.SEPID)
+    ).filter(
+      member =>
+        member.roleId === args.addSEPMembersRole.roleID &&
+        member.sepId === args.addSEPMembersRole.SEPID
+    );
+
+    if (existingChairOrSecretary) {
+      await this.dataSource.removeSEPMemberRole(
+        existingChairOrSecretary.userId,
+        existingChairOrSecretary.sepId,
+        existingChairOrSecretary.roleId
+      );
+    }
+
     return this.dataSource
       .addSEPMembersRole(args.addSEPMembersRole)
       .then(result => result)

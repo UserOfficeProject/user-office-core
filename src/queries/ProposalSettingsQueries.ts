@@ -1,10 +1,11 @@
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized } from '../decorators';
+import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
 export default class ProposalSettingsQueries {
-  constructor(private dataSource: ProposalSettingsDataSource) {}
+  constructor(public dataSource: ProposalSettingsDataSource) {}
 
   @Authorized()
   async getProposalStatus(agent: UserWithRole | null, id: number) {
@@ -33,12 +34,60 @@ export default class ProposalSettingsQueries {
     return proposalWorkflows;
   }
 
+  getUniqueDroppableGroupIds(list: ProposalWorkflowConnection[]) {
+    const flags = new Set();
+
+    return (
+      list
+        .map(item => ({
+          droppableGroupId: item.droppableGroupId,
+          prevProposalStatusId: item.prevProposalStatusId,
+        }))
+        // remove duplicates
+        .filter(item => {
+          if (flags.has(item.droppableGroupId)) {
+            return false;
+          }
+          flags.add(item.droppableGroupId);
+
+          return true;
+        })
+    );
+  }
+
+  groupProposalWorkflowConnectionsByDroppableArea(
+    proposalWorkflowConnections: ProposalWorkflowConnection[]
+  ) {
+    const groupedProposalWorkflowConnections = this.getUniqueDroppableGroupIds(
+      proposalWorkflowConnections
+    ).map(item => ({
+      groupId: item.droppableGroupId,
+      parentGroupId:
+        proposalWorkflowConnections.find(
+          element => element.proposalStatusId === item.prevProposalStatusId
+        )?.droppableGroupId || null,
+      connections: proposalWorkflowConnections.filter(
+        proposalWorkflowConnection =>
+          proposalWorkflowConnection.droppableGroupId === item.droppableGroupId
+      ),
+    }));
+
+    return groupedProposalWorkflowConnections;
+  }
+
   @Authorized([Roles.USER_OFFICER])
-  async getProposalWorkflowConnections(agent: UserWithRole | null, id: number) {
+  async proposalWorkflowConnectionGroups(
+    agent: UserWithRole | null,
+    proposalWorkflowId: number
+  ) {
     const proposalWorkflowConnections = await this.dataSource.getProposalWorkflowConnections(
-      id
+      proposalWorkflowId
     );
 
-    return proposalWorkflowConnections;
+    const groupedProposalWorkflowConnections = this.groupProposalWorkflowConnectionsByDroppableArea(
+      proposalWorkflowConnections
+    );
+
+    return groupedProposalWorkflowConnections;
   }
 }

@@ -34,9 +34,11 @@ export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
     name: 'TEST_STATUS',
     description: 'Test status',
   },
-  2,
   null,
-  'PROPOSAL_SUBMITTED'
+  null,
+  'PROPOSAL_SUBMITTED',
+  'proposalWorkflowConnections_0',
+  null
 );
 
 export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnection(
@@ -51,7 +53,9 @@ export const anotherDummyProposalWorkflowConnection = new ProposalWorkflowConnec
   },
   null,
   1,
-  'PROPOSAL_REVIEWED'
+  'PROPOSAL_REVIEWED',
+  'proposalWorkflowConnections_0',
+  null
 );
 
 export class ProposalSettingsDataSourceMock
@@ -116,8 +120,8 @@ export class ProposalSettingsDataSourceMock
     proposalWorkflowId: number
   ): Promise<ProposalWorkflowConnection[]> {
     return [
-      anotherDummyProposalWorkflowConnection,
       dummyProposalWorkflowConnection,
+      anotherDummyProposalWorkflowConnection,
     ];
   }
 
@@ -136,14 +140,14 @@ export class ProposalSettingsDataSourceMock
 
   async updateProposalWorkflowStatuses(
     proposalWorkflowStatuses: ProposalWorkflowConnection[]
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalWorkflowConnection[]> {
+    return [dummyProposalWorkflowConnection];
   }
 
   async deleteProposalWorkflowStatus(
     proposalStatusId: number,
     proposalWorkflowId: number
-  ): Promise<boolean> {
-    return true;
+  ): Promise<ProposalWorkflowConnection> {
+    return dummyProposalWorkflowConnection;
   }
 }

@@ -22,6 +22,12 @@ export class AddProposalWorkflowStatusInput
   @Field(() => Int)
   public sortOrder: number;
 
+  @Field(() => String)
+  public droppableGroupId: string;
+
+  @Field(() => String, { nullable: true })
+  public parentDroppableGroupId: string | null;
+
   @Field(() => Int)
   public proposalStatusId: number;
 
