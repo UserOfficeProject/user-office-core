@@ -487,7 +487,7 @@ export default class ProposalSettingsMutations {
           allGroupWorkflowConnections.length > 0;
 
         if (connectionsLeftInTheGroup) {
-          if (isLastConnectionInGroupRemoved) {
+          if (isLastConnectionInGroupRemoved && result.nextProposalStatusId) {
             await this.dataSource.deleteProposalWorkflowStatus(
               result.prevProposalStatusId as number,
               result.proposalWorkflowId,
@@ -498,11 +498,19 @@ export default class ProposalSettingsMutations {
               allGroupWorkflowConnections[
                 allGroupWorkflowConnections.length - 1
               ];
+
             if (newLastParentConnection) {
               await this.insertNewAndUpdateExistingProposalWorkflowStatuses(
                 omit(newLastParentConnection, 'id')
               );
             }
+          } else if (!result.nextProposalStatusId) {
+            await this.updateProposalWorkflowConnectionStatuses(
+              allGroupWorkflowConnections,
+              false,
+              false,
+              false
+            );
           }
 
           if (

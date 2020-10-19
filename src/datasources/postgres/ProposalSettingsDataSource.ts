@@ -365,18 +365,26 @@ export default class PostgresProposalSettingsDataSource
       [database('proposal_workflow_connections').insert(dataToInsert)]
     );
 
-    return result.rows;
+    return result.rows as ProposalWorkflowConnectionRecord[];
   }
 
   async updateProposalWorkflowStatuses(
     proposalWorkflowStatusesInput: ProposalWorkflowConnection[]
   ): Promise<ProposalWorkflowConnection[]> {
-    const result = await this.upsertProposalWorkflowStatuses(
+    const connectionsResult = await this.upsertProposalWorkflowStatuses(
       proposalWorkflowStatusesInput
     );
 
-    if (result) {
-      return result;
+    if (connectionsResult) {
+      // NOTE: Return result as ProposalWorkflowConnection[] but do not care about name and description.
+      return connectionsResult.map(connection =>
+        this.createProposalWorkflowConnectionObject({
+          ...connection,
+          name: '',
+          description: '',
+          full_count: connectionsResult.length,
+        })
+      );
     } else {
       return [];
     }
