@@ -66,6 +66,7 @@ export async function resolveInstrumentReference(
 
   // dataSource.get can be null, even with non-null operator the compiler complains
   return (await (ctx.queries.instrument.byRef(
+    ctx.user,
     reference.id
   ) as unknown)) as Instrument;
 }

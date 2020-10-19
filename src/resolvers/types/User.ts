@@ -124,5 +124,8 @@ export async function resolveUserReference(...params: any): Promise<User> {
   const [reference, ctx]: [Pick<User, 'id'>, ResolverContext] = params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
-  return (await (ctx.queries.user.byRef(reference.id) as unknown)) as User;
+  return (await (ctx.queries.user.byRef(
+    ctx.user,
+    reference.id
+  ) as unknown)) as User;
 }
