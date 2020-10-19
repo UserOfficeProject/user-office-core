@@ -408,7 +408,11 @@ context('Template tests', () => {
     cy.contains(fileQuestion).click();
     cy.get("[data-cy='delete']").click();
 
-    cy.get('[data-cy=show-more-button]').click();
-    cy.contains('Delete topic').click();
+    cy.get('[data-cy=show-more-button]')
+      .last()
+      .click();
+    cy.get('[data-cy=add-topic-menu-item]')
+      .last()
+      .click();
   });
 });
