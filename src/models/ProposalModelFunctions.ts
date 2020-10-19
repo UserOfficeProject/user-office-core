@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import {
   BooleanConfig,
-  ConfigBase,
   DateConfig,
   EmbellishmentConfig,
   FieldConfigType,
@@ -215,12 +214,12 @@ defaultConfigs.set('SelectionFromOptionsConfig', {
 defaultConfigs.set('TextInputConfig', {
   multiline: false,
   isHtmlQuestion: false,
-  placeholder: '',
+  titlePlaceholder: '',
   ...baseDefaultConfig,
 });
 
 defaultConfigs.set('SampleBasisConfig', {
-  placeholder: 'Title',
+  titlePlaceholder: 'Title',
   ...baseDefaultConfig,
 });
 

@@ -15,7 +15,7 @@ export class ConfigBase {
 @ObjectType()
 export class SampleBasisConfig extends ConfigBase {
   @Field(() => String)
-  placeholder: string;
+  titlePlaceholder: string;
 }
 
 @ObjectType()

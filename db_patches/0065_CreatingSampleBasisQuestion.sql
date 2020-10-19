@@ -16,7 +16,7 @@ BEGIN
             'sample_basis',
             'SAMPLE_BASIS',
             'Sample basic information',
-            '{"placeholder":"Title","required":false,"small_label":"","tooltip":""}',
+            '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}',
             'sample_basis',
             2
         );
