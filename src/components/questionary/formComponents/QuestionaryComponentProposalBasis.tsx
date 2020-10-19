@@ -156,15 +156,26 @@ const proposalBasisPreSubmit = (answer: Answer) => async ({
       });
     }
   } else {
-    const result = await api.createProposal({
+    const createResult = await api.createProposal({
       callId: callId,
     });
 
-    if (result.createProposal.proposal) {
+    if (createResult.createProposal.proposal) {
+      const updateResult = await api.updateProposal({
+        id: createResult.createProposal.proposal.id,
+        title: title,
+        abstract: abstract,
+        users: users.map(user => user.id),
+        proposerId: proposer.id,
+      });
       dispatch({
         type: EventType.PROPOSAL_CREATED,
         payload: {
-          proposal: { ...proposal, ...result.createProposal.proposal },
+          proposal: {
+            ...proposal,
+            ...createResult.createProposal.proposal,
+            ...updateResult.updateProposal.proposal,
+          },
         },
       });
     }

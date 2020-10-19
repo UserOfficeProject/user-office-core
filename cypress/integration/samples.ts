@@ -38,7 +38,7 @@ context('Samples tests', () => {
 
     cy.get('[data-cy=submit]').click();
 
-    cy.contains('General information');
+    cy.contains('New sample');
 
     cy.visit('/');
 
@@ -167,7 +167,7 @@ context('Samples tests', () => {
 
     cy.contains('Edit proposal').click();
 
-    cy.contains('General information').click();
+    cy.contains('New proposal').click();
 
     cy.get('[data-cy=title] input')
       .clear()

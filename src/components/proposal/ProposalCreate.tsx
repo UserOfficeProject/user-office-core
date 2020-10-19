@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useParams } from 'react-router';
 
 import UOLoader from 'components/common/UOLoader';
-import { QuestionaryStep } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { BasicUserDetails, QuestionaryStep } from 'generated/sdk';
 import { useBlankQuestionaryStepsData } from 'hooks/questionary/useBlankQuestionaryStepsData';
 import { ProposalSubsetSumbission } from 'models/ProposalSubmissionState';
 
@@ -11,22 +12,15 @@ import ProposalContainer from './ProposalContainer';
 function createProposalStub(
   callId: number,
   templateId: number,
-  questionarySteps: QuestionaryStep[]
+  questionarySteps: QuestionaryStep[],
+  proposer: BasicUserDetails
 ): ProposalSubsetSumbission {
   return {
     id: 0,
     title: '',
     abstract: '',
     callId: callId,
-    proposer: {
-      id: 0,
-      created: 0,
-      firstname: '',
-      lastname: '',
-      organisation: '',
-      placeholder: false,
-      position: '',
-    },
+    proposer: proposer,
     questionary: {
       questionaryId: 0,
       templateId: templateId,
@@ -42,6 +36,7 @@ function createProposalStub(
 }
 
 export default function ProposalCreate() {
+  const { user } = useContext(UserContext);
   const { callId, templateId } = useParams<any>();
   const { questionarySteps } = useBlankQuestionaryStepsData(
     parseInt(templateId as string)
@@ -56,7 +51,8 @@ export default function ProposalCreate() {
       proposal={createProposalStub(
         parseInt(callId as string),
         parseInt(templateId as string),
-        questionarySteps
+        questionarySteps,
+        user
       )}
     />
   );
