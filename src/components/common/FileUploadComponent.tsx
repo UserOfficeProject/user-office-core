@@ -27,12 +27,10 @@ export function FileUploadComponent(props: {
   id?: string;
   fileType?: string;
   value: string[];
-  onChange: Function;
-  className?: string;
+  onChange: (files: FileMetaData[]) => any;
 }) {
   const [files, setFiles] = useState<FileMetaData[]>([]);
   const previousFiles = usePrevious(files);
-  const inputRef = useRef(null);
   const api = useDataApi();
 
   const classes = makeStyles(() => ({
@@ -47,17 +45,10 @@ export function FileUploadComponent(props: {
   }))();
 
   useEffect(() => {
-    if (previousFiles === undefined) {
-      return; // first call
-    }
-
-    if (previousFiles.length === files.length) {
-      return; // no files added or removed
-    }
-  }, [files, previousFiles]);
-
-  useEffect(() => {
-    if (props.value) {
+    if (
+      props.value.length !== 0 &&
+      previousFiles?.length !== props.value.length
+    ) {
       api()
         .getFileMetadata({ fileIds: props.value })
         .then(data => {
@@ -66,21 +57,18 @@ export function FileUploadComponent(props: {
     }
   }, [api, props.value]);
 
-  const dispatchChange = (): void => {
-    const inputElement: HTMLInputElement = inputRef.current!;
-    const event: any = {};
-    event.target = inputElement;
-    props.onChange(event);
-  };
-
   const onUploadComplete = (newFile: FileMetaData): void => {
-    setFiles(files.concat(newFile));
-    dispatchChange();
+    const newValue = files.concat(newFile);
+    setFiles(newValue);
+    props.onChange(newValue);
   };
 
   const onDeleteClicked = (deleteFile: FileMetaData): void => {
-    setFiles(files.filter(fileId => fileId.fileId !== deleteFile.fileId));
-    dispatchChange();
+    const newValue = files.filter(
+      fileId => fileId.fileId !== deleteFile.fileId
+    );
+    setFiles(newValue);
+    props.onChange(newValue);
   };
 
   const { fileType, id } = props;
@@ -98,14 +86,6 @@ export function FileUploadComponent(props: {
 
   return (
     <>
-      <input
-        type="hidden"
-        id={id}
-        name={id}
-        readOnly
-        value={files.map(metaData => metaData.fileId).join(',')}
-        ref={inputRef}
-      />
       {amountFilesInfo}
       <List component="ul" className={classes.questionariesList}>
         {files.map &&

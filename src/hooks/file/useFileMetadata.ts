@@ -20,5 +20,5 @@ export function useFileMetadata(fileIds: string[]) {
       });
   }, [api, fileIds]);
 
-  return { files };
+  return { files, setFiles };
 }
