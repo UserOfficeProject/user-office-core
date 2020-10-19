@@ -66,7 +66,7 @@ export default class TemplateMutations {
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
-          'General information',
+          'New proposal',
           'proposal_basis'
         );
         break;
@@ -74,7 +74,7 @@ export default class TemplateMutations {
         await this.createInitialTopic(
           newTemplate.templateId,
           0,
-          'General information',
+          'New sample',
           'sample_basis'
         );
         break;
