@@ -46,7 +46,8 @@ export default class ProposalQueries {
     }
   }
 
-  byRef(id: number) {
+  @Authorized()
+  async byRef(agent: UserWithRole | null, id: number) {
     return this.dataSource.get(id);
   }
 

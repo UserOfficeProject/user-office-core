@@ -201,6 +201,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
           return false;
         }
         for await (const file of files) {
+          // ignore everything other than sql files
+          if (!/\.sql$/i.test(file)) {
+            continue;
+          }
+
           const contents = fs.readFileSync(`${directoryPath}/${file}`, 'utf8');
           await database
             .raw(contents)

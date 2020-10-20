@@ -86,5 +86,8 @@ export async function resolveCallReference(...params: any): Promise<Call> {
   const [reference, ctx]: [Pick<Call, 'id'>, ResolverContext] = params;
 
   // dataSource.get can be null, even with non-null operator the compiler complains
-  return (await (ctx.queries.call.byRef(reference.id) as unknown)) as Call;
+  return (await (ctx.queries.call.byRef(
+    ctx.user,
+    reference.id
+  ) as unknown)) as Call;
 }
