@@ -1562,9 +1562,10 @@ export type SamplesFilter = {
 };
 
 export enum SampleStatus {
-  NONE = 'NONE',
-  SAFE = 'SAFE',
-  UNSAFE = 'UNSAFE'
+  PENDING_EVALUTATION = 'PENDING_EVALUTATION',
+  LOW_RISK = 'LOW_RISK',
+  ELEVATED_RISK = 'ELEVATED_RISK',
+  HIGH_RISK = 'HIGH_RISK'
 }
 
 export type SelectionFromOptionsConfig = {
