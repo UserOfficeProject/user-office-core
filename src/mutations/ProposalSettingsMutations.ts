@@ -8,6 +8,7 @@ import {
   addProposalWorkflowStatusValidationSchema,
   moveProposalWorkflowStatusValidationSchema,
   deleteProposalWorkflowStatusValidationSchema,
+  addNextStatusEventsValidationSchema,
 } from '@esss-swap/duo-validation';
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -377,8 +378,7 @@ export default class ProposalSettingsMutations {
       .then(result => result);
   }
 
-  // TODO: Update validation and uncomment this!
-  // @ValidateArgs(addProposalWorkflowStatusValidationSchema)
+  @ValidateArgs(addProposalWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addProposalWorkflowStatus(
     agent: UserWithRole | null,
@@ -402,6 +402,7 @@ export default class ProposalSettingsMutations {
     }
   }
 
+  @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addNextStatusEventsToConnection(
     agent: UserWithRole | null,
