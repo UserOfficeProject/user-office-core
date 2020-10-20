@@ -110,7 +110,7 @@ export function SampleDeclarationContainer(props: {
             payload: { sample: initialState.sample },
           });
         } else {
-          api()
+          await api()
             .getSample({ sampleId: sampleState.sample.id }) // or load blankQuestionarySteps if sample is null
             .then(data => {
               if (data.sample && data.sample.questionary.steps) {
