@@ -432,24 +432,36 @@ export default class PostgresProposalSettingsDataSource
     );
   }
 
+  private createNextStatusEventObject(nextStatusEvent: NextStatusEventRecord) {
+    return new NextStatusEvent(
+      nextStatusEvent.next_status_event_id,
+      nextStatusEvent.proposal_workflow_connection_id,
+      nextStatusEvent.next_status_event
+    );
+  }
+
   async addNextStatusEventsToConnection(
     proposalWorkflowConnectionId: number,
     nextStatusEvents: string[]
-  ): Promise<boolean> {
+  ): Promise<NextStatusEvent[]> {
     const eventsToInsert = nextStatusEvents.map(nextStatusEvent => ({
       proposal_workflow_connection_id: proposalWorkflowConnectionId,
       next_status_event: nextStatusEvent,
     }));
 
     const result = await database.raw(
-      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING;',
+      '? ON CONFLICT ON CONSTRAINT unique_connection_event DO NOTHING RETURNING *;',
       [database('next_status_events').insert(eventsToInsert)]
     );
 
-    if (result.rows) {
-      return true;
+    const nextStatusEventsResult: NextStatusEventRecord[] = result.rows;
+
+    if (nextStatusEventsResult) {
+      return nextStatusEventsResult.map(nextStatusEventResult =>
+        this.createNextStatusEventObject(nextStatusEventResult)
+      );
     } else {
-      return false;
+      return [];
     }
   }
 
@@ -461,13 +473,8 @@ export default class PostgresProposalSettingsDataSource
       .from('next_status_events')
       .where('proposal_workflow_connection_id', proposalWorkflowConnectionId)
       .then((nextStatusEvents: NextStatusEventRecord[]) => {
-        return nextStatusEvents.map(
-          nextStatusEvent =>
-            new NextStatusEvent(
-              nextStatusEvent.next_status_event_id,
-              nextStatusEvent.proposal_workflow_connection_id,
-              nextStatusEvent.next_status_event
-            )
+        return nextStatusEvents.map(nextStatusEvent =>
+          this.createNextStatusEventObject(nextStatusEvent)
         );
       });
   }

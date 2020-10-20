@@ -159,8 +159,8 @@ export class ProposalSettingsDataSourceMock
   async addNextStatusEventsToConnection(
     proposalWorkflowConnectionId: number,
     nextStatusEvents: string[]
-  ): Promise<boolean> {
-    return true;
+  ): Promise<NextStatusEvent[]> {
+    return [dummyNextStatusEvent];
   }
 
   async getNextStatusEventsByConnectionId(

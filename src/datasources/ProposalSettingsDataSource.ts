@@ -49,7 +49,7 @@ export interface ProposalSettingsDataSource {
   addNextStatusEventsToConnection(
     proposalWorkflowConnectionId: number,
     nextStatusEvents: string[]
-  ): Promise<boolean>;
+  ): Promise<NextStatusEvent[]>;
   getNextStatusEventsByConnectionId(
     proposalWorkflowConnectionId: number
   ): Promise<NextStatusEvent[]>;

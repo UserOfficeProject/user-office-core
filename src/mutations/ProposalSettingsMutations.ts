@@ -12,6 +12,7 @@ import {
 
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
+import { NextStatusEvent } from '../models/NextStatusEvent';
 import { ProposalStatus } from '../models/ProposalStatus';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
@@ -405,7 +406,7 @@ export default class ProposalSettingsMutations {
   async addNextStatusEventsToConnection(
     agent: UserWithRole | null,
     args: AddNextStatusEventsToConnectionInput
-  ): Promise<boolean | Rejection> {
+  ): Promise<NextStatusEvent[] | Rejection> {
     return this.dataSource
       .addNextStatusEventsToConnection(
         args.proposalWorkflowConnectionId,

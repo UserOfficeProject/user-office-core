@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { SuccessResponseWrap } from '../../types/CommonWrappers';
+import { ProposalNextStatusEventResponseWrap } from '../../types/CommonWrappers';
 import { wrapResponse } from '../../wrapResponse';
 
 @InputType()
@@ -23,7 +23,7 @@ export class AddNextStatusEventsToConnectionInput {
 
 @Resolver()
 export class AddNextStatusEventsToConnectionMutation {
-  @Mutation(() => SuccessResponseWrap)
+  @Mutation(() => ProposalNextStatusEventResponseWrap)
   async addNextStatusEventsToConnection(
     @Ctx() context: ResolverContext,
     @Arg('addNextStatusEventsToConnectionInput')
@@ -34,7 +34,7 @@ export class AddNextStatusEventsToConnectionMutation {
         context.user,
         addNextStatusEventsToConnectionInput
       ),
-      SuccessResponseWrap
+      ProposalNextStatusEventResponseWrap
     );
   }
 }
