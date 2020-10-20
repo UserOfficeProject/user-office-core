@@ -1,5 +1,6 @@
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Authorized } from '../decorators';
+import { Event } from '../events/event.enum';
 import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -101,5 +102,15 @@ export default class ProposalSettingsQueries {
     );
 
     return nextStatusEvents;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getAllProposalEvents(agent: UserWithRole | null) {
+    const allEventsArray = Object.values(Event);
+    const allProposalEvents = allEventsArray.filter(eventItem =>
+      eventItem.startsWith('PROPOSAL_')
+    );
+
+    return allProposalEvents;
   }
 }
