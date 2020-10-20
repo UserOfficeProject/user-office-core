@@ -8,6 +8,11 @@ mutation addNextStatusEventsToConnection(
       nextStatusEvents: $nextStatusEvents
     }
   ) {
+    nextStatusEvents {
+      nextStatusEventId
+      proposalWorkflowConnectionId
+      nextStatusEvent
+    }
     error
   }
 }

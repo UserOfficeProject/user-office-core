@@ -242,7 +242,7 @@ export function usePersistProposalWorkflowEditorModel() {
                 type: EventType.NEXT_STATUS_EVENTS_ADDED,
                 payload: {
                   workflowConnection,
-                  nextStatusEvents,
+                  nextStatusEvents: result.nextStatusEvents,
                 },
               });
             }

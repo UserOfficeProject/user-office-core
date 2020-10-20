@@ -374,7 +374,7 @@ export type Mutation = {
   submitInstrument: SuccessResponseWrap;
   administrationProposal: ProposalResponseWrap;
   updateProposal: ProposalResponseWrap;
-  addNextStatusEventsToConnection: SuccessResponseWrap;
+  addNextStatusEventsToConnection: ProposalNextStatusEventResponseWrap;
   addProposalWorkflowStatus: ProposalWorkflowConnectionResponseWrap;
   createProposalStatus: ProposalStatusResponseWrap;
   createProposalWorkflow: ProposalWorkflowResponseWrap;
@@ -1085,6 +1085,12 @@ export enum ProposalEndStatus {
   RESERVED = 'RESERVED',
   REJECTED = 'REJECTED'
 }
+
+export type ProposalNextStatusEventResponseWrap = {
+  __typename?: 'ProposalNextStatusEventResponseWrap';
+  error: Maybe<Scalars['String']>;
+  nextStatusEvents: Maybe<Array<NextStatusEvent>>;
+};
 
 export type ProposalResponseWrap = {
   __typename?: 'ProposalResponseWrap';
@@ -3354,8 +3360,12 @@ export type AddNextStatusEventsToConnectionMutationVariables = Exact<{
 export type AddNextStatusEventsToConnectionMutation = (
   { __typename?: 'Mutation' }
   & { addNextStatusEventsToConnection: (
-    { __typename?: 'SuccessResponseWrap' }
-    & Pick<SuccessResponseWrap, 'error'>
+    { __typename?: 'ProposalNextStatusEventResponseWrap' }
+    & Pick<ProposalNextStatusEventResponseWrap, 'error'>
+    & { nextStatusEvents: Maybe<Array<(
+      { __typename?: 'NextStatusEvent' }
+      & Pick<NextStatusEvent, 'nextStatusEventId' | 'proposalWorkflowConnectionId' | 'nextStatusEvent'>
+    )>> }
   ) }
 );
 
@@ -5780,6 +5790,11 @@ export const UpdateSampleTitleDocument = gql`
 export const AddNextStatusEventsToConnectionDocument = gql`
     mutation addNextStatusEventsToConnection($proposalWorkflowConnectionId: Int!, $nextStatusEvents: [String!]!) {
   addNextStatusEventsToConnection(addNextStatusEventsToConnectionInput: {proposalWorkflowConnectionId: $proposalWorkflowConnectionId, nextStatusEvents: $nextStatusEvents}) {
+    nextStatusEvents {
+      nextStatusEventId
+      proposalWorkflowConnectionId
+      nextStatusEvent
+    }
     error
   }
 }

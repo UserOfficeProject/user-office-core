@@ -3,6 +3,7 @@ import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router';
 
 import {
+  NextStatusEvent,
   ProposalWorkflow,
   ProposalWorkflowConnection,
   ProposalWorkflowConnectionGroup,
@@ -115,29 +116,22 @@ const ProposalWorkflowEditorModel = (
     return workflowConnectionGroups;
   };
 
-  const findGroupAndAddNextStatusEventsToConnection = (
+  const addNextStatusEventsToConnection = (
     workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
     workflowConnection: ProposalWorkflowConnection,
-    nextStatusEvents: string[]
+    nextStatusEvents: NextStatusEvent[]
   ) => {
-    const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
+    const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
       workflowConnectionGroups,
       workflowConnection.droppableGroupId
     );
 
-    const updatedConnection = workflowConnectionGroups[
-      groupIndexWhereStatusShouldBeAdded
+    const connectionToUpdate = workflowConnectionGroups[
+      groupIndexWhereConnectionShouldBeUpdated
     ].connections.find(connection => connection.id === workflowConnection.id);
 
-    if (updatedConnection) {
-      updatedConnection.nextStatusEvents = nextStatusEvents.map(
-        (nextStatusEvent, index) => ({
-          nextStatusEvent,
-          // FIXME: This should be real id not index!
-          nextStatusEventId: index,
-          proposalWorkflowConnectionId: workflowConnection.id,
-        })
-      );
+    if (connectionToUpdate) {
+      connectionToUpdate.nextStatusEvents = nextStatusEvents;
     }
 
     return workflowConnectionGroups;
@@ -205,7 +199,7 @@ const ProposalWorkflowEditorModel = (
           const { proposalWorkflowConnectionGroups } = draft;
           const { workflowConnection, nextStatusEvents } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = findGroupAndAddNextStatusEventsToConnection(
+          draft.proposalWorkflowConnectionGroups = addNextStatusEventsToConnection(
             proposalWorkflowConnectionGroups,
             workflowConnection,
             nextStatusEvents
