@@ -24,7 +24,11 @@ export default function createHandler({
   // don't try to initialize during testing
   // causes infinite loop
   if (process.env.NODE_ENV !== 'test') {
-    rabbitMQ.setup();
+    rabbitMQ.setup({
+      hostname: process.env.RABBITMQ_HOSTNAME,
+      username: process.env.RABBITMQ_USERNAME,
+      password: process.env.RABBITMQ_PASSWORD,
+    });
   }
 
   return async function messageBrokerHandler(event: ApplicationEvent) {
