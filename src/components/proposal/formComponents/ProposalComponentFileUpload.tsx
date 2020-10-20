@@ -1,6 +1,6 @@
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import React, { ChangeEvent, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { FileMetaData } from 'models/FileUpload';
 
