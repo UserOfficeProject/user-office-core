@@ -20,9 +20,10 @@ const notificationWithClientLog = async (
   });
 
   if (error) {
+    //
     await getSdk(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar)
+      new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar, true)
     ).addClientLog({ error });
   }
 };
@@ -30,7 +31,8 @@ const notificationWithClientLog = async (
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
-    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar']
+    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
+    private skipErrorReport?: boolean
   ) {
     super(endpoint);
   }
@@ -40,6 +42,13 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     variables?: Variables
   ): Promise<T> {
     return super.request(query, variables).catch(error => {
+      // if the `notificationWithClientLog` fails
+      // and it fails while reporting an error, it can
+      // easily cause an infinite loop
+      if (this.skipErrorReport) {
+        throw error;
+      }
+
       if (error.response.error.includes('ECONNREFUSED')) {
         notificationWithClientLog(this.enqueueSnackbar, 'Connection problem!');
       } else {
@@ -142,5 +151,8 @@ export function useDataApi() {
 export function useUnauthorizedApi() {
   const { enqueueSnackbar } = useSnackbar();
 
-  return getSdk(new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar));
+  return useCallback(
+    () => getSdk(new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar)),
+    [enqueueSnackbar]
+  );
 }
