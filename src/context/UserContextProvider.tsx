@@ -141,10 +141,12 @@ export const UserContextProvider: React.FC = (props): JSX.Element => {
 
   checkLocalStorage(dispatch, state);
   useEffect(() => {
+    const hostname = window.location.hostname;
+
     setCookie('token', state.token, {
       path: '/',
       secure: false,
-      domain: `.${window.location.hostname}`,
+      domain: hostname === 'localhost' ? hostname : `.${hostname}`,
     });
   }, [setCookie, state]);
 
